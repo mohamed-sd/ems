@@ -12,6 +12,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/tenant_scope.php';   // نطاقُ الكيانِ من السياقِ لا من رقمٍ صلب
 require_once __DIR__ . '/../includes/screen_contract.php';
 require_once __DIR__ . '/../app/Services/Security/PermissionExplainService.php';
 require_once __DIR__ . '/../app/Services/Security/PermissionReviewService.php';
@@ -28,7 +29,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id     = intval($_SESSION['user']['company_id'] ?? 0);
 $uid            = intval($_SESSION['user']['id'] ?? 0);
 if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php"); exit(); }
-if ($is_super_admin && $company_id <= 0) { $company_id = 4; }
+$company_id = ems_scope_company($conn);
 
 $MODULE_CODE = 'admin/sec_governance.php';
 $can_view = $is_super_admin; $can_edit = $is_super_admin;

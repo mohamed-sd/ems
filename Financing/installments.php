@@ -39,18 +39,47 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['pay_inst'])) 
     else {
         $r = mysqli_query($conn, "SELECT i.inst_id, i.op_id, i.amount_total FROM financing_installments i
                                   JOIN financing_operations o ON o.op_id = i.op_id AND o.company_id = $company_id
-                                  WHERE i.inst_id = $iid AND i.state IN ('due','pending','Due','Pending')");
+                                  /* ⇐ INJ-0334 · التعدادُ الحيّ scheduled/due/paid/overdue/rescheduled.
+                                       فـ`pending` و`Due` و`Pending` **لا وجودَ لها**: لم يكن يُسدَّد
+                                       إلا ما حالتُه `due` — و**١١١ قسطًا متأخرًا (`overdue`) لا سبيلَ
+                                       إلى سدادِه أصلًا**. والمسموحُ هو غيرُ المسدَّد: مجدولٌ أو
+                                       مستحقٌّ أو متأخر — ولا يُسدَّد `paid` مرتين ولا `rescheduled`. */
+                                  WHERE i.inst_id = $iid AND i.state IN ('scheduled','due','overdue')");
         if ($r && ($inst = mysqli_fetch_assoc($r))) {
-            mysqli_begin_transaction($conn);
-            $ok1 = mysqli_query($conn, "UPDATE financing_installments SET state='paid', paid_date=CURDATE(),
-                                        payment_ref='" . mysqli_real_escape_string($conn, $ref) . "' WHERE inst_id = $iid");
-            // الرصيدُ محسوبٌ من الدفتر: القائمُ = رأسُ المال − Σ المسدَّد أصلًا
-            $ok2 = mysqli_query($conn, "UPDATE financing_operations o SET o.outstanding_balance =
-                    GREATEST(0, o.capital - COALESCE((SELECT SUM(amount_principal) FROM financing_installments
-                                                      WHERE op_id = o.op_id AND state = 'paid'), 0))
-                    WHERE o.op_id = " . intval($inst['op_id']));
-            if ($ok1 && $ok2) {
-                mysqli_commit($conn);
+            /* ══ INJ-0046 · «لكل بيانٍ موضعٌ واحدٌ يُنشأ فيه ويُعدَّل» (CS-05) ═══════
+                 كانت الشاشةُ تنفّذ السدادَ بـSQL خامٍّ ولا تنادي
+                 `FinancingService::payInstallment` — **وهي المنفّذُ المعتمد**.
+                 فينقص عن الصفِّ ما تكتبه الخدمةُ: `fx_rate_at_payment` و
+                 `functional_equivalent`؛ **ولا تنتقل العمليةُ إلى `settled`**
+                 عند بلوغِ الرصيدِ صفرًا. ومنطقُ الرصيدِ نفسُه كان مختلفًا:
+                 الشاشةُ تحسب (رأسُ المال − Σ الأصلِ المسدَّد) والخدمةُ تنقص
+                 `amount_total` من الرصيدِ القائم — **رقمان لحقيقةٍ واحدة**.
+               ◆ فصار المنفِّذُ واحدًا، والشاشةُ تُمرّر سعرَ الصرفِ ومعادِلَه من
+                 `includes/fx.php` — «الماليةُ تُسعّر يوميًّا» ولا يُخترع سعر. */
+            require_once dirname(__DIR__) . '/app/Services/Financing/FinancingService.php';
+            require_once __DIR__ . '/../includes/fx.php';
+            $__fx = null; $__eq = null;
+            $__cur = '';
+            $__cq = mysqli_query($conn, 'SELECT o.currency, i.seq_no, i.amount_total
+                                           FROM financing_installments i
+                                           JOIN financing_operations o ON o.op_id = i.op_id
+                                          WHERE i.inst_id = ' . (int) $iid . ' LIMIT 1');
+            $__ci = $__cq ? mysqli_fetch_assoc($__cq) : null;
+            if ($__ci) {
+                $__cur = (string) $__ci['currency'];
+                if (function_exists('ems_fx_rate') && $__cur !== '') {
+                    $__r = ems_fx_rate($__cur, date('Y-m-d'));
+                    if ($__r !== null && $__r > 0) {
+                        $__fx = (float) $__r;
+                        $__eq = round(((float) $__ci['amount_total']) * $__fx, 2);
+                    }
+                }
+            }
+            $__seq = $__ci ? (int) $__ci['seq_no'] : 0;
+            $__res = \App\Services\Financing\FinancingService::payInstallment(
+                $conn, $company_id, (int) $inst['op_id'], $__seq,
+                date('Y-m-d'), $ref, $__fx, $__eq);
+            if (!empty($__res['ok'])) {
                 /* ── INJ-0052 · «كلُّ سدادٍ يترك سطرَ تدقيق» ───────────────────────
                      الكتابةُ مباشرةٌ لا عبر البوابةِ المُدقِّقة، فيُنادى الموصِّلُ
                      صراحةً بعد **نجاحِ المعاملةِ** لا قبلَها — فأثرٌ لسدادٍ أُلغي
@@ -60,9 +89,15 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['pay_inst'])) 
                     array('state' => 'due', 'payment_ref' => null, 'paid_date' => null),
                     array('state' => 'paid', 'payment_ref' => $ref, 'paid_date' => date('Y-m-d')),
                     array('company_id' => $company_id, 'user_id' => $uid));
-                $msg = "سُدّد القسطُ #$iid بمرجع $ref — والرصيدُ أُعيد حسابُه";
+                /* والرسالةُ من الخدمةِ — فما تقوله الشاشةُ هو ما فعله المنفِّذ */
+                $__st = mysqli_query($conn, 'SELECT state, outstanding_balance FROM financing_operations
+                                              WHERE op_id = ' . (int) $inst['op_id'] . ' LIMIT 1');
+                $__op = $__st ? mysqli_fetch_assoc($__st) : null;
+                $msg = 'سُدّد القسطُ #' . $iid . ' بمرجع ' . $ref . ' — ' . $__res['reason']
+                     . ($__op ? (' · الرصيدُ ' . rtrim(rtrim((string) $__op['outstanding_balance'], '0'), '.')
+                                 . ' وحالةُ العملية «' . $__op['state'] . '»') : '');
             }
-            else { mysqli_rollback($conn); $msg = 'فشلت المعاملةُ فأُلغيت: ' . mysqli_error($conn); }
+            else { $msg = 'تعذّر السداد: ' . (string) $__res['reason'] . ' (' . (int) $__res['code'] . ')'; }
         } else { $msg = 'قسطٌ غيرُ مستحقٍّ أو مسدَّدٌ من قبل (409)'; }
     }
 }

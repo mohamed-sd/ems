@@ -13,6 +13,7 @@ session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
 
+require_once __DIR__ . '/../includes/tenant_scope.php';   // نطاقُ الكيانِ من السياقِ لا من رقمٍ صلب
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
 // كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
 // **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
@@ -28,7 +29,7 @@ use App\Core\OwnershipDomainGuard;
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $role = strval($_SESSION['user']['role'] ?? '');
 $uid = intval($_SESSION['user']['id'] ?? 0);
-$co = $company_id ?: 4;
+$co = ems_scope_company($conn);
 
 // بوابة المجال المقيَّد — fail-closed: منحة فردية أو لا شيء (السوبر خارجها)
 $granted = ($role === '-1');

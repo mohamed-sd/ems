@@ -34,11 +34,71 @@ class DepreciationService
      * قسطُ شهرٍ لأصلٍ — أو سببُ عدم الاحتساب.
      * @return array{ok:bool,code:int,reason:string,amount:float,basis:array}
      */
-    public static function computeFor(array $asset, $period)
+    /**
+     * ⇐ INJ-0033 · **ملفُّ الإهلاكِ المعتمدُ هو المصدر** — لا حقولُ الأصلِ المكتوبةُ بيد.
+     * ═══════════════════════════════════════════════════════════════════════
+     * ── ما كان ────────────────────────────────────────────────────────────
+     * `fleet_depreciation_profile` (٣٣ ملفًّا معتمدًا بطريقةٍ وعمرٍ ونسبةِ خردة)
+     * **لا يقرؤه محرّكُ الإهلاكِ إطلاقًا**: قارئوه شاشتُه وسجلُّ Excel وخريطةُ
+     * الأيقونات. والمحرّكُ يحسب من `fin_assets.useful_life_months` و
+     * `salvage_value` — حقلين يُكتبان بيدٍ لكلِّ أصل. **فسياسةٌ تُعتمد بتوقيعين
+     * ولا تحكم رقمًا واحدًا في الدفاتر.**
+     *
+     * ── والقاعدة ──────────────────────────────────────────────────────────
+     * «لكل بيانٍ موضعٌ واحدٌ يُنشأ فيه ويُعدَّل، وكلُّ عرضٍ آخرَ له قراءةٌ لا نسخة».
+     * فالعمرُ والخردةُ والطريقةُ **من الملفِّ المعتمد**، وحقلُ الأصلِ يبقى
+     * للموروثِ ولِما لا ملفَّ له — **معلَنًا** في الأساسِ لا مخفيًّا.
+     *
+     * ◆ والمطابقةُ بالأدقِّ فالأعمّ: (طرازٌ) ثم (ماركةٌ) ثم (فئةٌ) — وأولُ مطابقةٍ
+     *   معتمدةٍ غيرُ محذوفةٍ تحكم. ولا يُخمَّن: ما لا ملفَّ له يُعلَن ويُردّ.
+     *
+     * @param mysqli|null $conn لقراءةِ الملفِّ — و`null` يُبقي السلوكَ القديمَ للمعاينة
+     * @return array|null الملفُّ المعتمدُ أو null
+     */
+    public static function profileFor($conn, $companyId, array $asset)
+    {
+        if (!($conn instanceof \mysqli)) { return null; }
+        $companyId = (int) $companyId;
+        $cat  = (string) ($asset['category'] ?? '');
+        $eq   = isset($asset['equipment_id']) ? (int) $asset['equipment_id'] : 0;
+        $best = null;
+        $st = $conn->prepare(
+            "SELECT id, code, method, useful_life, salvage_pct, asset_category, brand, model_id
+               FROM fleet_depreciation_profile
+              WHERE company_id = ? AND state = 'approved' AND COALESCE(is_deleted,0) = 0");
+        if (!$st) { return null; }
+        $st->bind_param('i', $companyId);
+        $st->execute();
+        $rs = $st->get_result();
+        $rows = array();
+        while ($rs && ($x = $rs->fetch_assoc())) { $rows[] = $x; }
+        $st->close();
+        /* الأدقُّ أولًا: طرازٌ مطابقٌ ⇐ ثم فئةٌ مطابقة ⇐ ثم ملفٌّ عامٌّ بلا فئة */
+        foreach (array('model', 'category', 'generic') as $tier) {
+            foreach ($rows as $p) {
+                if ($tier === 'model'    && $eq > 0 && (int) $p['model_id'] === $eq) { $best = $p; break 2; }
+                if ($tier === 'category' && $cat !== '' && (string) $p['asset_category'] === $cat) { $best = $p; break 2; }
+                if ($tier === 'generic'  && (string) $p['asset_category'] === '') { $best = $p; break 2; }
+            }
+        }
+        return $best;
+    }
+
+    public static function computeFor(array $asset, $period, array $profile = null)
     {
         $out = array('ok' => false, 'code' => 0, 'reason' => '', 'amount' => 0.0, 'basis' => array());
         if (!preg_match('/^\d{4}-\d{2}$/', (string) $period)) {
             $out['code'] = 422; $out['reason'] = 'الفترةُ بصيغة YYYY-MM'; return $out;
+        }
+        /* ◆ INJ-0033: الملفُّ يعلو حقولَ الأصل — والمصدرُ يُعلَن في الأساس */
+        $srcOfTerms = 'asset';
+        if ($profile !== null) {
+            $srcOfTerms = 'profile:' . (string) $profile['code'];
+            $pl = (int) round((float) $profile['useful_life']);
+            if ($pl > 0) { $asset['useful_life_months'] = $pl; }
+            $pct = (float) $profile['salvage_pct'];
+            if ($pct > 0) { $asset['salvage_value'] = round(((float) $asset['acquisition_cost']) * $pct, 2); }
+            if ((string) $profile['method'] !== '') { $asset['method'] = (string) $profile['method']; }
         }
         $life = (int) $asset['useful_life_months'];
         if ($life <= 0) {
@@ -97,6 +157,8 @@ class DepreciationService
             'accumulated_before' => $acc, 'remaining_before' => $remaining,
             'clamped' => (round($amount, 2) !== round($monthly, 2)),
             'method' => (string) $asset['method'],
+            /* INJ-0033: من أينَ جاءت الشروط — فالقارئُ يعرف أَمِن ملفٍّ معتمدٍ أم من حقلٍ يدويّ */
+            'terms_source' => $srcOfTerms,
         );
         $out['ok'] = true; $out['code'] = 200; $out['amount'] = round($amount, 2);
         return $out;
@@ -191,7 +253,19 @@ class DepreciationService
             return $out;
         }
 
-        $calc = self::computeFor($asset, $period);
+        /* ══ INJ-0033 · «**وأصلٌ بلا ملفٍّ معتمدٍ يُرفض احتسابُه بسببٍ محكوم**» ═══
+             الترحيلُ يكتب في الدفاتر، فشروطُه من سياسةٍ معتمَدةٍ بتوقيعين لا من
+             حقلٍ يكتبه من يُدخل الأصل. والمعاينةُ (`computeFor` مباشرةً) تبقى
+             حرةً — فالمنعُ عند **الأثر** لا عند النظر. */
+        $profile = self::profileFor($conn, $companyId, $asset);
+        if ($profile === null) {
+            $out['code'] = 422;
+            $out['reason'] = 'DEP-422: لا ملفَّ إهلاكٍ معتمدًا لهذا الأصل (فئة «'
+                . (string) ($asset['category'] ?? '—') . '») — '
+                . 'اعتمدْ سياسةً في «سياسات الإهلاك المعتمدة» قبل الترحيل';
+            return $out;
+        }
+        $calc = self::computeFor($asset, $period, $profile);
         if (!$calc['ok']) { return array_merge($out, array('code' => $calc['code'], 'reason' => $calc['reason'])); }
         $amount = $calc['amount'];
         if ($amount <= 0) { $out['code'] = 422; $out['reason'] = 'قسطٌ صفريّ'; return $out; }

@@ -88,15 +88,15 @@ if ($__pcReject['run'] && $__pcReject['ok']) {
     if (!empty($res['ok'])) { ems_pc_idem_mark($conn, $__pcReject['idem'], $__pcReject['code'], 'unit_effects#' . (int) $__pcReject['data']['pe']); }
 }
 
-$rows = array();
-$sql = "SELECT d.id, d.due_no, d.party_kind, d.beneficiary_ref, d.amount, d.currency,
-               d.state, d.source_kind, d.created_at
-        FROM fin_dues d
-        WHERE d.company_id = $company_id
-          AND d.state IN ('proposed','pending_gate','awaiting_approval')
-        ORDER BY d.created_at LIMIT 200";
-$res = mysqli_query($conn, $sql);
-if ($res) { while ($x = mysqli_fetch_assoc($res)) $rows[] = $x; }
+/* ══ INJ-0037 — الطابورُ من الخدمةِ المالكةِ لا من استعلامٍ في الشاشة ══════
+     كانت الشاشةُ تسأل عن `due_no`/`party_kind`/`beneficiary_ref`/`state`/
+     `source_kind` — **وخمستُها لا وجودَ لها في `fin_dues`**. فيرسب الاستعلامُ،
+     ويبتلع `if ($res)` رسوبَه، فتُعلن الشاشةُ «لا أثرَ ينتظر» وفي القاعدةِ
+     **عشرون صفًّا معلَّقًا**. والآنَ الحكمُ في `gateQueue`، و**الرسوبُ يظهر
+     برمزٍ أحمرَ لا يلبس ثوبَ الخلوّ**. */
+$queue     = \App\Services\Policy\UnitJourneyService::gateQueue($conn, $company_id);
+$rows      = $queue['rows'];
+$queueFail = !$queue['ok'] ? $queue['error'] : '';
 
 $page_title = 'بوابة الاستحقاق المالي';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
@@ -112,7 +112,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-door-closed';
 $header_title_html = htmlspecialchars('بوابةُ الاستحقاق المالي', ENT_QUOTES, 'UTF-8');
-ob_start(); ?><span class="badge" style="background:#fd7e14;font-size:.95em">بانتظار البوابة: <?= count($rows) ?></span><?php
+ob_start(); ?><span class="badge" style="background:#fd7e14;font-size:.95em">بانتظار البوابة: <?= $queueFail === '' ? count($rows) : '—' ?></span><?php
 $header_actions = array(array('raw' => trim((string) ob_get_clean())));
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
@@ -122,6 +122,10 @@ include __DIR__ . '/../includes/page_header.php';
     <div class="alert <?= (mb_strpos($msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
       <?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?>
     </div>
+  <?php endif; ?>
+  <?php if ($queueFail !== ''): ?>
+    <!-- INJ-0037 · «صفرٌ لأنَّ الاستعلامَ رسب» لا يُعرض أبدًا كـ«صفرٌ لأنَّ لا عمل» -->
+    <div class="alert alert-danger"><?= htmlspecialchars($queueFail, ENT_QUOTES, 'UTF-8') ?></div>
   <?php endif; ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>رقم المحضر</th><th>الطرف</th><th>المبلغ</th><th>المصدر</th><th>الحالة</th><th>منذ</th><th>إجراء</th>
@@ -174,14 +178,22 @@ include __DIR__ . '/../includes/page_header.php';
     <?php endif; ?>
     <?php foreach ($rows as $r): ?>
       <tr>
-        <td><?= htmlspecialchars($r['due_no'] ?? ('#' . $r['id']), ENT_QUOTES, 'UTF-8') ?></td>
-        <td><?= htmlspecialchars($r['party_kind'] . ' / ' . $r['beneficiary_ref'], ENT_QUOTES, 'UTF-8') ?></td>
-        <td><?= number_format(floatval($r['amount']), 2) ?> <?= htmlspecialchars($r['currency'], ENT_QUOTES, 'UTF-8') ?></td>
-        <td><?= htmlspecialchars($r['source_kind'], ENT_QUOTES, 'UTF-8') ?></td>
-        <td><?= htmlspecialchars($r['state'], ENT_QUOTES, 'UTF-8') ?></td>
-        <td><?= htmlspecialchars(substr($r['created_at'], 0, 10), ENT_QUOTES, 'UTF-8') ?></td>
+        <!-- INJ-0037 · الأعمدةُ من الجدولِ الحقيقيّ: لا `due_no` ولا `party_kind`
+             ولا `beneficiary_ref` ولا `state` ولا `source_kind` في `fin_dues`. -->
+        <td>#<?= (int) $r['id'] ?><?= $r['period_ref'] !== '' ? ' · ' . htmlspecialchars((string) $r['period_ref'], ENT_QUOTES, 'UTF-8') : '' ?></td>
+        <td><?= htmlspecialchars($r['party_type'] . ' / ' . $r['party_ref'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= number_format(floatval($r['amount']), 2) ?> <?= htmlspecialchars((string) $r['currency'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $r['source_doc_type'] . ((int) $r['source_doc_id'] ? ' #' . (int) $r['source_doc_id'] : ''), ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $r['due_type'] . ' · ' . $r['settlement_state'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars(substr((string) $r['created_at'], 0, 10), ENT_QUOTES, 'UTF-8') ?></td>
         <td>
-          <?php $eid = intval($r['id']); ?>
+          <?php $eid = intval($r['pe_id']); ?>
+          <?php if ($eid <= 0): ?>
+            <!-- ◆ لا يُعرض زرٌّ يعلم النظامُ سلفًا أنَّه سيردُّ ٤٠٤: الفعلُ يقع على
+                 الأثرِ الماليِّ المقترح (`unit_effects.pe_id`) لا على الاستحقاق. -->
+            <span class="badge" style="background:#6c757d" title="<?= htmlspecialchars((string) $r['blocked'], ENT_QUOTES, 'UTF-8') ?>">غيرُ قابلٍ للاعتمادِ بعد</span>
+            <div class="text-muted" style="font-size:.8em;max-width:230px"><?= htmlspecialchars((string) $r['blocked'], ENT_QUOTES, 'UTF-8') ?></div>
+          <?php else: ?>
           <!-- FN-03 · FIXC-0017: فعلان محروسان بالعقدِ السبعيّ — لا رابطٌ يُحيل
                إلى شاشةٍ أخرى ثم يُقال «الاعتمادُ عبر الخدمة». -->
           <form method="post" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
@@ -207,6 +219,7 @@ include __DIR__ . '/../includes/page_header.php';
             </select>
             <button class="action-btn" type="submit"><i class="fa fa-rotate-left"></i> ردّ</button>
           </form>
+          <?php endif; ?>
           <a class="action-btn" style="margin-top:4px;display:inline-block" href="../Finance/approvals_inbox.php">صندوق الاعتماد ←</a>
         </td>
       </tr>

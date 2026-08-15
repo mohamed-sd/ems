@@ -1,23 +1,23 @@
 {
-    "generated_at": "2026-08-15 14:03:39",
+    "generated_at": "2026-08-15 16:40:11",
     "source_db": "equipation_manage",
     "server_version": "11.4.9-MariaDB",
     "files": {
         "schema.sql": {
-            "sha1": "325632431b07fa36bac6afe9ba499711ef1c6172",
-            "bytes": 918617
+            "sha1": "58c69cf79e773ef3494858c98f0e23c0f2c144e6",
+            "bytes": 921030
         },
         "seed_reference.sql": {
-            "sha1": "892c2a6edaa9b4e13831ad92a827aa9192aa24ae",
-            "bytes": 726097
+            "sha1": "834487ac294c359af547d8a0aa7f01590b0dc04c",
+            "bytes": 819536
         }
     },
     "schema": {
-        "tables": 554,
+        "tables": 555,
         "views": 6
     },
     "seed": {
-        "rows": 6644,
+        "rows": 7274,
         "tables": {
             "roles": 35,
             "modules": 466,
@@ -31,7 +31,8 @@
             "fin_effect_map": 11,
             "job_titles": 23,
             "employee_roles": 20,
-            "transfer_types": 20
+            "transfer_types": 20,
+            "gov_field_class": 630
         }
     }
 }

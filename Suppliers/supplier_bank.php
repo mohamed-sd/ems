@@ -95,38 +95,72 @@ $FIELDS = array (
   20 => 'درجة الأثر',
 );
 
-/* ── الحفظ: فورم الإضافة الموحد → المخزن البيني ─────────────────────────── */
+/* ══ INJ-0151 · «لكلِّ بيانٍ مصدرُ حقيقةٍ واحدٌ منظَّمٌ يُربط بكيانه» ═══════════
+     نصُّ القبول: «كلُّ حسابٍ بنكيٍّ **مرتبطٌ بمعرّف موردٍ حقيقي**، وشاشةُ الدفع
+     **تقرأ الحسابَ الموثَّقَ للمورد المحدَّد بلا إدخالٍ يدوي**».
+
+   ── ما كان ──────────────────────────────────────────────────────────────
+     المصدرُ المنظَّمُ **قائمٌ ومربوطٌ بمعرّفه**: `suppliers.bank_name` و
+     `bank_account_no` و`bank_iban` و`bank_doc_ref` — تكتبها
+     `SupplierDocumentService::verifyBank` من شاشةِ الوثائقِ **بسجلِّ تدقيق**،
+     و**١٩ موردًا** بحسابٍ موثَّقٍ فيها. وكانت هذه الشاشةُ **تكتب مخزنًا ثانيًا**
+     (`cmp03_screen_rows`) بحمولةٍ حرةٍ لا تُربط بمورد: **١٠ صفوفٍ لا يقابلها
+     مورد**. فالعيبُ **ازدواجُ مخزنٍ** لا انقطاعُ ارتباط.
+
+   ── القرار ──────────────────────────────────────────────────────────────
+     ◆ الشاشةُ صارت **قارئةً للمصدرِ الموثَّق**: كلُّ صفٍّ حسابُ موردٍ بمعرِّفه.
+     ◆ ولا مدخلَ يدويًّا فيها — التوثيقُ بابُه `Suppliers/supplier_documents.php`
+       حيث تكتب الخدمةُ المالكةُ بسجلِّ تدقيقٍ ومستندِ إثبات.
+     ◆ **والمخزنُ البينيُّ لا يُحذف**: عشرةُ صفوفِه تبقى وتُعلَن في
+       `docs/fix_progress/OWNER_DECISIONS_DATA.md` لقرارِ المالك — «المخزنُ
+       الملغى يُحوَّل إلى قارئٍ، ولا يُحذف». */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
-    $payload = array();
-    foreach ($FIELDS as $i => $lbl) {
-        $v = trim((string) ($_POST['f' . $i] ?? ''));
-        if ($v !== '') { $payload[$lbl] = $v; }
-    }
-    $status = $payload['الحالة'] ?? 'مسودة';
-    $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
-    // CS-05 / AC-F6 — الكتابةُ في مخزنِ CMP-03، والسطحُ يجمع الحمولةَ فقط.
-    require_once __DIR__ . '/../includes/cmp03_local_store.php';
-    $ok = cmp03_stage_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    ems_gov_flash_redirect(basename(__FILE__),
+        'حساباتُ الموردين تُوثَّق من شاشةِ وثائقِ المورد لا تُكتب هنا — '
+        . 'فالحسابُ يلزمه مستندُ إثباتٍ ومحقِّقٌ مسجَّل ❌',
+        'GOV-FAIL-409',
+        'افتحْ «وثائق المورد» واستعملْ فعلَ «توثيقُ الحساب البنكي»');
     exit();
 }
 
-/* ── القراءة: صفوف الكيان لهذه الشاشة ───────────────────────────────────── */
+/* ── القراءة: الحساباتُ الموثَّقةُ من مصدرِها المنظَّم ───────────────────── */
 $rows = array();
-$sql = "SELECT id, payload, status, created_by_name, created_at, is_seed
-          FROM cmp03_screen_rows
-         WHERE canonical_file = ?" . ($is_super_admin && $company_id <= 0 ? '' : ' AND company_id = ?') . "
-         ORDER BY id DESC LIMIT 500";
-$st = $conn->prepare($sql);
-if ($is_super_admin && $company_id <= 0) { $st->bind_param('s', $CANONICAL); }
-else { $st->bind_param('si', $CANONICAL, $company_id); }
-$st->execute();
-$rs = $st->get_result();
-while ($x = $rs->fetch_assoc()) {
-    $x['payload'] = json_decode((string) $x['payload'], true) ?: array();
-    $rows[] = $x;
+$sql = "SELECT s.id, s.name AS supplier_name, s.bank_name, s.bank_account_no, s.bank_iban,
+               s.bank_doc_ref, s.bank_verified_at, u.name AS verifier_name
+          FROM suppliers s
+          LEFT JOIN users u ON u.id = s.bank_verified_by
+         WHERE " . ($is_super_admin && $company_id <= 0 ? '1=1' : 's.company_id = ' . (int) $company_id) . "
+           AND COALESCE(s.bank_account_no, '') <> ''
+         ORDER BY s.name LIMIT 500";
+$rs = $conn->query($sql);
+if ($rs === false) {
+    /* الفشلُ يُعلَن برمزٍ ولا يلبس ثوبَ الخلوّ (CS-12) */
+    $__bankErr = 'SUP-500 · تعذّرت قراءةُ الحسابات — ' . $conn->error;
+} else {
+    while ($x = $rs->fetch_assoc()) {
+        $rows[] = array(
+            'id' => (int) $x['id'],
+            'status' => $x['bank_verified_at'] ? 'موثَّق' : 'مسجَّل',
+            'created_by_name' => (string) ($x['verifier_name'] ?? ''),
+            'created_at' => (string) ($x['bank_verified_at'] ?? ''),
+            'is_seed' => 0,
+            /* المفاتيحُ **بعناوينِ `$COLS` حرفًا** — فالعارضُ يقرأ بالعنوانِ لا بالموضع */
+            'payload' => array(
+                'رقم السجل'              => 'SUP-' . (int) $x['id'],
+                'المورد'                 => (string) $x['supplier_name'] . ' (#' . (int) $x['id'] . ')',
+                'اسم المستفيد'           => (string) $x['supplier_name'],
+                'رقم الحساب'             => (string) $x['bank_account_no'],
+                'IBAN'                   => (string) $x['bank_iban'],
+                'البنك'                  => (string) $x['bank_name'],
+                'مستند إثبات الحساب'     => (string) $x['bank_doc_ref'],
+                'حالة التحقق'            => $x['bank_verified_at'] ? 'موثَّق' : 'بانتظار التوثيق',
+                'تاريخ التحقق'           => (string) ($x['bank_verified_at'] ?? ''),
+                'محقِّق الحساب'          => (string) ($x['verifier_name'] ?? ''),
+                'المرجع الأب'            => 'مورد #' . (int) $x['id'],
+            ),
+        );
+    }
 }
-$st->close();
 
 $govCtx = ems_gov_ctx();
 $entityName = $govCtx['values']['entity'] ?? '—';

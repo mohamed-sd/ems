@@ -196,14 +196,69 @@ class TransferDeliveryService
             if (!$ev->execute()) { throw new \RuntimeException('event insert: ' . $ev->error); }
             $ev->close();
 
+            /* ══ INJ-0084 · INJ-0306 · سطرُ التحميلِ بقيمٍ حيّةٍ ومركزٍ حقيقيّ ══════
+                 كان السطرُ يُكتب بـ`cost_type='actual_total'` و`cost_bearer='project'`
+                 و`analytic_cost_center='PRJ'`، **والقيمتان الأوليان خارج تعدادَيهما**:
+                   cost_type   ∈ (fuel · labor · contractor · misc · permit)
+                   cost_bearer ∈ (client · company · new_client)
+                 و`sql_mode` **خالٍ**، فالخارجُ عن التعدادِ **يُبتر إلى `''` بتحذيرٍ
+                 1265 لا بخطأ** — فيمضي الإقفالُ مُعلنًا النجاحَ ويُكتب دفترُ التحميلِ
+                 بقيمٍ خاوية. **٩ أسطرَ مقيسةٍ في القاعدةِ بهذه الحال.**
+               ◆ فالمصدرُ صار الأمرَ نفسَه: متحمِّلُه ومركزُ تكلفتِه — «تحميلٌ على
+                 مصدرها» لا على قيمةٍ نائبة. و`contractor` هو الحيُّ المقابلُ لأجرِ
+                 النقلِ في التعداد.
+               ◆ **ويُقرأ الصفُّ بعد كتابتِه**: البترُ الصامتُ لا يُكشف من مُرجَعِ
+                 `execute` — فما لم يُطابق المكتوبُ المقصودَ ارتدَّت المعاملةُ
+                 و**ظهرت رسالةُ خطأٍ لا رسالةُ نجاح** (نصُّ القبولِ حرفًا). */
+            $ordRow = null;
+            $oq = $this->conn->prepare(
+                'SELECT cost_bearer, analytic_cost_center, tariff_currency
+                   FROM transfer_orders WHERE id = ? AND company_id = ? LIMIT 1');
+            if ($oq) {
+                $oq->bind_param('ii', $orderId, $companyId);
+                $oq->execute();
+                $ordRow = $oq->get_result()->fetch_assoc();
+                $oq->close();
+            }
+            $bearer = $ordRow && trim((string) $ordRow['cost_bearer']) !== ''
+                ? (string) $ordRow['cost_bearer'] : '';
+            $center = $ordRow ? trim((string) $ordRow['analytic_cost_center']) : '';
+            $curr   = $ordRow && trim((string) $ordRow['tariff_currency']) !== ''
+                ? (string) $ordRow['tariff_currency'] : 'USD';
+            if ($bearer === '') {
+                throw new \RuntimeException(
+                    'TRS-422: لا تحميلَ بلا متحمِّلٍ في الأمرِ — حدِّدْه في نموذجِ الأمرِ أولًا');
+            }
+            if ($center === '') {
+                throw new \RuntimeException(
+                    'TRS-422: لا تحميلَ بلا مركزِ تكلفةٍ في الأمرِ — «تحميلٌ على مصدرها»');
+            }
+            $type = 'contractor';
             $cl = $this->conn->prepare(
                 "INSERT INTO transfer_cost_lines
-                   (company_id, order_id, cost_type, amount_usd, currency, cost_bearer, analytic_cost_center)
-                 VALUES (?,?,'actual_total',?,'USD','project','PRJ')");
+                   (company_id, order_id, cost_type, amount_local, amount_usd, currency,
+                    fx_rate, cost_bearer, analytic_cost_center, created_at)
+                 VALUES (?,?,?,?,?,?,1,?,?,NOW())");
             if (!$cl) { throw new \RuntimeException('cost prepare: ' . $this->conn->error); }
-            $cl->bind_param('iid', $companyId, $orderId, $cost);
+            $cl->bind_param('iisddsss', $companyId, $orderId, $type, $cost, $cost, $curr, $bearer, $center);
             if (!$cl->execute()) { throw new \RuntimeException('cost insert: ' . $cl->error); }
+            $lineId = (int) $this->conn->insert_id;
             $cl->close();
+
+            /* قراءةُ ما كُتب فعلًا — فالبترُ يُعلن نفسَه هنا أو لا يُعلن أبدًا */
+            $chk = $this->conn->query('SELECT cost_type, cost_bearer, analytic_cost_center, amount_usd
+                                         FROM transfer_cost_lines WHERE id = ' . $lineId);
+            $wrote = $chk ? $chk->fetch_assoc() : null;
+            if (!$wrote
+                || (string) $wrote['cost_type'] !== $type
+                || (string) $wrote['cost_bearer'] !== $bearer
+                || trim((string) $wrote['analytic_cost_center']) === ''
+                || abs((float) $wrote['amount_usd'] - $cost) > 0.005) {
+                throw new \RuntimeException(
+                    'TRS-500: سطرُ التحميلِ كُتب مبتورًا (بترٌ صامتٌ بتحذير 1265) — '
+                    . 'النوع «' . ($wrote ? $wrote['cost_type'] : '?') . '» '
+                    . 'والمتحمِّل «' . ($wrote ? $wrote['cost_bearer'] : '?') . '»');
+            }
 
             $this->conn->commit();
             return array('ok' => true, 'replay' => false,

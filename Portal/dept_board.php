@@ -15,6 +15,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/tenant_scope.php';   // نطاقُ الكيانِ من السياقِ لا من رقمٍ صلب
 require_once '../includes/permissions_helper.php';
 require_once '../includes/resolve_manager.php';
 require_once __DIR__ . '/../Tickets/dept_inbox_map.php';
@@ -171,7 +172,7 @@ include __DIR__ . '/../includes/page_header.php';
       <th>طلبات بيدها</th><th>طلبات متأخرة</th><th>إنجازات 30ي</th>
     </tr></thead>
     <tbody>
-    <?php $coScan = $is_super_admin && $company_id <= 0 ? 4 : $company_id;
+    <?php $coScan = ems_scope_company($conn);
     for ($u = 1; $u <= 15; $u++):
         $members = ems_dept_member_ids($conn, $coScan, $u);
         $k = ems_dept_engine_kpis($conn, $coScan, $members);

@@ -182,6 +182,72 @@ class UnitJourneyService
     }
 
     /**
+     * ⇐ INJ-0037 · **طابورُ البوابة**: من ينتظر، وهل هو قابلٌ للفعلِ أصلًا.
+     * ═══════════════════════════════════════════════════════════════════════
+     * ── ما كان ────────────────────────────────────────────────────────────
+     * كانت `Finance/entitlement_gate.php` تسأل عن **خمسةِ أعمدةٍ لا وجودَ لها**
+     * في `fin_dues` (`due_no` · `party_kind` · `beneficiary_ref` · `state` ·
+     * `source_kind`). فيرسب الاستعلامُ، ويبتلع `if ($res)` رسوبَه، فتعرض
+     * الشاشةُ «لا أثرَ أوليًّا ينتظر البوابة» **وفي القاعدةِ عشرون صفًّا معلَّقًا**.
+     * ◆ والعطبُ الأخطرُ ليس القائمةَ الفارغة بل أنَّ **الفشلَ لبس ثوبَ الخلوّ**:
+     *   لا رمزَ ولا رسالةَ — فالموظفُ يظنُّ ألا عمل. ولذا يُرجَع هنا `ok` و`code`
+     *   صراحةً، ولا يُسمح للشاشةِ أن تعرض صفرًا إلا وقد عُلم أنَّه صفرٌ حقيقيّ.
+     *
+     * ── وقابليةُ الفعلِ حكمٌ لا زينة (CS-05) ──────────────────────────────
+     * فِعلا البوابةِ (`postEntitlement`/`rejectEntitlement`) يعملان على
+     * `unit_effects.pe_id` بمرحلةِ `financial` — لا على `fin_dues.id`. فالصفُّ
+     * المعروضُ **لا يصير قابلًا للاعتمادِ إلا إن وُصل بأثرٍ ماليٍّ مقترح**،
+     * ويُرجَع مع كلِّ صفٍّ `pe_id` أو `blocked` بسببِه — فلا يُعرض زرٌّ يعلم
+     * النظامُ سلفًا أنَّه سيردُّ ٤٠٤.
+     *
+     * @return array{ok:bool,code:int,error:string,rows:array,total:int,actionable:int}
+     */
+    public static function gateQueue(\mysqli $conn, $companyId)
+    {
+        $companyId = intval($companyId);
+        $out = array('ok' => false, 'code' => 0, 'error' => '', 'rows' => array(),
+                     'total' => 0, 'actionable' => 0);
+
+        /* الأعمدةُ **من الجدولِ الحقيقيّ**: party_type · party_ref · due_type ·
+           source_doc_type · settlement_state — لا أسماءَ من الذاكرة. */
+        $sql = "SELECT d.id, d.party_type, d.party_ref, d.due_type, d.direction,
+                       d.amount, d.currency, d.period_ref, d.event_id,
+                       d.source_doc_type, d.source_doc_id, d.settlement_state, d.created_at,
+                       ue.pe_id, ue.state AS pe_state
+                  FROM fin_dues d
+                  LEFT JOIN unit_effects ue
+                         ON ue.company_id = d.company_id
+                        AND ue.stage = 'financial'
+                        AND ue.state = 'Proposed'
+                        AND ue.fin_event_ref = d.event_id
+                        AND d.event_id IS NOT NULL AND d.event_id > 0
+                 WHERE d.company_id = {$companyId}
+                   AND d.is_deleted = 0
+                   AND d.settlement_state = 'pending'
+                 ORDER BY d.created_at
+                 LIMIT 200";
+        $r = $conn->query($sql);
+        if ($r === false) {
+            /* ◆ الرسوبُ يُعلَن برمزٍ ولا يُترجَم إلى «لا شيء ينتظر» */
+            $out['code']  = 500;
+            $out['error'] = 'FIN-500 · تعذّرت قراءةُ طابورِ البوابة — ' . $conn->error;
+            return $out;
+        }
+        while ($x = $r->fetch_assoc()) {
+            $pe = intval($x['pe_id']);
+            $x['pe_id']   = $pe ?: 0;
+            $x['blocked'] = $pe > 0 ? ''
+                : 'لا أثرَ ماليًّا مقترحًا موصولًا بهذا الاستحقاق — الاعتمادُ يقع على الأثرِ لا على الاستحقاق';
+            if ($pe > 0) { $out['actionable']++; }
+            $out['rows'][] = $x;
+        }
+        $out['ok']    = true;
+        $out['code']  = 200;
+        $out['total'] = count($out['rows']);
+        return $out;
+    }
+
+    /**
      * بوابة الاستحقاق: **لا Posted إلا باعتماد مدير الإدارة + المالية** —
      * عندها يُنشأ حدث FES وتُملأ fin_event_ref. قيد بلا اعتماد → 403.
      * @return array{ok:bool,code:int,reason:string,posted:int}

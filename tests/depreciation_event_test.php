@@ -54,6 +54,8 @@ $teardown = function () use ($conn, $CO, $MARK) {
                    WHERE a.code LIKE '%{$MARK}%'");
     $conn->query("DELETE FROM fin_assets WHERE code LIKE '%{$MARK}%'");
     $conn->query("DELETE FROM fin_financial_periods WHERE company_id={$CO} AND fiscal_year=2088");
+    /* INJ-0033: وملفّاتُ الإهلاكِ المبذورةُ تُكنس بالعائلةِ نفسِها */
+    $conn->query("DELETE FROM fleet_depreciation_profile WHERE code LIKE 'DEP-{$MARK}%'");
 };
 register_shutdown_function($teardown);
 $teardown();
@@ -62,11 +64,20 @@ fwrite(STDOUT, "\n══ M-30 — الإهلاكُ حدثًا دوريًّا ب�
 
 head('البذر — أصلان: تكلفة 120000 وخردة 0 وعمرٌ 10 شهور (قسطٌ 12000)');
 
+/* ◆ INJ-0033: الملفُّ يطابق **بالفئة**، فلكلِّ أصلٍ فئتُه وملفُّه — وإلا حكم
+     ملفٌّ واحدٌ على أعمارٍ ثلاثةٍ مختلفةٍ فاختلّت السيناريوهات. والعمرُ والخردةُ
+     في الملفِّ مطابقان لِما كان في حقولِ الأصل، فالأرقامُ المقيسةُ لا تتغيّر. */
 $mkAsset = function ($suffix, $cost, $salv, $life, $acq) use ($conn, $CO, $MARK) {
+    $cat = 'اختبار-' . $MARK . '-' . $suffix;
+    $pct = $cost > 0 ? round($salv / $cost, 4) : 0;
+    $conn->query("DELETE FROM fleet_depreciation_profile WHERE code = 'DEP-{$MARK}-{$suffix}'");
+    $conn->query("INSERT INTO fleet_depreciation_profile
+            (company_id, code, asset_category, method, useful_life, salvage_pct, state, created_at, updated_at)
+          VALUES ({$CO}, 'DEP-{$MARK}-{$suffix}', '{$cat}', 'straight_line', {$life}, {$pct}, 'approved', NOW(), NOW())");
     $conn->query("INSERT INTO fin_assets
         (company_id, code, name, category, acquisition_date, acquisition_cost, salvage_value,
          useful_life_months, method, accumulated_depreciation, state, created_at, updated_at)
-        VALUES ({$CO}, 'FA-{$MARK}-{$suffix}', 'أصلُ {$MARK}-{$suffix}', 'اختبار',
+        VALUES ({$CO}, 'FA-{$MARK}-{$suffix}', 'أصلُ {$MARK}-{$suffix}', '{$cat}',
                 '{$acq}', {$cost}, {$salv}, {$life}, 'straight_line', 0, 'active', NOW(), NOW())");
     if ($conn->error) { fwrite(STDOUT, '  ! ' . $conn->error . "\n"); return 0; }
     return intval($conn->insert_id);

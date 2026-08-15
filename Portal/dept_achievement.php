@@ -51,7 +51,8 @@ if (intval($unit) > 0) {
 // دورٌ بلا وحدةٍ في الخريطة ⇒ لا مستخدمين ⇒ أصفارٌ صريحةٌ لا أرقامُ شركةٍ مضلِّلة
 $roles_in   = count($unit_roles) ? implode(',', $unit_roles) : '0';
 $dept_users = "SELECT id FROM users WHERE company_id = $company_id AND role IN ($roles_in)";
-$ue_state   = "state IN ('site_approved','parties_approved','sales_approved','converted')";
+require_once __DIR__ . '/../includes/unit_chain_helpers.php';
+$ue_state   = ems_uc_accepted_sql('unit_entries');   // التعريفُ المركزيُّ الواحد (INJ-0334)
 
 /**
  * ح-12 · مؤشراتُ الإدارة من **دورتها هي** لا من دورة غيرها.

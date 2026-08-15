@@ -15,6 +15,7 @@ session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
 
+require_once __DIR__ . '/../includes/tenant_scope.php';   // نطاقُ الكيانِ من السياقِ لا من رقمٍ صلب
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
 // كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
 // **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
@@ -35,7 +36,7 @@ $is_super = ($role === '-1');
 if (!$is_super && !in_array($role, array('1', '19'), true)) {
     ems_gov_flash_redirect('../main/dashboard.php', 'منح المجال المقيَّد خلف صلاحية مقيَّدة ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
 }
-$co = $company_id ?: 4;
+$co = ems_scope_company($conn);
 $uid = intval($_SESSION['user']['id'] ?? 0);
 
 $PERM_AR = array(

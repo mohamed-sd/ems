@@ -1,0 +1,191 @@
+[
+    {
+        "file": "app\/Services\/Finance\/ApprovalsInboxService.php",
+        "col": "fin_requests.state",
+        "bad": [
+            "submitted"
+        ],
+        "enum": [
+            "draft",
+            "under_review",
+            "pending_approval",
+            "approved",
+            "rejected",
+            "returned",
+            "posted",
+            "paid",
+            "collected",
+            "closed",
+            "archived",
+            "withdrawn",
+            "cancelled",
+            "suspended",
+            "expired",
+            "merged"
+        ]
+    },
+    {
+        "file": "app\/Services\/Finance\/FinanceM10Service.php",
+        "col": "fin_event_links.effect_type",
+        "bad": [
+            "operator_due",
+            "operator_pay"
+        ],
+        "enum": [
+            "revenue_event",
+            "supplier_due",
+            "employee_due",
+            "cost_record",
+            "receivable",
+            "journal_entry",
+            "payment",
+            "metric_update",
+            "budget_consumption",
+            "party_award"
+        ]
+    },
+    {
+        "file": "app\/Services\/Portal\/AchievementService.php",
+        "col": "fin_requests.state",
+        "bad": [
+            "executed"
+        ],
+        "enum": [
+            "draft",
+            "under_review",
+            "pending_approval",
+            "approved",
+            "rejected",
+            "returned",
+            "posted",
+            "paid",
+            "collected",
+            "closed",
+            "archived",
+            "withdrawn",
+            "cancelled",
+            "suspended",
+            "expired",
+            "merged"
+        ]
+    },
+    {
+        "file": "app\/Services\/Portal\/AchievementService.php",
+        "col": "tickets.stage",
+        "bad": [
+            "مغلق"
+        ],
+        "enum": [
+            "new",
+            "classified",
+            "routed",
+            "in_progress",
+            "waiting",
+            "follow_up",
+            "done",
+            "closed",
+            "cancelled"
+        ]
+    },
+    {
+        "file": "app\/Services\/Portal\/WorkspaceFeedService.php",
+        "col": "fin_requests.state",
+        "bad": [
+            "submitted"
+        ],
+        "enum": [
+            "draft",
+            "under_review",
+            "pending_approval",
+            "approved",
+            "rejected",
+            "returned",
+            "posted",
+            "paid",
+            "collected",
+            "closed",
+            "archived",
+            "withdrawn",
+            "cancelled",
+            "suspended",
+            "expired",
+            "merged"
+        ]
+    },
+    {
+        "file": "Financing\/installments.php",
+        "col": "financing_installments.state",
+        "bad": [
+            "pending",
+            "Due",
+            "Pending"
+        ],
+        "enum": [
+            "scheduled",
+            "due",
+            "paid",
+            "overdue",
+            "rescheduled"
+        ]
+    },
+    {
+        "file": "Maintenance\/equipment_hours_preventive.php",
+        "col": "unit_entries.state",
+        "bad": [
+            "approved"
+        ],
+        "enum": [
+            "draft",
+            "submitted",
+            "site_approved",
+            "parties_review",
+            "parties_approved",
+            "sales_approved",
+            "on_hold",
+            "converted",
+            "superseded",
+            "reversed",
+            "returned",
+            "rejected",
+            "cancelled"
+        ]
+    },
+    {
+        "file": "Maintenance\/equipment_hours_preventive.php",
+        "col": "unit_entries.state",
+        "bad": [
+            "approved"
+        ],
+        "enum": [
+            "draft",
+            "submitted",
+            "site_approved",
+            "parties_review",
+            "parties_approved",
+            "sales_approved",
+            "on_hold",
+            "converted",
+            "superseded",
+            "reversed",
+            "returned",
+            "rejected",
+            "cancelled"
+        ]
+    },
+    {
+        "file": "Procurement\/rfq_compare_award.php",
+        "col": "supplier_rfqs.state",
+        "bad": [
+            "opened",
+            "quoted"
+        ],
+        "enum": [
+            "draft",
+            "sent",
+            "closed",
+            "awarded",
+            "contracted",
+            "cancelled"
+        ]
+    }
+]

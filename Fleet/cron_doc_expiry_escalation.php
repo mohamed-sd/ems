@@ -24,19 +24,30 @@ $r = $conn->query("SELECT d.doc_id, d.company_id, d.doc_type, d.doc_no, d.expiry
                       AND DATEDIFF(d.expiry_date, CURDATE()) BETWEEN 0 AND 7
                     ORDER BY d.expiry_date");
 while ($r && ($x = $r->fetch_assoc())) {
-    // العنوانُ يحمل (الوثيقةَ × مرحلةَ 7أيام) — فالإشعارُ لا يتكرر أبدًا لهذه المرحلة
+    /* ══ INJ-0167 · «تشغيلُ السكربت سبعةَ أيامٍ متتاليةٍ على الوثيقة نفسِها ينتج
+         **إشعارًا واحدًا** لمرحلة 7d» ═══════════════════════════════════════════
+         كان يعلن رأسُ الملفِّ أنَّ «العطالةَ بعنوانٍ يحمل معرّفَ الوثيقة والمرحلة»
+         — والعنوانُ يحمل معه **`days_left` المتغيّرَ يوميًّا**. فمقارنةُ النصِّ
+         لا تطابق شيئًا في اليومِ التالي، والوثيقةُ الواحدةُ تولّد **ثمانيةَ**
+         إشعاراتٍ (٠..٧) بدل واحد.
+       ◆ فالمفتاحُ صار **ثابتًا**: (الوثيقة × المرحلة) لا نصًّا فيه زمن.
+         والعنوانُ يبقى بيانَ عرضٍ حرًّا — لأنَّ **العنوانَ ليس مفتاحًا**.
+       ◆ والمقارنةُ بالمفتاحِ داخلَ النصِّ (بادئةٌ محكومة) لأنَّ `fin_notifications`
+         بلا عمودِ عطالة — فيُحفَظ المفتاحُ في `link` المحكومِ لا في العنوانِ الحرّ. */
+    $idemKey = 'doc:' . intval($x['doc_id']) . ':stage:7d';
+    $link    = 'Equipments/equipments.php?doc=' . intval($x['doc_id']) . '&esc=' . rawurlencode($idemKey);
     $title = mb_substr('⚠ تصعيدٌ E-11: وثيقة #' . intval($x['doc_id']) . ' (' . $x['doc_type']
            . ' ' . $x['doc_no'] . ') تنتهي خلال ' . intval($x['days_left'])
            . ' أيام — مرحلةُ 7d', 0, 200);
     $dup = $conn->query("SELECT id FROM fin_notifications
                           WHERE company_id = " . intval($x['company_id']) . "
-                            AND title = '" . $conn->real_escape_string($title) . "' LIMIT 1");
+                            AND link = '" . $conn->real_escape_string($link) . "' LIMIT 1");
     if ($dup && $dup->fetch_assoc()) { continue; }
     $st = $conn->prepare("INSERT INTO fin_notifications (company_id, target_level, title, link)
-                          VALUES (?, 'fleet_records', ?, 'Equipments/equipments.php')");
+                          VALUES (?, 'fleet_records', ?, ?)");
     if ($st) {
         $co = intval($x['company_id']);
-        $st->bind_param('is', $co, $title);
+        $st->bind_param('iss', $co, $title, $link);
         if ($st->execute()) { $n_escalated++; }
         $st->close();
     }

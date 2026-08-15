@@ -49,17 +49,46 @@ if ($__pc['run'] && $__pc['ok']) {
     if (!empty($res['ok'])) { ems_pc_idem_mark($conn, $__pc['idem'], $__pc['code'], 'transfer_orders#' . (int) $__pc['data']['oid']); }
 }
 
+/* ══ INJ-0317 — «لكلِّ عمودٍ مصدرٌ ومالكٌ ومعنًى» ═══════════════════════════
+     كان الجدولُ يعلن خمسةَ أعمدةِ بياناتٍ ثم **ثلاثةً وعشرين رأسًا بلا خليةٍ من
+     الخادم**، والتعليقُ نفسُه يقرّ: «الخلايا يحشوها ui-unification.js حتى ربط
+     المصدر». فالرأسُ يَعِد بعمودٍ لا وجودَ له — و**رأسٌ يعد بما لا يفي أسوأُ من
+     غيابِه** لأنَّه يُقرأ بيانًا.
+   ◆ والحكمُ من نصِّ القبولِ حرفًا: «<td> مقابلٌ بقيمةٍ من الخادم **أو لا يظهر
+     الرأسُ أصلًا»**. فخمسةَ عشرَ رأسًا وُصلت بمصدرِها المخزَّن، **وثمانيةٌ رُفعت**
+     لأنَّها بلا سجلٍّ في القاعدةِ إطلاقًا (اعتمادُ مديرِ النقلِ والمالية ورقمُ
+     القيدِ ومرجعُ التفويضِ وتاريخُ الاعتمادِ والعكسانِ ودرجةُ الأثر) — ولا
+     يُخترع لها عمودٌ لتُملأ بفراغ.
+   ◆ والتجميعُ في الاستعلامِ بمُجمِّعاتٍ فرعيةٍ لا بحلقةٍ لكلِّ صفّ. */
 $rows = array();
 $r = mysqli_query($conn,
     "SELECT o.id, o.order_no, o.estimated_cost_usd, o.actual_cost_usd, o.project_id,
             p.name AS project_name, o.arrival_datetime,
+            o.notes, o.cost_bearer, o.analytic_cost_center, o.stage, o.sync_uuid,
+            o.created_at, o.request_id, o.tariff_currency,
+            u.name AS creator_name, cmp.company_name AS entity_name,
+            rq.code AS request_code,
             (SELECT d.doc_ref FROM transfer_delivery_docs d
-              WHERE d.company_id = o.company_id AND d.order_id = o.id ORDER BY d.id DESC LIMIT 1) AS doc_ref
+              WHERE d.company_id = o.company_id AND d.order_id = o.id ORDER BY d.id DESC LIMIT 1) AS doc_ref,
+            (SELECT GROUP_CONCAT(DISTINCT cl.cost_type ORDER BY cl.cost_type SEPARATOR ' · ')
+               FROM transfer_cost_lines cl
+              WHERE cl.company_id = o.company_id AND cl.order_id = o.id AND cl.is_deleted = 0) AS cost_types,
+            (SELECT SUM(cl.amount_usd) FROM transfer_cost_lines cl
+              WHERE cl.company_id = o.company_id AND cl.order_id = o.id AND cl.is_deleted = 0) AS lines_usd,
+            (SELECT MAX(cl.fx_rate) FROM transfer_cost_lines cl
+              WHERE cl.company_id = o.company_id AND cl.order_id = o.id AND cl.is_deleted = 0) AS fx_rate,
+            (SELECT COUNT(*) FROM transfer_attachments a
+              WHERE a.company_id = o.company_id AND a.order_id = o.id AND a.is_deleted = 0) AS att_n
      FROM transfer_orders o
      LEFT JOIN project p ON p.id = o.project_id
+     LEFT JOIN users u ON u.id = o.created_by
+     LEFT JOIN admin_companies cmp ON cmp.id = o.company_id
+     LEFT JOIN transfer_requests rq ON rq.id = o.request_id
      WHERE o.company_id = $company_id AND o.is_deleted = 0 AND o.stage = 'arrived'
      ORDER BY o.arrival_datetime");
-if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
+/* ◆ ولا يبتلع `if ($r)` رسوبَ الاستعلامِ صامتًا — الفشلُ يُعلَن برمزٍ (CS-12) */
+if ($r === false) { $msg = 'TRS-500 · تعذّرت قراءةُ أوامرِ الإقفال — ' . mysqli_error($conn); }
+else { while ($x = mysqli_fetch_assoc($r)) { $rows[] = $x; } }
 
 $page_title = 'إقفال الأمر وتحميل التكلفة';
 // CM-00 (DEC-E · U10): بذرُ محاورِ الغلافِ من الخادم — AX-2/3 من محرك الصلاحيات
@@ -81,35 +110,29 @@ include __DIR__ . '/../includes/page_header.php';
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
+    <!-- INJ-0317 · كلُّ رأسٍ هنا له خليةٌ من الخادمِ في كلِّ صفّ. والرؤوسُ الثمانيةُ
+         التي كانت بلا سجلٍّ في القاعدةِ رُفعت ولم تُملأ بفراغ:
+         اعتمده مدير النقل · اعتمدته المالية · رقم القيد · مرجع التفويض ·
+         تاريخ الاعتماد · معكوس بـ · عكس عن · درجة الأثر. -->
     <thead><tr><th>أمر الترحيل</th><th>المشروعُ المحمَّل</th><th>المقدَّرة $</th><th>الفعلية $</th><th>تاريخ الإقفال</th>
-              <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم المحضر</th>
               <th class="ems-fn-th" data-fn="1">بند التكلفة</th>
               <th class="ems-fn-th" data-fn="1">الوصف</th>
               <th class="ems-fn-th" data-fn="1">المبلغ</th>
               <th class="ems-fn-th" data-fn="1">المستند المؤيد</th>
               <th class="ems-fn-th" data-fn="1">المتحمل</th>
-              <th class="ems-fn-th" data-fn="1">اعتمده مدير النقل</th>
-              <th class="ems-fn-th" data-fn="1">اعتمدته المالية</th>
-              <th class="ems-fn-th" data-fn="1">رقم القيد</th>
-              <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
               <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
               <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
               <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
               <th class="ems-gov-th" data-gov="idem_key" data-slice="2" title="يمنع وقوع الأثر مرتين بمفتاح مركب">مفتاح منع التكرار</th>
-              <th class="ems-gov-th none" data-gov="reversed_by" data-slice="2" title="مرجع الحركة التي عكسته">معكوس بـ</th>
-              <th class="ems-gov-th none" data-gov="reversal_of" data-slice="2" title="مرجع الحركة التي عكسها">عكس عن</th>
-              <th class="ems-gov-th none" data-gov="impact_grade" data-slice="2" title="مبدئي أم نهائي — فلا يقفل مبدئي ماليًّا">درجة الأثر</th>
-              <th class="ems-gov-th none" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
-              <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
-              <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
+              <th class="ems-gov-th" data-gov="cost_center" data-slice="3" title="وجهة التحميل">مركز التكلفة</th>
+              <th class="ems-gov-th" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
+              <th class="ems-gov-th" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead>
     <tbody>
-    <?php if (empty($rows)): ?><tr><td colspan="5" class="text-center text-muted">لا أوامرَ بانتظار الإقفال</td></tr><?php endif; ?>
+    <?php if (empty($rows)): ?><tr><td colspan="20" class="text-center text-muted">لا أوامرَ بانتظار الإقفال</td></tr><?php endif; ?>
     <?php foreach ($rows as $o): ?>
       <tr>
         <td><?= htmlspecialchars($o['order_no'], ENT_QUOTES, 'UTF-8') ?></td>
@@ -133,6 +156,30 @@ include __DIR__ . '/../includes/page_header.php';
         </td>
         <td><button class="action-btn" type="submit"><i class="fa fa-lock"></i> أقفل وحمّل</button></form></td>
           <?php endif; ?>
+        <?php
+        /* INJ-0317 · الخمسةَ عشرَ عمودًا الباقيةُ من مصادرِها المخزَّنة — لا حشوَ
+           من المتصفّح. و«—» تعني «لا قيمةَ لهذا الصفّ» لا «لا مصدرَ للعمود». */
+        $cell = function ($v) {
+            $v = trim((string) $v);
+            echo '<td' . ($v === '' ? ' class="ems-gov-empty"' : '') . '>'
+               . htmlspecialchars($v === '' ? '—' : $v, ENT_QUOTES, 'UTF-8') . '</td>';
+        };
+        $cell($o['doc_ref']);                                            // رقم المحضر
+        $cell($o['cost_types']);                                         // بند التكلفة
+        $cell($o['notes']);                                              // الوصف
+        $cell($o['lines_usd'] !== null ? number_format((float) $o['lines_usd'], 2) : '');  // المبلغ
+        $cell((int) $o['att_n'] > 0 ? ((int) $o['att_n'] . ' مرفقًا') : '');               // المستند المؤيد
+        $cell($o['cost_bearer']);                                        // المتحمل
+        $cell($o['entity_name']);                                        // الكيان
+        $cell($o['created_at']);                                         // تاريخ الإنشاء
+        $cell($o['request_code'] !== null ? ('طلبُ ترحيلٍ ' . $o['request_code']) : '');   // المرجع الأب
+        $cell($o['creator_name']);                                       // المُنشئ
+        $cell($o['stage']);                                              // الحالة
+        $cell($o['sync_uuid']);                                          // مفتاح منع التكرار
+        $cell($o['analytic_cost_center']);                               // مركز التكلفة
+        $cell($o['fx_rate'] !== null ? ('سعرُ بندِ التكلفة ' . rtrim(rtrim((string) $o['fx_rate'], '0'), '.')) : ''); // سعر الصرف ومصدره
+        $cell($o['tariff_currency']);                                    // العملة
+        ?>
       </tr>
     <?php endforeach; ?>
     </tbody>

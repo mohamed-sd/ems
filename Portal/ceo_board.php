@@ -86,8 +86,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
          الهرمِ مصدرُه حقلُ نصٍّ لا دفترُ حسابات.
          ◆ ولا يُحذف الجدولُ: اللقطةُ تبقى **مشتقّةً** من مصادرِها. والمُدخَلُ
            هنا يُرفض برمزٍ محكومٍ ويُسجَّل — فالمحاولةُ نفسُها أثرٌ يُراجَع. */
+    /* ◆ INJ-0129 يضمُّ إلى السبعةِ الماليةِ مؤشرَي المخزون: «المخاطر المفتوحة»
+         و«الاعتمادات المعلَّقة» — والحارسُ في **المعالج** لا في الفورمِ وحدَه،
+         فرفعُ الحقلِ من الصفحةِ لا يمنع POST مصنوعًا بيدٍ أخرى (CS-11). */
     $__FIN_KPI = array('portfolio_value', 'recognized_revenue', 'collection',
-        'overdue_receivables', 'expected_cashflow', 'financing_commitments', 'margin_pct');
+        'overdue_receivables', 'expected_cashflow', 'financing_commitments', 'margin_pct',
+        'open_risks', 'pending_approvals');
     $__typed = array();
     foreach ($__FIN_KPI as $__k) {
         if (isset($in[$__k]) && trim((string) $in[$__k]) !== '') { $__typed[] = $__k; }
@@ -142,9 +146,33 @@ $govCtx = ems_gov_ctx();
 $entityName = $govCtx['values']['entity'] ?? '—';
 
 /** قيمة خلية بفهرس عمود المستند — الكيان حي وسائرها من الجدول أو «—» */
-function m00_cell_at($idx, $row, $entityName, $COLDB) {
+/* ══ INJ-0129 — «المؤشرُ قيمةٌ مجمَّعةٌ تُشتق آليًّا» (FRD §٢٦-١ نوع ٨) ═══════
+     نصُّ القبول: «بعد تسجيلِ خطرٍ جديدٍ في `risk_register` يجب أن تُظهر لوحةُ
+     الرئيسِ الرقمَ الجديدَ بلا أيِّ إدخالٍ يدوي، ولا يوجد في الصفحةِ حقلُ
+     إدخالٍ باسم `f12`».
+   ── والمقيسُ قبلَه: «المخاطر المفتوحة» حقلُ نصٍّ حرٍّ يكتبه المُدخِل. فرقمٌ
+     يُقرَّر عليه في أعلى الهرمِ مصدرُه أصابعُ موظفٍ لا سجلُّ المخاطر.
+   ◆ و«المفتوح» **مخزونٌ لا تدفّق**: قيمتُه الصحيحةُ هي عددُ ما هو مفتوحٌ الآن،
+     فلا معنى لتجميدِه في لقطةِ فترةٍ — ولذلك يُشتقُّ عند العرضِ لا يُخزَّن.
+   ◆ و«الاعتمادات المعلَّقة» عيبُها هو هو: مؤشرٌ مخزونٌ كان يُكتب يدويًّا —
+     فأُشتقَّ معه، إذ تركُ توأمِ العيبِ بجوارِ المُصلَحِ يُعيد النمطَ من بابِه.
+   ◆ ولا يُحذف العمودان من الجدول: اللقطاتُ القديمةُ تبقى، ويعلوها المشتقُّ
+     في العرضِ — فلا تُمحى بيانةٌ ولا يُعرض رقمٌ مهجور. */
+$DERIVED_KPI = array();
+$__r = $conn->query("SELECT COUNT(*) FROM risk_register
+                      WHERE company_id = " . (int) $company_id . "
+                        AND state <> 'closed' AND merged_into_id IS NULL");
+if ($__r && ($__x = $__r->fetch_row())) { $DERIVED_KPI['open_risks'] = (int) $__x[0]; }
+$__r = $conn->query("SELECT COUNT(*) FROM exec_approvals
+                      WHERE company_id = " . (int) $company_id . "
+                        AND (decision IS NULL OR decision = '')");
+if ($__r && ($__x = $__r->fetch_row())) { $DERIVED_KPI['pending_approvals'] = (int) $__x[0]; }
+
+function m00_cell_at($idx, $row, $entityName, $COLDB, $derived = array()) {
     $col = $COLDB[$idx] ?? null;
     if ($col === null) { return $entityName; }
+    /* المشتقُّ يعلو المخزَّن — والمصدرُ سجلُّ المخاطرِ لا خليةُ إدخال */
+    if (isset($derived[$col])) { return (string) $derived[$col]; }
     $v = isset($row[$col]) ? trim((string) $row[$col]) : '';
     return $v !== '' ? $v : '—';
 }
@@ -245,10 +273,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" inputmode="decimal" name="f10" placeholder="0" id="emsf_1101_07779"></div>
                 <div class="form-group"><label for="emsf_1102_d1848">الهامش</label>
                     <input type="text" inputmode="decimal" name="f11" placeholder="0" id="emsf_1102_d1848"></div>
-                <div class="form-group"><label for="emsf_1103_bff73">المخاطر المفتوحة</label>
-                    <input type="text" name="f12" maxlength="190" id="emsf_1103_bff73"></div>
-                <div class="form-group"><label for="emsf_1104_48417">الاعتمادات المعلَّقة</label>
-                    <input type="text" name="f13" maxlength="190" id="emsf_1104_48417"></div>
+                <!-- INJ-0129 · «المخاطر المفتوحة» و«الاعتمادات المعلَّقة» **مؤشران
+                     مشتقّان**: يُقرآن من `risk_register` و`exec_approvals` عند العرض،
+                     فلا حقلَ `f12` ولا `f13` في هذه الصفحة. -->
+                <div class="form-group"><label>المخاطر المفتوحة</label>
+                    <input type="text" value="مشتقٌّ من سجل المخاطر — لا يُكتب" disabled
+                           class="form-control" aria-readonly="true"></div>
+                <div class="form-group"><label>الاعتمادات المعلَّقة</label>
+                    <input type="text" value="مشتقٌّ من صندوق الاعتماد — لا يُكتب" disabled
+                           class="form-control" aria-readonly="true"></div>
                 <div class="form-group"><label for="emsf_1105_88267">آخر تحديث</label>
                     <input type="text" name="f14" maxlength="190" id="emsf_1105_88267"></div>
             </div></div>
@@ -285,7 +318,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <tr><td colspan="16" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
-                    <?php foreach (array_keys($COLS) as $i): $v = m00_cell_at($i, $r, $entityName, $COLDB); ?>
+                    <?php foreach (array_keys($COLS) as $i): $v = m00_cell_at($i, $r, $entityName, $COLDB, $DERIVED_KPI); ?>
                     <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
                     <?php endforeach; ?>
                 </tr>

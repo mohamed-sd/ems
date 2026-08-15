@@ -17,6 +17,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/tenant_scope.php';   // نطاقُ الكيانِ من السياقِ لا من رقمٍ صلب
 require_once '../includes/permissions_helper.php';
 require_once '../includes/unit_chain_helpers.php';
 
@@ -34,7 +35,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 
-$co = $is_super_admin && $company_id <= 0 ? 4 : $company_id;
+$co = ems_scope_company($conn);
 $items = array();
 
 /* ① سلسلة الوحدة: الحالات الوسيطة التي حلقتُها القادمة بيد دور المستخدم.

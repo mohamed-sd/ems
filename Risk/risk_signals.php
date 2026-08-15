@@ -11,6 +11,12 @@ ems_shell_axes($__pp);
 $units = risk_units_list($conn, $company_id);
 $canTriage = $RISK_FULL && (!empty($__pp['can_edit']) || $is_super_admin);
 
+/* ⇐ INJ-0109 · وحداتُ الإدارةِ لمنتقي «الوحدة المالكة» — بشرطِ الكيان */
+$ORG_UNITS = array();
+$__ou = $conn->query('SELECT unit_id, name_ar FROM org_units
+                       WHERE company_id = ' . (int) $company_id . ' ORDER BY name_ar');
+while ($__ou && ($__x = $__ou->fetch_assoc())) { $ORG_UNITS[] = $__x; }
+
 $fState = isset($_GET['state']) ? (string) $_GET['state'] : 'pending';
 $w = "WHERE s.company_id = {$company_id}";
 if (in_array($fState, array('pending', 'dismissed', 'linked', 'converted', 'escalated'), true)) {
@@ -83,6 +89,19 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     </select>
                     <input class="sigReason form-control form-control-sm" placeholder="السبب المكتوب *" style="display:inline-block;width:150px" aria-label="السبب المكتوب">
                     <input class="sigExtra form-control form-control-sm" placeholder="رقم الخطر/الوحدة" style="display:inline-block;width:110px" aria-label="رقم الخطر/الوحدة">
+                    <?php /* ⇐ INJ-0109 · «المستندُ المنتَج: خطرٌ مسجَّلٌ **بمالكٍ ووحدة**»
+                             — فلا خطرَ يُسجَّل بلا وحدةٍ مالكة. وكان النموذجُ يرسل
+                             `ru_id` وحدَه، فيُكتب `owner_unit_id = NULL`؛ وحارسُ
+                             النطاقِ يطابق بالمساواة و**NULL لا يساوي شيئًا** —
+                             فالخطرُ يختفي من سجلِّ إدارتِه إلى الأبد. */ ?>
+                    <select class="sigOwner form-control form-control-sm" style="display:inline-block;width:160px"
+                            aria-label="الوحدة المالكة (إلزامية للتحويل)">
+                        <option value="">— الوحدة المالكة * —</option>
+                        <?php foreach ($ORG_UNITS as $ou): ?>
+                            <option value="<?php echo (int) $ou['unit_id']; ?>"><?php
+                                echo htmlspecialchars((string) $ou['name_ar'], ENT_QUOTES, 'UTF-8'); ?></option>
+                        <?php endforeach; ?>
+                    </select>
                     <button class="btn btn-sm btn-secondary sigGo">نفّذ</button>
                 </td>
                 <?php endif; ?>
@@ -144,7 +163,16 @@ document.addEventListener('DOMContentLoaded', function () {
                       reason: tr.querySelector('.sigReason').value };
             var extra = tr.querySelector('.sigExtra').value;
             if (dec.value === 'link') { d.risk_id = extra; }
-            if (dec.value === 'convert') { d.ru_id = extra; }
+            if (dec.value === 'convert') {
+                d.ru_id = extra;
+                /* INJ-0109: الوحدةُ المالكةُ تُرسَل مع التحويل — والخدمةُ ترفض غيابَها 422 */
+                var own = tr.querySelector('.sigOwner');
+                d.owner_unit_id = own ? own.value : '';
+                if (!d.owner_unit_id) {
+                    alert('RSK-422: الوحدةُ المالكةُ إلزاميةٌ — لا خطرَ يُسجَّل بلا وحدةٍ مالكة');
+                    return;
+                }
+            }
             post(d, function (j) {
                 if (j.ok) { location.reload(); }
                 else { alert((j.code || '') + ': ' + (j.msg || '') + (j.duplicates ? '\nمطابق قائم — اربط به' : '')); }

@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-15 14:03:39
--- الجداول: 554 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-15 16:40:11
+-- الجداول: 555 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -1015,6 +1015,21 @@ CREATE TABLE `clients` (
   KEY `idx_client_name` (`client_name`),
   KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول العملاء';
+
+-- ── Table: cmp03_idempotency ──
+CREATE TABLE `cmp03_idempotency` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL COMMENT 'عزلُ الشركات — المفتاحُ لا يعبر الكيانات',
+  `idem_key` char(40) NOT NULL COMMENT 'sha1 للفاعلِ والشاشةِ والحمولةِ المعنوية',
+  `canonical_file` varchar(80) NOT NULL COMMENT 'الشاشةُ التي كتبت',
+  `target_table` varchar(64) NOT NULL COMMENT 'جدولُ الأثر',
+  `row_id` bigint(20) unsigned DEFAULT NULL COMMENT 'مرجعُ الأثرِ الأولِ — يُعاد عند التكرار',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_cmp03_idem` (`company_id`,`idem_key`),
+  KEY `ix_cmp03_idem_row` (`target_table`,`row_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='INJ-0252: مفتاحُ منعِ تكرارِ كتابةِ شاشاتِ CMP-03 — قيدٌ لا فحصٌ في التطبيق';
 
 -- ── Table: cmp03_screen_rows ──
 CREATE TABLE `cmp03_screen_rows` (
@@ -3015,7 +3030,9 @@ CREATE TABLE `exec_approvals` (
   `created_by_name` varchar(120) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approved_at` datetime DEFAULT NULL COMMENT 'لحظةُ الاعتماد — وبها يُقاس زمنُ الدورة',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_exec_appr_no` (`company_id`,`request_no`),
   KEY `ix_exap_live` (`company_id`,`status`,`received_date`),
   KEY `ix_exap_src` (`source_request_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: الاعتماد الأعلى — الجدول الأصلي لشاشة ceo_approvals';
@@ -3142,7 +3159,11 @@ CREATE TABLE `exec_contract_signings` (
   `created_by_name` varchar(120) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_name` varchar(120) DEFAULT NULL COMMENT 'من اعتمده وبأي صفة',
+  `approver_authority_ref` varchar(120) DEFAULT NULL COMMENT 'سندُ صلاحيةِ المعتمِد — غيرُ سندِ المُوقِّع',
+  `approved_at` datetime DEFAULT NULL COMMENT 'لحظةُ الاعتماد',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_exec_sign_no` (`company_id`,`contract_no`),
   KEY `ix_excs_live` (`company_id`,`status`,`signing_date`),
   KEY `ix_excs_contract` (`contract_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: سجل التوقيع — الجدول الأصلي لشاشة ceo_contracts';
@@ -3172,7 +3193,10 @@ CREATE TABLE `exec_decisions` (
   `created_by_name` varchar(120) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `authority_ref` varchar(120) DEFAULT NULL COMMENT 'سندُ صلاحيةِ معتمِدِ القرار',
+  `parent_ref` varchar(64) DEFAULT NULL COMMENT 'المستندُ الذي تولَّد عنه — خيطُ التتبع',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_exec_decision_no` (`company_id`,`decision_no`),
   KEY `ix_exdc_live` (`company_id`,`status`,`raised_date`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: سجل القرارات العليا — الجدول الأصلي لشاشة ceo_risk';
 
@@ -3250,7 +3274,9 @@ CREATE TABLE `exec_project_charters` (
   `created_by_name` varchar(120) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `authority_ref` varchar(120) DEFAULT NULL COMMENT 'سندُ صلاحيةِ معتمِدِ القرار',
   PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_exec_charter_no` (`company_id`,`decision_no`),
   KEY `ix_expc_live` (`company_id`,`status`,`planned_start`),
   KEY `ix_expc_project` (`project_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: قرار فتح المشروع — الجدول الأصلي لشاشة project_charter';
@@ -6863,6 +6889,7 @@ CREATE TABLE `mnt_order` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `waiting_part_since` date DEFAULT NULL COMMENT 'M-32: تاريخُ دخول WaitingPart — العدّادُ يُحسب منه',
   `pm_cycle_key` varchar(80) DEFAULT NULL COMMENT 'M-36: plan:{id}:eq:{id}:due:{date} — يمنع توليدَ الدورة مرتين',
+  `readiness_cert_ref` varchar(190) DEFAULT NULL COMMENT 'INJ-0074: مرجعُ شهادةِ الجاهزيةِ الفنية — وتاريخُها ومُصدرُها في closed_at/closed_by',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_mnt_pm_cycle` (`pm_cycle_key`),
   KEY `idx_order_eq_company_state` (`equipment_id`,`company_id`,`state`),
@@ -11232,7 +11259,7 @@ CREATE TABLE `substitute_coverages` (
   `company_id` int(11) NOT NULL,
   `level` enum('own_standby','cross_supplier','source_change') NOT NULL COMMENT 'الدرجة: احتياطيُّ المورد نفسِه · تغطيةُ موردٍ آخر · تبديلُ مصدر التوريد (§6)',
   `covered_seat_id` int(10) unsigned NOT NULL COMMENT 'المقعدُ المغطى — op_containers.id (والموردُ المتعطل من شجرته)',
-  `covering_supplier_id` int(11) NOT NULL COMMENT 'الموردُ المغطِّي — suppliers.id (في own_standby هو المتعطلُ نفسُه)',
+  `covering_supplier_id` int(11) DEFAULT NULL COMMENT 'INJ-0140: تُحسم عند الاعتماد بحسب الدرجة — لا تُعرف عند الطلب',
   `failed_supplier_id` int(11) DEFAULT NULL COMMENT 'الموردُ المتعطل — لقطةٌ من شجرة المقعد عند التقديم',
   `covering_equipment_id` int(11) DEFAULT NULL COMMENT 'المعدةُ البديلة إن عُيّنت',
   `reason_code` enum('breakdown','scheduled_maintenance','relocation_exit','document_expired','operator_shortage') NOT NULL COMMENT '§6.1-①: سببٌ من قائمةٍ محكومة — لا تغطيةَ بلا سبب',
@@ -11249,6 +11276,7 @@ CREATE TABLE `substitute_coverages` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`cov_id`),
+  UNIQUE KEY `uq_cov_request` (`company_id`,`covered_seat_id`,`reason_code`,`valid_from`,`valid_to`,`level`),
   KEY `ix_cov_seat` (`company_id`,`covered_seat_id`,`valid_from`),
   KEY `ix_cov_supplier` (`company_id`,`covering_supplier_id`,`state`),
   KEY `fk_cov_seat` (`covered_seat_id`),

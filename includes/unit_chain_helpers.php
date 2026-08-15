@@ -24,6 +24,24 @@ function ems_uc_pending_states()
 }
 
 /**
+ * ⇐ INJ-0334 · الحالاتُ التي **تُعدُّ ساعاتُها واقعةً مقبولة**: ما جاوز اعتمادَ
+ * الموقعِ فصاعدًا. وقبلَ اليومِ كانت شاشةُ الوقائيةِ تسأل عن `'approved'` —
+ * **وهي ليست في تعدادِ العمود أصلًا**، فبقي المتراكمُ يُحسب من `converted` وحدَه
+ * وسقطت ١٥٠٠ ساعةٍ معتمدةٍ من عدّادِ الغيار صامتةً.
+ * ◆ والتعريفُ هنا **واحدٌ** تنادِيه الوقائيةُ ولوحةُ الإنجاز — فلا يتفرّق رقمان.
+ */
+function ems_uc_accepted_states()
+{
+    return array('site_approved', 'parties_approved', 'sales_approved', 'converted');
+}
+
+/** شرطُ القبولِ جاهزًا على اسمٍ مستعار: `ue.state IN ('…')`. */
+function ems_uc_accepted_sql($alias = 'ue')
+{
+    return $alias . ".state IN ('" . implode("','", ems_uc_accepted_states()) . "')";
+}
+
+/**
  * مقاييس DEC-01 ⑦ لشركة: العالق وعمر أقدمه، والمسجَّل/المكتمل في آخر 7 أيام.
  * «المكتمل» = بلغ converted عبر المحرّك (converted_at مملوء) — فالموروث لا يعدّ.
  */

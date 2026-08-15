@@ -123,13 +123,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $contracts = array();
 try {
     $contracts = $gate->scopedQuery(array('scope' => array('c' => 'contracts')),
-        "SELECT c.id, c.first_party, c.contract_status,
-                (SELECT COUNT(*) FROM contract_price_terms t
-                  WHERE t.contract_id = c.id AND COALESCE(t.is_deleted,0)=0) AS terms_count
+        "SELECT c.id, c.first_party, c.contract_status
            FROM contracts c
           WHERE {TENANT_SCOPE} AND COALESCE(c.is_deleted,0)=0
           ORDER BY c.id DESC");
-} catch (\Throwable $t) { $contracts = array(); }
+} catch (\Throwable $t) { error_log('price_terms contracts: ' . $t->getMessage()); $contracts = array(); }
+
+/* عدُّ الشروطِ لكلِّ عقدٍ — استعلامٌ مستقلٌّ لا استعلامٌ فرعيٌّ داخلَ SELECT.
+   ★ البوابةُ تمسح `FROM|JOIN` في النصِّ كلِّه وتردُّ كلَّ جدولٍ مستأجرٍ غيرَ
+     معلَن — والفرعيُّ هنا يذكر `contract_price_terms` بلا إعلان، فكانت البوابةُ
+     ترفض الاستعلامَ كلَّه، ويبتلع `catch` الرفضَ، **فتخلو قائمةُ العقودِ كلُّها**
+     ولا يُنتقى عقدٌ، فتُعرض الشاشةُ فارغةً وكأنَّ لا داتا. الفصلُ هو العلاجُ
+     نفسُه المتَّبعُ في `Clients/rate_books.php`. */
+$termsCounts = array();
+try {
+    $tc = $gate->scopedQuery(array('scope' => array('t' => 'contract_price_terms')),
+        "SELECT t.contract_id, COUNT(*) AS n FROM contract_price_terms t
+          WHERE {TENANT_SCOPE} AND COALESCE(t.is_deleted,0)=0 GROUP BY t.contract_id", array());
+    foreach ($tc as $x) { $termsCounts[(int) $x['contract_id']] = (int) $x['n']; }
+} catch (\Throwable $t) { error_log('price_terms counts: ' . $t->getMessage()); }
+foreach ($contracts as $i => $c) { $contracts[$i]['terms_count'] = $termsCounts[(int) $c['id']] ?? 0; }
 if ($selected <= 0 && $contracts) { $selected = intval($contracts[0]['id']); }
 
 $terms     = $selected > 0 ? PAS::activeTerms($gate, $selected, date('Y-m-d')) : array();

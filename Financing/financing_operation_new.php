@@ -10,6 +10,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/tenant_scope.php';   // نطاقُ الكيانِ من السياقِ لا من رقمٍ صلب
 require_once __DIR__ . '/../includes/screen_contract.php';
 require_once dirname(__DIR__) . '/app/Core/OwnershipDomainGuard.php';
 require_once dirname(__DIR__) . '/app/Services/Financing/FinancingService.php';
@@ -20,7 +21,9 @@ use App\Services\Financing\FinancingService;
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $role = strval($_SESSION['user']['role'] ?? '');
 $uid = intval($_SESSION['user']['id'] ?? 0);
-$co = $company_id ?: 4;
+/* ⇐ INJ-0203 · «حسابٌ بلا شركةٍ صالحةٍ **لا يستطيع فتحَ الشاشة ولا إنشاءَ عملية**».
+     وهذه شاشةُ إنشاءٍ — فالبوابةُ تُغلق مغلقًا لا تفترض كيانًا. */
+$co = ems_require_company($conn, '../main/dashboard.php');
 
 // بوابة المجال المقيَّد — الإنشاء يتطلب رؤية شروط التمويل تحديدًا
 $granted = ($role === '-1') || OwnershipDomainGuard::hasGrant($conn, $co, $uid, OwnershipDomainGuard::PERM_TERMS);

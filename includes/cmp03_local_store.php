@@ -117,15 +117,122 @@ if (!function_exists('cmp03_store_insert')) {
             $vals[] = $v;
             $types .= 's';
         }
+        /* ══ INJ-0252 · «مفتاحُ منع التكرار في كل أثر» ═══════════════════════════
+             نصُّ القبول: «إرسالُ نفسِ النموذج مرتين يُنتج صفًّا واحدًا **ويعيد
+             مرجعَ الأثر الأول**؛ واستعلامُ الصفوف المتطابقة في `scr_*` يُرجع صفرًا».
+           ── والمفتاحُ **قبلَ** الكتابةِ لا بعدها: العمودُ المعروضُ كان
+             `CMP03-<id>` — أي يُشتقُّ من المعرِّفِ **بعد** الإدراج، فيختلف بين
+             النسختين المكرَّرتين ولا يمنع شيئًا. **نتيجةٌ لا مفتاح.**
+           ── والحارسُ **قيدٌ في القاعدة** لا فحصٌ هنا (CS-11): فحصُ وجودٍ في PHP
+             يُهزَم بطلبين متزامنين — وطلبُ الحفظِ الثاني يصل بين الفحصِ والكتابة.
+             فيُدرَج المفتاحُ أولًا في `cmp03_idempotency` ذي القيدِ الفريد،
+             و**رمزُ 1062 هو الحكم**: تكرارٌ مؤكَّدٌ من القاعدةِ لا من ظنِّنا.
+           ◆ والحمولةُ المعنويةُ وحدَها في المفتاح — بعد التطبيعِ وترتيبِ المفاتيح
+             فلا يُفلت تكرارٌ لاختلافِ ترتيبِ الحقولِ أو فراغٍ زائد.
+           ◆ ولا حذفَ عند الفشل: العملُ كلُّه في معاملةٍ واحدة، فالتراجعُ يرفع
+             المفتاحَ بلا جملةِ حذف. */
+        $sig = array();
+        foreach ($payload as $lbl => $v) {
+            $vv = cmp03_store_norm((string) $v);
+            if ($vv === '') { continue; }
+            $sig[cmp03_store_norm((string) $lbl)] = $vv;
+        }
+        ksort($sig);
+        $idem = sha1(implode('|', array(
+            (int) $companyId, (string) $canonical, (int) $uid, (string) $status,
+            json_encode($sig, JSON_UNESCAPED_UNICODE),
+        )));
+
+        $prevRep = mysqli_report(MYSQLI_REPORT_OFF);   // 1062 حكمٌ يُقرأ لا استثناءٌ يُرمى
+        $conn->begin_transaction();
+
+        $ks = $conn->prepare(
+            'INSERT INTO cmp03_idempotency (company_id, idem_key, canonical_file, target_table, created_by)
+             VALUES (?, ?, ?, ?, ?)');
+        if (!$ks) {
+            $conn->rollback(); mysqli_report($prevRep);
+            error_log('cmp03_local_store: prepare(idem) فشل — ' . $conn->error);
+            return false;
+        }
+        $cid = (int) $companyId; $can = (string) $canonical; $tbl = (string) $table; $who = (int) $uid;
+        $ks->bind_param('isssi', $cid, $idem, $can, $tbl, $who);
+        $keyOk  = $ks->execute();
+        $keyErr = $ks->errno;
+        $ks->close();
+
+        if (!$keyOk && $keyErr === 1062) {
+            /* ══ تكرارٌ حكمت به القاعدة — لكن **العطالةُ تحرس أثرًا قائمًا لا ذكرى** ══
+                 مفتاحٌ يشير إلى صفٍّ **حُذف** لا يجوز أن يمنع كتابةً جديدةً بالمحتوى
+                 نفسِه: وإلا صار الحذفُ منعًا أبديًّا من إعادةِ الإدخال. فيُتحقَّق من
+                 بقاءِ الأثرِ الأول؛ فإن ذهب أُطلق المفتاحُ ومضت الكتابة. */
+            $ref = 0; $idemRow = 0;
+            $q = $conn->prepare('SELECT id, row_id FROM cmp03_idempotency
+                                  WHERE company_id = ? AND idem_key = ? LIMIT 1');
+            if ($q) {
+                $q->bind_param('is', $cid, $idem);
+                $q->execute();
+                $rs = $q->get_result();
+                if ($rs && ($rw = $rs->fetch_row())) { $idemRow = (int) $rw[0]; $ref = (int) $rw[1]; }
+                $q->close();
+            }
+            $stillThere = false;
+            if ($ref > 0) {
+                $c = $conn->query("SELECT 1 FROM `{$table}` WHERE id = " . (int) $ref . ' LIMIT 1');
+                $stillThere = (bool) ($c && $c->fetch_row());
+            }
+            if ($stillThere) {
+                $conn->rollback();
+                mysqli_report($prevRep);
+                cmp03_store_notice('هذا الصفُّ محفوظٌ سلفًا — لم يُنشأ صفٌّ ثانٍ.'
+                    . ' مرجعُ الأثرِ الأول: #' . $ref . '.'
+                    . ' (تحديثُ الصفحةِ بعد الحفظِ لا يضاعف البيانة.)');
+                return true;   // الأثرُ واقعٌ سلفًا — والعطالةُ نجاحٌ لا فشل
+            }
+            /* الأثرُ ذهب: يُعاد استعمالُ صفِّ المفتاحِ نفسِه — ولا حذفَ ولا صفٌّ ثانٍ */
+            if ($idemRow > 0) {
+                $u = $conn->prepare('UPDATE cmp03_idempotency SET row_id = NULL, created_by = ?, created_at = NOW()
+                                      WHERE id = ?');
+                if ($u) { $u->bind_param('ii', $who, $idemRow); $u->execute(); $u->close(); }
+                $idemId = $idemRow;
+            }
+        }
+        if (!$keyOk && $keyErr !== 1062) {
+            $conn->rollback(); mysqli_report($prevRep);
+            error_log('cmp03_local_store: execute(idem) فشل — errno ' . $keyErr);
+            return false;
+        }
+        /* 1062 مع أثرٍ ذاهبٍ ⇒ `$idemId` ضُبط أعلاه على صفِّ المفتاحِ المُعادِ استعمالُه */
+        if ($keyOk) { $idemId = (int) $conn->insert_id; }
+        if (empty($idemId)) {
+            $conn->rollback(); mysqli_report($prevRep);
+            error_log('cmp03_local_store: تعذّر تثبيتُ مفتاحِ العطالة');
+            return false;
+        }
+
         $sql = "INSERT INTO `{$table}` (`" . implode('`, `', $cols) . "`)
                 VALUES (" . implode(', ', array_fill(0, count($cols), '?')) . ")";
         $st = $conn->prepare($sql);
-        if (!$st) { error_log("cmp03_local_store: prepare فشل — " . $conn->error); return false; }
+        if (!$st) {
+            $conn->rollback(); mysqli_report($prevRep);
+            error_log('cmp03_local_store: prepare فشل — ' . $conn->error);
+            return false;
+        }
         $st->bind_param($types, ...$vals);
         $ok = $st->execute();
-        if (!$ok) { error_log("cmp03_local_store: execute فشل — " . $st->error); }
+        if (!$ok) { error_log('cmp03_local_store: execute فشل — ' . $st->error); }
+        $rowId = $ok ? (int) $conn->insert_id : 0;
         $st->close();
-        return (bool) $ok;
+        if (!$ok) {
+            /* التراجعُ يرفع المفتاحَ معه — فمحاولةٌ تاليةٌ صحيحةٌ لا تُحجَب */
+            $conn->rollback();
+            mysqli_report($prevRep);
+            return false;
+        }
+        $us = $conn->prepare('UPDATE cmp03_idempotency SET row_id = ? WHERE id = ?');
+        if ($us) { $us->bind_param('ii', $rowId, $idemId); $us->execute(); $us->close(); }
+        $conn->commit();
+        mysqli_report($prevRep);
+        return true;
     }
 }
 
@@ -412,5 +519,35 @@ if (!function_exists('cmp03_store_audit')) {
             error_log('cmp03_store_audit failed: ' . $e->getMessage());
         }
         mysqli_report($prev);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * CMP-03 · ربطُ عمودَي العكس بمصدرِهما القائم
+ * ═══════════════════════════════════════════════════════════════════════════
+ * «معكوس بـ» و«عكس عن» عمودانِ محقونانِ في الشاشاتِ المولَّدة، ولا عمودَ لهما
+ * في جداولِ `scr_*` — فكانا يُعرضان «—» أبدًا. لكنَّ الوصلَ **موجودٌ في
+ * القاعدة**: `cmp03_store_reverse` يكتبه نصًّا في `status`:
+ *   الأصلُ بعد عكسِه ⇐ «معكوس — بالحركة #<معرِّفُ العاكسة>»
+ *   والحركةُ العاكسة ⇐ «عكس — مرجع #<معرِّفُ الأصل>»
+ * فالربطُ قراءةٌ لما هو مكتوبٌ لا هجرةُ مخطَّطٍ ولا اختلاقُ قيمة.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+if (!function_exists('cmp03_reversal_ref')) {
+    /**
+     * @param string $status حالةُ الصفِّ كما هي في `scr_*`.`status`
+     * @param string $which  'reversed_by' (عُكس بهذه) أو 'reversal_of' (يعكس تلك)
+     * @return string مرجعٌ للعرض («#12») أو '' إن لم يكن الصفُّ طرفًا في عكس
+     */
+    function cmp03_reversal_ref($status, $which)
+    {
+        $s = (string) $status;
+        if ($which === 'reversed_by') {
+            // الأصلُ المعكوس: «معكوس — بالحركة #N»
+            if (preg_match('~معكوس\s*—\s*بالحركة\s*#(\d+)~u', $s, $m)) { return '#' . $m[1]; }
+            return '';
+        }
+        // الحركةُ العاكسة: «عكس — مرجع #N» (ولا تلتقط «معكوس» فهي كلمةٌ أخرى)
+        if (preg_match('~(?<!م)عكس\s*—\s*مرجع\s*#(\d+)~u', $s, $m)) { return '#' . $m[1]; }
+        return '';
     }
 }

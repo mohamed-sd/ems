@@ -31,7 +31,21 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['rts_order']))
         $r = mysqli_query($conn, "SELECT equipment_id FROM mnt_order WHERE id=$oid AND company_id=$company_id AND state IN ('Done','Executed','QA')");
         if ($r && ($o = mysqli_fetch_assoc($r))) {
             mysqli_begin_transaction($conn);
-            $ok1 = mysqli_query($conn, "UPDATE mnt_order SET state='Closed', updated_at=NOW() WHERE id=$oid");
+            /* ⇐ INJ-0074 · «كلُّ معدةٍ في لوحة الجاهزية تعرض **مرجعَ آخر شهادةِ
+                 جاهزيةٍ وتاريخَها ومُصدرَها**». وكانت الشهادةُ تُشترط (422 بدونها)
+                 ثم **تُكتب في سجلِّ التدقيقِ وحدَه** فلا سبيلَ إلى عرضِها:
+                 **شرطٌ يُستوفى ثم يضيع**. فصارت تُخزَّن مع الأمرِ الذي أصدرها،
+                 وتاريخُها ومُصدرُها في `closed_at`/`closed_by` القائمَين. */
+            $__certStmt = mysqli_prepare($conn,
+                "UPDATE mnt_order
+                    SET state='Closed', readiness_cert_ref=?, closed_at=NOW(), closed_by=?, updated_at=NOW()
+                  WHERE id=? AND company_id=?");
+            $ok1 = false;
+            if ($__certStmt) {
+                mysqli_stmt_bind_param($__certStmt, 'siii', $cert, $uid, $oid, $company_id);
+                $ok1 = mysqli_stmt_execute($__certStmt);
+                mysqli_stmt_close($__certStmt);
+            }
             $ok2 = mysqli_query($conn, "UPDATE equipments SET status=1 WHERE id=" . intval($o['equipment_id']));
             if ($ok1 && $ok2) {
                 mysqli_commit($conn);

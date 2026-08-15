@@ -15,25 +15,29 @@ session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/unit_chain_helpers.php';
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $is_super   = !empty($_SESSION['user']['is_super_admin']);
 $cw = $is_super ? '1=1' : "mp.company_id = $company_id";
 
-/* لكل خطةٍ وقائيةٍ بأساس العدّاد: المتراكمُ منذ آخر غيارٍ والمتبقي */
+/* لكل خطةٍ وقائيةٍ بأساس العدّاد: المتراكمُ منذ آخر غيارٍ والمتبقي
+   ◆ والحالاتُ المقبولةُ من التعريفِ المركزيِّ الواحد (`ems_uc_accepted_sql`) —
+     لا من قائمةٍ مكتوبةٍ هنا تتقادم مع أوّلِ هجرةٍ تمسُّ التعداد (INJ-0334). */
+$ue_ok = ems_uc_accepted_sql('ue');
 $rows = array();
 $sql = "SELECT mp.id, mp.name AS plan_name, mp.interval_value, mp.tolerance,
                mp.last_done_meter, mp.last_done_date, mp.next_due_meter,
                e.id AS eq_id, e.name AS eq_name,
                COALESCE((SELECT SUM(ue.qty) FROM unit_entries ue
-                         WHERE ue.equipment_id = e.id AND ue.state IN ('approved','converted')
+                         WHERE ue.equipment_id = e.id AND $ue_ok
                            AND (mp.last_done_date IS NULL OR ue.entry_date > mp.last_done_date)), 0) AS hours_since
         FROM mnt_plan mp
         JOIN equipments e ON e.id = mp.equipment_id
         WHERE $cw AND mp.is_deleted = 0 AND mp.state <> 'Retired'
           AND mp.trigger_basis IN ('meter','hours','Meter')
         ORDER BY (mp.interval_value - COALESCE((SELECT SUM(ue.qty) FROM unit_entries ue
-                  WHERE ue.equipment_id = e.id AND ue.state IN ('approved','converted')
+                  WHERE ue.equipment_id = e.id AND $ue_ok
                     AND (mp.last_done_date IS NULL OR ue.entry_date > mp.last_done_date)), 0)) ASC";
 $res = mysqli_query($conn, $sql);
 if ($res) { while ($x = mysqli_fetch_assoc($res)) $rows[] = $x; }

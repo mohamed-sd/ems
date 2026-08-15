@@ -51,14 +51,93 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $r = mysqli_query($conn, "SELECT id FROM op_containers WHERE project_id=$site AND equipment_id=$equipment AND is_deleted=0 LIMIT 1");
         if ($r && ($x = mysqli_fetch_assoc($r))) $seat = intval($x['id']);
         // الأثرُ المقدَّر يُحمل في الطلب — ويُعرض على الموافقين (§6.3-③)
-        $level = 'cross_supplier'; // الافتراضُ الأوسط — والخدمةُ تعيد الحسم بالدرجة عند الاعتماد
-        $ins = mysqli_prepare($conn,
-            "INSERT INTO substitute_coverages (covering_supplier_id, covered_seat_id, reason_code,
-                    valid_from, valid_to, level, estimated_hours, state, approvals_ref)
-             VALUES (NULL, ?, ?, CURDATE(), ?, ?, ?, 'Pending', NULL)");
-        mysqli_stmt_bind_param($ins, 'isssd', $seat, $reason, $until, $level, $est_h);
-        if (mysqli_stmt_execute($ins)) {
-            $covId = mysqli_stmt_insert_id($ins);
+        /* ══ الدرجةُ تُشتقُّ من البديلِ لا تُفترض ══════════════════════════════════
+             كان السطرُ يثبّت `cross_supplier` بتعليقٍ يقول «الخدمةُ تعيد الحسم» —
+             وهي لا تعيده: الدرجةُ ② تشترط موردًا مغطّيًا صريحًا فتردُّ ٤٢٢.
+             والصوابُ من §٦: إن كان البديلُ لمقعدِ **موردٍ آخر** فهي الدرجةُ ②
+             بمغطٍّ معلوم، وإلا فهي الدرجةُ ① — احتياطيُّ المورد نفسِه. */
+        $coveringSupplier = 0;
+        if ($sub_eq > 0) {
+            $q = mysqli_prepare($conn,
+                "SELECT supplier_id FROM op_containers
+                  WHERE company_id = ? AND equipment_id = ? AND is_deleted = 0
+                    AND supplier_id IS NOT NULL LIMIT 1");
+            if ($q) {
+                mysqli_stmt_bind_param($q, 'ii', $company_id, $sub_eq);
+                mysqli_stmt_execute($q);
+                mysqli_stmt_bind_result($q, $coveringSupplier);
+                mysqli_stmt_fetch($q);
+                mysqli_stmt_close($q);
+            }
+        }
+        $failedSupplier = 0;
+        $q = mysqli_prepare($conn, "SELECT supplier_id FROM op_containers WHERE id = ? LIMIT 1");
+        if ($q) {
+            mysqli_stmt_bind_param($q, 'i', $seat);
+            mysqli_stmt_execute($q);
+            mysqli_stmt_bind_result($q, $failedSupplier);
+            mysqli_stmt_fetch($q);
+            mysqli_stmt_close($q);
+        }
+        $coveringSupplier = (int) $coveringSupplier;
+        $failedSupplier   = (int) $failedSupplier;
+        $level = ($coveringSupplier > 0 && $coveringSupplier !== $failedSupplier)
+               ? 'cross_supplier' : 'own_standby';
+        /* ══ INJ-0140 — والعطبُ أكبرُ ممّا وُصف، مقيسًا حيًّا ══════════════════════
+             وُصف بأنَّ المعالجَ «يُدرج صفًّا في كل POST بلا مفتاحِ عطالة». وتشغيلُ
+             جملتِه حرفًا يقول:  execute=false · errno=1048 ·
+             «Column 'covering_supplier_id' cannot be null» — **فالطلبُ لم يُنشأ
+             ولا مرةً واحدة**. وفيها ثلاثةُ أعطالٍ لا واحد:
+               ① `covering_supplier_id` كان `NOT NULL` ويُمرَّر `NULL` صراحةً.
+               ② `'Pending'` ليست في تعدادِ `state` — و`sql_mode` خالٍ فتُبتر إلى `''`.
+               ③ `company_id` غائبٌ عن الجملة وهو `NOT NULL` — ثقبُ عزلٍ (ADR-02).
+             و**العطالةُ لا تُبنى فوق فعلٍ لا يقع**، فالإصلاحُ قبلَها.
+
+           ══ والحكمُ في الخدمةِ لا في الشاشة (CS-05) ═══════════════════════════════
+             `SubstituteCoverageService::create` **مبنيةٌ وكاملة**: تحرس الجاهزيةَ
+             الفنيةَ للبديل، ومهلةَ الإحلالِ في عقدِ المورد، وتحسب الأثرَ على
+             الأطرافِ الأربعةِ قبل الإرسال، وتكتب `pending_approvals` و`approvals_json`.
+             والشاشةُ كانت **تتجاوزها كلَّها** بجملةِ `INSERT` خاصةٍ بها — وهو
+             عيبُ «الآلاتُ مبنيةٌ والشاشاتُ تتجاوزها» بعينِه. فصارت تنادِيها.
+           ◆ والتكرارُ يردُّه **قيدُ القاعدة** `uq_cov_request` لا فحصٌ هنا (CS-11). */
+        require_once __DIR__ . '/../app/Services/Capacity/SubstituteCoverageService.php';
+        $__gate = ems_tenant_db();
+        $__res  = \App\Services\Capacity\SubstituteCoverageService::create($__gate, $company_id, array(
+            'level'                 => $level,
+            'covered_seat_id'       => $seat,
+            'covering_supplier_id'  => $coveringSupplier,
+            'covering_equipment_id' => $sub_eq > 0 ? $sub_eq : null,
+            'reason_code'           => $reason,
+            'valid_from'            => date('Y-m-d'),
+            'valid_to'              => $until,
+            'estimated_hours'       => $est_h,
+            'note'                  => 'طلبُ تبديلٍ من شاشةِ الموقع',
+        ), $uid);
+        $__insOk = !empty($__res['ok']);
+        if (!$__insOk) {
+            /* التكرارُ يصل من الخدمةِ ملفوفًا في «رفضٌ بنيوي» — يُميَّز ويُسمَّى صفُّه */
+            if (mb_strpos((string) $__res['reason'], 'Duplicate') !== false
+                || mb_strpos((string) $__res['reason'], '1062') !== false) {
+                $__ref = 0;
+                $__q = mysqli_prepare($conn,
+                    "SELECT cov_id FROM substitute_coverages
+                      WHERE company_id = ? AND covered_seat_id = ? AND reason_code = ?
+                        AND valid_from = CURDATE() AND valid_to = ? AND level = ? LIMIT 1");
+                if ($__q) {
+                    mysqli_stmt_bind_param($__q, 'iisss', $company_id, $seat, $reason, $until, $level);
+                    mysqli_stmt_execute($__q);
+                    mysqli_stmt_bind_result($__q, $__ref);
+                    mysqli_stmt_fetch($__q);
+                    mysqli_stmt_close($__q);
+                }
+                $msg = 'هذا الطلبُ مسجَّلٌ سلفًا — لم يُنشأ صفٌّ ثانٍ'
+                     . ($__ref ? (' (الطلبُ القائم #' . (int) $__ref . ')') : '') . ' (409)';
+            } else {
+                $msg = $__res['reason'] . ' (' . (int) $__res['code'] . ')';
+            }
+        }
+        if ($__insOk) {
+            $covId = (int) $__res['cov_id'];
             /* INJ-0139 — أثرُ تدقيقٍ لكلِّ فعلٍ كاتبٍ في وحدةِ التشغيل.
                و«قبل» هنا **مصفوفةٌ خاويةٌ بحقٍّ**: الصفُّ يُنشأ من عدمٍ، فكلُّ
                حقلٍ تغييرٌ من نُلٍّ — وهو ما يحسبه المُوصِلُ المشتركُ نفسُه. */
@@ -71,17 +150,18 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                     array(),
                     array('covered_seat_id' => $seat, 'reason_code' => $reason,
                           'valid_to' => $until, 'level' => $level,
-                          'estimated_hours' => $est_h, 'state' => 'Pending'),
+                          'estimated_hours' => $est_h, 'state' => 'pending_approvals'),
                     array('company_id' => $company_id,
                           'user_id' => intval($_SESSION['user']['id'] ?? 0),
                           'note' => 'طلبُ تبديلِ تغطيةٍ — بانتظارِ الاعتماد'));
             }
             // البندُ يظهر في صندوق الاعتماد الجامع عبر مجمِّعه (ApprovalsInboxService
-            // يقرأ substitute_coverages بحالة Pending) — لا رسائلَ ولا جدولَ وسيطًا.
+            // يقرأ substitute_coverages بحالة pending_approvals) — لا جدولَ وسيطًا.
             $msg = "أُرسل الطلبُ #$covId — بانتظار موافقة القوى التشغيلية ثم الإدارة المعنية";
-        } else {
-            $msg = 'تعذّر الحفظ: ' . mysqli_error($conn);
         }
+        /* ولا فرعَ `else` هنا: الرسالةُ ضُبطت أعلاه برمزِ الخدمةِ وسببِها —
+           و`mysqli_error($conn)` **خاوٍ** بعد فشلِ جملةٍ محضَّرة، فكان الفرعُ
+           القديمُ يعرض «تعذّر الحفظ:» بلا سبب. */
     }
 }
 

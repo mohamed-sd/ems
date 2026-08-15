@@ -171,7 +171,7 @@ class WorkspaceFeedService
                         break;
                     case 'decisions.pending':
                         $q = $conn->query("SELECT COUNT(*) n FROM fin_requests
-                                            WHERE company_id={$co} AND state IN ('submitted','under_review','pending_approval')");
+                                            WHERE company_id={$co} AND state IN ('under_review','pending_approval')");   /* INJ-0334 */
                         $x = $q ? $q->fetch_assoc() : null;
                         $value = $x ? ($x['n'] . ' بانتظار قرار') : null;
                         $out['decisions'][] = array('box' => 'requests.approval', 'count' => $x ? (int) $x['n'] : 0,

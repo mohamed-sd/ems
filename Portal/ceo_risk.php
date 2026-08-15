@@ -62,7 +62,9 @@ $COLS   = array (
   13 => 'تاريخ المتابعة',
   14 => 'المعتمِد — الاسم والصفة',
   15 => 'تاريخ القرار',
-  16 => 'الحالة',
+  16 => 'مرجع التفويض',
+  17 => 'المرجع الأب',
+  18 => 'الحالة',
 );
 /* أعمدة الجدول الأصلي بترتيب حقول الفورم f0..f15 (الأخير الحالة) */
 $DB_FIELDS = array(
@@ -74,7 +76,10 @@ $DB_FIELDS = array(
 $COLDB = array(null, 'decision_no', 'raised_date', 'raising_dept', 'issue_type',
     'issue_desc', 'est_impact', 'currency', 'options_text', 'chosen_option',
     'choice_reason', 'assigned_dept', 'exec_deadline', 'followup_date',
-    'approver_name', 'decision_date', '__status');
+    'approver_name', 'decision_date', 
+    /* أعمدةُ الحوكمةِ الناقصة — مصادرُها مخزَّنةٌ ولا تُدخَل يدويًّا */
+    'authority_ref', 'parent_ref',
+    '__status');
 
 /* ── الحفظ: فورم الإضافة الموحد → الجدول الأصلي ─────────────────────────── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
@@ -133,6 +138,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         $bindIn['assigned_dept'], $bindIn['exec_deadline'], $bindIn['followup_date'],
         $bindIn['approver_name'], $bindIn['decision_date'], $status, $uid, $creator);
     $ok = $st->execute();
+    /* رمزُ الخطأ من **الجملةِ** قبل إغلاقها — `$conn->errno` يبقى صفرًا بعد فشلِ
+       جملةٍ محضَّرة، فقراءتُه تقرأ نجاحًا حيث وقع تكرار. */
+    $__errno = (int) $st->errno;
     $newId = $ok ? (int) $conn->insert_id : 0;
     $st->close();
 
@@ -182,7 +190,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         } catch (\Throwable $t) { error_log('ceo_risk decision fact #' . $newId . ': ' . $t->getMessage()); }
     }
 
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    /* ══ INJ-0424 · «حفظُ صفَّين برقمِ المستندِ نفسِه يُرفض **برسالةٍ تسمّي الصفَّ
+         القائم**؛ وتحديثُ الصفحةِ بعد الحفظِ لا ينشئ صفًّا ثانيًا» ══════════════
+         والمنعُ قيدٌ في القاعدة (`UNIQUE(company_id, decision_no)`) لا فحصٌ هنا —
+         ففحصُ PHP يُهزَم بطلبين متزامنين، و**1062 حكمُ القاعدةِ لا ظنُّنا**. */
+    $__dup = !$ok && $__errno === 1062;
+    $__ref = '';
+    if ($__dup) {
+        $__q = $conn->prepare("SELECT id, status FROM exec_decisions
+                                 WHERE company_id = ? AND `decision_no` = ? LIMIT 1");
+        if ($__q) {
+            $__q->bind_param('is', $company_id, $in['decision_no']);
+            $__q->execute();
+            $__rs = $__q->get_result();
+            if ($__rs && ($__row = $__rs->fetch_assoc())) {
+                $__ref = ' — الصفُّ القائم #' . (int) $__row['id'] . ' (' . $__row['status'] . ')';
+            }
+            $__q->close();
+        }
+    }
+    ems_gov_flash_redirect(basename(__FILE__),
+        $ok ? 'حُفظ الصف ✅'
+            : ($__dup ? ('رقمُ القرار «' . $in['decision_no'] . '» مسجَّلٌ سلفًا — لم يُنشأ صفٌّ ثانٍ' . $__ref . ' ❌')
+                      : 'تعذر الحفظ ❌'),
+        $ok ? 'GOV-OK-200' : ($__dup ? 'GOV-FAIL-409' : 'GOV-OK-200'), '');
     exit();
 }
 
@@ -305,11 +336,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>تاريخ المتابعة</th>
             <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
             <th>تاريخ القرار</th>
+            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+            <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولَّد عنه — خيط التتبع">المرجع الأب</th>
             <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
             </tr></thead>
             <tbody>
             <?php if (!$rows): ?>
-                <tr><td colspan="17" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
+                <tr><td colspan="19" class="text-center text-muted">لا بياناتَ بعدُ — أضف أول صفٍّ بزر «إضافة»</td></tr>
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach (array_keys($COLS) as $i): $v = m00_cell_at($i, $r, $entityName, $COLDB); ?>

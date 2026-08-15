@@ -12924,8 +12924,15 @@ body.ems-site .main :is(table, .table, .dataTable, .alltable, .alltables) tbody 
   color: var(--c-1f3651) !important;
 }
 
-/* ── Unified badges/chips/status tokens ── */
-body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip, [class*=" badge"], [class^="badge"], [class*="status"], [class*="chip"], [class*="tag"]) {
+/* ── Unified badges/chips/status tokens ──
+   المحدداتُ الجزئيةُ أدناه (`[class*="status"]` وأختاها) تُطابِق بالسلسلةِ لا
+   بالمعنى؛ فصنفُ مجموعةِ العمودِ `group-status` على `<th>`/`<td>` كان يقع في
+   شِباكها فتصير **خليةُ الجدولِ نفسُها شارةً**: `display: inline-flex !important`
+   ينزع عنها دورَ الخلية، فتنهار الأعمدةُ وتتداخل مع بعضها ومع الترويسة
+   (مقيسٌ في Contracts/contracts.php و Employees/employee_contracts.php
+   و Suppliers/supplierscontracts.php). والشارةُ لا تكون بنيةَ جدولٍ أبدًا،
+   فاستُثنيت بنيةُ الجدولِ صراحةً — والشاراتُ الحقيقيةُ داخلَ الخلايا لا تُمس. */
+body.ems-site .main :is(.badge, .label, .chip, .tag, .status-badge, .status-chip, .ems-status-chip, [class*=" badge"], [class^="badge"], [class*="status"], [class*="chip"], [class*="tag"]):not(table):not(thead):not(tbody):not(tfoot):not(tr):not(th):not(td):not(col):not(colgroup):not(caption) {
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;

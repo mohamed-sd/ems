@@ -774,7 +774,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="group-status"> الإجراءات</th>
               <!-- INJ-0001: حالةُ العقدِ في آلةِ الحالة — عمودٌ حاكمٌ كان غائبًا -->
               <th class="group-status"> حالة العقد</th>
-              <th class="group-status"> نقلُ الحالة</th>
+              <th class="group-status ems-lc-cell"> نقلُ الحالة</th>
               <!-- المعلومات الأساسية -->
               <th class="group-basic"> رقم العقد</th>
               <th class="group-basic"> المشروع</th>
@@ -1241,7 +1241,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                               ? "<input type='text' name='clc_note' required minlength='3' class='ems-note-inline'"
                                 . " placeholder='السبب'>"
                               : '')
-                          . "<button class='action-btn' type='submit' title='"
+                          . "<button class='action-btn ems-lc-btn' type='submit' title='"
                           . htmlspecialchars($__tip, ENT_QUOTES, 'UTF-8') . "'>"
                           . htmlspecialchars($__a['label'], ENT_QUOTES, 'UTF-8')
                           . ($__rv['has'] ? '' : ' <small>⛒</small>')
@@ -1249,7 +1249,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     }
                 }
                 if ($csm_cell === '') { $csm_cell = "<span class='text-muted'>—</span>"; }
-                echo "<td class='group-status'>" . $csm_cell . "</td>";
+                echo "<td class='group-status ems-lc-cell'>" . $csm_cell . "</td>";
 
                 // المعلومات الأساسية
                 echo "<td class='group-basic'> " . $row['id'] . "#</td>";

@@ -14,7 +14,10 @@ ems_shell_axes($__ro);
 $unit = $RISK_FULL ? intval($_GET['unit'] ?? 0) : $RISK_ORG_UNIT;
 $unitName = '';
 if ($unit > 0) {
-    $r = $conn->query("SELECT name_ar FROM org_units WHERE unit_id = {$unit}");
+    /* ⇐ INJ-0579 · «عزلُ الكيانِ شرطٌ في **كلِّ** استعلام» — واسمُ الوحدةِ كان
+         يُقرأ بلا `company_id`، فوحدةٌ برقمٍ متطابقٍ في كيانٍ آخرَ تُعرض باسمِها. */
+    $r = $conn->query("SELECT name_ar FROM org_units
+                        WHERE unit_id = {$unit} AND company_id = " . (int) $company_id);
     if ($r && ($x = $r->fetch_assoc())) { $unitName = $x['name_ar']; }
 }
 $w = $unit > 0 ? " AND rr.owner_unit_id = {$unit} " : ($RISK_FULL ? '' : ' AND 1=0 ');

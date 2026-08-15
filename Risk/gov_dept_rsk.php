@@ -68,7 +68,10 @@ $auditCounts = array(
         WHERE company_id = {$company_id} AND source_module = 'risk'")->fetch_assoc()['c'],
     'سجل التصدير (تسعة بنود)' => (int) $conn->query("SELECT COUNT(*) c FROM risk_export_log
         WHERE company_id = {$company_id}")->fetch_assoc()['c'],
-    'سجل الاطّلاع الحساس' => (int) $conn->query("SELECT COUNT(*) c FROM sensitive_read_log")->fetch_assoc()['c'],
+    /* ⇐ INJ-0579 · «`COUNT` سجلِّ الاطّلاعِ يساوي عددَ صفوفِ **الكيانِ الحالي فقط**» —
+         وكان يعدُّ الكياناتِ كلَّها فيُعرض للمراجعِ رقمٌ ليس رقمَه. */
+    'سجل الاطّلاع الحساس' => (int) $conn->query("SELECT COUNT(*) c FROM sensitive_read_log
+        WHERE company_id = {$company_id}")->fetch_assoc()['c'],
     'سجل رفض الحارس' => (int) $conn->query("SELECT COUNT(*) c FROM action_execution_log
         WHERE company_id = {$company_id} AND denied_by_guard = 1")->fetch_assoc()['c'],
 );

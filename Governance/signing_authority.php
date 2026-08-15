@@ -12,6 +12,7 @@ session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
 
+require_once __DIR__ . '/../includes/tenant_scope.php';   // نطاقُ الكيانِ من السياقِ لا من رقمٍ صلب
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
 // كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
 // **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
@@ -33,7 +34,7 @@ $gov_write = ($role === '-1' || in_array($role, array('1', '19'), true));
 if (!$gov_write && $role !== EMS_ROLE_FINANCING_MGR) {
     ems_gov_flash_redirect('../main/dashboard.php', 'باب الحوكمة خلف صلاحيته ❌', 'GOV-PERM-403', 'اطلب المنحةَ من مدير الصلاحيات إن كانت ضمن عملك');
 }
-$co = $company_id ?: 4;
+$co = ems_scope_company($conn);
 
 $msg = ''; $err = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$gov_write) {

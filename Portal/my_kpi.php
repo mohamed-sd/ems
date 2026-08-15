@@ -11,6 +11,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/tenant_scope.php';   // نطاقُ الكيانِ من السياقِ لا من رقمٍ صلب
 require_once '../includes/permissions_helper.php';
 require_once '../includes/resolve_manager.php';
 require_once '../app/Services/Work/AchievementService.php';
@@ -33,7 +34,7 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 /* المدى الحر (IAM-023: بين تاريخين) */
 $from = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) ($_GET['from'] ?? '')) ? $_GET['from'] : date('Y-m-01');
 $to   = preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) ($_GET['to'] ?? '')) ? $_GET['to'] : date('Y-m-d');
-$co   = $is_super_admin && $company_id <= 0 ? 4 : $company_id;
+$co   = ems_scope_company($conn);
 
 function kpi_row(mysqli $conn, $co, $userId, $from, $to)
 {

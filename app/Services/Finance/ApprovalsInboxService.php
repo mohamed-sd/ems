@@ -43,7 +43,9 @@ class ApprovalsInboxService
         $r = $conn->query("SELECT id, request_no, request_type, amount, currency, state, created_at
                              FROM fin_requests
                             WHERE company_id={$co}
-                              AND state IN ('submitted','under_review','pending_approval')
+                              /* `submitted` ليست في تعدادِ `fin_requests.state` (INJ-0334):
+                                 أوّلُ حالةٍ بعد التقديمِ هي `under_review`. */
+                              AND state IN ('under_review','pending_approval')
                               {$notMine}
                             ORDER BY created_at LIMIT 50");
         while ($r && ($x = $r->fetch_assoc())) {

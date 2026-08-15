@@ -69,9 +69,15 @@ $body = ($pos !== false && $end !== false) ? substr($store, $pos, $end - $pos) :
 $ok($body !== '' && strpos($body, 'cmp03_store_audit') !== false,
     '**والإدراجُ يُدقّق** — `cmp03_stage_insert` تنادي المُوصِلَ المشترك',
     'كانت شقيقتاها تُدقّقان وهي لا — فكلُّ إدراجٍ من هذا الباب بلا أثر');
+/* ◆ INJ-0151: لم تعد شاشةُ الحساباتِ البنكيةِ تكتب من هذا البابِ إطلاقًا —
+     صارت **قارئةً** للمصدرِ الموثَّق `suppliers.bank_*`، والكتابةُ بابُها
+     `SupplierDocumentService::verifyBank` بمستندِ إثباتٍ ومحقِّقٍ مسجَّل.
+     فالمقاسُ هنا: أنَّها لا تكتب، وأنَّها تقرأ المصدرَ المنظَّم. */
 $bank = (string) file_get_contents($ROOT . '/Suppliers/supplier_bank.php');
-$ok(strpos($bank, 'cmp03_stage_insert') !== false,
-    'وشاشةُ الحساباتِ البنكيةِ تكتب من هذا الباب — فيسري عليها الإصلاح');
+$ok(strpos($bank, 'cmp03_stage_insert') === false,
+    'وشاشةُ الحساباتِ البنكيةِ لا تكتب من هذا البابِ أصلًا (INJ-0151)');
+$ok(strpos($bank, 'FROM suppliers s') !== false,
+    'بل تقرأ `suppliers` — المصدرَ الموثَّقَ المربوطَ بمعرِّفِ المورد');
 $ok(strpos($bank, 'ems_audit_change') === false && strpos($bank, 'cmp03_store_audit') === false,
     '   ولا تنادي التدقيقَ بيدها — فلا مسارَ تدقيقٍ ثانٍ يتفرّق عن الطبقة');
 

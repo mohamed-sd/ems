@@ -401,11 +401,40 @@ class RFQService
                         'reason' => isset($a['reason']) ? mb_substr((string) $a['reason'], 0, 255) : null,
                         'awarded_by' => (int) $actor ?: null,
                     ));
-                    // عدّادُ البند — و`CHECK` يحرس السقفَ ذرّيًّا
-                    $line = $g->selectOne('rfq_lines', array('where' => array('id' => $lid)));
-                    $g->update('rfq_lines',
-                        array('qty_awarded' => round((float) $line['qty_awarded'] + $qty, 2)),
-                        array('id' => $lid));
+                    /* ══ INJ-0455 · «محاولتان متزامنتان لترسيةِ البندِ نفسِه تنتجان
+                         صفًّا واحدًا؛ والثانيةُ تُردّ برسالةٍ تشير إلى الترسيةِ القائمة» ══
+                         كان العدّادُ يُقرأ **بلا قفل** ثم يُكتب بقيمةٍ مطلقة:
+                         فمعاملتان تقرآن `qty_awarded = 0` معًا وتكتبان القيمةَ
+                         نفسَها، فيمرُّ `ck_rfq_line_award` على كلٍّ منهما منفردةً
+                         — **ترسيتان والعدّادُ يقول واحدة** (تحديثٌ ضائع).
+                       ◆ فالقراءةُ صارت `FOR UPDATE` **داخلَ المعاملة**: الثانيةُ
+                         تنتظر الأولى ثم تقرأ العدّادَ الحقيقيّ. والسقفُ يُفحص
+                         صراحةً برمزٍ يسمّي الترسيةَ القائمةَ — ووراءَه `CHECK`
+                         في القاعدةِ حارسًا أخيرًا لا يُهزَم. */
+                    $lrows = $g->scopedQuery(array('scope' => array('l' => 'rfq_lines')),
+                        "SELECT l.qty_awarded, l.qty_required FROM rfq_lines l
+                          WHERE {TENANT_SCOPE} AND l.id = ? FOR UPDATE",
+                        array($lid));
+                    if (!$lrows) { throw new \RuntimeException('بندُ الطلب ' . $lid . ' غيرُ موجودٍ في نطاقك'); }
+                    $line   = $lrows[0];
+                    $newQty = round((float) $line['qty_awarded'] + $qty, 2);
+                    if ($newQty > (float) $line['qty_required'] + 0.0001) {
+                        $prev = $g->scopedQuery(array('scope' => array('a' => 'rfq_awards')),
+                            "SELECT a.id, a.supplier_id, a.qty_awarded FROM rfq_awards a
+                              WHERE {TENANT_SCOPE} AND a.line_id = ? ORDER BY a.id",
+                            array($lid));
+                        $refs = array();
+                        foreach ((array) $prev as $pv) {
+                            $refs[] = '#' . (int) $pv['id'] . ' (موردٌ ' . (int) $pv['supplier_id']
+                                    . ' · ' . rtrim(rtrim((string) $pv['qty_awarded'], '0'), '.') . ')';
+                        }
+                        throw new \RuntimeException('RFQ-409: البندُ ' . $lid . ' مُرسًى سلفًا — المطلوبُ '
+                            . rtrim(rtrim((string) $line['qty_required'], '0'), '.') . ' والمرسى '
+                            . rtrim(rtrim((string) $line['qty_awarded'], '0'), '.')
+                            . ($refs ? (' · الترسياتُ القائمة: ' . implode(' · ', $refs)) : '')
+                            . ' — فلا تُرسى كميةٌ فوقَ المطلوب');
+                    }
+                    $g->update('rfq_lines', array('qty_awarded' => $newQty), array('id' => $lid));
                     $n++;
                     $total = round($total + ($qty * (float) $quote['unit_price']), 2);
                 }

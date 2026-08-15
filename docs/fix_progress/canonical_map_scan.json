@@ -1,0 +1,370 @@
+{
+    "total": 208,
+    "ok": 156,
+    "gaps": [
+        {
+            "dept": 4,
+            "file": "risk_dept_ceo.php",
+            "title": "المخاطر المؤسسية",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 4,
+            "file": "gov_dept_ceo.php",
+            "title": "حوكمة مكتبُ الرئيس التنفيذي والنواب",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 5,
+            "file": "risk_dept_ops.php",
+            "title": "المخاطر التشغيلية",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 5,
+            "file": "gov_dept_ops.php",
+            "title": "حوكمة إدارة التشغيل",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 8,
+            "file": "risk_dept_flt.php",
+            "title": "مخاطر الأسطول",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 8,
+            "file": "gov_dept_flt.php",
+            "title": "حوكمة إدارة الأسطول",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 10,
+            "file": "risk_dept_cap.php",
+            "title": "مخاطر التمويل والملكية",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 10,
+            "file": "gov_dept_cap.php",
+            "title": "حوكمة التمويل والملكية",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 11,
+            "file": "risk_dept_hrm.php",
+            "title": "مخاطر الموارد البشرية",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 11,
+            "file": "gov_dept_hrm.php",
+            "title": "حوكمة الموارد البشرية",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 12,
+            "file": "risk_dashboard.php",
+            "title": "لوحة المخاطر المؤسسية",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 12,
+            "file": "risk_register.php",
+            "title": "سجل المخاطر المؤسسي",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 12,
+            "file": "risk_units.php",
+            "title": "وحدات المخاطر والتصنيف",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 12,
+            "file": "risk_profile.php",
+            "title": "ملف الخطر",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 12,
+            "file": "risk_assessment.php",
+            "title": "تقييم الخطر ونسخُه التاريخية",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 12,
+            "file": "risk_controls.php",
+            "title": "الضوابط والضوابط الحرجة",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 12,
+            "file": "risk_control_verify.php",
+            "title": "التحقق من الضوابط الحرجة",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 12,
+            "file": "risk_kri.php",
+            "title": "مؤشرات المخاطر والضوابط",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 12,
+            "file": "risk_treatment.php",
+            "title": "إجراءات المعالجة",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 12,
+            "file": "risk_acceptance.php",
+            "title": "القبول والاستثناءات",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 12,
+            "file": "risk_signals.php",
+            "title": "إشارات المخاطر والفرز",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 12,
+            "file": "risk_incidents.php",
+            "title": "الحوادث والوقائع",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 12,
+            "file": "risk_reviews.php",
+            "title": "المراجعات والتصعيدات",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 12,
+            "file": "risk_committee.php",
+            "title": "لجنة المخاطر",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 14,
+            "file": "risk_dept_crp.php",
+            "title": "مخاطر البلاغات والوقائع",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 14,
+            "file": "gov_dept_crp.php",
+            "title": "حوكمة مركز البلاغات",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 15,
+            "file": "risk_dept_mnt.php",
+            "title": "مخاطر الصيانة",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 15,
+            "file": "gov_dept_mnt.php",
+            "title": "حوكمة إدارة الصيانة",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 16,
+            "file": "risk_dept_wrk.php",
+            "title": "مخاطر القوى التشغيلية",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 16,
+            "file": "gov_dept_wrk.php",
+            "title": "حوكمة القوى التشغيلية",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 17,
+            "file": "risk_dept_trp.php",
+            "title": "مخاطر النقل والترحيل",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 17,
+            "file": "gov_dept_trp.php",
+            "title": "حوكمة النقل والترحيل",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 18,
+            "file": "risk_dept_prc.php",
+            "title": "مخاطر المشتريات التشغيلية",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 18,
+            "file": "gov_dept_prc.php",
+            "title": "حوكمة إدارة المشتريات التشغيلية",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 19,
+            "file": "risk_dept_inv.php",
+            "title": "مخاطر المخازن",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 19,
+            "file": "gov_dept_inv.php",
+            "title": "حوكمة إدارة المخازن",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 20,
+            "file": "risk_dept_sit.php",
+            "title": "مخاطر الموقع",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 20,
+            "file": "gov_dept_sit.php",
+            "title": "حوكمة إدارة الموقع",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 23,
+            "file": "risk_dashboard.php",
+            "title": "لوحة المخاطر المؤسسية",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 23,
+            "file": "risk_register.php",
+            "title": "سجل المخاطر المؤسسي",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 23,
+            "file": "risk_units.php",
+            "title": "وحدات المخاطر والتصنيف",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 23,
+            "file": "risk_profile.php",
+            "title": "ملف الخطر",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 23,
+            "file": "risk_assessment.php",
+            "title": "تقييم الخطر ونسخُه التاريخية",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 23,
+            "file": "risk_controls.php",
+            "title": "الضوابط والضوابط الحرجة",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 23,
+            "file": "risk_control_verify.php",
+            "title": "التحقق من الضوابط الحرجة",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 23,
+            "file": "risk_kri.php",
+            "title": "مؤشرات المخاطر والضوابط",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 23,
+            "file": "risk_treatment.php",
+            "title": "إجراءات المعالجة",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 23,
+            "file": "risk_acceptance.php",
+            "title": "القبول والاستثناءات",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 23,
+            "file": "risk_signals.php",
+            "title": "إشارات المخاطر والفرز",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 23,
+            "file": "risk_incidents.php",
+            "title": "الحوادث والوقائع",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 23,
+            "file": "risk_reviews.php",
+            "title": "المراجعات والتصعيدات",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        },
+        {
+            "dept": 23,
+            "file": "risk_committee.php",
+            "title": "لجنة المخاطر",
+            "why": "no_row",
+            "detail": "لا صفَّ في السجلّ"
+        }
+    ]
+}

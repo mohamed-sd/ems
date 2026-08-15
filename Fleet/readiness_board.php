@@ -77,6 +77,21 @@ include '../insidebar.php';
                     <small><?php echo htmlspecialchars($c['type']); ?> · <?php echo $LABELS[$c['status']]; ?>
                         <?php if ($c['open_tickets'] > 0): ?> · <?php echo intval($c['open_tickets']); ?> ⚠<?php endif; ?></small>
                 </a>
+                <?php /* ⇐ INJ-0074 · «كلُّ معدةٍ تعرض **مرجعَ آخر شهادةِ جاهزيةٍ
+                         وتاريخَها ومُصدرَها**، والنقرُ عليه **يفتح الأمرَ الذي أصدرها**».
+                         و«لا شهادةَ بعد» تُقال صراحةً — فالسكوتُ يُقرأ سلامةً. */ ?>
+                <div class="ems-readiness-cert" style="margin-top:-6px;margin-bottom:6px;font-size:11px;color:#555">
+                    <?php if ($c['cert_ref'] !== '' && $c['cert_link'] !== ''): ?>
+                        شهادةُ جاهزية:
+                        <a href="../<?php echo htmlspecialchars($c['cert_link'], ENT_QUOTES, 'UTF-8'); ?>"
+                           title="افتحْ أمرَ الصيانةِ الذي أصدرها"><?php
+                            echo htmlspecialchars(mb_substr($c['cert_ref'], 0, 40), ENT_QUOTES, 'UTF-8'); ?></a>
+                        · <?php echo htmlspecialchars(substr($c['cert_at'], 0, 10), ENT_QUOTES, 'UTF-8'); ?>
+                        · <?php echo htmlspecialchars($c['cert_by'] !== '' ? $c['cert_by'] : '—', ENT_QUOTES, 'UTF-8'); ?>
+                    <?php else: ?>
+                        <span class="ems-gov-empty">لا شهادةَ جاهزيةٍ مسجَّلةٌ بعد</span>
+                    <?php endif; ?>
+                </div>
             <?php endforeach; ?>
         </div>
         <?php endif; ?>

@@ -185,20 +185,33 @@ if (!defined('EMS_TOPBAR_RENDERED')) {
             // مساحةُ عملي — بابٌ فوق الإدارات كلِّها (NAV-01 §3) لا رابطٌ داخل كل قائمة،
             // وعدّادُ ما ينتظر المستخدمَ على أيقونة الباب (NAV-02 §7.5) — بخبيئة جلسةٍ خمسَ دقائق.
             $ems_tb_ws = function_exists('ems_url') ? ems_url('main/my_workspace.php') : '/ems/main/my_workspace.php';
+            /* ══ INJ-0407 · «عدَّادٌ واحدٌ بقيمةٍ واحدة» ═══════════════════════════════
+                 كانت الشارةُ تُحسب بـ`ApprovalsInboxService::inbox($conn, $company_id)`
+                 — **بوسيطِ الكيانِ وحدَه بلا مستخدم**: فتعدُّ ما ينتظر الشركةَ كلَّها
+                 ويراه الجميعُ رقمًا واحدًا. ونصُّ القبولِ يشترط أن يرى حسابان في
+                 الكيانِ نفسِه **رقمين مختلفين** يطابقان بلاطتَيهما.
+               ◆ فصار المصدرُ واحدًا: `ems_workspace_badge` هي نفسُها ما تجمعه
+                 البلاطتان — فلا يتفرّق عدّادٌ عن عارضِه.
+               ◆ والخبيئةُ **بمفتاحِ المستخدمِ والكيان** ولدقيقةٍ لا خمس: خبيئةٌ
+                 بلا هويةٍ تُسرّب رقمَ حسابٍ إلى آخر، وخمسُ دقائقَ تُبقيه بعد الفعل. */
             $ems_tb_wsCount = 0;
+            $ems_tb_wsUid   = intval($_SESSION['user']['id'] ?? 0);
+            $ems_tb_wsCo    = intval($_SESSION['user']['company_id'] ?? 0);
+            $ems_tb_wsKey   = $ems_tb_wsCo . ':' . $ems_tb_wsUid;
             $ems_tb_wsCache = isset($_SESSION['ems_ws_badge']) ? $_SESSION['ems_ws_badge'] : null;
-            if (is_array($ems_tb_wsCache) && (time() - intval($ems_tb_wsCache['at'])) < 300) {
+            if (is_array($ems_tb_wsCache)
+                && (string) ($ems_tb_wsCache['k'] ?? '') === $ems_tb_wsKey
+                && (time() - intval($ems_tb_wsCache['at'])) < 60) {
                 $ems_tb_wsCount = intval($ems_tb_wsCache['n']);
             } else {
-                $ems_tb_wsSvcPath = __DIR__ . '/../app/Services/Finance/ApprovalsInboxService.php';
-                if (is_file($ems_tb_wsSvcPath) && isset($GLOBALS['conn'])) {
-                    require_once $ems_tb_wsSvcPath;
+                if (isset($GLOBALS['conn'])) {
+                    require_once __DIR__ . '/my_workspace_counts.php';
                     try {
-                        $ems_tb_wsItems = \App\Services\Finance\ApprovalsInboxService::inbox($GLOBALS['conn'], intval($_SESSION['user']['company_id'] ?? 0));
-                        $ems_tb_wsCount = is_array($ems_tb_wsItems) ? count($ems_tb_wsItems) : 0;
+                        $ems_tb_wsCount = ems_workspace_badge($GLOBALS['conn'], $ems_tb_wsCo,
+                            $ems_tb_wsUid, strval($_SESSION['user']['role'] ?? ''));
                     } catch (\Throwable $e) { ems_catch_log($e, __METHOD__); ems_catch_ignored($e, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ 0 — $ems_tb_wsCount'); $ems_tb_wsCount = 0; }
                 }
-                $_SESSION['ems_ws_badge'] = array('n' => $ems_tb_wsCount, 'at' => time());
+                $_SESSION['ems_ws_badge'] = array('n' => $ems_tb_wsCount, 'at' => time(), 'k' => $ems_tb_wsKey);
             }
             ?>
             <a href="<?php echo htmlspecialchars($ems_tb_ws, ENT_QUOTES, 'UTF-8'); ?>" class="ems-topbar-icon ems-topbar-breakdowns" title="مساحة عملي — موافقاتي وطلباتي ومهامي" aria-label="مساحة عملي"><i class="fas fa-briefcase"></i><?php if ($ems_tb_wsCount > 0): ?><span class="ems-topbar-badge"><?php echo $ems_tb_wsCount > 99 ? '99+' : $ems_tb_wsCount; ?></span><?php endif; ?></a>

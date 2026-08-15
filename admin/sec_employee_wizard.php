@@ -13,6 +13,7 @@ session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
 
+require_once __DIR__ . '/../includes/tenant_scope.php';   // نطاقُ الكيانِ من السياقِ لا من رقمٍ صلب
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
 // كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
 // **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
@@ -32,7 +33,7 @@ $is_super_admin = ($current_role === '-1');
 $company_id     = intval($_SESSION['user']['company_id'] ?? 0);
 $uid            = intval($_SESSION['user']['id'] ?? 0);
 if (!$is_super_admin && $company_id <= 0) { header("Location: ../login.php"); exit(); }
-if ($is_super_admin && $company_id <= 0) { $company_id = 4; }
+$company_id = ems_scope_company($conn);
 
 $MODULE_CODE = 'admin/sec_employee_wizard.php';
 $can_view = $is_super_admin; $can_add = $is_super_admin;

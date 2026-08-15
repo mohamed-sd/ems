@@ -68,7 +68,10 @@ if ($__pc['run'] && $__pc['ok']) {
 
 $rfqs = array(); $quotes = array();
 $r = mysqli_query($conn, "SELECT id, rfq_no, title, state FROM supplier_rfqs
-                          WHERE company_id=$company_id AND is_deleted=0 AND state IN ('sent','opened','quoted')
+                          /* ⇐ INJ-0334 · `opened` و`quoted` **لا وجودَ لهما** في تعدادِ
+                               `supplier_rfqs.state` — فطلبُ عروضٍ أُقفلت مهلتُه (`closed`)
+                               وهو **الجاهزُ للترسيةِ بحقّ** كان يسقط من القائمةِ صامتًا. */
+                          WHERE company_id=$company_id AND is_deleted=0 AND state IN ('sent','closed')
                           ORDER BY id DESC LIMIT 40");
 if ($r) while ($x = mysqli_fetch_assoc($r)) $rfqs[] = $x;
 if ($rfq > 0) {

@@ -100,6 +100,16 @@ $core = array(
     'workflow_declared_actions_test',     /* فعلٌ مُعلَنٌ صار له وجود */
     'workflow_guards_and_stamp_test',     /* حارسٌ واحدٌ · سلطةٌ محكومة · بصمةٌ مولَّدة */
     'workflow_chain_links_test',         /* المستندُ يولّد تاليَه بمرجعٍ ظاهر */
+    'enum_in_guard_test',                /* لا يُسأل عن قيمةٍ خارجَ تعدادِ عمودها */
+    'entitlement_gate_queue_test',       /* بوابةُ الاستحقاق: صفرٌ صادقٌ لا صفرٌ كاذب */
+    'canonical_map_test',                /* رمزُ الوثيقةِ ⇄ مسارٌ موجودٌ ⇄ مالكٌ واحد */
+    'screen_columns_declared_test',      /* العمودُ المعلَنُ له مصدرٌ وخليةٌ ورأس */
+    'idempotency_and_race_test',         /* الأثرُ يقع مرةً واحدةً مهما تكرّر النداء */
+    'workspace_counters_tenant_test',    /* رقمٌ واحدٌ في موضعين · ولا كيانَ مفترَض */
+    'deploy_seed_and_escalation_test',   /* خطُّ النشرِ يحمل ما تحتاجه الشاشة */
+    'transfer_cost_and_shares_test',     /* سطرُ التحميلِ بقيمٍ حيّةٍ ومركزٍ حقيقيّ */
+    'financing_pay_and_shares_test',     /* منفِّذٌ واحدٌ للسداد · وحصةٌ بلا تراكب */
+    'source_of_truth_test',              /* لكلِّ بيانٍ مصدرٌ واحدٌ يحكم ويُعرض */
     'contract_lifecycle_actions_test',  /* دورةُ الحياةِ كاملةً بأفعالِها وعكسِها */
     'permgov_adoption_test',          /* حرّاسٌ بُنيت فتُبنَّيت — كرون · مصدر · حجب · شريحة */
     'nav_view_mechanism_test',        /* المنظرُ المُعلَنُ وجهةٌ لا معاملٌ ميت */

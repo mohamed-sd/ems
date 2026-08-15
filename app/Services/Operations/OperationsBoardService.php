@@ -251,7 +251,29 @@ class OperationsBoardService
                                     ORDER BY ue.id DESC LIMIT 1) today_state,
                                   (SELECT COUNT(*) FROM tickets t
                                     WHERE t.company_id={$co} AND t.equipment_id = e.id
-                                      AND t.close_date IS NULL) open_tickets
+                                      AND t.close_date IS NULL) open_tickets,
+                                  /* ⇐ INJ-0074 · «مرجعُ آخر شهادةِ جاهزيةٍ وتاريخُها
+                                       ومُصدرُها — والنقرُ عليه يفتح الأمرَ الذي أصدرها».
+                                       والمصدرُ أمرُ الصيانةِ المقفَل: المرجعُ في
+                                       `readiness_cert_ref` والتاريخُ في `closed_at`
+                                       والمُصدرُ في `closed_by`. */
+                                  (SELECT m.id FROM mnt_order m
+                                    WHERE m.company_id={$co} AND m.equipment_id = e.id
+                                      AND m.state='Closed' AND COALESCE(m.is_deleted,0)=0
+                                    ORDER BY m.closed_at DESC, m.id DESC LIMIT 1) cert_order_id,
+                                  (SELECT m.readiness_cert_ref FROM mnt_order m
+                                    WHERE m.company_id={$co} AND m.equipment_id = e.id
+                                      AND m.state='Closed' AND COALESCE(m.is_deleted,0)=0
+                                    ORDER BY m.closed_at DESC, m.id DESC LIMIT 1) cert_ref,
+                                  (SELECT m.closed_at FROM mnt_order m
+                                    WHERE m.company_id={$co} AND m.equipment_id = e.id
+                                      AND m.state='Closed' AND COALESCE(m.is_deleted,0)=0
+                                    ORDER BY m.closed_at DESC, m.id DESC LIMIT 1) cert_at,
+                                  (SELECT u.name FROM mnt_order m
+                                     LEFT JOIN users u ON u.id = m.closed_by
+                                    WHERE m.company_id={$co} AND m.equipment_id = e.id
+                                      AND m.state='Closed' AND COALESCE(m.is_deleted,0)=0
+                                    ORDER BY m.closed_at DESC, m.id DESC LIMIT 1) cert_by
                              FROM equipments e
                             WHERE e.company_id={$co}{$tw}
                             ORDER BY e.name LIMIT 300");
@@ -267,6 +289,12 @@ class OperationsBoardService
                 'name' => (string) ($x['name'] ?: $x['code']),
                 'type' => (string) $x['type'], 'status' => $status,
                 'open_tickets' => (int) $x['open_tickets'],
+                /* INJ-0074: شهادةُ الجاهزيةِ مرجعًا وتاريخًا ومُصدرًا — ورابطُ أمرِها */
+                'cert_ref'  => (string) ($x['cert_ref'] ?? ''),
+                'cert_at'   => (string) ($x['cert_at'] ?? ''),
+                'cert_by'   => (string) ($x['cert_by'] ?? ''),
+                'cert_link' => ((int) ($x['cert_order_id'] ?? 0) > 0)
+                    ? ('Maintenance/orders.php?id=' . (int) $x['cert_order_id']) : '',
                 'link' => 'Equipments/equipment_profile.php?id=' . (int) $x['id']);
         }
         return array('cells' => $cells, 'total' => $total,

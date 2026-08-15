@@ -117,6 +117,14 @@ function cmp03_cell($col, $row, $entityName) {
     if ($n === cmp03_screen_norm('تاريخ الإنشاء')) { return $row['created_at']; }
     if ($n === cmp03_screen_norm('الحالة')) { return $row['status']; }
     if ($n === cmp03_screen_norm('مفتاح منع التكرار')) { return 'CMP03-' . intval($row['id']); }
+    /* عمودا العكس — مصدرُهما نصُّ الحالةِ الذي يكتبه cmp03_store_reverse
+       (لا عمودَ لهما في scr_*، والوصلُ مكتوبٌ هناك). */
+    if ($n === cmp03_screen_norm('معكوس بـ')) {
+        return cmp03_reversal_ref($row['status'], 'reversed_by') ?: '—';
+    }
+    if ($n === cmp03_screen_norm('عكس عن')) {
+        return cmp03_reversal_ref($row['status'], 'reversal_of') ?: '—';
+    }
     if (isset($row['payload'][$col]) && $row['payload'][$col] !== '') { return $row['payload'][$col]; }
     return '—';
 }

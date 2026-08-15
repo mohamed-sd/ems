@@ -102,21 +102,41 @@ if ($user === '') { $say(''); $say("PASS={$PASS} · FAIL={$FAIL}"); exit(1); }
      نفسَها** في IBAN والبنكِ والفرع («دوري 2» في الثلاثة) — فغيابُ الحقلِ
      الحسّاسِ لا يُقاس بنصٍّ يظهر في عمودٍ غيرِ حسّاسٍ بحق. فيُزرع صفٌّ بقيمةٍ
      **فريدةٍ لا تتكرّر في عمودٍ آخر**، ويُكنس بعائلةِ وسمِه. */
+/* ◆ INJ-0151: صارت الشاشةُ تقرأ **المصدرَ الموثَّقَ** `suppliers.bank_*` لا
+     المخزنَ البينيّ. فالبذرُ يقع حيث تقرأ — وإلا قاس الفاحصُ حجبَ ما لا يُعرض.
+     (الحكمُ المحروسُ لم يتغيّر: قيمةٌ حسّاسةٌ لا تعبر الشبكةَ بلا منحة.) */
 $ibanVal = 'FIELDVISPROBE-IBAN-' . date('His');
 $seedId = 0;
-$payload = json_encode(array(
-    'المورد' => 'مورّدُ فاحصٍ FIELDVISPROBE', 'اسم المستفيد' => 'مستفيدُ فاحص',
-    'رقم الحساب' => 'FIELDVISPROBE-ACC-' . date('His'), 'IBAN' => $ibanVal,
-    'البنك' => 'بنكُ فاحصٍ ع', 'الفرع' => 'فرعُ فاحصٍ ص', 'العملة' => 'USD',
-), JSON_UNESCAPED_UNICODE);
-$st = $conn->prepare("INSERT INTO cmp03_screen_rows
-        (company_id, canonical_file, payload, status, created_by, created_by_name, created_at)
-        VALUES (?, 'supplier_bank.php', ?, 'مسودة', ?, 'فاحصُ الحجب', NOW())");
-if ($st) {
-    $st->bind_param('isi', $CO, $payload, $uid);
-    if ($st->execute()) { $seedId = (int) $conn->insert_id; }
-    $st->close();
+$__sup = 0;
+$__r = $conn->query("SELECT id FROM suppliers WHERE company_id = {$CO} ORDER BY id LIMIT 1");
+if ($__r && ($__x = $__r->fetch_row())) { $__sup = (int) $__x[0]; }
+$__snapBank = null;
+if ($__sup > 0) {
+    $__r = $conn->query("SELECT bank_name, bank_account_no, bank_iban, bank_doc_ref
+                           FROM suppliers WHERE id = {$__sup}");
+    $__snapBank = $__r ? $__r->fetch_assoc() : null;
+    $st = $conn->prepare("UPDATE suppliers
+            SET bank_name = 'بنكُ فاحصٍ ع', bank_account_no = ?, bank_iban = ?,
+                bank_doc_ref = 'FIELDVISPROBE-DOC'
+          WHERE id = ?");
+    if ($st) {
+        $acc = 'FIELDVISPROBE-ACC-' . date('His');
+        $st->bind_param('ssi', $acc, $ibanVal, $__sup);
+        if ($st->execute()) { $seedId = $__sup; }
+        $st->close();
+    }
 }
+/* واستعادةُ حسابِ المورّدِ الأصليِّ من اللقطةِ في الكنسِ البعديّ */
+register_shutdown_function(function () use ($conn, $__sup, $__snapBank) {
+    if ($__sup <= 0 || !is_array($__snapBank)) { return; }
+    $st = $conn->prepare('UPDATE suppliers SET bank_name = ?, bank_account_no = ?,
+                                 bank_iban = ?, bank_doc_ref = ? WHERE id = ?');
+    if (!$st) { return; }
+    $st->bind_param('ssssi', $__snapBank['bank_name'], $__snapBank['bank_account_no'],
+        $__snapBank['bank_iban'], $__snapBank['bank_doc_ref'], $__sup);
+    $st->execute();
+    $st->close();
+});
 $ok($seedId > 0, "زُرع صفٌّ بقيمةِ IBAN **فريدةٍ** يُقاس غيابُها (#{$seedId})", $conn->error);
 if ($seedId === 0) { $say(''); $say("PASS={$PASS} · FAIL={$FAIL}"); exit(1); }
 

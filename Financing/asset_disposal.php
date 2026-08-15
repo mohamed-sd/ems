@@ -46,8 +46,22 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
             if ($pct > $cur) { $msg = "النسبةُ المنقولة ($pct) تتجاوز الحصةَ القائمة ($cur) — 409"; }
             else {
                 mysqli_begin_transaction($conn);
-                // ① القديمةُ تُغلق اليوم — الأصلُ باقٍ سجلًّا
-                $ok1 = mysqli_query($conn, "UPDATE asset_ownership_shares SET valid_to = CURDATE() WHERE share_id = $share");
+                /* ══ INJ-0045 · «حصةُ البائع تُنهى وحصةُ المشتري تُفتح بالتاريخ نفسِه»
+                     — **بلا فجوةٍ ولا تراكب** ═══════════════════════════════════════
+                     كانت القديمةُ تُغلق بـ`valid_to = CURDATE()` والجديدتانِ تُفتحان
+                     بـ`valid_from = CURDATE()`. ومعيارُ السريانِ في القراءةِ كلِّها
+                     `(valid_to IS NULL OR valid_to >= CURDATE())` — **أي أنَّ `valid_to`
+                     آخرُ يومِ سريانٍ لا أوّلُ يومِ انقطاع**. فالصفوفُ الثلاثةُ ساريةٌ
+                     معًا في يومِ النقل: المجموعُ = القديمة + الباقي + المنقولة =
+                     **ضعفُ الحصةِ الأصلية**.
+                   ◆ **الاصطلاحُ المحسوم**: `valid_to` **شامل** — آخرُ يومٍ تسري فيه
+                     الحصة. فالإغلاقُ **أمس**، والفتحُ اليوم: لا فجوةَ ولا تراكب.
+                     وهذا هو الاصطلاحُ الذي تقرأ به الشاشاتُ كلُّها سلفًا، فتغييرُ
+                     القراءةِ بدلَ الكتابةِ كان سيكسر كلَّ قارئٍ في النظام.
+                   ◆ ووراءَه قادحٌ في القاعدةِ يردُّ أيَّ تراكبٍ **ولو كُتب من شاشةٍ
+                     أخرى** — فحارسٌ في طبقةٍ واحدةٍ ليس حارسًا (CS-11). */
+                $ok1 = mysqli_query($conn, "UPDATE asset_ownership_shares
+                        SET valid_to = DATE_SUB(CURDATE(), INTERVAL 1 DAY) WHERE share_id = $share");
                 // ② بقيةُ المالك القديم إن بقيت
                 $rest = $cur - $pct; $ok2 = true;
                 if ($rest > 0.001) {
@@ -69,7 +83,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                     mysqli_commit($conn);
                     mysqli_query($conn, "INSERT INTO action_execution_log (company_id, action_code, person_id, subject_ref, result)
                                          VALUES ($company_id, 'asset.share.transfer', $uid, 'share:$share→ent:$toEnt:$pct%', 'allowed')");
-                    $msg = "نُقلت $pct٪ بمرجع $doc — القديمةُ أُغلقت بتاريخها والجديدةُ صفٌّ (Σ محفوظ)";
+                    $msg = "نُقلت $pct٪ بمرجع $doc — القديمةُ أُغلقت أمسِ والجديدةُ تسري اليومَ"
+                         . ' (لا فجوةَ ولا تراكب · Σ = ١٠٠ في اليومين)';
                 } else { mysqli_rollback($conn); $msg = 'فشلت المعاملةُ فأُلغيت الثلاث: ' . mysqli_error($conn); }
             }
         } else { $msg = 'حصةٌ غيرُ ساريةٍ (404)'; }

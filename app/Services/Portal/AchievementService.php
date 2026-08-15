@@ -56,7 +56,9 @@ class AchievementService
 
         // ── ① الطلبات — من بوابة الطلبات (fin_requests) بمنشئها ─────────────
         $row = self::one($conn, "SELECT COUNT(*) created,
-                SUM(CASE WHEN state IN ('approved','paid','closed','executed') THEN 1 ELSE 0 END) completed,
+                /* `executed` ليست في التعداد (INJ-0334) — و«المنفَّذُ» في تعدادِ
+                   `fin_requests.state` هو `posted` ثم `paid` ثم `collected`. */
+                SUM(CASE WHEN state IN ('approved','posted','paid','collected','closed') THEN 1 ELSE 0 END) completed,
                 SUM(CASE WHEN state IN ('rejected') THEN 1 ELSE 0 END) rejected,
                 SUM(CASE WHEN state IN ('returned') THEN 1 ELSE 0 END) returned
            FROM fin_requests
@@ -115,7 +117,9 @@ class AchievementService
 
         // ── ⑦ الجودةُ والسلامة — بلاغاتُه المرفوعة والمغلقة ──────────────────
         $row = self::one($conn, "SELECT COUNT(*) raised,
-                SUM(CASE WHEN stage IN ('closed','مغلق') OR close_date IS NOT NULL THEN 1 ELSE 0 END) closed
+                /* `'مغلق'` بقيّةٌ من قبلِ تعريبِ التعداد — و`tickets.stage` اليومَ
+                   لاتينيٌّ خالص، فالقيمةُ العربيةُ لا تطابق شيئًا أبدًا (INJ-0334). */
+                SUM(CASE WHEN stage IN ('closed') OR close_date IS NOT NULL THEN 1 ELSE 0 END) closed
            FROM tickets
           WHERE company_id={$co} AND reporter_user_id={$accountId}
             AND call_date BETWEEN '{$f}' AND '{$t}'");

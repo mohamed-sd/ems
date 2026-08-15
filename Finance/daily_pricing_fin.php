@@ -27,6 +27,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php';
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/tenant_scope.php';   // نطاقُ الكيانِ من السياقِ لا من رقمٍ صلب
 include '../includes/permissions_helper.php';
 
 /* ◆ الحارسُ فوقَ كلِّ معالجٍ واستعلامٍ — فلا تُقرأ بياناتٌ لحسابٍ محرومٍ ثم يُقال
@@ -56,7 +57,7 @@ if (!$can_view) {
     exit();
 }
 
-$CO = $is_super_admin && $company_id <= 0 ? 4 : (int) $company_id;
+$CO = ems_scope_company($conn);
 $gate = ems_tenant_db();
 $SELF = 'daily_pricing_fin.php';
 

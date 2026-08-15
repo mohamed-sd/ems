@@ -592,7 +592,14 @@ class FinanceM10Service
         $q = "SELECT
                 COALESCE(SUM(CASE WHEN l.effect_type = 'revenue_event' THEN COALESCE(fe.base_amount, fe.amount) END),0) rev,
                 COALESCE(SUM(CASE WHEN l.effect_type = 'supplier_due' THEN COALESCE(fe.base_amount, fe.amount) END),0) sup,
-                COALESCE(SUM(CASE WHEN l.effect_type IN ('operator_due','operator_pay') THEN COALESCE(fe.base_amount, fe.amount) END),0) op,
+                /* ⇐ INJ-0334 · `operator_due` و`operator_pay` **ليستا في تعدادِ**
+                     `fin_event_links.effect_type` — فسطرُ «تكلفةِ المشغِّل» كان صفرًا
+                     **بالاستحالةِ لا بالخلوّ**. والاسمانِ الحيّانِ لأثرِ المشغِّل هما
+                     `party_award` (استحقاقُ طرفِ التشغيل) و`employee_due`.
+                   ◆ ويُعلَن بصدق: لا يزال الناتجُ صفرًا اليومَ لأنَّ روابطَ
+                     `party_award` كلَّها (٥٬١٩٦) معلَّقةٌ بأبٍ من نوع `timesheet`
+                     لا `unit_record` — فالفرقُ أنَّه صار **ممكنًا** بعد أن كان ممتنعًا. */
+                COALESCE(SUM(CASE WHEN l.effect_type IN ('party_award','employee_due') THEN COALESCE(fe.base_amount, fe.amount) END),0) op,
                 COALESCE(SUM(CASE WHEN l.effect_type = 'cost_record' THEN COALESCE(fe.base_amount, fe.amount) END),0) cost
               FROM fin_event_links l
               JOIN fin_unit_records ur ON ur.id = l.parent_ref AND l.parent_kind = 'unit_record'

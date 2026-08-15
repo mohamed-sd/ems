@@ -11,6 +11,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/tenant_scope.php';   // نطاقُ الكيانِ من السياقِ لا من رقمٍ صلب
 require_once __DIR__ . '/../app/Services/Tickets/TicketRouter.php';
 require_once __DIR__ . '/../app/Services/Tickets/DuplicateDetector.php';
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -20,7 +21,7 @@ use App\Services\Tickets\DuplicateDetector as DD;
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $uid = intval($_SESSION['user']['id'] ?? 0);
-if ($company_id <= 0) { $company_id = 4; }
+$company_id = ems_scope_company($conn);
 
 // السياق المحمول — من POST الزر أو من نموذج الحفظ
 $ctx = array();

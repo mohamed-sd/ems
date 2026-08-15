@@ -37,7 +37,13 @@
     white-space: nowrap;
 }
 
-#projectsTable .action-btn {
+/* المربّعُ ٣٢×٣٢ لأزرارِ **الأيقونات** وحدَها. وكان المُحدِّدُ يعمُّ كلَّ
+   `.action-btn` في الجدول، فيقع فيه أزرارُ عمودِ «نقلِ الحالة» وهي أزرارٌ
+   **نصية** (توقيع · إعادةٌ للتفاوض · تعليق): يُحبس الزرُّ في ٣٢ بكسلًا بينما
+   نصُّه `nowrap` يفيض خارجَه — فتتراكب العناوينُ بعضُها على بعضٍ وعلى جيرانها.
+   والاستثناءُ بالصنفِ لا بالحاوية: مُعرِّفُ `#projectsTable` مشتركٌ بين شاشاتٍ
+   عدّةٍ ليست كلُّها تلفُّ أيقوناتِها بـ`.action-btns`. */
+#projectsTable .action-btn:not(.ems-lc-btn) {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -47,6 +53,32 @@
     text-decoration: none;
     border: none;
     cursor: pointer;
+}
+
+/* ── عمودُ «نقلِ الحالة»: أزرارٌ نصيةٌ تأخذ عرضَ نصِّها وتلتفُّ في أسطر ── */
+#projectsTable td.ems-lc-cell {
+    white-space: normal;
+    max-width: 250px;
+}
+
+#projectsTable td.ems-lc-cell .ems-inline-form {
+    display: inline-block;
+    margin: 2px 3px 2px 0;
+}
+
+#projectsTable .action-btn.ems-lc-btn {
+    width: auto;
+    height: auto;
+    min-height: 28px;
+    padding: 4px 10px;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    cursor: pointer;
+}
+
+#projectsTable td.ems-lc-cell .ems-note-inline {
+    width: 92px;
+    vertical-align: middle;
 }
 
 /* ── ملفُّ عقدِ المشروع · Contracts/contracts_details.php ─────────────────── */
