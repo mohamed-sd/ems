@@ -90,18 +90,23 @@ $clausesOf = function ($test) {
 
 /* ══ ③ الأنماطُ ═══════════════════════════════════════════════════════════ */
 $PAT = array(
-    'SOD'         => '~من\s+(سجّل|أدخل|نفّذ|أنشأ|أعدّ|قدّم|رفع|أنشأ)|منشئُ|مُدخِلُ|لا يعتمد المرءُ|نفسُه لا يستطيع|أدخله المعتمِدُ نفسُه|الذي نفّذ~u',
+    /* ── فصلُ الواجباتِ عند **المنح**: مفاتيحُ متعارضةٌ لا تجتمع في دورٍ واحد.
+         آليتُه `includes/sod_guard.php` — وهي غيرُ آليةِ «من أنشأ لا يعتمد».
+         ويُفحص **قبلها** لأنَّ نصَّه يذكر «يُرفض» فيبتلعه الأعمُّ لو تأخّر. */
+    'SOD_GRANT'   => '~محاولةُ منحِ|منحُ حسابٍ واحدٍ|محاولةُ منح دورٍ|الرايات الثلاثَ|تُحظر لا تُحذَّر|بحجبٍ لا بتحذير|تسمّي الزوج~u',
+    'SOD'         => '~من\s+(سجّل|أدخل|نفّذ|أنشأ|أعدّ|قدّم|رفع)|منشئُ|مُنشئُ|مُدخِلُ|لا يعتمد المرءُ|نفسُه لا يستطيع|أدخله المعتمِدُ نفسُه|الذي نفّذ|أنشأ .{0,30}لا يستطيع|أنشأ .{0,30}لا يراه~u',
     'BREAK_GLASS' => '~كسر الزجاج|كسرِ زجاج|permission_exceptions|valid_to~u',
     'FIELD_MASK'  => '~حقلٍ حساس|الحقول الحساسة|يُخفي قيمتَه|لا يجد حقولَ|مقنَّعًا|غائبٌ نصًّا|بلا ذلك العمود|يُسقطه من ملف التصدير~u',
-    'EXPORT'      => '~can_export|ملفِّ التصدير|ملفَّ التصدير|أعمدةَ الملفين~u',
+    'EXPORT'      => '~can_export|ملفِّ التصدير|ملفَّ التصدير|أعمدةَ الملفين|audit\.export|يُرفض تصديرُه|تصديرُه 403~u',
+    'BUTTON_PARITY' => '~ظهورُ زرِّ|يظهر فيها الزرُّ|الزرُّ ويُرفض|⇔~u',
     'CAP'         => '~سقف|يُصعَّد|تصعيد|مرجعُ تفويض|صاحبِ سقفٍ أعلى~u',
-    'SCOPE'       => '~نطاقين|كيانٍ آخر|شركةٍ أخرى|لا يراه في صندوق|عدّادين مختلفين|owner_unit_id~u',
+    'SCOPE'       => '~نطاقين|كيانٍ آخر|شركةٍ أخرى|لا يراه في صندوق|عدّادين مختلفين|owner_unit_id|لا يرى أيَّ صفٍّ يخصُّ|الموقع ب~u',
     'NAV'         => '~سايدبار|القائمةِ الجانبية|تعرض المرحلتان|في قائمة الدور|غيرُ موجودٍ في القائمة~u',
     'AUDIT'       => '~سطرَ تدقيق|سجل التدقيق|activity_logs|صفَّ اطّلاع|read_log|ويُسجَّل|يُسجَّل الرفض|قبل وبعد|old_value|صفَّ تدقيق~u',
     'DENY_WRITE'  => '~يعيد ٤٠٣|يُعيد 403|يُردُّ 403|يتلقى 403|يجب 403|GOV-PERM-403|بلا can_edit|بلا can_add|ولا يُدرج|لا يُنشئ صفًّا|صفرُ صفٍّ|يُرفض 40~u',
     'REJECT_GUARD' => '~يُرفض 4\d\d|تُرفض 4\d\d|يُرفض برمز|422|423|409~u',
     'TOKEN_GET'   => '~بلا رمزٍ صالحٍ|بلا رمز CSRF|بلا رمزٍ~u',
-    'STATE_GUARD' => '~يبقى الصفُّ|تبقى الحالة|محسوبةً من|لا من المُدخَل|الحقلُ غيرُ موجودٍ في نموذجه|بنفسه غيرُ ممكنة~u',
+    'STATE_GUARD' => '~يبقى الصفُّ|تبقى الحالة|محسوبةً من|لا من المُدخَل|الحقلُ غيرُ موجودٍ في نموذجه|بنفسه غيرُ ممكنة|الدورُ 9 وحدَه|بدور غير 9|بحالة «محسوم»|بحالة «معتمد»~u',
 );
 $patternOf = function ($test) use ($PAT) {
     foreach ($PAT as $k => $re) { if (preg_match($re, $test)) { return $k; } }
@@ -193,15 +198,49 @@ $csrfEnforced = function ($rel) use ($csrfPaths) {
     foreach ($csrfPaths as $p) { if ($p !== '' && stripos('/' . $rel, $p) !== false) { return true; } }
     return false;
 };
-/* أيُّ جدولٍ تكتبه الشاشة — من معالجِ POST نفسِه، لا من نصِّ الاختبار */
-$writesOf = function ($rel) use ($ROOT) {
-    $s = (string) @file_get_contents($ROOT . '/' . $rel);
+/* ── أيُّ جدولٍ تكتبه الشاشة — بثلاثةِ مصادرَ لا مصدرٍ واحد ────────────────────
+     ① عباراتُ الكتابةِ في الملفِّ نفسِه.
+     ② خدماتُه المُضمَّنةُ — كثيرٌ من الشاشاتِ تكتب عبر خدمةِ نطاقٍ لا بيدِها.
+     ③ **خريطةُ الأفعالِ `nav09_action_map`** (`writes_text`) — وهي المصدرُ
+        المعتمَدُ حين يكون الفعلُ AJAX بلا عبارةٍ نصيّةٍ في الشاشة.
+     وأوّلُ صياغةٍ قرأت المصدرَ الأوّلَ وحدَه فأعلنت سبعةَ عشرَ شرطًا «بلا جدولٍ
+     مُسنَد» بينما الخريطةُ تسمّي جداولَها. */
+$writesOf = function ($rel) use ($ROOT, $conn) {
     $t = array();
-    if (preg_match_all('~INSERT\s+(?:IGNORE\s+)?INTO\s+`?([a-z0-9_]+)`?~i', $s, $m)) {
-        foreach ($m[1] as $x) { $t[strtolower($x)] = 'INSERT'; }
+    $scan = function ($src) use (&$t) {
+        if (preg_match_all('~INSERT\s+(?:IGNORE\s+)?INTO\s+`?([a-z0-9_]+)`?~i', $src, $m)) {
+            foreach ($m[1] as $x) { $t[strtolower($x)] = 'INSERT'; }
+        }
+        if (preg_match_all('~UPDATE\s+`?([a-z0-9_]+)`?\s+SET~i', $src, $m2)) {
+            foreach ($m2[1] as $x) { if (!isset($t[strtolower($x)])) { $t[strtolower($x)] = 'UPDATE'; } }
+        }
+    };
+    $s = (string) @file_get_contents($ROOT . '/' . $rel);
+    $scan($s);
+    /* ② خدماتُه المُضمَّنة */
+    if (preg_match_all('~(?:require_once|include)[^;\n]*[\'"]([^\'"]+\.php)[\'"]~', $s, $mm)) {
+        foreach ($mm[1] as $inc) {
+            $p = $ROOT . '/' . ltrim(preg_replace('~^(\.\./)+~', '', $inc), '/');
+            if (is_file($p) && strpos($p, '/includes/') === false) { $scan((string) @file_get_contents($p)); }
+        }
     }
-    if (preg_match_all('~UPDATE\s+`?([a-z0-9_]+)`?\s+SET~i', $s, $m2)) {
-        foreach ($m2[1] as $x) { if (!isset($t[strtolower($x)])) { $t[strtolower($x)] = 'UPDATE'; } }
+    /* ③ خريطةُ الأفعال — الفعلُ قد يكون AJAX بلا عبارةٍ في الشاشة */
+    if (!$t) {
+        $st = $conn->prepare("SELECT writes_text FROM nav09_action_map
+                               WHERE live_code = ? AND writes_text IS NOT NULL AND writes_text <> '—'");
+        if ($st) {
+            $lc = 'page:' . $rel;
+            $st->bind_param('s', $lc);
+            $st->execute();
+            $r = $st->get_result();
+            while ($r && ($x = $r->fetch_row())) {
+                foreach (preg_split('~[·,\s]+~u', (string) $x[0]) as $tbl) {
+                    $tbl = trim($tbl);
+                    if ($tbl !== '' && preg_match('~^[a-z0-9_]+$~', $tbl)) { $t[$tbl] = 'MAP'; }
+                }
+            }
+            $st->close();
+        }
     }
     return $t;
 };
@@ -564,6 +603,90 @@ foreach ($items as $id => $it) {
                     $verdicts[] = array('fail', 'تنادي حارسَ السقفِ لكنّها **ترفض بلا تصعيد** — والرفضُ الصامتُ يُضيع الطلب');
                 } else {
                     $verdicts[] = array('fail', 'لا تنادي `AuthorityGuard::sign()` — فالسقفُ مبنيٌّ وغيرُ متبنًّى');
+                }
+                continue;
+            }
+            /* ── شرطُ فصلِ الواجباتِ عند **المنح** ─────────────────────────────────
+                 «مفتاحانِ متعارضانِ لا يجتمعان في دورٍ واحد» — آليتُه
+                 `includes/sod_guard.php` وهي غيرُ حارسِ «من أنشأ لا يعتمد».
+                 ويُشترط **الحجبُ** لا التحذير: الزوجُ الدقيقُ يمنع بنيويًّا. */
+            if (preg_match($PAT['SOD_GRANT'], $c)) {
+                $gs = (string) @file_get_contents($ROOT . '/' . $rel);
+                $usesSod = (bool) preg_match('~ems_sod_check_grant|sod_guard\.php~', $gs);
+                $blocks = false;
+                if ($usesSod) {
+                    $guardSrc = (string) @file_get_contents($ROOT . '/includes/sod_guard.php');
+                    $blocks = (strpos($guardSrc, 'exact') !== false)
+                           && (preg_match('~block|منع|deny~u', $guardSrc) === 1);
+                }
+                if ($usesSod && $blocks) {
+                    $verdicts[] = array('pass',
+                        'تنادي `ems_sod_check_grant` — والزوجُ الدقيقُ **يُحظر بنيويًّا** لا يُحذَّر منه');
+                } elseif ($usesSod) {
+                    $verdicts[] = array('fail', 'تنادي حارسَ المنحِ لكنّه يُحذّر ولا يحجب');
+                } else {
+                    $verdicts[] = array('fail',
+                        'لا تنادي `includes/sod_guard.php` — فمفتاحانِ متعارضانِ يجتمعان بلا مانع');
+                }
+                continue;
+            }
+            /* ── شرطُ تطابقِ الزرِّ مع الفعل ────────────────────────────────────────
+                 «ظهورُ الزرِّ ⇔ نجاحُ تنفيذه» — زرٌّ يظهر ثم يُرفض فعلُه كذبٌ
+                 بصريّ. ويُقاس بأنَّ الشاشةَ تشتق ظهورَ الزرِّ من **العلمِ نفسِه**
+                 الذي يحرس الفعلَ لا من علمٍ آخر. */
+            if (preg_match($PAT['BUTTON_PARITY'], $c)) {
+                $bs = (string) @file_get_contents($ROOT . '/' . $rel);
+                $flags = array();
+                if (preg_match_all('~\$can_(view|add|edit|delete|export)\b~', $bs, $bm)) {
+                    foreach ($bm[1] as $x) { $flags[$x] = true; }
+                }
+                $usesSameFlag = count($flags) > 0
+                    && preg_match('~if\s*\(\s*\$can_(add|edit|delete)~', $bs)
+                    && preg_match('~\$can_(add|edit|delete)\s*\)\s*[:{]?\s*\?>~', $bs);
+                $verdicts[] = $usesSameFlag
+                    ? array('pass', 'ظهورُ الزرِّ مشتقٌّ من علمِ الصلاحيةِ نفسِه الذي يحرس الفعل')
+                    : array('unmeasured',
+                        'تطابقُ الزرِّ مع الفعلِ يحتاج قياسًا بصريًّا لكلِّ زرٍّ — لا مقياسَ آليًّا يُغطّيه');
+                continue;
+            }
+            /* ── شرطُ الرفضِ المحكومِ (422 · 423 · 409) ────────────────────────────
+                 ثلاثةُ حرّاسٍ مبنيّةٍ في المستودعِ لا حارسٌ واحد، ولكلٍّ نصُّه:
+                   ⓐ **فترةٌ مقفلة** ⇒ `includes/period_guard.php` (423).
+                   ⓑ **بلا مستندِ مصدر** ⇒ `includes/receivable_source_guard.php`
+                      ومعه قيدُ CHECK في القاعدةِ — «الوصلُ في موضعين وإلا زخرفة».
+                   ⓒ **مجموعٌ أو قيمةٌ خارجَ الحد** ⇒ قيدُ CHECK في القاعدة.
+                 وما لا يطابق أحدَها يُعلَن ولا يُحشر في أقربِها. */
+            if (preg_match($PAT['REJECT_GUARD'], $c)) {
+                $rs = (string) @file_get_contents($ROOT . '/' . $rel);
+                $isPeriod = (bool) preg_match('~فترةٍ مقفلة|فترةٌ مقفلة|423~u', $c);
+                $isSource = (bool) preg_match('~بلا مستندِ|بلا حدثٍ|بلا مرجعِ|لا يقابله صفٌّ|بلا مصدر~u', $c);
+                if ($isPeriod) {
+                    $has = (bool) preg_match('~ems_period_check|period_guard\.php~', $rs);
+                    $verdicts[] = $has
+                        ? array('pass', 'تنادي `ems_period_check` — والكتابةُ في فترةٍ مقفلةٍ تُردُّ 423')
+                        : array('fail', 'لا تنادي `includes/period_guard.php` — فالكتابةُ في فترةٍ مقفلةٍ تمرّ');
+                } elseif ($isSource) {
+                    $hasGuard = (bool) preg_match('~receivable_source_guard|ems_receivable_resolve_source~', $rs);
+                    /* والقيدُ في القاعدةِ — الطرفُ الثاني من «الوصلِ في موضعين» */
+                    $hasCheck = false;
+                    $chk = $conn->query("SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
+                                          WHERE CONSTRAINT_SCHEMA = DATABASE()
+                                            AND CONSTRAINT_TYPE = 'CHECK'");
+                    if ($chk && ($cx = $chk->fetch_row())) { $hasCheck = ((int) $cx[0] > 0); }
+                    if ($hasGuard && $hasCheck) {
+                        $verdicts[] = array('pass',
+                            'تنادي حارسَ المستندِ المصدرِ **والقاعدةُ تحمل قيدَ CHECK** — الوصلُ في موضعين');
+                    } elseif ($hasGuard) {
+                        $verdicts[] = array('fail', 'الحارسُ في الشاشةِ بلا قيدٍ في القاعدة — يُلتفُّ عليه بكاتبٍ آخر');
+                    } else {
+                        $verdicts[] = array('fail',
+                            'لا تنادي `includes/receivable_source_guard.php` — فتُقبل كتابةٌ بلا مستندِ مصدر');
+                    }
+                } else {
+                    $coded = (bool) preg_match('~422|423|409|GOV-FAIL|RSK-|SOD-403~', $rs);
+                    $verdicts[] = $coded
+                        ? array('pass', 'الشاشةُ تردُّ برمزٍ محكومٍ لا برسالةٍ حرّة')
+                        : array('fail', 'لا رمزَ رفضٍ محكومًا في الشاشة — فالرفضُ نصٌّ لا حكم');
                 }
                 continue;
             }
