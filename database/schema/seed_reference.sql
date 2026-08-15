@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-15 11:51:05
+-- المصدر: equipation_manage · التوليد: 2026-08-15 13:32:54
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -3155,7 +3155,13 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2963,33,476,1,0,0,0),
 (2964,34,476,1,0,0,0),
 (2965,35,476,1,0,0,0),
-(2967,15,477,1,0,0,0);
+(2967,15,477,1,0,0,0),
+(2968,17,20,1,0,0,0),
+(2969,17,43,1,0,0,0),
+(2970,17,73,1,0,0,0),
+(2971,17,72,1,0,0,0),
+(2972,16,22,1,0,0,0),
+(2973,16,192,1,0,0,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -5002,14 +5008,14 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (6080,16,'DAILY',3386,72,'أرصدة المخزون بحالاتها','Procurement/stock_proc.php','fa fa-circle-dot',1,NULL,'Procurement/stock_proc.php',1,'2026-08-03 10:14:17','2026-08-06 00:14:05'),
 (6081,16,'DAILY',3386,68,'كتالوج الأصناف والقطع الحرجة','Procurement/items_proc.php','fa fa-circle-dot',2,NULL,'Procurement/items_proc.php',1,'2026-08-03 10:14:17','2026-08-06 00:14:05'),
 (6082,16,'DAILY',3387,298,'طلب العروض ومقارنتها','Procurement/rfq_compare_award.php','fa fa-circle-dot',1,NULL,'Procurement/rfq_compare_award.php',1,'2026-08-03 10:14:17','2026-08-06 18:20:55'),
-(6083,16,'DAILY',3388,22,'سجل الموردين','Suppliers/suppliers.php','fa fa-circle-dot',1,NULL,'Suppliers/suppliers.php',0,'2026-08-03 10:14:17','2026-08-15 11:32:59'),
+(6083,16,'DAILY',3388,22,'سجل الموردين','Suppliers/suppliers.php','fa fa-circle-dot',1,NULL,'Suppliers/suppliers.php',1,'2026-08-03 10:14:17','2026-08-15 13:03:30'),
 (6084,16,'DAILY',3389,70,'أوامر الشراء','Procurement/orders_proc.php','fa fa-circle-dot',1,NULL,'Procurement/orders_proc.php',1,'2026-08-03 10:14:17','2026-08-06 00:14:05'),
 (6085,16,'DAILY',3390,300,'الاستلام المؤقت قبل الإدخال','Procurement/wh_receipt.php','fa fa-circle-dot',1,NULL,'Procurement/wh_receipt.php',1,'2026-08-03 10:14:17','2026-08-06 18:20:55'),
 (6086,16,'DAILY',3391,255,'مطابقة الفاتورة بالأمر والاستلام','Procurement/po_match.php','fa fa-circle-dot',1,NULL,'Procurement/po_match.php',1,'2026-08-03 10:14:17','2026-08-06 08:30:27'),
 (6087,16,'DAILY',3392,91,'طلبات الدفع والسداد','Finance/payments_fin.php','fa fa-circle-dot',1,NULL,'Finance/payments_fin.php',1,'2026-08-03 10:14:17','2026-08-06 00:14:05'),
 (6088,16,'DAILY',3393,307,'بلاغات إدارتي','Tickets/dept_inbox.php','fa fa-circle-dot',1,'dept_tickets_late','Tickets/dept_inbox.php',1,'2026-08-03 10:14:17','2026-08-12 11:49:29'),
 (6089,16,'DAILY',3393,227,'أبلغ عن مشكلة من هذه الشاشة','Tickets/ticket_contextual_open.php','fa fa-circle-dot',2,NULL,'Tickets/ticket_contextual_open.php',1,'2026-08-03 10:14:17','2026-08-06 00:14:05'),
-(6090,16,'DAILY',3393,192,'صندوق ما ينتظر اعتمادي','Finance/approvals_inbox.php','fa fa-circle-dot',3,NULL,'Finance/approvals_inbox.php',0,'2026-08-03 10:14:17','2026-08-15 11:32:59'),
+(6090,16,'DAILY',3393,192,'صندوق ما ينتظر اعتمادي','Finance/approvals_inbox.php','fa fa-circle-dot',3,NULL,'Finance/approvals_inbox.php',1,'2026-08-03 10:14:17','2026-08-15 12:58:48'),
 (6093,16,'DAILY',3395,268,'ميزانية إدارتي','Finance/budget_dept.php','fa fa-circle-dot',1,NULL,'Finance/budget_dept.php',1,'2026-08-03 10:14:17','2026-08-06 18:20:55'),
 (6094,16,'DAILY',3395,295,'إنجاز الإدارة','Portal/dept_achievement.php','fa fa-circle-dot',2,NULL,'Portal/dept_achievement.php',1,'2026-08-03 10:14:17','2026-08-06 18:20:55'),
 (6095,16,'DAILY',3395,263,'مركز التقارير','emsreports/index.php','fa fa-circle-dot',3,NULL,'emsreports/index.php',1,'2026-08-03 10:14:17','2026-08-06 18:20:55'),
@@ -5295,16 +5301,16 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (6400,17,'DAILY',3586,142,'المستخلصات والمطالبات','Contracts/claims.php','fa fa-circle-dot',1,'claims_unbilled','Contracts/claims.php',1,'2026-08-03 10:14:17','2026-08-12 11:49:29'),
 (6401,17,'DAILY',3586,164,'فواتير العملاء','Contracts/tax_invoices.php','fa fa-circle-dot',2,NULL,'Contracts/tax_invoices.php',1,'2026-08-03 10:14:17','2026-08-06 00:14:05'),
 (6402,17,'DAILY',3587,166,'ذمم العملاء وأعمارها','Contracts/collections.php','fa fa-circle-dot',1,NULL,'Contracts/collections.php',1,'2026-08-03 10:14:17','2026-08-06 00:14:05'),
-(6403,17,'DAILY',3588,20,'عقود العملاء','Contracts/contracts.php','fa fa-circle-dot',1,NULL,'Contracts/contracts.php',0,'2026-08-03 10:14:17','2026-08-15 11:32:59'),
+(6403,17,'DAILY',3588,20,'عقود العملاء','Contracts/contracts.php','fa fa-circle-dot',1,NULL,'Contracts/contracts.php',1,'2026-08-03 10:14:17','2026-08-15 12:58:48'),
 (6404,17,'DAILY',3588,200,'أحكام العقد — العملات والمقدم والمهل','Contracts/contract_card.php','fa fa-circle-dot',2,NULL,'Contracts/contract_card.php',1,'2026-08-03 10:14:17','2026-08-06 00:14:05'),
 (6405,17,'DAILY',3589,91,'طلبات الدفع والسداد','Finance/payments_fin.php','fa fa-circle-dot',1,NULL,'Finance/payments_fin.php',1,'2026-08-03 10:14:17','2026-08-06 00:14:05'),
 (6406,17,'DAILY',3590,90,'ذمم الموردين والمستحقات','Finance/dues_fin.php','fa fa-circle-dot',1,NULL,'Finance/dues_fin.php',1,'2026-08-03 10:14:17','2026-08-06 00:14:05'),
 (6407,17,'DAILY',3591,144,'تسويات ومستحقات الموردين','Suppliers/settlements.php','fa fa-circle-dot',1,NULL,'Suppliers/settlements.php',1,'2026-08-03 10:14:17','2026-08-06 00:14:05'),
 (6408,17,'DAILY',3591,106,'كشف حساب المورد الشهري','Finance/supplier_statement_fin.php','fa fa-circle-dot',2,NULL,'Finance/supplier_statement_fin.php',1,'2026-08-03 10:14:17','2026-08-06 00:14:05'),
 (6409,17,'DAILY',3592,156,'مسيّر الرواتب','Workforce/payroll_runs.php','fa fa-circle-dot',1,NULL,'Workforce/payroll_runs.php',1,'2026-08-03 10:14:17','2026-08-06 00:14:05'),
-(6410,17,'DAILY',3593,43,'أوامر الصيانة','Maintenance/orders.php','fa fa-circle-dot',1,NULL,'Maintenance/orders.php',0,'2026-08-03 10:14:17','2026-08-15 11:32:59'),
-(6411,17,'DAILY',3593,73,'صرف مواد من المخزن','Procurement/issue_proc.php','fa fa-circle-dot',2,NULL,'Procurement/issue_proc.php',0,'2026-08-03 10:14:17','2026-08-15 11:32:59'),
-(6412,17,'DAILY',3593,72,'أرصدة المخزون بحالاتها','Procurement/stock_proc.php','fa fa-circle-dot',3,NULL,'Procurement/stock_proc.php',0,'2026-08-03 10:14:17','2026-08-15 11:32:59'),
+(6410,17,'DAILY',3593,43,'أوامر الصيانة','Maintenance/orders.php','fa fa-circle-dot',1,NULL,'Maintenance/orders.php',1,'2026-08-03 10:14:17','2026-08-15 12:58:48'),
+(6411,17,'DAILY',3593,73,'صرف مواد من المخزن','Procurement/issue_proc.php','fa fa-circle-dot',2,NULL,'Procurement/issue_proc.php',1,'2026-08-03 10:14:17','2026-08-15 12:58:48'),
+(6412,17,'DAILY',3593,72,'أرصدة المخزون بحالاتها','Procurement/stock_proc.php','fa fa-circle-dot',3,NULL,'Procurement/stock_proc.php',1,'2026-08-03 10:14:17','2026-08-15 12:58:48'),
 (6413,17,'DAILY',3594,309,'إقفال الأمر وتحميل تكلفته','Transport/transfer_close_cost.php','fa fa-circle-dot',1,NULL,'Transport/transfer_close_cost.php',1,'2026-08-03 10:14:17','2026-08-06 18:20:56'),
 (6414,17,'DAILY',3595,271,'توزيع تكلفة التمويل على المشاريع','Financing/cost_allocation.php','fa fa-circle-dot',1,NULL,'Financing/cost_allocation.php',1,'2026-08-03 10:14:17','2026-08-06 18:20:55'),
 (6415,17,'DAILY',3596,101,'الإهلاك والقيمة الدفترية','Finance/assets_fin.php','fa fa-circle-dot',1,NULL,'Finance/assets_fin.php',1,'2026-08-03 10:14:17','2026-08-06 00:14:05'),

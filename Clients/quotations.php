@@ -113,6 +113,28 @@ if (!$can_view) {
     exit();
 }
 
+/* ══ INJ-0142 · قبولُ العرضِ يولّد عقدَه ═══════════════════════════════════════
+     نصُّ القبول: «قبولُ عرضٍ **يولّد عقدًا مسودةً يحمل `quotation_id`**، وشاشةُ
+     العقد تعرض رابطًا للعرض الأب، وبنودُ العقد تطابق بنودَ العرض».
+     والمقيسُ قبلَه: العرضُ يصير «مقبولًا» **وينتهي أثرُه عند تغييرِ كلمة** — لا
+     عقدَ يُولد، ولا عمودَ في `contracts` يحمل `quotation_id`. فالسلسلةُ التجاريةُ
+     مقطوعةٌ عند أهمِّ وصلاتِها: من أين جاء هذا العقد؟
+   ◆ والتوليدُ **فعلٌ محكومٌ في الخدمة** (CS-05): يتحقّق أنَّ العرضَ مقبول،
+     ولا يولّد ثانيًا إن كان العقدُ قائمًا (العطالةُ بالمرجعِ لا بالوقت). */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['quo_make_contract'])) {
+    $posted_csrf = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+    if (empty($posted_csrf) || !hash_equals($quo_csrf_token, $posted_csrf)) {
+        quo_redirect_with_msg('جلسة النموذج غير صالحة ❌');
+    }
+    if (!$can_edit) { quo_redirect_with_msg('لا توجد صلاحية ❌'); }
+    require_once __DIR__ . '/../app/Services/Workflow/ChainLinkService.php';
+    $__qid = intval($_POST['quo_make_contract']);
+    $__r = \App\Services\Workflow\ChainLinkService::contractFromQuotation(
+        $conn, ems_tenant_db(), intval($_SESSION['user']['company_id'] ?? 0),
+        $__qid, intval($_SESSION['user']['id'] ?? 0));
+    quo_redirect_with_msg(($__r['ok'] ? '✅ ' : '❌ ') . $__r['reason']);
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
 // معالجة إضافة / تعديل عرض عبر POST
 // ══════════════════════════════════════════════════════════════════════════════
@@ -627,6 +649,19 @@ function quo_state_tone($state)
                                             <a href="?delete_id=<?php echo urlencode($row['id']); ?>&csrf_token=<?php echo urlencode($quo_csrf_token); ?>"
                                                 class="action-btn delete"
                                                 onclick="return confirm('هل أنت متأكد من حذف هذا العرض؟')" title="حذف"><i class="fas fa-trash-alt"></i></a>
+                                        <?php endif; ?>
+                                        <?php
+                                        /* ◆ INJ-0142 · زرُّ توليدِ العقدِ يظهر **للمقبولِ وحدَه** — فالعرضُ
+                                             المسودةُ لا يُنشئ التزامًا، والزرُّ الذي يظهر ثم يُرفض كذبٌ بصريّ. */
+                                        if ($can_edit && (string) $row['state'] === 'مقبول'): ?>
+                                            <form method="post" style="display:inline">
+                                                <input type="hidden" name="csrf_token" value="<?php echo quo_e($quo_csrf_token); ?>">
+                                                <input type="hidden" name="quo_make_contract" value="<?php echo intval($row['id']); ?>">
+                                                <button type="submit" class="action-btn edit"
+                                                        title="توليدُ عقدٍ مسودةٍ من هذا العرضِ — يحمل مرجعَه ولا يُولَّد مرتين">
+                                                    <i class="fas fa-file-contract"></i>
+                                                </button>
+                                            </form>
                                         <?php endif; ?>
                                     </div>
                                 </td>

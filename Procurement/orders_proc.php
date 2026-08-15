@@ -139,6 +139,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['currency'])) {
 
     $supplier_id = ($_POST['supplier_id'] ?? '') !== '' ? intval($_POST['supplier_id']) : null;
     $request_id  = ($_POST['request_id'] ?? '') !== '' ? intval($_POST['request_id']) : null;
+
+    /* ══ INJ-0335 · لا أمرَ شراءٍ بلا طلبٍ معتمد ═══════════════════════════════════
+         نصُّ القبول: «**لا يمكن حفظُ أمرِ شراءٍ بلا طلبٍ مرتبط، ولا بطلبٍ غيرِ
+         معتمد** — وتظهر رسالةُ رفضٍ صريحةٌ في الحالتين».
+         والمقيسُ قبلَه: القائمةُ تحمل خيارَ «— بلا طلب —» و`request_id` يقبل
+         NULL، ولا فحصَ لحالةِ الطلبِ إطلاقًا — فيُشترى بلا احتياجٍ اعتُمد.
+       ◆ **والحارسُ في موضعين**: هنا برسالةٍ تُقرأ، وفي القاعدةِ بقادحِ
+         `trg_po_request_required` — فالكاتبُ الثاني لا يلتفُّ عليه. */
+    if ($request_id === null || $request_id <= 0) {
+        ems_gov_flash_redirect('orders_proc.php',
+            'PO-REQ-422: لا أمرَ شراءٍ بلا طلبٍ مرتبط — اختر طلبَ الشراءِ المعتمد ❌',
+            'GOV-FAIL-422', 'الأمرُ أثرُ احتياجٍ اعتُمد لا قرارٌ منفرد');
+        exit();
+    }
+    $__pr = null;
+    try { $__pr = proc_gate($is_super_admin)->selectOne('proc_request', array('where' => array('id' => $request_id))); }
+    catch (\Throwable $t) { $__pr = null; }
+    require_once __DIR__ . '/../app/Services/Workflow/ChainLinkService.php';
+    if (!$__pr) {
+        ems_gov_flash_redirect('orders_proc.php',
+            'PO-REQ-404: الطلبُ غيرُ موجودٍ في نطاقك ❌', 'GOV-REF-404', '');
+        exit();
+    }
+    if (!\App\Services\Workflow\ChainLinkService::requestApproved($__pr)) {
+        ems_gov_flash_redirect('orders_proc.php',
+            'PO-REQ-422: الطلبُ #' . $request_id . ' «' . (string) $__pr['state']
+            . '» — ولا أمرَ شراءٍ إلا على طلبٍ معتمد ❌',
+            'GOV-FAIL-422', 'الاعتمادُ يسبق الشراءَ لا يتبعه');
+        exit();
+    }
     $fin_approval_ref = trim($_POST['fin_approval_ref'] ?? '');
     $op_classification = trim($_POST['op_classification'] ?? 'استهلاكية');
     $currency = trim($_POST['currency'] ?? 'SDG');
@@ -432,7 +462,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     </div>
                     <div class="form-group">
                         <label for="emsf_410_7f092">مرجع طلب الشراء</label>
-                        <select name="request_id" id="emsf_410_7f092"><?php echo proc_options_from_rows($request_option_rows, $edit ? intval($edit['request_id']) : 0, '— بلا طلب —'); ?></select>
+                        <select name="request_id" id="emsf_410_7f092"><?php echo proc_options_from_rows($request_option_rows, $edit ? intval($edit['request_id']) : 0, '— اختر طلبًا معتمدًا —'); ?></select>
                     </div>
                     <div class="form-group">
                         <label for="emsf_411_ccb3f">مرجع الاعتماد المالي <span class="required">*</span> <small>(شرط الإصدار)</small></label>

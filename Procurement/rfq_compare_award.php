@@ -47,7 +47,23 @@ if ($__pc['run'] && $__pc['ok']) {
     $svc = new \App\Services\Procurement\RfqAwardService($conn);
     $res = $svc->award($company_id, (int) $__pc['data']['qid'], (string) $__pc['data']['why'], $uid);
     $msg = $res['msg'];
-    if (!empty($res['ok'])) { ems_pc_idem_mark($conn, $__pc['idem'], $__pc['code'], 'rfq_awards#' . $res['award_id']); }
+    if (!empty($res['ok'])) {
+        ems_pc_idem_mark($conn, $__pc['idem'], $__pc['code'], 'rfq_awards#' . $res['award_id']);
+        /* ══ INJ-0091 · والترسيةُ تولّد مسودةَ أمرِ الشراء ═══════════════════════
+             نصُّ القبول: «**والترسيةُ تُنشئ مسودةَ أمرِ شراءٍ تحمل `rfq_id`
+             و`award_id`** ويظهر المرجعُ الأبُ في كلا الشاشتين».
+             والمقيسُ قبلَه: الترسيةُ صفٌّ في `rfq_awards` **وتقف** — ثم يُنشئ
+             أحدُهم أمرَ شراءٍ يدويًّا بلا مرجعٍ إلى ترسيتِه، فلا يُعرف على أيِّ
+             عرضٍ رُسي ولا بأيِّ سعر.
+           ◆ والتوليدُ **لا يُسقط الترسيةَ إن تعثّر**: الترسيةُ وقعت، والأمرُ
+             أثرُها — فيُعلَن التعثّرُ في الرسالةِ ولا يُبتلع صامتًا. */
+        require_once __DIR__ . '/../app/Services/Workflow/ChainLinkService.php';
+        $__po = \App\Services\Workflow\ChainLinkService::orderFromAward(
+            $conn, ems_tenant_db(), (int) $company_id, (int) $res['award_id'], (int) $uid);
+        $msg .= ' · ' . ($__po['ok']
+            ? ('أمرُ الشراءِ المسودةُ #' . (int) $__po['order_id'] . ($__po['existing'] ? ' (قائمٌ سلفًا)' : ''))
+            : ('⚠ لم يُولَّد أمرُ الشراء: ' . $__po['reason']));
+    }
 }
 
 $rfqs = array(); $quotes = array();

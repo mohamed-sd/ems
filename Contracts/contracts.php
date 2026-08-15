@@ -1234,11 +1234,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                . ($__rv['has'] ? ('له عكسٌ: ' . $__rv['label'])
                                                : ('لا عكسَ له: ' . (string) $__rv['why']));
                         $__needNote = (!empty($__a['needs']) && $__a['needs'] === 'note');
-                        $csm_cell .= "<form method='post' data-ems-c='ct-2' style='display:inline'>" . csrf_field()
+                        $csm_cell .= "<form method='post' class='ems-inline-form' data-ems-c='ct-2'>" . csrf_field()
                           . "<input type='hidden' name='clc_contract_id' value='{$cid}'>"
                           . "<input type='hidden' name='clc_action' value='" . htmlspecialchars($__code, ENT_QUOTES, 'UTF-8') . "'>"
                           . ($__needNote
-                              ? "<input type='text' name='clc_note' required minlength='3' style='width:110px'"
+                              ? "<input type='text' name='clc_note' required minlength='3' class='ems-note-inline'"
                                 . " placeholder='السبب'>"
                               : '')
                           . "<button class='action-btn' type='submit' title='"

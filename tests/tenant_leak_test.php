@@ -67,7 +67,16 @@ $MIGRATED_SCREENS = array(
         'login_user' => 71, 'user_company' => 4, 'other_company' => 1,
         'table' => 'proc_order',
         'row' => function ($companyId, $mark) {
-            return "INSERT INTO proc_order (company_id, code) VALUES ({$companyId}, '{$mark}')";
+            /* ◆ قادحُ `trg_po_request_required` يشترط طلبًا مرتبطًا (INJ-0335) —
+                 فصفُّ الجسِّ يحمل طلبًا حقيقيًّا من شركتِه لا فراغًا. */
+            $pr = 0;
+            $rr = $GLOBALS['conn']->query("SELECT id FROM proc_request WHERE company_id = {$companyId} ORDER BY id LIMIT 1");
+            if ($rr && ($rx = $rr->fetch_row())) { $pr = (int) $rx[0]; }
+            if ($pr === 0) {
+                $rr2 = $GLOBALS['conn']->query('SELECT id FROM proc_request ORDER BY id LIMIT 1');
+                if ($rr2 && ($rx2 = $rr2->fetch_row())) { $pr = (int) $rx2[0]; }
+            }
+            return "INSERT INTO proc_order (company_id, code, request_id) VALUES ({$companyId}, '{$mark}', {$pr})";
         },
         'cleanup' => "DELETE FROM proc_order WHERE code LIKE 'LEAKTEST_%'",
     ),
@@ -334,9 +343,13 @@ unset($_SERVER['SCRIPT_NAME']);
 
 // ═════ 6جـ) قناة replaceChildren — اختبارات تسرّبٍ خاصة (شرط الاستعمال المسبق) ═════
 echo "── 6جـ) replaceChildren (نمط استبدال الأبناء — قناة مقيدة) ──\n";
-$poA = $gateA->insert('proc_order', array());
+/* ◆ والقادحُ نفسُه هنا: صفُّ الجسِّ يحمل طلبًا قائمًا */
+$__prAny = 0;
+$__rq = $GLOBALS['conn']->query('SELECT id FROM proc_request ORDER BY id LIMIT 1');
+if ($__rq && ($__rx = $__rq->fetch_row())) { $__prAny = (int) $__rx[0]; }
+$poA = $gateA->insert('proc_order', array('request_id' => $__prAny));
 $cleanup[] = array('proc_order', $poA);
-$poB = $gateB->insert('proc_order', array());
+$poB = $gateB->insert('proc_order', array('request_id' => $__prAny));
 $cleanup[] = array('proc_order', $poB);
 $gateA->replaceChildren('proc_order', $poA, 'proc_order_line', 'order_id',
     array(array('item_name' => $MARK_A . '_L1'), array('item_name' => $MARK_A . '_L2')));
@@ -379,8 +392,8 @@ mysqli_query($conn, "DELETE FROM proc_order_line WHERE item_name LIKE 'LEAKTEST_
 echo "── 6د) runInTransaction (ذرّية مشتركة بحراسة كاملة) ──\n";
 
 // t1: النجاح + الترابط: أبٌ ثم سطران ثم صفٌّ يستعمل line_id الوليد — الكل يُرتكب معًا
-$txIds = $gateA->runInTransaction(function ($g) use ($MARK_A) {
-    $po = $g->insert('proc_order', array('code' => $MARK_A . '_TX'));
+$txIds = $gateA->runInTransaction(function ($g) use ($MARK_A, $__prAny) {
+    $po = $g->insert('proc_order', array('code' => $MARK_A . '_TX', 'request_id' => $__prAny));
     $l1 = $g->insert('proc_order_line', array('order_id' => $po, 'item_name' => $MARK_A . '_TXL1'));
     // الترابط: اسم السطر الثاني يحمل line_id الوليد للأول (كنمط custody←line_id)
     $l2 = $g->insert('proc_order_line', array('order_id' => $po, 'item_name' => $MARK_A . '_TXL2_of_' . $l1));
@@ -393,9 +406,9 @@ ok('t1: المعاملة ارتُكبت والترابط عمل (line_id الو�
 
 // t2: فشل وسط الـcallable = تراجع الكل (الأب المدرَج أولًا يختفي)
 $t2_parent = null;
-expect_throw('t2a: فشلٌ في العملية الثانية يُرمى', function () use ($gateA, $MARK_A, &$t2_parent) {
-    $gateA->runInTransaction(function ($g) use ($MARK_A, &$t2_parent) {
-        $t2_parent = $g->insert('proc_order', array('code' => $MARK_A . '_TXFAIL'));
+expect_throw('t2a: فشلٌ في العملية الثانية يُرمى', function () use ($gateA, $MARK_A, &$t2_parent, $__prAny) {
+    $gateA->runInTransaction(function ($g) use ($MARK_A, &$t2_parent, $__prAny) {
+        $t2_parent = $g->insert('proc_order', array('code' => $MARK_A . '_TXFAIL', 'request_id' => $__prAny));
         $g->insert('proc_order_line', array('order_id' => $t2_parent, 'no_such_column' => 'boom'));
     }, 'leaktest t2');
 });
@@ -404,9 +417,9 @@ ok('t2b: الأب المُدرَج قبل الفشل تراجع كليًا (ذر
 
 // t3: الحراسة لا تتعلق داخل المعاملة: تزوير شركةٍ داخل tx يُرفض ويتراجع الكل
 $t3_parent = null;
-expect_throw('t3a: تزوير الهوية داخل المعاملة يُرفض (الحُرّاس أحياء)', function () use ($gateA, $COMPANY_B, $MARK_A, &$t3_parent) {
-    $gateA->runInTransaction(function ($g) use ($COMPANY_B, $MARK_A, &$t3_parent) {
-        $t3_parent = $g->insert('proc_order', array('code' => $MARK_A . '_TXFORGE'));
+expect_throw('t3a: تزوير الهوية داخل المعاملة يُرفض (الحُرّاس أحياء)', function () use ($gateA, $COMPANY_B, $MARK_A, &$t3_parent, $__prAny) {
+    $gateA->runInTransaction(function ($g) use ($COMPANY_B, $MARK_A, &$t3_parent, $__prAny) {
+        $t3_parent = $g->insert('proc_order', array('code' => $MARK_A . '_TXFORGE', 'request_id' => $__prAny));
         $g->insert('proc_order_line', array('order_id' => $t3_parent, 'item_name' => 'x', 'company_id' => $COMPANY_B));
     }, 'leaktest t3');
 });

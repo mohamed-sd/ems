@@ -60,6 +60,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && strval($_POST['rfq_action'] ?? '') 
         $redirect($r['ok'] ? ($r['reason'] . ' ✅') : ($r['code'] . ' — ' . $r['reason'] . ' ❌'),
                   (int) $r['rfq_id']);
     }
+
+    /* ══ INJ-0091 · طلبُ العروضِ يُشتقُّ من **طلبِ الشراءِ المعتمد** ═══════════════
+         نصُّ القبول: «**اعتمادُ طلبِ شراءٍ يُظهره في شاشة طلب العروض**».
+         والمقيسُ قبلَه: البابُ الوحيدُ `openFromContract` — أي أنَّ طلبَ العروضِ
+         يُشتقُّ من **العقود** لا من الاحتياج. فسلسلةُ «احتياجٌ ⇒ عروضٌ ⇒ أمرٌ»
+         مقطوعةٌ من أوّلها، والمشتري يفتح عروضًا لعقدٍ لا لطلبٍ اعتُمد.
+       ◆ والبابُ القديمُ **يبقى**: بعضُ العروضِ تُفتح عن عقدٍ فعلًا — فلا يُلغى
+         مسلكٌ مشروعٌ بل يُضاف المسلكُ الناقص. */
+    if ($act === 'open_from_request' && $can_add) {
+        require_once __DIR__ . '/../app/Services/Workflow/ChainLinkService.php';
+        $r = \App\Services\Workflow\ChainLinkService::rfqFromRequest(
+            $conn, $gate, $company_id, intval($_POST['request_id'] ?? 0),
+            strval($_POST['title'] ?? ''), $uid);
+        $redirect($r['ok'] ? ($r['reason'] . ' ✅') : ($r['code'] . ' — ' . $r['reason'] . ' ❌'),
+                  (int) $r['rfq_id']);
+    }
     if ($act === 'send' && $can_edit) {
         $r = RFQ::send($conn, $gate, $company_id, intval($_POST['rfq_id'] ?? 0), $uid);
         $redirect($r['ok'] ? 'أُرسل الطلبُ للمؤهلين ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'),
@@ -157,6 +173,51 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <div style="margin-top:12px"><button type="submit" class="btn-primary">
                 <i class="fa fa-file-circle-plus"></i> افتح طلبًا من التزامات العقد</button></div>
+        </form>
+
+        <?php
+        /* ══ INJ-0091 · والبابُ الثاني: **طلبُ شراءٍ معتمد** ═══════════════════════
+             تُعرض طلباتُ الشراءِ المعتمدةُ التي **لم يُفتح لها طلبُ عروضٍ بعد** —
+             فاعتمادُ الطلبِ يُظهره هنا، وهو نصُّ الشرطِ الأول بعينه. */
+        $__prs = array();
+        try {
+            $__prs = $gate->scopedQuery(array('scope' => array('r' => 'proc_request')),
+                "SELECT r.id, r.state, r.fin_approval_state,
+                        COALESCE(r.note, '') note
+                   FROM proc_request r
+                  WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0) = 0
+                    AND NOT EXISTS (SELECT 1 FROM supplier_rfqs q WHERE q.request_id = r.id)
+                  ORDER BY r.id DESC LIMIT 50");
+        } catch (\Throwable $t) { $__prs = array(); }
+        require_once __DIR__ . '/../app/Services/Workflow/ChainLinkService.php';
+        $__approved = array();
+        foreach ($__prs as $__p) {
+            if (\App\Services\Workflow\ChainLinkService::requestApproved($__p)) { $__approved[] = $__p; }
+        }
+        ?>
+        <form method="post" class="ems-form" style="margin-top:14px;padding-top:12px;border-top:1px dashed #ddd">
+            <input type="hidden" name="rfq_action" value="open_from_request">
+            <div class="form-grid">
+                <div class="form-group"><label for="emsf_rfq_pr">طلبُ شراءٍ معتمد <span style="color:#c00">*</span>
+                    <small>— «الاحتياجُ أوّلُ السلسلة» (INJ-0091)</small></label>
+                    <select name="request_id" required id="emsf_rfq_pr">
+                        <option value="">— اختر طلبًا معتمدًا بلا طلبِ عروض —</option>
+                        <?php foreach ($__approved as $__p): ?>
+                            <option value="<?php echo intval($__p['id']); ?>">
+                                #<?php echo intval($__p['id']); ?> ·
+                                <?php echo htmlspecialchars(mb_substr((string) $__p['note'], 0, 40), ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <?php if (!$__approved): ?>
+                        <small style="color:#8a6d00">لا طلبَ شراءٍ معتمدًا ينتظر — أو كلُّها فُتحت لها عروضٌ سلفًا</small>
+                    <?php endif; ?>
+                </div>
+                <div class="form-group"><label for="emsf_rfq_pr_t">عنوانٌ</label>
+                    <input type="text" name="title" maxlength="160" id="emsf_rfq_pr_t"></div>
+            </div>
+            <div style="margin-top:12px"><button type="submit" class="btn-primary">
+                <i class="fa fa-arrow-right-to-bracket"></i> افتح طلبَ عروضٍ عن طلبِ شراءٍ معتمد</button></div>
         </form>
         <?php endif; ?>
     </div></div>

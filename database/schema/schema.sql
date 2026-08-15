@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-15 11:51:05
+-- المصدر: equipation_manage · التوليد: 2026-08-15 13:32:54
 -- الجداول: 554 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -1822,6 +1822,7 @@ CREATE TABLE `contractequipments` (
 -- ── Table: contracts ──
 CREATE TABLE `contracts` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `quotation_id` int(11) DEFAULT NULL COMMENT 'العرضُ الأبُ الذي وُلد منه هذا العقد (INJ-0142)',
   `company_id` int(11) DEFAULT NULL,
   `contract_signing_date` date NOT NULL,
   `grace_period_days` int(11) DEFAULT 0,
@@ -1878,6 +1879,7 @@ CREATE TABLE `contracts` (
   KEY `idx_contracts_status_contract_status` (`status`,`contract_status`),
   KEY `ix_contract_state` (`company_id`,`contract_status`),
   KEY `ix_contracts_site` (`site_id`),
+  KEY `ix_contracts_quotation` (`quotation_id`),
   CONSTRAINT `fk_contracts_merged` FOREIGN KEY (`merged_with`) REFERENCES `contracts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_contracts_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`),
   CONSTRAINT `fk_contracts_site` FOREIGN KEY (`site_id`) REFERENCES `sites` (`id`)
@@ -8315,6 +8317,8 @@ CREATE TABLE `proc_order` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `rfq_id` int(11) DEFAULT NULL COMMENT 'طلبُ العروضِ الذي رُسي عنه هذا الأمر (INJ-0091)',
+  `award_id` int(11) DEFAULT NULL COMMENT 'صفُّ الترسيةِ الذي وُلد منه هذا الأمر (INJ-0091)',
   PRIMARY KEY (`id`),
   KEY `idx_proc_order_company_state` (`company_id`,`state`),
   KEY `idx_proc_order_deleted` (`is_deleted`),
@@ -8323,7 +8327,9 @@ CREATE TABLE `proc_order` (
   KEY `ix_po_due` (`due_date`),
   KEY `ix_po_match` (`match_state`),
   KEY `ix_po_event` (`event_id`),
-  KEY `ix_po_expected` (`expected_delivery_date`)
+  KEY `ix_po_expected` (`expected_delivery_date`),
+  KEY `ix_po_rfq_id` (`rfq_id`),
+  KEY `ix_po_award_id` (`award_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: proc_order_line ──
@@ -11602,6 +11608,7 @@ CREATE TABLE `supplier_rfqs` (
   `company_id` int(10) unsigned NOT NULL,
   `rfq_no` varchar(40) NOT NULL,
   `client_contract_id` int(10) unsigned NOT NULL COMMENT 'العقدُ الذي اشتُقت منه البنود',
+  `request_id` int(11) DEFAULT NULL COMMENT 'طلبُ الشراءِ المعتمدُ الذي اشتُقَّ منه طلبُ العروض (INJ-0091)',
   `title` varchar(160) DEFAULT NULL,
   `due_date` date NOT NULL COMMENT 'موعدُ الإقفال — «عرضٌ بعد الإقفال 423»',
   `state` enum('draft','sent','closed','awarded','contracted','cancelled') NOT NULL DEFAULT 'draft' COMMENT 'UX-05 §8.2: Awarded → Contracted → ContainersAllocated',
@@ -11620,6 +11627,7 @@ CREATE TABLE `supplier_rfqs` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_rfq_no` (`company_id`,`rfq_no`),
   KEY `ix_rfq_contract` (`company_id`,`client_contract_id`,`state`),
+  KEY `ix_rfq_request` (`request_id`),
   CONSTRAINT `ck_rfq_awarded` CHECK (`state` not in (_utf8mb4'awarded',_utf8mb4'contracted') or `awarded_by` is not null),
   CONSTRAINT `ck_rfq_cancel` CHECK (`state` <> _utf8mb4'cancelled' or `cancel_reason` is not null and `cancel_reason` <> _utf8mb4'')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

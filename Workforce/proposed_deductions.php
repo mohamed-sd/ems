@@ -45,6 +45,67 @@ $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 ?>
   <p class="text-muted" style="font-size:.9em">كلُّ خصمٍ بمصدره (M-11: لا خصمَ بلا مستند) — والاعتمادُ من صندوق الاعتماد الجامع لا من هنا.</p>
+
+  <?php
+  /* ══ INJ-0292 · شاشةُ الخصومِ صار لها **فعلُ اقتراح** ═══════════════════════════
+       نصُّ القبول: «**الدور ٢٧ يقترح خصمًا بمستندٍ مؤيدٍ** فيظهر في صندوق الاعتماد
+       بحالة pending، ولا يصير نافذًا إلا باكتمال سلّم الموافقات؛ ودورٌ بلا منحةٍ
+       يُرفض ٤٠٣».
+       والمقيسُ قبلَه: الشاشةُ **قراءةٌ محضةٌ في ٩٥ سطرًا** — تعرض المقترحَ ولا
+       سبيلَ إلى اقتراحِه. فالدورةُ تبدأ خارجَ النظامِ ثم تظهر فيه.
+     ◆ **والحكمُ في الخدمة** (CS-05): `ChainLinkService::proposeDeduction` تتحقّق
+       من الشخصِ والمبلغِ والمستند، وتكتب في `fin_dues` — الجدولِ الذي تقرؤه هذه
+       الشاشةُ نفسُها. **والكاتبُ يكتب حيث يقرأ العارض.**
+     ◆ والاعتمادُ يبقى في صندوقِ الاعتمادِ الجامعِ لا هنا — فمن يقترح لا يعتمد. */
+  $__ded_msg = '';
+  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ded_propose'])) {
+      $__perm = check_page_permissions($conn, 'Workforce/proposed_deductions.php');
+      if (empty($__perm['can_add']) && empty($__perm['can_edit'])) {
+          ems_gov_flash_redirect('proposed_deductions.php', 'لا توجد صلاحية اقتراحِ خصم ❌', 'GOV-PERM-403', '');
+          exit();
+      }
+      require_once __DIR__ . '/../app/Services/Workflow/ChainLinkService.php';
+      $__r = \App\Services\Workflow\ChainLinkService::proposeDeduction(
+          $conn, ems_tenant_db(), $company_id, array(
+              'person_id'   => intval($_POST['ded_person'] ?? 0),
+              'amount'      => $_POST['ded_amount'] ?? 0,
+              'doc_ref'     => strval($_POST['ded_doc'] ?? ''),
+              'source_type' => strval($_POST['ded_kind'] ?? 'penalty'),
+              'note'        => strval($_POST['ded_note'] ?? ''),
+          ), intval($_SESSION['user']['id'] ?? 0));
+      ems_gov_flash_redirect('proposed_deductions.php',
+          ($__r['ok'] ? '✅ ' : '❌ ') . $__r['reason'],
+          $__r['ok'] ? 'GOV-OK-200' : 'GOV-FAIL-422', '');
+      exit();
+  }
+  $__dperm = check_page_permissions($conn, 'Workforce/proposed_deductions.php');
+  if (!empty($__dperm['can_add']) || !empty($__dperm['can_edit'])): ?>
+  <form method="post" class="ems-form" style="margin-bottom:14px;padding:10px 12px;
+        border:1px solid #e0d7bd;border-radius:8px;background:#fffdf3">
+      <?php if (function_exists('csrf_field')) { echo csrf_field(); } ?>
+      <input type="hidden" name="ded_propose" value="1">
+      <strong>اقترحْ خصمًا</strong>
+      <div class="form-grid" style="margin-top:8px">
+          <div class="form-group"><label for="dedp">الموظف (المعرّف) <span style="color:#c00">*</span></label>
+              <input type="number" name="ded_person" id="dedp" min="1" required></div>
+          <div class="form-group"><label for="deda">المبلغ <span style="color:#c00">*</span></label>
+              <input type="number" name="ded_amount" id="deda" step="0.01" min="0.01" required></div>
+          <div class="form-group"><label for="dedk">نوعُ الخصم</label>
+              <select name="ded_kind" id="dedk">
+                  <option value="penalty">جزاء</option>
+                  <option value="advance">سلفة</option>
+                  <option value="discount">حسم</option>
+              </select></div>
+          <div class="form-group"><label for="dedd">المستندُ المؤيّد <span style="color:#c00">*</span>
+              <small>— لا خصمَ بلا مستند (M-11)</small></label>
+              <input type="text" name="ded_doc" id="dedd" maxlength="160" required></div>
+          <div class="form-group"><label for="dedn">ملاحظة</label>
+              <input type="text" name="ded_note" id="dedn" maxlength="255"></div>
+      </div>
+      <div style="margin-top:10px"><button type="submit" class="btn-primary">
+          <i class="fa fa-plus"></i> اقترحْ — ينتظر سلّمَ الموافقات</button></div>
+  </form>
+  <?php endif; ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>#</th><th>الطرف</th><th>نوع الخصم</th><th>المبلغ</th><th>المصدرُ المستندي</th><th>منذ</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
