@@ -533,3 +533,95 @@ if (!function_exists('trs_save_proof')) {
         return $rel;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * حارسا الإقفالِ والتجهيز — **دالّةٌ واحدةٌ تُستعمل من الشاشتين**
+ * ⇐ INJ-0310 · INJ-0313
+ *
+ * نصُّ INJ-0310: «**الإقفالُ من أيِّ الشاشتين يُرفض بالرسالة نفسها** إن لم يكن
+ * للأمر متحمِّلٌ ومراكزُ تكلفةٍ لكل بند».
+ * والعلّةُ: للإقفالِ مسارٌ محروسٌ (مستندُ التسليمِ + عطالةُ المستند) ومسارٌ آخرُ
+ * يتخطاه. **فالرسالةُ الواحدةُ تعني حارسًا واحدًا** — ونسخُ الشرطِ في شاشتين
+ * يعني شرطين يتفرّقان مع أوّلِ تعديل.
+ *
+ * ◆ **وحكمٌ مُعلَنٌ**: «مراكزُ تكلفةٍ **لكل بند**» — و`transfer_lines` لا تحمل
+ *   عمودَ مركزِ تكلفة؛ المركزُ صفةُ **الأمرِ** في هذا التصميم
+ *   (`transfer_orders.analytic_cost_center`). فالحارسُ يشترط المركزَ على الأمرِ
+ *   ووجودَ بنودٍ فيه — وإضافةُ مركزٍ لكلِّ بندٍ تُعيد تشكيلَ نموذجِ التكلفةِ
+ *   والمروحةِ معه، وذلك نطاقٌ آخر. يُعلَن ولا يُخفى.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+if (!function_exists('trs_close_gate')) {
+    /**
+     * أيجوز إقفالُ هذا الأمر؟ — الحارسُ الواحدُ برسالةٍ واحدة.
+     * @return array{ok:bool,code:int,reason:string}
+     */
+    function trs_close_gate($gate, $orderId)
+    {
+        $out = array('ok' => false, 'code' => 422, 'reason' => '');
+        $orderId = (int) $orderId;
+        if ($orderId <= 0) { $out['reason'] = 'TRS-422: أمرٌ غيرُ صالح'; return $out; }
+
+        $o = null;
+        try {
+            $o = $gate->selectOne('transfer_orders', array(
+                'columns' => array('id', 'cost_bearer', 'analytic_cost_center', 'stage'),
+                'where'   => array('id' => $orderId)));
+        } catch (\Throwable $t) { $o = null; }
+        if (!$o) { $out['code'] = 404; $out['reason'] = 'TRS-404: الأمرُ غيرُ موجودٍ في نطاقك'; return $out; }
+
+        $miss = array();
+        if (trim((string) $o['cost_bearer']) === '') { $miss[] = 'المتحمِّل'; }
+        if (trim((string) $o['analytic_cost_center']) === '') { $miss[] = 'مركزُ التكلفة'; }
+
+        $lines = 0;
+        try {
+            $lines = (int) $gate->count('transfer_lines',
+                array('whereRaw' => 'order_id = ' . $orderId . ' AND COALESCE(is_deleted,0) = 0'));
+        } catch (\Throwable $t) { $lines = 0; }
+        if ($lines === 0) { $miss[] = 'بندٌ واحدٌ على الأقل'; }
+
+        if ($miss) {
+            $out['code'] = 422;
+            $out['reason'] = 'TRS-422-CLOSE: لا إقفالَ بلا ' . implode(' و', $miss)
+                           . ' — والتكلفةُ لا تُحمَّل على مجهول';
+            return $out;
+        }
+        $out['ok'] = true; $out['code'] = 200; $out['reason'] = 'مستوفٍ لشروطِ الإقفال';
+        return $out;
+    }
+}
+
+if (!function_exists('trs_readiness_gate')) {
+    /**
+     * حارسُ التجهيز (INJ-0313): «ويجتاز الأمرُ حارسَ التجهيز» — تصريحُ مسارٍ
+     * **نافذٌ** على الأقلّ، ولا تصريحَ منتهيَ الصلاحيةِ يُحسب نافذًا.
+     * @return array{ok:bool,code:int,reason:string,valid:int}
+     */
+    function trs_readiness_gate($gate, $orderId)
+    {
+        $out = array('ok' => false, 'code' => 422, 'reason' => '', 'valid' => 0);
+        $orderId = (int) $orderId;
+        if ($orderId <= 0) { $out['reason'] = 'TRS-422: أمرٌ غيرُ صالح'; return $out; }
+
+        $valid = 0;
+        try {
+            /* ◆ **والمنتهي ليس نافذًا ولو كانت حالتُه `valid`**: التاريخُ حكمٌ
+                 والحالةُ بيان — وهي القاعدةُ نفسُها في حارسِ صلاحيةِ الوثائق. */
+            $valid = (int) $gate->count('transfer_permits', array(
+                'whereRaw' => 'order_id = ' . $orderId . " AND state = 'valid'"
+                            . ' AND COALESCE(is_deleted,0) = 0'
+                            . ' AND (expiry_date IS NULL OR expiry_date >= CURDATE())'));
+        } catch (\Throwable $t) { $valid = 0; }
+
+        $out['valid'] = $valid;
+        if ($valid === 0) {
+            $out['code'] = 422;
+            $out['reason'] = 'TRS-422-PERMIT: لا تصريحَ نافذًا على هذا الأمر — ولا تجهيزَ بلا تصريح';
+            return $out;
+        }
+        $out['ok'] = true; $out['code'] = 200;
+        $out['reason'] = 'تصاريحُ نافذةٌ: ' . $valid;
+        return $out;
+    }
+}

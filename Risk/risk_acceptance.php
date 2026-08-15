@@ -118,7 +118,25 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td style="font-size:.74rem"><?php echo htmlspecialchars((string) $x['parent_ref'] ?: '—'); ?></td>
                     <td><?php echo !empty($x['withdrawn_at'])
                             ? '<span class="badge badge-secondary">مسحوب</span>' : '<span class="badge badge-success">نافذ</span>'; ?></td>
-                    <td><a class="btn btn-sm btn-secondary" href="risk_card.php?id=<?php echo (int) $x['risk_id']; ?>">ملف الخطر</a></td>
+                    <td><a class="btn btn-sm btn-secondary" href="risk_card.php?id=<?php echo (int) $x['risk_id']; ?>">ملف الخطر</a>
+                        <?php
+                        /* ◆ INJ-0391 · **زرُّ السحبِ للنافذِ وحدَه**: العمودانِ
+                             `withdrawn_by/at` كانا يُصيَّرانِ ولا يُكتبان — فالجدولُ
+                             يعرض «مسحوب/نافذ» ولا سبيلَ إلى السحب. والآن للنافذِ بابٌ. */
+                        if (empty($x['withdrawn_at'])): ?>
+                        <form method="post" action="risk_actions.php" class="ems-inline-form">
+                            <?php if (function_exists('csrf_field')) { echo csrf_field(); } ?>
+                            <input type="hidden" name="action" value="risk_accept_withdraw">
+                            <input type="hidden" name="acceptance_id" value="<?php echo (int) $x['id']; ?>">
+                            <input type="text" name="note" required minlength="3" class="ems-note-inline"
+                                   placeholder="سببُ السحب">
+                            <button type="submit" class="btn btn-sm btn-secondary"
+                                    title="سحبُ القبولِ — حركةٌ تُختم بمن سحبها ومتى، ولا تمحو القرارَ الأول">
+                                اسحب القبول
+                            </button>
+                        </form>
+                        <?php endif; ?>
+                    </td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

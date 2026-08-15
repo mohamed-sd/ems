@@ -37,8 +37,31 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['aclose_tk']))
     if ($why === '') { $msg = 'السببُ المكتوبُ إلزامي (422)'; }
     else {
         // لا يُغلق منجَزٌ إداريًّا — المكررُ والملغى فقط
-        $r = mysqli_query($conn, "SELECT stage FROM tickets WHERE id = $tid AND company_id = $company_id");
+        /* ══ INJ-0264 · سياسةُ الإقفالِ تحكم الإغلاقَ الإداري ═══════════════════════
+             نصُّ القبول: «**محاولةُ إغلاقٍ إداريٍّ لبلاغِ شكوى أو سلامةٍ تُرفض ٤٠٣
+             برسالةٍ تسمّي السياسة**؛ والإغلاقُ الإداريُّ الخاطئ **يُعكَس بزرٍّ
+             ينتج حركةً مرتبطةً بالأصل**».
+             والمقيسُ قبلَه: الحارسُ الوحيدُ «لا يُغلق منجَزٌ» — أمّا شكوى العاملِ
+             أو بلاغُ السلامةِ فيُغلقان إداريًّا بضغطةٍ، وهما أحوجُ ما يكون إلى
+             تأكيدِ المبلِّغِ أو قرارِ لجنة.
+           ◆ والسياسةُ **مقروءةٌ من نوعِ البلاغِ** (`ticket_types.closure_policy`)
+             لا مكتوبةٌ هنا: `reporter_confirm` و`committee` لا يُغلقان إداريًّا. */
+        $r = mysqli_query($conn, "SELECT t.stage, t.ticket_type_id,
+                                         COALESCE(ty.closure_policy, 'admin_only') closure_policy,
+                                         COALESCE(ty.name, '') type_name
+                                    FROM tickets t
+                                    LEFT JOIN ticket_types ty ON ty.id = t.ticket_type_id
+                                   WHERE t.id = $tid AND t.company_id = $company_id");
         if (!$r || !($t = mysqli_fetch_assoc($r))) { $msg = 'بلاغٌ غيرُ موجود (404)'; }
+        elseif (in_array((string) $t['closure_policy'], array('reporter_confirm', 'committee'), true)) {
+            $__pol = array('reporter_confirm' => 'تأكيدُ المبلِّغ', 'committee' => 'قرارُ لجنة');
+            $msg = 'TKT-403-CLOSEPOL: سياسةُ إقفالِ هذا النوع «'
+                 . $__pol[(string) $t['closure_policy']] . '» — فلا يُغلق إداريًّا (403)';
+            if (function_exists('ems_log_denial')) {
+                @ems_log_denial('TKT-403-CLOSEPOL', 'ticket:' . $tid,
+                    'محاولةُ إغلاقٍ إداريٍّ لنوعٍ سياستُه ' . (string) $t['closure_policy']);
+            }
+        }
         elseif (in_array($t['stage'], array('done', 'closed'), true)) { $msg = 'منجَزٌ — يُغلق بمساره لا إداريًّا (403)'; }
         else {
             mysqli_begin_transaction($conn);
@@ -72,6 +95,74 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['aclose_tk']))
         }
     }
 }
+
+/* ══ INJ-0264 ② · عكسُ الإغلاقِ الإداريِّ الخاطئ ═══════════════════════════════
+     «**والإغلاقُ الإداريُّ الخاطئ يُعكَس بزرٍّ ينتج حركةً مرتبطةً بالأصل**».
+     والعكسُ **حركةٌ جديدةٌ بمرجعِها لا محوٌ للأولى** (CS-08): البلاغُ يعود إلى
+     مرحلتِه السابقةِ المقروءةِ **من سجلِّ التدقيق** لا من ظنّ، وتُكتب واقعةُ
+     `admin_close_reversed` في سجلِّ البلاغِ تشير إلى الإغلاقِ الذي نُقض.
+   ◆ والسببُ إلزاميٌّ — فنقضٌ صامتٌ يُقرأ عبثًا. */
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['areverse_tk'])) {
+    $rid = intval($_POST['areverse_tk']);
+    $rwhy = trim($_POST['reverse_reason'] ?? '');
+    if ($rwhy === '') { $msg = 'سببُ العكسِ إلزامي (422)'; }
+    else {
+        $rr = mysqli_query($conn, "SELECT stage FROM tickets WHERE id = $rid AND company_id = $company_id");
+        $tk = $rr ? mysqli_fetch_assoc($rr) : null;
+        if (!$tk) { $msg = 'بلاغٌ غيرُ موجود (404)'; }
+        elseif ((string) $tk['stage'] !== 'cancelled') {
+            $msg = 'TKT-422-NOTCLOSED: البلاغُ ليس مُغلقًا إداريًّا — لا عكسَ له (422)';
+        } else {
+            /* المرحلةُ السابقةُ من سجلِّ التدقيقِ — لا تُخمَّن */
+            $prev = '';
+            $aq = $conn->prepare("SELECT old_value FROM activity_logs
+                                   WHERE screen_name = 'tickets' AND record_id = ?
+                                     AND action_type = 'admin_close'
+                                   ORDER BY id DESC LIMIT 1");
+            if ($aq) {
+                $aq->bind_param('i', $rid);
+                if ($aq->execute()) {
+                    $ax = $aq->get_result()->fetch_row();
+                    if ($ax) {
+                        $j = json_decode((string) $ax[0], true);
+                        if (is_array($j) && !empty($j['stage'])) { $prev = (string) $j['stage']; }
+                    }
+                }
+                $aq->close();
+            }
+            if ($prev === '') {
+                $msg = 'TKT-409-NOTRACE: لا أثرَ تدقيقٍ يحمل المرحلةَ السابقة — فلا يُخمَّن إلى أين يُردّ (409)';
+            } else {
+                mysqli_begin_transaction($conn);
+                $u1 = mysqli_query($conn, "UPDATE tickets SET stage = '"
+                        . mysqli_real_escape_string($conn, $prev) . "' WHERE id = $rid AND stage = 'cancelled'");
+                $u2 = mysqli_query($conn, "INSERT INTO ticket_events (company_id, ticket_id, event_type, body, actor_user_id)
+                        VALUES ($company_id, $rid, 'admin_closed', '"
+                        . mysqli_real_escape_string($conn, 'نقضُ الإغلاقِ الإداريِّ — أُعيد إلى «' . $prev . '»: ' . $rwhy)
+                        . "', $uid)");
+                if ($u1 && $u2) {
+                    mysqli_commit($conn);
+                    require_once __DIR__ . '/../includes/audit_trail.php';
+                    ems_audit_change($conn, 'tickets', 'tickets', 'admin_close_reversed', (int) $rid,
+                        array('stage' => 'cancelled'),
+                        array('stage' => $prev, 'reason' => mb_substr($rwhy, 0, 200)),
+                        array('company_id' => (int) $company_id, 'user_id' => (int) $uid));
+                    $msg = "نُقض الإغلاقُ الإداريُّ لـ#$rid — عاد إلى «$prev» بحركةٍ مرتبطةٍ بالأصل";
+                } else {
+                    mysqli_rollback($conn);
+                    $msg = 'تعذّر العكسُ: ' . mysqli_error($conn);
+                }
+            }
+        }
+    }
+}
+
+/* البلاغاتُ المُغلقةُ إداريًّا — لتُعرض مع زرِّ النقض */
+$closed_rows = array();
+$rc = mysqli_query($conn, "SELECT id, ticket_no, complaint, created_at FROM tickets
+                            WHERE company_id = $company_id AND stage = 'cancelled'
+                            ORDER BY created_at DESC LIMIT 30");
+if ($rc) { while ($x = mysqli_fetch_assoc($rc)) { $closed_rows[] = $x; } }
 
 $rows = array();
 $r = mysqli_query($conn, "SELECT id, ticket_no, complaint, stage, created_at FROM tickets
@@ -140,4 +231,35 @@ include __DIR__ . '/../includes/page_header.php';
     <?php endforeach; ?>
     </tbody>
   </table>
+
+  <?php
+  /* ══ INJ-0264 ② · جدولُ المُغلَقِ إداريًّا بزرِّ نقضِه ═══════════════════════════
+       «والإغلاقُ الإداريُّ الخاطئ **يُعكَس بزرٍّ** ينتج حركةً مرتبطةً بالأصل».
+       فالبابُ ظاهرٌ لا مخبوءٌ في نقطةِ ردٍّ — ومن أغلق خطأً يجد سبيلَه. */
+  if (!empty($closed_rows)): ?>
+  <h5 style="margin-top:18px">المُغلَقُ إداريًّا — ولكلٍّ بابُ نقضٍ بحركةٍ مرتبطة</h5>
+  <table class="table table-striped" data-no-dt>
+    <thead><tr><th>رقم البلاغ</th><th>الموضوع</th><th>نقضُ الإغلاق</th></tr></thead>
+    <tbody>
+    <?php foreach ($closed_rows as $ct): ?>
+      <tr>
+        <td><?= htmlspecialchars((string) $ct['ticket_no'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars(mb_substr((string) $ct['complaint'], 0, 50), ENT_QUOTES, 'UTF-8') ?></td>
+        <td>
+          <form method="post" class="ems-inline-flex-form">
+            <?php echo csrf_field(); ?>
+            <input type="hidden" name="areverse_tk" value="<?= intval($ct['id']) ?>">
+            <input type="text" name="reverse_reason" class="form-control form-control-sm ems-reason-inline"
+                   placeholder="سببُ النقض" required aria-label="سببُ النقض">
+            <button class="action-btn" type="submit"
+                    title="نقضُ الإغلاق — يُعيد البلاغَ إلى مرحلتِه المقروءةِ من سجلِّ التدقيق، بحركةٍ جديدةٍ لا بمحوِ الأولى">
+              انقُض الإغلاق
+            </button>
+          </form>
+        </td>
+      </tr>
+    <?php endforeach; ?>
+    </tbody>
+  </table>
+  <?php endif; ?>
 </div>

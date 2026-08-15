@@ -677,6 +677,77 @@ class RiskService
         return true;
     }
 
+    /**
+     * ══ INJ-0391 · سحبُ القبول — فعلٌ كان مُعلَنًا بلا وجود ═══════════════════
+     *
+     * نصُّ القبول: «**اسحب قبولًا بسببٍ مكتوب: تمتلئ الأعمدةُ**، وتعود حالةُ
+     * الخطرِ إلى `reassessment`، **ويُنشر الحدث**».
+     *
+     * والمقيسُ قبلَه: `withdrawn_by` و`withdrawn_at` عمودانِ **يُقرآن ويُصيَّران**
+     * (`LEFT JOIN users wd ON wd.id = a.withdrawn_by` في شاشةِ القبول) — **ولا
+     * سطرَ في المستودعِ كلِّه يكتبهما**. فالشاشةُ تعرض عمودَ «مَن سحب» وهو فارغٌ
+     * أبدًا: **حقلٌ لا يُكتب قطُّ يكذب على قارئه**.
+     *
+     * ◆ **والسحبُ حركةٌ لا محو**: صفُّ القبولِ يبقى ويُختم بمن سحبه ومتى — فيُقرأ
+     *   السجلُّ «قُبل ثم سُحب» لا «لم يُقبل قطّ» (CS-08).
+     * ◆ ولا يُسحب قبولٌ مسحوبٌ — والعطالةُ بالعمودِ نفسِه.
+     *
+     * @return array{ok:bool,code:int,reason:string,acceptance_id:?int}
+     */
+    public static function withdrawAcceptance(\mysqli $db, $companyId, $acceptanceId, $why, $userId)
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '', 'acceptance_id' => null);
+        $acceptanceId = (int) $acceptanceId;
+        $why = trim((string) $why);
+        if ($acceptanceId <= 0) { $out['code'] = 422; $out['reason'] = 'RSK-422: قبولٌ غيرُ صالح'; return $out; }
+        if ($why === '') {
+            $out['code'] = 422;
+            $out['reason'] = 'RSK-422: سحبُ القبولِ يلزمه سببٌ مكتوب — لا سحبَ صامت';
+            return $out;
+        }
+
+        $st = $db->prepare('SELECT risk_id, withdrawn_by FROM risk_acceptances WHERE id = ? AND company_id = ? LIMIT 1');
+        if (!$st) { $out['code'] = 500; $out['reason'] = 'RSK-500: تعذّر التحضير'; return $out; }
+        $st->bind_param('ii', $acceptanceId, $companyId);
+        $st->execute();
+        $row = $st->get_result()->fetch_assoc();
+        $st->close();
+        if (!$row) { $out['code'] = 404; $out['reason'] = 'RSK-404: القبولُ غيرُ موجودٍ في نطاقك'; return $out; }
+        if (!empty($row['withdrawn_by'])) {
+            $out['code'] = 422; $out['reason'] = 'RSK-422: القبولُ مسحوبٌ سلفًا — لا سحبَ ثانٍ'; return $out;
+        }
+        $riskId = (int) $row['risk_id'];
+
+        $up = $db->prepare("UPDATE risk_acceptances
+                               SET withdrawn_by = ?, withdrawn_at = NOW(),
+                                   note = CONCAT(COALESCE(note,''), ' · سُحب: ', ?)
+                             WHERE id = ? AND withdrawn_by IS NULL");
+        if (!$up) { $out['code'] = 500; $out['reason'] = 'RSK-500: تعذّر التحضير'; return $out; }
+        $u = (int) $userId;
+        $up->bind_param('isi', $u, $why, $acceptanceId);
+        $done = ($up->execute() && $db->affected_rows > 0);
+        $up->close();
+        if (!$done) { $out['code'] = 409; $out['reason'] = 'RSK-409: لم يقع السحبُ — أُعيد التحميل'; return $out; }
+
+        /* ② والخطرُ يعود إلى إعادةِ التقييم — فالقبولُ زال وحكمُه معه */
+        $rs = $db->prepare("UPDATE risk_register SET state = 'reassessment'
+                             WHERE id = ? AND company_id = ? AND state <> 'closed'");
+        if ($rs) { $rs->bind_param('ii', $riskId, $companyId); $rs->execute(); $rs->close(); }
+
+        /* ③ ويُنشر الحدثُ — فالمروحةُ تعرف أنَّ القبولَ لم يعد قائمًا */
+        try {
+            RiskEvents::fire($db, $companyId, 'RiskAcceptanceWithdrawn', $riskId, array(
+                'acceptance_id' => $acceptanceId, 'reason' => $why,
+            ), $userId, (string) $acceptanceId);
+        } catch (\Throwable $t) {
+            error_log('risk withdraw event failed #' . $acceptanceId . ': ' . $t->getMessage());
+        }
+
+        $out['ok'] = true; $out['code'] = 200; $out['acceptance_id'] = $acceptanceId;
+        $out['reason'] = 'سُحب القبولُ #' . $acceptanceId . ' — وعاد الخطرُ إلى إعادةِ التقييم';
+        return $out;
+    }
+
     /** الإغلاق (RK-03): دليل تنفيذ + إعادة تقييم بعد آخر معالجة + قبول بالسقف */
     public static function closeRisk(\mysqli $db, $companyId, $riskId, $actorAuthority, $userId, $note = null)
     {

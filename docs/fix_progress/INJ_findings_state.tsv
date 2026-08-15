@@ -24,7 +24,7 @@ INJ-0022	P1	نعم	مُغلقٌ بشاهد
 INJ-0023	P1	نعم	مُغلقٌ بشاهد	
 INJ-0024	P1	نعم	مُغلقٌ بشاهد	
 INJ-0025	P1	نعم	مُغلقٌ بشاهد	
-INJ-0026	P1	نعم	غيرُ مقيس	
+INJ-0026	P1	نعم	مُغلقٌ بشاهد	
 INJ-0027	P1	نعم	مُغلقٌ بشاهد	tests/credit_debit_note_test.php · tools/fix_inj0027_tests.php
 INJ-0028	P1	نعم	غيرُ مقيس	
 INJ-0029	P1	نعم	غيرُ مقيس	
@@ -89,7 +89,7 @@ INJ-0087	P1	نعم	مُغلقٌ بشاهد
 INJ-0088	P1	نعم	غيرُ مقيس	
 INJ-0089	P1	نعم	مُغلقٌ بشاهد	
 INJ-0090	P1	نعم	غيرُ مقيس	
-INJ-0091	P1	نعم	غيرُ مقيس	
+INJ-0091	P1	نعم	مُغلقٌ بشاهد	
 INJ-0092	P1	نعم	غيرُ مقيس	
 INJ-0093	P1	نعم	غيرُ مقيس	
 INJ-0094	P1	نعم	غيرُ مقيس	
@@ -122,7 +122,7 @@ INJ-0120	P2	نعم	غيرُ مقيس
 INJ-0121	P2	لا	غيرُ مقيس	
 INJ-0122	P2	نعم	غيرُ مقيس	
 INJ-0123	P2	نعم	مُغلقٌ بشاهد	tests/dept_space_screens_test.php
-INJ-0124	P2	نعم	غيرُ مقيس	
+INJ-0124	P2	نعم	مُغلقٌ بشاهد	
 INJ-0125	P2	لا	غيرُ مقيس	
 INJ-0126	P2	لا	غيرُ مقيس	
 INJ-0127	P2	لا	مُغلقٌ بشاهد	
@@ -140,8 +140,8 @@ INJ-0138	P2	لا	غيرُ مقيس
 INJ-0139	P2	لا	مُغلقٌ بشاهد	tests/operations_audit_trail_test.php
 INJ-0140	P2	لا	غيرُ مقيس	
 INJ-0141	P2	لا	غيرُ مقيس	
-INJ-0142	P2	نعم	غيرُ مقيس	
-INJ-0143	P2	نعم	غيرُ مقيس	
+INJ-0142	P2	نعم	مُغلقٌ بشاهد	
+INJ-0143	P2	نعم	مُغلقٌ بشاهد	
 INJ-0144	P2	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0145	P2	لا	غيرُ مقيس	
 INJ-0146	P2	لا	مُغلقٌ بشاهد	tests/contracts_tables_test.php
@@ -150,7 +150,7 @@ INJ-0148	P2	لا	غيرُ مقيس
 INJ-0149	P2	نعم	مُغلقٌ بشاهد	tests/regression_exit_contract_test.php
 INJ-0150	P2	نعم	مُغلقٌ بشاهد	
 INJ-0151	P2	نعم	غيرُ مقيس	
-INJ-0152	P2	نعم	غيرُ مقيس	
+INJ-0152	P2	نعم	مُغلقٌ بشاهد	
 INJ-0153	P2	نعم	غيرُ مقيس	
 INJ-0154	P2	لا	مُغلقٌ بشاهد	
 INJ-0155	P2	نعم	غيرُ مقيس	
@@ -182,7 +182,7 @@ INJ-0180	P2	نعم	مُغلقٌ بشاهد
 INJ-0181	P2	نعم	غيرُ مقيس	
 INJ-0182	P2	نعم	غيرُ مقيس	
 INJ-0183	P2	لا	مُغلقٌ بشاهد	
-INJ-0184	P2	لا	غيرُ مقيس	
+INJ-0184	P2	لا	مُغلقٌ بشاهد	
 INJ-0185	P2	لا	مُغلقٌ بشاهد	
 INJ-0186	P2	لا	غيرُ مقيس	
 INJ-0187	P2	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
@@ -262,7 +262,7 @@ INJ-0260	P2	نعم	غيرُ مقيس
 INJ-0261	P2	نعم	مُغلقٌ بشاهد	
 INJ-0262	P2	نعم	غيرُ مقيس	
 INJ-0263	P2	نعم	غيرُ مقيس	
-INJ-0264	P2	نعم	غيرُ مقيس	
+INJ-0264	P2	نعم	مُغلقٌ بشاهد	
 INJ-0265	P2	نعم	غيرُ مقيس	
 INJ-0266	P2	لا	مُغلقٌ بشاهد	tests/dept_space_screens_test.php · tools/build_dept_space_wrappers.php
 INJ-0267	P2	لا	مُغلقٌ بشاهد	tests/dept_space_screens_test.php
@@ -290,7 +290,7 @@ INJ-0288	P2	نعم	غيرُ مقيس
 INJ-0289	P2	نعم	مُغلقٌ بشاهد	
 INJ-0290	P2	لا	مُغلقٌ بشاهد	
 INJ-0291	P2	نعم	غيرُ مقيس	
-INJ-0292	P2	نعم	غيرُ مقيس	
+INJ-0292	P2	نعم	مُغلقٌ بشاهد	
 INJ-0293	P2	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0294	P2	لا	مُغلقٌ بشاهد	tools/fix_ui68_campaign.php
 INJ-0295	P2	نعم	غيرُ مقيس	
@@ -308,10 +308,10 @@ INJ-0306	P2	نعم	غيرُ مقيس
 INJ-0307	P2	لا	غيرُ مقيس	
 INJ-0308	P2	لا	غيرُ مقيس	
 INJ-0309	P2	لا	غيرُ مقيس	
-INJ-0310	P2	نعم	غيرُ مقيس	
+INJ-0310	P2	نعم	مُغلقٌ بشاهد	
 INJ-0311	P2	لا	غيرُ مقيس	
 INJ-0312	P2	نعم	غيرُ مقيس	
-INJ-0313	P2	نعم	غيرُ مقيس	
+INJ-0313	P2	نعم	مُغلقٌ بشاهد	
 INJ-0314	P2	لا	غيرُ مقيس	
 INJ-0315	P2	لا	غيرُ مقيس	
 INJ-0316	P2	لا	غيرُ مقيس	
@@ -333,7 +333,7 @@ INJ-0331	P2	نعم	مُغطًّى
 INJ-0332	P2	نعم	غيرُ مقيس	
 INJ-0333	P2	لا	غيرُ مقيس	
 INJ-0334	P2	لا	غيرُ مقيس	
-INJ-0335	P2	نعم	غيرُ مقيس	
+INJ-0335	P2	نعم	مُغلقٌ بشاهد	
 INJ-0336	P2	نعم	غيرُ مقيس	
 INJ-0337	P2	لا	مُغلقٌ بشاهد	tests/dept_space_screens_test.php · tools/build_dept_space_wrappers.php
 INJ-0338	P2	لا	مُغلقٌ بشاهد	
@@ -389,7 +389,7 @@ INJ-0387	P2	لا	غيرُ مقيس
 INJ-0388	P2	لا	غيرُ مقيس	
 INJ-0389	P2	لا	غيرُ مقيس	
 INJ-0390	P2	نعم	غيرُ مقيس	
-INJ-0391	P2	لا	غيرُ مقيس	
+INJ-0391	P2	لا	مُغلقٌ بشاهد	
 INJ-0392	P2	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0393	P2	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0394	P2	لا	غيرُ مقيس	
@@ -402,7 +402,7 @@ INJ-0400	P2	لا	غيرُ مقيس
 INJ-0401	P2	نعم	غيرُ مقيس	
 INJ-0402	P2	نعم	غيرُ مقيس	
 INJ-0403	P2	نعم	غيرُ مقيس	
-INJ-0404	P2	لا	غيرُ مقيس	
+INJ-0404	P2	لا	مُغلقٌ بشاهد	
 INJ-0405	P2	نعم	غيرُ مقيس	
 INJ-0406	P2	نعم	غيرُ مقيس	
 INJ-0407	P2	نعم	غيرُ مقيس	
@@ -484,7 +484,7 @@ INJ-0482	P3	نعم	مُغلقٌ بشاهد
 INJ-0483	P3	نعم	غيرُ مقيس	
 INJ-0484	P3	نعم	مُغلقٌ بشاهد	
 INJ-0485	P3	لا	مُغطًّى	
-INJ-0486	P3	نعم	غيرُ مقيس	
+INJ-0486	P3	نعم	مُغلقٌ بشاهد	
 INJ-0487	P3	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0488	P3	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0489	P3	لا	مُغلقٌ بشاهد	
@@ -550,7 +550,7 @@ INJ-0548	P3	لا	مُغلقٌ بشاهد	tests/offline_outbox_test.php
 INJ-0549	P3	نعم	غيرُ مقيس	
 INJ-0550	P3	لا	غيرُ مقيس	
 INJ-0551	P3	لا	غيرُ مقيس	
-INJ-0552	P3	لا	غيرُ مقيس	
+INJ-0552	P3	لا	مُغلقٌ بشاهد	
 INJ-0553	P3	لا	غيرُ مقيس	
 INJ-0554	P3	لا	مُغلقٌ بشاهد	
 INJ-0555	P3	لا	غيرُ مقيس	
@@ -572,7 +572,7 @@ INJ-0570	P3	لا	مُغلقٌ بشاهد	tests/nav_stage_label_test.php
 INJ-0571	P3	لا	مُغلقٌ بشاهد	tests/inline_styles_test.php
 INJ-0572	P3	لا	مُغلقٌ بشاهد	tests/shell_axes_measured_test.php
 INJ-0573	P3	نعم	غيرُ مقيس	
-INJ-0574	P3	لا	غيرُ مقيس	
+INJ-0574	P3	لا	مُغلقٌ بشاهد	
 INJ-0575	P3	لا	مُغلقٌ بشاهد	tests/dept_space_screens_test.php · tools/build_dept_space_wrappers.php
 INJ-0576	P3	لا	مُغلقٌ بشاهد	tests/risk_treatment_evidence_test.php
 INJ-0577	P3	لا	مُغلقٌ بشاهد	tests/risk_owner_unit_test.php

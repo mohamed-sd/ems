@@ -160,6 +160,35 @@ class ContractLifecycleActions
             return $out;
         }
 
+        /* ══ INJ-0143 · ملاحظةٌ حرجةٌ مفتوحةٌ تحجب التوقيع ═══════════════════════
+             نصُّ القبول: «ملاحظةٌ حرجةٌ **تحجب التوقيعَ** حتى تُغلق بمستندٍ
+             ومعتمِد؛ **ولا يعتمد الحجبُ على أيِّ مطابقةٍ نصية**».
+           ◆ **والحجبُ بالعمودِ لا بالكلمة**: `severity='critical'` و
+             `note_state='open'` — ومطابقةُ النصِّ تُخدع بحرفٍ، وملاحظةٌ تقول
+             «غير حرج» تُقرأ حرجةً بالبحثِ عن كلمة.
+           ◆ وموضعُه **التوقيعُ وحدَه**: المراجعةُ تسبق التوقيعَ لا الإنهاءَ ولا
+             الإقفال — فلا يُجمَّد العقدُ في كلِّ خطوة. */
+        if ($code === 'sign' && $kind === self::KIND_CUSTOMER && $conn instanceof \mysqli) {
+            $blk = 0; $first = '';
+            $bq = $conn->prepare("SELECT COUNT(*), COALESCE(MIN(LEFT(note, 60)), '')
+                                    FROM contract_notes
+                                   WHERE contract_id = ? AND severity = 'critical' AND note_state = 'open'");
+            if ($bq) {
+                $bq->bind_param('i', $contractId);
+                if ($bq->execute()) {
+                    $br = $bq->get_result()->fetch_row();
+                    if ($br) { $blk = (int) $br[0]; $first = (string) $br[1]; }
+                }
+                $bq->close();
+            }
+            if ($blk > 0) {
+                $out['code'] = 423;
+                $out['reason'] = 'CNOTE-423: ' . $blk . ' ملاحظةً حرجةً مفتوحةً تحجب التوقيع — '
+                               . 'تُغلق بمستندٍ ومعتمِدٍ أولًا («' . mb_substr($first, 0, 40) . '»)';
+                return $out;
+            }
+        }
+
         /* ◆ **والفعلانِ الأوّلانِ يمرّانِ بخدمةِ الاعتمادِ لا بالآلةِ مباشرةً**:
              فيها سقفُ التفويضِ والتصعيدُ عند تجاوزه (INJ-0001). وتجاوزُها هنا
              يُسقط الحارسَ الذي بُني — وهو الخطأُ نفسُه الذي نُصلحه. */

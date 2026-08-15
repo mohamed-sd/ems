@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-15 13:32:54
+-- المصدر: equipation_manage · التوليد: 2026-08-15 14:03:39
 -- الجداول: 554 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -1434,10 +1434,16 @@ CREATE TABLE `contract_notes` (
   `user_id` int(11) DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) DEFAULT NULL,
+  `severity` enum('normal','critical') NOT NULL DEFAULT 'normal',
+  `note_state` enum('open','closed') NOT NULL DEFAULT 'open',
+  `closure_doc_ref` varchar(160) DEFAULT NULL,
+  `closed_by` int(11) DEFAULT NULL,
+  `closed_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_user_id` (`user_id`),
   KEY `fk_contract_notes_contract` (`contract_id`),
   KEY `fk_contract_notes_created_by` (`created_by`),
+  KEY `ix_cnote_block` (`contract_id`,`severity`,`note_state`),
   CONSTRAINT `fk_contract_notes_contract` FOREIGN KEY (`contract_id`) REFERENCES `contracts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_contract_notes_created_by` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_contract_notes_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE

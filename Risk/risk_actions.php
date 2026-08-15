@@ -395,6 +395,17 @@ try {
             $out = array('ok' => true);
             break;
 
+        /* ══ INJ-0391 · بابُ سحبِ القبول — كان الفعلُ مُعلَنًا بلا وجود ═══════════
+             `withdrawn_by/at` يُقرآن ويُصيَّران في الشاشةِ ولا سطرَ يكتبهما.
+             والسحبُ **حركةٌ لا محو**: صفُّ القبولِ يبقى مختومًا بمن سحبه ومتى. */
+        case 'risk_accept_withdraw':
+            if ($authority === '') { throw new \RuntimeException('RSK-403: لا سلطة سحبٍ لدورك'); }
+            $__w = RiskService::withdrawAcceptance($conn, $company_id,
+                (int) ($_POST['acceptance_id'] ?? 0), (string) ($_POST['note'] ?? ''), $uid);
+            if (empty($__w['ok'])) { throw new \RuntimeException($__w['reason']); }
+            $out = array('ok' => true, 'reason' => $__w['reason']);
+            break;
+
         case 'risk_close':
             if ($authority === '') { throw new \RuntimeException('RSK-403: لا سلطة إغلاق لدورك'); }
             RiskService::closeRisk($conn, $company_id, (int) $_POST['risk_id'], $authority, $uid, $_POST['note'] ?? null);

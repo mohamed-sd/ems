@@ -97,6 +97,8 @@ $core = array(
     'nav_duplicate_links_test',       /* 13 بندًا — صفرُ مسارٍ مكرَّرٍ في 35 دورًا */
     'nav_label_title_test',           /* الشروطُ المرافقة: العنوانُ يطابق التسمية */
     'workflow_stage_groups_test',        /* مجموعاتُ السايدبار تطابق مراحلَ الوثيقة */
+    'workflow_declared_actions_test',     /* فعلٌ مُعلَنٌ صار له وجود */
+    'workflow_guards_and_stamp_test',     /* حارسٌ واحدٌ · سلطةٌ محكومة · بصمةٌ مولَّدة */
     'workflow_chain_links_test',         /* المستندُ يولّد تاليَه بمرجعٍ ظاهر */
     'contract_lifecycle_actions_test',  /* دورةُ الحياةِ كاملةً بأفعالِها وعكسِها */
     'permgov_adoption_test',          /* حرّاسٌ بُنيت فتُبنَّيت — كرون · مصدر · حجب · شريحة */

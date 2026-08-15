@@ -284,9 +284,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'where' => array('order_id' => $id),
                 'whereRaw' => "item_type IN('equipment','attachment')",
             )) > 0;
-            $has_valid_permit = trs_gate($is_super_admin)->count('transfer_permits', array(
-                'where' => array('order_id' => $id, 'state' => 'valid'),
-            )) > 0;
+            /* ══ INJ-0313 · حارسُ التجهيزِ يقرأ التصريحَ **النافذَ** لا المُعلَنَ ═══
+                 نصُّ القبول: «إضافةُ تصريحٍ من الشاشة تُنشئ صفًّا في
+                 `transfer_permits` مرتبطًا بأمرٍ وبحالة valid، **ويجتاز الأمرُ
+                 حارسَ التجهيز**».
+                 والعدُّ السابقُ كان على الحالةِ وحدَها — **وتصريحٌ منتهي الصلاحيةِ
+                 حالتُه `valid` يمرُّ**. فالتاريخُ حكمٌ والحالةُ بيان، وهي القاعدةُ
+                 نفسُها في حارسِ صلاحيةِ الوثائق (E-08).
+               ◆ والحارسُ **دالّةٌ مشتركةٌ** في `trs_helpers.php` — تنادِيها هذه
+                 الشاشةُ وأيُّ شاشةٍ أخرى، فلا يتفرّق الشرطُ نسخًا. */
+            $__rdy = trs_readiness_gate(trs_gate($is_super_admin), $id);
+            $has_valid_permit = !empty($__rdy['ok']);
             if ($nlines === 0) { $err = 'لا+تجهيز+دون+عنصرٍ+منقولٍ+واحدٍ+على+الأقل'; }
             elseif (trim((string)$orow['route']) === '') { $err = 'لا+تجهيز+دون+تحديد+المسار'; }
             elseif ($has_equip && (empty($orow['vehicle_id']) || !$has_valid_permit)) { $err = 'ترحيل+المعدة+يتطلب+مركبة+ناقلة+وتصريحاً+سارياً'; }

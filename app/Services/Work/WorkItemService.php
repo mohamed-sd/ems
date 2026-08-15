@@ -93,9 +93,31 @@ class WorkItemService
         // النطاق: إدارةٌ أو مشروعٌ أو موقع — أحدها
         if (empty($a['org_unit_id']) && empty($a['project_id']) && empty($a['site_id'])) { $missing[] = 'النطاق (إدارة/مشروع/موقع)'; }
         if (!in_array((string) ($a['source_type'] ?? ''), self::SOURCES, true)) { $missing[] = 'مصدرٌ من الأربعة عشر'; }
+
+        /* ══ INJ-0486 · الحارسُ السباعيُّ كان خمسةً ونصفًا ═══════════════════════
+             نصُّ القبول: «إنشاءُ عنصرِ عملٍ **بلا `evidence_required` أو بلا
+             `verifier_user_id` يُرفض** برسالةٍ تبيّن الناقص؛ **وبمتحقِّقٍ =
+             المنفِّذِ يُرفض أيضًا**».
+             والمقيسُ قبلَه: الحقلانِ **اختياريانِ حقلًا لا حكمًا** —
+             `evidence_required` له افتراضٌ نصيٌّ يملأ الفراغ، و`verifier_user_id`
+             يقبل `null`. فعنصرُ عملٍ يُنشأ بلا دليلٍ مطلوبٍ وبلا متحقِّقٍ يُقفل
+             بشهادةِ منفِّذه وحدَه — وهو نقضُ «اليدِ الثانية» في أصلِه.
+           ◆ **والمتحقِّقُ غيرُ المنفِّذ**: من ينفّذ لا يشهد على نفسِه. وهذا
+             الشرطُ لا يُقاس بحقلٍ بل بمقارنةِ اثنين. */
+        if (!isset($a['evidence_required']) || trim((string) $a['evidence_required']) === '') {
+            $missing[] = 'الدليلُ المطلوب (evidence_required)';
+        }
+        if (empty($a['verifier_user_id']) || (int) $a['verifier_user_id'] <= 0) {
+            $missing[] = 'المتحقِّق (verifier_user_id)';
+        }
         if ($missing) {
             return array('ok' => false, 'code' => 422,
                 'reason' => 'لا عنصرَ بلا سبعة (WF-02) — الناقص: ' . implode(' · ', $missing));
+        }
+        $__exec = !empty($a['assigned_user_id']) ? (int) $a['assigned_user_id'] : 0;
+        if ($__exec > 0 && (int) $a['verifier_user_id'] === $__exec) {
+            return array('ok' => false, 'code' => 422,
+                'reason' => 'WF-422-SELFVERIFY: المتحقِّقُ هو المنفِّذُ نفسُه — ولا يشهد أحدٌ على عملِه');
         }
 
         // WF-08: تكليفٌ منتهٍ لا يولّد — إن جاء العنصر بمرجع تفويض يُفحص سريانه
@@ -546,6 +568,69 @@ class WorkItemService
         $st->execute();
         $nid = $st->insert_id;
         $st->close();
+
+        /* ══ INJ-0404 · «يتطلب فعلًا» يولّد مهمتَه في اللحظةِ نفسِها ═══════════════
+             نصُّ القبول: «كلُّ صفٍّ في `personal_notifications` بـ`requires_action=1`
+             يحمل `task_item_id` **غيرَ فارغٍ خلال الثانيةِ نفسِها**، ويظهر عنصرُه
+             في `Portal/my_tasks.php`».
+             والمقيسُ قبلَه: العمودُ يُكتب ١ **ولا مهمةَ تُولد** — والتعليقُ فوقَ
+             الدالّةِ يقول «التوليدُ هنا للربط لا للتنفيذ»، أي أنَّ الوعدَ مكتوبٌ
+             والفعلُ غائب. فالمستخدمُ يرى تنبيهًا «يتطلب فعلًا» ولا يجد في مهامِّه
+             شيئًا — **وشاشةٌ تعرض حقلًا لا يُكتب أبدًا تكذب**.
+           ◆ والربطُ **في اللحظةِ نفسِها**: تُنشأ المهمةُ ثم يُكتب مفتاحُها في
+             التنبيه — فلا تنبيهَ يتطلب فعلًا بلا مهمةٍ ولو لثانية.
+           ◆ وتعثّرُ التوليدِ **لا يُسقط التنبيه**: الإخطارُ وقع، والمهمةُ أثرُه —
+             فيُسجَّل التعثّرُ ولا يُبتلع صامتًا. */
+        if ($ra === 1 && $nid > 0) {
+            try {
+                $taskId = self::createTaskForNotification($conn, $co, $userId, $title, $body, $link, $by, (int) $nid);
+                if ($taskId > 0) {
+                    $up = $conn->prepare('UPDATE personal_notifications SET task_item_id = ? WHERE id = ?');
+                    if ($up) {
+                        $up->bind_param('ii', $taskId, $nid);
+                        $up->execute();
+                        $up->close();
+                    }
+                }
+            } catch (\Throwable $t) {
+                error_log('notify task link failed #' . $nid . ': ' . $t->getMessage());
+            }
+        }
         return $nid;
+    }
+
+    /**
+     * مهمةُ عنصرِ عملٍ عن تنبيهٍ يتطلب فعلًا — ⇐ INJ-0404.
+     * ◆ **ولا تُنشأ مهمتان لتنبيهٍ واحد**: العطالةُ بمرجعِ التنبيهِ في `source_ref`.
+     */
+    private static function createTaskForNotification(\mysqli $conn, $co, $userId, $title, $body, $link, $by, $notifId)
+    {
+        $ref = 'notification#' . (int) $notifId;
+        $q = $conn->prepare("SELECT id FROM work_items WHERE company_id = ? AND source_ref = ? LIMIT 1");
+        if ($q) {
+            $co2 = (int) $co;
+            $q->bind_param('is', $co2, $ref);
+            $q->execute();
+            $ex = $q->get_result()->fetch_row();
+            $q->close();
+            if ($ex) { return (int) $ex[0]; }
+        }
+        /* ◆ **وأسماءُ الأعمدةِ تُقاس**: الجدولُ يحمل `owner_user_id` و`assigned_user_id`
+             و`status` و`deliverable` الإلزاميّ — لا `assignee_user_id` ولا `state`.
+             والمُسلَّمُ هنا نصُّ ما يُنتظر من المستخدم، فالمهمةُ بلا مُسلَّمٍ لا تُقاس. */
+        $st = $conn->prepare("INSERT INTO work_items
+            (company_id, title, details, source_type, source_ref, source_screen,
+             owner_user_id, assigned_user_id, deliverable, status, created_by, created_at)
+            VALUES (?, ?, ?, 'notification', ?, ?, ?, ?, ?, 'open', ?, NOW())");
+        if (!$st) { return 0; }
+        $co3 = (int) $co; $u = (int) $userId; $b = (int) $by;
+        $ttl = mb_substr((string) $title, 0, 200);
+        $dtl = mb_substr((string) $body, 0, 600);
+        $scr = mb_substr((string) $link, 0, 160);
+        $dlv = mb_substr('تنفيذُ ما يطلبه الإخطار: ' . (string) $title, 0, 300);
+        $st->bind_param('issssiisi', $co3, $ttl, $dtl, $ref, $scr, $u, $u, $dlv, $b);
+        $newId = $st->execute() ? (int) $conn->insert_id : 0;
+        $st->close();
+        return $newId;
     }
 }

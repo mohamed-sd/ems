@@ -13342,3 +13342,5 @@ body.ems-site .main.ems-unified-page-shell > .card .table-container {
    وحقلُ السببِ عرضًا محدودًا — فيُعلَنان صنفين هنا مرةً واحدة. */
 .ems-inline-form { display: inline; }
 .ems-note-inline { width: 110px; }
+.ems-inline-flex-form { display: flex; gap: 6px; }
+.ems-reason-inline { max-width: 170px; }

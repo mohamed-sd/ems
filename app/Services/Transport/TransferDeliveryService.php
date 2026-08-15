@@ -140,6 +140,20 @@ class TransferDeliveryService
                 'msg' => 'لا إقفالَ بتكلفةٍ قبلَ تخزينِ مستندِ التسليم — وثّقِ التسليمَ أولًا (409)');
         }
 
+        /* ══ INJ-0310 · حارسٌ واحدٌ برسالةٍ واحدةٍ للشاشتين ═══════════════════════
+             نصُّ القبول: «**الإقفالُ من أيِّ الشاشتين يُرفض بالرسالة نفسها** إن لم
+             يكن للأمر متحمِّلٌ ومراكزُ تكلفةٍ لكل بند».
+             والشرطُ المنسوخُ في شاشتين شرطان يتفرّقان مع أوّلِ تعديل — فالحارسُ
+             دالّةٌ واحدةٌ في `Transport/trs_helpers.php` تنادِيها الخدمةُ وتنادِيها
+             الشاشةُ، **فالرسالةُ واحدةٌ لأنَّ المصدرَ واحد**. */
+        require_once dirname(__DIR__, 3) . '/Transport/trs_helpers.php';
+        if (function_exists('trs_close_gate') && function_exists('trs_gate')) {
+            $g = trs_close_gate(trs_gate(false), $orderId);
+            if (empty($g['ok'])) {
+                return array('ok' => false, 'replay' => false, 'msg' => $g['reason']);
+            }
+        }
+
         $this->conn->begin_transaction();
         try {
             /* ══ INJ-0062 · تبنّي `App\Core\ProcessedOperations` ══════════════

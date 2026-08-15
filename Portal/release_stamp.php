@@ -69,20 +69,58 @@ $FIELDS = array (
   16 => 'الحالة',
 );
 
-/* ── الحفظ: فورم الإضافة الموحد → المخزن البيني ─────────────────────────── */
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
-    $payload = array();
-    foreach ($FIELDS as $i => $lbl) {
-        $v = trim((string) ($_POST['f' . $i] ?? ''));
-        if ($v !== '') { $payload[$lbl] = $v; }
+/* ══ INJ-0124 · البصمةُ تُولَّد خادميًّا ولا تُدخَل يدويًّا ═══════════════════════
+     نصُّ القبول: «فتحُ شاشة بصمة الإصدار يعرض **بصمةً مولَّدةً تطابق النسخةَ
+     المنشورة**، **ولا يوجد فيها فورمُ إدخالٍ يدوي**».
+     والمقيسُ قبلَه: فورمٌ عامٌّ بثلاثةَ عشرَ حقلًا يكتبها المُدخِل — **فبصمةُ
+     الإصدارِ رأيُ من يكتبها لا حقيقةُ ما نُشر**. وبصمةٌ تُكتب باليدِ لا تُثبت
+     شيئًا: تُطابق ما يريده الكاتبُ لا ما يعمل على الخادم.
+   ◆ **والبصمةُ تُشتقُّ ممّا نُشر فعلًا**: بصمةُ مخطَّطِ القاعدةِ المُصدَّرِ
+     للمثبِّت · وعددُ الهجراتِ المطبَّقة · وعددُ الشاشاتِ الحيّة. فتغيُّرُ أيٍّ
+     منها يغيّر البصمةَ حتمًا، وثباتُها يعني أنَّ النسخةَ لم تتغيّر.
+   ◆ ولا تُخزَّن: تُحسب عند كلِّ فتح — فلا صفٌّ يتقادم عن مصدرِه. */
+if (!function_exists('release_stamp_compute')) {
+    function release_stamp_compute($conn, $root)
+    {
+        $parts = array();
+        $man = $root . '/database/schema/MANIFEST.json';
+        $sch = $root . '/database/schema/schema.sql';
+        $parts['schema_manifest'] = is_file($man) ? substr(md5_file($man), 0, 12) : '—';
+        $parts['schema_sql']      = is_file($sch) ? substr(md5_file($sch), 0, 12) : '—';
+        $parts['schema_bytes']    = is_file($sch) ? (int) filesize($sch) : 0;
+
+        $mig = glob($root . '/database/migrations/*.php');
+        $parts['migrations'] = is_array($mig) ? count($mig) : 0;
+
+        $screens = 0;
+        $r = @$conn->query("SELECT COUNT(*) FROM modules");
+        if ($r && ($x = $r->fetch_row())) { $screens = (int) $x[0]; }
+        $parts['modules'] = $screens;
+
+        $tables = 0;
+        $r2 = @$conn->query("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE()");
+        if ($r2 && ($x2 = $r2->fetch_row())) { $tables = (int) $x2[0]; }
+        $parts['tables'] = $tables;
+
+        $seed = implode('|', array($parts['schema_manifest'], $parts['schema_sql'],
+            (string) $parts['schema_bytes'], (string) $parts['migrations'],
+            (string) $parts['modules'], (string) $parts['tables']));
+        $parts['stamp'] = strtoupper(substr(sha1($seed), 0, 16));
+        $parts['computed_at'] = date('Y-m-d H:i:s');
+        return $parts;
     }
-    $status = $payload['الحالة'] ?? 'مسودة';
-    $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
-    // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
-    $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+}
+$RELEASE = release_stamp_compute($conn, dirname(__DIR__));
+
+/* ◆ **ولا مسلكَ إدخالٍ يدويّ**: مَن أرسل الفورمَ القديمَ يُردُّ برمزٍ يُقرأ. */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
+    ems_gov_flash_redirect(basename(__FILE__),
+        'REL-422-NOMANUAL: بصمةُ الإصدارِ تُولَّد من النسخةِ المنشورةِ ولا تُدخَل يدويًّا ❌',
+        'GOV-FAIL-422', 'البصمةُ حقيقةٌ تُقاس لا رأيٌ يُكتب');
     exit();
 }
+/* ◆ **والمسلكُ القديمُ نُزع لا عُطِّل**: شفرةٌ ميتةٌ خلف `if (false)` دَينٌ
+     يُقرأ يومًا على أنه مسلكٌ قائم. فما لا يُستعمل يُحذف. */
 
 /* ── القراءة: صفوف الكيان لهذه الشاشة ───────────────────────────────────── */
 // الموجة ٢: القراءة من الجدول الأصلي — الشكل القديم نفسه (id·payload·status·…)
@@ -136,54 +174,42 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     ?>
 
-    <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
-    <form method="post" action="" class="allforms" id="cmp03AddForm">
-        <input type="hidden" name="cmp03_action" value="add">
-        <div class="card"><div class="card-header">
-            <h5><i class="fa fa-plus"></i> إضافة — بصمة الإصدار وتقرير النشر</h5>
-        </div><div class="card-body">
-            <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label for="emsf_1232_fac21">رقم الإصدار</label>
-                    <input type="text" name="f0" required maxlength="190" id="emsf_1232_fac21"></div>
-                <div class="form-group"><label for="emsf_1233_68bf3">بصمة الإصدار</label>
-                    <input type="text" name="f1" maxlength="190" id="emsf_1233_68bf3"></div>
-                <div class="form-group"><label for="emsf_1234_88775">تاريخ النشر</label>
-                    <input type="date" name="f2" id="emsf_1234_88775"></div>
-                <div class="form-group"><label for="emsf_1235_e3066">نوع الإصدار</label>
-                    <input type="text" name="f3" maxlength="190" id="emsf_1235_e3066"></div>
-                <div class="form-group"><label for="emsf_1236_4c202">الشاشات المضافة</label>
-                    <input type="text" name="f4" maxlength="190" id="emsf_1236_4c202"></div>
-                <div class="form-group"><label for="emsf_1237_13676">الشاشات المعدَّلة</label>
-                    <input type="text" name="f5" maxlength="190" id="emsf_1237_13676"></div>
-                <div class="form-group"><label for="emsf_1238_51cdc">الأعمدة المضافة</label>
-                    <input type="text" inputmode="decimal" name="f6" placeholder="0" id="emsf_1238_51cdc"></div>
-                <div class="form-group"><label for="emsf_1239_aa89b">الأفعال المضافة</label>
-                    <input type="text" name="f7" maxlength="190" id="emsf_1239_aa89b"></div>
-                <div class="form-group"><label for="emsf_1240_36a9d">القواعد المتغيرة</label>
-                    <input type="text" name="f8" maxlength="190" id="emsf_1240_36a9d"></div>
-                <div class="form-group"><label for="emsf_1241_a72aa">الهجرات المنفَّذة</label>
-                    <input type="text" name="f9" maxlength="190" id="emsf_1241_a72aa"></div>
-                <div class="form-group"><label for="emsf_1242_3a8a8">تقرير الاكتمال</label>
-                    <input type="text" name="f10" maxlength="190" id="emsf_1242_3a8a8"></div>
-                <div class="form-group"><label for="emsf_1243_8d856">الاختبارات المجتازة</label>
-                    <input type="text" name="f11" maxlength="190" id="emsf_1243_8d856"></div>
-                <div class="form-group"><label for="emsf_1244_316f1">الاختبارات الراسبة</label>
-                    <input type="text" name="f12" maxlength="190" id="emsf_1244_316f1"></div>
-                <div class="form-group"><label for="emsf_1245_49296">علَم الرجوع</label>
-                    <input type="text" name="f13" maxlength="190" id="emsf_1245_49296"></div>
-                <div class="form-group"><label for="emsf_1246_3bd9b">الناشر — الاسم والصفة</label>
-                    <input type="text" name="f14" maxlength="190" id="emsf_1246_3bd9b"></div>
-                <div class="form-group"><label for="emsf_1247_70386">المعتمِد — الاسم والصفة</label>
-                    <input type="text" name="f15" maxlength="190" id="emsf_1247_70386"></div>
-                <div class="form-group"><label for="emsf_1248_06309">الحالة</label>
-                    <select name="f16" id="emsf_1248_06309"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-            </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
-                <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
-                <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
-            </div>
-        </div></div>
-    </form>
+    <?php
+    /* ══ INJ-0124 · لوحةُ البصمةِ المولَّدة — قراءةٌ فقط ═══════════════════════════
+         «يعرض بصمةً **مولَّدةً تطابق النسخةَ المنشورة**، **ولا يوجد فيها فورمُ
+         إدخالٍ يدوي**». فالفورمُ ذو الثلاثةَ عشرَ حقلًا أُزيل، وحلَّت محلَّه
+         بصمةٌ تُحسب عند كلِّ فتحٍ من مخطَّطِ القاعدةِ المُصدَّرِ وعددِ الهجراتِ
+         والشاشاتِ والجداول — فتغيُّرُ أيٍّ منها يغيّرها حتمًا. */
+    ?>
+    <div class="card"><div class="card-header">
+        <h5><i class="fa fa-fingerprint"></i> بصمةُ الإصدارِ الحالية — مولَّدةٌ من النسخةِ المنشورة</h5>
+    </div><div class="card-body">
+        <p class="text-muted" style="font-size:.9em">
+            هذه البصمةُ <strong>تُحسب ولا تُكتب</strong>: تُشتقُّ من مخطَّطِ القاعدةِ
+            المُصدَّرِ للمثبِّت وعددِ الهجراتِ المطبَّقةِ والشاشاتِ الحيّةِ وجداولِ
+            القاعدة. فبصمةٌ تُدخَل يدويًّا تُطابق ما يريده كاتبُها لا ما يعمل على الخادم.
+        </p>
+        <table class="table table-striped" data-no-dt>
+            <tbody>
+                <tr><th style="width:220px">البصمة</th>
+                    <td><strong style="font-family:monospace;font-size:1.15em"><?php
+                        echo htmlspecialchars((string) $RELEASE['stamp'], ENT_QUOTES, 'UTF-8'); ?></strong></td></tr>
+                <tr><th>بصمةُ بيانِ المخطَّط</th>
+                    <td><?php echo htmlspecialchars((string) $RELEASE['schema_manifest'], ENT_QUOTES, 'UTF-8'); ?></td></tr>
+                <tr><th>بصمةُ ملفِّ المخطَّط</th>
+                    <td><?php echo htmlspecialchars((string) $RELEASE['schema_sql'], ENT_QUOTES, 'UTF-8'); ?>
+                        · <?php echo number_format((int) $RELEASE['schema_bytes']); ?> بايت</td></tr>
+                <tr><th>الهجراتُ في المستودع</th>
+                    <td><?php echo (int) $RELEASE['migrations']; ?></td></tr>
+                <tr><th>الشاشاتُ المسجَّلة</th>
+                    <td><?php echo (int) $RELEASE['modules']; ?></td></tr>
+                <tr><th>جداولُ القاعدة</th>
+                    <td><?php echo (int) $RELEASE['tables']; ?></td></tr>
+                <tr><th>لحظةُ الاحتساب</th>
+                    <td><?php echo htmlspecialchars((string) $RELEASE['computed_at'], ENT_QUOTES, 'UTF-8'); ?></td></tr>
+            </tbody>
+        </table>
+    </div></div>
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
