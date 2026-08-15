@@ -79,7 +79,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'wi_tr
 /* ── العروض الثمانية (WFM-066) ─────────────────────────────────────────── */
 $mine = "(wi.assigned_user_id = {$uid})";
 $views = array(
-    'today'          => array('اليوم', "{$mine} AND wi.status IN ('assigned','accepted','in_progress') AND (wi.due_at IS NULL OR wi.due_at < DATE_ADD(CURDATE(), INTERVAL 1 DAY))"),
+    /* ══ «اليوم» كانت تشترط موعدًا قريبًا فابتلعت ما بُدئ فعلًا ═══════════════
+         المقيسُ قبلَه: `in_progress` **لا يطابق عرضًا واحدًا** متى كانت المهلةُ
+         أبعدَ من الليلة — «القادمة» تستثني `in_progress` من حالاتِها، و«اليوم»
+         تشترط `due_at` قبلَ الغد. فالمنفِّذُ يضغط «بدء» **فتختفي مهمتُه من
+         شاشتِه كلِّها** ولا تعود حتى تتأخّر. وأغلبُ المهامِّ مهلتُها أطولُ من يوم.
+       ◆ والقاعدة: **ما بُدئ فهو عملُ اليوم بحكمِ بدئِه لا بحكمِ موعدِه** — فلا
+         يُسأل `due_at` عن حالةٍ يجيب عنها الفعل. و`scheduled` مضمومةٌ هنا كما
+         هي في «القادمة»، وإلّا سقطت هي الأخرى متى استحقّت اليوم. */
+    'today'          => array('اليوم', "{$mine} AND wi.status IN ('assigned','accepted','in_progress','scheduled') AND (wi.status = 'in_progress' OR wi.due_at IS NULL OR wi.due_at < DATE_ADD(CURDATE(), INTERVAL 1 DAY))"),
     'late'           => array('المتأخرة', "{$mine} AND (wi.status = 'overdue' OR (wi.due_at < NOW() AND wi.status IN ('assigned','accepted','in_progress')))"),
     'upcoming'       => array('القادمة', "{$mine} AND wi.status IN ('assigned','accepted','scheduled') AND wi.due_at >= DATE_ADD(CURDATE(), INTERVAL 1 DAY)"),
     'blocked'        => array('المعطلة', "{$mine} AND wi.status = 'blocked'"),

@@ -110,6 +110,7 @@ $core = array(
     'transfer_cost_and_shares_test',     /* سطرُ التحميلِ بقيمٍ حيّةٍ ومركزٍ حقيقيّ */
     'financing_pay_and_shares_test',     /* منفِّذٌ واحدٌ للسداد · وحصةٌ بلا تراكب */
     'source_of_truth_test',              /* لكلِّ بيانٍ مصدرٌ واحدٌ يحكم ويُعرض */
+    'dual_store_bridge_test',            /* حقيقةٌ واحدةٌ في مخزنٍ واحد */
     'contract_lifecycle_actions_test',  /* دورةُ الحياةِ كاملةً بأفعالِها وعكسِها */
     'permgov_adoption_test',          /* حرّاسٌ بُنيت فتُبنَّيت — كرون · مصدر · حجب · شريحة */
     'nav_view_mechanism_test',        /* المنظرُ المُعلَنُ وجهةٌ لا معاملٌ ميت */

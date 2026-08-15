@@ -120,8 +120,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'dept_
             'source_ref' => 'DEPT-' . $unit0 . '-' . date('YmdHis'),
             'source_screen' => 'Portal/dept_board.php',
             'owner_user_id' => $uid, 'assigned_user_id' => $to,
+            // المكلِّفُ يتحقّق ما دام غيرَ المنفِّذ؛ وإن كلّف نفسَه رُفع لمديرِه
+            'verifier_user_id' => \App\Services\Work\WorkItemService::resolveVerifier($conn, $company_id, $to, $uid),
             'org_unit_id' => $unit0, 'title' => $title,
             'deliverable' => $deliv !== '' ? $deliv : 'إنجاز التكليف بدليله',
+            'evidence_required' => 'ما يُثبت إنجازَ المخرَج المطلوب',
             'priority' => in_array($_POST['priority'] ?? '', array('P0','P1','P2','P3','P4'), true) ? $_POST['priority'] : 'P3',
             'due_at' => preg_match('/^\d{4}-\d{2}-\d{2}$/', $dueD) ? $dueD . ' 17:00:00' : date('Y-m-d H:i:s', time() + 86400 * 3),
             'created_by' => $uid,

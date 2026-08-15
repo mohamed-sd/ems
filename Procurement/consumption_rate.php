@@ -87,16 +87,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
         $v = trim((string) ($_POST['f' . $i] ?? ''));
         if ($v !== '') { $payload[$lbl] = $v; }
     }
-    $status = $payload['الحالة'] ?? 'مسودة';
-    $creator = trim((string) ($_SESSION['user']['name'] ?? '')) ?: ('مستخدم #' . $uid);
-    // الموجة ٢: الحفظ في الجدول الأصلي للشاشة (الفارغ NULL — لا مخزن بينيًّا)
-    $ok = cmp03_store_insert($conn, $company_id, $CANONICAL, $payload, $status, $uid, $creator);
-    ems_gov_flash_redirect(basename(__FILE__), $ok ? 'حُفظ الصف ✅' : 'تعذر الحفظ ❌', 'GOV-OK-200', '');
+    /* ══ INJ-0356 · «الشاشةُ تعرض معدلَ الاستهلاك **محسوبًا من الحركات** لكل
+         معدةٍ وفترة، **ولا يوجد فيها حقلُ إدخالٍ يدويٍّ للمعدل**» ══════════════
+         ── ما كان: نموذجٌ مسطَّحٌ بخمسةٍ وعشرين حقلًا نصيًّا حرًّا يُدخلها المستخدمُ
+         بيدِه — بينما المعدلُ **محسوبٌ فعلًا** في
+         `ProcReorderService::consumption` من حركاتِ `proc_stock_move`.
+         فرقمٌ يُقرَّر عليه بالتوريدِ مصدرُه أصابعُ موظفٍ لا دفترُ حركة.
+       ◆ فالكتابةُ اليدويةُ **تُردُّ برمزٍ محكوم**، والشاشةُ صارت قارئةً حاسبة. */
+    ems_gov_flash_redirect(basename(__FILE__),
+        'معدلُ الاستهلاكِ **محسوبٌ من حركاتِ المخزن** ولا يُكتب بيد — '
+        . 'سجّلِ الصرفَ في «حركات المخزون» (استلام/صرف) ويُحتسب المعدلُ آليًّا ❌',
+        'GOV-FAIL-409',
+        'افتحْ «حركات المخزون» (استلام/صرف) وسجّلِ الصرفَ — والمعدلُ يظهر هنا فورًا');
     exit();
 }
 
-/* ── القراءة: صفوف الكيان لهذه الشاشة ───────────────────────────────────── */
-// الموجة ٢: القراءة من الجدول الأصلي — الشكل القديم نفسه (id·payload·status·…)
+/* ══ القراءة: المعدلُ محسوبٌ من الحركاتِ لكلِّ صنفٍ وفترة (INJ-0356) ══════════
+     ◆ والصفوفُ الموروثةُ في `scr_consumption_rate` **لا تُحذف**: تُعرض تحت
+       الجدولِ المحسوبِ موسومةً «سجلٌّ سابقٌ للربط» — «المخزنُ الملغى يُحوَّل
+       إلى قارئٍ ولا يُحذف». */
+require_once __DIR__ . '/../app/Services/Procurement/ProcReorderService.php';
+$WINDOW = 90;
+$computed = array();
+$__items = $conn->query('SELECT id, name, unit FROM proc_item
+                          WHERE company_id = ' . (int) $company_id . ' ORDER BY name LIMIT 200');
+if ($__items === false) {
+    $computeErr = 'PRC-500 · تعذّرت قراءةُ الأصناف — ' . $conn->error;
+} else {
+    while ($it = $__items->fetch_assoc()) {
+        $c = \App\Services\Procurement\ProcReorderService::consumption(
+            $conn, $company_id, (int) $it['id'], $WINDOW);
+        if ((float) $c['consumed'] <= 0) { continue; }   // لا يُعرض صنفٌ بلا حركة
+        $computed[] = array(
+            'item'    => (string) $it['name'],
+            'unit'    => (string) ($it['unit'] ?? ''),
+            'window'  => (int) $c['window_days'],
+            'consumed' => (float) $c['consumed'],
+            'daily'   => (float) $c['avg_daily'],
+            'lead'    => (int) $c['lead_time_days'],
+            'safety'  => (float) $c['safety_stock'],
+            'trigger' => (float) $c['suggested_trigger'],
+        );
+    }
+}
+
+/* الموروثُ — يُعرض قارئًا لا يُكتب */
 $rows = cmp03_store_rows($conn, $CANONICAL, ($is_super_admin && $company_id <= 0) ? 0 : $company_id);
 
 $govCtx = ems_gov_ctx();
@@ -136,9 +171,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php
     $header_title = 'استهلاك المعدة ومعدله';
     $header_icon = 'fa fa-gas-pump';
+    /* INJ-0356: لا زرَّ إضافةٍ — الشاشةُ قارئةٌ حاسبة، والصرفُ يُسجَّل في بابه */
     $header_actions = array(
-        array('tag' => 'button', 'id' => 'cmp03AddBtn', 'class' => '', 'icon' => 'fa fa-plus',
-              'label' => 'إضافة', 'title' => 'إضافة صف جديد', 'attrs' => 'type="button"'),
+        array('tag' => 'a', 'href' => 'wh_receipt.php', 'class' => '', 'icon' => 'fa fa-right-left',
+              'label' => 'حركات المخزون', 'title' => 'سجّلِ الصرفَ هناك — والمعدلُ يُحتسب هنا آليًّا'),
     );
     $header_back = false;
     include '../includes/page_header.php';
@@ -147,64 +183,48 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     ?>
 
-    <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
-    <form method="post" action="" class="allforms" id="cmp03AddForm">
-        <input type="hidden" name="cmp03_action" value="add">
-        <div class="card"><div class="card-header">
-            <h5><i class="fa fa-plus"></i> إضافة — استهلاك المعدة ومعدله</h5>
-        </div><div class="card-body">
-            <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label for="emsf_1255_ae451">رقم السجل</label>
-                    <input type="text" name="f0" required maxlength="190" id="emsf_1255_ae451"></div>
-                <div class="form-group"><label for="emsf_1256_5566b">الفترة</label>
-                    <input type="text" name="f1" maxlength="190" id="emsf_1256_5566b"></div>
-                <div class="form-group"><label for="emsf_1257_cfaf6">كود المعدة</label>
-                    <input type="text" name="f2" maxlength="190" id="emsf_1257_cfaf6"></div>
-                <div class="form-group"><label for="emsf_1258_b3c03">نوع المعدة</label>
-                    <input type="text" name="f3" maxlength="190" id="emsf_1258_b3c03"></div>
-                <div class="form-group"><label for="emsf_1259_9db98">الموقع</label>
-                    <input type="text" name="f4" maxlength="190" id="emsf_1259_9db98"></div>
-                <div class="form-group"><label for="emsf_1260_74f0d">الوحدة التعاقدية</label>
-                    <input type="text" name="f5" maxlength="190" id="emsf_1260_74f0d"></div>
-                <div class="form-group"><label for="emsf_1261_b0264">ساعات التشغيل</label>
-                    <input type="text" inputmode="decimal" name="f6" placeholder="0" id="emsf_1261_b0264"></div>
-                <div class="form-group"><label for="emsf_1262_9e234">صنف الاستهلاك</label>
-                    <input type="text" name="f7" maxlength="190" id="emsf_1262_9e234"></div>
-                <div class="form-group"><label for="emsf_1263_4f64d">الكمية المصروفة</label>
-                    <input type="text" inputmode="decimal" name="f8" placeholder="0" id="emsf_1263_4f64d"></div>
-                <div class="form-group"><label for="emsf_1264_5dcac">الوحدة</label>
-                    <input type="text" name="f9" maxlength="190" id="emsf_1264_5dcac"></div>
-                <div class="form-group"><label for="emsf_1265_7da18">معدل الاستهلاك للساعة</label>
-                    <input type="text" inputmode="decimal" name="f10" placeholder="0" id="emsf_1265_7da18"></div>
-                <div class="form-group"><label for="emsf_1266_b2a7e">المعدل المرجعي للموديل</label>
-                    <input type="text" inputmode="decimal" name="f11" placeholder="0" id="emsf_1266_b2a7e"></div>
-                <div class="form-group"><label for="emsf_1267_ddbf9">الانحراف</label>
-                    <input type="text" name="f12" maxlength="190" id="emsf_1267_ddbf9"></div>
-                <div class="form-group"><label for="emsf_1268_11b60">نسبة الانحراف</label>
-                    <input type="text" inputmode="decimal" name="f13" placeholder="0" id="emsf_1268_11b60"></div>
-                <div class="form-group"><label for="emsf_1269_49f09">حد الشذوذ</label>
-                    <input type="text" name="f14" maxlength="190" id="emsf_1269_49f09"></div>
-                <div class="form-group"><label for="emsf_1270_45075">حالة الشذوذ</label>
-                    <input type="text" name="f15" maxlength="190" id="emsf_1270_45075"></div>
-                <div class="form-group"><label for="emsf_1271_f3ed5">السبب المرجَّح</label>
-                    <input type="text" name="f16" maxlength="190" id="emsf_1271_f3ed5"></div>
-                <div class="form-group"><label for="emsf_1272_431ae">البلاغ المفتوح</label>
-                    <input type="text" name="f17" maxlength="190" id="emsf_1272_431ae"></div>
-                <div class="form-group"><label for="emsf_1273_61ed9">تكلفة الاستهلاك</label>
-                    <input type="text" inputmode="decimal" name="f18" placeholder="0" id="emsf_1273_61ed9"></div>
-                <div class="form-group"><label for="emsf_1274_17332">العملة</label>
-                    <input type="text" name="f19" maxlength="190" id="emsf_1274_17332"></div>
-                <div class="form-group"><label for="emsf_1275_25463">مركز التكلفة</label>
-                    <input type="text" inputmode="decimal" name="f20" placeholder="0" id="emsf_1275_25463"></div>
-                <div class="form-group"><label for="emsf_1276_71296">الحالة</label>
-                    <select name="f21" id="emsf_1276_71296"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
-            </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
-                <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
-                <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
-            </div>
-        </div></div>
-    </form>
+    <?php /* ⇐ INJ-0356 · «**ولا يوجد فيها حقلُ إدخالٍ يدويٍّ للمعدل**» —
+             فورمُ الإدخالِ المسطَّحُ ذو الخمسةِ والعشرين حقلًا رُفع كلُّه:
+             المعدلُ محسوبٌ من حركاتِ المخزن، وما يُحسب لا يُكتب بيد. */ ?>
+    <div class="card"><div class="card-header">
+        <h5><i class="fa fa-calculator"></i> معدلُ الاستهلاك — محسوبًا من الحركات (آخر <?php echo (int) $WINDOW; ?> يومًا)</h5>
+    </div><div class="card-body">
+        <?php if (isset($computeErr)): ?>
+            <div class="alert alert-danger"><?php echo htmlspecialchars($computeErr, ENT_QUOTES, 'UTF-8'); ?></div>
+        <?php endif; ?>
+        <p class="text-muted" style="font-size:.9em">
+            المصدرُ <code>proc_stock_move</code> — حركاتُ الصرفِ وحدَها. ولا يُعرض صنفٌ بلا حركةٍ في المدة.
+        </p>
+        <div class="table-responsive">
+        <table class="alltables display" id="consumptionComputedTable">
+            <thead><tr>
+                <th>الصنف</th><th>الوحدة</th><th>المدة (يومًا)</th><th>المنصرف</th>
+                <th>المعدل اليومي</th><th>مهلة التوريد</th><th>مخزون الأمان</th><th>حدُّ الطلب المقترح</th>
+            </tr></thead><tbody>
+            <?php if (!$computed): ?>
+                <tr><td colspan="8" class="text-center text-muted">لا حركةَ صرفٍ في المدة — فلا معدلَ يُحسب (ولا يُخترع)</td></tr>
+            <?php else: foreach ($computed as $c): ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($c['item'], ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td><?php echo htmlspecialchars($c['unit'] !== '' ? $c['unit'] : '—', ENT_QUOTES, 'UTF-8'); ?></td>
+                    <td><?php echo (int) $c['window']; ?></td>
+                    <td><?php echo number_format($c['consumed'], 2); ?></td>
+                    <td><strong><?php echo number_format($c['daily'], 3); ?></strong></td>
+                    <td><?php echo (int) $c['lead']; ?></td>
+                    <td><?php echo number_format($c['safety'], 2); ?></td>
+                    <td><?php echo number_format($c['trigger'], 2); ?></td>
+                </tr>
+            <?php endforeach; endif; ?>
+            </tbody></table>
+        </div>
+    </div></div>
+
+    <?php if ($rows): ?>
+    <div class="alert alert-warning" style="margin-top:14px">
+        <strong>سجلٌّ سابقٌ للربط.</strong> الصفوفُ أدناه أُدخلت يدويًّا قبلَ ربطِ الشاشةِ
+        بحركاتِ المخزن — تبقى للقراءةِ التاريخيةِ ولا يُكتب فيها بعد (لم يُحذف صفٌّ).
+    </div>
+    <?php endif; ?>
 
     <div class="card"><div class="card-body">
         <div class="table-responsive">
@@ -253,21 +273,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 </div>
 
 <script>
-(function () {
-    var btn = document.getElementById('cmp03AddBtn');
-    var form = document.getElementById('cmp03AddForm');
-    var cancel = document.getElementById('cmp03CancelBtn');
-    if (btn && form) {
-        btn.addEventListener('click', function (e) {
-            e.preventDefault();
-            form.classList.toggle('allforms-visible');
-            if (form.classList.contains('allforms-visible')) {
-                form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }
-        });
-    }
-    if (cancel && form) {
-        cancel.addEventListener('click', function () { form.classList.remove('allforms-visible'); });
-    }
-})();
+/* INJ-0356: رُفع مبدِّلُ فورمِ الإضافة — لا فورمَ إدخالٍ في شاشةٍ حاسبة. */
+(function () {})();
 </script>

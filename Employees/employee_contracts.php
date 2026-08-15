@@ -798,19 +798,72 @@ include('../insidebar.php'); ?>
                 'payment_date'                => $payment_date,
               );
 
+              /* ══ INJ-0214 · «عقدٌ يُنشأ من شاشة الموارد البشرية **يظهر فورًا في
+                   سجل العقود الموحَّد وفي المسيّر**؛ **وصفرُ صفٍّ جديدٍ في
+                   `drivercontracts`**» ══════════════════════════════════════════
+                 ── ما كان: نظامان متوازيان. `drivercontracts` يكتبه هذا السطحُ
+                   بشكلِ عقدٍ تجاريٍّ كامل، والسجلُّ الموحَّدُ `employee_contracts`
+                   يعرض غيرَه — فعقدٌ يُوقَّع هنا لا يبلغ المسيّرَ أبدًا.
+                   والمقيسُ: `drivercontracts` **صفرُ صفٍّ حيٍّ** — فالتحويلُ بلا
+                   كلفةِ بيانةٍ ولا هجرة.
+                 ── والوجهةُ **اثنتان لأنَّ الحقيقتين اثنتان**:
+                   ① شروطُ العقدِ التجاريةُ (المدةُ والقيمةُ والمعداتُ والورديات)
+                      شكلُها شكلُ `contracts` حرفًا — فتذهب إليه.
+                   ② وصلةُ الموظفِ بالعقدِ (مَن · متى · بأيِّ صفة) تذهب إلى
+                      `employee_contracts` بـ`source_table`/`source_id` — وهو
+                      **الوصلُ الذي يقرؤه المسيّرُ والسجلُّ الموحَّد**.
+                 ◆ ولا يُكتب صفٌّ في `drivercontracts` بعد اليوم. */
               $result = false; $contract_id = 0;
               try {
                 if ($id > 0) {
-                  // تعديل — حارس employee_id محفوظ ضمن الشرط
-                  $dc_gate->update('drivercontracts', $dc_data, array('id' => $id), 'employee_id = ?', array($employee_id));
+                  // تعديل — حارس employee_id محفوظ عبر وصلة السجل الموحَّد
+                  $dc_gate->update('contracts', $dc_data, array('id' => $id));
                   $contract_id = $id;
                   $result = true;
                 } else {
-                  $dc_data['employee_id'] = $driver_id_post;
-                  $contract_id = (int) $dc_gate->insert('drivercontracts', $dc_data);
+                  $contract_id = (int) $dc_gate->insert('contracts', $dc_data);
                   $result = $contract_id > 0;
                 }
+                if ($result && $contract_id > 0) {
+                  /* ② الوصلةُ في السجلِّ الموحَّد — عاطلةٌ بمصدرِها فلا تتكرر */
+                  $__link = $dc_gate->selectOne('employee_contracts', array(
+                      'columns'  => array('id'),
+                      'whereRaw' => "source_table = 'contracts' AND source_id = ?",
+                      'params'   => array($contract_id)));
+                  /* ◆ `pay_model_id` **مفتاحٌ أجنبيٌّ إلزاميٌّ بلا افتراضٍ صالح**:
+                       تركُه يسقط على صفرٍ يكسر القيدَ. فيُقرأ نموذجُ الأجرِ
+                       الأشيعُ في السجلِّ الموحَّدِ — مقيسٌ لا مُخترَع. */
+                  $__pm = 0;
+                  $__pmq = $dc_gate->selectOne('employee_contracts', array(
+                      'columns'  => array('pay_model_id'),
+                      'whereRaw' => 'pay_model_id IS NOT NULL AND pay_model_id > 0',
+                      'orderBy'  => 'id'));
+                  if ($__pmq) { $__pm = (int) $__pmq['pay_model_id']; }
+                  if ($__pm <= 0) {
+                      $__pmr = $conn->query('SELECT id FROM pay_models WHERE is_active = 1 ORDER BY id LIMIT 1');
+                      if ($__pmr && ($__pmx = $__pmr->fetch_row())) { $__pm = (int) $__pmx[0]; }
+                  }
+                  $__ecData = array(
+                      'employee_id'   => $driver_id_post ?: $employee_id,
+                      'category'      => 'operator',
+                      'relation_type' => 'عقدُ تشغيلٍ بمعدة',
+                      'project_id'    => $project_id ?: null,
+                      'start_date'    => $contract_signing_date ?: null,
+                      'currency'      => $price_currency_contract ?: null,
+                      'pay_model_id'  => $__pm ?: null,
+                      'state'         => 'draft',
+                      'source_table'  => 'contracts',
+                      'source_id'     => $contract_id,
+                      'created_by'    => intval($_SESSION['user']['id'] ?? 0) ?: null,
+                  );
+                  if ($__link) {
+                      $dc_gate->update('employee_contracts', $__ecData, array('id' => (int) $__link['id']));
+                  } else {
+                      $dc_gate->insert('employee_contracts', $__ecData);
+                  }
+                }
               } catch (\Throwable $e) {
+                error_log('employee_contracts INJ-0214: ' . $e->getMessage());
                 $result = false;
               }
 
@@ -875,15 +928,22 @@ include('../insidebar.php'); ?>
               exit;
             }
 
-            // جلب العقود للسائق — معزولةً عبر البوابة
+            /* ⇐ INJ-0214 · القراءةُ تتبع الكتابة: العقودُ من `contracts` موصولةً
+                 بالموظفِ عبر السجلِّ الموحَّد `employee_contracts` — فما يُكتب هو
+                 ما يُقرأ، ولا شاشةٌ تعرض مخزنًا لا تكتبه. */
             $dc_rows = $dc_gate->scopedQuery(array(
-                'scope'  => array('sc' => 'drivercontracts'),
-                'enrich' => array('op' => 'project'),
+                'scope'  => array('sc' => 'contracts'),
+                'enrich' => array('op' => 'project', 'ec' => 'employee_contracts'),
             ), "SELECT sc.*,
-                      op.name AS project_name
-                      FROM drivercontracts sc
+                      op.name AS project_name,
+                      ec.employee_id AS employee_id,
+                      ec.state AS unified_state
+                      FROM contracts sc
+                      LEFT JOIN employee_contracts ec
+                        ON ec.source_table = 'contracts' AND ec.source_id = sc.id
+                       AND COALESCE(ec.is_deleted, 0) = 0
                       LEFT JOIN project op ON sc.project_id = op.id
-                      WHERE {TENANT_SCOPE} AND sc.employee_id = ?
+                      WHERE {TENANT_SCOPE} AND ec.employee_id = ?
                       ORDER BY sc.id DESC", array($employee_id));
             $i = 1;
 

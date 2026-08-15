@@ -292,6 +292,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
             'company_id' => $rowCo, 'source_type' => 'SRC-10', 'source_ref' => 'EXPC-' . $rowId,
             'source_screen' => 'Portal/project_charter.php',
             'owner_user_id' => $uid, 'assigned_user_id' => $uid,
+            'verifier_user_id' => \App\Services\Work\WorkItemService::resolveVerifier($conn, $rowCo, $uid),
             'org_unit_id' => 1, 'project_id' => $projectId, 'site_id' => $siteIds[0] ?? 0,
             'title' => 'حجز موارد المشروع — ' . (string) $row['decision_no'],
             'deliverable' => 'حجز: ' . (string) ($row['equipment_needed'] ?? '—')

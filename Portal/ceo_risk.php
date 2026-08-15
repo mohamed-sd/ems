@@ -180,6 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 
                 'company_id' => $company_id, 'source_type' => 'SRC-10', 'source_ref' => 'EXDC-' . $newId,
                 'source_screen' => 'Portal/ceo_risk.php',
                 'owner_user_id' => $uid, 'assigned_user_id' => $uid,
+                'verifier_user_id' => \App\Services\Work\WorkItemService::resolveVerifier($conn, $company_id, $uid),
                 'org_unit_id' => 1, 'project_id' => 0, 'site_id' => 0,
                 'title' => 'متابعة قرارٍ تنفيذي — ' . ($in['decision_no'] !== '' ? $in['decision_no'] : ('EXDC-' . $newId)),
                 'deliverable' => 'إفادةُ تنفيذ الجهة المكلَّفة: ' . $in['assigned_dept'],

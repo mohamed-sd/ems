@@ -248,27 +248,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['risk_type'])) {
             risk_redirect_with_msg('كود الخطر موجود مسبقاً داخل شركتك ❌');
         }
 
+        /* ══ INJ-0108 · «السجلُّ المركزيُّ الواحدُ للمخاطر» ═══════════════════════
+             نصُّ القبول: «حاوِل إضافةَ خطرٍ من هذه الشاشة: **يجب أن يُنشئ إشارةً
+             في `risk_signals` لا صفًّا في `commercial_risks`**؛ و`COUNT(*) FROM
+             commercial_risks WHERE created_at > <تاريخ النشر>` = 0».
+           ── ما كان: سجلٌّ موازٍ كاملُ الكتابةِ بترقيمٍ مستقلٍّ عن `RSK-000001`،
+             وجسرُه مع السجلِّ المركزيِّ لوحةُ قراءةٍ فقط. فخطران متشابهان في
+             سجلَّين، ولا مصفوفةَ اعتمادٍ ولا شهيةَ خطرٍ تحكم الثاني.
+           ◆ **والبابُ الصحيحُ إشارةٌ لا خطرٌ مباشر**: إدارةُ المخاطرِ تملك
+             «اللغةَ والمنهجَ والتصنيفَ» — فالمبيعاتُ **تُبلّغ** وهي **تُصنّف**.
+             وهذا نصُّ الوثيقةِ لا اجتهادٌ: التسجيلُ والتصنيفُ اختصاصُها.
+           ◆ والفرزُ يحوّل الإشارةَ إلى خطرٍ بوحدةٍ مالكةٍ (INJ-0109) — فالخيطُ
+             متصلٌ من بلاغِ المبيعاتِ إلى السجلِّ المركزيّ. */
         try {
-            $new_id = (int) $risk_gate->insert('commercial_risks', array(
-                'risk_code'     => $risk_code_raw,
-                'name'          => $name_raw,
-                'risk_type'     => $type_raw,
-                'severity'      => $severity_raw,
-                'mitigation'    => $mitigation_raw,
-                'owner_user_id' => $owner_val,
-                'state'         => $state_raw,
-                'entity_type'   => $entity_type_raw,
-                'entity_id'     => $entity_id_val,
-                'notes'         => $notes_raw,
-                'created_by'    => $created_by,
-            ));
+            require_once dirname(__DIR__) . '/app/Services/Risk/RiskService.php';
+            $__sig = \App\Services\Risk\RiskService::createSignal($conn, (int) $company_id, array(
+                'source'      => 'manual',
+                'title'       => $name_raw,
+                'details'     => trim($mitigation_raw . "\n" . $notes_raw),
+                'entity_type' => $entity_type_raw,
+                'entity_id'   => $entity_id_val,
+                'root_cause'  => $type_raw,
+                'rule_key'    => 'commercial:' . $risk_code_raw,
+            ), $created_by);
+            /* المُرجَعُ مصفوفةٌ لا رقمًا — و`idempotent` يميّز الإشارةَ القائمةَ عن الجديدة */
+            $__sigId = (int) ($__sig['id'] ?? 0);
+            $__again = !empty($__sig['idempotent']);
             if (class_exists('\\App\\Services\\ActivityLogService')) {
-                \App\Services\ActivityLogService::logCreate('commercial_risks', 'commercial_risks', $new_id, ['risk_code' => $risk_code_raw]);
+                \App\Services\ActivityLogService::logCreate('risk_signals', 'commercial_risks',
+                    $__sigId, ['risk_code' => $risk_code_raw, 'via' => 'INJ-0108']);
             }
-            risk_redirect_with_msg('تم إضافة الخطر بنجاح ✅');
+            risk_redirect_with_msg(($__again
+                    ? ('إشارةُ هذا الخطرِ مرفوعةٌ سلفًا #' . $__sigId . ' — لم تُكرَّر')
+                    : ('رُفعت إشارةُ خطرٍ #' . $__sigId . ' إلى السجلِّ المركزيّ'))
+                . ' — تُفرَز في «إشارات الخطر والفرز» ✅');
         } catch (\Throwable $t) {
-            error_log('commercial_risks.php insert failed: ' . $t->getMessage());
-            risk_redirect_with_msg('حدث خطأ أثناء الإضافة ❌');
+            error_log('commercial_risks.php signal failed: ' . $t->getMessage());
+            risk_redirect_with_msg('تعذّر رفعُ الإشارة: ' . mb_substr($t->getMessage(), 0, 90) . ' ❌');
         }
     }
 }

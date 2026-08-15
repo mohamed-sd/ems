@@ -52,8 +52,8 @@ INJ-0050	P1	نعم	مُغلقٌ بشاهد
 INJ-0051	P1	نعم	غيرُ مقيس	
 INJ-0052	P1	نعم	مُغلقٌ بشاهد	
 INJ-0053	P1	نعم	مُغلقٌ بشاهد	
-INJ-0054	P1	نعم	غيرُ مقيس	
-INJ-0055	P1	نعم	غيرُ مقيس	
+INJ-0054	P1	نعم	مُغلق	tests/dual_store_bridge_test.php
+INJ-0055	P1	نعم	مُغلق	tests/dual_store_bridge_test.php
 INJ-0056	P1	نعم	غيرُ مقيس	
 INJ-0057	P1	نعم	مُغلقٌ بشاهد	
 INJ-0058	P1	نعم	مُغلقٌ بشاهد	
@@ -106,7 +106,7 @@ INJ-0104	P1	نعم	غيرُ مقيس
 INJ-0105	P1	نعم	غيرُ مقيس	
 INJ-0106	P1	نعم	مُغلقٌ بشاهد	
 INJ-0107	P1	نعم	مُغلقٌ بشاهد	
-INJ-0108	P1	نعم	غيرُ مقيس	
+INJ-0108	P1	نعم	مُغلق	tests/dual_store_bridge_test.php
 INJ-0109	P1	نعم	مُغلق	tests/source_of_truth_test.php
 INJ-0110	P1	نعم	مُغلقٌ بشاهد	
 INJ-0111	P1	نعم	غيرُ مقيس	
@@ -161,7 +161,7 @@ INJ-0159	P2	نعم	مُغلقٌ بشاهد
 INJ-0160	P2	نعم	مُغلقٌ بشاهد	
 INJ-0161	P2	نعم	مُغلقٌ بشاهد	
 INJ-0162	P2	نعم	مُغلقٌ بشاهد	tests/supplier_audit_trail_test.php
-INJ-0163	P2	نعم	غيرُ مقيس	
+INJ-0163	P2	نعم	مُغلق	tests/dual_store_bridge_test.php
 INJ-0164	P2	نعم	مُغلقٌ بشاهد	tests/dept_space_screens_test.php
 INJ-0165	P2	لا	غيرُ مقيس	
 INJ-0166	P2	لا	غيرُ مقيس	
@@ -212,7 +212,7 @@ INJ-0210	P2	نعم	غيرُ مقيس
 INJ-0211	P2	لا	مُغلقٌ بشاهد	tests/dept_space_screens_test.php · tools/build_dept_space_wrappers.php
 INJ-0212	P2	لا	غيرُ مقيس	
 INJ-0213	P2	نعم	مُغلقٌ بشاهد	
-INJ-0214	P2	نعم	غيرُ مقيس	
+INJ-0214	P2	نعم	مُغلق	tests/dual_store_bridge_test.php
 INJ-0215	P2	نعم	غيرُ مقيس	
 INJ-0216	P2	نعم	غيرُ مقيس	
 INJ-0217	P2	لا	مُغلقٌ بشاهد	tests/dept_space_screens_test.php · tools/build_dept_space_wrappers.php
@@ -354,7 +354,7 @@ INJ-0352	P2	نعم	مُغلق	tests/idempotency_and_race_test.php
 INJ-0353	P2	نعم	غيرُ مقيس	
 INJ-0354	P2	نعم	مُغلقٌ بشاهد	tests/dept_space_screens_test.php
 INJ-0355	P2	لا	مُغلقٌ بشاهد	tests/dept_space_screens_test.php · tools/build_dept_space_wrappers.php
-INJ-0356	P2	لا	غيرُ مقيس	
+INJ-0356	P2	لا	مُغلق	tests/dual_store_bridge_test.php
 INJ-0357	P2	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0358	P2	لا	غيرُ مقيس	
 INJ-0359	P2	لا	مُغلقٌ بشاهد	
@@ -368,7 +368,7 @@ INJ-0366	P2	نعم	غيرُ مقيس
 INJ-0367	P2	لا	غيرُ مقيس	
 INJ-0368	P2	لا	مُغلقٌ بشاهد	
 INJ-0369	P2	نعم	مُغلقٌ بشاهد	
-INJ-0370	P2	نعم	غيرُ مقيس	
+INJ-0370	P2	نعم	مُغلق	tests/dual_store_bridge_test.php
 INJ-0371	P2	نعم	مُغلقٌ بشاهد	
 INJ-0372	P2	لا	مُغلقٌ بشاهد	tests/dept_space_screens_test.php · tools/build_dept_space_wrappers.php
 INJ-0373	P2	لا	غيرُ مقيس	
@@ -409,7 +409,7 @@ INJ-0407	P2	نعم	مُغلق	tests/workspace_counters_tenant_test.php
 INJ-0408	P2	نعم	مُغلق	tests/workspace_counters_tenant_test.php
 INJ-0409	P2	نعم	غيرُ مقيس	
 INJ-0410	P2	نعم	غيرُ مقيس	
-INJ-0411	P3	لا	غيرُ مقيس	
+INJ-0411	P3	لا	مُغلق	tests/dual_store_bridge_test.php
 INJ-0412	P3	نعم	مُغلقٌ بشاهد	tests/dept_space_screens_test.php · tools/build_dept_space_wrappers.php
 INJ-0413	P3	لا	غيرُ مقيس	
 INJ-0414	P3	لا	مُغلقٌ بشاهد	

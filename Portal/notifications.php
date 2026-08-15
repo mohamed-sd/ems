@@ -67,8 +67,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'company_id' => intval($n['company_id']), 'source_type' => 'SRC-14',
                 'source_ref' => 'NTF-' . intval($n['id']), 'source_screen' => 'Portal/notifications.php',
                 'owner_user_id' => $uid, 'assigned_user_id' => $uid, 'org_unit_id' => 1,
+                'verifier_user_id' => WI::resolveVerifier($conn, intval($n['company_id']), $uid),
                 'title' => 'متابعة تنبيه: ' . $n['title'],
                 'deliverable' => 'إجراء التنبيه منفَّذًا', 'details' => (string) $n['body'],
+                'evidence_required' => 'أثرُ الفعلِ المطلوبِ في سجلِّ التدقيق',
                 'due_at' => date('Y-m-d H:i:s', time() + 172800), 'created_by' => $uid,
             ));
             if ($r['ok']) {

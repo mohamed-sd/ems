@@ -42,6 +42,9 @@ $mk = function ($ref, $extra = array()) use ($conn, $CO, $OWNER, $EXEC, $VERIF, 
         'company_id' => $CO, 'source_type' => 'SRC-01', 'source_ref' => $ref,
         'source_screen' => 'tests', 'owner_user_id' => $OWNER, 'assigned_user_id' => $EXEC,
         'verifier_user_id' => $VERIF, 'org_unit_id' => 1, 'title' => 'TST-S16 ' . $ref,
+        // INJ-0486: الدليلُ المطلوبُ شرطٌ في الحارس — والفخُّ الموجبُ يوفيه
+        // (ورفضُ الناقصِ مقيسٌ في S01 وفي workflow_guards_and_stamp_test)
+        'evidence_required' => 'أثر التنفيذ في سجل التدقيق',
         'deliverable' => 'مخرج', 'due_at' => $due, 'created_by' => $OWNER), $extra));
 };
 

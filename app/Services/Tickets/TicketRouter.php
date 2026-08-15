@@ -208,6 +208,8 @@ class TicketRouter
                                 'source_screen' => 'Tickets/tickets_list.php',
                                 'action_code' => 'ticket.ack',
                                 'owner_user_id' => $assignee, 'assigned_user_id' => $assignee,
+                                // المكلَّفُ هو المالكُ هنا، فالتحقّقُ يُرفع لمديرِه (WF-04)
+                                'verifier_user_id' => \App\Services\Work\WorkItemService::resolveVerifier($conn, $co, $assignee),
                                 'org_unit_id' => $unitId ?: 1, 'site_id' => $siteId ?: 0,
                                 'title' => 'معالجة بلاغ #' . intval($tkId) . ' — مسار ' . $w['workstream_type'],
                                 'deliverable' => 'إغلاق المسار بتوثيق الحل وتأكيد المبلِّغ',

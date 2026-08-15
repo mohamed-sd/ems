@@ -99,9 +99,14 @@ foreach ($files as $abs) {
         }
     }
 
-    /* ③ colspan صفِّ الخلوّ */
-    if (preg_match('~colspan="(\d+)"~', $src, $sm) && (int) $sm[1] !== $n) {
-        $issues[] = 'colspan=' . $sm[1] . " ≠ {$n}";
+    /* ③ colspan صفِّ الخلوّ — والصفحةُ قد تحمل جدولين (جدولٌ محسوبٌ وآخرُ موروث)،
+         فيكفي أن **يطابق أحدُ الـcolspan** عدَّةَ `$COLS`. وأخذُ الأولِ وحدَه
+         يُدين شاشةً سليمةً أضافت جدولًا ثانيًا بحقّ. */
+    if (preg_match_all('~colspan="(\d+)"~', $src, $sm)) {
+        $spans = array_map('intval', $sm[1]);
+        if (!in_array($n, $spans, true)) {
+            $issues[] = 'colspan=' . implode('/', $spans) . " ≠ {$n}";
+        }
     }
 
     /* ④ كلُّ مصدرٍ عمودٌ قائمٌ في جدولِ الشاشة */

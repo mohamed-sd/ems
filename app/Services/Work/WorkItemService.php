@@ -69,6 +69,34 @@ class WorkItemService
         'reopened'            => array('from' => array('closed_accepted'), 'by' => 'governance', 'reason' => true),
     );
 
+    /* ──────────────── مُحدِّدُ المتحقِّق (WF-04 · تتمّةُ INJ-0486) ──────────── */
+
+    /**
+     * متحقِّقُ العنصر — «ولا يشهد أحدٌ على عملِه».
+     * ───────────────────────────────────────────────────────────────────────
+     * الحارسُ السباعيُّ صار يلزم `verifier_user_id`، **والمُغذّياتُ لم تعرف مَن
+     * يتحقّق** — فكانت تُنشئ بلا متحقِّقٍ فتُردُّ 422 صامتةً وتموتُ السلسلة.
+     * فالتحديدُ قاعدةٌ واحدةٌ هنا لا اجتهادٌ في كلِّ شاشة:
+     *   المالكُ إن غايرَ المنفِّذ ← مديرُ المنفِّذ ← حوكمةُ شركته (15 ثم 9)
+     *   ← مُنشئُ العنصرِ إن غايرَه.
+     * ◆ ولا يُرجَع المنفِّذُ نفسُه أبدًا؛ وحين ينقطع السُّلَّمُ تُرجَع `null`
+     *   فيُرفض الإنشاءُ صراحةً — **ولا يُلفَّق شاهدٌ لتمرير عنصر**.
+     *
+     * @return int|null
+     */
+    public static function resolveVerifier(\mysqli $conn, $companyId, $executorUserId, $ownerUserId = 0, $createdBy = 0)
+    {
+        $exec = (int) $executorUserId;
+        if ($exec <= 0) { return null; }
+        $owner = (int) $ownerUserId;
+        if ($owner > 0 && $owner !== $exec) { return $owner; }
+        require_once dirname(__DIR__, 2) . '/../includes/resolve_manager.php';
+        $v = ems_resolve_verifier($conn, $exec, (int) $companyId);
+        if ($v !== null && (int) $v !== $exec) { return (int) $v; }
+        $by = (int) $createdBy;
+        return ($by > 0 && $by !== $exec) ? $by : null;
+    }
+
     /* ─────────────────────────── الإنشاء (WF-02) ─────────────────────────── */
 
     /**
@@ -178,8 +206,12 @@ class WorkItemService
 
         if ($assignee) {
             self::logAssignment($conn, $co, $id, 'assign', null, $assignee, null, $by);
-            self::notifyUser($conn, $co, $assignee, 'مهمةٌ مسنَدةٌ إليك', $title,
-                'Portal/my_tasks.php?item=' . $id, false, $by);
+            // `no_notify`: العنصرُ المولَّدُ **عن تنبيهٍ** لا يُخطِر مرتين —
+            // الإخطارُ وقع سلفًا وهذه المهمةُ أثرُه لا حدثٌ جديد.
+            if (empty($a['no_notify'])) {
+                self::notifyUser($conn, $co, $assignee, 'مهمةٌ مسنَدةٌ إليك', $title,
+                    'Portal/my_tasks.php?item=' . $id, false, $by);
+            }
         }
         return array('ok' => true, 'code' => 200, 'id' => $id, 'status' => $status);
     }
@@ -615,22 +647,33 @@ class WorkItemService
             $q->close();
             if ($ex) { return (int) $ex[0]; }
         }
-        /* ◆ **وأسماءُ الأعمدةِ تُقاس**: الجدولُ يحمل `owner_user_id` و`assigned_user_id`
-             و`status` و`deliverable` الإلزاميّ — لا `assignee_user_id` ولا `state`.
-             والمُسلَّمُ هنا نصُّ ما يُنتظر من المستخدم، فالمهمةُ بلا مُسلَّمٍ لا تُقاس. */
-        $st = $conn->prepare("INSERT INTO work_items
-            (company_id, title, details, source_type, source_ref, source_screen,
-             owner_user_id, assigned_user_id, deliverable, status, created_by, created_at)
-            VALUES (?, ?, ?, 'notification', ?, ?, ?, ?, ?, 'open', ?, NOW())");
-        if (!$st) { return 0; }
-        $co3 = (int) $co; $u = (int) $userId; $b = (int) $by;
-        $ttl = mb_substr((string) $title, 0, 200);
-        $dtl = mb_substr((string) $body, 0, 600);
-        $scr = mb_substr((string) $link, 0, 160);
-        $dlv = mb_substr('تنفيذُ ما يطلبه الإخطار: ' . (string) $title, 0, 300);
-        $st->bind_param('issssiisi', $co3, $ttl, $dtl, $ref, $scr, $u, $u, $dlv, $b);
-        $newId = $st->execute() ? (int) $conn->insert_id : 0;
-        $st->close();
-        return $newId;
+        /* ◆ **ولا شكلَ ثانيًا للعنصر** — كان هذا الموضعُ يُدرج في `work_items`
+             رأسًا **متجاوزًا `create()`** بـ`source_type='notification'`
+             و`status='open'`: الأولُ خارجَ الأربعةَ عشرَ والثاني خارجَ الخمسَ
+             عشرةَ. فالصفُّ يُكتب ولا يطابق **عرضًا واحدًا** من عروضِ «مهامي» —
+             مهمةٌ قائمةٌ لا يراها صاحبُها أبدًا، وهو أسوأُ من ألّا تُنشأ.
+             والعلّةُ في التجاوزِ نفسِه: ما لا يمرُّ بالحارسِ لا يلزمه شكلٌ.
+           ◆ فالتوليدُ يمرُّ بالحارسِ السباعيِّ كغيرِه: SRC-14 «طارئةٌ تشغيلية»
+             — وهو مصدرُ التنبيهِ المحوَّلِ نفسُه في `Portal/notifications.php`
+             فلا مصدرانِ لأصلٍ واحد — بحالةٍ `assigned` ومتحقِّقٍ بالقاعدة. */
+        $res = self::create($conn, array(
+            'company_id' => (int) $co, 'source_type' => 'SRC-14', 'source_ref' => $ref,
+            'source_screen' => mb_substr((string) $link, 0, 120),
+            'owner_user_id' => (int) $userId, 'assigned_user_id' => (int) $userId,
+            'verifier_user_id' => self::resolveVerifier($conn, $co, $userId, 0, $by),
+            'org_unit_id' => 1,
+            'title' => mb_substr((string) $title, 0, 200),
+            'details' => mb_substr((string) $body, 0, 600),
+            'deliverable' => mb_substr('تنفيذُ ما يطلبه الإخطار: ' . (string) $title, 0, 300),
+            'evidence_required' => 'أثرُ الفعلِ المطلوبِ في سجلِّ التدقيق',
+            'priority' => 'P3',
+            'due_at' => date('Y-m-d H:i:s', time() + 172800),
+            'created_by' => (int) $by, 'no_notify' => true,
+        ));
+        if (empty($res['ok'])) {
+            error_log('notification task rejected #' . (int) $notifId . ': ' . (string) ($res['reason'] ?? ''));
+            return 0;
+        }
+        return (int) $res['id'];
     }
 }

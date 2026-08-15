@@ -280,6 +280,8 @@ class RequestService
                     'company_id' => $co, 'source_type' => 'SRC-05', 'source_ref' => $no,
                     'source_screen' => 'Portal/my_requests.php',
                     'owner_user_id' => $eu, 'assigned_user_id' => $eu,
+                    // المستقبِلُ ينفّذ ويملك، فالتحقّقُ لمديرِه لا له (WF-04)
+                    'verifier_user_id' => WorkItemService::resolveVerifier($conn, $co, $eu, 0, $actor),
                     'org_unit_id' => intval($rq['org_unit_id']) ?: 1,
                     'project_id' => intval($rq['project_id']) ?: 0, 'site_id' => intval($rq['site_id']) ?: 0,
                     'title' => 'تنفيذ ' . (($type['name_ar'] ?? 'طلب')) . ' — ' . $no,

@@ -99,11 +99,25 @@ $finPulse = cr_rows($conn, "SELECT event_key k, COUNT(*) c FROM ems_business_eve
                              WHERE category = 'financial' AND occurred_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)
                                {$coW} GROUP BY event_key ORDER BY c DESC LIMIT 12");
 
-/* ⑦ المخاطر المفتوحة (قضايا بلا حسم) */
-$openRisk = array();
-foreach ($decRows as $d) {
-    if (in_array((string) $d['status'], array('مسودة', 'قيد الدراسة', 'قيد المراجعة'), true)) { $openRisk[] = $d; }
-}
+/* ══ ⑦ المخاطر المفتوحة — ⇐ INJ-0411 ═══════════════════════════════════════
+     نصُّ القبول: «بعد إغلاقِ خطرٍ في `Risk/risk_card.php` يجب أن **ينقص مؤشرُ
+     المخاطر المفتوحة** في `Portal/ceo_reports.php` بواحد».
+   ── ما كان: يُشتقُّ المؤشرُ من `exec_decisions` — **سجلِّ قراراتِ الرئيس** —
+     بمطابقةِ نصِّ حالةٍ («مسودة» · «قيد الدراسة»). فإغلاقُ خطرٍ في السجلِّ
+     المركزيِّ لا يحرّكه أبدًا، ورقمانِ لمعنًى واحدٍ في شاشتين.
+   ◆ **والسجلُّ المركزيُّ الواحدُ للمخاطر** (`risk_register`) هو المصدر — كما
+     تُصرّح الوثيقةُ ويقرأ به `Portal/ceo_board.php` سلفًا (INJ-0129).
+   ◆ وقراراتُ الرئيسِ تبقى في بابها ⑤ — فهي مستندٌ قائمٌ بذاته لا مخاطر. */
+$openRisk = cr_rows($conn,
+    "SELECT rr.id, rr.risk_code AS decision_no, rr.title AS issue_desc,
+            rr.current_level AS est_impact, rr.state AS status, rr.created_at AS raised_date,
+            ou.name_ar AS assigned_dept
+       FROM risk_register rr
+       LEFT JOIN org_units ou ON ou.unit_id = rr.owner_unit_id AND ou.company_id = rr.company_id
+      WHERE rr.state <> 'closed' AND rr.merged_into_id IS NULL
+        " . str_replace('company_id', 'rr.company_id', $coW) . "
+      ORDER BY FIELD(rr.current_level,'محظور','حرج','مرتفع','متوسط','منخفض'), rr.id DESC
+      LIMIT 50");
 
 /* ⑧ خريطة السقوف: ملكية التوجيه المالي + عناوين الموازنات */
 $routing = cr_rows($conn, "SELECT request_kind, owner_dept, COUNT(*) c FROM fin_request_routing
@@ -275,11 +289,14 @@ function cr_p($row, $key) {
     <div class="card-body">
         <table class="alltables display no-datatable" style="width:100%"><thead>
             <tr><th>المرجع</th><th>النوع</th><th>القضية</th><th>الأثر المقدَّر</th><th>الحالة</th></tr></thead><tbody>
+            <?php /* INJ-0411: المرجعُ رمزُ السجلِّ المركزيِّ والنقرُ يفتح بطاقتَه —
+                     فالرقمُ والمصدرُ واحدٌ لا رقمان في شاشتين. */ ?>
             <?php foreach ($openRisk as $w): ?>
-            <tr><td>EXDC-<?php echo (int) $w['id']; ?></td>
-                <td><?php echo htmlspecialchars((string) ($w['issue_type'] ?: '—'), ENT_QUOTES, 'UTF-8'); ?></td>
+            <tr><td><a href="../Risk/risk_card.php?id=<?php echo (int) $w['id']; ?>"><?php
+                    echo htmlspecialchars((string) ($w['decision_no'] ?: ('RSK-' . (int) $w['id'])), ENT_QUOTES, 'UTF-8'); ?></a></td>
+                <td><?php echo htmlspecialchars((string) ($w['assigned_dept'] ?: '—'), ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo htmlspecialchars(mb_substr((string) $w['issue_desc'], 0, 70), ENT_QUOTES, 'UTF-8'); ?></td>
-                <td><?php echo htmlspecialchars(trim((string) $w['est_impact'] . ' ' . (string) $w['currency']), ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?php echo htmlspecialchars((string) $w['est_impact'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo htmlspecialchars((string) $w['status'], ENT_QUOTES, 'UTF-8'); ?></td></tr>
             <?php endforeach; if (!$openRisk): ?><tr><td colspan="5" class="text-center text-muted">لا قضيةَ مفتوحةً — كلُّ المرفوع محسوم</td></tr><?php endif; ?>
         </tbody></table>

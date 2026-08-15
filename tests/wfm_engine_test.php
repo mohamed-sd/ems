@@ -46,6 +46,9 @@ fwrite(STDOUT, "── ① الإنشاء (WF-02): الحارس السباعي\n
 $r1 = WI::create($conn, array('company_id' => $CO, 'source_type' => 'SRC-01', 'source_ref' => 'TST-WFM-1',
     'source_screen' => 'tests', 'owner_user_id' => $OWNER, 'assigned_user_id' => $EXEC, 'verifier_user_id' => $VERIF,
     'org_unit_id' => 1, 'title' => 'TST-WFM مهمة اختبار', 'deliverable' => 'مخرج اختباري',
+    // INJ-0486: الدليلُ المطلوبُ صار شرطًا في الحارس — والفِخاخُ الموجبةُ توفيه
+    // كي تُقاس الأبوابُ التاليةُ لا يُحجب المسارُ عندها (والرفضُ مقيسٌ في r2/r3)
+    'evidence_required' => 'أثر التنفيذ في سجل التدقيق',
     'due_at' => $due, 'created_by' => $OWNER));
 ok($r1['ok'] && $r1['status'] === 'assigned', 'سماح: السبعة كاملة ⇒ أُنشئت مسنَدة #' . ($r1['id'] ?? '؟'));
 $ITEM = intval($r1['id'] ?? 0);
@@ -64,6 +67,8 @@ mysqli_query($conn, "INSERT INTO work_delegations (company_id, kind, from_user_i
                      VALUES ({$CO}, 'deputize', {$OWNER}, {$EXEC}, 'TST-WFM-DELEG', DATE_SUB(NOW(), INTERVAL 10 DAY), DATE_SUB(NOW(), INTERVAL 1 DAY), 'active', {$OWNER})");
 $r4 = WI::create($conn, array('company_id' => $CO, 'source_type' => 'SRC-02', 'source_ref' => 'TST-WFM-4',
     'owner_user_id' => $OWNER, 'assigned_user_id' => $EXEC, 'org_unit_id' => 1, 'delegation_ref' => 'TST-WFM-DELEG',
+    // السبعةُ كاملةٌ عمدًا — وإلّا رُدَّ لنقصِها فقِيس رفضٌ غيرُ الذي يقصده الفخ
+    'evidence_required' => 'x', 'verifier_user_id' => $VERIF,
     'title' => 'بتفويض ميت', 'deliverable' => 'x', 'due_at' => $due, 'created_by' => $OWNER));
 ok(!$r4['ok'] && mb_strpos($r4['reason'], 'WF-08') !== false, 'منع (WF-08): تفويضٌ منتهٍ لا يولّد');
 
@@ -156,6 +161,7 @@ ok($mgrKnown !== null, 'resolveManager: مرؤوسٌ حقيقيٌّ يجد مد�
 ok(ems_resolve_verifier($conn, 881, $CO) !== null, 'resolveVerifier: قمة الهرم ترتد للحوكمة');
 $r5 = WI::create($conn, array('company_id' => $CO, 'source_type' => 'SRC-11', 'source_ref' => 'TST-WFM-SLA',
     'owner_user_id' => $OWNER, 'assigned_user_id' => $EXEC, 'org_unit_id' => 1,
+    'evidence_required' => 'x', 'verifier_user_id' => $VERIF,
     'title' => 'TST-WFM متأخرة', 'deliverable' => 'x', 'due_at' => date('Y-m-d H:i:s', time() - 3600), 'created_by' => $OWNER));
 $sla = WI::sweepSla($conn);
 $r = mysqli_query($conn, "SELECT status, escalation_level FROM work_items WHERE id = " . intval($r5['id']));

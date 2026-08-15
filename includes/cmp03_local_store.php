@@ -83,6 +83,18 @@ if (!function_exists('cmp03_store_insert')) {
     function cmp03_store_insert(mysqli $conn, $companyId, $canonical, array $payload, $status, $uid, $creatorName)
     {
         cmp03_store_notice('');
+        /* ══ INJ-0055 · INJ-0054 · INJ-0163 — الجسرُ إلى جدولِ المجال ══════════════
+             شاشةٌ لها جسرٌ **لا تكتب `scr_*` إطلاقًا**: تُحوَّل كتابتُها إلى جدولِ
+             مجالِها فيقرأها محرِّكُه (المسيّرُ · حصصُ الملكية). وهذا موضعُ التحويلِ
+             لأنَّه **البابُ الوحيد** — فيُصلَح المولِّدُ لا مُخرَجُه.
+           ◆ ونصُّ القبولِ في الثلاثة: «**وصفرُ صفٍّ جديدٍ في `scr_*`**». */
+        require_once __DIR__ . '/cmp03_domain_bridge.php';
+        $__bridged = cmp03_bridge_write($conn, $companyId, $canonical, $payload, $status, $uid);
+        if ($__bridged !== null) {
+            cmp03_store_notice($__bridged['msg']);
+            return (bool) $__bridged['ok'];
+        }
+
         $reg = cmp03_registry();
         if (!isset($reg[$canonical])) {
             error_log("cmp03_local_store: شاشة خارج السجل — {$canonical}");

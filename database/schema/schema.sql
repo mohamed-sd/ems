@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-15 16:40:11
+-- المصدر: equipation_manage · التوليد: 2026-08-15 18:30:07
 -- الجداول: 555 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -10528,8 +10528,13 @@ CREATE TABLE `scr_site_gate_equip` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `equipment_id` int(11) DEFAULT NULL COMMENT 'INJ-0370: مرجعُ المعدةِ من سجلِّ المعدات — لا نصٌّ حر',
+  `site_project_id` int(11) DEFAULT NULL COMMENT 'INJ-0370: مرجعُ الموقعِ من سجلِّ المشاريع/المواقع',
+  `approved_by_user` int(11) DEFAULT NULL COMMENT 'INJ-0370: هويةُ المعتمِدِ من الحسابِ لا من الكتابة',
   PRIMARY KEY (`id`),
-  KEY `ix_site_gate_equip_live` (`company_id`,`status`)
+  KEY `ix_site_gate_equip_live` (`company_id`,`status`),
+  KEY `ix_sge_eq` (`equipment_id`),
+  KEY `ix_sge_site` (`site_project_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة site_gate_equip.php';
 
 -- ── Table: scr_site_gate_person ──
