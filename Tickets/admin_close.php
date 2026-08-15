@@ -53,7 +53,21 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['aclose_tk']))
                 mysqli_query($conn, "INSERT IGNORE INTO ticket_watchers (company_id, ticket_id, user_id, role_id)
                     SELECT company_id, $dup, reporter_user_id, NULL FROM tickets WHERE id = $tid AND reporter_user_id IS NOT NULL");
             }
-            if ($ok1 && $ok2 && $ok3) { mysqli_commit($conn); $msg = "أُغلق #$tid إداريًّا بسببه" . ($dup ? " ومبلِّغُه متابعٌ للأصل #$dup" : ''); }
+            if ($ok1 && $ok2 && $ok3) {
+                mysqli_commit($conn);
+                /* ── INJ-0274 · الإغلاقُ الإداريُّ أثقلُ أفعالِ المركزِ فلا يمرُّ بلا أثر ──
+                     `ticket_events` سجلُّ **دورةِ البلاغ** يراه أطرافُه، وهذا سجلُّ
+                     **التدقيقِ الحوكميّ** يراه المراجع — ولكلٍّ قارئُه. فالقيمةُ
+                     «قبل» تحمل مرحلةَ البلاغِ الفعليةَ المقروءةَ من الصفِّ لا
+                     مفترَضةً، والفاعلُ بصفتِه. */
+                require_once __DIR__ . '/../includes/audit_trail.php';
+                ems_audit_change($conn, 'tickets', 'tickets', 'admin_close', (int) $tid,
+                    array('stage' => (string) $t['stage']),
+                    array('stage' => 'cancelled', 'reason' => mb_substr($why, 0, 200),
+                          'duplicate_of' => $dup > 0 ? (int) $dup : null),
+                    array('company_id' => (int) $company_id, 'user_id' => (int) $uid));
+                $msg = "أُغلق #$tid إداريًّا بسببه" . ($dup ? " ومبلِّغُه متابعٌ للأصل #$dup" : '');
+            }
             else { mysqli_rollback($conn); $msg = 'فشلت: ' . mysqli_error($conn); }
         }
     }

@@ -125,7 +125,7 @@ $BASE = 'http://localhost/ems';
      وفيها ما اسمُه يحمل المسارَ صراحةً (`Settings/modules.php`)، وفيها ما رابطُه
      **مجلدٌ** يقصد مجموعةَ شاشاتٍ («شاشاتُ الحوكمةِ العشرون»). فالحكمُ على
      المجموعةِ حكمٌ على أفرادِها حين يكون الإصلاحُ مركزيًّا. */
-$relOf = function ($url, $scr = '') use ($ROOT) {
+$relOf = function ($url, $scr = '', $hint = '') use ($ROOT) {
     /* ① الرابطُ يشير إلى ملفٍّ حيّ */
     if (preg_match('~localhost/ems/([A-Za-z0-9_/\-]+\.php)~', (string) $url, $m)
         && is_file($ROOT . '/' . $m[1])) { return $m[1]; }
@@ -144,6 +144,19 @@ $relOf = function ($url, $scr = '') use ($ROOT) {
     if ($folder === null && preg_match('~المجلد\s+([A-Za-z0-9_]+)/~u', (string) $scr, $m5)
         && is_dir($ROOT . '/' . $m5[1])) { $folder = $m5[1]; }
     if ($folder !== null) {
+        /* ◆ **الشاشةُ التي يسمّيها نصُّ البندِ أولًا** — لا أوّلُ ملفٍّ في المجلد.
+             وقع الخطأُ فعلًا: بندُ «نموذجِ الفحص» أُسند إلى `failure_report.php`
+             (تقريرٌ قارئٌ بلا أثر) فأُدين بغيابِ تدقيقٍ لا يلزمه أصلًا. */
+        $hay = (string) $scr . ' ' . (string) $hint;
+        $best = null;
+        foreach (glob($ROOT . '/' . $folder . '/*.php') as $g) {
+            $base = basename($g, '.php');
+            if ($base !== '' && stripos($hay, $base) !== false) {
+                $best = $folder . '/' . basename($g);
+                break;
+            }
+        }
+        if ($best !== null) { return $best; }
         foreach (glob($ROOT . '/' . $folder . '/*.php') as $g) {
             $cand = $folder . '/' . basename($g);
             $src = (string) @file_get_contents($g);
@@ -413,7 +426,7 @@ $clauseTot = 0; $clauseMeas = 0; $clausePass = 0;
 $byPat = array(); $byReason = array();
 
 foreach ($items as $id => $it) {
-    $rel = $relOf($it['url'], $it['scr']);
+    $rel = $relOf($it['url'], $it['scr'], $it['test'] . ' ' . $it['real']);
     $pat = $patternOf($it['test']);
     $cls = $clausesOf($it['test']);
     $byPat[$pat] = (isset($byPat[$pat]) ? $byPat[$pat] : 0) + 1;

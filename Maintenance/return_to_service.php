@@ -33,7 +33,23 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['rts_order']))
             mysqli_begin_transaction($conn);
             $ok1 = mysqli_query($conn, "UPDATE mnt_order SET state='Closed', updated_at=NOW() WHERE id=$oid");
             $ok2 = mysqli_query($conn, "UPDATE equipments SET status=1 WHERE id=" . intval($o['equipment_id']));
-            if ($ok1 && $ok2) { mysqli_commit($conn); $msg = "عادت المعدةُ للخدمة وأُقفل الأمرُ #$oid — الشهادة: $cert"; }
+            if ($ok1 && $ok2) {
+                mysqli_commit($conn);
+                /* ── INJ-0075 · عودةُ المعدةِ للخدمةِ فعلٌ يُراجَع ─────────────────────
+                     الإقفالُ يُعيد المعدةَ إلى الأسطولِ ويفتح بابَ تشغيلِها — فلا
+                     يقع بلا أثرٍ يحمل مَن أقفل ومتى وبأيِّ شهادةِ جاهزية.
+                     والكتابةُ هنا مباشرةٌ لا عبر بوابةِ المستأجرِ المُدقِّقة، فيُنادى
+                     الموصِّلُ صراحةً **بعد نجاحِ المعاملةِ** لا قبلَها، والمصدرُ
+                     مُضمَّنٌ عند موضعِ الاستعمال. */
+                require_once __DIR__ . '/../includes/audit_trail.php';
+                ems_audit_change($conn, 'maintenance', 'mnt_order', 'return_to_service', (int) $oid,
+                    array('state' => 'Done', 'equipment_status' => 0),
+                    array('state' => 'Closed', 'equipment_status' => 1,
+                          'readiness_note' => mb_substr($cert, 0, 200),
+                          'equipment_id' => (int) $o['equipment_id']),
+                    array('company_id' => (int) $company_id, 'user_id' => (int) $uid));
+                $msg = "عادت المعدةُ للخدمة وأُقفل الأمرُ #$oid — الشهادة: $cert";
+            }
             else { mysqli_rollback($conn); $msg = 'فشلت المعاملة: ' . mysqli_error($conn); }
         } else { $msg = 'الأمرُ ليس منجَزًا بانتظار العودة (409)'; }
     }
