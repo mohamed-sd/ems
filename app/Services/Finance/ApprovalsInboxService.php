@@ -16,9 +16,26 @@ class ApprovalsInboxService
      * كلُّ ما ينتظر قرارًا — من مصادره الأربعة الحية.
      * @return array{ok:bool,boxes:array,total:int}
      */
-    public static function inbox($conn, $companyId)
+    /**
+     * كلُّ ما ينتظر قرارًا — من مصادره الأربعة الحية.
+     *
+     * ── INJ-0202 · «من أنشأ لا يجد ما أنشأه في صندوقِ اعتمادِه» ────────────────
+     * كان الصندوقُ يعرض للجميعِ كلَّ ما ينتظر قرارًا — بما فيه ما رفعه القارئُ
+     * نفسُه. فيرى المرءُ طلبَه في صندوقِ اعتمادِه ويضغط «اعتماد»، ثم يردُّه
+     * حارسُ «من أنشأ لا يعتمد» في الشاشةِ الأخرى. وهو منعٌ متأخّرٌ: الصندوقُ
+     * وعدَ بما لا يجوز.
+     * فصار الصندوقُ **لا يعرض ما أنشأه القارئ** — والمنعُ يقع حيث يقع الوعد.
+     * ◆ ومعرِّفُ القارئِ اختياريّ: نداءٌ قديمٌ بلا وسيطٍ ثالثٍ يعمل كما كان
+     *   (لا كسرَ توافقٍ)، لكنّه يعرض الكلَّ — فالمستدعي هو من يقرّر.
+     *
+     * @return array{ok:bool,boxes:array,total:int}
+     */
+    public static function inbox($conn, $companyId, $viewerId = 0)
     {
         $co = (int) $companyId;
+        $me = (int) $viewerId;
+        /* شرطُ الاستثناءِ يُبنى مرةً ويُستعمل في كلِّ صندوقٍ له `created_by` */
+        $notMine = ($me > 0) ? " AND COALESCE(created_by, 0) <> {$me}" : '';
         $boxes = array();
 
         // ── ① الطلباتُ المالية — بانتظار مراجعةٍ أو اعتماد ───────────────────
@@ -27,6 +44,7 @@ class ApprovalsInboxService
                              FROM fin_requests
                             WHERE company_id={$co}
                               AND state IN ('submitted','under_review','pending_approval')
+                              {$notMine}
                             ORDER BY created_at LIMIT 50");
         while ($r && ($x = $r->fetch_assoc())) {
             $rows[] = array('label' => $x['request_no'] . ' — ' . $x['request_type']
@@ -42,6 +60,7 @@ class ApprovalsInboxService
         $r = $conn->query("SELECT id, settlement_no, party_ref, party_name, state, created_at
                              FROM settlements
                             WHERE company_id={$co} AND state IN ('draft','payment_requested')
+                              {$notMine}
                             ORDER BY created_at LIMIT 50");
         while ($r && ($x = $r->fetch_assoc())) {
             $rows[] = array('label' => ($x['settlement_no'] ?: ('تسوية #' . $x['id']))
@@ -57,6 +76,7 @@ class ApprovalsInboxService
         $r = $conn->query("SELECT id, entry_no, posting_date, state, memo
                              FROM fin_journal_entries
                             WHERE company_id={$co} AND state <> 'posted'
+                              {$notMine}
                             ORDER BY posting_date LIMIT 50");
         while ($r && ($x = $r->fetch_assoc())) {
             $rows[] = array('label' => ($x['entry_no'] ?: ('قيد #' . $x['id'])) . ' — '

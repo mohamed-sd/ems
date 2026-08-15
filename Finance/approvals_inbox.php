@@ -36,7 +36,9 @@ else {
 }
 if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا صلاحيةَ عرضٍ للصندوق الموحد ❌', 'GOV-PERM-403', ''); exit(); }
 
-$inbox = AIS::inbox($conn, $company_id);
+/* INJ-0202: القارئُ يُمرَّر — فلا يعرض له الصندوقُ ما أنشأه هو */
+$__viewer = intval($_SESSION['user']['id'] ?? 0);
+$inbox = AIS::inbox($conn, $company_id, $__viewer);
 
 $page_title = 'إيكوبيشن | صندوق الاعتمادات الموحد';
 // CM-00 (DEC-E · U10): بذرُ محاورِ الغلافِ من الخادم — AX-2/3 من محرك الصلاحيات
