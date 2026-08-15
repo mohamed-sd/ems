@@ -239,13 +239,10 @@ class RiskService
             return array('id' => 0, 'duplicates' => $dups, 'dedup_key' => $key,
                 'hint' => 'خطر بالمفتاح نفسه داخل النافذة — اربط الإشارة به أو أكد الإنشاء بقرار محلل مسبَّب');
         }
-        // الرمز التسلسلي RSK-000001 لكل شركة
-        $st = $db->prepare("SELECT COALESCE(MAX(CAST(SUBSTRING(risk_code, 5) AS UNSIGNED)), 0) + 1 nx FROM risk_register WHERE company_id = ?");
-        $st->bind_param('i', $companyId);
-        $st->execute();
-        $nx = (int) $st->get_result()->fetch_assoc()['nx'];
-        $st->close();
-        $code = 'RSK-' . str_pad($nx, 6, '0', STR_PAD_LEFT);
+        // الرمز التسلسلي RSK-000001 لكل شركة — بالمُرقِّمِ الواحدِ لا باستعلامٍ
+        // ثانٍ هنا (INJ-0631: النسخةُ المحليةُ كانت تقتطع بالموضعِ فتلتقط بادئةً
+        // غريبةً وتلفُّ إلى 1.8e19). الحسابُ والحراسةُ في nextCode وحدَها.
+        $code = self::nextCode($db, $companyId, 'risk_register', 'risk_code', 'RSK-', 6);
 
         $st = $db->prepare('INSERT INTO risk_register
             (company_id, risk_code, ru_id, title, description, scope_type, scope_ref_type, scope_ref_id,
@@ -589,12 +586,50 @@ class RiskService
      */
     public static function acceptRisk(\mysqli $db, $companyId, $riskId, $actorAuthority, $userId, $note = null, $analystReviewBy = null, $compensatingCtl = null)
     {
-        $st = $db->prepare('SELECT current_level, state FROM risk_register WHERE id = ? AND company_id = ?');
+        $st = $db->prepare('SELECT current_level, state, owner_unit_id, risk_owner_user_id
+                              FROM risk_register WHERE id = ? AND company_id = ?');
         $st->bind_param('ii', $riskId, $companyId);
         $st->execute();
         $risk = $st->get_result()->fetch_assoc();
         $st->close();
         if (!$risk) { throw new \RuntimeException('RSK-404: الخطر غير موجود'); }
+
+        /* ══ INJ-0110 · القبولُ حقُّ مالكِ الخطرِ لا حقُّ كلِّ ذي سلطة ══════════
+             نصُّ القبول: «بحساب دور ٢٥ أرسل `risk_accept` لخطرٍ `owner_unit_id=3`
+             (المالية): **يجب ٤٠٣ برمز `RSK-403-OWNER`**؛ وبحساب مالكِ الخطرِ
+             نفسِه: يجب ٢٠٠».
+             وكانت المصفوفةُ تفحص **السلطةَ** ولا تفحص **الملكية**: فمن يملك
+             سلطةَ «مالكِ خطر» يقبل خطرَ إدارةٍ أخرى — والقبولُ إقرارٌ بتحمّلِ
+             الأثر، ولا يتحمّله من لا يقع عليه.
+           ◆ **والرمزُ مميِّزٌ لا عامّ**: `RSK-403` وحدَه لا يفرّق بين خمسةِ
+             رفوضٍ في هذه الدالّة — والفاحصُ يحتاج أن يعرف **أيَّها وقع**.
+           ◆ ونوّابُ الرئيسِ والرئيسُ يعبرون: سلطتُهم فوق الوحدةِ لا داخلَها. */
+        $__ownerUnit = isset($risk['owner_unit_id']) ? (int) $risk['owner_unit_id'] : 0;
+        if ($__ownerUnit > 0 && !in_array((string) $actorAuthority, array('deputy', 'ceo'), true)) {
+            /* ◆ **ووحدةُ الفاعلِ تُشتقُّ من دورِه** بالدالّةِ القائمةِ في
+                 `Risk/_risk_common.php` — لا من عمودٍ في `users` (لا وجودَ له).
+                 فمصدرُ الوحدةِ واحدٌ للشاشةِ وللخدمة، ولا يتفرّقان. */
+            $__myUnit = 0;
+            $__rcp = dirname(dirname(dirname(__DIR__))) . '/Risk/_risk_common.php';
+            if (!function_exists('risk_role_org_unit') && is_file($__rcp)) { @include_once $__rcp; }
+            if (function_exists('risk_role_org_unit')) {
+                $__uq = $db->prepare('SELECT role FROM users WHERE id = ? LIMIT 1');
+                if ($__uq) {
+                    $__uid = (int) $userId;
+                    $__uq->bind_param('i', $__uid);
+                    if ($__uq->execute()) {
+                        $__ur = $__uq->get_result()->fetch_row();
+                        if ($__ur) { $__myUnit = (int) risk_role_org_unit((string) $__ur[0]); }
+                    }
+                    $__uq->close();
+                }
+            }
+            $__isOwner = ((int) ($risk['risk_owner_user_id'] ?? 0) === (int) $userId);
+            if (!$__isOwner && $__myUnit !== $__ownerUnit) {
+                throw new \RuntimeException('RSK-403-OWNER: الخطرُ مملوكٌ لوحدةٍ أخرى (#'
+                    . $__ownerUnit . ') — قبولُه إقرارٌ بتحمّلِ أثرِه، ولا يتحمّله من لا يقع عليه');
+            }
+        }
         $level = (string) $risk['current_level'];
         if ($level === '' || $level === null) { throw new \RuntimeException('RSK-409: لا قبول قبل تقييم متبقٍّ معتمد'); }
         if ($level === 'محظور') {
@@ -1061,21 +1096,73 @@ class RiskService
         return array('event' => $ev ? (int) $ev['id'] : 0);
     }
 
-    /** رمزٌ تسلسليٌّ لكل شركةٍ على جدولٍ وعمودٍ — نمطُ risk_code نفسُه معمَّمًا */
+    /** سعةُ أعمدةِ الرموزِ الأربعةِ جميعًا — `varchar(16)` (انظر CODE_TABLES) */
+    const CODE_LEN = 16;
+
+    /**
+     * جداولُ الترقيمِ المسموحة: الجدولُ ⇒ عمودُ رمزِه. قائمةُ سماحٍ صلبةٌ لأنَّ
+     * اسمَ الجدولِ والعمودِ يُركَّبان في نصِّ الاستعلامِ ولا يُربَطان.
+     */
+    const CODE_TABLES = array(
+        'risk_register'  => 'risk_code',
+        'risk_reviews'   => 'review_code',
+        'risk_incidents' => 'incident_code',
+        'risk_committee' => 'minute_code',
+    );
+
+    /**
+     * رمزٌ تسلسليٌّ لكل شركةٍ على جدولٍ وعمودٍ — **المُرقِّمُ الوحيدُ في الوحدة**.
+     * ═══════════════════════════════════════════════════════════════════════
+     * INJ-0631 · «المُرقِّمُ يقرأ نمطَه لا موضِعَه»
+     *
+     * كان الاقتطاعُ بالموضعِ `SUBSTRING(code, strlen(prefix)+1)` — يفترض أنَّ كلَّ
+     * صفٍّ في العمودِ يحمل البادئةَ المنتظَرة. فحين حملت صفوفٌ مبذورةٌ بادئةً
+     * أطولَ بحرفٍ (`RISK-00004` مقابل `RSK-`) عاد الاقتطاعُ بـ`'-00004'`،
+     * و**MariaDB تلفُّ السالبَ إلى مُتمِّمِه الموجب بتنبيهٍ 1105 لا بخطأ**:
+     *
+     *     CAST('-00004' AS UNSIGNED) = 18446744073709551612
+     *
+     * فيصير «التالي» ‏1.8e19 والرمزُ `RSK-9223372036854775807` — ثلاثةٌ وعشرون
+     * حرفًا في عمودٍ سعتُه ستةَ عشر. و`sql_mode` خالٍ في تركيبِ التشغيل، فالقاعدةُ
+     * **تبتر بصمتٍ**: أوّلُ إنشاءٍ ينجح برمزٍ مشوَّهٍ يُحفظ، وما بعده يصطدم
+     * بمفتاحِ التفرُّدِ فيُردُّ. عيبٌ لا يُعلن عن نفسِه في السطرِ الذي أنشأه.
+     *
+     * فالحكمُ هنا ثلاثيّ:
+     *   ① **النمطُ يرشِّح**: لا يدخل المتوسطَ إلا ما طابق `^PREFIX[0-9]+$` —
+     *      فالبادئةُ الغريبةُ تصير خاملةً بلا حاجةٍ إلى مسِّ صفوفِها.
+     *   ② **حدٌّ صريحٌ للرقم**: أيُّ لفٍّ مستقبليٍّ يُرمى ولا يُبنى عليه رمز.
+     *   ③ **الطولُ يُقاس قبلَ الإدراج**: فلا يبلغ القاعدةَ رمزٌ تبتره صامتةً.
+     *
+     * ولا نسخةَ ثانيةَ من هذا الحساب: `createRisk` تناديه ولا تكتب استعلامَها —
+     * فمُرقِّمان في ملفٍ واحدٍ يتفرَّقان بأوّلِ إصلاحٍ يصيب أحدَهما.
+     */
     public static function nextCode(\mysqli $db, $companyId, $table, $column, $prefix, $width)
     {
-        $allowed = array('risk_reviews' => 'review_code', 'risk_incidents' => 'incident_code', 'risk_committee' => 'minute_code');
-        if (!isset($allowed[$table]) || $allowed[$table] !== $column) {
+        if (!isset(self::CODE_TABLES[$table]) || self::CODE_TABLES[$table] !== $column) {
             throw new \RuntimeException('RSK-500: جدولٌ أو عمودٌ خارجَ قائمةِ الترقيم');
         }
+        // البادئةُ تُركَّب في نمطِ REGEXP — فتُحصر في حروفٍ لاتينيةٍ وشَرطةٍ ختامية
+        if (!preg_match('~^[A-Z]{2,8}-$~', (string) $prefix)) {
+            throw new \RuntimeException('RSK-500: بادئةُ ترقيمٍ غيرُ مقبولة: ' . $prefix);
+        }
         $len = strlen($prefix) + 1;
-        $sql = "SELECT COALESCE(MAX(CAST(SUBSTRING(`$column`, $len) AS UNSIGNED)), 0) + 1 nx FROM `$table` WHERE company_id = ?";
+        $sql = "SELECT COALESCE(MAX(CAST(SUBSTRING(`$column`, $len) AS UNSIGNED)), 0) + 1 nx
+                  FROM `$table`
+                 WHERE company_id = ? AND `$column` REGEXP ?";
+        $pattern = '^' . $prefix . '[0-9]+$';
         $st = $db->prepare($sql);
-        $st->bind_param('i', $companyId);
+        $st->bind_param('is', $companyId, $pattern);
         $st->execute();
         $nx = (int) $st->get_result()->fetch_assoc()['nx'];
         $st->close();
-        return $prefix . str_pad((string) $nx, $width, '0', STR_PAD_LEFT);
+        if ($nx < 1 || $nx > 99999999) {
+            throw new \RuntimeException('RSK-500: تسلسلُ ' . $table . ' خارجَ المدى (' . $nx . ') — لا يُبنى عليه رمز');
+        }
+        $code = $prefix . str_pad((string) $nx, $width, '0', STR_PAD_LEFT);
+        if (strlen($code) > self::CODE_LEN) {
+            throw new \RuntimeException('RSK-500: رمزٌ أطولُ من سعةِ العمود: ' . $code);
+        }
+        return $code;
     }
 
     /** الدمج بقرار المحلل (ورقة 32) — الصف المدموج يبقى أثرًا لا يُحذف */

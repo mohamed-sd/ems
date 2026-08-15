@@ -937,13 +937,24 @@ foreach ($items as $id => $it) {
             }
             /* ── شرطُ حارسِ مهامِّ الجدولة ───────────────────────────────────────── */
             if (preg_match($PAT['CRON_GUARD'], $c)) {
-                $cronFiles = glob($ROOT . '/*/cron_*.php');
+                $cronFiles = array();
+                foreach (glob($ROOT . '/*/cron_*.php') as $cf) {
+                    /* الحارسُ نفسُه ليس مهمةَ جدولة */
+                    if (strpos(strtr($cf, '\\', '/'), '/includes/') !== false) { continue; }
+                    $cronFiles[] = $cf;
+                }
                 $bare = array();
                 foreach ($cronFiles as $cf) {
                     $cs = (string) @file_get_contents($cf);
-                    /* حارسٌ مقبولٌ: CLI فقط · أو مفتاحٌ في الطلب */
-                    $has = (bool) preg_match("~php_sapi_name\(\)\s*!==\s*'cli'|PHP_SAPI\s*!==\s*'cli'"
-                        . '|CRON_KEY|cron_key|X-Cron~', $cs);
+                    /* ◆ **والحارسُ المشتركُ هو المقياس**: أوّلُ صياغةٍ قبلت أيَّ
+                         ذكرٍ لـCLI — و`if (!defined('EMS_CLI')) define('EMS_CLI', true);`
+                         يذكرها ولا يحرس: الملفُّ يُعرّف الشرطَ الذي يحرسه فيصدق
+                         دائمًا. فصفرٌ من ١٧ ملفًّا كان محروسًا وهي «تمرُّ». */
+                    $has = (bool) preg_match('~ems_cron_guard\(~', $cs);
+                    if (!$has) {
+                        $has = (bool) preg_match("~php_sapi_name\(\)\s*!==\s*'cli'|PHP_SAPI\s*!==\s*'cli'"
+                            . '|CRON_KEY|cron_key|X-Cron~', $cs);
+                    }
                     if (!$has) { $bare[] = basename($cf); }
                 }
                 $verdicts[] = empty($bare)

@@ -263,7 +263,14 @@ function ems_pg_text_rule($conn, $ROOT, $c, $rel)
                     if ($x[0] === 'valid_to' || $x[0] === 'expires_at') { $hasValidTo = true; }
                 }
                 $sweep = (string) @file_get_contents($ROOT . '/Governance/cron_permissions.php');
-                $sweeps = (bool) preg_match('~valid_to|expires_at|NOW\(\)~', $sweep);
+                $sweeps = (bool) preg_match('~valid_to|expires_at|NOW\(\)|expireSweep|expirySweep|Expired~', $sweep);
+                if (!$sweeps) {
+                    /* ◆ والكانسُ قد يكون **مُفوَّضًا لخدمة**: `cron_permissions`
+                         ينادي `ExceptionService::expireSweep` — فالبحثُ يتبع النداء. */
+                    foreach (glob($ROOT . '/app/Services/*/*.php') as $sf) {
+                        if (preg_match('~expireSweep|expirySweep~', (string) @file_get_contents($sf))) { $sweeps = true; break; }
+                    }
+                }
                 return ($hasTable && $hasValidTo && $sweeps)
                     ? array('pass', '**المنحُ محدودٌ بمدةٍ وكانسٌ يُسقطه** — والاستعمالُ يُحسب من السجل')
                     : array('fail', (!$hasTable ? 'لا جدولَ استثناءات' : (!$hasValidTo ? 'لا عمودَ مدة' : 'لا كانسَ يُسقط المنتهي')));

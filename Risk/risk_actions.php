@@ -529,6 +529,31 @@ try {
         case 'escalation_ack':
             if ($authority !== 'ceo' && !$canWrite) { throw new \RuntimeException('RSK-403'); }
             $eid = (int) $_POST['escalation_id'];
+            /* ══ INJ-0110 · الإقرارُ بقدرِ الجهةِ المُصعَّدِ إليها ═══════════════════
+                 نصُّ القبول: «بحساب دور ٢٩ أقِرَّ تصعيدًا `to_authority='ceo'`:
+                 **يجب ٤٠٣ `RSK-403-ACKAUTH`**».
+                 وكان الفحصُ على **الكتابةِ** لا على **الجهة**: فمحلّلُ المخاطرِ
+                 يُقرُّ تصعيدًا مرفوعًا إلى الرئيسِ التنفيذيّ، فيُطفأ الإنذارُ
+                 قبل أن يبلغ صاحبَه — وأخطرُ ما في التصعيدِ أن يُقفل بلا وصول.
+               ◆ **والرمزُ مميِّز**: `RSK-403` وحدَه لا يفرّق بين رفضِ الكتابةِ
+                 ورفضِ الجهة، والفاحصُ يحتاج أن يعرف أيُّهما وقع. */
+            $__toAuth = '';
+            $__aq = $conn->prepare('SELECT to_authority FROM risk_escalations WHERE id = ? AND company_id = ? LIMIT 1');
+            if ($__aq) {
+                $__aq->bind_param('ii', $eid, $company_id);
+                if ($__aq->execute()) {
+                    $__ar = $__aq->get_result()->fetch_row();
+                    if ($__ar) { $__toAuth = (string) $__ar[0]; }
+                }
+                $__aq->close();
+            }
+            $__rank = array('risk_owner' => 1, 'analyst' => 2, 'deputy' => 3, 'ceo' => 4);
+            $__need = isset($__rank[$__toAuth]) ? $__rank[$__toAuth] : 0;
+            $__have = isset($__rank[$authority]) ? $__rank[$authority] : 0;
+            if ($__need > 0 && $__have < $__need) {
+                throw new \RuntimeException('RSK-403-ACKAUTH: التصعيدُ مرفوعٌ إلى «' . $__toAuth
+                    . '» — ولا يُقرُّه من دونَه، فالإنذارُ لا يُطفأ قبل أن يبلغ صاحبَه');
+            }
             $st = $conn->prepare('UPDATE risk_escalations SET acknowledged_by = ?, acknowledged_at = NOW() WHERE id = ? AND company_id = ? AND acknowledged_at IS NULL');
             $st->bind_param('iii', $uid, $eid, $company_id);
             $st->execute();
