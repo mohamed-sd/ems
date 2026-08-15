@@ -34,6 +34,13 @@ if (!$is_super_admin && $company_id <= 0) {
 }
 
 $CANONICAL = 'supplier_bank.php';
+
+/* ── INJ-0159 · الأعمدةُ التي لا تعبر الشبكةَ بلا منحةٍ فردية ──────────────────
+     رقمُ الحسابِ والـIBAN بيانٌ يُمكّن من التحويلِ المالي — فهما أشدُّ ما في
+     الشاشة. والقرارُ يُفوَّض إلى آليةِ الظهورِ القائمةِ (`portal_elements` +
+     `visibility_keys`) لا إلى شرطٍ محليّ. */
+require_once __DIR__ . '/../includes/field_visibility.php';
+$SENSITIVE_COLS = array('رقم الحساب', 'IBAN');
 $COLS   = array (
   0 => 'رقم السجل',
   1 => 'المورد',
@@ -265,7 +272,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <?php else: foreach ($rows as $r): ?>
                 <tr<?php echo $r['is_seed'] ? ' data-seed="1"' : ''; ?>>
                     <?php foreach ($COLS as $c): $v = cmp03_cell($c, $r, $entityName); ?>
+                    <?php /* ── INJ-0159 · القيمةُ الحسّاسةُ لا تعبر الشبكةَ لمن لا يراها ──────
+                             نصُّ القبول: «المخوَّلُ يرى IBAN **مقنَّعًا إلا بمنحةٍ فردية**؛
+                             وكلُّ اطّلاعٍ يكتب صفًّا في سجل الاطّلاع». والتقنيعُ بأسلوبِ
+                             عرضٍ ليس منعًا: القيمةُ تبقى في المصدرِ وفي كلِّ تصدير.
+                             فالحجبُ **قبل الطباعة**، والاطّلاعُ المخوَّلُ يُسجَّل. */ ?>
+                    <?php if (in_array($c, $SENSITIVE_COLS, true)
+                              && !ems_may_see_field($conn, 'supplier.bank_account',
+                                    'supplier_bank:' . (int) $r['id'], 'Suppliers/supplier_bank.php')): ?>
+                    <td class="ems-field-withheld" title="محجوبٌ — يحتاج منحةً فردية">—</td>
+                    <?php else: ?>
                     <td<?php echo $v === '—' ? ' class="ems-gov-empty"' : ''; ?>><?php echo htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); ?></td>
+                    <?php endif; ?>
                     <?php endforeach; ?>
                 </tr>
             <?php endforeach; endif; ?>

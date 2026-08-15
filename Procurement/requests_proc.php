@@ -190,6 +190,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'e21_d
     if (in_array($decision, array('return', 'reject'), true) && $reason === '') {
         ems_gov_flash_redirect('requests_proc.php', 'الإعادةُ والرفضُ بسببٍ مكتوبٍ إلزامًا ❌', 'GOV-FAIL-409', ''); exit();
     }
+    /* ══ INJ-0089 · «فوقَ سقفِ المشترياتِ لا يُعتمد داخلَ الإدارة» ══════════════
+         نصُّ القبول: «طلبُ شراءٍ بقيمةٍ فوق سقفِ المشتريات **لا يمكن اعتمادُه
+         داخل الإدارة** ويظهر في صندوق اعتماد نائب المالية».
+         وقيمةُ الطلبِ ليست عمودًا فيه بل مجموعُ أسطرِه — فتُجمع من مصدرِها.
+         و`AuthorityGuard` يقرأ سقفَ المعتمِدِ من `signing_authorities`؛ فإن
+         تجاوزَه الطلبُ **لم يُعتمد هنا** بل رُفع صفًّا في صندوقِ الاعتمادِ الأعلى. */
+    if ($decision === 'approve') {
+        require_once __DIR__ . '/../app/Core/AuthorityGuard.php';
+        $__total = 0.0;
+        /* ◆ سطرُ الطلبِ لا يحمل سعرًا — السعرُ يأتي عند العرضِ والأمر. فقيمةُ
+             الطلبِ التقديريةُ = الكميةُ × **متوسطُ تكلفةِ الصنف** (`avg_cost`).
+             وصنفٌ بلا متوسطٍ يُحسب صفرًا فلا يرفع الطلبَ فوقَ سقفٍ بلا سند. */
+        $__q = $conn->prepare('SELECT COALESCE(SUM(l.qty * COALESCE(i.avg_cost, 0)), 0)
+                                 FROM proc_request_line l
+                                 LEFT JOIN proc_item i ON i.id = l.item_id
+                                WHERE l.request_id = ?');
+        if ($__q) {
+            $__q->bind_param('i', $rid);
+            $__q->execute();
+            $__x = $__q->get_result()->fetch_row();
+            $__q->close();
+            if ($__x) { $__total = (float) $__x[0]; }
+        }
+        $__ent = \App\Core\AuthorityGuard::tenantEntity($conn, $company_id);
+        if ($__ent && $__total > 0) {
+            $__sig = \App\Core\AuthorityGuard::sign($conn, array(
+                'document_type' => 'proc_request', 'document_id' => $rid, 'step' => 'approve',
+                'person_id' => (int) $current_user_id, 'company_id' => (int) $company_id,
+                'entity_id' => $__ent, 'amount' => $__total,
+                'created_by_person_id' => (int) $req['created_by'],
+            ));
+            if (empty($__sig['ok']) && (int) $__sig['code'] === 409) {
+                $__esc = $conn->prepare("INSERT INTO exec_approvals
+                    (company_id, request_no, received_date, doc_type, document, requesting_dept,
+                     raise_reason, amount, currency, status, source_kind, created_by, created_by_name)
+                    VALUES (?, ?, CURDATE(), 'طلب شراء', ?, 'المشتريات التشغيلية',
+                            ?, ?, 'USD', 'قيد المراجعة', 'escalation', ?, ?)");
+                if ($__esc) {
+                    $__rq = 'ESC-PR-' . $rid . '-' . date('ymdHis');
+                    $__doc = 'طلبُ شراءٍ ' . (string) ($req['code'] ?? ('#' . $rid));
+                    $__why = 'تجاوزُ سقفِ المشتريات — ' . $__sig['reason'];
+                    $__amt = (string) $__total;
+                    $__nm  = 'معتمِدُ المشتريات #' . (int) $current_user_id;
+                    $__uidI = (int) $current_user_id;
+                    $__esc->bind_param('sssssis', $__rq, $__doc, $__why, $__amt, $__uidI, $__nm);
+                    $__esc->execute();
+                    $__esc->close();
+                }
+                ems_gov_flash_redirect('requests_proc.php',
+                    'PROC-CAP-409: ' . $__sig['reason'] . ' — **رُفع الطلبُ إلى صندوقِ اعتمادِ نائبِ المالية** ⤴',
+                    'GOV-FAIL-409', 'الاعتمادُ داخلَ الإدارةِ لا يتجاوز سقفَها');
+                exit();
+            }
+        }
+    }
     $to = $decision === 'approve' ? 'اعتماد المشتريات'
         : ($decision === 'return' ? 'مسودة' : 'مرفوض');
     proc_gate(false)->update('proc_request', array('state' => $to,

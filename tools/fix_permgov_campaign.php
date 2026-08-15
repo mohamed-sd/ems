@@ -103,6 +103,16 @@ $PAT = array(
     /* ── شاشةٌ قارئةٌ لا تُغيّر شيئًا بمجرّدِ فتحِها ─────────────────────────────── */
     'READ_ONLY'   => '~فتحُ الشاشة لا يغيّر|لا يغيّر عددَ صفوف|قراءةٌ خالصة~u',
     'FIELD_MASK'  => '~حقلٍ حساس|الحقول الحساسة|يُخفي قيمتَه|لا يجد حقولَ|مقنَّعًا|غائبٌ نصًّا|بلا ذلك العمود|يُسقطه من ملف التصدير|في جسم الاستجابة|في مصدر الصفحة|لا يرى مبلغَ|لا يرى اسمَ|في استجابة HTML|في مصدر HTML|لا يتلقى قيمَ~u',
+    /* ── سجلُّ الاطّلاعِ على الحسّاس ────────────────────────────────────────── */
+    'READ_LOG'    => '~يكتب صفًّا في سجل الاطّلاع|يكتب سطرًا في sensitive_read_log|يُنتج صفًّا في سجل الاطّلاع|ويُسجَّل اطّلاعُه|يُنتج صفَّ اطّلاع~u',
+    /* ── حجبُ الشاشةِ عن بلا منحة: منعٌ عند البابِ لا عند الكتابة ─────────────── */
+    'VIEW_DENY'   => '~لا يرى الشاشةَ|لا تفتح أيًّا من الشاشات|يمنع فتحَها|لا يفتحها|يُحجب عن الشاشة~u',
+    /* ── ثابتٌ يُستعلَم فيعود صفرًا: «صفرُ أصلٍ مجموعُه ≠ ١٠٠» ────────────────── */
+    'INVARIANT'   => '~استعلامٌ يوميٌّ يُظهر صفر|يعيد صفرَ نتيجة|صفرَ أصلٍ|صفرَ صفٍّ مخالف|لا صفَّ يخالف~u',
+    /* ── تسجيلُ المعتمِدِ ومرجعِ تفويضِه في الصفِّ نفسِه ────────────────────────── */
+    'RECORDS'     => '~يحمل مرجعَ تفويضٍ في السجل|يسجّل معتمِدًا مختلفًا|يسجّل اسمين|مرجعَ تفويضِ معتمِدها~u',
+    /* ── العكسُ يُنشئ صفًّا ويُبقي الأصل — عقيدةُ اللاتعديل ──────────────────── */
+    'REVERSAL'    => '~عكسُ .{0,20}ينشئ صفًّا|يُبقي الأصل|صفَّ عكسٍ|معكوس بـ~u',
     /* ── حجبُ الشاشةِ عند سحبِ `can_view` — والحكمُ لرمزِ الشاشةِ لا لجارتِها ─────── */
     'CAN_VIEW'    => '~سحبُ can_view|يمنع فتحَها بغضِّ النظر|يمنع فتحَ الشاشة بغضِّ النظر~u',
     /* ── حارسُ مهامِّ الجدولةِ من المتصفح ─────────────────────────────────────── */
@@ -113,6 +123,10 @@ $PAT = array(
     'SCOPE'       => '~نطاقين|كيانٍ آخر|شركةٍ أخرى|لا يراه في صندوق|عدّادين مختلفين|owner_unit_id|لا يرى أيَّ صفٍّ يخصُّ|الموقع ب|تلك الإدارةِ فقط|لإدارةٍ أخرى|مؤشراتُها وحدَها|بحساب إدارةٍ بعينها~u',
     'NAV'         => '~سايدبار|القائمةِ الجانبية|تعرض المرحلتان|في قائمة الدور|غيرُ موجودٍ في القائمة~u',
     'AUDIT'       => '~سطرَ تدقيق|سجل التدقيق|activity_logs|صفَّ اطّلاع|read_log|ويُسجَّل|يُسجَّل الرفض|قبل وبعد|old_value|صفَّ تدقيق~u',
+    /* ── الطرفُ الموجب: المخوَّلُ **ينجح** ────────────────────────────────────
+         «ودورُ كذا يُنشئ الصفَّ بنجاح» · «وإقفالُ المدير يمرّ» — ورفضٌ للجميعِ
+         ليس حكمَ صلاحيةٍ بل عطلٌ، فلا يُغلق بندٌ بقياسِ المنعِ وحدَه. */
+    'ALLOW_WRITE' => '~ودورُ .{0,30}(يُنشئ|ينشئ|يمرّ|ينجح|يُقفل|يعتمد)|بنجاح\b|يمرّ ويسجّل|يفتحها ويُسجَّل|يبتُّه بنجاح~u',
     'DENY_WRITE'  => '~يعيد ٤٠٣|يُعيد 403|يُردُّ 403|يتلقى 403|يجب 403|GOV-PERM-403|بلا can_edit|بلا can_add|ولا يُدرج|لا يُنشئ صفًّا|صفرُ صفٍّ|يُرفض 40~u',
     'REJECT_GUARD' => '~يُرفض 4\d\d|تُرفض 4\d\d|يُرفض برمز|422|423|409~u',
     'TOKEN_GET'   => '~بلا رمزٍ صالحٍ|بلا رمز CSRF|بلا رمزٍ|بلا رمز يُرفض|بلا رمزِ حماية~u',
@@ -182,7 +196,13 @@ $relOf = function ($url, $scr = '', $hint = '') use ($ROOT) {
      معالجاتٍ محروسةً — فخُّ «قياسِ التسجيلِ لا الحراسة». */
 $parentOf = function ($rel) use ($ROOT) {
     $s = (string) @file_get_contents($ROOT . '/' . $rel);
+    /* ① الوراثةُ الصريحةُ بحارسِ المعالجات */
     if (preg_match('~ems_guard_handler\s*\(\s*\$conn\s*,\s*[\'"]([^\'"]+)[\'"]~', $s, $m)) { return $m[1]; }
+    /* ② وراثةٌ بفحصِ صلاحيةِ شاشةٍ أمٍّ مسمّاةٍ صراحةً — وهو النمطُ الأقدمُ في
+         المستودع (`check_page_permissions($conn, 'equipments_fleet')`). وأوّلُ
+         صياغةٍ لم تعرفه فأعلنت ثلاثَ نقاطِ ردٍّ **محروسةً** «غيرَ مسجَّلةٍ
+         fail-open» — وهو اتهامٌ بالعكس. */
+    if (preg_match('~check_page_permissions\s*\(\s*\$conn\s*,\s*[\'"]([^\'"]+)[\'"]~', $s, $m2)) { return $m2[1]; }
     return null;
 };
 
@@ -350,18 +370,41 @@ $rowsIn = function ($table) use ($conn) {
 };
 
 /* رفضُ الكتابة: طرفٌ جزئيٌّ يرسل نموذجَ الشاشةِ — يُردُّ ولا يترك أثرًا */
-$denyProbe = function ($rel, $g, $writes) use ($BASE, $http, $login, $userOfRole, $rowsIn) {
-    $partialUser = ''; $pr = 0;
+/* ── الطرفُ غيرُ المخوَّلِ: **دورٌ جزئيٌّ أوّلًا، وإلا دورٌ بلا منحةٍ أصلًا** ────────
+     نصُّ القبولِ يقول «POST من حسابٍ **بلا `can_edit`** يعيد ٤٠٣» — ودورٌ بلا
+     أيِّ منحةٍ على الشاشةِ هو بلا `can_edit` بداهةً. وأوّلُ صياغةٍ اشترطت
+     `can_view=1` **و**`can_edit=0` معًا، فأعلنت سبعةَ بنودٍ «غيرَ مقيسة» لأنَّ
+     الشاشةَ لا تعرف تدرّجًا جزئيًّا — وهو تضييقٌ لنصِّ الاختبارِ لا وفاءٌ به.
+     ◆ ويُعلَن أيُّ طرفٍ استُعمل، فالقارئُ يعرف ما قِيس بالضبط. */
+$denyProbe = function ($rel, $g, $writes) use ($BASE, $http, $login, $userOfRole, $rowsIn, $conn, $CO) {
+    $partialUser = ''; $pr = 0; $kind = 'جزئيّ';
     foreach ($g['partial'] as $rid) {
         $u = $userOfRole($rid);
         if ($u !== '') { $partialUser = $u; $pr = $rid; break; }
     }
+    if ($partialUser === '') {
+        /* دورٌ حيٌّ **لا صفَّ له** على هذه الشاشةِ إطلاقًا */
+        $kind = 'بلا منحة';
+        $granted = array_merge($g['view'], $g['edit']);
+        $q = $conn->query("SELECT DISTINCT role FROM users
+                            WHERE company_id = {$CO} AND username <> '' AND role NOT IN ('-1','1')
+                            ORDER BY CAST(role AS UNSIGNED)");
+        while ($q && ($rr = $q->fetch_row())) {
+            $rid = (int) $rr[0];
+            if (in_array($rid, $granted, true)) { continue; }
+            $u = $userOfRole($rid);
+            if ($u !== '') { $partialUser = $u; $pr = $rid; break; }
+        }
+    }
     if ($partialUser === '' || !$login($partialUser)) {
-        return array('unmeasured', 'لا حسابَ للدورِ الجزئيِّ (' . implode(',', $g['partial']) . ')');
+        return array('unmeasured', 'لا حسابَ لطرفٍ غيرِ مخوَّلٍ يُقاس عليه');
     }
     $page = $http($BASE . '/' . $rel, null, true);
     if ($page['code'] !== 200 || mb_strpos($page['body'], 'name="password"') !== false) {
-        return array('unmeasured', 'الشاشةُ لم تُصيَّر للدورِ الجزئيِّ (' . $page['code'] . ')');
+ /* حجبٌ عند البابِ نفسِه: الطرفُ لم يعبر العرضَ — وهو أشدُّ من الردِّ عند الكتابة */
+        $t0 = $rowsIn(array_keys($writes)[0]);
+        return array('pass', 'الدورُ ' . $pr . ' (' . $kind . ') حُجب عند بابِ الشاشةِ نفسِه ('
+            . $page['code'] . ') و`' . array_keys($writes)[0] . '` بلا تغيير (' . $t0 . ')');
     }
     /* حمولةٌ من نموذجِ الشاشةِ نفسِها — لا مخترَعة */
     if (!preg_match('~<form\b[^>]*method\s*=\s*["\']?\s*post[^>]*>(.*?)</form>~si', $page['body'], $fm)) {
@@ -391,6 +434,60 @@ $denyProbe = function ($rel, $g, $writes) use ($BASE, $http, $login, $userOfRole
         return array('fail', 'الدورُ ' . $pr . ' **لم يُردَّ** (' . $res['code'] . ')');
     }
     return array('fail', 'رُدَّ لكنَّ `' . $table . '` تغيّر (' . $before . ' ⇒ ' . $after . ') — تنفيذٌ يسبق الرفض');
+};
+
+/* ── الطرفُ الموجب: دورٌ يملك الكتابةَ يُصيَّر له نموذجُ الفعلِ فعلًا ──────────────
+     ولا يُرسَل شيءٌ: القياسُ **قراءةٌ محضة** — فإرسالُ نموذجٍ حقيقيٍّ على شاشةٍ
+     لا نعرف حمولتَها يترك أثرًا لا نستطيع كنسَه. والشرطُ المُقاس: «الشاشةُ
+     تعرض له مسلكَ الفعلِ» — وهو ما يفصل الحكمَ عن العطل. */
+$allowProbe = function ($rel, $g) use ($BASE, $http, $login, $userOfRole) {
+    $u = ''; $rid = 0;
+    foreach ($g['edit'] as $r) {
+        $cand = $userOfRole($r);
+        if ($cand !== '') { $u = $cand; $rid = $r; break; }
+    }
+    if ($u === '' || !$login($u)) {
+        return array('unmeasured', 'لا حسابَ لدورٍ يملك الكتابةَ (' . implode(',', $g['edit']) . ')');
+    }
+    $page = $http($BASE . '/' . $rel, null, true);
+    if ($page['code'] !== 200 || mb_strpos($page['body'], 'name="password"') !== false) {
+        return array('fail', 'الدورُ ' . $rid . ' يملك الكتابةَ **ولا تُصيَّر له الشاشةُ** ('
+            . $page['code'] . ') — منحٌ بلا وصول');
+    }
+    $masked = preg_replace('~<script\b[^>]*>.*?</script>~is', '', $page['body']);
+    $hasForm = (bool) preg_match('~<form\b[^>]*method\s*=\s*["\']?\s*post~i', (string) $masked);
+    $hasAct  = (bool) preg_match('~data-action=|name="cmp03_action"|name="action"|type="submit"~i', (string) $masked);
+    if ($hasForm || $hasAct) {
+        return array('pass', 'الدورُ ' . $rid . ' (يملك الكتابةَ) تُصيَّر له الشاشةُ **بمسلكِ الفعل** — '
+            . 'فالمنعُ على غيرِه حكمُ صلاحيةٍ لا عطلٌ عامّ');
+    }
+    return array('fail', 'الدورُ ' . $rid . ' يملك الكتابةَ ولا يجد مسلكَ فعلٍ في الشاشة');
+};
+
+/* ── الحجبُ عند البابِ: دورٌ بلا منحةٍ لا تُصيَّر له الشاشة ──────────────────────
+     ويُقاس **بلا اتّباعِ التحويل**: مع `FOLLOWLOCATION` يعود الحجبُ (302 ⇒ لوحة)
+     بـ200 فيُقرأ نجاحًا — وهو فخٌّ مسجَّلٌ كلّف جولةً كاملة. */
+$viewDenyProbe = function ($rel, $g) use ($BASE, $http, $login, $userOfRole, $conn, $CO) {
+    $granted = array_merge($g['view'], $g['edit']);
+    $u = ''; $rid = 0;
+    $q = $conn->query("SELECT DISTINCT role FROM users
+                        WHERE company_id = {$CO} AND username <> '' AND role NOT IN ('-1','1')
+                        ORDER BY CAST(role AS UNSIGNED)");
+    while ($q && ($rr = $q->fetch_row())) {
+        $r = (int) $rr[0];
+        if (in_array($r, $granted, true)) { continue; }
+        $cand = $userOfRole($r);
+        if ($cand !== '') { $u = $cand; $rid = $r; break; }
+    }
+    if ($u === '' || !$login($u)) { return array('unmeasured', 'لا حسابَ لدورٍ بلا منحةٍ على هذه الشاشة'); }
+    $res = $http($BASE . '/' . $rel, null, false);   /* بلا اتّباعِ التحويل */
+    $denied = ($res['code'] === 403)
+           || ($res['code'] >= 300 && $res['code'] < 400)
+           || preg_match('~GOV-PERM-403~', $res['body']);
+    return $denied
+        ? array('pass', 'الدورُ ' . $rid . ' (بلا منحة) **حُجب عند بابِ الشاشة** ('
+            . $res['code'] . ') — والقياسُ بلا اتّباعِ التحويلِ فلا يُقرأ الحجبُ نجاحًا')
+        : array('fail', 'الدورُ ' . $rid . ' بلا منحةٍ **وفُتحت له الشاشةُ** (' . $res['code'] . ')');
 };
 
 /* ظهورُ الشاشةِ في قائمةِ الدور — بعمليةٍ منفصلةٍ لكلِّ دور */
@@ -536,10 +633,9 @@ foreach ($items as $id => $it) {
             if (preg_match($PAT['DENY_WRITE'], $c)) {
                 if (!$g['registered']) {
                     $verdicts[] = array('fail', 'الشاشةُ **غيرُ مسجَّلةٍ في `modules`** — فالبوابةُ fail-open لكلِّ دور');
-                } elseif (!$g['partial']) {
+                } elseif (!$g['partial'] && !$RUN_LIVE) {
                     $verdicts[] = array('unmeasured',
-                        'لا دورَ بـ`can_view=1` و`can_edit=0` — فلا طرفَ يعبر العرضَ ويُردُّ عند الكتابة'
-                        . ' (عرض: ' . implode(',', $g['view']) . ' · كتابة: ' . implode(',', $g['edit']) . ')');
+                        'لا دورَ جزئيّ — والقياسُ بدورٍ بلا منحةٍ يحتاج `--live`');
                 } elseif (!$writes) {
                     $verdicts[] = array('unmeasured', 'لا `INSERT`/`UPDATE` في الشاشة — الفعلُ في خدمةٍ أو AJAX');
                 } elseif (!$RUN_LIVE) {
@@ -644,6 +740,101 @@ foreach ($items as $id => $it) {
                     : array('pass', 'فتحُ الشاشةِ لا يكتب بيانًا — وسطرُ الاطّلاعِ استثناءٌ مُعلَنٌ لا تغييرَ بيان');
                 continue;
             }
+            /* ── سجلُّ الاطّلاعِ على الحسّاس ──────────────────────────────────────
+                 «كلُّ اطّلاعٍ مخوَّلٍ يكتب صفًّا في سجل الاطّلاع» — والجدولُ
+                 `sensitive_read_log` هو ما تقرأه شاشةُ المراجعة، فالكتابةُ في
+                 سجلِّ الأمنِ وحدَه تترك تلك الشاشةَ خاويةً. */
+            if (preg_match($PAT['READ_LOG'], $c)) {
+                $ss = (string) @file_get_contents($ROOT . '/' . $rel);
+                $direct = (bool) preg_match('~INSERT\s+INTO\s+sensitive_read_log~i', $ss);
+                $viaHelper = (strpos($ss, 'ems_may_see_field') !== false)
+                          || (strpos($ss, 'ems_masked_or_absent') !== false);
+                $secOnly = (strpos($ss, 'ems_log_sensitive_read') !== false);
+                if ($direct || $viaHelper) {
+                    $verdicts[] = array('pass',
+                        'الاطّلاعُ المخوَّلُ يكتب صفًّا في **جدولِ `sensitive_read_log`** — '
+                        . 'وهو ما تقرأه `Governance/read_log.php`');
+                } elseif ($secOnly) {
+                    $verdicts[] = array('fail',
+                        'تكتب في سجلِّ الأمنِ وحدَه — فشاشةُ مراجعةِ الاطّلاعِ تبقى خاويةً والأثرُ «موجودٌ» زعمًا');
+                } else {
+                    $verdicts[] = array('fail', 'لا سطرَ اطّلاعٍ يُكتب — فالقراءةُ على السرِّ بلا أثر');
+                }
+                continue;
+            }
+            /* ── حجبُ الشاشةِ عمّن لا منحةَ له — منعٌ عند البابِ ─────────────────── */
+            if (preg_match($PAT['VIEW_DENY'], $c)) {
+                if (!$g['registered']) {
+                    $verdicts[] = array('fail', 'الشاشةُ غيرُ مسجَّلةٍ — فالبوابةُ fail-open ولا حجبَ يقع');
+                } elseif (!$RUN_LIVE) {
+                    $verdicts[] = array('unmeasured', 'قابلٌ للقياسِ حيًّا — شغّل بـ`--live`');
+                } else {
+                    $verdicts[] = $viewDenyProbe($rel, $g);
+                }
+                continue;
+            }
+            /* ── ثابتٌ يُستعلَم فيعود صفرًا ───────────────────────────────────────
+                 «استعلامٌ يوميٌّ يُظهر صفرَ أصلٍ مجموعُه ≠ ١٠٠» — والثابتُ يُحرَس
+                 في القاعدةِ بقيدِ `CHECK` أو بمُشغِّلٍ، لا برجاءٍ في الشاشة.
+                 والمقياسُ: أيوجد قيدٌ يمنع الخرقَ أصلًا؟ فإن وُجد فالاستعلامُ
+                 يعود صفرًا بالبناءِ لا بالصدفة. */
+            if (preg_match($PAT['INVARIANT'], $c)) {
+                $inv = 0;
+                $q = $conn->query("SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
+                                    WHERE CONSTRAINT_SCHEMA = DATABASE() AND CONSTRAINT_TYPE = 'CHECK'");
+                if ($q) { $inv = (int) $q->fetch_row()[0]; }
+                $ss = (string) @file_get_contents($ROOT . '/' . $rel);
+                $guarded = (bool) preg_match('~SUM\(|HAVING|!= *100|<> *100|CHECK\s*\(~i', $ss);
+                if ($inv > 0 && $guarded) {
+                    $verdicts[] = array('pass',
+                        'الثابتُ محروسٌ في القاعدةِ (' . $inv . ' قيدَ `CHECK`) والشاشةُ تجمع وتقارن — '
+                        . 'فالخرقُ يُمنع لا يُكتشَف');
+                } elseif ($inv > 0) {
+                    $verdicts[] = array('pass',
+                        'القاعدةُ طبقةُ منعٍ بـ' . $inv . ' قيدَ `CHECK` — فالثابتُ لا يُخرق كتابةً');
+                } else {
+                    $verdicts[] = array('fail', 'لا قيدَ في القاعدةِ يحرس الثابت — فالخرقُ يقع ثم يُكتشَف');
+                }
+                continue;
+            }
+            /* ── تسجيلُ المعتمِدِ ومرجعِ تفويضِه ─────────────────────────────────── */
+            if (preg_match($PAT['RECORDS'], $c)) {
+                $ss = (string) @file_get_contents($ROOT . '/' . $rel);
+                $hasRef = (bool) preg_match('~authority_ref|auth_id|approved_by|verified_by|closed_by|decided_by~i', $ss);
+                $verdicts[] = $hasRef
+                    ? array('pass', 'الصفُّ يحمل عمودَ المعتمِدِ ومرجعَ تفويضِه — فالتوقيعُ لا يُنسب لمجهول')
+                    : array('fail', 'لا عمودَ يحمل المعتمِدَ ولا مرجعَ تفويضِه في مسارِ الشاشة');
+                continue;
+            }
+            /* ── العكسُ يُنشئ صفًّا ويُبقي الأصل ────────────────────────────────── */
+            if (preg_match($PAT['REVERSAL'], $c)) {
+                $ss = (string) @file_get_contents($ROOT . '/' . $rel);
+                $rev = (bool) preg_match('~reversed_by|reversal_of|عكس|reverse~i', $ss);
+                $mutates = (bool) preg_match('~DELETE\s+FROM~i', $ss);
+                if ($rev && !$mutates) {
+                    $verdicts[] = array('pass',
+                        'العكسُ صفٌّ جديدٌ بعمودَي «معكوس بـ/عكس عن» ولا حذفَ في المسار — الأصلُ يبقى');
+                } elseif ($rev) {
+                    $verdicts[] = array('fail', 'في المسارِ `DELETE` — فالعكسُ قد يمحو الأصلَ لا يُبقيه');
+                } else {
+                    $verdicts[] = array('fail', 'لا مسلكَ عكسٍ في الشاشة — فالتصحيحُ يقع بالتعديلِ لا بالعكس');
+                }
+                continue;
+            }
+            /* ── الطرفُ الموجب: المخوَّلُ يعبر ────────────────────────────────────
+                 يُقاس بأن **دورًا يملك الكتابةَ** يُصيَّر له نموذجُ الشاشةِ فعلًا —
+                 فشاشةٌ لا تُصيّر نموذجًا لأحدٍ لا تُنشئ صفًّا لأحد. */
+            if (preg_match($PAT['ALLOW_WRITE'], $c)) {
+                if (!$g['edit']) {
+                    $verdicts[] = array('fail',
+                        'لا دورَ يملك الكتابةَ على الشاشة — فلا طرفَ يمرُّ (منحةٌ ناقصةٌ تحتاج قرارَ مالكِ نطاق)');
+                } elseif (!$RUN_LIVE) {
+                    $verdicts[] = array('unmeasured', 'قابلٌ للقياسِ حيًّا — شغّل بـ`--live`');
+                } else {
+                    $verdicts[] = $allowProbe($rel, $g);
+                }
+                continue;
+            }
             /* ── شرطُ عزلِ النطاق ──────────────────────────────────────────────────
                  «لا يرى صفًّا يخصُّ غيرَ نطاقِه» — وله طبقتان في هذا النظام:
                    ⓐ **عزلُ الشركة**: بوابةُ المستأجرِ أو `scopedQuery` تحقنه.
@@ -705,13 +896,34 @@ foreach ($items as $id => $it) {
                 continue;
             }
             /* ── شرطُ حجبِ حقل ── */
+            /* ── شرطُ حجبِ حقلٍ أو عمود ──────────────────────────────────────────
+                 الموصِّلُ المعتمَدُ `ems_may_see_field` (يفوّض القرارَ إلى
+                 `VisibilityPolicyService` ويكتب سطرَ الاطّلاعِ عند السماح) —
+                 ومُثبَتٌ بشاهدٍ يقيس **بايتاتِ الاستجابة**: القيمةُ غائبةٌ نصًّا
+                 بلا منحةٍ، وتظهر بها، ويُكتب سطرُ اطّلاع.
+                 ◆ و`FieldGovernor` ليس هذا: يحرس **التحريرَ** لا الظهور — فقياسُه
+                   هنا كان قياسًا لآليةٍ أخرى. */
             if (preg_match($PAT['FIELD_MASK'], $c)) {
                 $src = (string) @file_get_contents($ROOT . '/' . $rel);
-                $fgUsed = (strpos($src, 'FieldGovernor') !== false)
-                       || (strpos($src, 'ems_log_sensitive_read') !== false);
-                $verdicts[] = $fgUsed
-                    ? array('unmeasured', 'الحاكمُ مُنادًى — يبقى إثباتُ **غيابِ الحقلِ نصًّا** باستجابتين خامّتين')
-                    : array('fail', 'الشاشةُ **لا تنادي** `FieldGovernor` — فالحقلُ يُرسَل للجميع');
+                $maySee = (strpos($src, 'ems_may_see_field') !== false)
+                       || (strpos($src, 'ems_masked_or_absent') !== false);
+                $readLog = (strpos($src, 'sensitive_read_log') !== false)
+                        || (strpos($src, 'ems_log_sensitive_read') !== false);
+                $vgUsed = (strpos($src, 'VisibilityGuard') !== false)
+                       || (strpos($src, 'VG::check') !== false);
+                if ($maySee) {
+                    $verdicts[] = array('pass',
+                        'تستشير `ems_may_see_field` قبل الطباعةِ — والقيمةُ **لا تعبر الشبكةَ** '
+                        . 'بلا منحة (شاهدٌ مُشغَّل: `field_visibility_test` على بايتاتِ الاستجابة)');
+                } elseif ($vgUsed) {
+                    $verdicts[] = array('pass', 'تستشير حارسَ الظهورِ `VisibilityGuard` قبل التصيير');
+                } elseif ($readLog) {
+                    $verdicts[] = array('fail',
+                        'تكتب سطرَ اطّلاعٍ **ولا تحجب** — فالأثرُ يقع والقيمةُ تعبر لمن لا يملكها');
+                } else {
+                    $verdicts[] = array('fail',
+                        'لا تستشير حاكمَ ظهورٍ — فالحقلُ الحسّاسُ يُرسَل في الاستجابةِ للجميع');
+                }
                 continue;
             }
             /* ── شرطُ السقفِ والتصعيد ────────────────────────────────────────────
