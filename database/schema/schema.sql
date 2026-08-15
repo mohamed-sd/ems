@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-16 10:39:14
+-- المصدر: equipation_manage · التوليد: 2026-08-15 23:39:57
 -- الجداول: 555 · المناظير: 7
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -11114,13 +11114,23 @@ CREATE TABLE `settlements` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `client_executed_hours` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'منفَّذةُ العميلِ المعتمدة — مدخلُ F-07',
+  `adj_work_added` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'تسوية①: عملٌ مضاف',
+  `adj_breakdown_added` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'تسوية②: تعطلٌ مضاف',
+  `adj_standby_added` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'تسوية③: استعدادٌ مضاف',
+  `adj_deducted` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'تسوية④: خصم',
+  `adj_doc_ref` varchar(190) DEFAULT NULL COMMENT 'مستندُ التسوية — إلزاميٌّ متى كانت Σ التسويات ≠ 0 (CK-06)',
+  `supplier_executed_hours` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'F-07 محسوبٌ بقادحٍ — لا يُدخَل',
+  `client_settled_hours` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'المحصَّلةُ من العميل — مدخلُ F-08',
+  `borne_by_treasury` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'F-08 المتحمَّلُ من الخزينة — مقياسُ الخسارةِ المباشرة، محسوبٌ بقادح',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_settlement_no` (`company_id`,`settlement_no`),
   UNIQUE KEY `uq_settlement_party_period` (`company_id`,`party_type`,`party_ref`,`period_from`,`period_to`) COMMENT 'تسويةٌ واحدةٌ لكل (طرف × فترة) — إعادةُ التوليد ترجع 409 بمرجع القائم (§15.4)',
   KEY `ix_settlement_state` (`state`),
   KEY `ix_settlement_party` (`party_type`,`party_ref`),
   KEY `ix_settlement_invoice` (`company_id`,`party_ref`,`invoice_no`),
-  CONSTRAINT `ck_settlement_invoice_diff` CHECK (`invoice_diff` is null or abs(`invoice_diff`) < 0.005 or `invoice_diff_reason` is not null and char_length(trim(`invoice_diff_reason`)) > 0 and `invoice_diff_doc_ref` is not null and char_length(trim(`invoice_diff_doc_ref`)) > 0)
+  CONSTRAINT `ck_settlement_invoice_diff` CHECK (`invoice_diff` is null or abs(`invoice_diff`) < 0.005 or `invoice_diff_reason` is not null and char_length(trim(`invoice_diff_reason`)) > 0 and `invoice_diff_doc_ref` is not null and char_length(trim(`invoice_diff_doc_ref`)) > 0),
+  CONSTRAINT `chk_settle_adj_doc` CHECK (`adj_work_added` + `adj_breakdown_added` + `adj_standby_added` + `adj_deducted` = 0 or `adj_doc_ref` is not null and `adj_doc_ref` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: shift_patterns ──

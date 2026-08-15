@@ -65,11 +65,14 @@ $CHECKS = array(
           WHERE container_id IS NULL OR to_container_id IS NULL OR effective_from IS NULL",
         'container_swaps بدل sup_handover_events'),
 
-    array('CK-06', 'صفرُ تسويةٍ بفارقِ فاتورةٍ بلا مستند',
+    array('CK-06', 'صفرُ تسويةٍ بلا مستند (التسوياتُ الأربعُ + فارقُ الفاتورة)',
         "SELECT COUNT(*) FROM settlements
-          WHERE is_deleted = 0 AND COALESCE(invoice_diff,0) <> 0
-            AND (invoice_diff_doc_ref IS NULL OR invoice_diff_doc_ref = '')",
-        'settlements بدل sup_settlements'),
+          WHERE is_deleted = 0 AND (
+                ((adj_work_added + adj_breakdown_added + adj_standby_added + adj_deducted) <> 0
+                 AND (adj_doc_ref IS NULL OR adj_doc_ref = ''))
+             OR (COALESCE(invoice_diff,0) <> 0
+                 AND (invoice_diff_doc_ref IS NULL OR invoice_diff_doc_ref = '')))",
+        'settlements — نصُّ TSP-0134 حرفًا بعد إضافةِ أعمدةِ التسوياتِ الأربع (2027_05_04) + فارقُ الفاتورةِ القائم'),
 
     array('CK-07', 'صفرُ فعلٍ غيرِ مسجَّلٍ في القاموس',
         "SELECT COUNT(*) FROM (

@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-16 10:39:14
+-- المصدر: equipation_manage · التوليد: 2026-08-15 23:39:57
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -523,7 +523,8 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (475,'مؤشرات البلاغات','Tickets/ticket_kpi.php',24,NULL,1,0,'fa fa-chart-simple',704),
 (476,'بلاغاتي','Tickets/my_tickets.php',24,NULL,1,0,'fa fa-inbox',705),
 (477,'سجل الأمان','Governance/security_log.php',15,NULL,1,0,'fa fa-shield-halved',247),
-(478,'قيدُ الوردية اليومي','Operations/shift_entry.php',6,NULL,1,0,'fa fa-circle-dot',100);
+(478,'قيدُ الوردية اليومي','Operations/shift_entry.php',6,NULL,1,0,'fa fa-circle-dot',100),
+(479,'تسليمُ الحصص بين الموردين','Suppliers/sup_handover.php',2,NULL,1,0,'fa fa-right-left',100);
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -3165,7 +3166,10 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2973,16,192,1,0,0,0),
 (2974,6,478,1,1,1,0),
 (2975,7,478,1,0,0,0),
-(2976,27,478,1,0,0,0);
+(2976,27,478,1,0,0,0),
+(2977,2,479,1,1,1,0),
+(2978,1,479,1,0,0,0),
+(2979,8,479,1,0,0,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -4312,7 +4316,8 @@ INSERT INTO `link_groups` (`id`, `name`, `group_code`, `owner_role_id`, `icon`, 
 (3935,'أخرى — للمراجعة','n9s99_others_r9',9,'fa fa-box-archive',9900,99,'خارج الوثيقة — بانتظار قرار المالك',1),
 (3936,'التقارير والتصدير','n9o_reports_r9',9,'fa fa-file-lines',800,8,'ثامنًا: التقارير والتصدير',1),
 (3937,'— بقرار المالك','n9o_19_10',19,'fa fa-list-check',810,10,'صندوقُ الموافقات',1),
-(3938,'القيد اليومي','n9o_site_shift_r6',6,'fa fa-clock',414,4,'رابعًا: تسجيل عمل اليوم',1);
+(3938,'القيد اليومي','n9o_site_shift_r6',6,'fa fa-clock',414,4,'رابعًا: تسجيل عمل اليوم',1),
+(3939,'تسليمُ الحصص','n9o_sup_handover_r2',2,'fa fa-right-left',416,4,'رابعًا: توزيع الحصة على معداته',1);
 
 -- ── nav_items ──
 DELETE FROM `nav_items`;
@@ -5884,7 +5889,8 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (7327,15,'DAILY',3845,477,'سجل الأمان','Governance/security_log.php','fa fa-shield-halved',2,NULL,'Governance/security_log.php',1,'2026-08-15 08:48:33','2026-08-15 08:48:33'),
 (7330,1,'DAILY',3856,205,'تصنيف قواعد المنع','Settings/guard_classification.php','fa fa-shield-halved',950,NULL,'Settings/guard_classification.php',1,'2026-08-15 09:36:41','2026-08-15 09:36:41'),
 (7331,19,'DAILY',3937,205,'تصنيف قواعد المنع','Settings/guard_classification.php','fa fa-shield-halved',950,NULL,'Settings/guard_classification.php',1,'2026-08-15 09:36:41','2026-08-15 09:36:41'),
-(7388,6,'DAILY',3938,478,'قيدُ الوردية اليومي','Operations/shift_entry.php','fa fa-clock',1,NULL,'Operations/shift_entry.php',1,'2026-08-16 02:30:21','2026-08-16 02:30:21');
+(7388,6,'DAILY',3938,478,'قيدُ الوردية اليومي','Operations/shift_entry.php','fa fa-clock',1,NULL,'Operations/shift_entry.php',1,'2026-08-16 02:30:21','2026-08-16 02:30:21'),
+(7389,2,'DAILY',3939,479,'تسليمُ الحصص بين الموردين','Suppliers/sup_handover.php','fa fa-right-left',1,NULL,'Suppliers/sup_handover.php',1,'2026-08-15 23:36:16','2026-08-15 23:36:16');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;
