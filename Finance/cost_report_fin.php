@@ -43,10 +43,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cost_type'])) {
     $revenue    = ($_POST['revenue'] ?? '') === '' ? null : round(floatval($_POST['revenue']), 2);
     if (!isset($cost_types[$cost_type]) || $total_cost < 0) { ems_gov_flash_redirect('cost_report_fin.php', 'بيانات غير صحيحة ❌', 'GOV-REF-404', ''); exit(); }
 
+    /* ══ INJ-0179 · «سجلُّ التكلفةِ أثرُ حدثٍ لا رقمٌ يُكتب» ═══════════════════════
+         نصُّ القبول شقّان:
+           ① «حفظُ سجلِّ تكلفةٍ **بلا حدثٍ مصدرٍ** يُرفض 422».
+           ② «وحقلُ **الإيراد غيرُ قابلٍ للإدخال** في هذه الشاشة ويُقرأ من مصدره».
+         والمقيسُ قبلَه: `event_id` عمودٌ في الجدولِ **لا يُملأ أبدًا**، والإيرادُ
+         حقلٌ مفتوحٌ في النموذج — فيُكتب ربحٌ بلا واقعةٍ تُسنده. */
+    $source_event = intval($_POST['event_id'] ?? 0);
+    if ($source_event <= 0) {
+        ems_gov_flash_redirect('cost_report_fin.php',
+            '422 لا سجلَّ تكلفةٍ بلا حدثٍ مصدرٍ — اختر الحدثَ الماليَّ الذي نشأت عنه',
+            'GOV-REF-422', 'التكلفةُ أثرُ واقعةٍ لا رقمٌ يُدخَل');
+        exit();
+    }
+    $__ev = $conn->prepare('SELECT id FROM fin_financial_events WHERE id = ? AND company_id = ? LIMIT 1');
+    $__evOk = false;
+    if ($__ev) {
+        $__ev->bind_param('ii', $source_event, $company_id);
+        $__ev->execute();
+        $__evOk = (bool) $__ev->get_result()->fetch_row();
+        $__ev->close();
+    }
+    if (!$__evOk) {
+        ems_gov_flash_redirect('cost_report_fin.php',
+            '422 الحدثُ #' . $source_event . ' غيرُ موجودٍ في نطاقِ شركتك',
+            'GOV-REF-422', '');
+        exit();
+    }
+    /* ② الإيرادُ **يُقرأ من مصدرِه** لا من النموذج — والمصدرُ هو مبلغُ الحدثِ
+         حين يكون نوعُه إيرادًا، وإلا فلا إيرادَ مقابلٌ لهذا السجل. */
+    $revenue = null;
+    /* ◆ العمودُ `event_type` لا `effect_type` — سُئلت البنيةُ ولم تُفترَض؛
+         وقيمُه الحيّةُ: revenue · expense · payroll · enterprise. */
+    $__rv = $conn->prepare("SELECT amount FROM fin_financial_events
+                             WHERE id = ? AND company_id = ? AND event_type = 'revenue' LIMIT 1");
+    if ($__rv) {
+        $__rv->bind_param('ii', $source_event, $company_id);
+        $__rv->execute();
+        $__rr = $__rv->get_result()->fetch_row();
+        $__rv->close();
+        if ($__rr) { $revenue = round((float) $__rr[0], 2); }
+    }
+
+    /* ══ INJ-0180 · ولا كتابةَ ماليةً في فترةٍ مقفلة ═════════════════════════ */
+    require_once __DIR__ . '/../includes/period_guard.php';
+    $__pd = ems_period_check($conn, (int) $company_id, date('Y-m-d'));
+    if (empty($__pd['ok'])) {
+        ems_gov_flash_redirect('cost_report_fin.php', $__pd['reason'], 'GOV-PERIOD-423', '');
+        exit();
+    }
+
     fin_gate($is_super_admin)->insert('fin_cost_records', array(
         'cost_type' => $cost_type, 'equipment_id' => $equip_id, 'project_id' => $project_id,
         'period_ref' => date('Y-m'), 'qty' => $qty, 'unit' => $unit, 'unit_cost' => $unit_cost,
-        'total_cost' => $total_cost, 'revenue' => $revenue, 'created_by' => $current_user_id,
+        'total_cost' => $total_cost, 'revenue' => $revenue, 'event_id' => $source_event,
+        'created_by' => $current_user_id,
     ));
     ems_gov_flash_redirect('cost_report_fin.php', 'تمت إضافة سجلّ التكلفة ✅', 'GOV-OK-200', ''); exit();
 }
@@ -81,7 +132,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_363_5913a">الوحدة</label><input type="text" name="unit" placeholder="ساعة/طن/لتر" id="emsf_363_5913a"></div>
             <div class="form-group"><label for="emsf_364_a2d3c">تكلفة الوحدة</label><input type="number" step="0.0001" name="unit_cost" id="emsf_364_a2d3c"></div>
             <div class="form-group"><label for="emsf_365_947f3">إجمالي التكلفة <span class="required">*</span></label><input type="number" step="0.01" min="0" name="total_cost" required id="emsf_365_947f3"></div>
-            <div class="form-group"><label for="emsf_366_8d8fe">الإيراد المقابل</label><input type="number" step="0.01" name="revenue" id="emsf_366_8d8fe"></div>
+            <?php /* INJ-0179: الحدثُ المصدرُ إلزاميٌّ — والتكلفةُ أثرُه لا رقمٌ حر */ ?>
+            <div class="form-group"><label for="emsf_ev_src">الحدث المالي المصدر <span class="required">*</span></label>
+                <select name="event_id" id="emsf_ev_src" required>
+                    <option value="">— اختر الحدث —</option>
+                    <?php
+                    $__evq = $conn->query("SELECT id, event_type, amount, currency, source_ref
+                                             FROM fin_financial_events
+                                            WHERE company_id = " . (int) $company_id . "
+                                            ORDER BY id DESC LIMIT 200");
+                    while ($__evq && ($__e = $__evq->fetch_assoc())) {
+                        echo '<option value="' . (int) $__e['id'] . '">#' . (int) $__e['id'] . ' — '
+                           . htmlspecialchars((string) $__e['event_type']) . ' · '
+                           . htmlspecialchars((string) $__e['amount']) . ' '
+                           . htmlspecialchars((string) $__e['currency'])
+                           . (($__e['source_ref'] ?? '') !== '' ? ' · ' . htmlspecialchars((string) $__e['source_ref']) : '')
+                           . '</option>';
+                    }
+                    ?>
+                </select>
+            </div>
+            <?php /* والإيرادُ **يُقرأ من مصدرِه** — لا حقلَ إدخالٍ له في هذه الشاشة */ ?>
+            <div class="form-group"><label>الإيراد المقابل</label>
+                <div class="ems-readonly-value"><small class="text-muted">يُقرأ من الحدثِ المصدرِ عند الحفظ — لا يُدخَل هنا</small></div>
+            </div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-secondary" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>

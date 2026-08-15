@@ -172,6 +172,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_type'])) {
     }
     if (!in_array($currency, $currencies, true)) { $currency = 'SDG'; }
 
+    /* ══ INJ-0176 · لا حدثَ ماليَّ على واقعةٍ لا وجودَ لها ══════════════════════
+         كان `source_ref` نصًّا حرًّا لا يُتحقَّق منه، فيُفتح حدثٌ على أمرِ صيانةٍ
+         أو ورديةٍ **غيرِ موجودة**، ثم تُبنى عليه مروحةُ الأثرِ والقيدُ والذمّة.
+         والمرجعُ الآن **يُحَلُّ إلى صفٍّ قائمٍ في جدولِ إدارتِه** وإلا رُدَّ 422
+         ولم يُنشأ صفّ. (وإدارةٌ بلا جدولٍ مُعرَّفٍ تُعلَن ولا تُمنع — فمنعُ ما لا
+         نملك جدولَه يوقف عملًا مشروعًا.) */
+    require_once __DIR__ . '/../includes/fin_event_source_guard.php';
+    $__es = ems_fin_event_resolve_source($conn, (int) $company_id, $source_module, $source_ref);
+    if (empty($__es['ok'])) {
+        ems_gov_flash_redirect('events_list_fin.php', $__es['reason'], 'GOV-REF-422',
+            'اختر مرجعًا يقابله صفٌّ في إدارةِ المصدر');
+        exit();
+    }
+
+    /* ══ INJ-0180 · ولا كتابةَ ماليةً في فترةٍ مقفلة ═════════════════════════ */
+    require_once __DIR__ . '/../includes/period_guard.php';
+    $__pd = ems_period_check($conn, (int) $company_id, date('Y-m-d'));
+    if (empty($__pd['ok'])) {
+        ems_gov_flash_redirect('events_list_fin.php', $__pd['reason'], 'GOV-PERIOD-423',
+            'تُفتح الفترةُ استثنائيًّا من شاشة إقفال الفترات بقرارٍ موثَّق');
+        exit();
+    }
+
     if ($is_editing) {
         // A0 · عبر البوابة المحصَّنة (§12): تعديل حدثٍ منشورٍ على الناقل مرفوض؛
         // القيود اليدوية تُعدَّل كالمعتاد. سعة السوبر محفوظة بforAllTenants.

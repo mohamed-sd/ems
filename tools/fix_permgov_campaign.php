@@ -666,7 +666,15 @@ foreach ($items as $id => $it) {
                         ? array('pass', 'تنادي `ems_period_check` — والكتابةُ في فترةٍ مقفلةٍ تُردُّ 423')
                         : array('fail', 'لا تنادي `includes/period_guard.php` — فالكتابةُ في فترةٍ مقفلةٍ تمرّ');
                 } elseif ($isSource) {
-                    $hasGuard = (bool) preg_match('~receivable_source_guard|ems_receivable_resolve_source~', $rs);
+                    /* ثلاثةُ حرّاسِ مصدرٍ مشروعةٍ لا واحد — ولكلٍّ نطاقُه:
+                         الذمّةُ ⇐ `receivable_source_guard` · الحدثُ الماليُّ ⇐
+                         `fin_event_source_guard` · وسجلُّ التكلفةِ يُحَلُّ إلى
+                         `fin_financial_events` مباشرةً. وأوّلُ صياغةٍ عرفت الأوّلَ
+                         وحدَه فأدانت شاشاتٍ تحرس بالثاني والثالث. */
+                    $hasGuard = (bool) preg_match(
+                        '~receivable_source_guard|ems_receivable_resolve_source'
+                        . '|fin_event_source_guard|ems_fin_event_resolve_source'
+                        . '|FROM fin_financial_events\s+WHERE id = \?~', $rs);
                     /* والقيدُ في القاعدةِ — الطرفُ الثاني من «الوصلِ في موضعين» */
                     $hasCheck = false;
                     $chk = $conn->query("SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS

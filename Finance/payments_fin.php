@@ -140,6 +140,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
     $memo       = trim($_POST['memo'] ?? '');
     if ($amount <= 0) { ems_gov_flash_redirect('payments_fin.php', 'المبلغ غير صحيح ❌', 'GOV-REF-404', ''); exit(); }
 
+    /* ══ INJ-0180 · لا كتابةَ ماليةً في فترةٍ مقفلة (423) ══════════════════════
+         نصُّ القبول: «كلُّ محاولةِ كتابةٍ ماليةٍ بتاريخٍ في فترةٍ مقفلةٍ تُرفض 423
+         برسالةٍ **تسمّي الفترةَ والسبب**، من كلِّ شاشاتِ المالية». والحارسُ
+         `includes/period_guard.php` مبنيٌّ ويعطي الرسالةَ المسمّاة — وهذه الشاشةُ
+         لم تكن تناديه، فتُكتب حركةُ خزينةٍ في شهرٍ مُقفَل. */
+    require_once __DIR__ . '/../includes/period_guard.php';
+    $__pd = ems_period_check($conn, (int) $company_id, date('Y-m-d'));
+    if (empty($__pd['ok'])) {
+        ems_gov_flash_redirect('payments_fin.php', $__pd['reason'], 'GOV-PERIOD-423',
+            'تُفتح الفترةُ استثنائيًّا من شاشة إقفال الفترات بقرارٍ موثَّق');
+        exit();
+    }
+
+    /* ══ INJ-0178 · «المالُ أثرٌ لا مصدر» — لا صرفَ بلا مستندٍ ══════════════════
+         نصُّ القبول: «حفظُ حركةِ صرفٍ **بلا مستندِ التزامٍ أو ذمّةٍ معتمدةٍ** يُرفض
+         422». وكان `receivable_id` اختياريًّا تمامًا: تُصرَف الخزينةُ بلا ما
+         يُسندها، فلا يُعرف على أيِّ التزامٍ وقع الصرف.
+         ◆ والتحصيلُ يُستثنى: هو **يُنشئ** الأثرَ لا يستهلكه. */
+    if ($direction === 'disbursement') {
+        if (!$receivable_id) {
+            ems_gov_flash_redirect('payments_fin.php',
+                '422 لا صرفَ بلا مستندِ التزامٍ أو ذمّةٍ معتمدة — اختر الذمّةَ التي يُسدَّد عنها',
+                'GOV-REF-422', 'الصرفُ أثرٌ لالتزامٍ قائمٍ لا قرارٌ منفرد');
+            exit();
+        }
+        /* والمستندُ يُحَلُّ فعلًا: قائمٌ · لهذه الشركةِ · وله رصيدٌ قائم */
+        $__rq = $conn->prepare('SELECT id, outstanding FROM fin_receivables
+                                 WHERE id = ? AND company_id = ? LIMIT 1');
+        $__okSrc = false; $__why = '';
+        if ($__rq) {
+            $__rq->bind_param('ii', $receivable_id, $company_id);
+            $__rq->execute();
+            $__rr = $__rq->get_result()->fetch_assoc();
+            $__rq->close();
+            if (!$__rr) { $__why = 'الذمّةُ #' . $receivable_id . ' غيرُ موجودةٍ في نطاقِ شركتك'; }
+            elseif ((float) $__rr['outstanding'] <= 0) { $__why = 'الذمّةُ #' . $receivable_id . ' بلا رصيدٍ قائم'; }
+            else { $__okSrc = true; }
+        } else { $__why = 'تعذَّر التحقّقُ من المستند'; }
+        if (!$__okSrc) {
+            ems_gov_flash_redirect('payments_fin.php', '422 ' . $__why, 'GOV-REF-422', '');
+            exit();
+        }
+    }
+
     $payment_no = fin_gen_code($conn, 'fin_payments', 'FIN-PY', $company_id);
     fin_gate($is_super_admin)->insert('fin_payments', array(
         'payment_no' => $payment_no, 'direction' => $direction, 'party_type' => $party_type,
