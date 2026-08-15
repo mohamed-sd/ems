@@ -185,6 +185,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
     $jr_fx = $fx['ok'] ? $fx['rate'] : null;
     $jr_base = $fx['ok'] ? $fx['base'] : null;
 
+    /* ══ INJ-0177 · لا قيدَ يدويًّا بلا حدثٍ مرتبطٍ أو استثناءٍ نافذ ══════════
+         كان `event_id` اختياريًّا (`?: null`) — فالقيدُ اليدويُّ يُنشئ حقيقةً
+         ماليةً من العدمِ ولا سبيلَ بعدها إلى مراجعتها. والحكمُ الحاكم:
+         **الرقمُ المالي أثرُ واقعةٍ لا مصدرُها** (ADR-15).
+         ◆ والفحصُ **قبل توليدِ الرقمِ المسلسل**: توليدُه ثم الرفضُ يستهلك
+           رقمًا من السلسلةِ بلا قيدٍ يحملُه — فتصير في الدفترِ فجوةٌ لا تُفسَّر. */
+    require_once __DIR__ . '/../includes/source_doc_guard.php';
+    $__src = ems_require_source_doc($conn, $company_id, 'journal_entry',
+        array('event_id' => $event_id), $current_user_id, 'journal_form_fin');
+    if (!$__src['ok']) {
+        ems_gov_flash_redirect('journal_form_fin.php', $__src['reason'] . ' ❌', 'GOV-FAIL-422', '');
+        exit();
+    }
+
     $entry_no = fin_gen_code($conn, 'fin_journal_entries', 'FIN-JV', $company_id);
     // رأس + سطور = زوجٌ ذرّي (§9): إمّا القيد كاملًا أو لا شيء (لا رأسٌ بلا سطوره)
     ems_tenant_db()->runInTransaction(function ($g) use ($entry_no, $event_id, $posting_date, $txn_date, $jr_code, $jr_fx, $jr_base, $tot_d, $tot_c, $memo, $current_user_id, $lines) {

@@ -10,6 +10,8 @@
 define('EMS_CLI', true);
 require_once __DIR__ . '/../includes/session_bootstrap.php';
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../includes/cron_guard.php';
+ems_cron_guard('cron_unit_chain_weekly.php'); // INJ-0025: لا تُشغَّل من المتصفّح
 require_once __DIR__ . '/../includes/unit_chain_helpers.php';
 while (ob_get_level()) { ob_end_clean(); }
 $conn = $GLOBALS['conn'];

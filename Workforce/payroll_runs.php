@@ -170,6 +170,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 // M-14 BR-GOV-07: المسيّر رواتبُ الناس — القراءةُ تُسجَّل كما تُسجَّل الكتابة
 require_once __DIR__ . '/../includes/sensitive_read_log.php';
 ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected) : 'screen:list', 'Workforce/payroll_runs.php');
+
+/* ══ INJ-0225 · الأثرُ يقع والقيمةُ تُحجَب ══════════════════════════════════
+     نصُّ القبول: «حسابٌ بلا منحةِ الأجور يرى العدّاداتِ **ولا يرى مبلغَ أيِّ
+     سطرٍ في جسمِ الاستجابة**؛ ومن يملكها يراها **ويُسجَّل اطّلاعُه**».
+     والمقيسُ قبلَه: الشاشةُ **تكتب سطرَ الاطّلاعِ ولا تحجب** — فالأثرُ يقع
+     والقيمةُ تعبر لمن لا يملكها. والسجلُّ بلا حجبٍ يوثّق التسريبَ ولا يمنعه.
+   ◆ **والحجبُ في الخادمِ لا في المتصفّح**: قيمةٌ مخفيةٌ بـCSS تُقرأ بـ«عرضِ
+     المصدر» — فالشرطُ يقول «في جسمِ الاستجابة» ويعني ما يقول.
+   ◆ والحاكمُ `VisibilityPolicyService` **مغلقٌ افتراضًا**: من لا منحةَ له
+     لا يرى، ومن له منحةٌ يرى ويُسجَّل — وهو ما بُني ولم يُتبنَّ. */
+require_once __DIR__ . '/../includes/field_visibility.php';
+$__maySeePay = ems_may_see_field($conn, 'payroll.amount',
+    $selected > 0 ? ('run:' . $selected) : 'screen:list', 'Workforce/payroll_runs.php');
+/** يُرجع المبلغَ لمن يملك، و«محجوب» لمن لا يملك — ولا يطبع الرقمَ إطلاقًا. */
+$__money = function ($v, $fmt = true) use ($__maySeePay) {
+    if (!$__maySeePay) { return 'محجوب'; }
+    if ($v === null) { return 'لم يُحتسب'; }
+    return $fmt ? number_format((float) $v, 2) : (string) $v;
+};
 ?>
 <div class="main ems-unified-page-shell">
     <?php
@@ -414,12 +433,12 @@ ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected
                         <?php endif; ?>
                         <a href="?run_id=<?php echo $selected; ?>&slip=<?php echo intval($rr['person_id']); ?>"
                            title="كشفُ الفرد بطبقاته"><i class="fas fa-file-invoice"></i></a></td>
-                    <td><?php echo number_format((float)$rr['pay'], 2); ?></td>
-                    <td><?php echo number_format((float)$rr['incentive'], 2); ?></td>
-                    <td><?php echo number_format((float)$rr['overtime'], 2); ?></td>
-                    <td><?php echo number_format((float)$rr['absence'], 2); ?></td>
-                    <td><?php echo number_format((float)$rr['deductions'], 2); ?></td>
-                    <td><strong><?php echo number_format((float)$rr['net'], 2); ?></strong></td>
+                    <td><?php echo htmlspecialchars($__money($rr['pay'])); ?></td>
+                    <td><?php echo htmlspecialchars($__money($rr['incentive'])); ?></td>
+                    <td><?php echo htmlspecialchars($__money($rr['overtime'])); ?></td>
+                    <td><?php echo htmlspecialchars($__money($rr['absence'])); ?></td>
+                    <td><?php echo htmlspecialchars($__money($rr['deductions'])); ?></td>
+                    <td><strong><?php echo htmlspecialchars($__money($rr['net'])); ?></strong></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -447,8 +466,7 @@ ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected
                 <li>
                     <?php echo htmlspecialchars((string)($row['component_ref'] ?? ($row['source_type'] ?? ''))); ?>
                     <?php if (isset($row['amount'])): ?>
-                        — <strong><?php echo $row['amount'] !== null
-                            ? number_format((float)$row['amount'], 2) : 'لم يُحتسب'; ?></strong>
+                        — <strong><?php echo htmlspecialchars($__money($row['amount'])); ?></strong>
                     <?php endif; ?>
                     <?php if (!empty($row['doc_ref'])): ?>
                         · <small>سند: <?php echo htmlspecialchars((string)$row['doc_ref']); ?></small>
@@ -461,9 +479,9 @@ ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected
             </ul>
         <?php endforeach; ?>
         <hr>
-        <p>الإجمالي <strong><?php echo number_format($slip['gross'], 2); ?></strong>
+        <p>الإجمالي <strong><?php echo htmlspecialchars($__money($slip['gross'])); ?></strong>
            · الخصومات <strong><?php echo number_format($slip['deductions'], 2); ?></strong>
-           · <span style="font-size:1.2em">الصافي <strong><?php echo number_format($slip['net'], 2); ?></strong></span></p>
+           · <span style="font-size:1.2em">الصافي <strong><?php echo htmlspecialchars($__money($slip['net'])); ?></strong></span></p>
         <p style="color:#666">اللقطاتُ المستنَدُ إليها:
             <?php foreach ($slip['snapshot_ids'] as $sid): ?>
                 <span class="badge badge-secondary">لقطة #<?php echo intval($sid); ?></span>
@@ -493,9 +511,8 @@ ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected
                     <td>#<?php echo intval($d['person_id']); ?></td>
                     <td><?php echo htmlspecialchars((string)$d['source_type']); ?>
                         #<?php echo intval($d['source_id']); ?></td>
-                    <td><?php echo $d['requested_amount'] !== null
-                        ? htmlspecialchars((string)$d['requested_amount']) : '—'; ?></td>
-                    <td><strong><?php echo htmlspecialchars((string)$d['amount']); ?></strong></td>
+                    <td><?php echo htmlspecialchars($d['requested_amount'] !== null ? $__money($d['requested_amount'], false) : '—'); ?></td>
+                    <td><strong><?php echo htmlspecialchars($__money($d['amount'], false)); ?></strong></td>
                     <td><small><?php echo htmlspecialchars((string)$d['doc_ref']); ?></small></td>
                     <td><?php echo intval($d['rescheduled']) === 1
                         ? "<span class='badge badge-warning'>مُرحَّلٌ بحدِّ الحماية</span>"
@@ -540,7 +557,7 @@ ems_log_sensitive_read($conn, 'payroll_run', $selected > 0 ? ('run:' . $selected
                         <?php echo $l['bearer_id'] ? ('#' . intval($l['bearer_id'])) : ''; ?></td>
                     <td><?php echo $l['percent'] !== null ? htmlspecialchars((string)$l['percent']) : '—'; ?></td>
                     <td><?php if ($l['amount'] !== null): ?>
-                            <strong><?php echo htmlspecialchars((string)$l['amount']); ?></strong>
+                            <strong><?php echo htmlspecialchars($__money($l['amount'], false)); ?></strong>
                         <?php else: ?>
                             <span class="badge badge-warning" title="<?php echo htmlspecialchars((string)$l['note']); ?>">
                                 لم يُحتسب بعد</span>

@@ -157,10 +157,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $is_ajax && in_array($_POST['action
         $mv   = trim($_POST['measured_value'] ?? '');
         $note = trim($_POST['note'] ?? '');
         $rec  = trim($_POST['recommendation'] ?? '');
+        /* ══ INJ-0290 · إعادةُ الإرسالِ تُرجع مرجعَ الأوّلِ لا صفًّا ثانيًا ═════════
+             نصُّ القبول: «إعادةُ إرسال نموذج الفحص **لا تُنشئ صفًّا ثانيًا بل
+             تُرجع مرجعَ الأول**». وهذا نداءُ AJAX: شبكةٌ متعثّرةٌ تُعيده، فيصير
+             بندُ الفحصِ بندين متطابقين، ويُقرأ العطلُ مرتين في تقريرِ الجاهزية.
+           ◆ والمفتاحُ من حمولةِ البندِ وفحصِه — فبندٌ آخرُ بمكوّنٍ مختلفٍ يمرُّ.
+           ◆ **ويُرجَع مرجعُ الأوّل** لا رسالةُ خطأ: المُرسِلُ لم يُخطئ، وإنما
+             وصل طلبُه مرتين. */
+        require_once __DIR__ . '/../includes/post_contract.php';
+        $__idem = ems_pc_idem_key('mnt.inspection.add_line', array(
+            'ins' => $iid, 'component' => $component, 'cond' => $cond,
+            'mv' => $mv, 'note' => $note, 'rec' => $rec));
+        if (ems_pc_idem_seen($conn, $__idem)) {
+            mnt_ins_json(array('success' => true, 'replay' => true,
+                'line' => array('id' => 0, 'component' => $component, 'condition_state' => $cond,
+                                'measured_value' => $mv, 'note' => $note, 'recommendation' => $rec),
+                'count' => mnt_ins_line_count($conn, $iid, $company_id)));
+        }
         $lineId = ems_tenant_db()->insert('mnt_inspection_line', array(
             'inspection_id' => $iid, 'component' => $component, 'section' => 'بنود إضافية',
             'applies_to' => 'عام', 'check_method' => '', 'measured_value' => $mv, 'note' => $note,
             'condition_state' => $cond, 'recommendation' => $rec, 'is_template' => 0));
+        ems_pc_idem_mark($conn, $__idem, 'mnt.inspection.add_line', 'mnt_inspection_line#' . $lineId);
         mnt_ins_json(array('success' => true,
             'line' => array('id' => $lineId, 'component' => $component, 'condition_state' => $cond,
                             'measured_value' => $mv, 'note' => $note, 'recommendation' => $rec),

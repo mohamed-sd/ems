@@ -89,6 +89,77 @@ function ems_gov_emit_assets() {
     echo "\n<script>window.emsGovCtx = " .
         json_encode($ctx, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) .
         ";</script>\n";
+    ems_gov_slice_filter_start();
+}
+
+/**
+ * ══ INJ-0104 · المحجوبُ **غيرُ موجودٍ في مصدرِ HTML** لا مخفيٌّ فيه ══════════
+ *
+ * نصُّ القبول: «كلُّ دورٍ يرى الشاشةَ بزاويته: أعمدةٌ وأفعالٌ مختلفة، **والمحجوبُ
+ * غيرُ موجودٍ في مصدرِ HTML أصلًا**». والمقيسُ قبلَه: الأعمدةُ الحاكمةُ كلُّها
+ * تُطبع لكلِّ دورٍ بصنفِ `none` — أي **مخفيةٌ بالعرضِ حاضرةٌ في المصدر**. ومن
+ * يضغط «عرض المصدر» يقرأ مفاتيحَ منعِ التكرارِ ومراكزَ التكلفةِ وأسعارَ الصرف.
+ *
+ * والحجبُ هنا **في الخادمِ ومركزيٌّ**: مرشِّحُ مُخرَجٍ يبدأ من نقطةِ الحقنِ
+ * نفسِها (`inheader.php`) فيشمل كلَّ شاشةٍ بلا تعديلِ ملفٍّ واحدٍ منها —
+ * «أصلح المولِّد لا مُخرَجه».
+ *
+ * ◆ **والشريحةُ هي المقياس**: الشريحةُ ① هويةُ المستندِ وسلسلتُه — يراها كلُّ
+ *   من يرى الشاشة. والشريحتان ②③ دواخلُ حوكمةٍ وماليةٍ (مفاتيحُ العطالة ·
+ *   مراجعُ العكس · مراكزُ التكلفة · أسعارُ الصرف) — لا يراها إلا من يملك
+ *   منفذًا حاكمًا.
+ * ◆ **والخليةُ تُحشى بجافاسكربت** فلا `<td>` ثابتةٌ تُيتَّم بإزالةِ `<th>`.
+ * ◆ وإطفاؤه بعلمٍ واحد (`EMS_GOV_SLICE_FILTER=off`) — فمن أراد المسلكَ القديمَ
+ *   يُعلنه ولا يكتشفه.
+ */
+function ems_gov_slice_allowed($slice) {
+    static $max = null;
+    if ($max === null) {
+        $role = isset($_SESSION['user']['role']) ? (string) $_SESSION['user']['role'] : '';
+        if ($role === '-1') { $max = 3; }
+        else {
+            $max = 1;
+            if (isset($GLOBALS['conn']) && $GLOBALS['conn'] instanceof mysqli && $role !== '') {
+                /* منفذٌ حاكمٌ = منحةُ قراءةٍ على مودولِ حوكمةٍ أو تدقيقٍ أو مالية */
+                $st = $GLOBALS['conn']->prepare(
+                    "SELECT COUNT(*) FROM role_permissions rp
+                       JOIN modules m ON m.id = rp.module_id
+                      WHERE rp.role_id = ? AND rp.can_view = 1
+                        AND (m.code LIKE 'Governance/%' OR m.code LIKE 'admin/%'
+                          OR m.code LIKE 'Audit/%'      OR m.code LIKE 'Finance/%')");
+                if ($st) {
+                    $rid = (int) $role;
+                    $st->bind_param('i', $rid);
+                    if ($st->execute()) {
+                        $row = $st->get_result()->fetch_row();
+                        if ($row && (int) $row[0] > 0) { $max = 3; }
+                    }
+                    $st->close();
+                }
+            }
+        }
+    }
+    return ((int) $slice) <= $max;
+}
+
+function ems_gov_slice_filter_start() {
+    if (php_sapi_name() === 'cli') { return; }
+    if (!empty($GLOBALS['__ems_gov_filter_on'])) { return; }
+    if (function_exists('ems_env') && strtolower((string) ems_env('EMS_GOV_SLICE_FILTER')) === 'off') { return; }
+    if (ems_gov_slice_allowed(3)) { return; }   /* يرى الكلَّ — فلا مرشِّحَ يُنصب */
+    $GLOBALS['__ems_gov_filter_on'] = true;
+    ob_start('ems_gov_slice_filter');
+}
+
+/** ينزع من المُخرَجِ كلَّ `<th>` حاكمٍ بشريحةٍ لا يملكها الناظر. */
+function ems_gov_slice_filter($html) {
+    return preg_replace_callback(
+        '~<th\b[^>]*\bdata-gov="[^"]*"[^>]*>.*?</th>\s*~is',
+        function ($m) {
+            if (!preg_match('~data-slice="(\d+)"~', $m[0], $s)) { return $m[0]; }
+            return ems_gov_slice_allowed((int) $s[1]) ? $m[0] : '';
+        },
+        $html);
 }
 
 }

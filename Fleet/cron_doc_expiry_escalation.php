@@ -11,6 +11,8 @@
 
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 require_once dirname(__DIR__) . '/config.php';
+require_once __DIR__ . '/../includes/cron_guard.php';
+ems_cron_guard('cron_doc_expiry_escalation.php'); // INJ-0025: لا تُشغَّل من المتصفّح
 while (ob_get_level() > 0) { ob_end_clean(); }
 
 $n_escalated = 0;

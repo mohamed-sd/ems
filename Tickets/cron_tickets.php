@@ -17,6 +17,8 @@
  */
 $IS_CLI = (PHP_SAPI === 'cli');
 require __DIR__ . '/../config.php';
+require_once __DIR__ . '/../includes/cron_guard.php';
+ems_cron_guard('cron_tickets.php'); // INJ-0025: لا تُشغَّل من المتصفّح
 require_once __DIR__ . '/tkt_helpers.php';
 
 // حارس المتصفح: fail-closed — مفتاحٌ غير مضبوطٍ في .env = لا مسار ويب إطلاقًا.

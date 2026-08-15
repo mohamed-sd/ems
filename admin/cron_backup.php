@@ -14,6 +14,8 @@
 $IS_CLI = (PHP_SAPI === 'cli');
 
 require __DIR__ . '/../config.php';
+require_once __DIR__ . '/../includes/cron_guard.php';
+ems_cron_guard('cron_backup.php'); // INJ-0025: لا تُشغَّل من المتصفّح
 require __DIR__ . '/includes/db_tools.php';
 
 if (!$IS_CLI) {

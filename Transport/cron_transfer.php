@@ -14,6 +14,8 @@
  */
 $IS_CLI = (PHP_SAPI === 'cli');
 require __DIR__ . '/../config.php';
+require_once __DIR__ . '/../includes/cron_guard.php';
+ems_cron_guard('cron_transfer.php'); // INJ-0025: لا تُشغَّل من المتصفّح
 require_once __DIR__ . '/trs_helpers.php';
 
 // حارس التشغيل عبر المتصفح: ?key=... يُطابَق مع TRANSPORT_CRON_KEY من .env (ADR-04).

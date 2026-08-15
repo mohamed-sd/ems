@@ -87,6 +87,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'resol
             'يلزم شخصٌ آخرُ غيرُ من سجّل الفاتورة');
         exit();
     }
+    /* ══ INJ-0093 ② · والفرقُ فوق السقفِ يحتاج صاحبَ سقفٍ أعلى ═══════════════
+         نصُّ القبول: «والفرقُ **فوق السقف** يتطلب اعتمادَ صاحبِ سقفٍ أعلى
+         مسجَّلًا في سلسلة الاعتماد». والفصلُ وحدَه لا يكفي: يدٌ ثانيةٌ **بلا
+         سقفٍ كافٍ** تحسم فرقًا يفوق تفويضَها، فيمرُّ المالُ بتوقيعٍ لا يحمله.
+       ◆ والقيمةُ تُقرأ من الأمرِ نفسِه لا من النموذج — فلا يُملي مُرسِلُ الطلبِ
+         حجمَ الفرقِ ليهبط تحت سقفِه.
+       ◆ والتوقيعُ **قبل الحسم**: توقيعٌ بعدَ الأثرِ توثيقٌ لا حراسة. */
+    /* ◆ ولا عمودَ «فرقٍ» مخزَّنًا: الفرقُ **يُحسب** من الفاتورةِ والأمرِ معًا —
+         وحسابُه هنا أصدقُ من عمودٍ قد يتقادم عن مصدرِه. */
+    $__var = 0.0;
+    $__vq = $conn->prepare('SELECT ABS(COALESCE(invoice_amount, 0) - COALESCE(total_amount, 0))
+                              FROM proc_order WHERE id = ? LIMIT 1');
+    if ($__vq) {
+        $__vq->bind_param('i', $rid);
+        $__vq->execute();
+        $__vr = $__vq->get_result()->fetch_row();
+        $__vq->close();
+        if ($__vr) { $__var = (float) $__vr[0]; }
+    }
+    if ($__var > 0) {
+        require_once __DIR__ . '/../app/Core/AuthorityGuard.php';
+        $__sig = \App\Core\AuthorityGuard::sign($conn, array(
+            'company_id'    => (int) $company_id,
+            'person_id'     => (int) $current_user_id,
+            'document_type' => 'po_variance',
+            'document_id'   => $rid,
+            'amount'        => $__var,
+            'reason'        => 'حسمُ فرقِ مطابقةٍ على الأمر #' . $rid,
+        ));
+        if (empty($__sig['ok']) && (int) $__sig['code'] === 409) {
+            ems_gov_flash_redirect('po_match.php',
+                'PO-CAP-409: الفرقُ (' . number_format($__var, 2) . ') فوقَ سقفِ تفويضك — '
+                . $__sig['reason'], 'GOV-FAIL-409',
+                'يُصعَّد إلى صاحبِ سقفٍ أعلى في سلسلةِ الاعتماد');
+            exit();
+        }
+    }
+
     $res = proc_match_resolve($conn, $rid, $_POST['decision'] ?? '', $_POST['reason'] ?? '', $current_user_id);
     if ($res['status'] === 'resolved') {
         $msg = 'حُسم الفرقُ (' . ($_POST['decision'] ?? '') . ')' . ($res['due_id'] ? ' — ذمة #' . $res['due_id'] : '') . ' ✅';

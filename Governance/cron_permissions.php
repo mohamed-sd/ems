@@ -10,6 +10,8 @@ if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
 error_reporting(E_ALL & ~E_DEPRECATED);
 
 require_once dirname(__DIR__) . '/config.php';
+require_once __DIR__ . '/../includes/cron_guard.php';
+ems_cron_guard('cron_permissions.php'); // INJ-0025: لا تُشغَّل من المتصفّح
 require_once dirname(__DIR__) . '/includes/catch_log.php';
 require_once dirname(__DIR__) . '/app/Services/Security/ExpiryJob.php';
 require_once dirname(__DIR__) . '/app/Services/Security/BreakGlassService.php';

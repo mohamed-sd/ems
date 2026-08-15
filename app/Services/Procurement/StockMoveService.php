@@ -37,6 +37,39 @@ class StockMoveService
         if (abs($diff) < 0.001)     { return array('ok' => false, 'msg' => 'لا فرقَ — لا تسويةَ تُكتب', 'move_id' => 0); }
         if ($itemId <= 0)           { return array('ok' => false, 'msg' => 'صنفٌ غيرُ صالح (422)', 'move_id' => 0); }
 
+        /* ══ INJ-0100 · من صرف الصنفَ لا يُسوّي فرقَه ═══════════════════════════
+             نصُّ القبول: «من نفّذ حركةَ صرفٍ **لا يستطيع تسويةَ فرقِ الصنفِ نفسِه**
+             في الجرد بلا اعتمادِ مدير المخازن».
+             والمقيسُ قبلَه: لا شيء يمنع — فمن صرف مئةً وسجّل تسعين يُسوّي العشرةَ
+             الباقيةَ «عجزًا» بيدِه، والدفترُ يوافق. **وسببُ التسويةِ مطلوبٌ سلفًا،
+             لكنَّ السببَ نصٌّ واليدُ الثانيةُ حكم.**
+           ◆ والحدُّ **بالصنفِ والمخزنِ معًا**: من صرف صنفًا في مخزنٍ لا يُسوّيه
+             فيه — ولا يُمنع من تسويةِ صنفٍ لم يمسَّه. فالمنعُ بقدرِ التعارضِ لا فوقَه.
+           ◆ والنافذةُ **ثلاثون يومًا**: صرفٌ قديمٌ لا يُقيّد الجردَ إلى الأبد. */
+        $st0 = $this->conn->prepare(
+            "SELECT COUNT(*) FROM proc_stock_move
+              WHERE company_id = ? AND item_id = ? AND warehouse_id = ?
+                AND created_by = ? AND move_type IN ('صرف','تحويل صادر')
+                AND moved_at >= DATE_SUB(NOW(), INTERVAL 30 DAY)");
+        if ($st0) {
+            $st0->bind_param('iiii', $companyId, $itemId, $warehouseId, $actorId);
+            if ($st0->execute()) {
+                $r0 = $st0->get_result()->fetch_row();
+                $mine = $r0 ? (int) $r0[0] : 0;
+                if ($mine > 0) {
+                    $st0->close();
+                    if (function_exists('ems_log_denial')) {
+                        @ems_log_denial('STK-403-SELFADJ', 'item:' . $itemId . '@wh:' . $warehouseId,
+                            'من صرف الصنفَ حاول تسويةَ فرقِه');
+                    }
+                    return array('ok' => false, 'move_id' => 0,
+                        'msg' => 'STK-403-SELFADJ: صرفتَ هذا الصنفَ من هذا المخزنِ خلال ٣٠ يومًا ('
+                               . $mine . ' حركة) — تسويةُ فرقِه تحتاج يدًا ثانيةً باعتمادِ مدير المخازن');
+                }
+            }
+            $st0->close();
+        }
+
         $type = $diff > 0 ? 'تسوية زيادة' : 'تسوية عجز';
         $qty  = abs($diff);
 

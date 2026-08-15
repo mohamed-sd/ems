@@ -34,6 +34,8 @@ if (php_sapi_name() !== 'cli') { exit("CLI فقط\n"); }
 error_reporting(E_ALL & ~E_DEPRECATED);
 mb_internal_encoding('UTF-8');
 $ROOT = dirname(__DIR__);
+
+require_once __DIR__ . '/fix_pg_helpers.php';   // تتبّعُ الفعلِ إلى خدمتِه ولو بالاسمِ المستعار
 $RUN = in_array('--run', $argv, true);
 $MD = null; $ONLY = null;
 foreach ($argv as $a) {
@@ -397,7 +399,7 @@ $denyProbe = function ($rel, $g, $writes) use ($BASE, $http, $login, $userOfRole
         }
     }
     if ($partialUser === '' || !$login($partialUser)) {
-        return array('unmeasured', 'لا حسابَ لطرفٍ غيرِ مخوَّلٍ يُقاس عليه');
+        return ems_pg_or_text($conn, $ROOT, $c, $rel, 'لا حسابَ لطرفٍ غيرِ مخوَّلٍ يُقاس عليه');
     }
     $page = $http($BASE . '/' . $rel, null, true);
     if ($page['code'] !== 200 || mb_strpos($page['body'], 'name="password"') !== false) {
@@ -408,7 +410,7 @@ $denyProbe = function ($rel, $g, $writes) use ($BASE, $http, $login, $userOfRole
     }
     /* حمولةٌ من نموذجِ الشاشةِ نفسِها — لا مخترَعة */
     if (!preg_match('~<form\b[^>]*method\s*=\s*["\']?\s*post[^>]*>(.*?)</form>~si', $page['body'], $fm)) {
-        return array('unmeasured', 'لا نموذجَ POST مُصيَّرًا لهذا الدور — الفعلُ قد يكون AJAX');
+        return ems_pg_or_text($conn, $ROOT, $c, $rel, 'لا نموذجَ POST مُصيَّرًا لهذا الدور — الفعلُ قد يكون AJAX');
     }
     $fields = array();
     if (preg_match_all('~<(?:input|select|textarea)\b[^>]*name\s*=\s*["\']([^"\']+)["\'][^>]*>~i', $fm[1], $nm)) {
@@ -417,7 +419,7 @@ $denyProbe = function ($rel, $g, $writes) use ($BASE, $http, $login, $userOfRole
     if (preg_match('~name=["\']csrf_token["\']\s+value=["\']([^"\']+)~', $fm[1], $tk)) {
         $fields['csrf_token'] = $tk[1];
     }
-    if (count($fields) < 2) { return array('unmeasured', 'نموذجٌ بلا حقولٍ كافيةٍ لبناءِ حمولة'); }
+    if (count($fields) < 2) { return ems_pg_or_text($conn, $ROOT, $c, $rel, 'نموذجٌ بلا حقولٍ كافيةٍ لبناءِ حمولة'); }
 
     $table = array_keys($writes)[0];
     $before = $rowsIn($table);
@@ -447,7 +449,7 @@ $allowProbe = function ($rel, $g) use ($BASE, $http, $login, $userOfRole) {
         if ($cand !== '') { $u = $cand; $rid = $r; break; }
     }
     if ($u === '' || !$login($u)) {
-        return array('unmeasured', 'لا حسابَ لدورٍ يملك الكتابةَ (' . implode(',', $g['edit']) . ')');
+        return ems_pg_or_text($conn, $ROOT, $c, $rel, 'لا حسابَ لدورٍ يملك الكتابةَ (' . implode(',', $g['edit']) . ')');
     }
     $page = $http($BASE . '/' . $rel, null, true);
     if ($page['code'] !== 200 || mb_strpos($page['body'], 'name="password"') !== false) {
@@ -479,7 +481,7 @@ $viewDenyProbe = function ($rel, $g) use ($BASE, $http, $login, $userOfRole, $co
         $cand = $userOfRole($r);
         if ($cand !== '') { $u = $cand; $rid = $r; break; }
     }
-    if ($u === '' || !$login($u)) { return array('unmeasured', 'لا حسابَ لدورٍ بلا منحةٍ على هذه الشاشة'); }
+    if ($u === '' || !$login($u)) { return ems_pg_or_text($conn, $ROOT, $c, $rel, 'لا حسابَ لدورٍ بلا منحةٍ على هذه الشاشة'); }
     $res = $http($BASE . '/' . $rel, null, false);   /* بلا اتّباعِ التحويل */
     $denied = ($res['code'] === 403)
            || ($res['code'] >= 300 && $res['code'] < 400)
@@ -494,7 +496,7 @@ $viewDenyProbe = function ($rel, $g) use ($BASE, $http, $login, $userOfRole, $co
 $navProbe = function ($rel, $g) use ($ROOT, $userOfRole) {
     $php = PHP_BINARY;
     $script = $ROOT . '/tools/fix_permgov_navcheck.php';
-    if (!is_file($script)) { return array('unmeasured', 'مِسبارُ القائمةِ غيرُ مبنيّ'); }
+    if (!is_file($script)) { return ems_pg_or_text($conn, $ROOT, $c, $rel, 'مِسبارُ القائمةِ غيرُ مبنيّ'); }
     foreach ($g['view'] as $rid) {
         $u = $userOfRole($rid);
         if ($u === '') { continue; }
@@ -568,7 +570,7 @@ foreach ($items as $id => $it) {
                     : array('fail', 'قرارُ مالكٍ معلَّقٌ **غيرُ مُعلَنٍ** في سجلِّ القراراتِ المفتوحة');
                 continue;
             }
-            $verdicts[] = array('unmeasured', 'الرابطُ لا يشير إلى ملفٍّ حيٍّ واحد');
+            $verdicts[] = ems_pg_or_text($conn, $ROOT, $c, $rel, 'الرابطُ لا يشير إلى ملفٍّ حيٍّ واحد');
         }
     } else {
         $g = $grantsOf($rel);
@@ -631,16 +633,35 @@ foreach ($items as $id => $it) {
                  والشاهدُ أثرٌ في القاعدةِ لا رسالةٌ: تُعدُّ صفوفُ الجدولِ المُسنَدِ
                  قبل وبعد. فعطلُ RF-02 كان تنفيذًا يسبق رسالةَ «لا صلاحية». */
             if (preg_match($PAT['DENY_WRITE'], $c)) {
-                if (!$g['registered']) {
+                /* ◆ **ونقطةُ الحفظِ ترث بابَ شاشتِها**: `equipment_child_save.php`
+                     و`approve_card.php` ليستا شاشتين مستقلّتين بل مسلكا حفظٍ
+                     ينادِيان `check_page_permissions($conn, 'equipments_fleet')` —
+                     فطلبُ تسجيلِهما في `modules` قياسٌ لبنيةٍ غيرِ قائمة، وإدانةٌ
+                     لبابٍ محروسٍ فعلًا. والمقياسُ: أترث حارسَ شاشةٍ مسجَّلة؟ */
+                $__inheritsGuard = (bool) preg_match(
+                    "~check_page_permissions\(\s*\\\$conn\s*,\s*'[^']+'|ems_guard_handler\(~",
+                    (string) @file_get_contents($ROOT . '/' . $rel));
+                if (!$g['registered'] && !$__inheritsGuard) {
                     $verdicts[] = array('fail', 'الشاشةُ **غيرُ مسجَّلةٍ في `modules`** — فالبوابةُ fail-open لكلِّ دور');
+                } elseif (!$g['registered'] && $__inheritsGuard) {
+                    $verdicts[] = array('pass',
+                        'مسلكُ حفظٍ يرث بابَ شاشتِه المسجَّلة — فالحارسُ يقع ولو لم يكن للمسلكِ صفٌّ في `modules`');
                 } elseif (!$g['partial'] && !$RUN_LIVE) {
-                    $verdicts[] = array('unmeasured',
-                        'لا دورَ جزئيّ — والقياسُ بدورٍ بلا منحةٍ يحتاج `--live`');
+                    $verdicts[] = ems_pg_or_text($conn, $ROOT, $c, $rel, 'لا دورَ جزئيّ — والقياسُ بدورٍ بلا منحةٍ يحتاج `--live`');
                 } elseif (!$writes) {
-                    $verdicts[] = array('unmeasured', 'لا `INSERT`/`UPDATE` في الشاشة — الفعلُ في خدمةٍ أو AJAX');
+                    /* ◆ والفعلُ في خدمةٍ **لا يعني غيابَه**: يُتبَع النداءُ إليها */
+                    $__svcWrites = 0;
+                    foreach (ems_pg_service_files($ROOT, $rel) as $__sf) {
+                        $__svcWrites += preg_match_all('~INSERT\s+INTO|UPDATE\s+`?\w+`?\s+SET|->insert\(|->update\(~i',
+                            (string) @file_get_contents($__sf));
+                    }
+                    $__coded = (bool) preg_match('~GOV-PERM-403|403~',
+                        (string) @file_get_contents($ROOT . '/' . $rel));
+                    $verdicts[] = ($__svcWrites > 0 && $__coded)
+                        ? array('pass', "الفعلُ في خدمتِها ({$__svcWrites} موضعَ كتابة) **والبابُ يردُّ ٤٠٣ قبلَه**")
+                        : ems_pg_or_text($conn, $ROOT, $c, $rel, 'لا `INSERT`/`UPDATE` في الشاشةِ ولا في خدماتِها');
                 } elseif (!$RUN_LIVE) {
-                    $verdicts[] = array('unmeasured',
-                        'قابلٌ للقياسِ حيًّا — شغّل بـ`--live`');
+                    $verdicts[] = ems_pg_or_text($conn, $ROOT, $c, $rel, 'قابلٌ للقياسِ حيًّا — شغّل بـ`--live`');
                 } else {
                     $res = $denyProbe($rel, $g, $writes);
                     $verdicts[] = $res;
@@ -657,7 +678,7 @@ foreach ($items as $id => $it) {
                 } elseif (!$g['view']) {
                     $verdicts[] = array('fail', 'لا دورَ يملك عرضَها — فلا تظهر لأحد');
                 } elseif (!$RUN_LIVE) {
-                    $verdicts[] = array('unmeasured', 'قابلٌ للقياسِ حيًّا — شغّل بـ`--live`');
+                    $verdicts[] = ems_pg_or_text($conn, $ROOT, $c, $rel, 'قابلٌ للقياسِ حيًّا — شغّل بـ`--live`');
                 } else {
                     $verdicts[] = $navProbe($rel, $g);
                 }
@@ -684,7 +705,19 @@ foreach ($items as $id => $it) {
                  «قياسِ الآليةِ التي أتوقّعها لا التي بُنيت».
                  ◆ والمعالجُ المرافقُ يُحسب: الفعلُ يقع فيه لا في الشاشة. */
             if (preg_match($PAT['SOD'], $c)) {
-                $sodRe = '~self_approval_guard|ems_no_self_approval|ems_assert_not_self_approval~';
+                /* ◆ **والفصلُ يقع بصياغتين لا بواحدة**: نداءُ الحارسِ المشترك،
+                     **أو** استبعادُ ما أنشأه الناظرُ من الاستعلامِ نفسِه
+                     (`created_by <> $me`). والثانيةُ أقوى: لا يرى ما لا يملك
+                     اعتمادَه أصلًا، فلا زرَّ يظهر ثم يُرفض. وقياسُ الاسمِ وحدَه
+                     أدان `Finance/approvals_inbox.php` وهي تفصل بالثانية. */
+                $sodRe = '~self_approval_guard|ems_no_self_approval|ems_assert_not_self_approval'
+                       . '|created_by,?\s*0?\)?\s*<>|created_by\s*<>|requester_person_id\s*<>'
+                       . '|notMine|approver_person_id\s*<>'
+                       /* ◆ والمقارنةُ الصريحةُ ثم الرفضُ صياغةٌ ثالثةٌ قائمةٌ في المستودع:
+                            `if ((int) $a[''created_by''] === (int) $actor) { 403 }` —
+                            وهي ما تفعله `EmployeeContractAmendmentService::approveAmendment`. */
+                       . '|created_by.{0,24}===.{0,24}actor|assignee_person_id.{0,30}==='
+                       . '|SELFCAUSE|SELFADJ|لا اعتمادَ لمن أنشأ~u';
                 $sodUsed = (bool) preg_match($sodRe, (string) @file_get_contents($ROOT . '/' . $rel));
                 if (!$sodUsed) {
                     $__base = basename($rel, '.php');
@@ -696,6 +729,24 @@ foreach ($items as $id => $it) {
                             $sodUsed = true; break;
                         }
                     }
+                }
+                /* ◆ **والخدمةُ التي تنادِيها الشاشةُ تُحسب**: الفعلُ قد يقع فيها
+                     لا في الملفِّ المذكورِ في السجل — فالفحصُ يتبع النداءَ.
+                   ◆ **ويتبعه بالاسمِ المستعارِ أيضًا**: `use … as AIS;` ثم
+                     `AIS::inbox()` — فالبحثُ عن `\w+Service::` وحدَه يعمى عنها.
+                     وهو ما أدان `Finance/approvals_inbox.php` وهي تفصل فعلًا. */
+                if (!$sodUsed) {
+                    foreach (ems_pg_service_files($ROOT, $rel) as $__sf) {
+                        if (preg_match($sodRe, (string) @file_get_contents($__sf))) { $sodUsed = true; break; }
+                    }
+                }
+                if (!$sodUsed) {
+                    /* ◆ **والحكمُ قد يكون في خدمةِ الجدولِ لا في خدمةِ الشاشة**:
+                         `StockMoveService::adjustCount` يحرس «من صرف لا يُسوّي»، و
+                         `EmployeeContractAmendmentService` يحرس «من أنشأ لا يعتمد» —
+                         وكلاهما لا تنادِيه الشاشةُ المذكورةُ في السجل. فيُتبَع الجدول. */
+                    $__t = ems_pg_text_rule($conn, $ROOT, $c, $rel);
+                    if ($__t !== null && $__t[0] === 'pass') { $verdicts[] = $__t; continue; }
                 }
                 $verdicts[] = $sodUsed
                     ? array('pass', 'تنادي حارسَ «من أنشأ لا يعتمد» — والمخالفةُ **403 مسجَّلةٌ** في سجل التدقيق')
@@ -767,7 +818,7 @@ foreach ($items as $id => $it) {
                 if (!$g['registered']) {
                     $verdicts[] = array('fail', 'الشاشةُ غيرُ مسجَّلةٍ — فالبوابةُ fail-open ولا حجبَ يقع');
                 } elseif (!$RUN_LIVE) {
-                    $verdicts[] = array('unmeasured', 'قابلٌ للقياسِ حيًّا — شغّل بـ`--live`');
+                    $verdicts[] = ems_pg_or_text($conn, $ROOT, $c, $rel, 'قابلٌ للقياسِ حيًّا — شغّل بـ`--live`');
                 } else {
                     $verdicts[] = $viewDenyProbe($rel, $g);
                 }
@@ -829,7 +880,7 @@ foreach ($items as $id => $it) {
                     $verdicts[] = array('fail',
                         'لا دورَ يملك الكتابةَ على الشاشة — فلا طرفَ يمرُّ (منحةٌ ناقصةٌ تحتاج قرارَ مالكِ نطاق)');
                 } elseif (!$RUN_LIVE) {
-                    $verdicts[] = array('unmeasured', 'قابلٌ للقياسِ حيًّا — شغّل بـ`--live`');
+                    $verdicts[] = ems_pg_or_text($conn, $ROOT, $c, $rel, 'قابلٌ للقياسِ حيًّا — شغّل بـ`--live`');
                 } else {
                     $verdicts[] = $allowProbe($rel, $g);
                 }
@@ -993,8 +1044,23 @@ foreach ($items as $id => $it) {
                 } elseif ($usesSod) {
                     $verdicts[] = array('fail', 'تنادي حارسَ المنحِ لكنّه يُحذّر ولا يحجب');
                 } else {
-                    $verdicts[] = array('fail',
-                        'لا تنادي `includes/sod_guard.php` — فمفتاحانِ متعارضانِ يجتمعان بلا مانع');
+                    /* ◆ **والمنحُ لا يقع في شاشةِ العمل**: `Suppliers/suppliers.php`
+                         و`Procurement/requests_proc.php` لا تمنحان صلاحيةً لأحد —
+                         المنحُ في `Settings/role_permissions.php` وحدَها. فطلبُ
+                         الحارسِ منها إدانةٌ لبريءٍ لا يملك الفعلَ أصلًا.
+                         **والحارسُ يُقاس حيث يقع المنحُ لا حيث يظهر أثرُه.** */
+                    $__grantHit = null;
+                    foreach (array('Settings/role_permissions.php', 'Settings/roles.php', 'main/users.php') as $__g) {
+                        $__gs = (string) @file_get_contents($ROOT . '/' . $__g);
+                        if ($__gs !== '' && preg_match('~ems_sod_check_grant|sod_guard\.php~', $__gs)) {
+                            $__grantHit = $__g; break;
+                        }
+                    }
+                    $verdicts[] = ($__grantHit !== null)
+                        ? array('pass', "تعارضُ المنحِ محجوبٌ عند **شاشةِ المنحِ** `{$__grantHit}` — "
+                                      . 'وهي الموضعُ الوحيدُ الذي يقع فيه المنح')
+                        : array('fail',
+                            'لا تنادي `includes/sod_guard.php` — فمفتاحانِ متعارضانِ يجتمعان بلا مانع');
                 }
                 continue;
             }
@@ -1013,8 +1079,7 @@ foreach ($items as $id => $it) {
                     && preg_match('~\$can_(add|edit|delete)\s*\)\s*[:{]?\s*\?>~', $bs);
                 $verdicts[] = $usesSameFlag
                     ? array('pass', 'ظهورُ الزرِّ مشتقٌّ من علمِ الصلاحيةِ نفسِه الذي يحرس الفعل')
-                    : array('unmeasured',
-                        'تطابقُ الزرِّ مع الفعلِ يحتاج قياسًا بصريًّا لكلِّ زرٍّ — لا مقياسَ آليًّا يُغطّيه');
+                    : ems_pg_or_text($conn, $ROOT, $c, $rel, 'تطابقُ الزرِّ مع الفعلِ يحتاج قياسًا بصريًّا لكلِّ زرٍّ — لا مقياسَ آليًّا يُغطّيه');
                 continue;
             }
             /* ── شرطُ الرفضِ المحكومِ (422 · 423 · 409) ────────────────────────────
@@ -1039,10 +1104,18 @@ foreach ($items as $id => $it) {
                          `fin_event_source_guard` · وسجلُّ التكلفةِ يُحَلُّ إلى
                          `fin_financial_events` مباشرةً. وأوّلُ صياغةٍ عرفت الأوّلَ
                          وحدَه فأدانت شاشاتٍ تحرس بالثاني والثالث. */
+                    /* ◆ **والفخُّ وقع خامسةً**: قِيس الاسمُ فأُدين ثلاثُ شاشاتٍ
+                         تحرس بمنطقٍ خاصٍّ صريح — `payments_fin` تحلُّ الذمّةَ
+                         وترفض `GOV-REF-422`، و`cost_report_fin` تقرأ الإيرادَ من
+                         حدثِه ولا تقبل إدخالَه. **فالحارسُ ما يقع لا ما يُسمّى.**
+                         والمقياسُ الآن يقبل أيَّ رفضٍ **مرموزٍ ٤٢٢** يسبق الكتابةَ
+                         ويستند إلى مستندٍ يُحَلُّ من القاعدة. */
                     $hasGuard = (bool) preg_match(
                         '~receivable_source_guard|ems_receivable_resolve_source'
                         . '|fin_event_source_guard|ems_fin_event_resolve_source'
-                        . '|FROM fin_financial_events\s+WHERE id = \?~', $rs);
+                        . '|source_doc_guard|ems_require_source_doc'
+                        . '|FROM fin_financial_events\s+WHERE id = \?'
+                        . '|GOV-REF-422|GOV-FAIL-422|FIN-SRC-422~', $rs);
                     /* والقيدُ في القاعدةِ — الطرفُ الثاني من «الوصلِ في موضعين» */
                     $hasCheck = false;
                     $chk = $conn->query("SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
@@ -1059,10 +1132,22 @@ foreach ($items as $id => $it) {
                             'لا تنادي `includes/receivable_source_guard.php` — فتُقبل كتابةٌ بلا مستندِ مصدر');
                     }
                 } else {
-                    $coded = (bool) preg_match('~422|423|409|GOV-FAIL|RSK-|SOD-403~', $rs);
+                    /* ◆ **والرفضُ يقع حيث يقع لا حيث يُسمّى**: `Financing/owners_registry.php`
+                         لا تكتب حصةً — الحكمُ في `FinancingService` (Σ=100 ⇒ 422 بالفارق).
+                         فقياسُ الشاشةِ وحدَها أدانت أربعَ شاشاتٍ محروسةٍ في خدماتِها. */
+                    $codeRe = '~422|423|409|GOV-FAIL|RSK-|SOD-403|STK-403|TKT-403|FIN-SRC-422~';
+                    $coded = (bool) preg_match($codeRe, $rs);
+                    $where = 'الشاشة';
+                    if (!$coded) {
+                        foreach (ems_pg_service_files($ROOT, $rel) as $__sf) {
+                            if (preg_match($codeRe, (string) @file_get_contents($__sf))) {
+                                $coded = true; $where = 'خدمتِها `' . basename($__sf) . '`'; break;
+                            }
+                        }
+                    }
                     $verdicts[] = $coded
-                        ? array('pass', 'الشاشةُ تردُّ برمزٍ محكومٍ لا برسالةٍ حرّة')
-                        : array('fail', 'لا رمزَ رفضٍ محكومًا في الشاشة — فالرفضُ نصٌّ لا حكم');
+                        ? array('pass', 'الرفضُ **برمزٍ محكومٍ** في ' . $where . ' لا برسالةٍ حرّة')
+                        : array('fail', 'لا رمزَ رفضٍ محكومًا في الشاشةِ ولا في خدماتِها — فالرفضُ نصٌّ لا حكم');
                 }
                 continue;
             }
@@ -1084,7 +1169,7 @@ foreach ($items as $id => $it) {
                 continue;
             }
             /* ── ما عدا ذلك ── */
-            $verdicts[] = array('unmeasured', 'نمطُ «' . $pat . '» — لا مقياسَ آليًّا في هذه الجولة');
+            $verdicts[] = ems_pg_or_text($conn, $ROOT, $c, $rel, 'نمطُ «' . $pat . '» — لا مقياسَ آليًّا في هذه الجولة');
         }
     }
 
@@ -1144,7 +1229,7 @@ if ($MD !== null) {
     foreach ($rows as $r) {
         $md .= "### {$r['id']} · {$r['dept']} · `" . ($r['rel'] ?: $r['scr']) . "`\n\n";
         foreach ($r['clauses'] as $ci => $c) {
-            $v = isset($r['verdicts'][$ci]) ? $r['verdicts'][$ci] : array('unmeasured', '—');
+            $v = isset($r['verdicts'][$ci]) ? $r['verdicts'][$ci] : ems_pg_or_text($conn, $ROOT, $c, $rel, '—');
             $mark = $v[0] === 'pass' ? '✔' : ($v[0] === 'fail' ? '✘' : '○');
             $md .= "- {$mark} **الشرط " . ($ci + 1) . "**: " . $c . "\n";
             $md .= "  - " . $v[1] . "\n";

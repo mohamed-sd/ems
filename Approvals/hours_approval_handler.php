@@ -28,6 +28,20 @@ if (!in_array($role, $allowed_roles)) {
     die(json_encode(['success' => false, 'message' => 'ليس لديك صلاحية'], JSON_UNESCAPED_UNICODE));
 }
 
+/* ══ INJ-0537 · «سحبُ can_edit يمنع الاعتمادَ فورًا» ═══════════════════════════
+     كان الحارسُ **قائمةَ أدوارٍ صلبةً** لا منحةً: يُسحب `can_edit` من الدورِ في
+     شاشةِ الصلاحيات فلا يتغيّر شيء — الاعتمادُ يمضي لأنَّ الدورَ ما زال في
+     القائمة. فالشرطُ «فورًا» غيرُ محقَّقٍ بنيويًّا.
+   ◆ **والقائمةُ تبقى**: هي تضيّق الدائرةَ (أيُّ الأدوارِ يصلح أصلًا)، والمنحةُ
+     تحكم داخلَها (أيُّ دورٍ يملك اليوم). فطبقتانِ لا واحدة — ونزعُ إحداهما
+     يفتح بابًا.
+   ◆ ويرثُ المعالجُ بابَ شاشتِه الأمِّ `Approvals/hours_approval.php` — فلا
+     وحدةَ صلاحياتٍ ثانيةٌ تُنسى عند تعديلِ الأولى. */
+require_once __DIR__ . '/../includes/handler_guard.php';
+if (function_exists('ems_guard_handler')) {
+    ems_guard_handler($conn, 'Approvals/hours_approval.php', 'edit');
+}
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     die(json_encode(['success' => false, 'message' => 'طريقة الطلب غير صحيحة'], JSON_UNESCAPED_UNICODE));
 }

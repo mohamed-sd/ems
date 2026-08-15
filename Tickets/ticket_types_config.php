@@ -73,11 +73,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
                 array('id' => $id));
             ems_gov_flash_redirect('ticket_types_config.php', 'تم تعديل النوع بنجاح ✅', 'GOV-OK-200', ''); exit();
         } else {
+            /* ══ INJ-0277 · إعادةُ الإرسالِ لا تُنشئ صفًّا ثانيًا ═══════════════════
+                 نصُّ القبول: «وإعادةُ إرسال النموذج **لا تُنتج صفًّا ثانيًا**».
+                 والمقيسُ قبلَه: لا عقدَ إرسالٍ ولا مفتاحَ عطالة — فضغطةٌ مزدوجةٌ
+                 أو رجوعٌ بالمتصفّحِ يُنشئ نوعَ بلاغٍ مكرَّرًا بكودٍ مختلف، ثم
+                 تتفرّق قواعدُ التوجيهِ بين توأمين لا يُميّزهما أحد.
+               ◆ والمفتاحُ من **حمولةِ الطلبِ وفاعلِه** لا من الوقت: فإعادةُ
+                 الإرسالِ نفسِها تُطابقه، وإرسالٌ جديدٌ بمحتوًى مختلفٍ لا يُطابقه.
+               ◆ ويُثبَّت **بعد** نجاحِ الكتابةِ لا قبلَها — فمفتاحٌ يُثبَّت ثم
+                 تفشل الكتابةُ يمنع المحاولةَ الصحيحةَ إلى الأبد. */
+            require_once __DIR__ . '/../includes/post_contract.php';
+            $__idem = ems_pc_idem_key('tkt.types.create', array(
+                'name' => $name, 'owner' => $owner_role_id,
+                'nature' => $default_nature, 'ref' => $ref_table_val, 'co' => $company_id));
+            if (ems_pc_idem_seen($conn, $__idem)) {
+                ems_gov_flash_redirect('ticket_types_config.php',
+                    'هذا النوعُ سُجِّل سلفًا بالطلبِ نفسِه — لا صفَّ ثانيًا ✅', 'GOV-OK-200', '');
+                exit();
+            }
             $code = tkt_gen_code('ticket_types');
             tkt_gate(false)->insert('ticket_types', array(
                 'code' => $code, 'name' => $name, 'owner_role_id' => $owner_role_id,
                 'default_nature' => $default_nature, 'ref_table' => $ref_table_val, 'active' => $active,
             ));
+            ems_pc_idem_mark($conn, $__idem, 'tkt.types.create', 'ticket_types#' . $code);
             ems_gov_flash_redirect('ticket_types_config.php', 'تمت إضافة النوع بنجاح ✅', 'GOV-OK-200', ''); exit();
         }
     } catch (\App\Core\TenantGateException $e) {

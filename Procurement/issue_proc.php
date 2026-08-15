@@ -240,6 +240,19 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
+/* ══ INJ-0368 · قيمةُ التكلفةِ **غائبةٌ** عمَّن لا يملكها ══════════════════════
+     نصُّ القبول: «حسابٌ بلا منحٍ **لا يتلقى قيمَ التكلفة في استجابةِ HTML
+     أصلًا**، وكلُّ اطّلاعٍ مخوَّلٍ يُنتج صفًّا في سجلِّ الاطّلاع».
+     والمقيسُ قبلَه: **لا سطرَ اطّلاعٍ يُكتب** — فالقراءةُ على تكلفةِ المخزنِ
+     بلا أثرٍ، والقيمةُ تُرسَل للجميع. والحجبُ في الخادمِ لا بـCSS: قيمةٌ
+     مخفيةٌ بالأنماطِ تُقرأ بـ«عرضِ المصدر». */
+require_once __DIR__ . '/../includes/field_visibility.php';
+$__maySeeCost = ems_may_see_field($conn, 'issue.cost', 'screen:issue_proc', 'Procurement/issue_proc.php');
+$__cost = function ($v, $fmt = true) use ($__maySeeCost) {
+    if (!$__maySeeCost) { return 'محجوب'; }
+    return $fmt ? number_format((float) $v, 2) : (string) $v;
+};
+
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
 /** صف سطر صرف. */
@@ -248,7 +261,8 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
     $iid = $line ? intval($line['item_id']) : 0;
     $iname = $line ? htmlspecialchars((string)$line['item_name'], ENT_QUOTES) : '';
     $qty = $line ? htmlspecialchars((string)$line['qty'], ENT_QUOTES) : '1';
-    $cost = $line ? htmlspecialchars((string)$line['unit_cost'], ENT_QUOTES) : '0';
+    /* ◆ وحقلُ الإدخالِ نفسُه لا يحمل القيمةَ لمن لا يراها */
+    $cost = ($line && $__maySeeCost) ? htmlspecialchars((string)$line['unit_cost'], ENT_QUOTES) : '0';
     $opts = proc_items_options($conn, $is_super_admin, $company_id, $iid);
     return '<div class="proc-line form-grid" style="align-items:end;margin-bottom:8px">'
         . '<div class="form-group"><label for="emsf_380_a0417">الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item" id="emsf_380_a0417">' . $opts . '</select></div>'
@@ -469,7 +483,7 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
                         echo "<td>" . htmlspecialchars((string)($row['issue_date'] ?? '')) . "</td>";
                         echo "<td>" . htmlspecialchars($equip) . "</td>";
                         echo "<td>" . htmlspecialchars((string)($row['maint_type'] ?? '')) . "</td>";
-                        echo "<td>" . htmlspecialchars(number_format((float)$row['total_cost'], 2)) . "</td>";
+                        echo "<td>" . htmlspecialchars($__cost($row['total_cost'])) . "</td>";
                         echo "<td><span class='action-btn'>" . htmlspecialchars((string)$row['state']) . "</span></td>";
                         echo "<td>" . intval($row['line_count']) . "</td>";
                         echo "</tr>";

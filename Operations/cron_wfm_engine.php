@@ -16,6 +16,8 @@
 if (!defined('EMS_CLI')) { define('EMS_CLI', true); } // قد يُركَّب على كرونٍ مضيف
 require_once __DIR__ . '/../includes/session_bootstrap.php';
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../includes/cron_guard.php';
+ems_cron_guard('cron_wfm_engine.php'); // INJ-0025: لا تُشغَّل من المتصفّح
 require_once __DIR__ . '/../includes/resolve_manager.php';
 require_once __DIR__ . '/../app/Services/Work/WorkItemService.php';
 while (ob_get_level()) { ob_end_clean(); }

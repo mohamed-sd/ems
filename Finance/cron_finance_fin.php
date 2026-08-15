@@ -6,6 +6,8 @@
  */
 $IS_CLI = (PHP_SAPI === 'cli');
 require __DIR__ . '/../config.php';
+require_once __DIR__ . '/../includes/cron_guard.php';
+ems_cron_guard('cron_finance_fin.php'); // INJ-0025: لا تُشغَّل من المتصفّح
 
 // حارس التشغيل عبر المتصفح: ?key=... يُطابَق مع FINANCE_CRON_KEY من .env (ADR-04).
 // fail-closed: مفتاح غير مضبوط في .env = لا مسار ويب إطلاقًا (CLI لا يتأثر).

@@ -96,11 +96,39 @@ if (isset($_GET['action']) && isset($_GET['pid'])) {
 }
 
 // ── إنجاز بند إقفال ──
-if (isset($_GET['done_item'])) {
+/* ══ INJ-0183 · لا إنجازَ لبندِ إقفالٍ بلا مرجعِ دليل ══════════════════════════
+     نصُّ القبول: «إنجازُ بندِ إقفالٍ **بلا مرجعِ دليلٍ** يُرفض 422؛ وكلُّ بندٍ
+     منجَزٍ **يعرض دليلَه ومن أنجزه ومتى**».
+     وكان الإنجازُ رابطَ `GET` عاريًا: نقرةٌ واحدةٌ تُعلن بندَ إقفالٍ منجَزًا بلا
+     ما يُثبته — والإقفالُ المحاسبيُّ أثقلُ من أن يُقفل بنقرة.
+   ◆ **وصار POST**: فعلٌ يُغيّر الحالةَ لا يُنفَّذ بـGET — فمعاينةٌ آليةٌ أو
+     رابطٌ في بريدٍ كانا يُنجزان البندَ بلا قصدِ صاحبه (نمطُ INJ-0160 نفسُه).
+   ◆ والدليلُ يُحفظ في `note` ويُعرض في الجدول مع `done_by` و`done_at`. */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['done_item'])) {
     if (!$can_edit) { ems_gov_flash_redirect('periods_fin.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
-    $it = intval($_GET['done_item']); $pid = intval($_GET['pid'] ?? 0);
-    fin_gate($is_super_admin)->update('fin_closing_items', array('item_state'=>'done','done_by'=>$current_user_id,'done_at'=>date('Y-m-d H:i:s')), array('id'=>$it));
-    ems_gov_redirect("Location: periods_fin.php?pid=$pid&msg=تم+إنجاز+البند+✅"); exit();
+    $it = intval($_POST['done_item']); $pid = intval($_POST['pid'] ?? 0);
+    $evidence = trim((string) ($_POST['evidence_ref'] ?? ''));
+
+    require_once __DIR__ . '/../includes/source_doc_guard.php';
+    $__src = ems_require_source_doc($conn, $company_id, 'closing_item',
+        array('note' => $evidence), $current_user_id, 'periods_fin#' . $it);
+    if (!$__src['ok']) {
+        ems_gov_flash_redirect('periods_fin.php?pid=' . $pid, $__src['reason'] . ' ❌', 'GOV-FAIL-422', '');
+        exit();
+    }
+    fin_gate($is_super_admin)->update('fin_closing_items',
+        array('item_state' => 'done', 'done_by' => $current_user_id,
+              'done_at' => date('Y-m-d H:i:s'), 'note' => $evidence),
+        array('id' => $it));
+    ems_gov_redirect("Location: periods_fin.php?pid=$pid&msg=تم+إنجاز+البند+بدليله+✅"); exit();
+}
+/* ◆ والمسلكُ القديمُ بـGET **يُردُّ صراحةً** لا يُترك يعمل بصمت — فمن حفظ
+     الرابطَ يعرف لماذا لم يعد يعمل. */
+if (isset($_GET['done_item'])) {
+    ems_gov_flash_redirect('periods_fin.php?pid=' . intval($_GET['pid'] ?? 0),
+        'إنجازُ بندِ الإقفالِ صار يحتاج مرجعَ دليلٍ — استعمل زرَّ الإنجاز في الجدول ❌',
+        'GOV-FAIL-422', 'الإقفالُ أثقلُ من أن يقع بنقرةِ رابط');
+    exit();
 }
 
 // ── إنشاء فترة + بنود إقفالها ──
@@ -241,7 +269,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <h5 style="margin:18px 0 10px"><i class="fas fa-list-check"></i> قائمة إقفال الفترة #<?php echo $sel_pid; ?></h5>
         <div class="table-container">
             <table class="alltables" style="width:100%;">
-                <thead><tr><th>البند</th><th>إلزامي</th><th>الحالة</th><th>الإجراء</th></tr></thead>
+                <thead><tr><th>البند</th><th>إلزامي</th><th>الحالة</th><th>الدليل</th><th>مَن أنجزه ومتى</th><th>الإجراء</th></tr></thead>
                 <tbody>
                 <?php
                 $done = 0; $total = 0;
@@ -254,14 +282,47 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     echo "<td>" . htmlspecialchars($closing_steps[$it['step']] ?? $it['step']) . "</td>";
                     echo "<td>" . ($it['required'] ? '✔' : '—') . "</td>";
                     echo "<td><span class='badge badge-" . $tone . "'>" . ($lbl[$it['item_state']] ?? $it['item_state']) . "</span></td>";
+                    /* ◆ الدليلُ ومَن أنجزه ومتى — معروضةٌ لا مخزَّنةً وحدَها (INJ-0183) */
+                    $__ev = trim((string) ($it['note'] ?? ''));
+                    echo "<td>" . ($__ev !== '' ? htmlspecialchars($__ev, ENT_QUOTES, 'UTF-8')
+                                                : "<span style='color:#999'>—</span>") . "</td>";
+                    $__who = intval($it['done_by'] ?? 0);
+                    $__when = trim((string) ($it['done_at'] ?? ''));
+                    if ($__who > 0 || $__when !== '') {
+                        if (!isset($__doerName)) { $__doerName = array(); }
+                        if ($__who > 0 && !isset($__doerName[$__who])) {
+                            $__ns = $conn->prepare('SELECT name FROM users WHERE id = ? LIMIT 1');
+                            if ($__ns) {
+                                $__ns->bind_param('i', $__who);
+                                $__ns->execute();
+                                $__nr = $__ns->get_result()->fetch_row();
+                                $__ns->close();
+                                $__doerName[$__who] = $__nr ? (string) $__nr[0] : ('#' . $__who);
+                            }
+                        }
+                        echo "<td>" . htmlspecialchars(($__who > 0 ? ($__doerName[$__who] ?? ('#' . $__who)) : '—')
+                             . ' · ' . ($__when !== '' ? $__when : '—'), ENT_QUOTES, 'UTF-8') . "</td>";
+                    } else {
+                        echo "<td><span style='color:#999'>—</span></td>";
+                    }
                     echo "<td>";
-                    if ($can_edit && $it['item_state'] === 'pending') echo "<a href='?done_item=" . intval($it['id']) . "&pid=$sel_pid' class='action-btn edit' title='إنجاز'><i class='fas fa-check'></i></a>";
+                    if ($can_edit && $it['item_state'] === 'pending') {
+                        /* ◆ نموذجُ POST بدليلٍ إلزاميٍّ — لا رابطَ إنجازٍ عارٍ */
+                        echo "<form method='post' style='display:flex;gap:4px;align-items:center'>"
+                           . (function_exists('csrf_field') ? csrf_field() : '')
+                           . "<input type='hidden' name='done_item' value='" . intval($it['id']) . "'>"
+                           . "<input type='hidden' name='pid' value='" . intval($sel_pid) . "'>"
+                           . "<input type='text' name='evidence_ref' required minlength='3' style='width:150px'"
+                           . " placeholder='مرجعُ الدليل' title='مرجعُ الدليل — إلزاميّ'>"
+                           . "<button type='submit' class='action-btn edit' title='إنجاز'>"
+                           . "<i class='fas fa-check'></i></button></form>";
+                    }
                     echo "</td></tr>";
                 }
                 $pct = $total > 0 ? round($done / $total * 100) : 0;
                 ?>
                 </tbody>
-                <tfoot><tr><th colspan="4">نسبة الاكتمال: <span class="badge badge-<?php echo $pct == 100 ? 'success' : 'warn'; ?>"><?php echo $pct; ?>%</span> (<?php echo $done; ?>/<?php echo $total; ?>)</th></tr></tfoot>
+                <tfoot><tr><th colspan="6">نسبة الاكتمال: <span class="badge badge-<?php echo $pct == 100 ? 'success' : 'warn'; ?>"><?php echo $pct; ?>%</span> (<?php echo $done; ?>/<?php echo $total; ?>)</th></tr></tfoot>
             </table>
         </div>
         <?php endif; ?>

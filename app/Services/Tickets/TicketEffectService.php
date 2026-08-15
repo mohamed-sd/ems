@@ -52,8 +52,22 @@ class TicketEffectService
     {
         $tkId = intval($tkId);
         $mws = intval($maintenanceWsId);
-        // الحارس: المعتمد ليس مكلف المسار نفسه (لا اعتماد ذات) — يد ثانية
+        /* ══ INJ-0520 · الحارسُ كان تعليقًا لا حكمًا ═══════════════════════════
+             السطرُ التالي كان يقرأ مكلَّفَ المسارِ **ولا يستعمله**: تعليقٌ يقول
+             «لا اعتمادَ ذاتٍ» وصفٌّ يُجلَب ثم يُهمل — فمكلَّفُ مسارِ الصيانةِ
+             يعتمد سببَ مسارِه الفنيَّ بنفسِه، ويُفتح أمرُ عملٍ بيدٍ واحدة.
+             والفرقُ بين «حارسٍ مكتوبٍ» و«حارسٍ يقع» هو هذا البند كلُّه. */
         $w = $conn->query("SELECT assignee_person_id FROM ticket_workstreams WHERE ws_id = {$mws}")->fetch_assoc();
+        $p0 = intval($approverPersonId);
+        if ($w && intval($w['assignee_person_id']) > 0 && intval($w['assignee_person_id']) === $p0) {
+            /* ◆ والرفضُ **يُسجَّل**: منعٌ صامتٌ يُقرأ عطلًا فيُلتَفُّ عليه */
+            if (function_exists('ems_log_denial')) {
+                @ems_log_denial('TKT-403-SELFCAUSE', 'ticket_workstreams:' . $mws,
+                    'مكلَّفُ المسارِ حاول اعتمادَ سببِه الفنيِّ بنفسِه');
+            }
+            return array('ok' => false, 'code' => 403,
+                'reason' => 'TKT-403-SELFCAUSE: لا يعتمد مكلَّفُ المسارِ سببَه الفنيَّ — يدٌ ثانيةٌ لازمة');
+        }
         $woRef = 'WO-TK' . $tkId;
         $stmt = $conn->prepare(
             "INSERT INTO ticket_effects (ws_id, effect_type, effect_ref, is_provisional) VALUES (?, 'work_order', ?, 0)");
