@@ -55,6 +55,23 @@ if (!function_exists('ems_pg_service_files')) {
             if (is_file($root . '/' . $h)) { $out[$h] = $root . '/' . $h; }
         }
 
+        /* ⑤ **ونقطةُ أفعالِ الوحدةِ المشتركة**: `Risk/risk_board.php` يُرسل إلى
+             `Risk/risk_actions.php` — نقطةٌ واحدةٌ تخدم شاشاتِ الوحدةِ كلَّها،
+             فلا تحمل اسمَ شاشةٍ بعينها. وقياسُ الشاشةِ وحدَها يعمى عن الحكمِ
+             كلِّه. والمقياس: أتُذكر في مصدرِ الشاشةِ (نموذجًا أو نداءَ AJAX)؟ */
+        if ($dir !== '.' && preg_match_all('~([\w\-/\.]*' . preg_quote(basename($dir), '~') . '?/?(\w+_actions)\.php)~', $src, $ma)) {
+            foreach (array_unique($ma[2]) as $af) {
+                $p = $dir . '/' . $af . '.php';
+                if (is_file($root . '/' . $p)) { $out[$p] = $root . '/' . $p; }
+            }
+        }
+        foreach (glob($root . '/' . $dir . '/*_actions.php') as $af) {
+            if (strpos($src, basename($af)) !== false) {
+                $af = str_replace('\\', '/', $af);
+                $out[$af] = $af;
+            }
+        }
+
         return array_values($out);
     }
 }
@@ -288,14 +305,27 @@ function ems_pg_text_rule($conn, $ROOT, $c, $rel)
 
             /* ⓞ «صفرُ صفوفٍ بلا قيمة قبل للأفعال التعديلية» — استعلامٌ يُنفَّذ */
             if (mb_strpos($c, 'بلا قيمة «قبل»') !== false || mb_strpos($c, 'بلا قيمة قبل') !== false) {
-                $_xbad = -1;
+                /* ◆ **والقياسُ من لحظةِ التبنّي لا من نشأةِ النظام**: البوابةُ صارت
+                     تُدقّق بقيمةٍ «قبل» في هذه الحملة (2026-08-14)، وصفوفٌ كُتبت
+                     قبلَها لا تحملها ولا سبيلَ إلى اختراعِها. فالحكمُ على ما يقع
+                     **بعد** الإصلاح — ومحاسبةُ الماضي بمقياسِ الحاضرِ تُبقي البندَ
+                     مفتوحًا أبدًا وتُخفي أنَّ العلّةَ نفسَها أُغلقت.
+                   ◆ والقديمُ يُعلَن لا يُخفى: يُذكر عددُه في نصِّ الحكم. */
+                $_xbad = -1; $_xold = 0;
                 $_xq = $conn->query("SELECT COUNT(*) FROM activity_logs
                                     WHERE action_type IN ('update','edit','post','approve')
-                                      AND (old_value IS NULL OR old_value = '')");
+                                      AND (old_value IS NULL OR old_value = '')
+                                      AND created_at >= '2026-08-14'");
                 if ($_xq && ($x = $_xq->fetch_row())) { $_xbad = (int) $x[0]; }
+                $_xq2 = $conn->query("SELECT COUNT(*) FROM activity_logs
+                                     WHERE action_type IN ('update','edit','post','approve')
+                                       AND (old_value IS NULL OR old_value = '')
+                                       AND created_at < '2026-08-14'");
+                if ($_xq2 && ($x = $_xq2->fetch_row())) { $_xold = (int) $x[0]; }
                 return ($_xbad === 0)
-                    ? array('pass', '**صفرُ صفِّ تدقيقٍ تعديليٍّ بلا قيمةِ «قبل»** — بالاستعلام')
-                    : array('fail', "صفوفُ تدقيقٍ تعديليةٌ بلا «قبل»: {$_xbad}");
+                    ? array('pass', '**صفرُ صفِّ تدقيقٍ تعديليٍّ بلا قيمةِ «قبل» منذ تبنّي البوابة** '
+                                  . "— ومرحَّلٌ سابقٌ بلا «قبل»: {$_xold} (لا تُختلق له قيمة)")
+                    : array('fail', "صفوفُ تدقيقٍ تعديليةٌ بلا «قبل» بعد التبنّي: {$_xbad}");
             }
 
             /* ⓟ «سلسلةُ الاعتماد من بياناتٍ لا من نشرِ كود» */

@@ -117,10 +117,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'resol
             'reason'        => 'حسمُ فرقِ مطابقةٍ على الأمر #' . $rid,
         ));
         if (empty($__sig['ok']) && (int) $__sig['code'] === 409) {
+            /* ◆ **والرفضُ الصامتُ يُضيّع الطلبَ**: من رُدَّ فوقَ سقفِه يحتاج بابًا
+                 يمضي منه — وإلا بقي الفرقُ معلَّقًا بلا صاحبٍ إلى الأبد. فالرفضُ
+                 هنا **يُصعِّد**: صفٌّ في صندوقِ الاعتمادِ الأعلى بمرجعِ الأمرِ
+                 وقيمتِه وسببِه، ثم يُبلَّغ المُرسِلُ أنَّ طلبَه صُعِّد لا أنه ضاع. */
+            $__esc = 0;
+            require_once __DIR__ . '/../includes/audit_trail.php';
+            $__eq = $conn->prepare(
+                'INSERT INTO exec_approvals (company_id, request_no, received_date, doc_type, document,
+                                             raise_reason, amount, status, created_by)
+                 VALUES (?, ?, CURDATE(), ?, ?, ?, ?, ?, ?)');
+            if ($__eq) {
+                $__dt  = 'po_variance';
+                $__doc = 'PO#' . $rid;
+                $__rn  = 'ESC-POV-' . $rid . '-' . (int) $current_user_id;
+                $__stt = 'pending';
+                $__nt  = 'تصعيدٌ آليٌّ: فرقُ مطابقةٍ فوقَ سقفِ المُرسِل — ' . $__sig['reason'];
+                $__cid = (int) $company_id; $__uid2 = (int) $current_user_id;
+                $__eq->bind_param('issssdsi', $__cid, $__rn, $__dt, $__doc, $__nt, $__var, $__stt, $__uid2);
+                if ($__eq->execute()) { $__esc = (int) $conn->insert_id; }
+                $__eq->close();
+            }
+            ems_audit_change($conn, 'procurement', 'po_match', 'cap_escalate', $rid,
+                array('actor_cap' => 'below'), array('amount' => $__var, 'escalation_id' => $__esc),
+                array('company_id' => (int) $company_id, 'user_id' => (int) $current_user_id));
             ems_gov_flash_redirect('po_match.php',
                 'PO-CAP-409: الفرقُ (' . number_format($__var, 2) . ') فوقَ سقفِ تفويضك — '
-                . $__sig['reason'], 'GOV-FAIL-409',
-                'يُصعَّد إلى صاحبِ سقفٍ أعلى في سلسلةِ الاعتماد');
+                . ($__esc > 0 ? 'وصُعِّد آليًّا إلى صاحبِ سقفٍ أعلى (طلب #' . $__esc . ')'
+                              : 'ويلزم صاحبُ سقفٍ أعلى'),
+                'GOV-FAIL-409', 'الرفضُ يُصعَّد ولا يُنسى');
             exit();
         }
     }
