@@ -367,11 +367,24 @@ if (!function_exists('ems_nav_norm_route')) {
             $r = $parts[0];
             $anchor = trim($parts[1]);
         }
+        /* ◆ **والمنظرُ المُعلَنُ جزءٌ من هويةِ الرابطِ كالمِرساة**: `?view=` مُعلَنٌ
+             في `includes/nav_views.php` يفتح محتوًى مختلفًا فعلًا (قسمًا مركَّزًا
+             أو ترشيحًا بعمود)، فطيُّه في اسمِ الملفِّ يجعل وجهتين تبدوان واحدة.
+             وغيرُ المُعلَنِ **لا يُميّز** — فلا يُهرَّب به صفٌّ مكرَّرٌ من الحارس. */
+        $view = '';
+        if ($anchor === '' && strpos($r, 'view=') !== false) {
+            require_once __DIR__ . '/nav_views.php';
+            if (ems_nav_route_has_view($r) && preg_match('~[?&]view=([^&#]+)~', $r, $mv)) {
+                $view = strtolower(urldecode($mv[1]));
+            }
+        }
         $r = explode('?', $r, 2)[0];                 /* سلسلةُ الاستعلامِ منظرٌ لا ملف */
         $r = preg_replace('~^(\.\./)+~', '', $r);    /* البادئةُ النسبية */
         $r = strtolower(trim(ltrim((string) $r, '/')));
-        if ($dropAnchor || $anchor === '') { return $r; }
-        return $r . '#' . strtolower($anchor);
+        if ($dropAnchor) { return $r; }
+        if ($anchor !== '') { return $r . '#' . strtolower($anchor); }
+        if ($view !== '') { return $r . '?view=' . $view; }
+        return $r;
     }
 }
 if (!function_exists('ems_nav_mark_printed')) {
@@ -394,7 +407,16 @@ if (!function_exists('ems_nav_mark_printed')) {
         }
         $file = ems_nav_norm_route($route, true);          /* بلا مِرساة */
         if ($file === '') { return true; }
+        /* ── وما الذي يُميّز رابطين على ملفٍّ واحد؟ ───────────────────────────
+           مِرساةٌ (`#`) — أو **مِنظرٌ مُعلَنٌ** في `includes/nav_views.php`.
+           والقيدُ «مُعلَن» جوهريّ: `?view=` غيرُ مُعلَنٍ لا يُغيّر ما يُعرض
+           (قِيس: صفرٌ من ١٥ ملفًّا يقرأ `$_GET['view']` بنفسِه)، فلو عُدَّ
+           مميِّزًا لصار بابًا يُهرَّب منه كلُّ صفٍّ مكرَّرٍ من الحارس. */
         $hasAnchor = (strpos((string) $route, '#') !== false);
+        if (!$hasAnchor && strpos((string) $route, 'view=') !== false) {
+            require_once __DIR__ . '/nav_views.php';
+            $hasAnchor = ems_nav_route_has_view($route);
+        }
 
         $kLabel = $file . '||' . $label;                   /* ⓐ */
         $kBare  = $hasAnchor ? null : ($file . '||#bare'); /* ⓑ */

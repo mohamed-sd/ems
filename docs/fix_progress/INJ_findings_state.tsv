@@ -29,7 +29,7 @@ INJ-0027	P1	نعم	مُغلقٌ بشاهد	tests/credit_debit_note_test.php · t
 INJ-0028	P1	نعم	غيرُ مقيس	
 INJ-0029	P1	نعم	غيرُ مقيس	
 INJ-0030	P1	نعم	مُغلقٌ بشاهد	
-INJ-0031	P1	نعم	غيرُ مقيس	
+INJ-0031	P1	نعم	مُغلقٌ بشاهد	
 INJ-0032	P1	نعم	مُغلقٌ بشاهد	tools/fix_u13_nav_tests.php
 INJ-0033	P1	نعم	غيرُ مقيس	
 INJ-0034	P1	نعم	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
@@ -112,7 +112,7 @@ INJ-0110	P1	نعم	غيرُ مقيس
 INJ-0111	P1	نعم	غيرُ مقيس	
 INJ-0112	P1	نعم	مُغلقٌ بشاهد	
 INJ-0113	P1	نعم	غيرُ مقيس	
-INJ-0114	P1	نعم	غيرُ مقيس	
+INJ-0114	P1	نعم	مُغلقٌ بشاهد	
 INJ-0115	P1	لا	غيرُ مقيس	
 INJ-0116	P1	نعم	غيرُ مقيس	
 INJ-0117	P2	نعم	غيرُ مقيس	
@@ -166,7 +166,7 @@ INJ-0164	P2	نعم	مُغلقٌ بشاهد	tests/dept_space_screens_test.php
 INJ-0165	P2	لا	غيرُ مقيس	
 INJ-0166	P2	لا	غيرُ مقيس	
 INJ-0167	P2	لا	غيرُ مقيس	
-INJ-0168	P2	نعم	غيرُ مقيس	
+INJ-0168	P2	نعم	مُغلقٌ بشاهد	
 INJ-0169	P2	لا	غيرُ مقيس	
 INJ-0170	P2	نعم	غيرُ مقيس	
 INJ-0171	P2	لا	مُغلقٌ بشاهد	tools/build_dept_space_wrappers.php · tools/fix_od19_probe.php
@@ -248,7 +248,7 @@ INJ-0246	P2	نعم	غيرُ مقيس
 INJ-0247	P2	نعم	مُغلقٌ بشاهد	tests/dept_space_screens_test.php
 INJ-0248	P2	نعم	غيرُ مقيس	
 INJ-0249	P2	نعم	غيرُ مقيس	
-INJ-0250	P2	نعم	غيرُ مقيس	
+INJ-0250	P2	نعم	مُغلقٌ بشاهد	
 INJ-0251	P2	نعم	غيرُ مقيس	
 INJ-0252	P2	لا	غيرُ مقيس	
 INJ-0253	P2	لا	مُغلقٌ بشاهد	
@@ -510,9 +510,9 @@ INJ-0508	P3	لا	مُغلقٌ بشاهد
 INJ-0509	P3	لا	غيرُ مقيس	
 INJ-0510	P3	لا	غيرُ مقيس	
 INJ-0511	P3	لا	غيرُ مقيس	
-INJ-0512	P3	لا	غيرُ مقيس	
+INJ-0512	P3	لا	مُغلقٌ بشاهد	
 INJ-0513	P3	لا	مُغلقٌ بشاهد	
-INJ-0514	P3	لا	غيرُ مقيس	
+INJ-0514	P3	لا	مُغلقٌ بشاهد	
 INJ-0515	P3	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0516	P3	لا	مُغلقٌ بشاهد	tools/fix_missing_screen_campaign.php
 INJ-0517	P3	لا	مُغلقٌ بشاهد	tests/nav_stage_label_test.php
@@ -583,12 +583,12 @@ INJ-0581	P3	لا	غيرُ مقيس
 INJ-0582	P3	نعم	غيرُ مقيس	
 INJ-0583	P3	نعم	غيرُ مقيس	
 INJ-0584	P3	لا	غيرُ مقيس	
-INJ-0585	P3	لا	غيرُ مقيس	
+INJ-0585	P3	لا	مُغلقٌ بشاهد	
 INJ-0586	P3	نعم	غيرُ مقيس	
 INJ-0587	P3	لا	مُغلقٌ بشاهد	tests/approvals_inbox_parity_test.php
 INJ-0588	P3	نعم	مُغلقٌ بشاهد	
 INJ-0589	P3	نعم	مُغلقٌ بشاهد	tools/fix_od19_probe.php
-INJ-0590	P3	لا	غيرُ مقيس	
+INJ-0590	P3	لا	مُغلقٌ بشاهد	
 INJ-0591	P4	لا	غيرُ مقيس	
 INJ-0592	P4	لا	غيرُ مقيس	
 INJ-0593	P4	لا	مُغلقٌ بشاهد	tests/ui_consistency_scan_test.php

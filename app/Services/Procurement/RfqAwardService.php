@@ -34,6 +34,49 @@ class RfqAwardService
         if ($quoteId <= 0)        { return array('ok' => false, 'msg' => 'عرضٌ غيرُ صالح (422)', 'award_id' => 0); }
         if (trim($reason) === '') { return array('ok' => false, 'msg' => 'سببُ الترسية إلزامي — لا ترسيةَ صامتة (422)', 'award_id' => 0); }
 
+        /* ══ INJ-0031 · **التفويضُ لا الكتابةُ الموازية** ═══════════════════════════
+             كان هذا المسارُ يكتب `rfq_awards` بنفسِه — فمحرّكانِ يكتبان الجدولَ
+             نفسَه ويتفرَّقان: هذا يُرسي عرضًا واحدًا، و`RFQService::award` يُرسي
+             كمياتٍ ويحدّث عدّاداتِ البنودِ وينشر حقيقةً محايدةً ويحرس السقف.
+
+             **فصار الكاتبُ واحدًا**: هذه الخدمةُ تُترجم «عرضٌ واحد» إلى ترسيةِ
+             كميتِه ثم تُفوّض. ويبقى مدخلُ شاشةِ المقارنةِ كما هو — تغيَّر مَن
+             يكتب لا مَن يُنادى.
+             ◆ والكميةُ من العرضِ نفسِه (`qty_offered`) — فلا رقمَ يُخترع. */
+        try {
+            $svc = dirname(__DIR__) . '/Procurement/RFQService.php';
+            if (is_file($svc)) { require_once $svc; }
+            if (class_exists('\\App\\Services\\Procurement\\RFQService') && function_exists('ems_tenant_db')) {
+                $qs = $this->conn->prepare('SELECT rfq_id, line_id, supplier_id, qty_offered
+                                              FROM rfq_quotes WHERE id = ? AND company_id = ? LIMIT 1');
+                if ($qs) {
+                    $qs->bind_param('ii', $quoteId, $companyId);
+                    $qs->execute();
+                    $qr = $qs->get_result()->fetch_assoc();
+                    $qs->close();
+                    if ($qr && $qr['line_id'] !== null) {
+                        $gate = ems_tenant_db();
+                        $res = \App\Services\Procurement\RFQService::award(
+                            $this->conn, $gate, (int) $companyId, (int) $qr['rfq_id'],
+                            array(array('line_id' => (int) $qr['line_id'],
+                                        'supplier_id' => (int) $qr['supplier_id'],
+                                        'qty' => (float) $qr['qty_offered'],
+                                        'reason' => $reason)),
+                            (int) $actorId);
+                        $aid = 0;
+                        $g = $this->conn->query('SELECT id FROM rfq_awards WHERE quote_id = '
+                            . (int) $quoteId . ' ORDER BY id DESC LIMIT 1');
+                        if ($g && ($gx = $g->fetch_row())) { $aid = (int) $gx[0]; }
+                        return array('ok' => !empty($res['ok']), 'award_id' => $aid,
+                            'msg' => (string) $res['reason']);
+                    }
+                }
+            }
+        } catch (\Throwable $de) {
+            error_log('rfq award delegate: ' . $de->getMessage());
+            /* التفويضُ تعذَّر — يُكمَل بالمسارِ القديمِ فلا تتعطّل الترسية */
+        }
+
         $this->conn->begin_transaction();
         try {
             $st = $this->conn->prepare(

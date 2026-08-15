@@ -194,17 +194,25 @@ if ($r) { $hash24 = (int) $r->fetch_row()[0]; }
      (`ticket_recurrence.php` و`ticket_types_config.php`). وتجريدُها يجعلهما
      رابطًا واحدًا فيختفي أحدُ المدخلين — وأيُّ التسميتين صحيحةٌ (أم تُقسَم
      الشاشةُ إلى ملفّين) **قرارُ مالكِ نطاقٍ** مرفوعٌ ولا يُحسم هنا. */
-$say("  ○ مرفوعٌ لقرارِ المالك: {$hash24} مِرساةً باقيةً للدور ٢٤ — ملفٌّ واحدٌ"
-     . ' بتسميتين (`ticket_recurrence` · `ticket_types_config`): أيُّ التسميتين'
-     . ' صحيحةٌ أم تُقسَم الشاشة؟ (INJ-0512 · INJ-0514 مفتوحان)');
+/* ◆ وحُسم: المدخلُ الثاني صار **منظرًا بمعامل** (`?view=settings`) لا مِرساةً
+     بلا أثر — فالوجهتانِ مختلفتانِ فعلًا والمستخدمُ يجد ما ضغط عليه. */
+$ok($hash24 === 0, "وصفوفُ الدور ٢٤ بلا مِرساة ({$hash24}) — والمدخلُ الثاني منظرٌ بمعامل");
 /* وما **أُصلح** يُؤكَّد: كلُّ مِرساةٍ لا تُميّز شيئًا جُرِّدت */
-$redundant = 0;
-$r = $conn->query("SELECT ni.id FROM nav_items ni WHERE ni.route LIKE '%#%'
+/* ◆ و«الزائدة» تُعرَّف بدقة: مِرساةٌ **من رموزِ التنقّلِ المولَّدة** (`n9g7i1`)
+     لا تُميّز شيئًا حين يظهر الملفُّ مرةً واحدة. أمّا مِرساةٌ **دلاليةٌ**
+     (`#plan`) فوجهةٌ حقيقيةٌ تقفز إلى قسمٍ في الشاشة — وتجريدُها يُفقد
+     المستخدمَ موضعَه (INJ-0459 بنت لها مرساةً في الوجهة). */
+$redundant = 0; $semantic = 0;
+$r = $conn->query("SELECT ni.id, ni.route FROM nav_items ni WHERE ni.route LIKE '%#%'
                      AND (SELECT COUNT(*) FROM nav_items n2 WHERE n2.role_id = ni.role_id
                           AND SUBSTRING_INDEX(n2.route, '#', 1) = SUBSTRING_INDEX(ni.route, '#', 1)) = 1");
-while ($r && $r->fetch_row()) { $redundant++; }
+while ($r && ($x = $r->fetch_assoc())) {
+    $frag = substr(strrchr((string) $x['route'], '#'), 1);
+    if (preg_match('~^n9g\d+i\d+$~', $frag)) { $redundant++; } else { $semantic++; }
+}
 $ok($redundant === 0,
-    "**وصفرُ مِرساةٍ زائدةٍ في النظامِ كلِّه** ({$redundant}) — كلُّ مِرساةٍ باقيةٍ تُميّز ملفًّا بمدخلين");
+    "**وصفرُ مِرساةِ تنقّلٍ زائدةٍ في النظامِ كلِّه** ({$redundant})"
+    . ($semantic ? " · ودلاليةٌ باقيةٌ: {$semantic}" : ''));
 
 /* ── ⑥ «موافقاتي» ظاهرةٌ لكلِّ دورٍ وتفتح مسارًا واحدًا (INJ-0127) ──────────── */
 $roles = array();

@@ -113,7 +113,21 @@ $__titleHtml = isset($header_title_html) ? $header_title_html : null;
      حين لا يكون للشاشةِ صفُّ تنقّلٍ (نقاطُ ردٍّ · شاشاتٌ تُفتح بمعرّف).
    ◆ ولا يُستبدل عنوانٌ صريحٌ بـ`$header_title_html` — فذاك ترويسةٌ مركَّبةٌ
      بعلاماتٍ، وإحلالُ نصٍّ محلَّها يُفقد بناءَها. */
-if ($__titleHtml === null && isset($GLOBALS['conn']) && $GLOBALS['conn'] instanceof mysqli) {
+/* ◆ **ولا يطغى على عنوانِ منظرٍ مطلوب**: شاشةٌ تحمل مناظرَ إخوتِها (INJ-0590)
+     عنوانُها يتبع المنظرَ لا تسميةَ الرابطِ العامّة — وإلا بدت كلُّ المناظرِ
+     شاشةً واحدةً بعنوانٍ واحد. */
+/* ◆ **والمنظرُ المُعلَنُ يحكم العنوانَ بنفسِه** (INJ-0512 · INJ-0514): رمزٌ
+     مُعلَنٌ في `includes/nav_views.php` عنوانُه تسميةُ الرابطِ الذي ضُغط —
+     فمَن ضغط «الفاتورة الضريبية» يرى «الفاتورة الضريبية» لا «فواتير العملاء».
+     ورمزٌ **غيرُ مُعلَنٍ** لا يصل إلى هنا أصلًا: `ems_nav_view_resolve` يردُّه
+     إلى الرابطِ العاري — فلا صفحةَ بمعاملٍ ميتٍ تُوهم بمحتوًى لا يأتي. */
+require_once __DIR__ . '/nav_view.php';
+$__navView = ems_nav_view_resolve();
+if ($__navView !== null && $__titleHtml === null) { $__title = $__navView['label']; }
+
+$__viewActive = (isset($_GET['view']) && trim((string) $_GET['view']) !== '');
+if (!$__viewActive && $__titleHtml === null
+    && isset($GLOBALS['conn']) && $GLOBALS['conn'] instanceof mysqli) {
     $__navLabel = null;
     try {
         $__script = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
@@ -243,3 +257,8 @@ if (!empty($header_context) && is_array($header_context)) {
     echo '</div>';
     $header_context = array(); // لا تسرُّبَ لتضمينٍ لاحقٍ في الصفحة نفسها
 }
+
+/* ◆ شارةُ المنظرِ تحت الترويسةِ مباشرةً — تُعلن أيَّ منظرٍ أنت فيه وتردُّك
+     إلى الكلِّ بضغطةٍ واحدة. وهي المُطبِّقُ أيضًا: تحمل الإعلانَ وتُنفّذه على
+     ما صُيِّر. وتُطبع مرةً واحدةً مهما تكرّر تضمينُ الترويسة. */
+echo ems_nav_view_chip();

@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-13 03:14:04
--- الجداول: 548 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-15 10:24:13
+-- الجداول: 553 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -5643,6 +5643,8 @@ CREATE TABLE `financing_operations` (
   `maturity_date` date DEFAULT NULL,
   `state` enum('draft','negotiation','approved','signed','active','paying','settled','closed','defaulted') NOT NULL DEFAULT 'draft',
   `created_by` int(11) DEFAULT NULL,
+  `authority_ref` varchar(64) DEFAULT NULL COMMENT 'مرجعُ تفويضِ من اعتمد — signing_authorities.auth_id',
+  `escalated_to` varchar(64) DEFAULT NULL COMMENT 'مرجعُ صفِّ التصعيدِ في exec_approvals عند تجاوزِ السقف',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`op_id`),
@@ -7068,6 +7070,136 @@ CREATE TABLE `nav09_file_map` (
 
 -- ── Table: nav_items ──
 CREATE TABLE `nav_items` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_id` int(11) NOT NULL COMMENT 'الدور المالك لهذا العنصر في قائمته',
+  `door` varchar(16) NOT NULL COMMENT 'HOME·DAILY·APPR·REC·REP·SET — الأبواب الستة',
+  `group_id` int(11) DEFAULT NULL COMMENT 'link_groups — مجموعةٌ قابلةٌ للطيّ داخل الباب؛ NULL = مباشرةً تحته',
+  `module_id` int(11) DEFAULT NULL COMMENT 'modules.id حين يكون العنصر شاشةً مسجَّلة — مرجعُ الصلاحية والاسم',
+  `label_ar` varchar(64) NOT NULL COMMENT 'اسم العرض؛ يُفحص خلوّه من المحظور المعماري عند الحفظ',
+  `route` varchar(128) NOT NULL COMMENT 'المسار كما في سجل الشاشات',
+  `icon` varchar(50) DEFAULT NULL,
+  `sort_order` int(11) NOT NULL DEFAULT 0 COMMENT 'الترتيب داخل الباب/المجموعة',
+  `counter_source` varchar(64) DEFAULT NULL COMMENT 'مُعرِّف العدّاد من سجل العدّادات — عدّادٌ واحدٌ بقيمةٍ واحدة',
+  `permission_code` varchar(128) DEFAULT NULL COMMENT 'كود الشاشة لفحص can_view؛ NULL = ظهورٌ بلا فحص (ثوابت)',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_nav_role_route` (`role_id`,`route`),
+  KEY `ix_nav_role_door` (`role_id`,`door`,`sort_order`),
+  KEY `ix_nav_group` (`group_id`),
+  KEY `ix_nav_module` (`module_id`),
+  CONSTRAINT `chk_nav_route_not_relative` CHECK (`route` is null or `route`  not like '../%'),
+  CONSTRAINT `chk_nav_door` CHECK (`door` in ('HOME','DAILY','APPR','REC','REP','SET','GOV','FIN','RISK')),
+  CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: nav_items_archive_alias ──
+CREATE TABLE `nav_items_archive_alias` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_id` int(11) NOT NULL COMMENT 'الدور المالك لهذا العنصر في قائمته',
+  `door` varchar(16) NOT NULL COMMENT 'HOME·DAILY·APPR·REC·REP·SET — الأبواب الستة',
+  `group_id` int(11) DEFAULT NULL COMMENT 'link_groups — مجموعةٌ قابلةٌ للطيّ داخل الباب؛ NULL = مباشرةً تحته',
+  `module_id` int(11) DEFAULT NULL COMMENT 'modules.id حين يكون العنصر شاشةً مسجَّلة — مرجعُ الصلاحية والاسم',
+  `label_ar` varchar(64) NOT NULL COMMENT 'اسم العرض؛ يُفحص خلوّه من المحظور المعماري عند الحفظ',
+  `route` varchar(128) NOT NULL COMMENT 'المسار كما في سجل الشاشات',
+  `icon` varchar(50) DEFAULT NULL,
+  `sort_order` int(11) NOT NULL DEFAULT 0 COMMENT 'الترتيب داخل الباب/المجموعة',
+  `counter_source` varchar(64) DEFAULT NULL COMMENT 'مُعرِّف العدّاد من سجل العدّادات — عدّادٌ واحدٌ بقيمةٍ واحدة',
+  `permission_code` varchar(128) DEFAULT NULL COMMENT 'كود الشاشة لفحص can_view؛ NULL = ظهورٌ بلا فحص (ثوابت)',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_nav_role_route` (`role_id`,`route`),
+  KEY `ix_nav_role_door` (`role_id`,`door`,`sort_order`),
+  KEY `ix_nav_group` (`group_id`),
+  KEY `ix_nav_module` (`module_id`),
+  CONSTRAINT `chk_nav_route_not_relative` CHECK (`route` is null or `route`  not like '../%'),
+  CONSTRAINT `chk_nav_door` CHECK (`door` in ('HOME','DAILY','APPR','REC','REP','SET','GOV','FIN','RISK')),
+  CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: nav_items_archive_anchors ──
+CREATE TABLE `nav_items_archive_anchors` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_id` int(11) NOT NULL COMMENT 'الدور المالك لهذا العنصر في قائمته',
+  `door` varchar(16) NOT NULL COMMENT 'HOME·DAILY·APPR·REC·REP·SET — الأبواب الستة',
+  `group_id` int(11) DEFAULT NULL COMMENT 'link_groups — مجموعةٌ قابلةٌ للطيّ داخل الباب؛ NULL = مباشرةً تحته',
+  `module_id` int(11) DEFAULT NULL COMMENT 'modules.id حين يكون العنصر شاشةً مسجَّلة — مرجعُ الصلاحية والاسم',
+  `label_ar` varchar(64) NOT NULL COMMENT 'اسم العرض؛ يُفحص خلوّه من المحظور المعماري عند الحفظ',
+  `route` varchar(128) NOT NULL COMMENT 'المسار كما في سجل الشاشات',
+  `icon` varchar(50) DEFAULT NULL,
+  `sort_order` int(11) NOT NULL DEFAULT 0 COMMENT 'الترتيب داخل الباب/المجموعة',
+  `counter_source` varchar(64) DEFAULT NULL COMMENT 'مُعرِّف العدّاد من سجل العدّادات — عدّادٌ واحدٌ بقيمةٍ واحدة',
+  `permission_code` varchar(128) DEFAULT NULL COMMENT 'كود الشاشة لفحص can_view؛ NULL = ظهورٌ بلا فحص (ثوابت)',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_nav_role_route` (`role_id`,`route`),
+  KEY `ix_nav_role_door` (`role_id`,`door`,`sort_order`),
+  KEY `ix_nav_group` (`group_id`),
+  KEY `ix_nav_module` (`module_id`),
+  CONSTRAINT `chk_nav_route_not_relative` CHECK (`route` is null or `route`  not like '../%'),
+  CONSTRAINT `chk_nav_door` CHECK (`door` in ('HOME','DAILY','APPR','REC','REP','SET','GOV','FIN','RISK')),
+  CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: nav_items_archive_chats ──
+CREATE TABLE `nav_items_archive_chats` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_id` int(11) NOT NULL COMMENT 'الدور المالك لهذا العنصر في قائمته',
+  `door` varchar(16) NOT NULL COMMENT 'HOME·DAILY·APPR·REC·REP·SET — الأبواب الستة',
+  `group_id` int(11) DEFAULT NULL COMMENT 'link_groups — مجموعةٌ قابلةٌ للطيّ داخل الباب؛ NULL = مباشرةً تحته',
+  `module_id` int(11) DEFAULT NULL COMMENT 'modules.id حين يكون العنصر شاشةً مسجَّلة — مرجعُ الصلاحية والاسم',
+  `label_ar` varchar(64) NOT NULL COMMENT 'اسم العرض؛ يُفحص خلوّه من المحظور المعماري عند الحفظ',
+  `route` varchar(128) NOT NULL COMMENT 'المسار كما في سجل الشاشات',
+  `icon` varchar(50) DEFAULT NULL,
+  `sort_order` int(11) NOT NULL DEFAULT 0 COMMENT 'الترتيب داخل الباب/المجموعة',
+  `counter_source` varchar(64) DEFAULT NULL COMMENT 'مُعرِّف العدّاد من سجل العدّادات — عدّادٌ واحدٌ بقيمةٍ واحدة',
+  `permission_code` varchar(128) DEFAULT NULL COMMENT 'كود الشاشة لفحص can_view؛ NULL = ظهورٌ بلا فحص (ثوابت)',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_nav_role_route` (`role_id`,`route`),
+  KEY `ix_nav_role_door` (`role_id`,`door`,`sort_order`),
+  KEY `ix_nav_group` (`group_id`),
+  KEY `ix_nav_module` (`module_id`),
+  CONSTRAINT `chk_nav_route_not_relative` CHECK (`route` is null or `route`  not like '../%'),
+  CONSTRAINT `chk_nav_door` CHECK (`door` in ('HOME','DAILY','APPR','REC','REP','SET','GOV','FIN','RISK')),
+  CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: nav_items_archive_dupes ──
+CREATE TABLE `nav_items_archive_dupes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role_id` int(11) NOT NULL COMMENT 'الدور المالك لهذا العنصر في قائمته',
+  `door` varchar(16) NOT NULL COMMENT 'HOME·DAILY·APPR·REC·REP·SET — الأبواب الستة',
+  `group_id` int(11) DEFAULT NULL COMMENT 'link_groups — مجموعةٌ قابلةٌ للطيّ داخل الباب؛ NULL = مباشرةً تحته',
+  `module_id` int(11) DEFAULT NULL COMMENT 'modules.id حين يكون العنصر شاشةً مسجَّلة — مرجعُ الصلاحية والاسم',
+  `label_ar` varchar(64) NOT NULL COMMENT 'اسم العرض؛ يُفحص خلوّه من المحظور المعماري عند الحفظ',
+  `route` varchar(128) NOT NULL COMMENT 'المسار كما في سجل الشاشات',
+  `icon` varchar(50) DEFAULT NULL,
+  `sort_order` int(11) NOT NULL DEFAULT 0 COMMENT 'الترتيب داخل الباب/المجموعة',
+  `counter_source` varchar(64) DEFAULT NULL COMMENT 'مُعرِّف العدّاد من سجل العدّادات — عدّادٌ واحدٌ بقيمةٍ واحدة',
+  `permission_code` varchar(128) DEFAULT NULL COMMENT 'كود الشاشة لفحص can_view؛ NULL = ظهورٌ بلا فحص (ثوابت)',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_nav_role_route` (`role_id`,`route`),
+  KEY `ix_nav_role_door` (`role_id`,`door`,`sort_order`),
+  KEY `ix_nav_group` (`group_id`),
+  KEY `ix_nav_module` (`module_id`),
+  CONSTRAINT `chk_nav_route_not_relative` CHECK (`route` is null or `route`  not like '../%'),
+  CONSTRAINT `chk_nav_door` CHECK (`door` in ('HOME','DAILY','APPR','REC','REP','SET','GOV','FIN','RISK')),
+  CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: nav_items_archive_views ──
+CREATE TABLE `nav_items_archive_views` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `role_id` int(11) NOT NULL COMMENT 'الدور المالك لهذا العنصر في قائمته',
   `door` varchar(16) NOT NULL COMMENT 'HOME·DAILY·APPR·REC·REP·SET — الأبواب الستة',
@@ -9156,6 +9288,8 @@ CREATE TABLE `risk_treatments` (
   `due_date` date NOT NULL,
   `state` enum('planned','in_progress','done','verified','overdue') NOT NULL DEFAULT 'planned',
   `done_evidence` text DEFAULT NULL COMMENT 'دليل الإنجاز — الإغلاق بقبول المتحقق',
+  `done_attachment` varchar(255) DEFAULT NULL COMMENT 'مسارُ مرفقِ دليلِ الإنجاز',
+  `done_ref` varchar(120) DEFAULT NULL COMMENT 'مرجعُ الدليل: رقمُ مستندٍ أو أمرِ عمل',
   `verified_by` int(11) DEFAULT NULL,
   `verified_at` timestamp NULL DEFAULT NULL,
   `authority_ref` varchar(120) NOT NULL DEFAULT '' COMMENT '§9-1 مرجع التفويض',

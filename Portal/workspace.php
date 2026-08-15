@@ -10,6 +10,30 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+
+/* ══ INJ-0585 · «مساحةُ العمل» صارت شاشةً واحدة ═════════════════════════════
+     كان في النظامِ شاشتانِ لغرضٍ واحد:
+       · `main/my_workspace.php` (مودول 228) — **٣٢ صفَّ تنقّلٍ** تشير إليها،
+         وهي ما يصل إليه المستخدمُ فعلًا.
+       · `Portal/workspace.php` (مودول 191) — **صفرُ صفِّ تنقّل**: لا يبلغها
+         أحدٌ من القائمة، ولا تُفتح إلا برابطٍ محفوظٍ أو مرجعٍ في تقرير.
+
+     **القرار: تبقى `main/my_workspace.php`** — لأنها الموصولةُ بالقائمةِ لكلِّ
+     الأدوار، وإبقاءُ المهجورةِ يعني شاشتين تتباعدان بلا أن يلاحظ أحد.
+
+     ◆ **ولا تُحذف**: التحويلُ يُبقي الروابطَ المحفوظةَ والمراجعَ في التقاريرِ
+       عاملةً — والحذفُ الفوريُّ يكسرها.
+     ◆ وكلُّ فتحةٍ تُسجَّل بمُحيلِها، ليُعرف من ما زال يستعمل الرابطَ القديم. */
+require_once __DIR__ . '/../includes/audit_trail.php';
+ems_audit_change($conn, 'portal', 'route_redirect', 'legacy_hit', 191,
+    array(),
+    array('from' => 'Portal/workspace.php', 'to' => 'main/my_workspace.php',
+          'referer' => mb_substr((string) ($_SERVER['HTTP_REFERER'] ?? ''), 0, 180)),
+    array('company_id' => intval($_SESSION['user']['company_id'] ?? 0),
+          'user_id' => intval($_SESSION['user']['id'] ?? 0)));
+header('Location: ../main/my_workspace.php');
+exit();
+
 require_once __DIR__ . '/../app/Services/Portal/WorkspaceFeedService.php';
 
 use App\Services\Portal\WorkspaceFeedService as WFS;

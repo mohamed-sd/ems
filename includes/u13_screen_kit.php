@@ -138,6 +138,73 @@ if (!$u13IsSuper && empty($__pp['can_view'])) {
     exit();
 }
 
+/* ══ INJ-0590 · جدولٌ واحدٌ ⇒ شاشةٌ واحدةٌ بمناظرَ لا خمسُ شاشات ═══════════════
+     خمسُ شاشاتٍ في `Audit/` تُصيَّر فوق `iaf_findings` ولا تختلف إلا في شرطِ
+     `where` وعنوانِها. ونصُّ القبول: **ملفُّ شاشةٍ واحدٌ**، والمناظرُ من منتقٍ
+     داخلَه.
+
+     ── والإصلاحُ في العُدَّةِ لا في الملفّاتِ المولَّدة ────────────────────────────
+     تلك الملفّاتُ يُعيد `tools/u13_screens_build.php` توليدَها، فأيُّ تعديلٍ
+     فيها يزول. فالمنتقي هنا:
+       · الشاشةُ **الأولى** على الجدولِ هي المضيفة، وأخواتُها **مناظرُ** فيها.
+       · فتحُ أختٍ مباشرةً ⇒ تحويلٌ إلى المضيفةِ بـ`?view=<اسمها>` — فلا يبقى
+         مسارٌ ثانٍ يُصيّر الجدولَ نفسَه.
+       · والمنظرُ يُبدّل `where` و`order` و`title` — فالمحتوى يتغيّر لا الشكل.
+     ◆ ولا تُحذف الملفّات: التحويلُ يُبقي الروابطَ المحفوظةَ عاملة. */
+if (!function_exists('u13_siblings')) {
+    /** أخواتُ الشاشةِ على الجدولِ نفسِه — من بيانِ الشاشاتِ لا من القرص. */
+    function u13_siblings($root, $table)
+    {
+        static $memo = array();
+        if (isset($memo[$table])) { return $memo[$table]; }
+        $out = array();
+        /* ◆ البيانُ **دالةٌ** تُرجع المصفوفةَ لا مصفوفةٌ في الملفّ — و`include`
+             وحدَه يُعيد 1. ومفتاحُ الشاشةِ فيه `code` لا `screen`. */
+        $mf = $root . '/tools/u13_screens_manifest.php';
+        if (is_file($mf)) {
+            require_once $mf;
+            if (function_exists('u13_screens_manifest')) {
+                foreach (u13_screens_manifest() as $e) {
+                    if (!is_array($e) || !isset($e['table']) || $e['table'] !== $table) { continue; }
+                    if (!isset($e['code'], $e['file'], $e['dir'])) { continue; }
+                    $e['file'] = $e['dir'] . '/' . $e['file'];
+                    $out[$e['code']] = $e;
+                }
+            }
+        }
+        $memo[$table] = $out;
+        return $out;
+    }
+}
+$u13Sibs = u13_siblings($u13Root, $U13['table']);
+if (count($u13Sibs) > 1) {
+    $u13Host = null;
+    foreach ($u13Sibs as $code => $e) { $u13Host = $code; break; }   /* الأولى مضيفة */
+    $u13Self = isset($U13['screen']) ? $U13['screen'] : '';
+    $u13View = isset($_GET['view']) ? preg_replace('~[^a-z0-9_]~i', '', (string) $_GET['view']) : '';
+
+    /* أختٌ فُتحت مباشرةً ⇒ تُحوَّل إلى المضيفةِ منظرًا */
+    if ($u13Self !== $u13Host && $u13Self !== '' && isset($u13Sibs[$u13Host])) {
+        require_once $u13Root . '/includes/audit_trail.php';
+        ems_audit_change($conn, 'audit', 'route_redirect', 'view_merge', 0, array(),
+            array('from' => $U13['file'], 'to' => $u13Sibs[$u13Host]['file'] . '?view=' . $u13Self),
+            array('company_id' => $u13Company, 'user_id' => $u13Uid));
+        header('Location: ' . basename($u13Sibs[$u13Host]['file']) . '?view=' . rawurlencode($u13Self));
+        exit();
+    }
+    /* والمضيفةُ تتلبّس منظرَ أختِها المطلوبة */
+    if ($u13View !== '' && isset($u13Sibs[$u13View]) && $u13View !== $u13Host) {
+        foreach (array('title', 'where', 'order', 'intro', 'rule', 'empty_hint', 'icon', 'actions') as $k) {
+            $src = $u13Sibs[$u13View];
+            if ($k === 'empty_hint' && isset($src['empty'])) { $U13[$k] = $src['empty']; continue; }
+            if (isset($src[$k])) { $U13[$k] = $src[$k]; }
+        }
+    }
+    $GLOBALS['U13_VIEWS'] = $u13Sibs;
+    $GLOBALS['U13_HOST']  = $u13Host;
+    $GLOBALS['U13_VIEW']  = ($u13View !== '' && isset($u13Sibs[$u13View])) ? $u13View : $u13Host;
+}
+
 /* ═══ طبقةُ الكتابة — الأفعالُ تُنفَّذ بخدمتِها لا بـSQL في الشاشة ═════════
    ◆ الشاشةُ لا تكتب الجدولَ مباشرةً: تُنادي **الخدمةَ المالكةَ للحكم**، فتبقى
      الحراسةُ في مكانٍ واحدٍ ويستحيل أن تلتفَّ شاشةٌ على قاعدةٍ يحرسها المحرّك.

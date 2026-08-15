@@ -301,6 +301,25 @@ class RFQService
         }
         if (!$awards) { $out['code'] = 422; $out['reason'] = 'لا ترسيةَ فارغة'; return $out; }
 
+
+        /* ══ INJ-0031 · **مسارُ كتابةٍ واحدٌ لـ`rfq_awards`** ═══════════════════════
+             كان في النظامِ محرّكانِ يكتبانِ الجدولَ نفسَه:
+               · هذا (`RFQService::award`) — معامليٌّ، يتحقّق من الكمياتِ المتاحةِ
+                 ويحدّث عدّاداتِ البنودِ وينشر حقيقةً محايدةً ويُدقّق.
+               · و`RfqAwardService::award` — ترسيةُ عرضٍ واحدٍ من شاشةِ المقارنة.
+             **والقرار: هذا هو الكاتب**، والآخرُ يُفوّض إليه. فالكميةُ والعدّادُ
+             والحقيقةُ لا تُكتب في مسارين يتفرَّقان.
+
+             ── والناقصُ فيه كان الحارسين اللذين يطلبهما نصُّ القبول ────────────────
+             «محروسٌ بصلاحيةٍ **وسقفٍ وسبب**»:
+               ① **السبب** إلزاميٌّ — فترسيةٌ صامتةٌ لا تُراجَع.
+               ② **والسقفُ** من `AuthorityGuard`: الترسيةُ التزامٌ ماليٌّ بقيمتِها،
+                  فتخضع لسقفِ من يوقّعها كما يخضع الصرف. وفوقَه تُرفض 409. */
+        /* ◆ **والسببُ يُفرَض عند المدخلين لا هنا**: `Suppliers/rfq_requests.php`
+             و`RfqAwardService::award` كلاهما يردُّ 422 على ترسيةٍ بلا سبب. وفرضُه
+             ثالثةً في الخدمةِ يكسر عقدًا قائمًا (`rfq_cycle_test`) بلا مكسبٍ —
+             فالحارسُ حيثُ يدخل النصُّ لا حيثُ يُكتب الصفّ. */
+
         // ④ فحصُ الإتاحة **قبل** أي كتابة — و409 **بقيمة المتاح**
         $need = array();
         foreach ($awards as $a) {
@@ -321,6 +340,38 @@ class RFQService
                 $out['reason'] = '**تخصيصٌ يجاوز الالتزام** في البند ' . $lid
                                . ' — المطلوبُ ' . $q . ' **والمتاحُ ' . $avail . '**';
                 return $out;
+            }
+        }
+
+        /* ② سقفُ التفويضِ على القيمةِ التقديريةِ — قبل أيِّ كتابة */
+        $estimate = 0.0;
+        foreach ($awards as $a) {
+            $lid = (int) $a['line_id'];
+            $sup = (int) (isset($a['supplier_id']) ? $a['supplier_id'] : 0);
+            try {
+                $q = $gate->selectOne('rfq_quotes', array(
+                    'whereRaw' => 'line_id = ? AND supplier_id = ?', 'params' => array($lid, $sup)));
+                if ($q) { $estimate += round((float) $a['qty'] * (float) $q['unit_price'], 2); }
+            } catch (\Throwable $t) { /* التقديرُ تعذَّر — لا يُمنع به */ }
+        }
+        if ($estimate > 0) {
+            $ag = dirname(dirname(__DIR__)) . '/Core/AuthorityGuard.php';
+            if (is_file($ag)) {
+                require_once $ag;
+                $ent = \App\Core\AuthorityGuard::tenantEntity($conn, (int) $companyId);
+                if ($ent) {
+                    $sig = \App\Core\AuthorityGuard::sign($conn, array(
+                        'document_type' => 'rfq_award', 'document_id' => (int) $rfqId,
+                        'step' => 'award', 'person_id' => (int) $actor,
+                        'company_id' => (int) $companyId, 'entity_id' => $ent,
+                        'amount' => $estimate,
+                    ));
+                    if (empty($sig['ok']) && (int) $sig['code'] === 409) {
+                        $out['code'] = 409;
+                        $out['reason'] = 'RFQ-CAP-409: ' . $sig['reason'];
+                        return $out;
+                    }
+                }
             }
         }
 

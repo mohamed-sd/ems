@@ -91,7 +91,11 @@ $rows = array();
 $r = mysqli_query($conn, "SELECT * FROM financing_deviations WHERE company_id = $company_id
                           ORDER BY state = 'closed', FIELD(priority,'high','medium','low'), created_at DESC LIMIT 100");
 if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
-$types = array('no_movement' => 'عقدٌ بلا حركة', 'payment_gap' => 'فروقُ سداد', 'unrecorded_exit' => 'خروجٌ غيرُ مسجَّل');
+/* ◆ التعدادُ في القاعدة `enum('no_ledger','payment_gap','unrecorded_exit')` —
+     وكانت الخريطةُ تقول `no_movement` فيُعرض صنفُ «بلا دفتر» **فارغًا**.
+     والمفتاحانِ يبقيان معًا: القديمُ لبياناتٍ مرحَّلةٍ إن وُجدت. */
+$types = array('no_ledger' => 'عقدٌ بلا حركة', 'no_movement' => 'عقدٌ بلا حركة',
+               'payment_gap' => 'فروقُ سداد', 'unrecorded_exit' => 'خروجٌ غيرُ مسجَّل');
 
 $page_title = 'الانحرافات الثلاث';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
