@@ -94,7 +94,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pen_action'])) {
 
     } elseif ($act === 'waive') {
         if (!$can_approve) { pen_back('الإعفاءُ صلاحيةُ مدير الإدارة المالية (ق-13) ❌', $c, $f, $t); }
-        $r = PEN::waive($conn, $gate, $company_id, intval($_POST['aid'] ?? 0),
+        /* ══ INJ-0028 · «إعفاءٌ فوق السقف يُرفض ويُصعَّد» ══════════════════════════
+             الإعفاءُ **يُسقط استحقاقًا قائمًا** — فهو قرارٌ ماليٌّ بقيمةِ الغرامة،
+             ويخضع لسقفِ تفويضِ من يوقّعه كما يخضع الصرفُ. وكان يمرُّ بمجرّدِ
+             `can_edit` مهما بلغت القيمة.
+             ◆ وقيمةُ الغرامةِ تُقرأ من صفِّها لا من النموذج. */
+        $__aid = intval($_POST['aid'] ?? 0);
+        $__amt = 0.0;
+        $__q = $conn->prepare('SELECT amount FROM contract_penalty_assessments
+                                WHERE id = ? AND company_id = ? LIMIT 1');
+        if ($__q) {
+            $__q->bind_param('ii', $__aid, $company_id);
+            $__q->execute();
+            $__x = $__q->get_result()->fetch_row();
+            $__q->close();
+            if ($__x) { $__amt = (float) $__x[0]; }
+        }
+        require_once __DIR__ . '/../app/Core/AuthorityGuard.php';
+        $__ent = \App\Core\AuthorityGuard::tenantEntity($conn, $company_id);
+        if ($__ent && $__amt > 0) {
+            $__sig = \App\Core\AuthorityGuard::sign($conn, array(
+                'document_type' => 'penalty_waiver', 'document_id' => $__aid, 'step' => 'waive',
+                'person_id' => (int) $uid, 'company_id' => (int) $company_id,
+                'entity_id' => $__ent, 'amount' => $__amt,
+            ));
+            if (empty($__sig['ok']) && (int) $__sig['code'] === 409) {
+                $__esc = $conn->prepare("INSERT INTO exec_approvals
+                    (company_id, request_no, received_date, doc_type, document, requesting_dept,
+                     raise_reason, amount, currency, status, source_kind, created_by, created_by_name)
+                    VALUES (?, ?, CURDATE(), 'إعفاء غرامة', ?, 'المالية والخزينة',
+                            ?, ?, 'USD', 'قيد المراجعة', 'escalation', ?, ?)");
+                if ($__esc) {
+                    $__rq = 'ESC-PEN-' . $__aid . '-' . date('ymdHis');
+                    $__doc = 'إعفاءُ غرامةٍ #' . $__aid;
+                    $__why = 'تجاوزُ سقفِ التفويضِ للإعفاء — ' . $__sig['reason'];
+                    $__amtS = (string) $__amt;
+                    $__nm = 'طالبُ الإعفاء #' . (int) $uid;
+                    $__uidI = (int) $uid;
+                    $__esc->bind_param('sssssis', $__rq, $__doc, $__why, $__amtS, $__uidI, $__nm);
+                    $__esc->execute();
+                    $__esc->close();
+                }
+                pen_back('PEN-CAP-409: ' . $__sig['reason'] . ' — **رُفع الإعفاءُ لصندوقِ الاعتمادِ الأعلى** ⤴',
+                    $c, $f, $t);
+            }
+        }
+        $r = PEN::waive($conn, $gate, $company_id, $__aid,
                         strval($_POST['reason'] ?? ''), $uid);
         pen_back($r['reason'] . ($r['ok'] ? ' ✅' : ' ❌'), $c, $f, $t);
 

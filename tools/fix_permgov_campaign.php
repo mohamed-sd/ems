@@ -844,7 +844,13 @@ foreach ($items as $id => $it) {
             if (preg_match($PAT['SCOPE'], $c)) {
                 $ss = (string) @file_get_contents($ROOT . '/' . $rel);
                 $tenant = (bool) preg_match('~ems_tenant_db\(|scopedQuery\(|company_id\s*=~', $ss);
-                $unit = (bool) preg_match('~owner_unit_id|org_unit|unit_id|dept_code|project_id\s*=|site_id~', $ss);
+                /* ◆ والعزلُ الإداريُّ قد يقع في **دالةِ نطاقٍ مشتركة** لا في نصِّ
+                     الاستعلام: `risk_scope_sql` · `fin_project_scope` · `proc_scope`
+                     · `ems_dept_scope`. وأوّلُ صياغةٍ بحثت عن أسماءِ الأعمدةِ حرفيًّا
+                     فأدانت شاشاتٍ **تعزل فعلًا** — قياسُ الحرفِ لا الآلية. */
+                $unit = (bool) preg_match('~owner_unit_id|org_unit|unit_id|dept_code|project_id\s*=|site_id'
+                    . '|risk_scope_sql|fin_project_scope|proc_scope\(|ems_dept_scope|_scope_sql|scopeSql'
+                    . '|RISK_ORG_UNIT|\$scope~', $ss);
                 if ($tenant && $unit) {
                     $verdicts[] = array('pass',
                         'الاستعلامُ معزولٌ بالشركةِ **وبالإدارةِ/الموقع** — فلا يرى نطاقٌ نطاقًا آخر');
