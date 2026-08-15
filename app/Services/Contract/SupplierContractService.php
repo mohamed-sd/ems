@@ -185,7 +185,179 @@ class SupplierContractService
         }
         self::audit($conn, $companyId, $actor, 'supplier_contracts', 'transition', (int) $contractId,
             array('state' => $from), array('state' => (string) $to));
+
+        /* ══ INJ-0152 · «وينشر حدثًا واحدًا يُقفل حاوياتِه» ═══════════════════════
+             كان الانتقالُ يُدقَّق ولا يُنشر: الحالةُ تتغيّر في الجدولِ ولا يعلم بها
+             أحد. والدورةُ المحاسبيةُ كلُّها مبنيةٌ على **الوقائعِ المنشورة**
+             (ADR-15) — فانتقالٌ صامتٌ لا يُحرّك مروحةَ الأثر، وحاوياتُ عقدٍ
+             انتهى تبقى **نشطةً** فتستقبل تحميلًا على عقدٍ لا وجودَ له.
+           ◆ **حدثٌ واحدٌ لا اثنان**: واقعةٌ واحدةٌ لانتقالٍ واحد — وتعدُّدُ
+             الحقائقِ للواقعةِ الواحدةِ يُضاعف الأثرَ في المروحة.
+           ◆ **والإقفالُ أثرُ الحدثِ لا فعلٌ موازٍ**: يقع مع الإنهاءِ والإقفالِ
+             وحدَهما، ويحمل سببَه في `close_reason` فيُقرأ لاحقًا لماذا أُقفلت. */
+        try {
+            require_once dirname(dirname(__DIR__)) . '/Core/EventPublisher.php';
+            \App\Core\EventPublisher::publishFact($conn, array(
+                /* ◆ **والنطاقُ لاتينيٌّ بلا شرطةٍ سفلية**: عقدُ §9 يشترط `domain.entity.action`
+                     و`^[a-z]+` للنطاق — فـ`supplier_contract.state.changed` تُرفض
+                     صامتةً (يُبتلع الاستثناءُ في السجل) فيبقى الانتقالُ بلا حقيقة. */
+                'event_key'     => 'procurement.supplier_contract.state_changed',
+                'category'      => 'commercial',
+                'source_module' => 'procurement',
+                'company_id'    => (int) $companyId,
+                'entity_type'   => 'supplier_contract',
+                'entity_id'     => (int) $contractId,
+                'occurred_at'   => gmdate('Y-m-d H:i:s'),
+                'created_by'    => (int) $actor ?: 1,
+                'payload'       => array('from' => $from, 'to' => (string) $to),
+            ));
+        } catch (\Throwable $t) {
+            /* الحدثُ أثرٌ لا شرط: انتقالٌ وقع لا يُلغى لأنَّ النشرَ تعثّر —
+               لكنَّ التعثّرَ يُسجَّل فلا يمرُّ صامتًا. */
+            error_log('supplier contract fact failed #' . (int) $contractId . ': ' . $t->getMessage());
+        }
+
+        if (in_array((string) $to, array(ContractStateMachine::ENDED, ContractStateMachine::CLOSED), true)) {
+            $closed = 0;
+            $st = $conn->prepare(
+                "UPDATE op_containers
+                    SET state = 'مقفلة', close_reason = ?, updated_at = NOW()
+                  WHERE company_id = ? AND supplier_id = ? AND state <> 'مقفلة'
+                    AND COALESCE(is_deleted,0) = 0");
+            if ($st) {
+                $why = 'إقفالٌ تبعًا لعقدِ المورد #' . (int) $contractId . ' (' . (string) $to . ')';
+                $cid2 = (int) $companyId; $sup = (int) $head['supplier_id'];
+                $st->bind_param('sii', $why, $cid2, $sup);
+                if ($st->execute()) { $closed = (int) $conn->affected_rows; }
+                $st->close();
+            }
+            if ($closed > 0) {
+                self::audit($conn, $companyId, $actor, 'op_containers', 'close_by_contract',
+                    (int) $contractId, array('state' => 'نشطة'), array('state' => 'مقفلة', 'count' => $closed));
+                $out['containers_closed'] = $closed;
+            }
+        }
+
         $out['ok'] = true; $out['code'] = 200; $out['state'] = (string) $to;
+        return $out;
+    }
+
+    /**
+     * ══ INJ-0152 · نقضُ الإنهاء — **حركةٌ معوِّضةٌ بمرجعِها لا رجوعٌ في الزمن** ══
+     *
+     * نصُّ القبول يشترط «**وله فعلُ نقضٍ**». وجدولُ الانتقالاتِ لا يحمل حافةً من
+     * «منتهٍ» إلى ما قبلَها — وهذا صوابٌ: العقدُ المنتهي لا يُحيا بتعديلِ عمود.
+     *
+     * فالنقضُ هنا **ليس انتقالًا** بل **تعويضٌ محكوم**:
+     *   ① لا يقع إلا على عقدٍ «منتهٍ» — وما بعدَه (مقفل · مصفّى) لا نقضَ له
+     *      لأنَّ التزاماتِه سُوِّيت وردُّها يفتح ما أُغلق.
+     *   ② ولا يقع إلا **داخلَ نافذةِ سبعةِ أيامٍ** من الإنهاء: خطأٌ يُكتشف
+     *      بعد أسبوعٍ يُعالَج بعقدٍ جديدٍ لا بإنكارِ ما وقع.
+     *   ③ ويُعيد الحالةَ إلى **ما كانت عليه قبلَ الإنهاءِ مقروءةً من سجلِّ
+     *      التدقيق** — لا إلى حالةٍ يختارها الناقض.
+     *   ④ ويُعيد فتحَ الحاوياتِ التي أُقفلت **بذلك الإنهاءِ وحدَه** (بمطابقةِ
+     *      سببِ الإقفال) — فلا يفتح ما أُقفل لسببٍ آخر.
+     *   ⑤ وينشر حقيقةً جديدةً تشير إلى الأصل — فالسجلُّ يقرأ «أُنهي ثم نُقض»
+     *      لا «لم يُنهَ قطّ». **والعكسُ حركةٌ لا محو** (CS-08).
+     *
+     * @return array{ok:bool,code:int,reason:string,state:?string,containers_reopened:int}
+     */
+    public static function revokeTermination($conn, $gate, $companyId, $contractId, $why, $actor)
+    {
+        $out = array('ok' => false, 'code' => 0, 'reason' => '', 'state' => null, 'containers_reopened' => 0);
+        $contractId = (int) $contractId;
+        $why = trim((string) $why);
+        if ($why === '') {
+            $out['code'] = 422; $out['reason'] = 'SCT-422: نقضُ الإنهاءِ يلزمه سببٌ مكتوب'; return $out;
+        }
+        $head = self::head($gate, $contractId);
+        if (!$head) { $out['code'] = 404; $out['reason'] = 'عقدُ المورد غيرُ موجودٍ في نطاقك'; return $out; }
+        if ((string) $head['state'] !== ContractStateMachine::ENDED) {
+            $out['code'] = 422;
+            $out['reason'] = 'SCT-422: النقضُ للمنتهي وحدَه — والعقدُ الآن «' . $head['state'] . '»';
+            return $out;
+        }
+
+        /* ① الحالةُ السابقةُ والنافذةُ الزمنيةُ — من سجلِّ التدقيقِ لا من ظنّ */
+        $prev = ''; $whenTs = 0;
+        /* ◆ **وعمودُ الجدولِ في سجلِّ التدقيقِ اسمُه `screen_name` لا `table_name`**:
+             أوّلُ صياغةٍ سألت باسمٍ لا وجودَ له فرجعت صفرًا دائمًا — فالنقضُ
+             يردُّ ٤٠٩ «لا أثرَ» على عقدٍ أثرُه مكتوب. والاستعلامُ يُقاس لا يُظنّ. */
+        $st = $conn->prepare(
+            "SELECT old_value, created_at FROM activity_logs
+              WHERE screen_name = 'supplier_contracts' AND record_id = ?
+                AND action_type = 'transition'
+              ORDER BY id DESC LIMIT 1");
+        if ($st) {
+            $st->bind_param('i', $contractId);
+            if ($st->execute()) {
+                $row = $st->get_result()->fetch_assoc();
+                if ($row) {
+                    $j = json_decode((string) $row['old_value'], true);
+                    if (is_array($j) && isset($j['state'])) { $prev = (string) $j['state']; }
+                    $whenTs = strtotime((string) $row['created_at']);
+                }
+            }
+            $st->close();
+        }
+        if ($prev === '' || !in_array($prev, ContractStateMachine::ALL, true)) {
+            $out['code'] = 409;
+            $out['reason'] = 'SCT-409: لا أثرَ تدقيقٍ يحمل الحالةَ السابقة — فلا يُخمَّن إلى أين يُردّ';
+            return $out;
+        }
+        if ($whenTs > 0 && (time() - $whenTs) > (7 * 86400)) {
+            $out['code'] = 423;
+            $out['reason'] = 'SCT-423: مضى أكثرُ من سبعةِ أيامٍ على الإنهاء — يُعالَج بعقدٍ جديدٍ لا بنقض';
+            return $out;
+        }
+
+        try {
+            $gate->update('supplier_contracts',
+                array('state' => $prev, 'version' => (int) $head['version'] + 1),
+                array('id' => $contractId, 'version' => (int) $head['version']));
+        } catch (\Throwable $t) {
+            $out['code'] = 422; $out['reason'] = 'تعذّر النقض: ' . $t->getMessage(); return $out;
+        }
+
+        /* ④ الحاوياتُ التي أُقفلت بهذا الإنهاءِ وحدَها */
+        $reopened = 0;
+        $st2 = $conn->prepare(
+            "UPDATE op_containers SET state = 'نشطة', close_reason = NULL, updated_at = NOW()
+              WHERE company_id = ? AND state = 'مقفلة' AND close_reason LIKE ?");
+        if ($st2) {
+            $like = 'إقفالٌ تبعًا لعقدِ المورد #' . $contractId . '%';
+            $cid2 = (int) $companyId;
+            $st2->bind_param('is', $cid2, $like);
+            if ($st2->execute()) { $reopened = (int) $conn->affected_rows; }
+            $st2->close();
+        }
+
+        self::audit($conn, $companyId, $actor, 'supplier_contracts', 'revoke_termination', $contractId,
+            array('state' => ContractStateMachine::ENDED),
+            array('state' => $prev, 'reason' => $why, 'containers_reopened' => $reopened));
+
+        try {
+            require_once dirname(dirname(__DIR__)) . '/Core/EventPublisher.php';
+            \App\Core\EventPublisher::publishFact($conn, array(
+                'event_key'     => 'procurement.supplier_contract.termination_revoked',
+                'category'      => 'commercial',
+                'source_module' => 'procurement',
+                'company_id'    => (int) $companyId,
+                'entity_type'   => 'supplier_contract',
+                'entity_id'     => $contractId,
+                'occurred_at'   => gmdate('Y-m-d H:i:s'),
+                'created_by'    => (int) $actor ?: 1,
+                'payload'       => array('restored_to' => $prev, 'reason' => $why,
+                                         'containers_reopened' => $reopened),
+            ));
+        } catch (\Throwable $t) {
+            error_log('supplier revoke fact failed #' . $contractId . ': ' . $t->getMessage());
+        }
+
+        $out['ok'] = true; $out['code'] = 200; $out['state'] = $prev;
+        $out['containers_reopened'] = $reopened;
+        $out['reason'] = 'نُقض الإنهاءُ — عاد العقدُ إلى «' . $prev . '»'
+                       . ($reopened > 0 ? (' وأُعيد فتحُ ' . $reopened . ' حاوية') : '');
         return $out;
     }
 

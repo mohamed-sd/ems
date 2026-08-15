@@ -127,6 +127,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             intval($_POST['line_id'] ?? 0), strval($_POST['end_date'] ?? ''), $uid);
         $redirect($r['ok'] ? 'أُنهي البند بسريانه ✅' : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
     }
+
+    /* ══ INJ-0152 · دورةُ حياةِ عقدِ المورد — بابُها في شاشتِها المالكة ═══════════
+         نصُّ القبول: «إنهاءُ عقدِ موردٍ **ينقل حالتَه في آلة الحالة**، وينشر
+         حدثًا واحدًا يُقفل حاوياتِه، ويكتب صفَّ تدقيقٍ بقيمةٍ قبل وبعد، **وله
+         فعلُ نقضٍ**».
+         والمقيسُ قبلَه: `SupplierContractService::transition` مبنيةٌ ومحروسةٌ
+         (قفلٌ تفاؤليٌّ · حارسُ تجديدٍ · حارسُ إقفال) — و**لا شاشةَ تنادِيها**.
+         فالحالةُ تُعرض في الترويسةِ ولا سبيلَ إلى تغييرها إلا بيدٍ في القاعدة.
+       ◆ والأفعالُ من السجلِّ الواحدِ نفسِه (`ContractLifecycleActions`) —
+         فعقدُ الموردِ وعقدُ العميلِ يتشاركان الآلةَ فيتشاركان بابَها. */
+    if ($action === 'sc_lifecycle') {
+        $cid = intval($_POST['contract_id'] ?? 0);
+        if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $cid); }
+        require_once __DIR__ . '/../app/Services/Contract/ContractLifecycleActions.php';
+        $r = \App\Services\Contract\ContractLifecycleActions::run(
+            $conn, $gate, $company_id, 'supplier', $cid, strval($_POST['sc_action'] ?? ''),
+            strval($_POST['sc_note'] ?? ''), $uid, 0, intval($_POST['sc_version'] ?? 0));
+        $redirect($r['ok'] ? ($r['reason'] . ' ✅') : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
+    }
+
+    /* ◆ **والنقضُ بابٌ مستقلٌّ**: ليس انتقالًا في الجدولِ بل حركةٌ معوِّضةٌ
+         محكومةٌ بنافذةٍ زمنيةٍ وبالحالةِ السابقةِ المقروءةِ من سجلِّ التدقيق. */
+    if ($action === 'sc_revoke_end') {
+        $cid = intval($_POST['contract_id'] ?? 0);
+        if (!$can_edit) { $redirect('لا توجد صلاحية لهذا الإجراء ❌', $cid); }
+        $r = SCS::revokeTermination($conn, $gate, $company_id, $cid, strval($_POST['sc_note'] ?? ''), $uid);
+        $redirect($r['ok'] ? ($r['reason'] . ' ✅') : ($r['code'] . ' — ' . $r['reason'] . ' ❌'), $cid);
+    }
 }
 
 // ── القراءة ────────────────────────────────────────────────────────────────
@@ -282,6 +310,52 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 </span>
             <?php endif; ?>
         </div>
+        <?php
+        /* ══ INJ-0152 · أزرارُ دورةِ الحياةِ من السجلِّ لا من رأيِ الشاشة ═════════
+             تُصيَّر الأفعالُ المشروعةُ **من الحالةِ الراهنة** وحدَها، ويحمل كلُّ
+             زرٍّ في `title` جوابَ سؤالِ العكس: له عكسٌ باسمِه، أو لا عكسَ له
+             بسببِه. والعقدُ المرحَّلُ لا يُقاد من هنا — حالتُه مرآةُ مصدرِه. */
+        if ($head !== null && $can_edit && trim((string) $head['source_table']) === '') {
+            require_once __DIR__ . '/../app/Services/Contract/ContractLifecycleActions.php';
+            $__scActs = \App\Services\Contract\ContractLifecycleActions::availableFor('supplier', (string) $head['state']);
+            $__isEnded = ((string) $head['state'] === \App\Services\Contract\ContractStateMachine::ENDED);
+            if ($__scActs || $__isEnded) { ?>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:12px;
+                        padding:8px 10px;border:1px solid #e0d7bd;border-radius:8px;background:#fffdf3">
+                <strong>دورةُ الحياة:</strong>
+                <?php foreach ($__scActs as $__c => $__a):
+                    $__rv = \App\Services\Contract\ContractLifecycleActions::reverseOf('supplier', $__c); ?>
+                    <form method="post" style="display:inline">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="action" value="sc_lifecycle">
+                        <input type="hidden" name="contract_id" value="<?php echo intval($head['id']); ?>">
+                        <input type="hidden" name="sc_action" value="<?php echo htmlspecialchars($__c, ENT_QUOTES, 'UTF-8'); ?>">
+                        <input type="hidden" name="sc_version" value="<?php echo intval($head['version']); ?>">
+                        <button class="action-btn" type="submit"
+                                title="<?php echo htmlspecialchars($__a['label'] . ' — '
+                                    . ($__rv['has'] ? ('له عكسٌ: ' . $__rv['label'])
+                                                    : ('لا عكسَ له: ' . (string) $__rv['why'])), ENT_QUOTES, 'UTF-8'); ?>">
+                            <?php echo htmlspecialchars($__a['label'], ENT_QUOTES, 'UTF-8'); ?>
+                            <?php if (!$__rv['has']): ?><small>⛒</small><?php endif; ?>
+                        </button>
+                    </form>
+                <?php endforeach; ?>
+                <?php if ($__isEnded): ?>
+                    <form method="post" style="display:flex;gap:4px;align-items:center">
+                        <?php echo csrf_field(); ?>
+                        <input type="hidden" name="action" value="sc_revoke_end">
+                        <input type="hidden" name="contract_id" value="<?php echo intval($head['id']); ?>">
+                        <input type="text" name="sc_note" required minlength="3" style="width:150px"
+                               placeholder="سببُ النقض">
+                        <button class="action-btn" type="submit"
+                                title="نقضُ الإنهاء — حركةٌ معوِّضةٌ داخلَ سبعةِ أيامٍ تُعيد الحالةَ السابقةَ وتفتح حاوياتِها">
+                            نقضُ الإنهاء
+                        </button>
+                    </form>
+                <?php endif; ?>
+            </div>
+            <?php }
+        } ?>
         <?php if ($blocked !== null): ?>
             <div class="alert alert-warning">
                 <i class="fa fa-lock"></i> <?php echo htmlspecialchars($blocked['reason']); ?>

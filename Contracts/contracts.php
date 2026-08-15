@@ -153,6 +153,44 @@ if ($__pcApp['run'] && $__pcApp['ok']) {
     if ($r['ok']) { ems_pc_idem_mark($conn, $__pcApp['idem'], $__pcApp['code'], 'contracts#' . (int) $__pcApp['data']['cid']); }
 }
 
+/* ══ INJ-0026 · دورةُ الحياةِ كاملةً لا فعلين منها ═══════════════════════════
+     نصُّ القبول: «**كلُّ فعلٍ من الثمانية** ينقل `contract_status` إلى حالةٍ
+     مشروعةٍ فقط، وينشر حدثًا واحدًا، ويكتب صفَّ تدقيقٍ بقيمةٍ قبل وبعد، **وله
+     فعلُ عكسٍ** يعيد الحالةَ السابقة».
+     والمقيسُ قبلَه: فعلانِ من ثمانية — فالعقدُ يبلغ «معتمد» ثم **يقف**: لا
+     توقيعَ ولا إنفاذَ ولا إنهاءَ ولا إقفال، والآلةُ التي تعرف الطريقَ كلَّه
+     مبنيةٌ ولا يُنادى منها إلا بابان.
+   ◆ والأفعالُ تُقرأ من `ContractLifecycleActions` — سجلٌّ واحدٌ مشتقٌّ من جدولِ
+     الانتقالاتِ نفسِه. فإن تغيّر الجدولُ تغيّرت الأزرارُ معه ولا تتفرّقان.
+   ◆ والحكمُ يبقى في الآلةِ والخدمة (CS-05): هذه الكتلةُ تُرسل ولا تحكم. */
+require_once __DIR__ . '/../app/Services/Contract/ContractLifecycleActions.php';
+$__clcReg = \App\Services\Contract\ContractLifecycleActions::registry('customer');
+$__pcLc = ems_post_contract($conn, array(
+    'action'  => 'contract.lifecycle',
+    'perm'    => 'can_edit',
+    'trigger' => 'clc_action',
+    'idem'    => array('contract' => intval($_POST['clc_contract_id'] ?? 0),
+                       'act'      => strval($_POST['clc_action'] ?? '')),
+    'validate' => function (array $in) use ($__clcReg) {
+        $cid = intval($in['clc_contract_id'] ?? 0);
+        $act = trim(strval($in['clc_action'] ?? ''));
+        if ($cid <= 0)              { return array('ok' => false, 'msg' => 'عقدٌ غيرُ صالح (422)'); }
+        if (!isset($__clcReg[$act])) { return array('ok' => false, 'msg' => 'فعلٌ غيرُ مُعلَنٍ في سجلِّ دورةِ الحياة (422)'); }
+        return array('ok' => true, 'data' => array('cid' => $cid, 'act' => $act,
+                                                   'note' => trim(strval($in['clc_note'] ?? ''))));
+    },
+));
+if (!$__pcLc['ok'] && $__pcLc['msg'] !== '') { $csm_msg = $__pcLc['msg']; }
+if ($__pcLc['replay'])                        { $csm_msg = $__pcLc['msg']; }
+if ($__pcLc['run'] && $__pcLc['ok']) {
+    $__r = \App\Services\Contract\ContractLifecycleActions::run(
+        $conn, $contracts_gate, $company_id, 'customer',
+        (int) $__pcLc['data']['cid'], (string) $__pcLc['data']['act'],
+        (string) $__pcLc['data']['note'], intval($_SESSION['user']['id'] ?? 0), intval($current_role));
+    $csm_msg = ($__r['ok'] ? '✅ ' : '❌ ') . $__r['reason'] . ' (' . $__r['code'] . ')';
+    if ($__r['ok']) { ems_pc_idem_mark($conn, $__pcLc['idem'], $__pcLc['code'], 'contracts#' . (int) $__pcLc['data']['cid']); }
+}
+
 // أنواع المعدات — كتالوج عام (managed) عبر البوابة
 $equipmentTypes = $contracts_gate->select('equipments_types', array(
   'columns'  => array('id', 'type'),
@@ -1177,22 +1215,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 echo "<td class='group-status'><span class='badge'>"
                    . htmlspecialchars($csm_state, ENT_QUOTES, 'UTF-8') . "</span></td>";
 
+                /* ══ INJ-0026 · الأفعالُ الثمانيةُ كلُّها من السجلِّ الواحد ═══════
+                     كان يُصيَّر فعلانِ بشرطين مكتوبَينِ يدويًّا — فالعقدُ يبلغ
+                     «معتمد» ثم يقف بلا بابٍ للتوقيعِ ولا للإنفاذِ ولا للإنهاء.
+                     والآن تُصيَّر **كلُّ الأفعالِ المشروعةِ من الحالةِ الراهنة**
+                     بحسب `ContractLifecycleActions` — فزيادةُ حالةٍ في الآلةِ
+                     تظهر زرًّا بلا لمسِ هذه الشاشة.
+                   ◆ **وفعلُ العكسِ يُعرض مع فعلِه**: من يرى «اعتماد» يرى معه أنَّ
+                     له عكسًا («إعادةٌ للتفاوض»)؛ ومن لا عكسَ له يحمل زرُّه سببَ
+                     الامتناعِ في `title` — فلا يبحث المستخدمُ عن زرٍّ لا وجودَ له. */
                 $csm_cell = '';
                 if ($can_edit) {
                     $cid = intval($row['id']);
-                    if (in_array(\App\Services\Contract\ContractStateMachine::NEGOTIATION, $csm_allowed, true)) {
-                        $csm_cell .= "<form method='post' data-ems-c='ct-2'>
-        <?php echo csrf_field(); ?>"
-                          . "<input type='hidden' name='csm_submit_id' value='{$cid}'>"
-                          . "<button class='action-btn' type='submit' title='رفعٌ للتفاوض'>"
-                          . "<i class='fa fa-arrow-up'></i> تفاوض</button></form> ";
-                    }
-                    if (in_array(\App\Services\Contract\ContractStateMachine::APPROVED, $csm_allowed, true)) {
-                        $csm_cell .= "<form method='post' data-ems-c='ct-2'>
-        <?php echo csrf_field(); ?>"
-                          . "<input type='hidden' name='csm_approve_id' value='{$cid}'>"
-                          . "<button class='action-btn' type='submit' title='اعتمادٌ ضمنَ السقف'>"
-                          . "<i class='fa fa-check'></i> اعتماد</button></form>";
+                    $__acts = \App\Services\Contract\ContractLifecycleActions::availableFor('customer', $csm_state);
+                    foreach ($__acts as $__code => $__a) {
+                        $__rv = \App\Services\Contract\ContractLifecycleActions::reverseOf('customer', $__code);
+                        $__tip = $__a['label'] . ' — '
+                               . ($__rv['has'] ? ('له عكسٌ: ' . $__rv['label'])
+                                               : ('لا عكسَ له: ' . (string) $__rv['why']));
+                        $__needNote = (!empty($__a['needs']) && $__a['needs'] === 'note');
+                        $csm_cell .= "<form method='post' data-ems-c='ct-2' style='display:inline'>" . csrf_field()
+                          . "<input type='hidden' name='clc_contract_id' value='{$cid}'>"
+                          . "<input type='hidden' name='clc_action' value='" . htmlspecialchars($__code, ENT_QUOTES, 'UTF-8') . "'>"
+                          . ($__needNote
+                              ? "<input type='text' name='clc_note' required minlength='3' style='width:110px'"
+                                . " placeholder='السبب'>"
+                              : '')
+                          . "<button class='action-btn' type='submit' title='"
+                          . htmlspecialchars($__tip, ENT_QUOTES, 'UTF-8') . "'>"
+                          . htmlspecialchars($__a['label'], ENT_QUOTES, 'UTF-8')
+                          . ($__rv['has'] ? '' : ' <small>⛒</small>')
+                          . "</button></form> ";
                     }
                 }
                 if ($csm_cell === '') { $csm_cell = "<span class='text-muted'>—</span>"; }

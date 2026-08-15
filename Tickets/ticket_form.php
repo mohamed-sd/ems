@@ -584,8 +584,7 @@ endif; ?>
 
     <?php if ($can_manage && !$is_final): ?>
     <!-- ② صقل التصنيف والوزن والإسناد (فريق البلاغات) -->
-    <form method="post" action="<?php echo htmlspecialchars($self_url); ?>
-        <?php echo csrf_field(); ?>" class="allforms allforms-visible">
+    <form method="post" action="<?php echo htmlspecialchars($self_url); ?>" . csrf_field() class="allforms allforms-visible">
         <input type="hidden" name="action" value="refine">
         <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
         <div class="card-header"><h5><i class="fas fa-sliders"></i> التصنيف والوزن والإسناد (فريق البلاغات)</h5></div>
@@ -638,8 +637,7 @@ endif; ?>
         <h5 style="margin-bottom:10px;"><i class="fas fa-diagram-project"></i> سير العمل والملكية</h5>
         <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start;">
             <?php foreach ($avail as $key => $tr): ?>
-                <form method="post" action="<?php echo htmlspecialchars($self_url); ?>
-        <?php echo csrf_field(); ?>" style="display:inline-block;">
+                <form method="post" action="<?php echo htmlspecialchars($self_url); ?>" . csrf_field() style="display:inline-block;">
                     <input type="hidden" name="action" value="transition">
                     <input type="hidden" name="do" value="<?php echo htmlspecialchars($key); ?>">
                     <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
@@ -655,8 +653,7 @@ endif; ?>
 
         <?php if ($can_manage && !$is_final): ?>
         <hr style="margin:14px 0;">
-        <form method="post" action="<?php echo htmlspecialchars($self_url); ?>
-        <?php echo csrf_field(); ?>" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <form method="post" action="<?php echo htmlspecialchars($self_url); ?>" . csrf_field() style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
             <input type="hidden" name="action" value="transfer">
             <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
             <label style="font-weight:700;" for="emsf_522_086d6"><i class="fas fa-right-left"></i> تحويل الملكية إلى:</label>
@@ -688,8 +685,7 @@ endif; ?>
                 <a class="action-btn edit" href="../Maintenance/orders.php?id=<?php echo intval($ticket['linked_ref_id']); ?>" title="فتح أمر الصيانة"><i class="fas fa-up-right-from-square"></i></a>
             </div>
         <?php else: ?>
-            <form method="post" action="<?php echo htmlspecialchars($self_url); ?>
-        <?php echo csrf_field(); ?>" style="display:flex;gap:8px;align-items:center;"
+            <form method="post" action="<?php echo htmlspecialchars($self_url); ?>" . csrf_field() style="display:flex;gap:8px;align-items:center;"
                   onsubmit="return confirm('إصدار أمر صيانة من هذا البلاغ وربطه به؟');">
                 <input type="hidden" name="action" value="issue_mnt_order">
                 <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
@@ -701,8 +697,7 @@ endif; ?>
 
         <?php if ($can_manage && !$is_final && $ticket['parent_id'] === null): ?>
         <hr style="margin:14px 0;">
-        <form method="post" action="<?php echo htmlspecialchars($self_url); ?>
-        <?php echo csrf_field(); ?>" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <form method="post" action="<?php echo htmlspecialchars($self_url); ?>" . csrf_field() style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
             <input type="hidden" name="action" value="branch">
             <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
             <label style="font-weight:700;"><i class="fas fa-code-branch"></i> تفريع تذكرة:</label>
@@ -714,8 +709,7 @@ endif; ?>
 
         <?php if ($can_admin && !$is_final): ?>
         <hr style="margin:14px 0;">
-        <form method="post" action="<?php echo htmlspecialchars($self_url); ?>
-        <?php echo csrf_field(); ?>" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;"
+        <form method="post" action="<?php echo htmlspecialchars($self_url); ?>" . csrf_field() style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;"
               onsubmit="return confirm('إلغاء التذكرة؟ تبقى في السجل للتدقيق ولا تُحذف.');">
             <input type="hidden" name="action" value="cancel">
             <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
@@ -820,8 +814,7 @@ endif; ?>
             <?php endforeach; ?>
         </div>
 
-        <form method="post" action="<?php echo htmlspecialchars($self_url); ?>
-        <?php echo csrf_field(); ?>" enctype="multipart/form-data" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <form method="post" action="<?php echo htmlspecialchars($self_url); ?>" . csrf_field() enctype="multipart/form-data" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
             <input type="hidden" name="action" value="comment">
             <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
             <input type="text" name="body" placeholder="أضف تعليقًا/تواصلًا يظهر لكل الأطراف..." style="flex:1;min-width:260px;" aria-label="أضف تعليقًا/تواصلًا يظهر لكل الأطراف...">

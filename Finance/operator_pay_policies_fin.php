@@ -384,8 +384,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         if ($ps === 'draft') {
                             $act = "<a href='?activate_policy=" . intval($p['id']) . "' class='badge badge-success' style='text-decoration:none;padding:5px 10px;' onclick=\"return confirm('تفعيلُ السياسة؟ ما يُخلِفه سريانُها من سياساتٍ نافذةٍ يُغلق عند يومٍ قبله.');\"><i class='fas fa-play'></i> فعّل</a>";
                         } elseif ($ps === 'active' || $ps === 'superseded') {
-                            $act = "<form method='post' style='display:flex;gap:6px;align-items:center;'>
-        <?php echo csrf_field(); ?>"
+                            $act = "<form method='post' style='display:flex;gap:6px;align-items:center;'>" . csrf_field()
                                  . "<input type='hidden' name='expire_policy' value='1'>"
                                  . "<input type='hidden' name='policy_id' value='" . intval($p['id']) . "'>"
                                  . "<input type='text' name='expire_reason' maxlength='200' required placeholder='سببُ الإنهاء' style='width:150px;'>"

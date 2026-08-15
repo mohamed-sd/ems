@@ -147,8 +147,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($can_edit): ?>
     <!-- نموذج المعالجة (يظهر عند التحرير) -->
-    <form id="finForm" action="" method="post" class="allforms<?php echo $editLine ? ' allforms-visible' : ''; ?>
-        <?php echo csrf_field(); ?>">
+    <form id="finForm" action="" method="post" class="allforms<?php echo $editLine ? ' allforms-visible' : ''; ?>" . csrf_field()>
         <div class="card-header"><h5><i class="fas fa-notes-medical"></i> معالجة انحراف بند الموازنة</h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="line_id" value="<?php echo $editLine ? intval($editLine['id']) : ''; ?>">

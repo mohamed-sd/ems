@@ -183,8 +183,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <i class="fa fa-arrow-up"></i> اضغط زر <strong>«إنشاء طلب مالي»</strong> أعلى الصفحة لفتح النموذج.
         </div>
     <?php endif; ?>
-    <form id="finreqForm" action="request_actions.php" method="post" class="allforms<?php echo $form_visible ? ' allforms-visible' : ''; ?>
-        <?php echo csrf_field(); ?>">
+    <form id="finreqForm" action="request_actions.php" method="post" class="allforms<?php echo $form_visible ? ' allforms-visible' : ''; ?>" . csrf_field()>
         <input type="hidden" name="action" value="<?php echo $req ? 'update_draft' : 'create'; ?>">
         <?php if ($req): ?><input type="hidden" name="id" value="<?php echo intval($req['id']); ?>"><?php endif; ?>
         <div class="card">
