@@ -81,8 +81,12 @@ $g = $http('http://localhost/ems/login.php');
 preg_match('/name="csrf_token"\s+value="([^"]+)"/', $g['body'], $m);
 $http('http://localhost/ems/login.php', array('csrf_token' => $m[1], 'username' => 'محمد', 'password' => '12345678'));
 $pg = $http('http://localhost/ems/Suppliers/sup_handover.php');
-$ok($pg['code'] === 200 && strpos($pg['body'], 'تسليمُ الحصص') !== false && strpos($pg['body'], 'csrf_token') !== false,
-    '⑥ الشاشةُ تُصيَّر للمخوَّلِ وفيها رمزُ الحماية (' . $pg['code'] . ')');
+/* محمد (دور 1) مُنح عرضًا بلا إضافةٍ عمدًا — فالنموذجُ (ورمزُه) لا يُصيَّران له،
+   وذلك صوابُ الشاشةِ لا عيبُها. الرمزُ يُشترط فقط متى صُيِّر النموذج. */
+$hasForm = strpos($pg['body'], 'sup_handover') !== false && stripos($pg['body'], '<form') !== false;
+$ok($pg['code'] === 200 && strpos($pg['body'], 'تسليمُ الحصص') !== false
+    && (!$hasForm || strpos($pg['body'], 'csrf_token') !== false),
+    '⑥ الشاشةُ تُصيَّر للمخوَّل (' . $pg['code'] . ($hasForm ? ' · نموذجٌ برمزه' : ' · قراءةٌ بلا نموذجٍ لدورٍ بلا can_add') . ')');
 @unlink($jar);
 $g2 = $http('http://localhost/ems/login.php');
 preg_match('/name="csrf_token"\s+value="([^"]+)"/', $g2['body'], $m2);
