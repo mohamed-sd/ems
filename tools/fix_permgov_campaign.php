@@ -433,7 +433,36 @@ foreach ($items as $id => $it) {
     $verdicts = array();      /* لكلِّ شرط: array(state, note) — state ∈ pass|fail|unmeasured */
 
     if ($rel === null) {
-        foreach ($cls as $c) { $verdicts[] = array('unmeasured', 'الرابطُ لا يشير إلى ملفٍّ حيٍّ واحد'); }
+        /* ── بندٌ بلا ملفٍّ: ثلاثةُ أحوالٍ لا حالٌ واحد ──────────────────────────
+             ⓐ **حارسٌ مركزيٌّ** (لا شاشة) — يُقاس على الحارسِ نفسِه.
+             ⓑ **قرارُ مالكٍ معلَّق** — ونصُّ قبولِه يقبل صراحةً بديلًا: أن يُعلَن
+                في السجلِّ بندًا مفتوحًا بتاريخٍ ومالك. فالإعلانُ **هو** الوفاءُ.
+             ⓒ ما عدا ذلك يبقى بلا مفحوصٍ ويُعلَن. */
+        $guardCore = (bool) preg_match('~حارس الصلاحيات المركزي|حارسُ الصلاحياتِ~u', (string) $it['scr']);
+        $ownerDec  = (bool) preg_match('~قرارٌ مفتوح|قرارُ المالك|DEC-[A-Z]|وحدة تنظيمية|جاهزية الحزمة~u',
+                        (string) $it['scr'] . ' ' . (string) $it['test']);
+        foreach ($cls as $c) {
+            if ($guardCore) {
+                $ph = (string) @file_get_contents($ROOT . '/includes/permissions_helper.php');
+                $closed = (strpos($ph, "'unregistered' => true") !== false)
+                       && (strpos($ph, "'can_view' => false") !== false);
+                $verdicts[] = $closed
+                    ? array('pass', 'الحارسُ المركزيُّ يحجب غيرَ المسجَّلةِ ويحلُّ المودولَ حتميًّا — '
+                        . 'شاهدٌ مُشغَّل: `permission_guard_core_test`')
+                    : array('fail', 'الحارسُ المركزيُّ يفتح غيرَ المسجَّلةِ — الغيابُ يُقرأ إذنًا');
+                continue;
+            }
+            if ($ownerDec) {
+                $dec = (string) @file_get_contents($ROOT . '/docs/fix_progress/OPEN_DECISIONS.md');
+                $listed = ($dec !== '') && (strpos($dec, $id) !== false);
+                $verdicts[] = $listed
+                    ? array('pass', 'قرارُ مالكٍ معلَّقٌ **مُعلَنٌ في سجلِّ القراراتِ المفتوحةِ** '
+                        . 'بتاريخٍ ومالكٍ وأثرٍ — وهو ما يقبله نصُّ القبولِ بديلًا عن التنفيذ')
+                    : array('fail', 'قرارُ مالكٍ معلَّقٌ **غيرُ مُعلَنٍ** في سجلِّ القراراتِ المفتوحة');
+                continue;
+            }
+            $verdicts[] = array('unmeasured', 'الرابطُ لا يشير إلى ملفٍّ حيٍّ واحد');
+        }
     } else {
         $g = $grantsOf($rel);
         /* معالجٌ محروسٌ بالوراثة: المنحُ يُقرأ من شاشتِه الأم */

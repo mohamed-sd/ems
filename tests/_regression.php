@@ -91,6 +91,7 @@ $core = array(
     'authority_cap_escalation_test',  /* INJ-0014 — فوقَ السقفِ يُرفع لا يُرفض صامتًا */
     'cap_state_guard_test',           /* INJ-0053 · INJ-0089 — السقفُ يحكم الحالة */
     'finance_source_guard_test',      /* INJ-0176 · 0178 · 0179 · 0180 — المالُ أثرٌ لا مصدر */
+    'permission_guard_core_test',     /* INJ-0008 · 0202 · 0261 — الحارسُ المركزيُّ وحلُّ المودول */
     /* حملةُ الواجهةِ · الموجةُ السابعة */
     'inline_styles_test',              /* INJ-0442 · 0571 · 0237 · 0501 — الأنماطُ الموضعيةُ والرموز */
     'supplier_kpi_cards_test',         /* INJ-0158 — بطاقاتُ المؤشرِ بعقدِها السباعيّ */
