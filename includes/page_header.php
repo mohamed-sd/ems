@@ -100,6 +100,45 @@ $__iconTag   = (isset($header_icon_tag) && $header_icon_tag === 'span') ? 'span'
 $__title     = isset($header_title) ? $header_title : '';
 $__titleHtml = isset($header_title_html) ? $header_title_html : null;
 
+/* ══ عنوانُ الصفحةِ يطابق تسميةَ الرابطِ الذي أوصل إليها ═══════════════════════
+   ⇐ INJ-0132 · INJ-0154 · INJ-0428
+
+   نصُّ ثلاثةِ بنودٍ: «وعنوانُ الصفحة يطابق تسميةَ الرابط **حرفيًّا**».
+   والمقيسُ قبلَه: **ثلاثٌ وستون** شاشةً من ١٤٢ عنوانُها غيرُ تسميتِها — تضغط
+   «طلب مالي جديد» فتهبط على «الطلب المالي الموحّد»، وتضغط «تسجيل الوحدات»
+   فتهبط على «اختيار نوع الآلية». فالمستخدمُ يشكُّ أنه أخطأ الرابط.
+
+   ◆ والإصلاحُ **في الترويسةِ المشتركةِ لا في ٦٣ ملفًّا**: التسميةُ في `nav_items`
+     هي ما وعد به النظامُ المستخدمَ، فهي المرجع. وعنوانُ الشاشةِ يبقى احتياطًا
+     حين لا يكون للشاشةِ صفُّ تنقّلٍ (نقاطُ ردٍّ · شاشاتٌ تُفتح بمعرّف).
+   ◆ ولا يُستبدل عنوانٌ صريحٌ بـ`$header_title_html` — فذاك ترويسةٌ مركَّبةٌ
+     بعلاماتٍ، وإحلالُ نصٍّ محلَّها يُفقد بناءَها. */
+if ($__titleHtml === null && isset($GLOBALS['conn']) && $GLOBALS['conn'] instanceof mysqli) {
+    $__navLabel = null;
+    try {
+        $__script = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
+        $__rel = ltrim(preg_replace('~^.*/ems/~', '', $__script), '/');
+        if ($__rel !== '' && substr($__rel, -4) === '.php') {
+            $__role = (string) ($_SESSION['user']['role'] ?? '');
+            $__st = $GLOBALS['conn']->prepare(
+                "SELECT label_ar FROM nav_items
+                  WHERE role_id = ? AND (route = ? OR route = ? OR route LIKE ?)
+                  ORDER BY CHAR_LENGTH(route) LIMIT 1");
+            if ($__st) {
+                $__a = $__rel; $__b = '../' . $__rel; $__c = '%' . $__rel . '#%';
+                $__st->bind_param('ssss', $__role, $__a, $__b, $__c);
+                $__st->execute();
+                $__row = $__st->get_result()->fetch_assoc();
+                $__st->close();
+                if ($__row && trim((string) $__row['label_ar']) !== '') {
+                    $__navLabel = trim((string) $__row['label_ar']);
+                }
+            }
+        }
+    } catch (\Throwable $__e) { $__navLabel = null; }
+    if ($__navLabel !== null) { $__title = $__navLabel; }
+}
+
 // Normalise the back area. (bool) false omits the element entirely; an empty
 // array renders an empty .head_back div; otherwise accept a single item or a list.
 $__showBack  = !(isset($header_back) && $header_back === false);

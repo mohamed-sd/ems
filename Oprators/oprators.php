@@ -8,17 +8,26 @@ if (!isset($_SESSION['user'])) {
 $page_title = "إيكوبيشن | التشغيل ";
 include '../config.php';
 
-// M-27 (SPEC-03 بطاقة 1 · SPEC-00 §3-②): الشاشةُ استُوعبت في غرفة العمليات —
-// **Redirect بعدّاد hits حتى يصفر**، و?legacy=1 بابُ رجوعٍ مؤقتٌ معلَن.
-if (!isset($_GET['legacy'])) {
-    require_once '../includes/audit_trail.php';
-    ems_audit_change($conn, 'operations', 'route_redirect', 'legacy_hit', 9,
-        array(), array('from' => 'Oprators/oprators.php', 'to' => 'Operations/operations_room.php'),
-        array('company_id' => intval($_SESSION['user']['company_id'] ?? 0),
-              'user_id' => intval($_SESSION['user']['id'] ?? 0)));
-    header("Location: ../Operations/operations_room.php");
-    exit();
-}
+/* ══ INJ-0534 · بابُ الرجوعِ أُغلق — التحويلُ **غيرُ مشروط** ═══════════════════
+     M-27: الشاشةُ استُوعبت في غرفة العمليات، وكان التحويلُ مشروطًا بـ`?legacy=1`
+     «بابَ رجوعٍ مؤقتًا معلَنًا». والمقيسُ أنَّ البابَ يتخطّى **التحويلَ وسطرَ
+     التدقيقِ معًا**: من يعرف المعاملَ يفتح الشاشةَ القديمةَ بأفعالِها كاملةً
+     ولا يُخلّف أثرًا واحدًا. فهو عطلُ حراسةٍ لا قرارُ ملكية.
+
+     ◆ والشاشةُ **لا تُحذف**: التحويلُ يُبقي الروابطَ المحفوظةَ والمراجعَ في
+       التقاريرِ عاملةً — والحذفُ الفوريُّ يكسرها.
+     ◆ وكلُّ فتحةٍ تُسجَّل — بما فيها المحاولاتُ بالمعاملِ القديم، ليُعرف من
+       ما زال يستعمل الرابطَ القديمَ ومن أين. */
+require_once '../includes/audit_trail.php';
+ems_audit_change($conn, 'operations', 'route_redirect', 'legacy_hit', 9,
+    array(),
+    array('from' => 'Oprators/oprators.php', 'to' => 'Operations/operations_room.php',
+          'legacy_param' => isset($_GET['legacy']) ? '1' : '0',
+          'referer' => mb_substr((string) ($_SERVER['HTTP_REFERER'] ?? ''), 0, 180)),
+    array('company_id' => intval($_SESSION['user']['company_id'] ?? 0),
+          'user_id' => intval($_SESSION['user']['id'] ?? 0)));
+header('Location: ../Operations/operations_room.php');
+exit();
 include '../includes/permissions_helper.php';
 require_once '../includes/approval_workflow.php';
 

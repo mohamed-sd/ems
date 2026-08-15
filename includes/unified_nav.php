@@ -282,8 +282,12 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
         // مستوى المصيّر فيصمدان أمام كل إعادة توليدٍ من الوثيقة.
         if (!$hdrPrinted) {
             $hdrPrinted = true;
+            /* المفتاحُ بصيغةِ «المسار||التسمية» — نفسِ صيغةِ `printNavLinkItem`،
+               وإلا لم يتعرَّف الحارسُ على المحقونِ فطُبع مرتين من مصدرين. */
+            ems_nav_mark_printed('main/role_board.php||الرئيسية');
             echo '<li><a href="' . $basePrefix . 'main/role_board.php">'
                . '<i class="fa fa-house"></i> <span>الرئيسية</span></a></li>' . "\n";
+            ems_nav_mark_printed('chats/index.php||المراسلات');
             echo '<li><a href="' . $basePrefix . 'chats/index.php" id="sidebarChatLink">'
                . '<i class="fa fa-comments"></i> <span>المراسلات</span>'
                . '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>'
@@ -319,6 +323,87 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
         }
         echo '  </ul>' . "\n";
         echo '</li>' . "\n";
+    }
+}
+
+/* ══ مجموعةُ المسارِ المطبوع — حارسُ التكرارِ في المولِّد ═══════════════════════
+   ⇐ INJ-0414 · INJ-0489 · INJ-0540 · INJ-0448 · INJ-0222 · INJ-0562
+              · INJ-0127 · INJ-0132 · INJ-0154 · INJ-0428 · INJ-0512 · INJ-0513 · INJ-0554
+
+   **العلّةُ الواحدة**: «المراسلات» تُطبع مرتين في سايدبارِ خمسةٍ وعشرين دورًا —
+   مرةً **محقونةً في المولِّد** (وهي التي تحمل شارةَ غيرِ المقروءِ الحيّة) ومرةً
+   من صفٍّ في `nav_items`. وستةُ بنودٍ في السجلِّ ليست إلا عرضًا لهذه العلّة.
+
+   ── ولماذا الحارسُ هنا لا في البذرة ─────────────────────────────────────────
+   حذفُ الصفوفِ يُصلح اليوم؛ وأولُ إعادةِ توليدٍ من الوثيقةِ تُعيدها. فالمنعُ
+   **في المولِّد**: مسارٌ طُبع مرةً لا يُطبع ثانيةً مهما تعدَّد مصدرُه — بذرةً
+   كان أو حقنًا يدويًّا أو صفًّا يدويًّا. وهو يحرس كلَّ الأدوارِ اليومَ ومستقبلًا.
+
+   ── وثلاثةُ ضوابطَ في التطبيع ──────────────────────────────────────────────
+     ① **المرساةُ تُجرَّد**: `chats/index.php#n9g7i1` هو الملفُّ نفسُه — ومقارنةٌ
+        بلا تجريدٍ تعدُّه ملفًّا آخر (INJ-0132 · 0154 · 0428 · 0512 · 0513 · 0554).
+     ② **البادئةُ النسبيةُ تُجرَّد**: `../chats/index.php` = `chats/index.php`.
+     ③ **وسلسلةُ الاستعلامِ تُجرَّد**: `?type=1` منظرٌ لا ملفٌّ آخر — إلا أن
+        يُصرَّح بخلافِ ذلك، وحينها يُوسَم الصفُّ صراحةً.
+   والمجموعةُ **لكلِّ طلبٍ**: `static` داخلَ الدالةِ يبقى ما بقيت العملية، وهو
+   ما نريد — فالسايدبارُ يُصيَّر مرةً في الطلبِ الواحد. */
+if (!function_exists('ems_nav_norm_route')) {
+    /**
+     * @param bool $dropAnchor هل تُجرَّد المِرساة؟
+     *   `false` (الافتراض) = **هويةُ الرابط**: مِرساتانِ مختلفتانِ مدخلانِ
+     *      مقصودان لقسمين في الشاشةِ نفسِها (INJ-0459) — فلا يُبتلع أحدُهما.
+     *   `true` = **هويةُ الملفّ**: للقياسِ الذي يسأل «كم مرةً ظهر هذا الملفُّ؟».
+     *
+     * ◆ وقع الفخُّ فعلًا: أوّلُ صياغةٍ جرّدت المِرساةَ في **الحارس** فابتلعت
+     *   أربعين رابطًا مشروعًا (١٢٧٦ ⇒ ١٢٣٦) وصارت ٣٩ صفًّا «شاشاتٍ ميتة».
+     *   فالحارسُ يقارن بالهويةِ الكاملة، والقياسُ وحدَه يجرّد.
+     */
+    function ems_nav_norm_route($route, $dropAnchor = false)
+    {
+        $r = (string) $route;
+        $anchor = '';
+        if (strpos($r, '#') !== false) {
+            $parts = explode('#', $r, 2);
+            $r = $parts[0];
+            $anchor = trim($parts[1]);
+        }
+        $r = explode('?', $r, 2)[0];                 /* سلسلةُ الاستعلامِ منظرٌ لا ملف */
+        $r = preg_replace('~^(\.\./)+~', '', $r);    /* البادئةُ النسبية */
+        $r = strtolower(trim(ltrim((string) $r, '/')));
+        if ($dropAnchor || $anchor === '') { return $r; }
+        return $r . '#' . strtolower($anchor);
+    }
+}
+if (!function_exists('ems_nav_mark_printed')) {
+    /** @return bool true إن كان أوّلَ ظهورٍ لهذا المسار (فيُطبع)، false إن تكرَّر */
+    function ems_nav_mark_printed($route, $reset = false)
+    {
+        static $seen = array();
+        if ($reset) { $seen = array(); return true; }
+        /* ── متى يكون رابطانِ تكرارًا؟ شرطانِ لا شرطٌ واحد ────────────────────────
+             ⓐ **الملفُّ نفسُه بالتسميةِ نفسِها** — لا شيءَ يميّزهما للمستخدم.
+             ⓑ **الملفُّ نفسُه وكلاهما بلا مِرساة** — يهبطانِ في المكانِ نفسِه
+                ولو اختلفت التسمية («الرئيسية» و«لوحة الإدارة» لـ`role_board`).
+             وما عدا ذلك — ملفٌّ بمِرساتين مختلفتين — **مدخلانِ مقصودانِ** لقسمين،
+             ويُطبعانِ (وهو ما تحرسه مِراسي الوصولِ في INJ-0459). */
+        $label = '';
+        if (strpos((string) $route, '||') !== false) {
+            $parts = explode('||', (string) $route, 2);
+            $route = $parts[0];
+            $label = trim($parts[1]);
+        }
+        $file = ems_nav_norm_route($route, true);          /* بلا مِرساة */
+        if ($file === '') { return true; }
+        $hasAnchor = (strpos((string) $route, '#') !== false);
+
+        $kLabel = $file . '||' . $label;                   /* ⓐ */
+        $kBare  = $hasAnchor ? null : ($file . '||#bare'); /* ⓑ */
+
+        if (isset($seen[$kLabel])) { return false; }
+        if ($kBare !== null && isset($seen[$kBare])) { return false; }
+        $seen[$kLabel] = true;
+        if ($kBare !== null) { $seen[$kBare] = true; }
+        return true;
     }
 }
 
