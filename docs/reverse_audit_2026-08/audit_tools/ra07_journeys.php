@@ -269,9 +269,16 @@ foreach ($J as $jk => $j) {
             $rec['linked'] = $r ? (int) $r->fetch_row()[0] : -2;
             $rec['note'] = 'قياسٌ مخصَّص: ' . $custom;
         } else {
+            $toT = $toS['table']; $fromT = $fromS['table'];
             $w = ["`$fk` IS NOT NULL", "`$fk` > 0"];
-            if ($colExists($toS['table'], 'is_deleted')) { $w[] = 'is_deleted=0'; }
-            $sql = "SELECT COUNT(DISTINCT `$fk`) FROM `{$toS['table']}` WHERE " . implode(' AND ', $w);
+            if ($colExists($toT, 'is_deleted')) { $w[] = "`$toT`.is_deleted=0"; }
+            /* ◆ اتساقُ المرشِّح: لو استبعد جانبُ «من» المحذوفَ ولم يستبعده جانبُ
+               «الموصول» خرجت نسبةٌ فوق 100٪ (قِيست 100.1٪: قيدانِ محذوفانِ
+               حذفًا ناعمًا وسطورُهما حيّة). فيُشترط أن يكون السلفُ حيًّا أيضًا. */
+            if ($colExists($fromT, 'is_deleted') && $colExists($fromT, 'id')) {
+                $w[] = "EXISTS (SELECT 1 FROM `$fromT` _p WHERE _p.id = `$toT`.`$fk` AND _p.is_deleted = 0)";
+            }
+            $sql = "SELECT COUNT(DISTINCT `$fk`) FROM `$toT` WHERE " . implode(' AND ', $w);
             $r = $db->query($sql);
             $rec['linked'] = $r ? (int) $r->fetch_row()[0] : -2;
         }

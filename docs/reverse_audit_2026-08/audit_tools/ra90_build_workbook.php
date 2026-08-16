@@ -123,6 +123,14 @@ foreach ($stateF as $id => $s) {
 }
 $pct3 = round($pass3 / max(1, $tot3) * 100, 1);
 $jrX = $J('journeys.json'); $nfrX = $J('nfr.json');
+/* أرقامُ الترحيلِ حيّةٌ — تتحرّك بكلِّ تشغيلة فلا تُقرأ من ملفٍ مجمَّد */
+$liveOne = function (string $sql) use ($db) { $r = $db->query($sql); return $r ? (int) $r->fetch_row()[0] : 0; };
+$eventsNow    = $liveOne("SELECT COUNT(*) FROM fin_financial_events");
+$postedNow    = $liveOne("SELECT COUNT(*) FROM fin_financial_events WHERE fes_status='Posted'");
+$publishedNow = $liveOne("SELECT COUNT(*) FROM fin_financial_events WHERE fes_status='Published'");
+$approvedNow  = $liveOne("SELECT COUNT(*) FROM fin_financial_events WHERE fes_status='Approved'");
+$failedNow    = $liveOne("SELECT COUNT(*) FROM fin_financial_events WHERE fes_status='PostingFailed'");
+$jeAutoNow    = $liveOne("SELECT COUNT(*) FROM fin_journal_entries WHERE event_id IS NOT NULL AND event_id>0 AND is_deleted=0");
 $jLive = 0; $jJudge = 0;
 foreach ($jrX['journeys'] as $jj) { $jLive += $jj['links_live']; $jJudge += $jj['links_judgeable']; }
 $ebX = $nfrX['event_bus'];
@@ -146,8 +154,11 @@ $rows00 = [
     ['— دوراتُ العملِ عبرَ الإدارات (قياسٌ حيٌّ جديد) —', '', '', 'h'],
     ['اتصاليةُ الرحلاتِ الست', $jLive . ' / ' . $jJudge . ' وصلةً = ' . round($jLive / max(1, $jJudge) * 100, 1) . '٪',
         'أتصلُ صفوفُ المرحلةِ إلى التالية؟ — تفصيلُها في ورقة 90', 'bad'],
-    ['ترحيلُ الوقائعِ إلى الدفتر', $ebX['fin_events_posted'] . ' / ' . $ebX['financial_events'] . ' = ' . round($ebX['fin_events_posted'] / max(1, $ebX['financial_events']) * 100, 2) . '٪',
-        '5,207 واقعةً حالتُها Published تنتظر — والانتقالُ إلى UnderReview بلا موضعِ نداءٍ في الشجرة (fin00)', 'bad'],
+    /* يُقرأ حيًّا لا من nfr.json: رقمٌ يتحرّك بكلِّ تشغيلةِ ترحيلٍ فلا يُجمَّد في ملف */
+    ['ترحيلُ الوقائعِ إلى الدفتر', $postedNow . ' / ' . $eventsNow . ' = ' . round($postedNow / max(1, $eventsNow) * 100, 1) . '٪',
+        'كان 9 (0.17٪) لحظةَ خطِّ الأساس · بُني المسارُ الثلاثيُّ وشُغِّل بسقفٍ فصار ' . number_format($postedNow)
+        . ' قيدًا متوازنًا · والمتبقي ' . number_format($publishedNow) . ' منشورًا و' . number_format($approvedNow) . ' معتمَدًا ينتظر فترتَه',
+        $postedNow > 500 ? 'warn' : 'bad'],
     ['تسليمُ أحداثِ الأعمال', $ebX['deliveries'] . ' / ' . $ebX['business_events'] . ' = ' . $ebX['delivery_coverage_pct'] . '٪',
         'أربعةُ مستهلكين مسجَّلين فقط — الناقلُ سجلٌّ لا ناقل', 'bad'],
     ['مهامٌ ميتةٌ في الطابور', $nfrX['job_queue']['dead'] . ' / ' . $nfrX['job_queue']['rows'],
@@ -473,8 +484,17 @@ $d93 = array_merge($d93, [
         'آلةُ الحالاتِ تُعرّف السلسلةَ كاملةً والتهيئةُ جاهزة (27 قاعدةَ ترحيلٍ · 20 اعتمادٍ · 298 حسابًا) والناقلُ حيّ — لكن لا كودَ ينقل المنشورَ إلى المراجعة. خطوةٌ لم تُبنَ لا عطلٌ يُصلَح'],
     ['والتسعةُ «المُرحَّلة» بذورٌ', 'posted_by و posted_at فارغانِ في كلِّها',
         'FIN-EV-0001..0010 — بُذرت مُرحَّلةً ولم يُرحِّلها مسار'],
-    ['ومن أين امتلأ الدفتر؟', '1,653 قيدًا · 9 بمرجعِ واقعة (0.54٪)',
+    ['ومن أين امتلأ الدفتر؟', '1,653 قيدًا · 9 بمرجعِ واقعة (0.54٪) لحظةَ خطِّ الأساس',
         'الباقي من مسارٍ يدويٍّ موازٍ: إيرادُ مستخلصٍ 285 · تحصيلٌ 214 · سدادُ موردٍ 258'],
+    ['— أثرُ البناءِ على B8 (مقيسٌ لا معلَن) —', '', ''],
+    ['قيودٌ آليةٌ من وقائع', '9 ⇐ ' . number_format($jeAutoNow),
+        'بُنيت الأبوابُ الثلاثةُ (PostingService) وشُغِّلت بسقفٍ إلزاميّ — والتسعةُ الأصليةُ كانت بذورًا بلا posted_by'],
+    ['وصلةُ «واقعة ⇐ قيد» في رحلةِ المالية', '0.1٪ ⇐ 21.2٪',
+        'تحسُّنٌ مقيس — ولم يعبر عتبةَ 50٪ فبقي الحكمُ PARTIAL. والاتصاليةُ الكليةُ 60.4٪ كما هي'],
+    ['المتبقي في القمع', number_format($publishedNow) . ' منشور · ' . number_format($approvedNow) . ' معتمَد',
+        'المعتمَدُ ينتظر فتحَ فترتِه (2026-06 مغلق) · و' . $failedNow . ' في PostingFailed بأسبابِها'],
+    ['تصحيحُ أداةٍ: نسبةٌ فوق 100٪', '100.1٪ ⇐ مستحيلٌ أُزيل',
+        'جانبُ «من» كان يستبعد المحذوفَ ناعمًا وجانبُ «الموصول» لا يستبعده — قيدانِ محذوفانِ بأربعةِ سطورٍ حيّة. وُحِّد المرشِّح'],
 ]);
 foreach ($d93 as $x) { $sh->setCellValue("A$r", $x[0]); $sh->setCellValue("B$r", $x[1]); $sh->setCellValue("C$r", $x[2]); $sh->getStyle("C$r")->getAlignment()->setWrapText(true); $r++; }
 $sh->getColumnDimension('A')->setWidth(28); $sh->getColumnDimension('B')->setWidth(14); $sh->getColumnDimension('C')->setWidth(80);

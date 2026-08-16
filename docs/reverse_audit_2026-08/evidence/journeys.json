@@ -1,5 +1,5 @@
 {
-    "measured_at": "2026-08-16T01:10:35+00:00",
+    "measured_at": "2026-08-16T06:09:07+00:00",
     "journeys": {
         "C": {
             "key": "C",
@@ -146,7 +146,7 @@
                     "table": "fin_journal_entries",
                     "filter": "",
                     "exists": true,
-                    "rows": 1651,
+                    "rows": 2757,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -479,8 +479,8 @@
                     "fk": "inspection_id",
                     "kind": "opt",
                     "from_total": 10,
-                    "linked": 7,
-                    "pct": 70,
+                    "linked": 5,
+                    "pct": 50,
                     "verdict": "LIVE",
                     "note": ""
                 },
@@ -494,8 +494,8 @@
                     "fk": "order_id",
                     "kind": "req",
                     "from_total": 17,
-                    "linked": 19,
-                    "pct": 111.8,
+                    "linked": 14,
+                    "pct": 82.4,
                     "verdict": "LIVE",
                     "note": ""
                 },
@@ -509,8 +509,8 @@
                     "fk": "order_id",
                     "kind": "req",
                     "from_total": 17,
-                    "linked": 18,
-                    "pct": 105.9,
+                    "linked": 13,
+                    "pct": 76.5,
                     "verdict": "LIVE",
                     "note": ""
                 },
@@ -776,8 +776,8 @@
                     "fk": "custody_id",
                     "kind": "req",
                     "from_total": 14,
-                    "linked": 16,
-                    "pct": 114.3,
+                    "linked": 14,
+                    "pct": 100,
                     "verdict": "LIVE",
                     "note": ""
                 },
@@ -887,7 +887,7 @@
                     "table": "fin_journal_entries",
                     "filter": "",
                     "exists": true,
-                    "rows": 1651,
+                    "rows": 2757,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -896,7 +896,7 @@
                     "table": "fin_journal_lines",
                     "filter": "",
                     "exists": true,
-                    "rows": 3306,
+                    "rows": 5518,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -974,8 +974,8 @@
                     "fk": "event_id",
                     "kind": "req",
                     "from_total": 5253,
-                    "linked": 7,
-                    "pct": 0.1,
+                    "linked": 1113,
+                    "pct": 21.2,
                     "verdict": "PARTIAL",
                     "note": ""
                 },
@@ -988,9 +988,9 @@
                     "to_table": "fin_journal_lines",
                     "fk": "entry_id",
                     "kind": "req",
-                    "from_total": 1651,
-                    "linked": 1653,
-                    "pct": 100.1,
+                    "from_total": 2757,
+                    "linked": 2757,
+                    "pct": 100,
                     "verdict": "LIVE",
                     "note": ""
                 },
@@ -1018,9 +1018,9 @@
                     "to_table": "fin_closing_items",
                     "fk": "__any__",
                     "kind": "opt",
-                    "from_total": 1651,
+                    "from_total": 2757,
                     "linked": 80,
-                    "pct": 4.8,
+                    "pct": 2.9,
                     "verdict": "LIVE",
                     "note": "قياسٌ مخصَّص: SELECT COUNT(*) FROM fin_closing_items"
                 }
@@ -1340,7 +1340,7 @@
                     "table": "activity_logs",
                     "filter": "",
                     "exists": true,
-                    "rows": 170645,
+                    "rows": 180212,
                     "verdict": "HAS_DATA"
                 },
                 {
