@@ -353,6 +353,16 @@ class PostingService
         if (empty($orig['journal_entry_id'])) {
             return array('ok' => false, 'code' => 409, 'reasons' => array('واقعةٌ Posted بلا قيد — حالةٌ لا تُعكس بل تُصحَّح'));
         }
+        /* ◆ ولا يُعكس عاكس: الواقعةُ المعوِّضةُ تُصيَّر Posted كي يصحَّ قيدُها،
+           فتبدو صالحةً للعكس — وعكسُها يُنشئ سلسلةً بلا معنى (عكسُ عكسٍ لعكس)
+           ومبلغُها **سالبٌ** فيُنتج رأسَ قيدٍ سالبًا يخالف سطورَه الموجبة.
+           (قِيس: سلسلةُ 8577 ⇐ 17982 ⇐ 17983 ورأسٌ بـ-954.80 مقابلَ سطرين موجبين.)
+           فمن أراد إلغاءَ عكسٍ فذاك تصحيحُ قيدٍ لا عكسٌ ثانٍ. */
+        if (!empty($orig['reverses_event_id'])) {
+            return array('ok' => false, 'code' => 409,
+                         'reasons' => array('هذه واقعةٌ معوِّضةٌ (تعكس #' . (int) $orig['reverses_event_id']
+                                          . ') — ولا يُعكس عاكس'));
+        }
         $date = substr((string) $orig['occurred_at'], 0, 10);
         if (!self::periodOpen($conn, $companyId, $date)) {
             return array('ok' => false, 'code' => 409,
@@ -385,7 +395,9 @@ class PostingService
         }
 
         /* ② القيدُ العاكسُ — مدينٌ ودائنٌ متبادلان */
-        $amt = round((float) $orig['amount'], 2);
+        /* المبلغُ **مطلقٌ دائمًا**: رأسُ القيدِ مجموعُ مدينٍ ودائنٍ موجبين،
+           والاتجاهُ يعبّر عنه تبادلُ السطرين لا إشارةُ الرأس. */
+        $amt = round(abs((float) $orig['amount']), 2);
         $revEntryId = 0;
         $gate->runInTransaction(function ($g) use (&$revEntryId, $orig, $lines, $amt, $date, $actor, $revEventId, $reason) {
             $revEntryId = (int) $g->insert('fin_journal_entries', array(

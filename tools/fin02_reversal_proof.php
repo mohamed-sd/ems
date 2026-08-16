@@ -32,8 +32,13 @@ $_SESSION = array('user' => array('id' => $actor, 'company_id' => $CO, 'role' =>
 $gate = ems_tenant_db();
 
 /* واقعةٌ مُرحَّلةٌ لم تُعكس بعد */
+/* ◆ ولا تُختَر واقعةٌ معوِّضةٌ: هي Posted ولها قيدٌ فتبدو صالحة، لكنَّ عكسَها
+   سلسلةٌ بلا معنى ومبلغُها سالب. (اختارها المسبارُ مرةً فأنتج ثلاثةَ معكوسات
+   ورأسَ قيدٍ سالبًا — والعيبُ في المسبارِ والخدمةِ معًا، وأُصلحا.) */
 $evId = (int) $one("SELECT e.id FROM fin_financial_events e
                     WHERE e.company_id=$CO AND e.fes_status='Posted' AND e.journal_entry_id>0
+                      AND e.amount > 0
+                      AND e.reverses_event_id IS NULL
                       AND NOT EXISTS (SELECT 1 FROM fin_financial_events r WHERE r.reverses_event_id=e.id)
                     ORDER BY e.id DESC LIMIT 1");
 if (!$evId) { exit("لا واقعةَ مُرحَّلةٌ صالحةٌ للاختبار\n"); }

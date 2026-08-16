@@ -70,7 +70,7 @@ $verify = function (string $file) use ($dataMb): array {
 };
 
 if ($verifyOnly) {
-    $files = glob($outDir . '/*.sql*') ?: array();
+    $files = glob($outDir . "/*.sql*") ?: array(); $files = array_values(array_filter($files, fn($f) => substr($f,-10) !== ".snap.json"));
     usort($files, fn($a, $b) => filemtime($b) <=> filemtime($a));
     if (!$files) { exit("  ✘ لا نسخةَ في $outDir\n"); }
     echo "\n── التحقُّقُ من النسخِ القائمة ──\n";
@@ -151,8 +151,26 @@ if (function_exists('gzopen')) {
     printf("  ✔ ضُغطت: %.1f م.ب · نُزع DEFINER من %d موضعًا\n", filesize($file) / 1048576, $stripped);
 }
 
+/* ── لقطةٌ مرافقةٌ للنسخة ─────────────────────────────────────────────
+   تجربةُ الاستعادةِ تقارن بها لا بالحيِّ الآن — فبين النسخِ والتجربةِ يتغيّر
+   الإنتاجُ ويظهر التفارقُ عيبًا وهو عملٌ جديد. */
+$snapNow = array();
+foreach (array(
+    'tables'  => "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA='$dbName' AND TABLE_TYPE='BASE TABLE'",
+    'views'   => "SELECT COUNT(*) FROM information_schema.VIEWS WHERE TABLE_SCHEMA='$dbName'",
+    'trigs'   => "SELECT COUNT(*) FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA='$dbName'",
+    'entries' => "SELECT COUNT(*) FROM unit_entries",
+    'journal' => "SELECT COUNT(*) FROM fin_journal_entries",
+    'events'  => "SELECT COUNT(*) FROM fin_financial_events",
+) as $k => $sql) {
+    $q = $conn->query($sql);
+    $snapNow[$k] = $q ? (int) $q->fetch_row()[0] : -1;
+}
+file_put_contents($file . '.snap.json', json_encode($snapNow, JSON_UNESCAPED_UNICODE));
+echo "  ✔ لقطةٌ مرافقةٌ للمقارنة\n";
+
 /* التدوير */
-$files = glob($outDir . '/*.sql*') ?: array();
+$files = glob($outDir . "/*.sql*") ?: array(); $files = array_values(array_filter($files, fn($f) => substr($f,-10) !== ".snap.json"));
 usort($files, fn($a, $b) => filemtime($b) <=> filemtime($a));
 $removed = 0;
 foreach (array_slice($files, $keep) as $old) { @unlink($old); $removed++; }

@@ -35,7 +35,13 @@ $bin = null;
 foreach (glob('C:/wamp64/bin/mariadb/*/bin/mysql.exe') ?: array() as $c) { $bin = $c; break; }
 if (!$bin) { exit("لم يُعثر على عميلِ mysql\n"); }
 
-$files = glob($ROOT . '/storage/backups/daily/*.sql*') ?: array();
+/* ◆ نمطُ `*.sql*` يلتقط **اللقطةَ المرافقةَ** `....sql.gz.snap.json` أيضًا،
+   وهي أحدثُ فتُختار وتُستعاد بوصفها SQL — فتخرج قاعدةٌ فارغةٌ وتُتّهم النسخة.
+   (وقع فعلًا: 555 جدولًا ⇐ صفر.) فتُستبعد المرافقاتُ صراحةً. */
+$files = array_values(array_filter(
+    glob($ROOT . '/storage/backups/daily/*.sql*') ?: array(),
+    fn($f) => substr($f, -10) !== '.snap.json'
+));
 usort($files, fn($a, $b) => filemtime($b) <=> filemtime($a));
 if (!$files) { exit("لا نسخةَ يوميةٌ لاستعادتِها\n"); }
 $bak = $files[0];
@@ -62,8 +68,21 @@ $snap = function (mysqli $c, string $db): array {
         'events'  => $q("SELECT COUNT(*) FROM `$db`.fin_financial_events"),
     );
 };
-$before = $snap($c, $src);
-echo "\n  الأصل: " . json_encode($before, JSON_UNESCAPED_UNICODE) . "\n";
+/* ◆ المقارنةُ يجب أن تكون بلقطةِ **لحظةِ النسخِ** لا بالحيِّ الآن: بين النسخِ
+   والتجربةِ يتغيّر الإنتاج، فيظهر التفارقُ عيبًا في الاستعادةِ وهو عملٌ جديد.
+   (وقع فعلًا: مسبارُ العكسِ أضاف صفوفًا بعدَ النسخِ فأخفقت التجربةُ كذبًا.)
+   فإن وُجدت لقطةٌ مرافقةٌ للنسخةِ استُعملت، وإلا **تُعاد النسخةُ الآن** كي
+   تتطابق اللحظتان. */
+$sidecar = $bak . '.snap.json';
+if (is_file($sidecar)) {
+    $before = json_decode((string) file_get_contents($sidecar), true);
+    echo "\n  لقطةُ لحظةِ النسخ (مرافقة): " . json_encode($before, JSON_UNESCAPED_UNICODE) . "\n";
+} else {
+    $before = $snap($c, $src);
+    file_put_contents($sidecar, json_encode($before, JSON_UNESCAPED_UNICODE));
+    echo "\n  لا لقطةَ مرافقة — كُتبت الآن (والنسخةُ أقدمُ منها فقد يظهر تفارقٌ مشروع)\n";
+    echo '  الأصلُ الآن: ' . json_encode($before, JSON_UNESCAPED_UNICODE) . "\n";
+}
 
 /* الاستعادة */
 $c->query("DROP DATABASE IF EXISTS `$drill`");
