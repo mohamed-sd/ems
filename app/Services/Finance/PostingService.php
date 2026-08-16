@@ -1,0 +1,285 @@
+<?php
+/**
+ * PostingService — الخطواتُ الثلاثُ التي تصل الواقعةَ بالدفتر (B8)
+ * ═══════════════════════════════════════════════════════════════════════════
+ * التشخيصُ (tools/fin00_posting_gap.php): آلةُ الحالاتِ تُعرّف السلسلةَ كاملةً
+ * والتهيئةُ موجودةٌ والناقلُ حيّ — لكنَّ الانتقالَ Published ⇐ UnderReview **بلا
+ * موضعِ نداءٍ واحدٍ** في الشجرة. فالسلسلةُ تقف عند البابِ الأول. هذه الخدمةُ
+ * تبني الأبوابَ الثلاثةَ ولا تخترع حكمًا:
+ *
+ *   ① reviewPublished()  Published   ⇐ UnderReview  · التوجيهُ لمحاسبِ التخصص
+ *   ② approveReviewed()  UnderReview ⇐ Approved     · بالسقوفِ المُعرَّفةِ سلفًا
+ *   ③ postApproved()     Approved    ⇐ Posted       · قيدٌ متوازنٌ في الدفتر
+ *
+ * ── ما يُقرأ ولا يُخترع ────────────────────────────────────────────────
+ * · السقوفُ من `fin_approval_matrix` (min/max/required_level) — لا رقمَ مكتوبٌ هنا.
+ * · الحساباتُ من `fin_chart_of_accounts` بشرطِ `is_postable=1 AND active=1`.
+ * · الفترةُ من `fin_financial_periods` بشرطِ `posting_allowed=1`.
+ * · الحالاتُ عبرَ `EventStateMachine::transition` — بقائمةِ سماحِها لا بكتابةٍ مباشرة.
+ *
+ * ── وما يُعلَن لأنه اجتهادٌ لا نصّ ─────────────────────────────────────
+ * `fin_posting_matrix` **نصٌّ وصفيٌّ لا قاعدةٌ آلية** («4101 · 4102 بحسب النموذج»).
+ * فخريطةُ الحساباتِ أدناه مستخرَجةٌ من **نمطِ القيودِ التسعةِ القائمةِ في الدفتر**
+ * (مدين 1104 ذمم العملاء / دائن 4101 إيراد التأجير بالساعة) وممدودةٌ بالوحدةِ
+ * إلى 4102 للطن و4103 للمتر كما تسمّيها أسماءُ الحساباتِ نفسُها. وما لا قاعدةَ
+ * له **يقف في PostingFailed بسببِه** ولا يُخمَّن له حساب.
+ *
+ * ── ولا صفَّ يُكتب بلا هذه الشروط ──────────────────────────────────────
+ * مبلغٌ موجب · فترةٌ مفتوحة · حسابانِ قابلانِ للترحيل · ومدينٌ = دائن.
+ * والعطالةُ بـ`journal_entry_id` — فإعادةُ التشغيلِ لا تُنتج قيدًا ثانيًا.
+ */
+
+namespace App\Services\Finance;
+
+require_once __DIR__ . '/EventStateMachine.php';
+
+class PostingService
+{
+    /** خريطةُ الحسابات — مُعلَنةٌ لأنها اجتهادٌ فوقَ مصفوفةٍ نصّية */
+    const ACCOUNT_MAP = array(
+        'revenue|hour'  => array('debit' => '1104', 'credit' => '4101'),
+        'revenue|ton'   => array('debit' => '1104', 'credit' => '4102'),
+        'revenue|meter' => array('debit' => '1104', 'credit' => '4103'),
+    );
+
+    /** ──────────────────────────────────────────────────────────────────
+     * ① Published ⇐ UnderReview — التوجيهُ لمحاسبِ التخصص
+     * ────────────────────────────────────────────────────────────────── */
+    public static function reviewPublished($gate, \mysqli $conn, $companyId, $actor, $limit = 100)
+    {
+        $companyId = (int) $companyId;
+        $limit = max(1, (int) $limit);
+        $out = array('moved' => 0, 'skipped' => 0, 'failed' => 0, 'reasons' => array());
+
+        /* ◆ لا تُمرَّر واقعةٌ في السلسلةِ إن كانت لا تستطيع بلوغَ الدفتر: الشرطُ
+           هنا هو شرطُ الترحيلِ نفسُه (مبلغٌ موجب · فترةٌ مفتوحة · نوعٌ مخرَّط).
+           وإلا تراكمت وقائعُ «معتمَدةٌ لا تُرحَّل» — وهي حالةٌ تُقلق ولا تُفيد.
+           (قِيست: 472 واقعةً وقفت في Approved بفترةٍ مغلقةٍ قبلَ هذا الشرط.) */
+        $keys = array();
+        foreach (array_keys(self::ACCOUNT_MAP) as $k) {
+            list($t, $u) = explode('|', $k);
+            $keys[] = "(LOWER(e.event_type)='" . $conn->real_escape_string($t)
+                    . "' AND LOWER(e.unit)='" . $conn->real_escape_string($u) . "')";
+        }
+        $typeCond = $keys ? '(' . implode(' OR ', $keys) . ')' : '0';
+
+        $rs = $conn->query("SELECT e.id, e.event_no, e.event_type, e.amount, e.accountant_id
+                            FROM fin_financial_events e
+                            WHERE e.company_id = $companyId AND e.fes_status = 'Published'
+                              AND COALESCE(e.is_deleted,0) = 0
+                              AND e.amount > 0
+                              AND $typeCond
+                              AND EXISTS (SELECT 1 FROM fin_financial_periods p
+                                          WHERE p.company_id = e.company_id AND p.period_type = 'month'
+                                            AND p.posting_allowed = 1
+                                            AND DATE(e.occurred_at) BETWEEN p.start_date AND p.end_date)
+                            ORDER BY e.id LIMIT $limit");
+        if (!$rs) { return $out; }
+        while ($e = $rs->fetch_assoc()) {
+            $r = EventStateMachine::transition($gate, $conn, (int) $e['id'], 'UnderReview', $actor);
+            if (!empty($r['ok'])) { $out['moved']++; }
+            else {
+                $out['failed']++;
+                $why = implode(' · ', (array) ($r['reasons'] ?? array('سببٌ غيرُ معلوم')));
+                $out['reasons'][$why] = ($out['reasons'][$why] ?? 0) + 1;
+            }
+        }
+        return $out;
+    }
+
+    /** ──────────────────────────────────────────────────────────────────
+     * ② UnderReview ⇐ Approved — بالسقفِ المُعرَّفِ في المصفوفة
+     * ────────────────────────────────────────────────────────────────── */
+    public static function approveReviewed($gate, \mysqli $conn, $companyId, $actor, $limit = 100)
+    {
+        $companyId = (int) $companyId;
+        $limit = max(1, (int) $limit);
+        $out = array('moved' => 0, 'held' => 0, 'failed' => 0, 'levels' => array(), 'reasons' => array());
+
+        $rs = $conn->query("SELECT id, event_no, event_type, amount, currency
+                            FROM fin_financial_events
+                            WHERE company_id = $companyId AND fes_status = 'UnderReview'
+                              AND COALESCE(is_deleted,0) = 0
+                            ORDER BY id LIMIT $limit");
+        if (!$rs) { return $out; }
+        while ($e = $rs->fetch_assoc()) {
+            $lvl = self::requiredLevel($conn, $companyId, (string) $e['event_type'], (float) $e['amount']);
+            if ($lvl === null) {
+                $out['held']++;
+                $out['reasons']['لا قاعدةَ اعتمادٍ تغطي هذا المبلغ'] =
+                    ($out['reasons']['لا قاعدةَ اعتمادٍ تغطي هذا المبلغ'] ?? 0) + 1;
+                continue;
+            }
+            $out['levels'][$lvl] = ($out['levels'][$lvl] ?? 0) + 1;
+            $r = EventStateMachine::transition($gate, $conn, (int) $e['id'], 'Approved', $actor);
+            if (!empty($r['ok'])) {
+                $out['moved']++;
+                $conn->query("UPDATE fin_financial_events
+                              SET approved_by = " . (int) $actor . ", approved_at = NOW()
+                              WHERE id = " . (int) $e['id']);
+            } else {
+                $out['failed']++;
+                $why = implode(' · ', (array) ($r['reasons'] ?? array('سببٌ غيرُ معلوم')));
+                $out['reasons'][$why] = ($out['reasons'][$why] ?? 0) + 1;
+            }
+        }
+        return $out;
+    }
+
+    /** مستوى الاعتمادِ المطلوبُ من `fin_approval_matrix` — قراءةٌ لا اختراع */
+    public static function requiredLevel(\mysqli $conn, $companyId, $eventType, $amount)
+    {
+        $st = $conn->prepare("SELECT required_level FROM fin_approval_matrix
+                              WHERE company_id = ? AND active = 1
+                                AND (event_type = ? OR event_type = 'any')
+                                AND ? >= min_amount AND ? < max_amount
+                              ORDER BY (event_type = 'any'), sequence LIMIT 1");
+        if (!$st) { return null; }
+        $c = (int) $companyId; $a = (float) $amount;
+        $st->bind_param('isdd', $c, $eventType, $a, $a);
+        $st->execute();
+        $row = $st->get_result()->fetch_assoc();
+        $st->close();
+        return $row ? (string) $row['required_level'] : null;
+    }
+
+    /** ──────────────────────────────────────────────────────────────────
+     * ③ Approved ⇐ Posted — القيدُ المتوازن
+     * ────────────────────────────────────────────────────────────────── */
+    public static function postApproved($gate, \mysqli $conn, $companyId, $actor, $limit = 100)
+    {
+        $companyId = (int) $companyId;
+        $limit = max(1, (int) $limit);
+        $out = array('posted' => 0, 'skipped' => 0, 'failed' => 0,
+                     'debit_total' => 0.0, 'credit_total' => 0.0, 'reasons' => array());
+        $note = function (&$o, $k) { $o['reasons'][$k] = ($o['reasons'][$k] ?? 0) + 1; };
+
+        /* ◆ لا يستهلكِ السقفَ ما لا يُرحَّل: المعتمَدُ في فترةٍ مغلقةٍ حالةٌ مشروعةٌ
+           (اعتُمد وينتظر فتحَ فترتِه) — لكنه لو دخل الاختيارَ سدَّ الطابورَ على
+           المؤهَّل. (قِيست: 472 عالقًا ابتلعت سقفَ 500 فلم يُرحَّل إلا 28.) */
+        $rs = $conn->query("SELECT e.id, e.event_no, e.event_type, e.unit, e.amount, e.base_amount,
+                                   e.currency, e.fx_rate, e.occurred_at, e.project_id, e.equipment_id,
+                                   e.contract_id, e.customer_entity_id, e.journal_entry_id
+                            FROM fin_financial_events e
+                            WHERE e.company_id = $companyId AND e.fes_status = 'Approved'
+                              AND COALESCE(e.is_deleted,0) = 0
+                              AND e.amount > 0
+                              AND EXISTS (SELECT 1 FROM fin_financial_periods p
+                                          WHERE p.company_id = e.company_id AND p.period_type = 'month'
+                                            AND p.posting_allowed = 1
+                                            AND DATE(e.occurred_at) BETWEEN p.start_date AND p.end_date)
+                            ORDER BY e.id LIMIT $limit");
+        if (!$rs) { return $out; }
+
+        while ($e = $rs->fetch_assoc()) {
+            /* عطالة: قيدٌ قائمٌ ⇒ لا يُكرَّر */
+            if (!empty($e['journal_entry_id'])) { $out['skipped']++; $note($out, 'له قيدٌ سلفًا'); continue; }
+
+            $amount = (float) $e['amount'];
+            if ($amount <= 0) { $out['skipped']++; $note($out, 'مبلغٌ صفريٌّ أو سالب'); continue; }
+
+            $key = strtolower((string) $e['event_type']) . '|' . strtolower((string) $e['unit']);
+            if (!isset(self::ACCOUNT_MAP[$key])) {
+                self::fail($gate, $conn, (int) $e['id'], $actor);
+                $out['failed']++; $note($out, "لا قاعدةَ ترحيلٍ للنوع «$key»");
+                continue;
+            }
+            $map = self::ACCOUNT_MAP[$key];
+
+            $date = substr((string) $e['occurred_at'], 0, 10);
+            if (!self::periodOpen($conn, $companyId, $date)) {
+                $out['skipped']++; $note($out, 'فترةٌ مغلقةٌ للترحيل'); continue;
+            }
+            $dr = self::accountId($conn, $companyId, $map['debit']);
+            $cr = self::accountId($conn, $companyId, $map['credit']);
+            if (!$dr || !$cr) {
+                self::fail($gate, $conn, (int) $e['id'], $actor);
+                $out['failed']++; $note($out, 'حسابٌ غيرُ قابلٍ للترحيلِ أو غيرُ موجود');
+                continue;
+            }
+
+            $amt = round($amount, 2);
+            $entryId = 0;
+            $gate->runInTransaction(function ($g) use (&$entryId, $companyId, $e, $amt, $dr, $cr, $date, $actor) {
+                $entryId = (int) $g->insert('fin_journal_entries', array(
+                    'entry_no'     => 'TMP-' . uniqid('', true),
+                    'event_id'     => (int) $e['id'],
+                    'posting_date' => $date,
+                    'txn_date'     => $date,
+                    'currency'     => (string) $e['currency'],
+                    'fx_rate'      => $e['fx_rate'] !== null ? (float) $e['fx_rate'] : null,
+                    'base_amount'  => $e['base_amount'] !== null ? (float) $e['base_amount'] : null,
+                    'total_debit'  => $amt,
+                    'total_credit' => $amt,
+                    'memo'         => 'ترحيلٌ آليٌّ من الواقعة ' . $e['event_no'],
+                    'state'        => 'posted',
+                    'posted_by'    => (int) $actor ?: null,
+                    'posted_at'    => date('Y-m-d H:i:s'),
+                    'created_by'   => (int) $actor ?: null,
+                ));
+                if ($entryId <= 0) { throw new \RuntimeException('PostingService: فشل إدراجُ القيد'); }
+                $g->update('fin_journal_entries',
+                    array('entry_no' => 'JV-' . str_pad((string) $entryId, 6, '0', STR_PAD_LEFT)),
+                    array('id' => $entryId));
+
+                $base = array('entry_id' => $entryId, 'project_id' => $e['project_id'] ?: null,
+                              'equipment_id' => $e['equipment_id'] ?: null,
+                              'contract_id' => $e['contract_id'] ?: null,
+                              'counterparty_type' => 'client',
+                              'counterparty_id' => $e['customer_entity_id'] ?: null,
+                              'memo' => 'ترحيلٌ آليٌّ من الواقعة ' . $e['event_no']);
+                $g->insert('fin_journal_lines', $base + array('account_id' => $dr, 'debit' => $amt, 'credit' => 0));
+                $g->insert('fin_journal_lines', $base + array('account_id' => $cr, 'debit' => 0, 'credit' => $amt));
+            });
+
+            $t = EventStateMachine::transition($gate, $conn, (int) $e['id'], 'Posted', $actor);
+            if (empty($t['ok'])) {
+                $out['failed']++;
+                $note($out, 'القيدُ كُتب والحالةُ لم تنتقل: ' . implode(' · ', (array) ($t['reasons'] ?? array())));
+                continue;
+            }
+            $conn->query("UPDATE fin_financial_events
+                          SET journal_entry_id = $entryId, posted_by = " . (int) $actor . ", posted_at = NOW()
+                          WHERE id = " . (int) $e['id']);
+            $out['posted']++;
+            $out['debit_total'] += $amt;
+            $out['credit_total'] += $amt;
+        }
+        return $out;
+    }
+
+    /* ── مساعداتٌ صغيرة ───────────────────────────────────────────── */
+
+    private static function fail($gate, \mysqli $conn, $eventId, $actor)
+    {
+        EventStateMachine::transition($gate, $conn, $eventId, 'PostingFailed', $actor);
+    }
+
+    public static function periodOpen(\mysqli $conn, $companyId, $date)
+    {
+        $st = $conn->prepare("SELECT 1 FROM fin_financial_periods
+                              WHERE company_id = ? AND period_type = 'month'
+                                AND posting_allowed = 1 AND ? BETWEEN start_date AND end_date LIMIT 1");
+        if (!$st) { return false; }
+        $c = (int) $companyId;
+        $st->bind_param('is', $c, $date);
+        $st->execute();
+        $hit = (bool) $st->get_result()->fetch_row();
+        $st->close();
+        return $hit;
+    }
+
+    public static function accountId(\mysqli $conn, $companyId, $code)
+    {
+        $st = $conn->prepare("SELECT id FROM fin_chart_of_accounts
+                              WHERE company_id = ? AND code = ? AND is_postable = 1
+                                AND active = 1 AND COALESCE(is_deleted,0) = 0 LIMIT 1");
+        if (!$st) { return 0; }
+        $c = (int) $companyId;
+        $st->bind_param('is', $c, $code);
+        $st->execute();
+        $row = $st->get_result()->fetch_row();
+        $st->close();
+        return $row ? (int) $row[0] : 0;
+    }
+}
