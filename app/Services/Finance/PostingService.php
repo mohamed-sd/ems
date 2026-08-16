@@ -35,12 +35,32 @@ require_once __DIR__ . '/EventStateMachine.php';
 
 class PostingService
 {
-    /** خريطةُ الحسابات — مُعلَنةٌ لأنها اجتهادٌ فوقَ مصفوفةٍ نصّية */
+    /** خريطةُ الحسابات — مُعلَنةٌ لأنها اجتهادٌ فوقَ مصفوفةٍ نصّية.
+     *  المفتاحُ الأولُ `النوع|الوحدة` (للإيرادِ فالوحدةُ تحدّد نموذجَ العمل)،
+     *  فإن لم يُصب جُرِّب `النوع|المصدر` (للمصروفِ فالوحدةُ فارغةٌ والمصدرُ
+     *  هو ما يحدّد طبيعةَ التكلفة). وما لا يُصيب مفتاحًا **يقف بسببِه**. */
     const ACCOUNT_MAP = array(
-        'revenue|hour'  => array('debit' => '1104', 'credit' => '4101'),
-        'revenue|ton'   => array('debit' => '1104', 'credit' => '4102'),
-        'revenue|meter' => array('debit' => '1104', 'credit' => '4103'),
+        // الإيراد: الوحدةُ تحدّد نموذجَ العمل
+        'revenue|hour'          => array('debit' => '1104', 'credit' => '4101'),
+        'revenue|ton'           => array('debit' => '1104', 'credit' => '4102'),
+        'revenue|meter'         => array('debit' => '1104', 'credit' => '4103'),
+        // المصروف: المصدرُ يحدّد طبيعةَ التكلفة · والدائنُ ذممُ الموردين
+        'expense|maintenance'   => array('debit' => '5110', 'credit' => '2101'),
+        'expense|procurement'   => array('debit' => '5109', 'credit' => '2101'),
+        'expense|movement'      => array('debit' => '5112', 'credit' => '2101'),
+        'expense|transport'     => array('debit' => '5112', 'credit' => '2101'),
     );
+
+    /** مفتاحُ الخريطةِ لواقعةٍ — بالوحدةِ أولًا ثم بالمصدر */
+    public static function mapKey($eventType, $unit, $sourceModule)
+    {
+        $t = strtolower(trim((string) $eventType));
+        $u = strtolower(trim((string) $unit));
+        if ($u !== '' && isset(self::ACCOUNT_MAP["$t|$u"])) { return "$t|$u"; }
+        $s = strtolower(trim((string) $sourceModule));
+        if ($s !== '' && isset(self::ACCOUNT_MAP["$t|$s"])) { return "$t|$s"; }
+        return null;
+    }
 
     /** ──────────────────────────────────────────────────────────────────
      * ① Published ⇐ UnderReview — التوجيهُ لمحاسبِ التخصص
@@ -58,8 +78,10 @@ class PostingService
         $keys = array();
         foreach (array_keys(self::ACCOUNT_MAP) as $k) {
             list($t, $u) = explode('|', $k);
-            $keys[] = "(LOWER(e.event_type)='" . $conn->real_escape_string($t)
-                    . "' AND LOWER(e.unit)='" . $conn->real_escape_string($u) . "')";
+            $t = $conn->real_escape_string($t); $u = $conn->real_escape_string($u);
+            /* يُصيب بالوحدةِ أو بالمصدر — كما في mapKey تمامًا، وإلا اختلف
+               شرطُ الأهليةِ عن شرطِ الترحيلِ فتراكم معتمَدٌ لا يُرحَّل. */
+            $keys[] = "(LOWER(e.event_type)='$t' AND (LOWER(e.unit)='$u' OR LOWER(e.source_module)='$u'))";
         }
         $typeCond = $keys ? '(' . implode(' OR ', $keys) . ')' : '0';
 
@@ -159,9 +181,10 @@ class PostingService
            المؤهَّل. (قِيست: 472 عالقًا ابتلعت سقفَ 500 فلم يُرحَّل إلا 28.) */
         $rs = $conn->query("SELECT e.id, e.event_no, e.event_type, e.unit, e.amount, e.base_amount,
                                    e.currency, e.fx_rate, e.occurred_at, e.project_id, e.equipment_id,
-                                   e.contract_id, e.customer_entity_id, e.journal_entry_id
+                                   e.contract_id, e.customer_entity_id, e.journal_entry_id, e.source_module
                             FROM fin_financial_events e
-                            WHERE e.company_id = $companyId AND e.fes_status = 'Approved'
+                            WHERE e.company_id = $companyId
+                              AND e.fes_status IN ('Approved','RetryPending')
                               AND COALESCE(e.is_deleted,0) = 0
                               AND e.amount > 0
                               AND EXISTS (SELECT 1 FROM fin_financial_periods p
@@ -178,10 +201,11 @@ class PostingService
             $amount = (float) $e['amount'];
             if ($amount <= 0) { $out['skipped']++; $note($out, 'مبلغٌ صفريٌّ أو سالب'); continue; }
 
-            $key = strtolower((string) $e['event_type']) . '|' . strtolower((string) $e['unit']);
-            if (!isset(self::ACCOUNT_MAP[$key])) {
+            $key = self::mapKey($e['event_type'], $e['unit'], $e['source_module']);
+            if ($key === null) {
                 self::fail($gate, $conn, (int) $e['id'], $actor);
-                $out['failed']++; $note($out, "لا قاعدةَ ترحيلٍ للنوع «$key»");
+                $out['failed']++;
+                $note($out, 'لا قاعدةَ ترحيلٍ لـ' . $e['event_type'] . '|' . ($e['unit'] ?: $e['source_module'] ?: '—'));
                 continue;
             }
             $map = self::ACCOUNT_MAP[$key];
@@ -244,6 +268,49 @@ class PostingService
             $out['posted']++;
             $out['debit_total'] += $amt;
             $out['credit_total'] += $amt;
+        }
+        return $out;
+    }
+
+    /** ──────────────────────────────────────────────────────────────────
+     * ③-ب PostingFailed ⇐ RetryPending — إعادةُ ما رسب بعدَ زوالِ سببِه
+     * ────────────────────────────────────────────────────────────────────
+     * الرسوبُ ليس حكمًا نهائيًّا: واقعةٌ رسبت لغيابِ خريطةِ حسابٍ ثم أُضيفت
+     * الخريطةُ يجب أن تُعاد، وإلا بقي الرسوبُ أثرًا لسببٍ زال. وآلةُ الحالاتِ
+     * تسمح PostingFailed ⇐ RetryPending ⇐ Posted — والمسارُ كان معرَّفًا بلا نداء.
+     * ◆ ولا يُعاد إلا ما زال سببُه فعلًا: خريطةٌ مُصيبةٌ · فترةٌ مفتوحة · مبلغٌ موجب.
+     */
+    public static function retryFailed($gate, \mysqli $conn, $companyId, $actor, $limit = 100)
+    {
+        $companyId = (int) $companyId;
+        $limit = max(1, (int) $limit);
+        $out = array('requeued' => 0, 'still_blocked' => 0, 'reasons' => array());
+
+        $rs = $conn->query("SELECT id, event_type, unit, source_module, amount, occurred_at
+                            FROM fin_financial_events
+                            WHERE company_id = $companyId AND fes_status = 'PostingFailed'
+                              AND COALESCE(is_deleted,0) = 0
+                            ORDER BY id LIMIT $limit");
+        if (!$rs) { return $out; }
+        while ($e = $rs->fetch_assoc()) {
+            $why = null;
+            if ((float) $e['amount'] <= 0)                                        { $why = 'مبلغٌ صفريٌّ أو سالب'; }
+            elseif (empty($e['occurred_at']))                                     { $why = 'بلا تاريخِ وقوعٍ — لا فترةَ لها'; }
+            elseif (self::mapKey($e['event_type'], $e['unit'], $e['source_module']) === null) { $why = 'ما زال بلا خريطةِ حساب'; }
+            elseif (!self::periodOpen($conn, $companyId, substr((string) $e['occurred_at'], 0, 10))) { $why = 'فترتُها ما زالت مغلقة'; }
+
+            if ($why !== null) {
+                $out['still_blocked']++;
+                $out['reasons'][$why] = ($out['reasons'][$why] ?? 0) + 1;
+                continue;
+            }
+            $r = EventStateMachine::transition($gate, $conn, (int) $e['id'], 'RetryPending', $actor);
+            if (!empty($r['ok'])) { $out['requeued']++; }
+            else {
+                $out['still_blocked']++;
+                $k = 'تعذّر الانتقال: ' . implode(' · ', (array) ($r['reasons'] ?? array()));
+                $out['reasons'][$k] = ($out['reasons'][$k] ?? 0) + 1;
+            }
         }
         return $out;
     }

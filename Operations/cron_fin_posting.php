@@ -92,7 +92,10 @@ $show('نتيجة', PS::reviewPublished($gate, $conn, $companyId, $actor, $limit
 echo "\n② الاعتماد (UnderReview ⇐ Approved)\n";
 $show('نتيجة', PS::approveReviewed($gate, $conn, $companyId, $actor, $limit));
 
-echo "\n③ الترحيل (Approved ⇐ Posted)\n";
+echo "\n②-ب إعادةُ ما رسب بعدَ زوالِ سببِه (PostingFailed ⇐ RetryPending)\n";
+$show('نتيجة', PS::retryFailed($gate, $conn, $companyId, $actor, $limit));
+
+echo "\n③ الترحيل (Approved · RetryPending ⇐ Posted)\n";
 $p = PS::postApproved($gate, $conn, $companyId, $actor, $limit);
 $show('نتيجة', $p);
 
