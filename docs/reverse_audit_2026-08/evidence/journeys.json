@@ -1,5 +1,5 @@
 {
-    "measured_at": "2026-08-16T06:09:07+00:00",
+    "measured_at": "2026-08-16T07:40:25+00:00",
     "journeys": {
         "C": {
             "key": "C",
@@ -146,7 +146,7 @@
                     "table": "fin_journal_entries",
                     "filter": "",
                     "exists": true,
-                    "rows": 2757,
+                    "rows": 6696,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -842,7 +842,7 @@
                     "table": "fin_routing_log",
                     "filter": "",
                     "exists": true,
-                    "rows": 28,
+                    "rows": 29,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -878,7 +878,7 @@
                     "table": "fin_financial_events",
                     "filter": "",
                     "exists": true,
-                    "rows": 5253,
+                    "rows": 5254,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -887,7 +887,7 @@
                     "table": "fin_journal_entries",
                     "filter": "",
                     "exists": true,
-                    "rows": 2757,
+                    "rows": 6696,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -896,7 +896,7 @@
                     "table": "fin_journal_lines",
                     "filter": "",
                     "exists": true,
-                    "rows": 5518,
+                    "rows": 13396,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -928,7 +928,7 @@
                     "to_table": "fin_routing_log",
                     "fk": "__src__",
                     "kind": "req",
-                    "from_total": 5253,
+                    "from_total": 5254,
                     "linked": 26,
                     "pct": 0.5,
                     "verdict": "PARTIAL",
@@ -973,10 +973,10 @@
                     "to_table": "fin_journal_entries",
                     "fk": "event_id",
                     "kind": "req",
-                    "from_total": 5253,
-                    "linked": 1113,
-                    "pct": 21.2,
-                    "verdict": "PARTIAL",
+                    "from_total": 5254,
+                    "linked": 5052,
+                    "pct": 96.2,
+                    "verdict": "LIVE",
                     "note": ""
                 },
                 {
@@ -988,8 +988,8 @@
                     "to_table": "fin_journal_lines",
                     "fk": "entry_id",
                     "kind": "req",
-                    "from_total": 2757,
-                    "linked": 2757,
+                    "from_total": 6696,
+                    "linked": 6696,
                     "pct": 100,
                     "verdict": "LIVE",
                     "note": ""
@@ -1018,9 +1018,9 @@
                     "to_table": "fin_closing_items",
                     "fk": "__any__",
                     "kind": "opt",
-                    "from_total": 2757,
+                    "from_total": 6696,
                     "linked": 80,
-                    "pct": 2.9,
+                    "pct": 1.2,
                     "verdict": "LIVE",
                     "note": "قياسٌ مخصَّص: SELECT COUNT(*) FROM fin_closing_items"
                 }
@@ -1030,11 +1030,11 @@
             "stages_empty": 2,
             "links_total": 7,
             "links_judgeable": 7,
-            "links_live": 3,
+            "links_live": 4,
             "links_dead": 2,
-            "links_partial": 2,
+            "links_partial": 1,
             "links_missing_col": 0,
-            "continuity_pct": 42.9
+            "continuity_pct": 57.1
         },
         "R": {
             "key": "R",
@@ -1340,7 +1340,7 @@
                     "table": "activity_logs",
                     "filter": "",
                     "exists": true,
-                    "rows": 180212,
+                    "rows": 205998,
                     "verdict": "HAS_DATA"
                 },
                 {
