@@ -194,7 +194,9 @@ $J['S'] = [
   'stages' => [
     ['US','مستخدم','users',''],
     ['RO','دور','roles',''],
-    ['UR','تكليفُ مستخدمٍ بدور','users',"role_id IS NOT NULL AND role_id>0"],
+    /* الدورُ في عمودين: `role` مملوءٌ للكلِّ و`role_id` لـ46 من 75 فقط (بلا
+       تناقضٍ بينهما حيث اجتمعا). فالقياسُ على `role_id` وحدَه يُسقط 29 مستخدمًا. */
+    ['UR','تكليفُ مستخدمٍ بدور','users',"COALESCE(NULLIF(role_id,0), CAST(NULLIF(role,'') AS UNSIGNED)) > 0"],
     ['SC','نطاق','sec_scopes',''],
     ['MD','وحدة صلاحية (ظهور)','modules',''],
     ['GR','منحة دور','role_permissions',''],
@@ -208,7 +210,7 @@ $J['S'] = [
   'links' => [
     ['RO','GR','role_id','req',null],
     ['MD','GR','module_id','req',null],
-    ['RO','UR','__role__','req','SELECT COUNT(DISTINCT role_id) FROM users WHERE role_id IS NOT NULL AND role_id>0 AND is_deleted=0'],
+    ['RO','UR','__role__','req',"SELECT COUNT(DISTINCT COALESCE(NULLIF(role_id,0), CAST(NULLIF(role,'') AS UNSIGNED))) FROM users WHERE COALESCE(is_deleted,0)=0"],
     ['AC','DN','__code__','opt','SELECT COUNT(DISTINCT guard_code) FROM guard_denials'],
     ['DL','DX','__self__','opt','SELECT COUNT(*) FROM work_delegations WHERE ends_at IS NOT NULL AND ends_at < NOW()'],
   ],

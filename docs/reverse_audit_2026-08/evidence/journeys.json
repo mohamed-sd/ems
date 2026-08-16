@@ -1,5 +1,5 @@
 {
-    "measured_at": "2026-08-15T19:16:13+00:00",
+    "measured_at": "2026-08-16T01:10:35+00:00",
     "journeys": {
         "C": {
             "key": "C",
@@ -1275,9 +1275,9 @@
                     "code": "UR",
                     "name": "تكليفُ مستخدمٍ بدور",
                     "table": "users",
-                    "filter": "role_id IS NOT NULL AND role_id>0",
+                    "filter": "COALESCE(NULLIF(role_id,0), CAST(NULLIF(role,'') AS UNSIGNED)) > 0",
                     "exists": true,
-                    "rows": 46,
+                    "rows": 75,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -1295,7 +1295,7 @@
                     "table": "modules",
                     "filter": "",
                     "exists": true,
-                    "rows": 466,
+                    "rows": 467,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -1304,7 +1304,7 @@
                     "table": "role_permissions",
                     "filter": "",
                     "exists": true,
-                    "rows": 2622,
+                    "rows": 2625,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -1313,7 +1313,7 @@
                     "table": "nav09_action_map",
                     "filter": "",
                     "exists": true,
-                    "rows": 362,
+                    "rows": 364,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -1331,7 +1331,7 @@
                     "table": "guard_denials",
                     "filter": "",
                     "exists": true,
-                    "rows": 4784,
+                    "rows": 4788,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -1340,7 +1340,7 @@
                     "table": "activity_logs",
                     "filter": "",
                     "exists": true,
-                    "rows": 170612,
+                    "rows": 170645,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -1387,8 +1387,8 @@
                     "to_table": "role_permissions",
                     "fk": "module_id",
                     "kind": "req",
-                    "from_total": 466,
-                    "linked": 466,
+                    "from_total": 467,
+                    "linked": 467,
                     "pct": 100,
                     "verdict": "LIVE",
                     "note": ""
@@ -1403,10 +1403,10 @@
                     "fk": "__role__",
                     "kind": "req",
                     "from_total": 35,
-                    "linked": 21,
-                    "pct": 60,
+                    "linked": 32,
+                    "pct": 91.4,
                     "verdict": "LIVE",
-                    "note": "قياسٌ مخصَّص: SELECT COUNT(DISTINCT role_id) FROM users WHERE role_id IS NOT NULL AND role_id>0 AND is_deleted=0"
+                    "note": "قياسٌ مخصَّص: SELECT COUNT(DISTINCT COALESCE(NULLIF(role_id,0), CAST(NULLIF(role,'') AS UNSIGNED))) FROM users WHERE COALESCE(is_deleted,0)=0"
                 },
                 {
                     "from": "AC",
@@ -1417,9 +1417,9 @@
                     "to_table": "guard_denials",
                     "fk": "__code__",
                     "kind": "opt",
-                    "from_total": 362,
+                    "from_total": 364,
                     "linked": 14,
-                    "pct": 3.9,
+                    "pct": 3.8,
                     "verdict": "LIVE",
                     "note": "قياسٌ مخصَّص: SELECT COUNT(DISTINCT guard_code) FROM guard_denials"
                 },
