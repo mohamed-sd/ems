@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-15 18:30:07
+-- المصدر: equipation_manage · التوليد: 2026-08-16 04:05:57
 -- الجداول: 555 · المناظير: 6
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -13017,9 +13017,20 @@ CREATE TABLE `unit_entries` (
   `client_match_ref` varchar(120) DEFAULT NULL COMMENT 'TS-04 — مرجعُ دليلِ المطابقة',
   `client_decision` enum('pending','accepted','disputed') NOT NULL DEFAULT 'pending' COMMENT 'TS-16 — قرارُ العميلِ على هذا المدخلِ وحدَه (القبولُ الجزئيُّ لكلِّ مدخل)',
   `dispute_ref` varchar(120) DEFAULT NULL COMMENT 'TS-16 — مرجعُ ملفِّ الاختلافِ — إلزاميٌّ عند النزاع',
+  `entity_layer` enum('operations','contracting','holding') NOT NULL DEFAULT 'operations' COMMENT 'TS-03: طبقةُ الكيان',
+  `container_key` varchar(32) DEFAULT NULL COMMENT 'المفتاحُ الثلاثيُّ client-contract-renewal',
+  `client_id` int(10) unsigned DEFAULT NULL COMMENT 'العميلُ — مشتقٌّ من العقدِ ويُثبَّت لحظةَ القيد',
+  `meter_before` decimal(12,2) DEFAULT NULL COMMENT 'قراءةُ العدّادِ قبل',
+  `meter_after` decimal(12,2) DEFAULT NULL COMMENT 'قراءةُ العدّادِ بعد',
+  `fuel_received_qty` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT 'وقودٌ مستلَمٌ كميةً',
+  `fuel_issued_qty` decimal(10,2) NOT NULL DEFAULT 0.00 COMMENT 'وقودٌ مصروفٌ كميةً',
+  `created_by_role` smallint(5) unsigned DEFAULT NULL COMMENT 'TS-04: الدورُ يُخزَّن مع المعرِّف لأن دورَ الشخصِ يتغير والسجلُّ لا',
+  `seed_tag` varchar(32) DEFAULT NULL COMMENT 'TS-05: وسمُ البيانِ المبذور — ''test-seed''',
+  `shift_slot_key` varchar(96) GENERATED ALWAYS AS (case when `seed_tag` is null and `state` not in ('rejected','cancelled','superseded','reversed') then concat_ws('|',`company_id`,`entry_date`,`shift`,`equipment_id`) else NULL end) STORED COMMENT 'مفتاحُ القفل — يوائم ق-18: NULL للمبذورِ وللحالاتِ المنتهيةِ فلا تشغل الخانة',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_entry_no` (`company_id`,`entry_no`),
   UNIQUE KEY `uq_sync` (`company_id`,`sync_uuid`),
+  UNIQUE KEY `uq_shift_ue` (`shift_slot_key`),
   KEY `ix_date` (`company_id`,`entry_date`),
   KEY `ix_project` (`company_id`,`project_id`,`state`),
   KEY `ix_state` (`company_id`,`state`),
@@ -13029,8 +13040,12 @@ CREATE TABLE `unit_entries` (
   KEY `ix_ue_site` (`operational_site_id`),
   KEY `idx_ue_match` (`client_match_state`),
   KEY `idx_ue_cdec` (`client_decision`),
+  KEY `ix_container_ue` (`container_key`),
+  KEY `ix_machine_ue` (`equipment_id`,`entry_date`),
+  KEY `ix_supplier_ue` (`supplier_entity_id`,`entry_date`),
   CONSTRAINT `chk_ue_match_evidence` CHECK (`client_match_state` = 'pending' or `client_match_at` is not null and `client_match_by` is not null),
-  CONSTRAINT `chk_ue_dispute_ref` CHECK (`client_decision` <> 'disputed' or `dispute_ref` is not null)
+  CONSTRAINT `chk_ue_dispute_ref` CHECK (`client_decision` <> 'disputed' or `dispute_ref` is not null),
+  CONSTRAINT `chk_ue_meter` CHECK (`meter_after` is null or `meter_before` is null or `meter_after` >= `meter_before`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='D02 §3.1 — سجلّ الواقعة: مصدر الحقيقة الوحيد للوحدة التشغيلية';
 
 -- ── Table: unit_match_overrides ──

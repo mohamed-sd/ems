@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-15 18:30:07
+-- المصدر: equipation_manage · التوليد: 2026-08-16 04:05:57
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -522,7 +522,8 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (474,'محاضر اعتماد وحدات المورد','Suppliers/quota_approval_minutes.php',2,NULL,1,0,'fa fa-file-signature',703),
 (475,'مؤشرات البلاغات','Tickets/ticket_kpi.php',24,NULL,1,0,'fa fa-chart-simple',704),
 (476,'بلاغاتي','Tickets/my_tickets.php',24,NULL,1,0,'fa fa-inbox',705),
-(477,'سجل الأمان','Governance/security_log.php',15,NULL,1,0,'fa fa-shield-halved',247);
+(477,'سجل الأمان','Governance/security_log.php',15,NULL,1,0,'fa fa-shield-halved',247),
+(478,'قيدُ الوردية اليومي','Operations/shift_entry.php',6,NULL,1,0,'fa fa-circle-dot',100);
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -3161,7 +3162,10 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (2970,17,73,1,0,0,0),
 (2971,17,72,1,0,0,0),
 (2972,16,22,1,0,0,0),
-(2973,16,192,1,0,0,0);
+(2973,16,192,1,0,0,0),
+(2974,6,478,1,1,1,0),
+(2975,7,478,1,0,0,0),
+(2976,27,478,1,0,0,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -4307,7 +4311,8 @@ INSERT INTO `link_groups` (`id`, `name`, `group_code`, `owner_role_id`, `icon`, 
 (3934,'تقارير الجهة المشرفة','n9o_fin7_r33',33,'fa fa-circle-dot',80,7,'سابعًا: التقارير للجهة المشرفة',1),
 (3935,'أخرى — للمراجعة','n9s99_others_r9',9,'fa fa-box-archive',9900,99,'خارج الوثيقة — بانتظار قرار المالك',1),
 (3936,'التقارير والتصدير','n9o_reports_r9',9,'fa fa-file-lines',800,8,'ثامنًا: التقارير والتصدير',1),
-(3937,'— بقرار المالك','n9o_19_10',19,'fa fa-list-check',810,10,'صندوقُ الموافقات',1);
+(3937,'— بقرار المالك','n9o_19_10',19,'fa fa-list-check',810,10,'صندوقُ الموافقات',1),
+(3938,'القيد اليومي','n9o_site_shift_r6',6,'fa fa-clock',414,4,'رابعًا: تسجيل عمل اليوم',1);
 
 -- ── nav_items ──
 DELETE FROM `nav_items`;
@@ -4779,7 +4784,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (1320,15,'REC',421,NULL,'من يرى ماذا (محاكاة)','admin/sec_governance.php?tab=visibility','fa fa-link',30,NULL,NULL,0,'2026-08-02 18:49:34','2026-08-03 08:37:12'),
 (1321,6,'REC',251,NULL,'التوقفات بلا مسؤول','Reports/exceptions_report.php?focus=unattributed_stops','fa fa-link',30,NULL,NULL,0,'2026-08-02 18:49:34','2026-08-02 20:25:23'),
 (1323,2,'REC',384,20,'حصص الموردين والتغطية','Contracts/contracts.php','fa fa-link',30,NULL,'Contracts/contracts.php',1,'2026-08-02 18:49:34','2026-08-15 09:05:58'),
-(1324,2,'REC',384,22,'خطة معدات المورد','Suppliers/suppliers.php#plan','fa fa-link',30,NULL,'Suppliers/suppliers.php',1,'2026-08-02 18:49:34','2026-08-12 04:45:04'),
+(1324,2,'REC',384,22,'خطة معدات المورد','Suppliers/suppliers.php','fa fa-link',30,NULL,'Suppliers/suppliers.php',1,'2026-08-02 18:49:34','2026-08-16 02:16:37'),
 (1325,26,'DAILY',2106,NULL,'ملف عملية التمويل','Financing/operation_profile.php','fa fa-folder-open',50,NULL,NULL,0,'2026-08-03 08:47:42','2026-08-03 13:35:07'),
 (1330,26,'DAILY',2106,NULL,'التصرف في الأصل','Financing/asset_disposal.php','fa fa-exchange-alt',50,NULL,NULL,0,'2026-08-03 08:47:42','2026-08-03 13:35:07'),
 (1334,24,'DAILY',2104,NULL,'الاستقبال والتصنيف','Tickets/intake_classify.php','fa fa-inbox',50,NULL,NULL,0,'2026-08-03 08:47:42','2026-08-03 13:35:07'),
@@ -5830,7 +5835,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (7004,33,'GOV',3929,384,'ردود الإدارات على الملاحظات','Audit/iaf_responses.php','fa fa-circle-dot',14,NULL,'Audit/iaf_responses.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
 (7005,33,'GOV',3929,379,'الكون الرقابي','Audit/iaf_universe.php','fa fa-circle-dot',15,NULL,'Audit/iaf_universe.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
 (7006,33,'GOV',3929,382,'أوراق العمل والأدلة','Audit/iaf_workpapers.php','fa fa-circle-dot',16,NULL,'Audit/iaf_workpapers.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
-(7007,33,'DAILY',3930,370,'سلسلة الاعتماد الرباعية','Finance/acc_approval_chain.php','fa fa-circle-dot',1,NULL,'Finance/acc_approval_chain.php',1,'2026-08-09 23:47:47','2026-08-13 06:12:25'),
+(7007,33,'DAILY',3930,370,'سلسلة الاعتماد الرباعية','Finance/acc_approval_chain.php','fa fa-circle-dot',1,NULL,'Finance/acc_approval_chain.php',1,'2026-08-09 23:47:47','2026-08-15 20:48:41'),
 (7008,33,'DAILY',3930,369,'المرتجَع المالي للإدارات','Finance/acc_backflow.php','fa fa-circle-dot',2,NULL,'Finance/acc_backflow.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
 (7009,33,'DAILY',3930,366,'مساحة عملي اليوم — محاسب التخصص','Finance/acc_my_day.php','fa fa-circle-dot',3,NULL,'Finance/acc_my_day.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
 (7010,33,'DAILY',3930,368,'مصفوفة التوجيه لمحاسبي التخصصات','Finance/acc_routing_matrix.php','fa fa-circle-dot',4,NULL,'Finance/acc_routing_matrix.php',1,'2026-08-09 23:47:47','2026-08-09 23:50:25'),
@@ -5878,7 +5883,8 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (7139,35,'HOME',178,228,'مساحة عملي','main/my_workspace.php','fa fa-user-circle',1,NULL,'main/my_workspace.php',1,'2026-08-12 04:36:02','2026-08-12 12:55:28'),
 (7327,15,'DAILY',3845,477,'سجل الأمان','Governance/security_log.php','fa fa-shield-halved',2,NULL,'Governance/security_log.php',1,'2026-08-15 08:48:33','2026-08-15 08:48:33'),
 (7330,1,'DAILY',3856,205,'تصنيف قواعد المنع','Settings/guard_classification.php','fa fa-shield-halved',950,NULL,'Settings/guard_classification.php',1,'2026-08-15 09:36:41','2026-08-15 09:36:41'),
-(7331,19,'DAILY',3937,205,'تصنيف قواعد المنع','Settings/guard_classification.php','fa fa-shield-halved',950,NULL,'Settings/guard_classification.php',1,'2026-08-15 09:36:41','2026-08-15 09:36:41');
+(7331,19,'DAILY',3937,205,'تصنيف قواعد المنع','Settings/guard_classification.php','fa fa-shield-halved',950,NULL,'Settings/guard_classification.php',1,'2026-08-15 09:36:41','2026-08-15 09:36:41'),
+(7388,6,'DAILY',3938,478,'قيدُ الوردية اليومي','Operations/shift_entry.php','fa fa-clock',1,NULL,'Operations/shift_entry.php',1,'2026-08-16 02:30:21','2026-08-16 02:30:21');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;

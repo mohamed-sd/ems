@@ -264,6 +264,25 @@ class TimesheetEntryService
                 'state'                => $state,
                 'entered_by'           => (int) $actor ?: null,
             );
+
+            /* ── قيدُ الورديةِ اليوميّ (المواصفة 70 · TSP-0013): تسعةُ مدخلاتٍ خامّة
+               أُضيفت بهجرة 2027_04_19. مدخلاتٌ لا محسوبات — والعدّادُ فرقُه
+               يُشتق عند العرض ولا يُخزَّن. وغيابُها من صفِّ الإدراج كان يعني
+               ابتلاعَها صامتةً: الشاشةُ ترسل والخدمةُ تُهمل. */
+            $numOrNull = function ($v) {
+                return ($v === null || $v === '' ) ? null : round((float) $v, 2);
+            };
+            $row['meter_before']      = $numOrNull($input['meter_before'] ?? null);
+            $row['meter_after']       = $numOrNull($input['meter_after'] ?? null);
+            $row['fuel_received_qty'] = (float) ($input['fuel_received_qty'] ?? 0);
+            $row['fuel_issued_qty']   = (float) ($input['fuel_issued_qty'] ?? 0);
+            $ck = trim((string) ($input['container_key'] ?? ''));
+            if ($ck !== '') { $row['container_key'] = mb_substr($ck, 0, 32); }
+            if (!empty($input['client_id']))       { $row['client_id'] = (int) $input['client_id']; }
+            if (!empty($input['created_by_role'])) { $row['created_by_role'] = (int) $input['created_by_role']; }
+            if (!empty($input['entity_layer']))    { $row['entity_layer'] = (string) $input['entity_layer']; }
+            $sd = trim((string) ($input['seed_tag'] ?? ''));
+            if ($sd !== '') { $row['seed_tag'] = mb_substr($sd, 0, 32); }
             if ($syncUuid !== '') { $row['sync_uuid'] = $syncUuid; }
             // CAP-31: المفاتيحُ الثمانيةُ مقترحةً مع الإدراج — تُعرض للتأكيد لا للإدخال
             if ($capKeys !== null) {
