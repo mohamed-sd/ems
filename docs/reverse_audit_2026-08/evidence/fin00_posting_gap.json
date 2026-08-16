@@ -1,0 +1,35 @@
+{
+    "measured_at": "2026-08-16T05:33:30+00:00",
+    "funnel": {
+        "Published": 5207,
+        "Draft": 37,
+        "Posted": 9,
+        "UnderReview": 2
+    },
+    "legacy_mirror_has_published": false,
+    "published_but_legacy_draft": 5207,
+    "callsites": {
+        "UnderReview": [],
+        "Approved": [
+            "app\/Services\/Portal\/EvaluationService.php"
+        ],
+        "Posted": [
+            "Finance\/journal_form_fin.php"
+        ],
+        "ReturnedToSource": [
+            "Finance\/events_list_fin.php"
+        ],
+        "Published": [
+            "Finance\/events_list_fin.php"
+        ]
+    },
+    "posted_events": {
+        "linked": 9,
+        "with_posted_by": 0,
+        "with_posted_at": 0
+    },
+    "journal": {
+        "entries": 1653,
+        "with_event_ref": 9
+    }
+}
