@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-16 04:05:57
--- الجداول: 555 · المناظير: 6
+-- المصدر: equipation_manage · التوليد: 2026-08-16 09:36:41
+-- الجداول: 555 · المناظير: 7
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -13752,6 +13752,10 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `client_contracts` AS selec
 
 -- ── View: unified_fault_taxonomy ──
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `unified_fault_taxonomy` AS select distinct `fc`.`main_category_code` AS `code`,`fc`.`main_category_name` AS `name`,`fc`.`equipment_type` AS `equipment_type`,'failure_codes' AS `source` from `failure_codes` `fc` where `fc`.`main_category_code` is not null and `fc`.`main_category_code` <> '';
+
+-- ── View: v_monthly_performance ──
+SET collation_connection = 'utf8mb4_unicode_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_monthly_performance` AS select `ue`.`company_id` AS `company_id`,date_format(`ue`.`entry_date`,'%Y-%m') AS `period`,`ue`.`supplier_entity_id` AS `supplier_entity_id`,`ue`.`contract_id` AS `contract_id`,`ue`.`project_id` AS `project_id`,`ue`.`equipment_id` AS `equipment_id`,count(distinct `ue`.`id`) AS `entries_count`,count(distinct `ue`.`entry_date`) AS `days_worked`,round(coalesce(sum(case when `l`.`ops_state` = 'actual_work' then `l`.`hours` end),0),2) AS `run_hours`,round(coalesce(sum(case when `l`.`ops_state` = 'standby' then `l`.`hours` end),0),2) AS `standby_hours`,round(coalesce(sum(case when `l`.`ops_state` in ('tech_breakdown','supplier_stop','operator_stop','client_stop','fuel_logistics_stop','planned_stop','force_majeure') then `l`.`hours` end),0),2) AS `breakdown_hours`,round(coalesce(sum(`l`.`hours`),0),2) AS `total_hours`,round(coalesce(sum(case when `l`.`resp_party` = 'client' then `l`.`hours` end),0),2) AS `client_liable_hours`,round(coalesce(sum(case when `l`.`resp_party` = 'supplier' then `l`.`hours` end),0),2) AS `supplier_liable_hours`,round(coalesce(sum(case when `l`.`resp_party` = 'company' then `l`.`hours` end),0),2) AS `company_liable_hours`,case when coalesce(sum(`l`.`hours`),0) > 0 then round(100 * coalesce(sum(case when `l`.`ops_state` = 'actual_work' then `l`.`hours` end),0) / sum(`l`.`hours`),2) else NULL end AS `availability_pct`,round(coalesce(sum(`ue`.`fuel_issued_qty`),0),2) AS `fuel_issued_qty`,round(coalesce(sum(`ue`.`fuel_received_qty`),0),2) AS `fuel_received_qty`,round(coalesce(sum(case when `ue`.`meter_after` is not null and `ue`.`meter_before` is not null then `ue`.`meter_after` - `ue`.`meter_before` end),0),2) AS `meter_delta`,round(coalesce(sum(case when `ue`.`unit_type` = 'ton' then `ue`.`qty` end),0),2) AS `tons`,round(coalesce(sum(case when `ue`.`unit_type` = 'meter' then `ue`.`qty` end),0),2) AS `meters`,round(coalesce(sum(case when `ue`.`unit_type` = 'trip' then `ue`.`qty` end),0),2) AS `trips`,max(`ue`.`updated_at`) AS `last_entry_at` from (`unit_entries` `ue` left join `unit_time_log` `l` on(`l`.`entry_id` = `ue`.`id`)) where `ue`.`seed_tag` is null and `ue`.`state` not in ('rejected','cancelled','superseded','reversed') group by `ue`.`company_id`,date_format(`ue`.`entry_date`,'%Y-%m'),`ue`.`supplier_entity_id`,`ue`.`contract_id`,`ue`.`project_id`,`ue`.`equipment_id`;
 
 -- ── View: v_org_unit_heads ──
 SET collation_connection = 'utf8mb4_unicode_ci';
