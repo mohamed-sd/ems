@@ -58,3 +58,6 @@ worker_evaluation_kpi,20,CHILD,"ابن معلن في العقد (الأب: worke
 worker_settlement_line,20,CHILD,"ابن معلن في العقد (الأب: worker_settlement)","العزل عبر الأب المعلن"
 workspace_cards,10,GLOBAL,"مصنف في العقد: global","العقد نافذ — لا عمود"
 workspace_layouts,6,GLOBAL,"مصنف في العقد: global","العقد نافذ — لا عمود"
+ems_post_idempotency,0,GLOBAL,"بنيةُ نظامٍ: مفاتيحُ عطالةِ POST عابرةٌ قصيرةُ العمر — تُنظَّف دوريًّا ولا تحمل بيانَ كيان","بنية نظام — لا عمودَ عزل"
+role_permissions_archive_auditor,0,GLOBAL,"أرشيفُ لقطةِ منحٍ لمراجعةِ المدقق (2026-08-06) — نسخةٌ تاريخيةٌ من جدولٍ عالميِّ المنح","أرشيفٌ مرجعيٌّ — لا عمودَ عزل"
+screen_about,20,GLOBAL,"وصفُ الشاشاتِ التعريفيُّ للمنصةِ كلِّها (screen_about component) — بيانُ واجهةٍ لا بيانُ كيان","مرجعيٌّ مشترك — لا عمودَ عزل"

@@ -44,10 +44,21 @@ $isShared = function ($t) use ($SHARED_PREFIX, $SHARED_EXACT) {
 $o("════ فحوص E-05 — الهوية والكيانات ════\n");
 $fail = 0;
 
-/* ① الحساب بلا شخص */
+/* ① الحساب بلا شخص
+   ◆ تصويب 2026-08-16: كان الفحصُ يطابق `u.position_id = person_positions.p_id`
+   والعمودُ مقيّدٌ بنيويًّا بجدولٍ آخر (fk_users_position ⇐ positions.id) —
+   فالدلالةُ القديمةُ **يستحيل إرضاؤها بأيِّ بيانات** (قِيست: صفرُ ربطٍ منذ
+   الإنشاء وتجربةُ ربطٍ يدويةٌ رفضها FK). الجسرُ الحيُّ المعمولُ به منذ بناءِ
+   النموذج (صفوف 2026-08-06): شخصٌ نشطٌ بموقعٍ نشطٍ في كيانِ الحسابِ
+   بعنوانِ دورِه (title_code = role_N). */
 $r = mysqli_query($conn,
     "SELECT COUNT(*) n FROM users u WHERE u.status='active' AND u.role <> '-1'
-       AND NOT EXISTS (SELECT 1 FROM person_positions p WHERE p.p_id = u.position_id AND p.state='active')");
+       AND NOT EXISTS (
+           SELECT 1 FROM person_positions p
+             JOIN persons pe ON pe.person_id = p.person_id AND pe.active = 1
+            WHERE p.state = 'active'
+              AND p.company_id = u.company_id
+              AND p.title_code = CONCAT('role_', u.role))");
 $unbridged = ($r && ($x = mysqli_fetch_assoc($r))) ? (int) $x['n'] : -1;
 $t = mysqli_fetch_assoc(mysqli_query($conn, "SELECT COUNT(*) n FROM users WHERE status='active' AND role <> '-1'"));
 $ok1 = ($unbridged === 0);
