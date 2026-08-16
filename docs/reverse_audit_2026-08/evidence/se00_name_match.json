@@ -1,0 +1,151 @@
+{
+    "shift_entries": {
+        "verdict": "EQUIVALENT?",
+        "exact": false,
+        "candidates": [
+            "timesheet",
+            "unit_time_log",
+            "unit_entries",
+            "timesheet_approvals",
+            "scr_shift_log",
+            "scr_site_shift_plan",
+            "shift_patterns",
+            "timesheet_approval_notes"
+        ],
+        "by_signature": [
+            "timesheet"
+        ]
+    },
+    "sup_handover_events": {
+        "verdict": "NAME_ONLY?",
+        "exact": false,
+        "candidates": [
+            "op_containers",
+            "transfer_events",
+            "container_swaps",
+            "container_consumption"
+        ],
+        "by_signature": []
+    },
+    "contract_amendments": {
+        "verdict": "EXISTS",
+        "exact": true,
+        "candidates": [
+            "contract_monthly_plan",
+            "contract_amendments",
+            "contract_price_revisions",
+            "contract_payment_schedule",
+            "employee_contract_amendments"
+        ],
+        "by_signature": [
+            "contract_amendments",
+            "contract_monthly_plan",
+            "contract_payment_schedule",
+            "contract_price_revisions",
+            "employee_contract_amendments"
+        ]
+    },
+    "coverage": {
+        "verdict": "EQUIVALENT?",
+        "exact": false,
+        "candidates": [
+            "operations",
+            "contracts",
+            "supplierscontracts",
+            "client_contracts",
+            "drivercontracts",
+            "contract_monthly_plan",
+            "contract_commitments",
+            "fin_budget_commitments"
+        ],
+        "by_signature": [
+            "operations",
+            "client_contracts",
+            "contracts",
+            "drivercontracts",
+            "supplierscontracts"
+        ]
+    },
+    "units": {
+        "verdict": "EQUIVALENT?",
+        "exact": false,
+        "candidates": [
+            "ems_business_events",
+            "unit_entries",
+            "fin_financial_events",
+            "fin_journal_lines",
+            "op_containers",
+            "tickets",
+            "fin_requests",
+            "proc_issue"
+        ],
+        "by_signature": [
+            "ems_business_events",
+            "fin_financial_events",
+            "fin_journal_lines",
+            "fin_requests",
+            "fleet_reservations",
+            "op_containers",
+            "proc_issue",
+            "supplier_capacity"
+        ]
+    },
+    "supplier_quota": {
+        "verdict": "EQUIVALENT?",
+        "exact": false,
+        "candidates": [
+            "unit_time_log",
+            "op_containers",
+            "operations",
+            "proc_issue",
+            "supplier_evaluations",
+            "supplier_contract_closures",
+            "capacity_gap_watch",
+            "capacity_consumption_ledger"
+        ],
+        "by_signature": [
+            "operations",
+            "op_containers",
+            "proc_issue",
+            "supplier_contract_closures",
+            "supplier_evaluations",
+            "unit_time_log"
+        ]
+    },
+    "supplier_settle": {
+        "verdict": "EQUIVALENT?",
+        "exact": false,
+        "candidates": [
+            "proc_landed_cost",
+            "supplier_advance_requests",
+            "settlements",
+            "settlement_lines",
+            "coverage_settlement_lines",
+            "employee_final_settlements",
+            "employee_final_settlement_lines",
+            "worker_settlement"
+        ],
+        "by_signature": [
+            "proc_landed_cost",
+            "supplier_advance_requests",
+            "settlements"
+        ]
+    },
+    "quota_ledger": {
+        "verdict": "EQUIVALENT?",
+        "exact": false,
+        "candidates": [
+            "fin_obl_alert_log",
+            "fin_obl_schedule",
+            "monthly_performance_downtime",
+            "capacity_consumption_ledger",
+            "scr_consumption_rate",
+            "container_consumption"
+        ],
+        "by_signature": [
+            "fin_obl_alert_log",
+            "fin_obl_schedule",
+            "monthly_performance_downtime"
+        ]
+    }
+}

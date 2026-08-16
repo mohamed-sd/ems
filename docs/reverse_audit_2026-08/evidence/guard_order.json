@@ -1,0 +1,100 @@
+{
+    "scanned": 556,
+    "no_write": 496,
+    "guarded_before_write": 46,
+    "write_before_guard": [],
+    "write_no_guard": [
+        {
+            "file": "Maintenance\/breakdowns.php",
+            "write_line": 26,
+            "guard_line": null,
+            "ajax_central": false
+        },
+        {
+            "file": "admin\/forgot_password.php",
+            "write_line": 37,
+            "guard_line": null,
+            "ajax_central": false
+        },
+        {
+            "file": "admin\/login.php",
+            "write_line": 58,
+            "guard_line": null,
+            "ajax_central": false
+        },
+        {
+            "file": "admin\/reset_password.php",
+            "write_line": 51,
+            "guard_line": null,
+            "ajax_central": false
+        },
+        {
+            "file": "admin\/setup_once.php",
+            "write_line": 138,
+            "guard_line": null,
+            "ajax_central": false
+        },
+        {
+            "file": "chats\/mark_read.php",
+            "write_line": 34,
+            "guard_line": null,
+            "ajax_central": false
+        },
+        {
+            "file": "chats\/send_broadcast.php",
+            "write_line": 114,
+            "guard_line": null,
+            "ajax_central": false
+        },
+        {
+            "file": "chats\/send_message.php",
+            "write_line": 56,
+            "guard_line": null,
+            "ajax_central": false
+        }
+    ],
+    "direct_write_screens": 54,
+    "central_ajax_only": 0,
+    "dirs": [
+        "main",
+        "Clients",
+        "Projects",
+        "Reports",
+        "Equipments",
+        "Employees",
+        "Oprators",
+        "Timesheet",
+        "Settings",
+        "ActivityLogs",
+        "Contracts",
+        "Suppliers",
+        "movement",
+        "Maintenance",
+        "Workforce",
+        "Opportunities",
+        "Procurement",
+        "Finance",
+        "Transport",
+        "FinRequests",
+        "Tickets",
+        "Approvals",
+        "Operations",
+        "Portal",
+        "Fleet",
+        "Governance",
+        "Financing",
+        "admin",
+        "chats",
+        "emsreports",
+        "Risk",
+        "Audit"
+    ],
+    "helper_files": [
+        "Timesheet\/_ts_journey.php",
+        "FinRequests\/_finreq_helpers.php",
+        "Risk\/_legacy_view_panel.php",
+        "Risk\/_risk_authority.php",
+        "Risk\/_risk_common.php",
+        "Risk\/_risk_views.php"
+    ]
+}

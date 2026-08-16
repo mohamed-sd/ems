@@ -1,0 +1,229 @@
+{
+    "measured_at": "2026-08-15T17:37:05+00:00",
+    "measured_by": "reverse_audit_2026-08 \/ ra00_baseline.php",
+    "php_cli": "8.2.30 (C:\\wamp64\\bin\\php\\php8.2.30\\php.exe)",
+    "os": "Windows NT DESKTOP-8APCDH7 10.0 build 22000 (Windows 11) AMD64",
+    "git": {
+        "branch": "fix\/remediation-2026-08",
+        "head": "a6d6a3ae667107cb8dd528c6e296cf38ba986dcc",
+        "head_date": "2026-08-15 18:54:31 +0300",
+        "status_short": "?? \"docs\/fix\/~$X-02 \\342\\200\\224 \\330\\252\\330\\265\\330\\255\\331\\212\\330\\255 \\330\\247\\331\\204\\331\\202\\330\\264\\330\\261\\330\\251 \\331\\210\\330\\247\\331\\204\\331\\206\\330\\270\\330\\247\\331\\205 \\330\\247\\331\\204\\330\\252\\330\\265\\331\\205\\331\\212\\331\\205\\331\\212.docx\"\n?? docs\/reverse_audit_2026-08\/",
+        "ahead_origin_fix": "0",
+        "ahead_local_main": "121",
+        "ahead_origin_main": "121",
+        "main_ref": "d0f783475bdfad134f1f729a2d612085827a24b7",
+        "note_main_reset": "refs\/heads\/main أُعيد ضبطُه إلى origin\/main في 2026-08-15 19:46:58 (حدثٌ خارجيٌّ مرصود في reflog) — 553ad70 سلفٌ لِـHEAD فلا عملَ يتيمًا"
+    },
+    "db": {
+        "server": "11.4.9-MariaDB",
+        "database": "equipation_manage",
+        "port": 3307,
+        "base_tables": 555,
+        "views": 6,
+        "triggers": 14,
+        "foreign_keys": 255,
+        "check_constraints": 230,
+        "unique_constraints": 358,
+        "tables_with_company_id": 462,
+        "migrations_applied": 414,
+        "modules": 466,
+        "role_permissions": 2622,
+        "roles": 35,
+        "users": 77,
+        "nav_items_active": 1250,
+        "action_map_rows": 362,
+        "activity_logs": 170332,
+        "business_events": 21190
+    },
+    "schema_sha1": "d66f94e28c28107e34c3db71ed9a925f176328ce",
+    "trigger_sha1": "601bca3ea9729271d7ea8986ee2d3b53db36fdde",
+    "tree": {
+        "php_files_total": 1668,
+        "tests_files": 289,
+        "tools_files": 308,
+        "migration_files": 117,
+        "php_by_top_dir": {
+            "tools": 308,
+            "tests": 289,
+            "app": 203,
+            "database": 146,
+            "includes": 83,
+            "Finance": 74,
+            "admin": 39,
+            "Risk": 39,
+            "Contracts": 30,
+            "emsreports": 30,
+            "Operations": 30,
+            "Portal": 30,
+            "Equipments": 25,
+            "Workforce": 24,
+            "Governance": 23,
+            "Procurement": 23,
+            "Suppliers": 23,
+            "Tickets": 23,
+            "Reports": 17,
+            "Audit": 16,
+            "Transport": 16,
+            "Employees": 15,
+            "Maintenance": 15,
+            "Clients": 14,
+            "Timesheet": 14,
+            "Financing": 13,
+            "FinRequests": 11,
+            "main": 11,
+            "api": 10,
+            "movement": 10
+        }
+    },
+    "fingerprints": {
+        "FIX-01 — التصحيح البنيوي.docx": {
+            "sha1": "3a3f72931abf4469be1a8390503af4041f94ae77",
+            "bytes": 38765,
+            "mtime": "2026-08-11T14:56:30+00:00"
+        },
+        "FIX-02 — تصحيح القشرة والنظام التصميمي.docx": {
+            "sha1": "61f002f6eb8cf7a1decddd83b9e549186b665dc4",
+            "bytes": 38885,
+            "mtime": "2026-08-11T14:56:30+00:00"
+        },
+        "FIX-03 — تصحيح المالية والمراجعة.docx": {
+            "sha1": "4749b28f425ad1c97666250b50321ead6fcc1832",
+            "bytes": 46711,
+            "mtime": "2026-08-11T14:56:30+00:00"
+        },
+        "INJAZ_Executive_Summary.docx": {
+            "sha1": "fe5cbd28790c582daf05c7d4d3de45bc6f46fc11",
+            "bytes": 16401,
+            "mtime": "2026-08-11T14:56:30+00:00"
+        },
+        "~$X-02 — تصحيح القشرة والنظام التصميمي.docx": {
+            "sha1": "0de9f7de6aad7f0b764086017e5f7a8485633712",
+            "bytes": 162,
+            "mtime": "2026-08-15T17:18:37+00:00"
+        },
+        "01_CORE_Audit.xlsx": {
+            "sha1": "44c03752831e8ab30f529a2226ad1df4b0ce9be5",
+            "bytes": 126396,
+            "mtime": "2026-08-11T14:56:30+00:00"
+        },
+        "02_FRD_Department_Audit.xlsx": {
+            "sha1": "78bca7cb75bf58f4228ff3d6f4a868b85874dc37",
+            "bytes": 190165,
+            "mtime": "2026-08-11T14:56:30+00:00"
+        },
+        "03_UX_Screens_Sidebar_Audit.xlsx": {
+            "sha1": "50198f923097406d2a16bb52b2859ede5eeba900",
+            "bytes": 177161,
+            "mtime": "2026-08-11T14:56:30+00:00"
+        },
+        "04_UXR_Live_UI_Reconstruction_Audit.xlsx": {
+            "sha1": "7ca33a9d23817c4e7eceafe0375ae673f4dcd28d",
+            "bytes": 97246,
+            "mtime": "2026-08-11T14:56:30+00:00"
+        },
+        "05_DELIVERY_Evidence_Testing_Audit.xlsx": {
+            "sha1": "92ce45ed98f8723e030f22d30e08a627d03250c4",
+            "bytes": 129400,
+            "mtime": "2026-08-11T14:56:30+00:00"
+        },
+        "06_Governance_Compliance_M14_Audit.xlsx": {
+            "sha1": "64092b22eb76126f71f3a15de9a1abc5ad118493",
+            "bytes": 217392,
+            "mtime": "2026-08-11T14:56:30+00:00"
+        },
+        "07_Master_Findings_Register.xlsx": {
+            "sha1": "9771a481eb521745897d567f2e92a7701de440e5",
+            "bytes": 613787,
+            "mtime": "2026-08-11T14:56:30+00:00"
+        },
+        "master_register.tsv": {
+            "sha1": "2f7a09838d11da760a8b0ea1066079eb5590b08b",
+            "bytes": 1669753,
+            "mtime": "2026-08-11T14:56:30+00:00"
+        },
+        "INJ_findings_state.tsv": {
+            "sha1": "7c8b5e0d917c5fd5fef175a5d46bfd62ed847c51",
+            "bytes": 30284,
+            "mtime": "2026-08-15T15:45:00+00:00"
+        },
+        "FIX_rules_register.tsv": {
+            "sha1": "88bef1cfe37d30c92f09014cd04779e70efbf18e",
+            "bytes": 181452,
+            "mtime": "2026-08-13T11:32:27+00:00"
+        },
+        "ARCHITECTURE_CURRENT_SYSTEM_v21_ar.md": {
+            "sha1": "00857e759fffe2dcc57c6e38f5494ffa60505eb7",
+            "bytes": 40012,
+            "mtime": "2026-08-11T14:56:30+00:00"
+        }
+    },
+    "env_snapshot": {
+        "DB_HOST": "localhost:3307",
+        "DB_USER": "ems_app",
+        "DB_PASS": "•محجوب•",
+        "DB_NAME": "equipation_manage",
+        "DB_APP_USER": "ems_app",
+        "DB_APP_PASS": "•محجوب•",
+        "DB_MIGRATOR_USER": "ems_migrator",
+        "DB_MIGRATOR_PASS": "•محجوب•",
+        "FINANCE_CRON_KEY": "•محجوب•",
+        "TRANSPORT_CRON_KEY": "•محجوب•",
+        "REQUESTS_CRON_KEY": "•محجوب•",
+        "EVENTS_CRON_KEY": "•محجوب•",
+        "TICKETS_CRON_KEY": "•محجوب•",
+        "CSRF_ENFORCE_PATHS": "\/Finance\/,\/FinRequests\/,\/Contracts\/,\/Approvals\/,\/Tickets\/,\/Financing\/,\/Procurement\/,\/Employees\/,\/Workforce\/,\/Maintenance\/,\/Governance\/,\/Operations\/,\/Risk\/,\/Suppliers\/,\/Clients\/,\/Equipments\/,\/Transport\/,\/Portal\/,\/Fleet\/,\/Settings\/,\/Timesheet\/,\/Projects\/,\/Opportunities\/,\/company\/,\/chats\/,\/movement\/,\/Oprators\/",
+        "EMS_TENANT_GATE": "enforce",
+        "TENANT_ENFORCE_PATHS": "",
+        "EMS_FAILCLOSED_ENFORCE_PREFIXES": "",
+        "EMS_FAILCLOSED_MONITOR_PREFIXES": "\/Finance\/,\/Maintenance\/,\/Equipments\/,\/Contracts\/,\/Employees\/,\/Reports\/,\/emsreports\/,\/Timesheet\/,\/Approvals\/",
+        "EMS_LEGACY_TRANSPARENCY_DEADLINE": "2026-09-30",
+        "EMS_ACTION_GUARD": "enforce",
+        "EMS_DDL_FREEZE": "true",
+        "EMS_EVENT_HOOKS": "publish",
+        "EMS_EVENT_ROOT": "publish",
+        "EMS_UNIT_CONVERT_GATE": "on",
+        "EMS_UNIT_DUAL_WRITE": "on",
+        "EMS_TS_TIME_LINES": "on",
+        "EMS_TS_WRITER": "service",
+        "EMS_E02_HOURS_GUARD": "enforce",
+        "EMS_APPROVAL_BOX": "on",
+        "EMS_UNIT_FANOUT_SOURCE": "legal",
+        "EMS_AWARD_AUTHORITY": "on",
+        "EMS_UNIT_CAPACITY_EQUIPMENT_HOURS": "20",
+        "EMS_UNIT_CAPACITY_OPERATOR_HOURS": "10",
+        "EMS_NAV_UNIFIED_ROLES": "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33",
+        "EMS_ROLE_BOARD_ROLES": "1,17,13,14,16,23,24,12,2,3,4,5,6,15,7,8,10,11,18,19,20,21,22,25,26",
+        "EMS_ATTRIBUTION_MATRIX": "on",
+        "EMS_RESP_PARTY_STRICT": "enforce",
+        "EMS_DOC_EXPIRY_GUARD": "enforce",
+        "EMS_SUPPLIER_DOC_GATE": "enforce",
+        "EMS_CONTAINER_GATE": "10",
+        "EMS_CONTAINER_GATE_MODE": "monitor",
+        "EMS_ROTATION_AUTOTRANSFER": "",
+        "EMS_PRICE_ADJUST": "7",
+        "EMS_BASELINE_GATE": "enforce",
+        "EMS_BASELINE_GATE_CONTRACTS": "7",
+        "EMS_ORG_AUTHORITY": "monitor",
+        "EMS_APPROVAL_RULES": "monitor",
+        "EMS_PERMIT_GATE": "off",
+        "EMS_PERMIT_GATE_SITES": "",
+        "EMS_PERM_SOURCE": "legacy",
+        "EMS_FOUNDING_MODE": "off",
+        "EMS_APP_TIMEZONE": "Africa\/Cairo",
+        "EMS_SESSION_STORE": "files",
+        "MYSQL_BIN_DIR": "C:\/wamp64\/bin\/mysql\/mysql8.4.7\/bin",
+        "EMS_CAPACITY_SOURCE": "columns",
+        "EMS_CAP_OUTBOX": "on",
+        "EMS_SUBSTITUTE_LADDER": "monitor",
+        "EMS_SEC013": "off",
+        "EMS_E02_ENTRY_QUAD": "monitor",
+        "EMS_U13_APPROVAL_GATE": "monitor",
+        "EMS_U13_ASSIGNMENT_GATE": "monitor",
+        "EMS_U13_CFIELD_GATE": "monitor"
+    },
+    "scope_notes": [
+        "المسابيرُ الشاهدةُ تكتب صفوفَ اختبارٍ وتنظّفها — بصمةُ المخططِ تُعاد بعد كلِّ جولةٍ لإثباتِ ثباتِ البنية",
+        "أدواتُ هذه المراجعةِ قراءةٌ فقط ولا تكتب إلا تحت docs\/reverse_audit_2026-08\/",
+        "ملفُّ ~$X-02...docx قفلُ Word مؤقتٌ غيرُ متتبَّع — ليس تعديلَ منتج"
+    ]
+}

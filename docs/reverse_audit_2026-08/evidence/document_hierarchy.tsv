@@ -1,0 +1,930 @@
+path	family	suffix	class	rank	reason	bytes	mtime	sha1
+docs/ACTION_GUARD_GUIDE_ar.md	ACTION_GUARD_GUIDE_ar	0	متخصصة نافذة	4	دليل استخدام/تشغيل	4604	2026-07-07 18:01	f8ec39b964c2f57238f23a2dedf9b2058af2c4b3
+docs/ARCHITECTURE_CURRENT_SYSTEM_v10_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v10_ar	0	مستبدلة	2	استبدلها v21	15628	2026-08-01 20:13	3d83bbba65d39f9780244d58bf4fab7164e66f09
+docs/ARCHITECTURE_CURRENT_SYSTEM_v11_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v11_ar	0	مستبدلة	2	استبدلها v21	14352	2026-08-01 20:13	52b6700788e8fdd6e657ead6d65f3f192df27649
+docs/ARCHITECTURE_CURRENT_SYSTEM_v13_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v13_ar	0	مستبدلة	2	استبدلها v21	16970	2026-08-06 14:44	16041768702218a4921f8e7378a6e28476b1beb3
+docs/ARCHITECTURE_CURRENT_SYSTEM_v14_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v14_ar	0	مستبدلة	2	استبدلها v21	22515	2026-08-06 20:30	736e6ada00790c52b13105e0ea84ce76e2e4c6ae
+docs/ARCHITECTURE_CURRENT_SYSTEM_v15_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v15_ar	0	مستبدلة	2	استبدلها v21	17294	2026-08-06 22:22	2b1e820fb22768173d1faf650e80c61e78365e36
+docs/ARCHITECTURE_CURRENT_SYSTEM_v16_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v16_ar	0	مستبدلة	2	استبدلها v21	25422	2026-08-08 10:31	2805729b2d6a42af6c2197cfe43650cef710d135
+docs/ARCHITECTURE_CURRENT_SYSTEM_v17_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v17_ar	0	مستبدلة	2	استبدلها v21	21191	2026-08-08 13:51	d7ac9bccc604d7625fcaaa8e2df35fa9679691a3
+docs/ARCHITECTURE_CURRENT_SYSTEM_v18_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v18_ar	0	مستبدلة	2	استبدلها v21	18008	2026-08-08 19:55	f5fa1427e8ca974000dc75061c2298d8173a8ceb
+docs/ARCHITECTURE_CURRENT_SYSTEM_v19_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v19_ar	0	مستبدلة	2	استبدلها v21	14479	2026-08-08 20:34	39f8fc5241e8d63cad9d34ddee129d71b6f260d5
+docs/ARCHITECTURE_CURRENT_SYSTEM_v20_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v20_ar	0	مستبدلة	2	استبدلها v21	21903	2026-08-09 03:07	613877b2d3cd80300e67cc3d77340b41d624ab5c
+docs/ARCHITECTURE_CURRENT_SYSTEM_v21_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v21_ar	0	حاكمة نافذة	2	المرجع المعماري As-Built النافذ	40012	2026-08-11 14:56	00857e759fffe2dcc57c6e38f5494ffa60505eb7
+docs/ARCHITECTURE_CURRENT_SYSTEM_v2_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v2_ar	0	مستبدلة	2	استبدلها v21	102015	2026-07-07 17:28	5963bf2944fc5d7f615e7133b5fdd14dc68187f3
+docs/ARCHITECTURE_CURRENT_SYSTEM_v3_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v3_ar	0	مستبدلة	2	استبدلها v21	98717	2026-07-10 14:16	2ed334e0b6e9bdd4c98c87788a72bb9e170fa6f8
+docs/ARCHITECTURE_CURRENT_SYSTEM_v4_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v4_ar	0	مستبدلة	2	استبدلها v21	16789	2026-07-12 16:50	a2722ecba19f8284e0f2b6f7ad0c10968ae0e5f6
+docs/ARCHITECTURE_CURRENT_SYSTEM_v5_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v5_ar	0	مستبدلة	2	استبدلها v21	24459	2026-07-14 01:56	e149f7aff58e24a3fd210ce5a44d4b9f712adc75
+docs/ARCHITECTURE_CURRENT_SYSTEM_v6_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v6_ar	0	مستبدلة	2	استبدلها v21	20389	2026-07-16 15:59	77266a0defcbb6e08f018082aa4765b92f0fd9a1
+docs/ARCHITECTURE_CURRENT_SYSTEM_v7_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v7_ar	0	مستبدلة	2	استبدلها v21	26307	2026-07-17 21:33	560aa472872ae6487305bc04cb5f447f6cd5178f
+docs/ARCHITECTURE_CURRENT_SYSTEM_v8_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v8_ar	0	مستبدلة	2	استبدلها v21	34091	2026-08-01 20:13	d0106ecd56cf49c6ae17db31da97a60dee20b25d
+docs/ARCHITECTURE_CURRENT_SYSTEM_v9_ar.md	ARCHITECTURE_CURRENT_SYSTEM_v9_ar	0	مستبدلة	2	استبدلها v21	16831	2026-08-01 20:13	261bd800f9276c38cfde227a3738872c2afb0e8e
+docs/CMP03_EXECUTION_LOG_ar.md	CMP03_EXECUTION_LOG_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	20921	2026-08-05 08:42	82038cc9020d0aa70905cd52f879b26e25da1325
+docs/CMP03_EXECUTION_PLAN_ar.md	CMP03_EXECUTION_PLAN_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	3129	2026-08-03 17:04	e5bb158d1537c1e3c84ed1f16ee7b42cb635abf4
+docs/CMP03_EXTRAS_DECISION_ar.csv	CMP03_EXTRAS_DECISION_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	310518	2026-08-03 19:07	2d7cdc6347af805caf2ccaee3313e00e6bf68e65
+docs/CMP03_FOLLOWUP_SOURCES_ar.md	CMP03_FOLLOWUP_SOURCES_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	401149	2026-08-03 18:50	13ccaf1746329c8c96614c0f80bf1d1c816e8979
+docs/CMP03_OVERFLOW_LOG_ar.md	CMP03_OVERFLOW_LOG_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	77498	2026-08-03 18:50	fa3f2ea9002f23701ccd4ff962ca7ecf9e1f26fa
+docs/CMP03_REVERSE_AUDIT_ar.md	CMP03_REVERSE_AUDIT_ar	0	تقرير تدقيق	6	تقرير تدقيق سابق	20281	2026-08-05 08:37	94a48d91c94e2a0a0b1da434f7d6969c0cf71529
+docs/CON02_ACTIVATION_REPORT_ar.md	CON02_ACTIVATION_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	14393	2026-08-01 20:13	9408f5fd4a63b7313f8bf43bb75592187974ee3f
+docs/CON02_CHANGES_AND_TESTING_GUIDE_ar.md	CON02_CHANGES_AND_TESTING_GUIDE_ar	0	متخصصة نافذة	4	دليل استخدام/تشغيل	13079	2026-08-01 20:13	a429e89a13bc7be5a43a88fa291a0200f876cc71
+docs/CON02_CLIENT_CONTRACTS_GAP_REPORT_ar.md	CON02_CLIENT_CONTRACTS_GAP_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	38610	2026-08-01 20:13	2ac7ea650cb905ab3854b73fcd988b3025ed71cd
+docs/CON02_MEDIUM_TIER_DECISIONS_ar.md	CON02_MEDIUM_TIER_DECISIONS_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	13704	2026-08-01 20:13	91ac72266c7f06d89598e4142fd8e8000b9d704e
+docs/CON02_UAT_PER_TASK_ar.md	CON02_UAT_PER_TASK_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	12063	2026-08-01 20:13	2b58f3eaa28b21eeb11dd888d3ddb5bbef0370e2
+docs/CSRF_ROLLOUT_GUIDE_ar.md	CSRF_ROLLOUT_GUIDE_ar	0	متخصصة نافذة	4	دليل استخدام/تشغيل	4933	2026-07-07 16:48	4445994424c3fa215887417a95a3f0fbf3c5094d
+docs/D04_D05_IMPLEMENTATION_STATUS_ar.pdf	D04_D05_IMPLEMENTATION_STATUS_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	327008	2026-07-18 00:05	d05a3df6d99a17ce4f8fce51a62b428f8353035f
+docs/D04_D05_WhatsApp_ar.txt	D04_D05_WhatsApp_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	1643	2026-07-18 00:05	3987d037f555e0101522364c3a2e47b9897ccd3c
+docs/D04_FINANCE_AUDIT_REPORT_ar.md	D04_FINANCE_AUDIT_REPORT_ar	0	تقرير تدقيق	6	تقرير تدقيق سابق	27001	2026-07-18 17:53	8d72d79f00a52ee897a9ad519048992d05ea8d71
+docs/DOCS_COMPLIANCE_AUDIT_20260727_ar.md	DOCS_COMPLIANCE_AUDIT_20260727_ar	0	تقرير تدقيق	6	تقرير تدقيق سابق	17117	2026-08-01 20:13	e38f2b9be7e6ab4db043896710079125f0b8becd
+docs/DOCS_EXECUTION_STATUS_REPORT_ar.md	DOCS_EXECUTION_STATUS_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	21279	2026-08-06 04:30	da15e681844023f8ec8a68b9ad8b119c090c4652
+docs/DOCS_EXECUTION_STATUS_REPORT_ar.pdf	DOCS_EXECUTION_STATUS_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	511034	2026-08-06 04:28	3860a172d31becdf9e709c8a3a77cb59c90c6bf6
+docs/E01_CONVERSION_SWEEP_ar.csv	E01_CONVERSION_SWEEP_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	61256	2026-08-06 05:50	a7ad5e4763199d2029035fedd1efdcf754793c9f
+docs/E02_BRIDGE_AMBIGUOUS_ar.csv	E02_BRIDGE_AMBIGUOUS_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	3155	2026-08-06 02:31	c4ac4c82baf80e4b7faa8ae9db0663736d4f973c
+docs/E02_TON_METER_MISSING_HOURS_ar.csv	E02_TON_METER_MISSING_HOURS_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	93339	2026-08-05 20:51	a7cf71d9e440c3b8d6ea65eeda7f875be0b428c0
+docs/EMS_CATALOG_EQUIPATION_ar.md	EMS_CATALOG_EQUIPATION_ar	0	متخصصة نافذة	4	دليل استخدام/تشغيل	31090	2026-08-01 20:13	f7e38dd2f242d9ec14ff5679c8c6cbd7b214cfe7
+docs/EMS_CATALOG_ar.md	EMS_CATALOG_ar	0	متخصصة نافذة	4	دليل استخدام/تشغيل	193086	2026-08-01 20:13	947f42f05b01f142812bf0946a6b8ea1fd334280
+docs/EMS_CATALOG_ar.pdf	EMS_CATALOG_ar	0	متخصصة نافذة	4	دليل استخدام/تشغيل	3011162	2026-08-01 20:13	761f5f732de758a2f97c7421ea507381878dd67b
+docs/EMS_تقرير_إعادة_التسمية_النصية_20260719.docx	EMS_تقرير_إعادة_التسمية_النصية_20260719	0	سجل تنفيذ حي	7	محضر تنفيذ	29417	2026-08-01 20:13	27821229acddea71d4e563acf6e5b83ec0b25bf4
+docs/EMS_تقرير_صلاحيات_الشاشات_20260719.xlsx	EMS_تقرير_صلاحيات_الشاشات_20260719	0	سجل تنفيذ حي	7	محضر تنفيذ	125368	2026-07-18 22:40	c96491b927f27abf9b16cceffd29935d130ba62c
+docs/EMS_دليل_السايدبار_وقرار_المالك_20260725.xlsx	EMS_دليل_السايدبار_وقرار_المالك_20260725	0	متخصصة نافذة	4	دليل استخدام/تشغيل	119192	2026-08-03 08:59	2448f33dc4f8cef0420445e76cb138dc28807d86
+docs/EMS_دليل_السايدبار_وقرار_المالك_v2_20260725.xlsx	EMS_دليل_السايدبار_وقرار_المالك_v2_20260725	0	متخصصة نافذة	4	دليل استخدام/تشغيل	104557	2026-08-08 10:55	6018d452b1ae0c78c3738b7c920ff7a03ced5c03
+docs/EMS_دليل_شاشات_إدارة_المبيعات_وجداولها_20260725.xlsx	EMS_دليل_شاشات_إدارة_المبيعات_وجداولها_20260725	0	متخصصة نافذة	4	دليل استخدام/تشغيل	68621	2026-08-01 20:13	60702da2ae746f54dfe7bed1b95922ff9c41e7d2
+docs/EMS_دليل_شاشات_الإدارات_20260719.xlsx	EMS_دليل_شاشات_الإدارات_20260719	0	متخصصة نافذة	4	دليل استخدام/تشغيل	79077	2026-07-18 22:57	d94a2919aae79aee854dbec55e6676bef22cce9f
+docs/EMS_دليل_شاشات_الإدارات_20260725.xlsx	EMS_دليل_شاشات_الإدارات_20260725	0	متخصصة نافذة	4	دليل استخدام/تشغيل	93139	2026-08-01 20:13	85af976d959e84eefa10ac12b0ae01838ada0f64
+docs/EMS_دليل_شاشات_الإدارة_المالية_وجداولها_20260725.xlsx	EMS_دليل_شاشات_الإدارة_المالية_وجداولها_20260725	0	متخصصة نافذة	4	دليل استخدام/تشغيل	94636	2026-08-01 20:13	b6285399fb153138b12656dcf5701a4ed64fe651
+docs/EMS_دليل_شاشات_السايدبار_20260719.xlsx	EMS_دليل_شاشات_السايدبار_20260719	0	متخصصة نافذة	4	دليل استخدام/تشغيل	94700	2026-07-18 17:54	a7ed6616213f24a46f14cca5d4c01a7a88f550dd
+docs/EMS_دليل_شاشات_السايدبار_20260725.xlsx	EMS_دليل_شاشات_السايدبار_20260725	0	متخصصة نافذة	4	دليل استخدام/تشغيل	108002	2026-08-01 20:13	73ffe39b5f3e48f0181e0e246ab67012da6d09a4
+docs/EMS_دليل_شاشات_السايدبار_v2_20260725.xlsx	EMS_دليل_شاشات_السايدبار_v2_20260725	0	متخصصة نافذة	4	دليل استخدام/تشغيل	111672	2026-08-01 20:13	1f0f586936a2f029de113ed4c88a02f26aaa0212
+docs/EMS_دليل_شاشات_السايدبار_v3_20260725.xlsx	EMS_دليل_شاشات_السايدبار_v3_20260725	0	متخصصة نافذة	4	دليل استخدام/تشغيل	116062	2026-08-02 20:21	54c598b1e5b66193ca7b817ffc4ac4d91d004a8f
+docs/EMS_دليل_شاشات_السايدبار_v4_20260725.xlsx	EMS_دليل_شاشات_السايدبار_v4_20260725	0	متخصصة نافذة	4	دليل استخدام/تشغيل	122861	2026-08-02 20:56	b6b1245f2266be7eec594cecf44f935f256c2667
+docs/EMS_دليل_شاشات_السايدبار_الشامل_20260725.xlsx	EMS_دليل_شاشات_السايدبار_الشامل_20260725	0	متخصصة نافذة	4	دليل استخدام/تشغيل	114947	2026-08-08 11:00	ebf0b027b1204b0aed9d18c925c6b20e322b4bb7
+docs/EMS_دليل_شاشات_السايدبار_الشامل_v2_20260725.xlsx	EMS_دليل_شاشات_السايدبار_الشامل_v2_20260725	0	متخصصة نافذة	4	دليل استخدام/تشغيل	115866	2026-08-08 20:42	35442b27de5b9f7b06a697761cea7be1627f919d
+docs/EMS_دليل_شاشات_السايدبار_الشامل_v3_20260725.xlsx	EMS_دليل_شاشات_السايدبار_الشامل_v3_20260725	0	متخصصة نافذة	4	دليل استخدام/تشغيل	120865	2026-08-08 20:51	ddb3a3199627319ab930aee9a4dabcfb64ec6050
+docs/EMS_دليل_شاشات_السايدبار_الشامل_النهائي_20260809.xlsx	EMS_دليل_شاشات_السايدبار_الشامل_النهائي_20260809	0	متخصصة نافذة	4	دليل استخدام/تشغيل	123714	2026-08-08 21:01	fd01a1efdfceea3c03ce5d74c9e53bf29ab9af8f
+docs/EMS_دليل_شاشات_السايدبار_قبل_وبعد_20260725.xlsx	EMS_دليل_شاشات_السايدبار_قبل_وبعد_20260725	0	متخصصة نافذة	4	دليل استخدام/تشغيل	87960	2026-08-01 20:13	7257804d74facaeeea458bc765166c0446c29ae8
+docs/EXECUTION_ADDENDUM_PLAN03_ar.md	EXECUTION_ADDENDUM_PLAN03_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	12740	2026-08-01 20:13	290c72f6f2ad04272baa175fa2e38d193628b231
+docs/EXECUTION_BRIEF_update0001_ar.md	EXECUTION_BRIEF_update0001_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	38852	2026-08-01 20:13	753706958c6c8c2d7e0edd5e9390b25e5e96b8df
+docs/EXECUTION_LOG_update0001.md	EXECUTION_LOG_update0001	0	سجل تنفيذ حي	7	محضر تنفيذ	261405	2026-08-01 20:13	e7d7a30ea4773b25626fa32f101cb195bafe4378
+docs/EXECUTION_LOG_update0003.md	EXECUTION_LOG_update0003	0	سجل تنفيذ حي	7	محضر تنفيذ	59837	2026-08-01 20:13	dabceab340d62faf3b9fb4d857ce22d122e05569
+docs/FINANCE_ROLE_EXPLAINER_ar.md	FINANCE_ROLE_EXPLAINER_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	36297	2026-07-18 17:54	07973c4692f619159ec86b850c5169e715b761d1
+docs/FINANCE_SCREENS_MANUAL_ar.md	FINANCE_SCREENS_MANUAL_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	72205	2026-07-18 18:24	319dabe067d2ff3fef850e9f600c34853122ee52
+docs/GAP_REPORT_update0001_ar.md	GAP_REPORT_update0001_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	45761	2026-08-01 20:13	983c3f3b909ab229c855e54a01a48352f6a5a0cd
+docs/GUARD_DEBT_SWEEP_ar.csv	GUARD_DEBT_SWEEP_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	3245	2026-08-06 03:35	ebc46c2b1cb5b3e099b176e0c75fd2a30cc8290b
+docs/HANDOFF_finance_migration_2026-07-12_ar.md	HANDOFF_finance_migration_2026-07-12_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	12453	2026-07-12 08:16	a1c4b87282bb0bcc456aa2bc8e0daed939e62f85
+docs/HR_Workforce_Audit_Report_2026-06-28.md	HR_Workforce_Audit_Report_2026-06	28	سجل تنفيذ حي	7	محضر تنفيذ	28284	2026-06-28 15:44	c917b694a571c495fc6622c518650cf5d67f2cb2
+docs/INSTALL_ar.md	INSTALL_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	7825	2026-08-01 21:47	057dcf784dde830b442176ed954f4309db81943c
+docs/K9_MIGRATION_PLAN_ar.md	K9_MIGRATION_PLAN_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	15919	2026-07-08 13:56	f8157f40213326f641b063a3d097dea23a6442f5
+docs/M00_AUDIT_ar.md	M00_AUDIT_ar	0	تقرير تدقيق	6	تقرير تدقيق سابق	8622	2026-08-06 13:02	e01ec53e52e5122c0e847e91fcf44289a4aa0e5d
+docs/MAINTENANCE_DEPARTMENT_AUDIT_REPORT_ar.md	MAINTENANCE_DEPARTMENT_AUDIT_REPORT_ar	0	تقرير تدقيق	6	تقرير تدقيق سابق	59278	2026-08-01 20:13	01531508549677765b386dcef082f6599186795b
+docs/MIGRATIONS_GUIDE_ar.md	MIGRATIONS_GUIDE_ar	0	متخصصة نافذة	4	دليل استخدام/تشغيل	10539	2026-07-08 10:45	10f09893a9d186c38273ced77c4528023994e91c
+docs/NAV09_CMP01_QUALITY_REPORT_ar.md	NAV09_CMP01_QUALITY_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	14567	2026-08-06 08:56	4cd9ad9369b3f75bda2134abf273ee204754c7c2
+docs/NAV09_OTHERS_DECISION_ar.md	NAV09_OTHERS_DECISION_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	20905	2026-08-03 06:21	24c0ba1058b05254ee8c1f5a95495605d54b1b80
+docs/NAV09_OWNER_DECISION_ROADMAP_ar.md	NAV09_OWNER_DECISION_ROADMAP_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	3599	2026-08-03 09:22	a9a14af387ba0a67ab68743b66b768e689a3583c
+docs/NEUTRAL_ROOT_ADR15_ar.md	NEUTRAL_ROOT_ADR15_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	5923	2026-07-17 12:56	8114d265e3d2deec6ec96124b14c750b72fac6e1
+docs/NEXT_SESSION_PROMPT_ar.md	NEXT_SESSION_PROMPT_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	8948	2026-08-06 06:23	a2092985850d6bff2255e03b5d6ab451da2f3fce
+docs/OWNER_DECISIONS_20260812.md	OWNER_DECISIONS_20260812	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	17582	2026-08-12 14:03	049a54474ef29a97c3e514ad8b3e02da3a4c9b1c
+docs/PHASE1_CLOSURE_REPORT_ar.md	PHASE1_CLOSURE_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	20246	2026-07-11 17:37	69cf2705791709df2420ebff1e8e827538492537
+docs/PHASE1_PLAN_ar.md	PHASE1_PLAN_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	34700	2026-07-08 13:38	df5254b3df3cd1cee1b09e19363696d975cf0fd6
+docs/PRE_PRODUCTION_CHECKLIST_ar.md	PRE_PRODUCTION_CHECKLIST_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	3965	2026-07-07 16:48	d15289a65a042a0a475a1260db5b5fe35606fe9e
+docs/PROMPT_CON02_ACTIVATION_ar.md	PROMPT_CON02_ACTIVATION_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	12294	2026-08-01 20:13	6031ca49c061f05bce12e7e2ac3e465d05a4cbcb
+docs/PROMPT_CON02_CLOSURE_ar.md	PROMPT_CON02_CLOSURE_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	11844	2026-08-01 20:13	4902efe3bfa01c779c11876d8ecd58c34d9a59bc
+docs/PROMPT_CON02_EASY_TIER_ar.md	PROMPT_CON02_EASY_TIER_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	16643	2026-08-01 20:13	3458562c141947c07a71ea7ca7094937060776e8
+docs/PROMPT_CON02_MEDIUM_TIER_ar.md	PROMPT_CON02_MEDIUM_TIER_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	24483	2026-08-01 20:13	74f7ed90f8701d9149d11a606120cc457afe0736
+docs/PROVIDER_BATCH_POLICY_ar.md	PROVIDER_BATCH_POLICY_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	7697	2026-07-16 09:33	e3381847e47507fa4d295365f87e6b7de06c9959
+docs/RELEASE_GATE_LAST_ar.md	RELEASE_GATE_LAST_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	2094	2026-08-11 14:56	97c8cd6942cc727e305e2d8b04787ee6ef6abc05
+docs/REV01_ARCH_REVIEW_REPORT_v2_ar.md	REV01_ARCH_REVIEW_REPORT_v2_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	44929	2026-07-08 09:20	9697a8d3826c7de026b3c537113be6080c01e896
+docs/REV02_ARCH_REVIEW_DELIVERABLES_v2_ar.md	REV02_ARCH_REVIEW_DELIVERABLES_v2_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	65888	2026-07-08 09:20	71494a1c8845f7df35b17794e0e908e1a1c9dbcc
+docs/REV08_CLOSURE_REPLY_ar.md	REV08_CLOSURE_REPLY_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	18205	2026-07-14 01:54	a926b13fd0a507224883b3ec2cb829da0bdd8fc9
+docs/REV_V2_TRACEABILITY_ar.md	REV_V2_TRACEABILITY_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	11269	2026-07-08 08:02	f28e3d514fc9c2b21818952232f7e22eb0ef81ba
+docs/ROLES_AND_PERMISSIONS_GUIDE_ar.md	ROLES_AND_PERMISSIONS_GUIDE_ar	0	متخصصة نافذة	4	دليل استخدام/تشغيل	45613	2026-08-01 20:13	2eaf890a70226b91080e0eb84d6ae9a1ee694bf9
+docs/S12_TICKETS_FEASIBILITY_REPORT_ar.md	S12_TICKETS_FEASIBILITY_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	14152	2026-07-18 06:05	2aaedb3fb980c0501b059c5ee41f8d9b67822b35
+docs/SALES_DEPARTMENT_AUDIT_REPORT_ar.md	SALES_DEPARTMENT_AUDIT_REPORT_ar	0	تقرير تدقيق	6	تقرير تدقيق سابق	60646	2026-07-18 05:08	2245ff13602e153a5ef0a6ab781cd9c24e1f6f7a
+docs/SCR01_SCREEN_REVIEW_AND_DEDUP_ar.md	SCR01_SCREEN_REVIEW_AND_DEDUP_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	22835	2026-08-01 20:13	ff41ed362525b71223ac2f4687ec75df78ed7a78
+docs/SESSION_HANDOFF_20260726_ar.md	SESSION_HANDOFF_20260726_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	27580	2026-08-01 20:13	0b80ca65640f98aa13d0aab8b4f66a1bb40daa9e
+docs/SETUP_ar.md	SETUP_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	7972	2026-08-02 08:06	37ac7d603983f0fe0bb3809989a63cdd8694a636
+docs/SUPPLIERS_DEPARTMENT_AUDIT_REPORT_ar.md	SUPPLIERS_DEPARTMENT_AUDIT_REPORT_ar	0	تقرير تدقيق	6	تقرير تدقيق سابق	60107	2026-07-18 02:41	80cacd908bbaca422c3044c021dae2ec5f4f898c
+docs/TENANT_GATE_CONTRACT_ar.md	TENANT_GATE_CONTRACT_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	20823	2026-08-06 08:20	26fc959ed55681c601d0bb962d0508709a2b2141
+docs/TRACE_BARE_LEFT_ar.txt	TRACE_BARE_LEFT_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	2077	2026-08-06 07:16	c181e122c87144c7776496703ad63eb6f6cf3cbd
+docs/TRACE_BARE_ar.csv	TRACE_BARE_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	214466	2026-08-06 07:04	c6d3109d54cfb19c5d8446a48caaf28468f91038
+docs/TRACE_MATRIX_ar.csv	TRACE_MATRIX_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	29247	2026-08-06 07:17	566c442793ba2c763ad5ef11b4ac06479ce11301
+docs/TRACE_MATRIX_ar.md	TRACE_MATRIX_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	3214	2026-08-06 07:17	20c1a24a3e9939483de6698438454aef1eabe9f0
+docs/TRIAL_READINESS_ar.md	TRIAL_READINESS_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	2203	2026-08-06 05:34	6d3b66845894a942c04e16115b77347ceaac22a1
+docs/UAT_PLAN_ar.md	UAT_PLAN_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	15983	2026-07-10 10:16	7e6f016eff8b8f8867ead6341d7b18d00b731ccf
+docs/UAT_SIGNOFF_TEMPLATE_ar.md	UAT_SIGNOFF_TEMPLATE_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	2564	2026-08-06 03:10	e628eb967590889e5df0a42a6c306af0de82738e
+docs/UAT_SIGNOFF_ar.md	UAT_SIGNOFF_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	6139	2026-08-06 13:05	aa9c8d35cf557bd02232991043c1417cb1560b24
+docs/UAT_UPDATE0007B_SCENARIO_ar.md	UAT_UPDATE0007B_SCENARIO_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	7280	2026-08-02 20:21	c1dd0a8d8247b54822f2bc6c006b62eaa220785e
+docs/UNITS_OF_MEASURE_GAP_REPORT_ar.md	UNITS_OF_MEASURE_GAP_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	17646	2026-07-17 22:07	bf1a58bcd7b4c2832fcac2f05c325043ec3d5673
+docs/UPDATE0001_COMPLETED_TASKS_LIST_ar.md	UPDATE0001_COMPLETED_TASKS_LIST_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	13912	2026-08-01 20:13	1df76fe9b7c0323d00a549a7436f09c2a6bdfcff
+docs/UPDATE0001_COMPLETED_TASKS_OWNER_ar.md	UPDATE0001_COMPLETED_TASKS_OWNER_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	12170	2026-08-01 20:13	4618260f04b485bd48cd0e2877c0f9a17183c8f0
+docs/UPDATE0001_FINAL_OWNER_REPORT_ar.md	UPDATE0001_FINAL_OWNER_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	10181	2026-08-01 20:13	23d83ae913ce1896bc3d8220af30822bd1dcdb41
+docs/UPDATE0001_OWNER_REPORT_ar.md	UPDATE0001_OWNER_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	21459	2026-08-01 20:13	1ad2ea913768a9c82b16e68b1d99a93eef376e98
+docs/UPDATE0001_PROGRESS_OWNER_ar.md	UPDATE0001_PROGRESS_OWNER_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	9037	2026-08-01 20:13	bda38ea06dcd867e3a778ed57bf24fcdb8cf0fe5
+docs/UPDATE0001_REVERSE_AUDIT_ar.md	UPDATE0001_REVERSE_AUDIT_ar	0	تقرير تدقيق	6	تقرير تدقيق سابق	9861	2026-08-01 20:13	6506cb1908e6f8d8ecc3e0253823cecca7579aa2
+docs/UPDATE0001_SPRINT_01_EXECUTION_PROMPT_ar.md	UPDATE0001_SPRINT_01_EXECUTION_PROMPT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	18695	2026-08-01 20:13	e84d6a831ba4c0944baa41f797e39aaf9d39637f
+docs/UPDATE0001_SPRINT_01_ar.md	UPDATE0001_SPRINT_01_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	22969	2026-08-01 20:13	4ee34aa714adf78935bf19252c35e035b5ae8dd5
+docs/UPDATE0001_TASK_BACKLOG_ar.md	UPDATE0001_TASK_BACKLOG_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	37765	2026-08-01 20:13	72c48fdfaa9e772b50fe6e10a99a72cc0076a819
+docs/UPDATE0003_COMPLETED_TASKS_LIST_ar.md	UPDATE0003_COMPLETED_TASKS_LIST_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	8596	2026-08-01 20:13	2a7ac9f43a52d19bd13f50d2859ae217edbbd16f
+docs/UPDATE0004_AUTONOMOUS_PROMPT_ar.md	UPDATE0004_AUTONOMOUS_PROMPT_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	22488	2026-08-02 01:21	d03fde3fc2596dfb2cd9b8d574eb5a7b2ba55e69
+docs/UPDATE0004_DECISIONS_ar.md	UPDATE0004_DECISIONS_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	4112	2026-08-02 01:21	2e86923c25a0d310a63364f4d2e3753d3f609c7d
+docs/UPDATE0004_EXECUTION_LOG.md	UPDATE0004_EXECUTION_LOG	0	سجل تنفيذ حي	7	محضر تنفيذ	34194	2026-08-02 01:21	22d0ecbbaa8ddfefa73aa09a3cf23149f5a68078
+docs/UPDATE0004_EXECUTION_PROMPT_ar.md	UPDATE0004_EXECUTION_PROMPT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	28265	2026-08-02 01:21	1bedc83f6b785fb42e2e8d2acd0272dbf7790512
+docs/UPDATE0004_FINAL_REPORT_ar.md	UPDATE0004_FINAL_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	11018	2026-08-02 01:21	c4c13ec04a398d6a877bf67902459a81fd55d99f
+docs/UPDATE0004_JUDGMENT_LOG.md	UPDATE0004_JUDGMENT_LOG	0	سجل تنفيذ حي	7	محضر تنفيذ	19986	2026-08-02 01:21	863b42744ea20343bea56e4bdb0e14dc095bf08e
+docs/UPDATE0004_PLAN_ar.md	UPDATE0004_PLAN_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	32082	2026-08-02 01:21	1dedccaf16b9fce87fff3a4e140015ee4e481616
+docs/UPDATE0005_AUTONOMOUS_PROMPT_ar.md	UPDATE0005_AUTONOMOUS_PROMPT_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	12148	2026-08-02 05:32	b740bd81f547628652f193ad07a3c15a4490f9bd
+docs/UPDATE0005_DEFERRED_ASSIGNMENTS_ar.md	UPDATE0005_DEFERRED_ASSIGNMENTS_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	7000	2026-08-02 05:32	84d325cbe28968d235f2b59b314122843a17132e
+docs/UPDATE0005_EXECUTION_LOG.md	UPDATE0005_EXECUTION_LOG	0	سجل تنفيذ حي	7	محضر تنفيذ	21462	2026-08-02 05:32	02fe16f5c181bc28eff7952803c856db0d17dd89
+docs/UPDATE0005_FINAL_REPORT_ar.md	UPDATE0005_FINAL_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	14064	2026-08-02 05:32	f0c3f15010dabd08c1119b4eea67c9fd9d91c801
+docs/UPDATE0005_JUDGMENT_LOG.md	UPDATE0005_JUDGMENT_LOG	0	سجل تنفيذ حي	7	محضر تنفيذ	12863	2026-08-02 05:32	c22ef6821a704e558146d57ddd059f682a94e979
+docs/UPDATE0005_PLAN_ar.md	UPDATE0005_PLAN_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	21555	2026-08-02 05:32	d7dd135a9a391da6264a65fa6f010d1956d7ea9a
+docs/UPDATE0006_EXECUTION_LOG.md	UPDATE0006_EXECUTION_LOG	0	سجل تنفيذ حي	7	محضر تنفيذ	6887	2026-08-02 20:21	3471fc7d22f3e62e23547f016e25da02d027120e
+docs/UPDATE0006_FINAL_REPORT_ar.md	UPDATE0006_FINAL_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	6800	2026-08-02 20:21	3dd8b3f11a47f99cd0c9de486c138e732014651c
+docs/UPDATE0006_JUDGMENT_LOG.md	UPDATE0006_JUDGMENT_LOG	0	سجل تنفيذ حي	7	محضر تنفيذ	2215	2026-08-02 20:21	99ad93d5c9b82a66ea1fc53388d59c46c787c1f3
+docs/UPDATE0006_PLAN_ar.md	UPDATE0006_PLAN_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	6219	2026-08-02 20:21	b9b9efee8e74d38ce279633c977d279de0cef662
+docs/UPDATE0007_DEFERRED_ar.md	UPDATE0007_DEFERRED_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	1875	2026-08-02 20:21	af430e0fc5ce776d3656e5ab01046b3733cca500
+docs/UPDATE0007_EXECUTION_LOG.md	UPDATE0007_EXECUTION_LOG	0	سجل تنفيذ حي	7	محضر تنفيذ	25339	2026-08-03 17:04	38582a6492a531c9ecc8e2d9eba2e6c53e37b008
+docs/UPDATE0007_FINAL_REPORT_ar.md	UPDATE0007_FINAL_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	4633	2026-08-02 20:21	3309f7870444a91ae5e95b6164f1255cc2d75fa0
+docs/UPDATE0007_PLAN_ar.md	UPDATE0007_PLAN_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	17688	2026-08-02 20:21	338e105eb1a1f98b4944b3cb56de81aee94fad33
+docs/UPDATE0007_REVERSE_AUDIT_ar.md	UPDATE0007_REVERSE_AUDIT_ar	0	تقرير تدقيق	6	تقرير تدقيق سابق	8924	2026-08-02 20:21	1166a40220c3a54dd6217f314d36604f1b4b2166
+docs/UPDATE0008_AUDIT_ar.md	UPDATE0008_AUDIT_ar	0	تقرير تدقيق	6	تقرير تدقيق سابق	13512	2026-08-06 13:02	7a825f5bf65835958834820db0110430ebc14023
+docs/UPDATE0008_DECISIONS_LOG_ar.md	UPDATE0008_DECISIONS_LOG_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	13113	2026-08-06 12:44	b8b87ca158a05cc02786971ebdeda3c82174970e
+docs/UPDATE0008_DOCS_PROGRESS_ar.md	UPDATE0008_DOCS_PROGRESS_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	6727	2026-08-06 08:57	b7990b25545c9a9564b6dcb98977d76f8e4560ac
+docs/UPDATE0008_REMAINING_BLOCKERS_ar.md	UPDATE0008_REMAINING_BLOCKERS_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	13257	2026-08-06 07:38	cd96fc34d26822d971ebe3d672fe2c08e990e522
+docs/UPDATE0008_TASK_LEDGER_ar.md	UPDATE0008_TASK_LEDGER_ar	0	متخصصة نافذة	4	وثيقة جذر — الأحدث في عائلته	29152	2026-08-06 13:03	326d14661c2a0a3b237de6c159d81aa313b779fa
+docs/USER_TESTING_GUIDE_ar.md	USER_TESTING_GUIDE_ar	0	متخصصة نافذة	4	دليل استخدام/تشغيل	63469	2026-08-05 22:05	5a25c925d9755a452a48b68fc1904b3bf54e1d49
+docs/UXR01_COVERAGE_AUDIT_20260808_ar.md	UXR01_COVERAGE_AUDIT_20260808_ar	0	تقرير تدقيق	6	تقرير تدقيق سابق	34192	2026-08-08 11:12	7072840d2746260b9cf1bedeb6381c14df0988a3
+docs/UX_TASKS_DIFFICULTY_REPORT_ar.html	UX_TASKS_DIFFICULTY_REPORT_ar	0	سجل تنفيذ حي	7	محضر تنفيذ	37752	2026-08-01 20:13	cf5364c6b63c5ca078863169fc3f19efc0fd1327
+docs/act01/ACT_debt_report.txt	ACT_debt_report	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	1471	2026-08-02 20:21	2dac130e0297f65e9adc0727220596d233f0c121
+docs/act01/ACT_debt_report_raw.txt	ACT_debt_report_raw	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	2791	2026-08-02 20:21	7004fa81fdaac84e9586c2a6909b51a33eba772f
+docs/audit_2026-08/01_CORE_Audit.xlsx	01_CORE_Audit	0	تقرير تدقيق	6	ادعاءات تدقيق 2026-08-09 — تُعاد لا تُصدَّق	126396	2026-08-11 14:56	44c03752831e8ab30f529a2226ad1df4b0ce9be5
+docs/audit_2026-08/02_FRD_Department_Audit.xlsx	02_FRD_Department_Audit	0	تقرير تدقيق	6	ادعاءات تدقيق 2026-08-09 — تُعاد لا تُصدَّق	190165	2026-08-11 14:56	78bca7cb75bf58f4228ff3d6f4a868b85874dc37
+docs/audit_2026-08/03_UX_Screens_Sidebar_Audit.xlsx	03_UX_Screens_Sidebar_Audit	0	تقرير تدقيق	6	ادعاءات تدقيق 2026-08-09 — تُعاد لا تُصدَّق	177161	2026-08-11 14:56	50198f923097406d2a16bb52b2859ede5eeba900
+docs/audit_2026-08/04_UXR_Live_UI_Reconstruction_Audit.xlsx	04_UXR_Live_UI_Reconstruction_Audit	0	تقرير تدقيق	6	ادعاءات تدقيق 2026-08-09 — تُعاد لا تُصدَّق	97246	2026-08-11 14:56	7ca33a9d23817c4e7eceafe0375ae673f4dcd28d
+docs/audit_2026-08/05_DELIVERY_Evidence_Testing_Audit.xlsx	05_DELIVERY_Evidence_Testing_Audit	0	تقرير تدقيق	6	ادعاءات تدقيق 2026-08-09 — تُعاد لا تُصدَّق	129400	2026-08-11 14:56	92ce45ed98f8723e030f22d30e08a627d03250c4
+docs/audit_2026-08/06_Governance_Compliance_M14_Audit.xlsx	06_Governance_Compliance_M14_Audit	0	تقرير تدقيق	6	ادعاءات تدقيق 2026-08-09 — تُعاد لا تُصدَّق	217392	2026-08-11 14:56	64092b22eb76126f71f3a15de9a1abc5ad118493
+docs/audit_2026-08/07_Master_Findings_Register.xlsx	07_Master_Findings_Register	0	تقرير تدقيق	6	ادعاءات تدقيق 2026-08-09 — تُعاد لا تُصدَّق	613787	2026-08-11 14:56	9771a481eb521745897d567f2e92a7701de440e5
+docs/basicRolesDocs/INJAZ-CORE-01 — الدستور والمعمارية والحوكمة-5.docx	INJAZ-CORE-01 — الدستور والمعمارية والحوكمة	5	حاكمة نافذة	2	المجموعة الحاكمة الست بأحدث لواحقها	66054	2026-08-09 04:36	a7318cdd6c8b51b482e2f3e291a9188e1b1b3d35
+docs/basicRolesDocs/INJAZ-DELIVERY-01 — التنفيذ والتتبع والاختبار والتشغيل-4.docx	INJAZ-DELIVERY-01 — التنفيذ والتتبع والاختبار والتشغيل	4	حاكمة نافذة	2	المجموعة الحاكمة الست بأحدث لواحقها	60086	2026-08-09 04:36	518c037391be2a74fd4933c7ff0f6640ffe82d79
+docs/basicRolesDocs/INJAZ-FRD-01 — المتطلبات الوظيفية الموحّدة-5.docx	INJAZ-FRD-01 — المتطلبات الوظيفية الموحّدة	5	حاكمة نافذة	2	المجموعة الحاكمة الست بأحدث لواحقها	113620	2026-08-09 04:36	9b5f9e002a6a4be68532311e7877fb1bb041b6b3
+docs/basicRolesDocs/INJAZ-UX-01 — الشاشات وتجربة المستخدم والنظام التصميمي-4.docx	INJAZ-UX-01 — الشاشات وتجربة المستخدم والنظام التصميمي	4	حاكمة نافذة	2	المجموعة الحاكمة الست بأحدث لواحقها	60742	2026-08-09 04:36	994e56ecb5d9965e5c0d003ff4cac4374476b711
+docs/basicRolesDocs/M-14 — الحوكمة والالتزام-1.docx	M-14 — الحوكمة والالتزام	1	حاكمة نافذة	2	المجموعة الحاكمة الست بأحدث لواحقها	154762	2026-08-09 04:37	a9338f6a769cbaff1edab210fd64461d24fc5dec
+docs/basicRolesDocs/UXR-01 — إعادة بناء واجهة المستخدم وتجربته-1.docx	UXR-01 — إعادة بناء واجهة المستخدم وتجربته	1	حاكمة نافذة	2	المجموعة الحاكمة الست بأحدث لواحقها	65246	2026-08-09 04:37	02ea4e5ec3c13b6dac340a21dd398c8d16c74818
+docs/files/CMP-03 مقارنة أعمدة الشاشات بالنظام الحي.xlsx	CMP-03 مقارنة أعمدة الشاشات بالنظام الحي	0	متخصصة نافذة	4	ملفات مرجعية — الأحدث في عائلته نافذ	183256	2026-08-03 17:04	fb97ec45d8c7e9c909ab16b6eaa85e149bb70c85
+docs/files/DEC-01 قرارات المالك.docx	DEC-01 قرارات المالك	0	قرار مالك نافذ	3	وثيقة قرارات مالك	24440	2026-08-01 20:13	013ae7a2487c74e057274c1254b07a98ae952851
+docs/files/EMS_دليل_السايدبار_وقرار_المالك_20260725.xlsx	EMS_دليل_السايدبار_وقرار_المالك_20260725	0	متخصصة نافذة	4	ملفات مرجعية — الأحدث في عائلته نافذ	119192	2026-08-03 09:23	2448f33dc4f8cef0420445e76cb138dc28807d86
+docs/files/FIN-01 إدارة التمويل والملكية-2.docx	FIN-01 إدارة التمويل والملكية	2	متخصصة نافذة	4	ملفات مرجعية — الأحدث في عائلته نافذ	34917	2026-08-01 20:13	1195e34422f3388c7e705af4aa691adb3f55db34
+docs/files/GOV-01 مصفوفة الحمايات والاستثناءات-1.docx	GOV-01 مصفوفة الحمايات والاستثناءات	1	متخصصة نافذة	4	ملفات مرجعية — الأحدث في عائلته نافذ	40309	2026-08-01 20:13	4779ffd83b79d6735875d5dc4fff8b8235358642
+docs/files/LEG-01 الكيانات والحوكمة والهوية-2.docx	LEG-01 الكيانات والحوكمة والهوية	2	متخصصة نافذة	4	ملفات مرجعية — الأحدث في عائلته نافذ	31924	2026-08-01 20:13	a767e36ca0fb68e32bf750a77ddb1266e13b4eae
+docs/files/NAV-09 نظام الشاشات النافذ الموسع-1.xlsx	NAV-09 نظام الشاشات النافذ الموسع	1	مستبدلة	9	نسخ NAV-09 غير الحية	252279	2026-08-03 05:20	bb4ed1cfeb6d5aeaa9481b73aed67ea6df4aa3ca
+docs/files/NAV-09 نظام الشاشات النافذ الموسع-4.xlsx	NAV-09 نظام الشاشات النافذ الموسع	4	مستبدلة	9	نسخ NAV-09 غير الحية	295614	2026-08-03 06:12	94c8cda97c68a65e22f9b9f7c6a33c02d6d82065
+docs/files/NAV-09-current.xlsx	NAV-09-current	0	متخصصة نافذة	3	مصدر الحقيقة الحي لنظام الشاشات	377241	2026-08-06 15:56	7b289d5f00ab844c69b90bd0415cb6299d6ae72e
+docs/files/NAV-09-v4-backup-20260806.xlsx	NAV-09-v4-backup	20260806	مستبدلة	9	نسخ NAV-09 غير الحية	295614	2026-08-06 15:56	94c8cda97c68a65e22f9b9f7c6a33c02d6d82065
+docs/files/PLAN-04 تعميق نموذج الحاوية والحوكمة والتمويل-2.docx	PLAN-04 تعميق نموذج الحاوية والحوكمة والتمويل	2	متخصصة نافذة	4	ملفات مرجعية — الأحدث في عائلته نافذ	36811	2026-08-01 20:13	f1165f33313d5a259e7fd5e8ff045939a7684921
+docs/files/PLAN-05 مصفوفة المطابقة وخارطة التنفيذ-2.docx	PLAN-05 مصفوفة المطابقة وخارطة التنفيذ	2	متخصصة نافذة	4	ملفات مرجعية — الأحدث في عائلته نافذ	39624	2026-08-01 20:13	6f4192667238e03102597cabe763cfd34c9f8390
+docs/files/POL-01 إطار السياسات ومسار الوحدة-1.docx	POL-01 إطار السياسات ومسار الوحدة	1	متخصصة نافذة	4	ملفات مرجعية — الأحدث في عائلته نافذ	37564	2026-08-01 20:13	fd77ad70240d00d197afb622583abe9b9606f8f3
+docs/files/SCR-02 معيار بناء الشاشات والجديدة.docx	SCR-02 معيار بناء الشاشات والجديدة	0	متخصصة نافذة	4	ملفات مرجعية — الأحدث في عائلته نافذ	29794	2026-08-01 20:13	5031686f55442b979b99d6006a99c1aa1e85589c
+docs/files/SCR-DES-01 تصميم أعمدة الشاشات-2.xlsx	SCR-DES-01 تصميم أعمدة الشاشات	2	متخصصة نافذة	4	ملفات مرجعية — الأحدث في عائلته نافذ	402260	2026-08-03 11:09	cb09ae4b99d40fce8c109063d62d9cb61fa70008
+docs/files/UPDATE0001_COMPLETED_TASKS_LIST_ar.md	UPDATE0001_COMPLETED_TASKS_LIST_ar	0	متخصصة نافذة	4	ملفات مرجعية — الأحدث في عائلته نافذ	13912	2026-08-01 20:13	1df76fe9b7c0323d00a549a7436f09c2a6bdfcff
+docs/files/WRK-01 الورديات والحضور وسياسات الخصم-1.docx	WRK-01 الورديات والحضور وسياسات الخصم	1	متخصصة نافذة	4	ملفات مرجعية — الأحدث في عائلته نافذ	33617	2026-08-01 20:13	78c6442581818776bfa06d5f0e19c137b8706c41
+docs/finance_user_guide_ar.md	finance_user_guide_ar	0	متخصصة نافذة	4	دليل استخدام/تشغيل	23463	2026-07-05 14:14	7e5676f729266ea75a42747ccf067a0a9709291f
+docs/fix/FIX-01 — التصحيح البنيوي.docx	FIX-01 — التصحيح البنيوي	0	وثيقة تصحيح	5	حزمة FIX الحاكمة للتصحيح	38765	2026-08-11 14:56	3a3f72931abf4469be1a8390503af4041f94ae77
+docs/fix/FIX-02 — تصحيح القشرة والنظام التصميمي.docx	FIX-02 — تصحيح القشرة والنظام التصميمي	0	وثيقة تصحيح	5	حزمة FIX الحاكمة للتصحيح	38885	2026-08-11 14:56	61f002f6eb8cf7a1decddd83b9e549186b665dc4
+docs/fix/FIX-03 — تصحيح المالية والمراجعة.docx	FIX-03 — تصحيح المالية والمراجعة	0	وثيقة تصحيح	5	حزمة FIX الحاكمة للتصحيح	46711	2026-08-11 14:56	4749b28f425ad1c97666250b50321ead6fcc1832
+docs/fix/INJAZ_Executive_Summary.docx	INJAZ_Executive_Summary	0	وثيقة تصحيح	5	حزمة FIX الحاكمة للتصحيح	16401	2026-08-11 14:56	fe5cbd28790c582daf05c7d4d3de45bc6f46fc11
+docs/fix/~$X-02 — تصحيح القشرة والنظام التصميمي.docx	~$X-02 — تصحيح القشرة والنظام التصميمي	0	غير صالحة	9	قفل Word مؤقت	162	2026-08-15 17:18	0de9f7de6aad7f0b764086017e5f7a8485633712
+docs/fix_2026-08/AUDIT_COVERAGE_ar.md	AUDIT_COVERAGE_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	5962	2026-08-11 21:56	459982f83fba76fc1643a15cabea480d074d0445
+docs/fix_2026-08/CHECK_FULL_SWEEP_ar.md	CHECK_FULL_SWEEP_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	17582	2026-08-12 01:12	1ae79dce962b1eab03cb489fcfedb782a9c097f9
+docs/fix_2026-08/DATA_MISMATCH_CAMPAIGN_2026-08-15.md	DATA_MISMATCH_CAMPAIGN_2026-08	15	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	13131	2026-08-15 15:47	b583f70db5b7ff4c2c523a6dd70295a8802671c9
+docs/fix_2026-08/DENOMINATOR_ar.md	DENOMINATOR_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	5862	2026-08-11 14:56	b838ffe002293dde9764afd190f96a1690e0660f
+docs/fix_2026-08/DOCS_INVENTORY_ar.md	DOCS_INVENTORY_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	3933	2026-08-11 14:56	42ca49d608226ae15a802451a49824cc596f7eec
+docs/fix_2026-08/DUP_SCREENS_CAMPAIGN_2026-08-14.md	DUP_SCREENS_CAMPAIGN_2026-08	14	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	14249	2026-08-15 07:23	42e58fc9b933ad82fc29f2accaa8e7c0befa6aa4
+docs/fix_2026-08/EASY_CLUSTERS_ar.md	EASY_CLUSTERS_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	13496	2026-08-11 14:56	6864ad5f95219bf330d439da768e7dc1f8afc41c
+docs/fix_2026-08/EFFORT_SHARE_ar.md	EFFORT_SHARE_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	3232	2026-08-11 21:56	7b01f3aadd35ec00ed3b082c83b53da5bac89abe
+docs/fix_2026-08/EVIDENCE_CAMPAIGN_2026-08-13.md	EVIDENCE_CAMPAIGN_2026-08	13	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	8491	2026-08-13 01:27	400cd454c1059856385a8e9e6a7347536c4adc5f
+docs/fix_2026-08/EVIDENCE_CAMPAIGN_COVERED_2026-08-13.md	EVIDENCE_CAMPAIGN_COVERED_2026-08	13	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	20931	2026-08-13 04:48	312d66663ada6737e65eb9f8bfb079afc0154f56
+docs/fix_2026-08/EVIDENCE_GAP_PROBE_ar.md	EVIDENCE_GAP_PROBE_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	9770	2026-08-11 14:56	cd50b3b9e3e9535780b61f9c1e61afed83a4a8c2
+docs/fix_2026-08/EVIDENCE_GAP_ar.md	EVIDENCE_GAP_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	73119	2026-08-11 14:56	cd1b7d1d816746f3359d45ad29ca87ff76ff5750
+docs/fix_2026-08/FINAL_STATUS_ar.md	FINAL_STATUS_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	7784	2026-08-11 14:56	24a5de690490bedd6792e2fd4404e5dd5685749e
+docs/fix_2026-08/FIX_CLOSURE_REPORT_ar.md	FIX_CLOSURE_REPORT_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	28923	2026-08-11 14:56	7fb4071c4a541edec9bbefd89473eb82b7d52040
+docs/fix_2026-08/HANDOVER_2026-08-10.md	HANDOVER_2026-08	10	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	11210	2026-08-11 22:19	71f94fac1631bbe6b4f29af174f70ac34b385e58
+docs/fix_2026-08/LOST_CONSTRAINTS_PLAN_ar.md	LOST_CONSTRAINTS_PLAN_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	3453	2026-08-11 23:26	84e11ac16e289ccd21b0228328ba5591e7c099eb
+docs/fix_2026-08/LOST_CONSTRAINTS_ar.md	LOST_CONSTRAINTS_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	6622	2026-08-11 23:24	629779f547a9cc3274d86357171650573259c58e
+docs/fix_2026-08/MISSING_CONSTRAINTS_ar.md	MISSING_CONSTRAINTS_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	2787	2026-08-11 23:49	43e500035413f9a9943e9c243b993c2c056cc31b
+docs/fix_2026-08/OWNER_REVIEW_FIX_ar.md	OWNER_REVIEW_FIX_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	6335	2026-08-11 14:56	d8bec85331fea2516e43698ba5ba74ac0a2e5ce3
+docs/fix_2026-08/PERM_GOV_CAMPAIGN_2026-08-14.md	PERM_GOV_CAMPAIGN_2026-08	14	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	62434	2026-08-15 05:33	7f52241c2f991dd86771f513958b5196fbc7c531
+docs/fix_2026-08/PERM_GOV_CAMPAIGN_2026-08-15.md	PERM_GOV_CAMPAIGN_2026-08	15	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	33156	2026-08-15 08:58	ce7b3e5e0d629418ec96760320d71406cfa813a6
+docs/fix_2026-08/REPORT_SCOPE_AND_PROGRESS_ar.md	REPORT_SCOPE_AND_PROGRESS_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	21285	2026-08-11 14:56	92c276e0a65700ad7873bbb3d502f6d821589f13
+docs/fix_2026-08/SALES_DEMO_DATA_FILL_2026-08-13.md	SALES_DEMO_DATA_FILL_2026-08	13	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	19300	2026-08-13 04:31	19d4e0c908495eaa06646f37a8fb6331bba31d7b
+docs/fix_2026-08/SCREEN_REGISTRY_ar.md	SCREEN_REGISTRY_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	2189	2026-08-11 14:56	b48114b211969591f417304ad7f89f6bcef8f0a1
+docs/fix_2026-08/STATUS_REPORT_ar.md	STATUS_REPORT_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	4734	2026-08-11 21:55	bde895845911ec24e7cc7306bc07f696e5e1871c
+docs/fix_2026-08/UI68_CAMPAIGN_2026-08-13.md	UI68_CAMPAIGN_2026-08	13	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	18148	2026-08-13 21:08	1684266314544b74708116f0f95c5537802f4553
+docs/fix_2026-08/UI68_CAMPAIGN_SUMMARY_ar.md	UI68_CAMPAIGN_SUMMARY_ar	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	6642	2026-08-13 21:29	9cc269efdd2898e33aa7a722cea97d348172493c
+docs/fix_2026-08/WORKFLOW_CAMPAIGN_2026-08-15.md	WORKFLOW_CAMPAIGN_2026-08	15	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	12483	2026-08-15 11:02	9f3f5301a58485c12c3736c8760091ec8b38517f
+docs/fix_2026-08/gate_fix.md	gate_fix	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	5710	2026-08-11 14:56	2c5497dc65f14060cc599881c5861d07c10f5cb0
+docs/fix_2026-08/gate_ui.md	gate_ui	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	1528	2026-08-11 14:56	55d8df1d6b327d267da3199866d6e155c901d41a
+docs/fix_2026-08/guard_dead_methods_baseline.txt	guard_dead_methods_baseline	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	1936	2026-08-12 21:51	73b71010dcc08303be9c5ca804c29fba5c456f77
+docs/fix_2026-08/inj0219_closure.md	inj0219_closure	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	15032	2026-08-11 14:56	dec5a066250d8e01b4b23f5fb009f7a624d6528f
+docs/fix_2026-08/master_register.tsv	master_register	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	1669753	2026-08-11 14:56	2f7a09838d11da760a8b0ea1066079eb5590b08b
+docs/fix_2026-08/od19_status.md	od19_status	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	3970	2026-08-11 14:56	0ab8ae9e00e6b37c8e06f9bf44b295ce69dd52f6
+docs/fix_2026-08/sod_precision.md	sod_precision	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	1948	2026-08-11 14:56	03c237d3c919439757d140aa36fd93edbe3fd2cb
+docs/fix_2026-08/wf_rules_status.md	wf_rules_status	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	5877	2026-08-11 14:56	cd2e0f2ffa749a66c14ddd2560c0bfa6b28c5fc6
+docs/fix_2026-08/تصحيح المستندات 1.pdf	تصحيح المستندات 1	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	189942	2026-08-12 21:24	551891076b36e31aa571b1aa1d03c4147e7a7aeb
+docs/fix_progress/BINDINGS.md	BINDINGS	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	120568	2026-08-12 20:36	5978476f4d538fd507f7db30d0e698441f476a8e
+docs/fix_progress/CLOSURE_RATIONALE.md	CLOSURE_RATIONALE	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	30907	2026-08-13 01:03	481923338b7d3c54fa23cc87d87965bc9fe18c2e
+docs/fix_progress/FIX_rules_register.tsv	FIX_rules_register	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	181452	2026-08-13 11:32	88bef1cfe37d30c92f09014cd04779e70efbf18e
+docs/fix_progress/INJ_findings_state.tsv	INJ_findings_state	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	30284	2026-08-15 15:45	7c8b5e0d917c5fd5fef175a5d46bfd62ed847c51
+docs/fix_progress/OPEN_DECISIONS.md	OPEN_DECISIONS	0	تحتاج قرارًا	3	بنود تنتظر توقيع المالك	5201	2026-08-15 01:23	017a62d49f3ffeda63ad182f40cd862f65208d7e
+docs/fix_progress/OWNER_DECISIONS_DATA.md	OWNER_DECISIONS_DATA	0	تحتاج قرارًا	3	بنود تنتظر توقيع المالك	10935	2026-08-15 15:46	a4ebdbe7c31fff88d787df7d0a0bdeec7f66a09d
+docs/fix_progress/OWNER_DECISIONS_DUP.md	OWNER_DECISIONS_DUP	0	تحتاج قرارًا	3	بنود تنتظر توقيع المالك	9838	2026-08-15 07:22	df3e1b26f22f4d8414d6a4411b62d2bf9600ea1f
+docs/fix_progress/OWNER_DECISIONS_WORKFLOW.md	OWNER_DECISIONS_WORKFLOW	0	تحتاج قرارًا	3	بنود تنتظر توقيع المالك	8292	2026-08-15 11:00	e1095e9f8e795db2b418e0cc056f6ed8b0f845c4
+docs/fix_progress/canonical_map_scan.json	canonical_map_scan	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	12192	2026-08-15 11:49	660ff368af217294cf79e0983dac7578c61cd779
+docs/fix_progress/covered_screen_map.tsv	covered_screen_map	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	7998	2026-08-13 04:00	3774732b74ddd4b66cc900222940bd6571754ba9
+docs/fix_progress/data_mismatch_scope.json	data_mismatch_scope	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	17980	2026-08-15 11:22	b72400fce1dc446853fd9c0aaaa5f63ab53ad5e0
+docs/fix_progress/dual_store_measure.json	dual_store_measure	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	48456	2026-08-15 13:53	577d5547f7d7591111b77c15e5eed8f3bdbe5c79
+docs/fix_progress/dual_store_measure.md	dual_store_measure	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	2528	2026-08-15 13:53	15ec5d130ab16e33ed170acb782671eeb7bb197e
+docs/fix_progress/enum_in_scan.json	enum_in_scan	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	4396	2026-08-15 11:26	f086d33815ef0fff52f04f1364b1b241b69f016c
+docs/fix_progress/screen_columns_scan.json	screen_columns_scan	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	47	2026-08-15 12:24	30b5119f61e6354f285652572a11ecfc8a7155ec
+docs/fix_progress/ui_optout_map.tsv	ui_optout_map	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	7505	2026-08-13 09:05	dcc5f13b1fa40d3f8e2650122c4751623491de54
+docs/fix_progress/workflow_scope.json	workflow_scope	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	9686	2026-08-15 09:26	897fface9e61a0dda471b4a3cd528f6c8392b1a2
+docs/nav01/NAV-D1_inventory.csv	NAV-D1_inventory	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	95054	2026-08-02 01:21	d0dbdca2ac28bc9a6ffe26019e8b42b1ca60c3a2
+docs/nav01/NAV-D2_matrix_summary_ar.md	NAV-D2_matrix_summary_ar	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	746	2026-08-02 01:21	58508a0794443f9b04854735ba2645d06e0d1e1f
+docs/nav01/NAV-D2_migration_matrix.csv	NAV-D2_migration_matrix	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	136552	2026-08-02 01:21	625e823616eb3cb867b1027db35bc46788f9d53f
+docs/nav01/NAV-D3_site_roles_merge_ar.md	NAV-D3_site_roles_merge_ar	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	3216	2026-08-02 01:21	26a80e2ef5d6f4438aa56cad2f63d6e7c8c4c20a
+docs/nav01/NAV-D6_seven_guard_report.txt	NAV-D6_seven_guard_report	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	7411	2026-08-02 01:21	400063ee540a0e2e864ea0dc8d050d2b7d9f58e0
+docs/nav02/PENDING_MERGES.md	PENDING_MERGES	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	1671	2026-08-02 20:21	cd8ca7525f9b7ce3956efd2cf8d5dde22739424f
+docs/nav02/matrix_delta.csv	matrix_delta	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	40188	2026-08-02 20:21	cca14d643207ad814379fe78891d415d3840bb5a
+docs/nav07/target_delta.csv	target_delta	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	42860	2026-08-02 20:21	a8be0c1874e708153757bd66c5850d0f36ee1bc3
+docs/nfr/N-25_timezone_report_ar.md	N-25_timezone_report_ar	0	متخصصة نافذة	4	وثائق NFR	2981	2026-08-02 01:21	714272b7850a637e72516a52eb0d90b93c6d5228
+docs/nfr/N-25_utc_migration_plan_ar.md	N-25_utc_migration_plan_ar	0	متخصصة نافذة	4	وثائق NFR	2167	2026-08-02 01:21	15dfc326a93771eed0956ff46a127ec4c6bd0934
+docs/nfr/N-26_infra_readiness_ar.md	N-26_infra_readiness_ar	0	متخصصة نافذة	4	وثائق NFR	4139	2026-08-02 05:32	fee4910b6566343ab7aaccb63cc55ddddff24389
+docs/owf01/OWF01_register.tsv	OWF01_register	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	92253	2026-08-12 16:35	22f259fa8c8e47d4cc8853ea70cfbc61eb31e0dc
+docs/renaming_20260724/VERIFICATION.md	VERIFICATION	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	4457	2026-08-01 20:13	0f2c63af45ee9ce9cdd3d8fa80ef1e6db056dd6c
+docs/renaming_20260724/after_modules.tsv	after_modules	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	8896	2026-08-01 20:13	1c18c8515503c2baf870d2b48642288f82a8b38e
+docs/renaming_20260724/applied.sql	applied	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	10509	2026-08-01 20:13	84f825fbb5853645bcad35e8b396849b6572b115
+docs/renaming_20260724/before_modules.tsv	before_modules	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	9093	2026-08-01 20:13	98f4c7238b114aebca824d56262cebae5c0946d7
+docs/renaming_20260724/manifest.json	manifest	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	41741	2026-08-01 20:13	f580ca599f6d1a4db5b9d506e7f181068a793d92
+docs/renaming_20260724/rollback.sql	rollback	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	10366	2026-08-01 20:13	fe9ce8a9dacd1fea368a85917c3183325748e6c9
+docs/reports/CONTAINER_GATE_WEEK_20260730.md	CONTAINER_GATE_WEEK_20260730	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	827	2026-08-01 20:13	6eecdf13f03373cb7da0223e5c67f90ed91914fd
+docs/reports/CONTAINER_GATE_WEEK_20260801.md	CONTAINER_GATE_WEEK_20260801	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	827	2026-08-01 20:13	b9c45dcf1fb2b24522f1a0cb21081820b62ece02
+docs/reports/CONTAINER_GATE_WEEK_20260812.md	CONTAINER_GATE_WEEK_20260812	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	930	2026-08-12 20:55	80bec746ab38aee096bbf55202d1da0108ac437d
+docs/reports/CONTAINER_GATE_WEEK_20260813.md	CONTAINER_GATE_WEEK_20260813	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	930	2026-08-13 00:21	0a3fa45a08679f272c368123121224373c289081
+docs/reports/DOC_EXPIRY_RECONCILIATION_20260730.md	DOC_EXPIRY_RECONCILIATION_20260730	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	8065	2026-08-01 20:13	3327100f950b07540d30b8029cc4f41eb910dfda
+docs/reports/FIX_PROGRESS.md	FIX_PROGRESS	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	1424	2026-08-13 11:32	2bfd718fd1ec5a6d9288f7a62a62acb2aa2cfc89
+docs/reports/H-07_SUPPLIER_CONTRACT_MIGRATION_20260730.md	H-07_SUPPLIER_CONTRACT_MIGRATION_20260730	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	7119	2026-08-01 20:13	fb81afa996ba6e9fb14a3cd75850394b7b8ef952
+docs/reports/H-08_1_MIGRATION_RECONCILIATION_20260730.md	H-08_1_MIGRATION_RECONCILIATION_20260730	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	4460	2026-08-01 20:13	4801e628ee53415909b4b2998bffd19ff70af8c6
+docs/reports/M-09_PRICE_TERMS_20260730.md	M-09_PRICE_TERMS_20260730	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	5449	2026-08-01 20:13	0ae210c2b72e45ed3d29d133c8ff8af8779b77b5
+docs/reports/M-25_METER_READINGS_20260730.md	M-25_METER_READINGS_20260730	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	6919	2026-08-01 20:13	3de63e40d6476795ef5f1db372d1e53b10826577
+docs/reports/N-01_IDEMPOTENCY_MATRIX.md	N-01_IDEMPOTENCY_MATRIX	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	5146	2026-08-01 20:13	5c660cee387f6b945064d0a4ed62eb3b5045fc08
+docs/reports/WAVE1_CLOSURE_20260730.md	WAVE1_CLOSURE_20260730	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	3317	2026-08-01 20:13	344bc0d85809f47b33c9848dd3ca838d3b4588aa
+docs/reports/WAVE2_CLOSURE_20260730.md	WAVE2_CLOSURE_20260730	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	6399	2026-08-01 20:13	7bcf1a58bab3f7b31146359135c8c1f98dc38853
+docs/reports/WAVE3B_CLOSURE_20260801.md	WAVE3B_CLOSURE_20260801	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	9349	2026-08-01 20:13	85b09c26b6a88f667f68b08218213ae8c529c5bf
+docs/reports/WAVE3_CLOSURE_20260731.md	WAVE3_CLOSURE_20260731	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	6203	2026-08-01 20:13	d75b0aba72c84901019260e672c0feafd00eb381
+docs/reports/WAVE4_CLOSURE_20260801.md	WAVE4_CLOSURE_20260801	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	6626	2026-08-01 20:13	fdd52e9c02e3c00c949c9b745736fe13ae9962f5
+docs/reports/dec_M30_depreciation_catchup.md	dec_M30_depreciation_catchup	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	3625	2026-08-01 20:13	6bbad28cd19deb7aa7f2412766f03d6388fa9b9e
+docs/reports/dec_M41_periodic_backlog.md	dec_M41_periodic_backlog	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	2933	2026-08-01 20:13	fc2a19234fb777b69a3e3b06e75ad987035b2b25
+docs/reports/e15_dead_link_check.md	e15_dead_link_check	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	1746	2026-08-01 20:13	60bded662a7e427736702fcc0c30caec97d771ed
+docs/reports/layer_3_signoff.md	layer_3_signoff	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	4242	2026-08-01 20:13	fdc897ad92399d777de95059bf8789855e74078c
+docs/reports/layer_4_signoff.md	layer_4_signoff	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	3250	2026-08-01 20:13	38f70908958fcc19d930c69b8a44d51bddbcd18e
+docs/reports/layer_5_signoff.md	layer_5_signoff	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	3936	2026-08-01 20:13	042a271b9e05667a3bda3c9c61c84f194e3efd61
+docs/reports/m30_test_isolation_incident_20260731.md	m30_test_isolation_incident_20260731	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	4046	2026-08-01 20:13	6cc0ecf67abd57f8f995363b94f6175b5856e698
+docs/reports/m31_taxonomy_reconciliation.md	m31_taxonomy_reconciliation	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	2422	2026-08-01 20:13	a3682586db8339ce961c5cd4206e96187ee08df8
+docs/reports/p01_hierarchy_relink_20260801.md	p01_hierarchy_relink_20260801	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	5160	2026-08-01 20:13	4312bf34468892da78162a5d01031e17edaaf0bb
+docs/reports/p04_resource_backfill_plan_20260801.md	p04_resource_backfill_plan_20260801	0	سجل تنفيذ حي	7	قياسات ومحاضر تنفيذ — دليل لا مواصفة	5710	2026-08-01 20:13	702ff328d5c864d320307d3e13597755db1890fd
+docs/sec01/SEC-D1_dictionary_draft_ar.md	SEC-D1_dictionary_draft_ar	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	6468	2026-08-13 00:19	872dc780b536673298acf1a2f35f2d6c5fd7ac0e
+docs/sec01/SEC-D2_matrix_208x25.csv	SEC-D2_matrix_208x25	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	2409850	2026-08-13 00:19	bac0709b66d8a2569f51b2daf337a2a6f6422c06
+docs/sec01/SEC-D2_matrix_summary_ar.md	SEC-D2_matrix_summary_ar	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	1230	2026-08-13 00:19	682bd4f9ff13ccfe4ec9de2e9e99e48a5fc4183c
+docs/sec01/SEC-D3_roles_map_ar.md	SEC-D3_roles_map_ar	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	5864	2026-08-13 00:19	20a3b35a2d9a625523a7424c027f96427022dc11
+docs/sec01/SEC-D4_sources_17_ar.md	SEC-D4_sources_17_ar	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	3242	2026-08-13 00:19	1b141dd3bec11253a581c3be631c59f1397f9748
+docs/sec01/SEC-D5_screens_reconciliation.csv	SEC-D5_screens_reconciliation	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	44219	2026-08-13 00:19	ebb9a8c38950d942007e264ba8140b1206df66f1
+docs/sec01/SEC-D5_screens_reconciliation_ar.md	SEC-D5_screens_reconciliation_ar	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	1075	2026-08-13 00:19	c89b1972cea2901dd64105755e5bd4d23a686529
+docs/sec01/SEC-D6_four_sources_review_ar.md	SEC-D6_four_sources_review_ar	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	3519	2026-08-02 01:21	506b50b8fb00b3d9e829e66cef833d6190be5c7f
+docs/sources/ACT-01.docx	ACT	1	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	34595	2026-08-02 20:21	f4ceaf6c772aae54ade2aa6bf62b06b4f3ff4b18
+docs/sources/CAP-01.extracted.md	CAP-01.extracted	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	65596	2026-08-02 05:32	58d0cd3c8eed316ddc29ee11c907b7d9c86aa577
+docs/sources/DEC-01.docx	DEC	1	قرار مالك نافذ	3	وثيقة قرارات مالك	24440	2026-08-02 01:21	013ae7a2487c74e057274c1254b07a98ae952851
+docs/sources/DEC-01.extracted.md	DEC-01.extracted	0	قرار مالك نافذ	3	وثيقة قرارات مالك	19254	2026-08-02 01:21	5127223b3040101df47c1dbe4792f51fd04bef16
+docs/sources/NAV-01.DIFF_REPORT.md	NAV-01.DIFF_REPORT	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	1301	2026-08-02 01:21	c6d336393b343657c58f16aa676751ee99e891a3
+docs/sources/NAV-01.corrected.md	NAV-01.corrected	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	49693	2026-08-02 01:21	2d4535a5451b1ca07b3ec81cfc4378bc81d9dbcd
+docs/sources/NAV-01.docx	NAV	1	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	45352	2026-08-02 20:21	311b95296125d93e324101c57fadfef3e5c85ab6
+docs/sources/NAV-01.extracted.md	NAV-01.extracted	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	49227	2026-08-02 01:21	04f44482ddbfb792816cd4c90728f6a858d372f3
+docs/sources/NAV-01_v2.docx	NAV-01_v2	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	37507	2026-08-02 20:21	4c73c49f73504c6dd416d64f9a701f0b703408f9
+docs/sources/NAV-02.docx	NAV	2	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	49877	2026-08-02 20:21	5974049770e67a51c57eae908ea4b8df6c13449b
+docs/sources/NAV-02_matrix.xlsx	NAV-02_matrix	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	40073	2026-08-02 20:21	fb1e64c01e4f303fadaa4cdd7029fa6c47f36206
+docs/sources/ORG-01.docx	ORG	1	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	39900	2026-08-02 20:21	613f6d2b80af444d41460a6e72f99dbbe7100c2d
+docs/sources/ORG-01.extracted.md	ORG-01.extracted	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	37353	2026-08-02 01:21	4ad68c6a1e9804bbfdd62e499b9933e4d9871f64
+docs/sources/PLAN-05.docx	PLAN	5	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	48539	2026-08-02 01:21	890adaf86f77d90a511ae22b882321f399556ed9
+docs/sources/PLAN-05.extracted.md	PLAN-05.extracted	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	54808	2026-08-02 01:21	a350e0f56c94137e10da2e351caf416b61d978ba
+docs/sources/SEC-01.DIFF_REPORT.md	SEC-01.DIFF_REPORT	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	2819	2026-08-02 01:21	1fc54dfebf6b6e22324fc821903473bdd8b72926
+docs/sources/SEC-01.corrected.md	SEC-01.corrected	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	81761	2026-08-02 01:21	021019759b8b609b356aa6a8ce8a483c757b8085
+docs/sources/SEC-01.docx	SEC	1	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	69677	2026-08-02 01:21	d284f64e544d63bdd12c80d5e3529f98a1e8f065
+docs/sources/SEC-01.extracted.md	SEC-01.extracted	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	81786	2026-08-02 01:21	8bd2555bf6bb3c91a8bc1dd947c1c9d92ec7ad04
+docs/sources/SYSTEM_TEST_REQUEST.docx	SYSTEM_TEST_REQUEST	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	51265	2026-08-02 01:21	72a7c6407941ad14313c9c6798c675117d92ca3f
+docs/sources/SYSTEM_TEST_REQUEST.extracted.md	SYSTEM_TEST_REQUEST.extracted	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	27997	2026-08-02 01:21	6814ce878b72b52ce235f4b461c14cb144eccb2f
+docs/sources/TARGET_ORDER.xlsx	TARGET_ORDER	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	392932	2026-08-02 20:21	d533f7b9e949ee51ba52e399e3d39e93d3999a39
+docs/sources/TKT-01.DIFF_REPORT.md	TKT-01.DIFF_REPORT	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	2583	2026-08-02 01:21	7948c67c7f0a674d5229bb0c9646a6334e79ef9c
+docs/sources/TKT-01.corrected.md	TKT-01.corrected	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	45745	2026-08-02 01:21	881bcd98859daf2a6353f9397084709cf0fb3104
+docs/sources/TKT-01.docx	TKT	1	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	44380	2026-08-02 01:21	8eff5189b356ea4633ceeb2f9b96c49ff646dc73
+docs/sources/TKT-01.extracted.md	TKT-01.extracted	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	45743	2026-08-02 01:21	974472a79be3d9b3181069fd9695dce5cfd6f9b4
+docs/sources/UAT-01.DIFF_REPORT.md	UAT-01.DIFF_REPORT	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	4710	2026-08-02 01:21	97713a28c10c65bd434407fbc52ca784edbcc3cb
+docs/sources/UAT-01.corrected.md	UAT-01.corrected	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	35647	2026-08-02 01:21	877797b41ab93068785e7d6806d07b58d67d56b5
+docs/sources/UAT-01.docx	UAT	1	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	35302	2026-08-02 01:21	9f5a3ffb99e9ecfcf39714a6b70f2c6197197673
+docs/sources/UAT-01.extracted.md	UAT-01.extracted	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	35624	2026-08-02 01:21	66c54788fafe4537f5b44075487813c5b9f5230b
+docs/sources/UAT-01_APPENDIX12.DIFF_REPORT.md	UAT-01_APPENDIX12.DIFF_REPORT	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	1422	2026-08-02 01:21	82ee21569a0195e39c1ce2f61bc4c84eb6a18672
+docs/sources/UAT-01_APPENDIX12.corrected.md	UAT-01_APPENDIX12.corrected	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	17867	2026-08-02 01:21	9efa4589e917bc9299e8d108f32896d8ae17f23b
+docs/sources/UAT-01_APPENDIX12.docx	UAT-01_APPENDIX12	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	22921	2026-08-02 01:21	7220581ddbe790395d2d107688f197026519a642
+docs/sources/UAT-01_APPENDIX12.extracted.md	UAT-01_APPENDIX12.extracted	0	تاريخية	9	مستخلصات وأدلة عمل لمراحل منتهية	17849	2026-08-02 01:21	37857b7006348fddf8981ceed8e600901bdff21f
+docs/specs/E-24_pay_policy_state.md	E-24_pay_policy_state	0	متخصصة نافذة	4	مواصفات وحدات H/E	6756	2026-08-01 20:13	b7f8a052fff395c591461484af7542223cfda2fd
+docs/specs/H-01_3_pilot_gate.md	H-01_3_pilot_gate	0	متخصصة نافذة	4	مواصفات وحدات H/E	4902	2026-08-01 20:13	c52a4daab6569f47ad13bebdf5d5bc38486cb9b8
+docs/specs/H-03_daily_plan.md	H-03_daily_plan	0	متخصصة نافذة	4	مواصفات وحدات H/E	5742	2026-08-01 20:13	07501251df56107632ebd39a2fbf48b0f204382b
+docs/specs/H-04_rotation_swap.md	H-04_rotation_swap	0	متخصصة نافذة	4	مواصفات وحدات H/E	5574	2026-08-01 20:13	6edffdc784b2e9a80e5adfb1d45dd232b1fadb8e
+docs/specs/H-05_sites_entity.md	H-05_sites_entity	0	متخصصة نافذة	4	مواصفات وحدات H/E	5938	2026-08-01 20:13	31fa9eb568dea760eee2ee8c2094f52623e0d4ff
+docs/specs/H-07_supplier_contract_lines.md	H-07_supplier_contract_lines	0	متخصصة نافذة	4	مواصفات وحدات H/E	9170	2026-08-01 20:13	7f506de225fd3b7efffafdbc567caaee695dc473
+docs/specs/H-08_1_contract_registry_head.md	H-08_1_contract_registry_head	0	متخصصة نافذة	4	مواصفات وحدات H/E	11199	2026-08-01 20:13	5a58177db227a9cf1e3a7c7c0bac162b6a2139cc
+docs/specs/H-08_2_pay_components.md	H-08_2_pay_components	0	متخصصة نافذة	4	مواصفات وحدات H/E	4578	2026-08-01 20:13	cf8412013ac90b8f8e46ba520aa42386aeb695a5
+docs/specs/H-08_3_incentive_rules.md	H-08_3_incentive_rules	0	متخصصة نافذة	4	مواصفات وحدات H/E	4177	2026-08-01 20:13	32a1f8cca63fe1e994a9a1f5a0f3c01e715de8c5
+docs/specs/H-08_4_cost_bearers.md	H-08_4_cost_bearers	0	متخصصة نافذة	4	مواصفات وحدات H/E	3841	2026-08-01 20:13	30e31ac87ccbfba593603b5cd932626d46a1ffeb
+docs/specs/H-09_1_payroll_snapshot_gate.md	H-09_1_payroll_snapshot_gate	0	متخصصة نافذة	4	مواصفات وحدات H/E	5302	2026-08-01 20:13	63912a41eb6ff3aed05f8c75c2cd51312bee50cf
+docs/specs/H-09_2_time_path.md	H-09_2_time_path	0	متخصصة نافذة	4	مواصفات وحدات H/E	5971	2026-08-01 20:13	1942c264ff966ae93f81e05d6da4c0003048277b
+docs/specs/H-09_3_production_path.md	H-09_3_production_path	0	متخصصة نافذة	4	مواصفات وحدات H/E	5976	2026-08-01 20:13	c550606e487f3b6cb7360323acc223f8e9b7d8aa
+docs/specs/H-09_4_advances_offset.md	H-09_4_advances_offset	0	متخصصة نافذة	4	مواصفات وحدات H/E	6582	2026-08-01 20:13	fe8adb16966a20b7aa963db06b532833e4fe1913
+docs/specs/H-09_5_run_cycle.md	H-09_5_run_cycle	0	متخصصة نافذة	4	مواصفات وحدات H/E	5768	2026-08-01 20:13	c175955c03f8ee0d900bf350228b9d7aca5efad7
+docs/specs/H-10_employee_contract_amendments.md	H-10_employee_contract_amendments	0	متخصصة نافذة	4	مواصفات وحدات H/E	5577	2026-08-01 20:13	eaf9cf4a8dfa98b6af3d96d8b9cbf07cd7da1b60
+docs/specs/H-11_contract_snapshots.md	H-11_contract_snapshots	0	متخصصة نافذة	4	مواصفات وحدات H/E	5062	2026-08-01 20:13	50d28b0eebd29e091478a2714939cec4fce814ee
+docs/specs/H-12_fes_event_contract.md	H-12_fes_event_contract	0	متخصصة نافذة	4	مواصفات وحدات H/E	6180	2026-08-01 20:13	08801cef1a2b179a4e246f11a8b842044694ca4e
+docs/specs/H-13_bank_reconciliation.md	H-13_bank_reconciliation	0	متخصصة نافذة	4	مواصفات وحدات H/E	6766	2026-08-01 20:13	3a1ea61a2b42887ebbf7991c564a23d9f52e75b4
+docs/specs/H-15_user_capacities.md	H-15_user_capacities	0	متخصصة نافذة	4	مواصفات وحدات H/E	4630	2026-08-01 20:13	60c7c7a6631e888fdf205f97fbd8ca13129e1535
+docs/specs/H-16_visibility_system.md	H-16_visibility_system	0	متخصصة نافذة	4	مواصفات وحدات H/E	3954	2026-08-01 20:13	fe95942082a585cad10d6445b43a810144bdcb7a
+docs/specs/H-18_personal_portal.md	H-18_personal_portal	0	متخصصة نافذة	4	مواصفات وحدات H/E	3508	2026-08-01 20:13	2c3d153f3ccfb76d99a983076f6100fe5a33445f
+docs/specs/H-19_workspaces.md	H-19_workspaces	0	متخصصة نافذة	4	مواصفات وحدات H/E	2291	2026-08-01 20:13	e42e209a498f48249159d840edffd474478d7c51
+docs/specs/H-20_supplier_portal_guard.md	H-20_supplier_portal_guard	0	متخصصة نافذة	4	مواصفات وحدات H/E	6194	2026-08-01 20:13	e8017be20022e6867b9bb12f0f8985a1eb3ef2b2
+docs/specs/H-21_supplier_rfq.md	H-21_supplier_rfq	0	متخصصة نافذة	4	مواصفات وحدات H/E	6332	2026-08-01 20:13	cf3ed79a3436bded98b75fd7f2751731edc30e25
+docs/specs/H-22_server_side_tables.md	H-22_server_side_tables	0	متخصصة نافذة	4	مواصفات وحدات H/E	4944	2026-08-01 20:13	d29a04783d5f32ec9392459c8175d6e0239348f4
+docs/specs/INVENTORY_WAVE123_ar.md	INVENTORY_WAVE123_ar	0	متخصصة نافذة	4	مواصفات وحدات H/E	17486	2026-08-01 20:13	25ddaf8b9a3a5399224dcfb44d618def3d45df2c
+docs/specs/M-03_tax_invoices.md	M-03_tax_invoices	0	متخصصة نافذة	4	مواصفات وحدات H/E	5446	2026-08-01 20:13	ec1f96cae7ddd9330119e7087944bbcdb24ec4f7
+docs/specs/M-04_client_statement.md	M-04_client_statement	0	متخصصة نافذة	4	مواصفات وحدات H/E	3713	2026-08-01 20:13	f76f587832fd15f9844e84f58bc1c7b986eedfc8
+docs/specs/M-05_collection_control.md	M-05_collection_control	0	متخصصة نافذة	4	مواصفات وحدات H/E	4518	2026-08-01 20:13	79d4aa22f088e84a84373e987062172014badc3c
+docs/specs/M-06_claim_disputes.md	M-06_claim_disputes	0	متخصصة نافذة	4	مواصفات وحدات H/E	4097	2026-08-01 20:13	1f4ba5ddffa2e9c069ca439c9e54756391db2161
+docs/specs/M-09_price_adjustment_terms.md	M-09_price_adjustment_terms	0	متخصصة نافذة	4	مواصفات وحدات H/E	7561	2026-08-01 20:13	f169481ee3e7db768d654a9506c6cec5ec03c265
+docs/specs/M-10_amendment_obligation_effects.md	M-10_amendment_obligation_effects	0	متخصصة نافذة	4	مواصفات وحدات H/E	5105	2026-08-01 20:13	b3bf23e983cee05ddd5e3b862a176c796eb1abd4
+docs/specs/M-12_supplier_advances.md	M-12_supplier_advances	0	متخصصة نافذة	4	مواصفات وحدات H/E	4975	2026-08-01 20:13	82d53e84e6d62a6fa510d272d769f9f6d5754045
+docs/specs/M-13_invoiced_closed.md	M-13_invoiced_closed	0	متخصصة نافذة	4	مواصفات وحدات H/E	4992	2026-08-01 20:13	69f236d6dde7452ccb956402b827a6a67441e6af
+docs/specs/M-14_supplier_statement.md	M-14_supplier_statement	0	متخصصة نافذة	4	مواصفات وحدات H/E	4698	2026-08-01 20:13	c46ff0fdf433b87219ee61adf7074d5f85c45aba
+docs/specs/M-15_supplier_rules.md	M-15_supplier_rules	0	متخصصة نافذة	4	مواصفات وحدات H/E	5059	2026-08-01 20:13	085ad95da6bd70b2f9ee39eb50024063f38f594e
+docs/specs/M-16_supplier_capacity.md	M-16_supplier_capacity	0	متخصصة نافذة	4	مواصفات وحدات H/E	8105	2026-08-01 20:13	e659ebf2fd749425777f99201a5a594d9f266697
+docs/specs/M-17_supplier_evaluation.md	M-17_supplier_evaluation	0	متخصصة نافذة	4	مواصفات وحدات H/E	6211	2026-08-01 20:13	7cf4e9b344f469448c1f812258809e225eb01d2c
+docs/specs/M-18_supplier_closure.md	M-18_supplier_closure	0	متخصصة نافذة	4	مواصفات وحدات H/E	4938	2026-08-01 20:13	0807d4904aeaadd2a2c898f34fb5ff7dfd992103
+docs/specs/M-19_supplier_documents.md	M-19_supplier_documents	0	متخصصة نافذة	4	مواصفات وحدات H/E	4880	2026-08-01 20:13	ce1fd1fe2b660ff425753f4838d4543303b49b33
+docs/specs/M-22_final_settlement.md	M-22_final_settlement	0	متخصصة نافذة	4	مواصفات وحدات H/E	8815	2026-08-01 20:13	1626ffbdf6099acb43f42a2a381a65f6f9bd39a2
+docs/specs/M-25_meter_readings.md	M-25_meter_readings	0	متخصصة نافذة	4	مواصفات وحدات H/E	8545	2026-08-01 20:13	4ba5f4af5ca4fee6d5b2b1ccf0282f6d4800e835
+docs/specs/M-30_depreciation_event.md	M-30_depreciation_event	0	متخصصة نافذة	4	مواصفات وحدات H/E	6185	2026-08-01 20:13	33fa7db8c6ba6b815b90c0d38e67ea705a533561
+docs/specs/M-38_journal_head_columns.md	M-38_journal_head_columns	0	متخصصة نافذة	4	مواصفات وحدات H/E	5690	2026-08-01 20:13	5079dda7d44d8e459a2182f2289f616d19921faa
+docs/specs/M-41_periodic_events.md	M-41_periodic_events	0	متخصصة نافذة	4	مواصفات وحدات H/E	7029	2026-08-01 20:13	a85cf43e5ba3c699895a5e195f4eb9c89a3e16ba
+docs/specs/M-52_transfer_tariff.md	M-52_transfer_tariff	0	متخصصة نافذة	4	مواصفات وحدات H/E	8147	2026-08-01 20:13	d59bb3c04bfb4eeb8727359193d133d62bdd59fb
+docs/specs/N-04_MIGRATION_ROLLBACK_PLAN_ar.md	N-04_MIGRATION_ROLLBACK_PLAN_ar	0	متخصصة نافذة	4	مواصفات وحدات H/E	7607	2026-08-01 20:13	9de21faf54c6270b1722bce0b9fc88245114659d
+docs/specs/N-05_rotation_autotransfer.md	N-05_rotation_autotransfer	0	متخصصة نافذة	4	مواصفات وحدات H/E	2875	2026-08-01 20:13	79ff6e19d25699f49545039fbbe3d469947bf3b6
+docs/specs/ORG01_wave1_structure.md	ORG01_wave1_structure	0	متخصصة نافذة	4	مواصفات وحدات H/E	2846	2026-08-02 01:21	fd07a4ab111b2137794433641432bf8b0004855e
+docs/specs/ORG01_wave2_authority.md	ORG01_wave2_authority	0	متخصصة نافذة	4	مواصفات وحدات H/E	2687	2026-08-02 01:21	2cc78ad79b6445dcd0f008be59915379ee521638
+docs/specs/ORG01_wave34_permits_screens.md	ORG01_wave34_permits_screens	0	متخصصة نافذة	4	مواصفات وحدات H/E	2742	2026-08-02 01:21	56ddff3721967541296026aa08ca769229cff91f
+docs/specs/P-01_contract_operational_sites.md	P-01_contract_operational_sites	0	متخصصة نافذة	4	مواصفات وحدات H/E	6605	2026-08-01 20:13	8e8f22a8908ae0b8cacd67087a3bd68d7f6621a0
+docs/specs/P-02_client_contract_lines.md	P-02_client_contract_lines	0	متخصصة نافذة	4	مواصفات وحدات H/E	6406	2026-08-01 20:13	148908f88ac68c5596efed92ed45d1170ffc3394
+docs/specs/P-03_contract_monthly_plan.md	P-03_contract_monthly_plan	0	متخصصة نافذة	4	مواصفات وحدات H/E	5462	2026-08-01 20:13	e2a80f5b7d4ddab63c6cd01cb0a354bb35ae8e7d
+docs/specs/P-04_contract_resource_plan.md	P-04_contract_resource_plan	0	متخصصة نافذة	4	مواصفات وحدات H/E	7793	2026-08-01 20:13	9d1c8a30a4586ec2523d3be6b430775175d9e1f2
+docs/specs/P-05_contract_payment_schedule.md	P-05_contract_payment_schedule	0	متخصصة نافذة	4	مواصفات وحدات H/E	8764	2026-08-01 20:13	d4b03b0b99a34046a2ef7b408ecea63380df313e
+docs/specs/P-06_contract_guarantees.md	P-06_contract_guarantees	0	متخصصة نافذة	4	مواصفات وحدات H/E	7125	2026-08-01 20:13	bc80a9b86e9de079d08713465122b86777a94a8f
+docs/specs/P-07_allocation_targets.md	P-07_allocation_targets	0	متخصصة نافذة	4	مواصفات وحدات H/E	6346	2026-08-01 20:13	65729b1a2c48c5632f1f3639e8c9e2d16fb8c86c
+docs/specs/P-08_three_currencies.md	P-08_three_currencies	0	متخصصة نافذة	4	مواصفات وحدات H/E	6682	2026-08-01 20:13	0dae8cd112f17a57e0efc38b59c6228692169e01
+docs/specs/P-09_plan_actual_keys.md	P-09_plan_actual_keys	0	متخصصة نافذة	4	مواصفات وحدات H/E	5914	2026-08-01 20:13	d4338e9fb081e2bea70b4fa0d9e737e3d408621b
+docs/specs/P-10_contract_baseline.md	P-10_contract_baseline	0	متخصصة نافذة	4	مواصفات وحدات H/E	6214	2026-08-01 20:13	006d83f49d0b796a9d0c71423f45a1af5d33fa84
+docs/specs/P-11_lifecycle_economics.md	P-11_lifecycle_economics	0	متخصصة نافذة	4	مواصفات وحدات H/E	6716	2026-08-01 20:13	12a3fe4d55d3d39b10ff093cc8e2b2129340a536
+docs/specs/P-12_commercial_board.md	P-12_commercial_board	0	متخصصة نافذة	4	مواصفات وحدات H/E	5874	2026-08-01 20:13	d526222fbe5eba006ef48eb146f444de9e409c2c
+docs/specs/PLAN03_NAME_MAP.md	PLAN03_NAME_MAP	0	متخصصة نافذة	4	مواصفات وحدات H/E	4401	2026-08-01 20:13	98ab33907a69f4424157fadc5c28a201f4b59709
+docs/specs/SEC01_gate2_summary.md	SEC01_gate2_summary	0	متخصصة نافذة	4	مواصفات وحدات H/E	2859	2026-08-02 01:21	3ed3401770e2b8135a07b844d1229e656b474801
+docs/specs/SPEC00_INVENTORY_TEMPLATE_ar.md	SPEC00_INVENTORY_TEMPLATE_ar	0	متخصصة نافذة	4	مواصفات وحدات H/E	7264	2026-08-01 20:13	368f374633add10c0df896f3a370fff62fcf79b2
+docs/specs/SPEC_CAP_W5_OUTBOX_EVENTS_ar.md	SPEC_CAP_W5_OUTBOX_EVENTS_ar	0	متخصصة نافذة	4	مواصفات وحدات H/E	3877	2026-08-02 05:32	213545c25efe75c5a6349a84e27ef473fcf8dc84
+docs/specs/SPEC_TIMESHEET_CYCLE_ar.md	SPEC_TIMESHEET_CYCLE_ar	0	متخصصة نافذة	4	مواصفات وحدات H/E	28001	2026-08-11 14:56	d8fd12bd57a74c3bf4aacab7c6bb0da7b852f628
+docs/uat/UAT_CAP01_SCENARIOS_C22_C33_ar.md	UAT_CAP01_SCENARIOS_C22_C33_ar	0	متخصصة نافذة	4	خطط ومحاضر UAT	6333	2026-08-02 05:32	0e0e62f6163190f4b52731eec2e382ba2ac0b2bf
+docs/uat/UAT_DATA_POPULATION_MANIFEST_ar.md	UAT_DATA_POPULATION_MANIFEST_ar	0	متخصصة نافذة	4	خطط ومحاضر UAT	15998	2026-08-12 17:57	4a92006b697ac7a05f70eaaaa739a67bea5fd896
+docs/uat/UAT_DEFECT_LOG_ar.md	UAT_DEFECT_LOG_ar	0	متخصصة نافذة	4	خطط ومحاضر UAT	8636	2026-08-02 20:21	3ea7b0774c120efe4d7a077e73af129b674f9bdf
+docs/uat/UAT_OPERATIONAL_TRIAL_PLAN_ar.md	UAT_OPERATIONAL_TRIAL_PLAN_ar	0	متخصصة نافذة	4	خطط ومحاضر UAT	42124	2026-08-02 20:21	97dc31a32608750e8df41c935555a59155196e3b
+docs/uat/UAT_data_plan_ar.md	UAT_data_plan_ar	0	متخصصة نافذة	4	خطط ومحاضر UAT	3019	2026-08-02 01:21	41ad656a55c52f8c794cbc30d96ff8dc88f5c468
+docs/uat/UAT_decision_report_ar.md	UAT_decision_report_ar	0	متخصصة نافذة	4	خطط ومحاضر UAT	4033	2026-08-02 01:21	f0da4ae4a9d4b77deb5de3d082aa1451aaf38ca4
+docs/uat/UAT_hardening_report_ar.md	UAT_hardening_report_ar	0	متخصصة نافذة	4	خطط ومحاضر UAT	2169	2026-08-13 00:28	a791c4d7c3211975afa722579db0fa05ae49a1c9
+docs/update0001/00 المرجع الجامع — نظام إنجاز-2.docx	00 المرجع الجامع — نظام إنجاز	2	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	456897	2026-08-01 20:13	387021da7ab8154d5f81d0869f155028be7ac121
+docs/update0001/ADM-01 إدارة ظهور البوابة.docx	ADM-01 إدارة ظهور البوابة	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	18745	2026-08-01 20:13	faaaf8f103db8d24bdcfad55248aa690e0132b5c
+docs/update0001/CON-01 عقود الموظفين.docx	CON-01 عقود الموظفين	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	26652	2026-08-01 20:13	0fb13eeaa8c7bf1afb0b3f161af8db68c6eac34b
+docs/update0001/CON-02 عقود العملاء.docx	CON-02 عقود العملاء	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	24917	2026-08-01 20:13	f0387805ff59ab5e8ed96ccd959084664fadb044
+docs/update0001/CON-03 عقود الموردين.docx	CON-03 عقود الموردين	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	22229	2026-08-01 20:13	4fa38168e5533fae4d1a1a59388703805cd14761
+docs/update0001/ENT-01 استحقاقات الموظفين.docx	ENT-01 استحقاقات الموظفين	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	23887	2026-08-01 20:13	33b0e5b02f5df92f8cde46b212eeb6ac377c6e1e
+docs/update0001/ENT-02 استحقاقات الموردين.docx	ENT-02 استحقاقات الموردين	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	22915	2026-08-01 20:13	458eba37e0029b1102a885fa09e3a1b39b506cfa
+docs/update0001/ENT-03 إيرادات العملاء.docx	ENT-03 إيرادات العملاء	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	23605	2026-08-01 20:13	a4edefe17de1dbbefdb723465b43ea189798c391
+docs/update0001/FES-01 معيار الحدث المالي-4.docx	FES-01 معيار الحدث المالي	4	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	41535	2026-08-01 20:13	b1c44f2dd288156f5cf093a3087e080ea0a0ba9c
+docs/update0001/PLAN-01 خطة التنفيذ بالأولوية المعمارية-2.docx	PLAN-01 خطة التنفيذ بالأولوية المعمارية	2	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	45042	2026-08-01 20:13	b230788d60e627811a1e244794be6fbd6f90a87e
+docs/update0001/PLAN-03 خط الأساس التجاري وتصحيح الهرم التعاقدي.docx	PLAN-03 خط الأساس التجاري وتصحيح الهرم التعاقدي	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	36906	2026-08-01 20:13	fe3095a86c132abcf7eafb9b804598d064ca20dc
+docs/update0001/SPEC-00 دليل الجرد والقالب.docx	SPEC-00 دليل الجرد والقالب	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	17559	2026-08-01 20:13	b1de8d8b86d1a25a688330103523e9b3b474f033
+docs/update0001/SPEC-01 مواصفات المالية-5.docx	SPEC-01 مواصفات المالية	5	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	43325	2026-08-01 20:13	f6dda71a795290f9b1b1a184e241611e75bba977
+docs/update0001/SPEC-03 مواصفات التشغيل.docx	SPEC-03 مواصفات التشغيل	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	19582	2026-08-01 20:13	a8a22e58a30962a524737e02f7f1150d8a0bb8bf
+docs/update0001/SPEC-04 مواصفات الصيانة.docx	SPEC-04 مواصفات الصيانة	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	17441	2026-08-01 20:13	a348f53ef3d292b0dd5a68c59ae722e79a42286e
+docs/update0001/UI-01 معيار الشاشات.docx	UI-01 معيار الشاشات	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	21192	2026-08-01 20:13	31bde8b76ec0a86d930c8eca1c4a62815dcf214d
+docs/update0001/USR-01 بوابة المستخدم الموحدة-1.docx	USR-01 بوابة المستخدم الموحدة	1	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	32386	2026-08-01 20:13	248a00330dfe64f84db6e898215f128dbe5aa93f
+docs/update0001/UX-00 الدستور-5.docx	UX-00 الدستور	5	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	36235	2026-08-01 20:13	f19ea7f578c82ba8e41194b08c3b1d1734d12d91
+docs/update0001/UX-01 الدليل-5.docx	UX-01 الدليل	5	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	55865	2026-08-01 20:13	31e2031039c23d6978bb51621a9215dab059974b
+docs/update0001/UX-02 المالية-6.docx	UX-02 المالية	6	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	44796	2026-08-01 20:13	05f4c407cbfcb91b0dfbea25ed40271c9db16f73
+docs/update0001/UX-03 التشغيل-5.docx	UX-03 التشغيل	5	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	27967	2026-08-01 20:13	4a7a94499ac544bf1f5b282ef0451dcc1a174566
+docs/update0001/UX-04 الصيانة-2.docx	UX-04 الصيانة	2	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	21591	2026-08-01 20:13	4d079e32c76592dd4ab6bb2a20c9677fe139caa1
+docs/update0001/UX-05 الموردون-3.docx	UX-05 الموردون	3	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	29586	2026-08-01 20:13	caf19db2783a89be34bd166441af7e6273e07932
+docs/update0001/UX-06 القوى-2.docx	UX-06 القوى	2	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	22675	2026-08-01 20:13	7a17d42d9d29497896c38e98d8a59341bcefaa90
+docs/update0001/UX-07 البلاغات-1.docx	UX-07 البلاغات	1	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	21798	2026-08-01 20:13	443ae3fe701e153e2f2d358ea67a362da3d1b5a9
+docs/update0001/UX-08 المبيعات-2.docx	UX-08 المبيعات	2	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	23453	2026-08-01 20:13	af0a33c5e21cd0f2190b99317869813cae0dea6d
+docs/update0001/UX-09 المشتريات-2.docx	UX-09 المشتريات	2	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	22468	2026-08-01 20:13	e6a72782dd31ddc9a462ddcabafcd73186ac43c5
+docs/update0001/UX-10 الأسطول-2.docx	UX-10 الأسطول	2	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	22185	2026-08-01 20:13	fd1798a233433704fff651ab2078934835bc31da
+docs/update0001/WSP-01 مساحات العمل.docx	WSP-01 مساحات العمل	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0001	22570	2026-08-01 20:13	09cb5c7f6716797ec2eca965ff2681d592947cad
+docs/update0002/07_مواصفات_الحركة_والتشغيل-4.docx	07_مواصفات_الحركة_والتشغيل	4	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0002	62135	2026-08-01 20:13	acb858f3198cd66bd4149a1004bb008010c27451
+docs/update0002/08_مواصفات_الصيانة-4.docx	08_مواصفات_الصيانة	4	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0002	74395	2026-08-01 20:13	b4467c505c12808eed392786b48bdef7b02bca81
+docs/update0002/EQUIP-OPE-S03_مواصفات_الأسطول_والجاهزية-1.docx	EQUIP-OPE-S03_مواصفات_الأسطول_والجاهزية	1	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0002	71138	2026-08-01 20:13	b36feaa538c648f8852ead956d590a661c03c475
+docs/update0002/export_clients_2026-07-26.xlsx	export_clients_2026-07	26	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0002	7703	2026-08-01 20:13	4970a8b16d89df837be885bb28e83e09265b26bb
+docs/update0002/export_projects_2026-07-26.xlsx	export_projects_2026-07	26	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0002	7951	2026-08-01 20:13	6f81c4929bd3ba5b3ffe4fe1aad228d7b1787065
+docs/update0002/export_timesheet_2026-07-26.xlsx	export_timesheet_2026-07	26	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0002	16172	2026-08-01 20:13	451fa04fa61b5ceb3f7b0bcab54d12622c8ca0b1
+docs/update0002/إيكوبيشن  استقبال معاملات الإدارات.xlsx	إيكوبيشن  استقبال معاملات الإدارات	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0002	4158	2026-08-01 20:13	e7f87387aa52fd2dace158bf7cc8c075d74427b9
+docs/update0002/استمارات_التفتيش_الفني-3.xlsx	استمارات_التفتيش_الفني	3	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0002	63323	2026-08-01 20:13	3d4995a830a6692a757e05f8132b07ce903f3033
+docs/update0002/دليل_تشغيل_إدارة_البلاغات-1.docx	دليل_تشغيل_إدارة_البلاغات	1	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0002	54548	2026-08-01 20:13	1cb311c75bb9511b549ebbe8484b1bd646b746c6
+docs/update0002/دليل_تشغيل_المبيعات.docx	دليل_تشغيل_المبيعات	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0002	57318	2026-08-01 20:13	b9d733db6832803c25166f33b18ad3aa730705f6
+docs/update0002/وثيقة المشتريات التشغيلية-3.docx	وثيقة المشتريات التشغيلية	3	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0002	48312	2026-08-01 20:13	5c8f388be83fc6f723fd475473692871e60b4f21
+docs/update0008/E-01 — محرّك الأحداث المالية.docx	E-01 — محرّك الأحداث المالية	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008	48508	2026-08-05 14:54	180aa4a241c62e410a8fcf8f8fe9d2cbb2f72eed
+docs/update0008/E-02 — محرّك دورة الوحدة والتايم شيت.docx	E-02 — محرّك دورة الوحدة والتايم شيت	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008	54079	2026-08-05 14:53	01eb2fdd46d2416c10a376dcb39729922f6f2ad3
+docs/update0008/E-03 — محرّك تجربة المستخدم والشاشات.docx	E-03 — محرّك تجربة المستخدم والشاشات	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008	166229	2026-08-05 14:53	98ea8644cd8060fe3ba304611ede0f5b295fca9c
+docs/update0008/E-04 — محرّك الصلاحيات والتكليفات والظهور.docx	E-04 — محرّك الصلاحيات والتكليفات والظهور	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008	63010	2026-08-05 14:53	c959abfd7e236bc941802214709056efdedcbdf3
+docs/update0008/E-05 — محرّك الهوية والحسابات والكيانات.docx	E-05 — محرّك الهوية والحسابات والكيانات	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008	39600	2026-08-05 14:53	d0ce8535a2b918abf66963d7c73ecce750eb3e68
+docs/update0008/E-06 — محرّك الاختبارات والتسليم.docx	E-06 — محرّك الاختبارات والتسليم	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008	34821	2026-08-05 14:53	f382f42c4bac38eea052816bc69d51b2450ac78d
+docs/update0008/M-00 — الإدارة التنفيذية · وثيقة المتطلبات الوظيفية.docx	M-00 — الإدارة التنفيذية · وثيقة المتطلبات الوظيفية	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008	70526	2026-08-05 14:54	ce0334f3005bbc8c54bc51ccd3f6525911ad6ccb
+docs/update0008/M-14 — الحوكمة والالتزام · وثيقة المتطلبات الوظيفية.docx	M-14 — الحوكمة والالتزام · وثيقة المتطلبات الوظيفية	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008	195522	2026-08-05 14:53	56ddc960da33065a4eefffce6ebcf544c3c90a68
+docs/update0008/WFM-01 — محرّك العمل الشخصي والتكليفات والطلبات والإنجازات-1.docx	WFM-01 — محرّك العمل الشخصي والتكليفات والطلبات والإنجازات	1	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008	81427	2026-08-05 14:53	70b495c25f302e64ee59db063aab8a88936f1fd4
+docs/update0008/WFM-MAP-01 — مصفوفة مهام الإدارات ومسارات العمل والطلبات والإنجازات-1.xlsx	WFM-MAP-01 — مصفوفة مهام الإدارات ومسارات العمل والطلبات والإنجازات	1	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008	281786	2026-08-05 14:53	9a7b432636a00ecc26c5e49caf72abcfce2e0f30
+docs/update0008_extracts/E-01.txt	E	1	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	116446	2026-08-06 06:05	f805dfeddf4fce491577fdb16eb3ce3f4eb511e3
+docs/update0008_extracts/E-02.txt	E	2	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	148049	2026-08-06 06:05	ca49d6796c870bd47447ce536bef72fa3db25ea8
+docs/update0008_extracts/E-03.txt	E	3	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	638724	2026-08-06 06:05	382005e6306a3ed8521ed1e1e65ef9907b72066b
+docs/update0008_extracts/E-04.txt	E	4	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	191670	2026-08-06 06:05	39267501609e0c9ad66274f2e1ad008801a7f9b2
+docs/update0008_extracts/E-05.txt	E	5	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	82637	2026-08-06 06:05	cf87b6f63ba3a32af9089b6246223553a654c298
+docs/update0008_extracts/E-06.txt	E	6	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008_extracts	64668	2026-08-06 06:05	6f9a9590b09a31aa28cdd95a4b4218cd097078c4
+docs/update0008_extracts/M-00-NEW.txt	M-00-NEW	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008_extracts	133331	2026-08-06 06:05	f454ee0105702959aea1b3ba62cd7bdda9145ec7
+docs/update0008_extracts/M-00.txt	M	0	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	133331	2026-08-06 06:05	f454ee0105702959aea1b3ba62cd7bdda9145ec7
+docs/update0008_extracts/M-14.txt	M	14	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008_extracts	611296	2026-08-06 06:05	08ac01c5e1b1d288bd6290b4880e91d006c627f3
+docs/update0008_extracts/WFM-01.txt	WFM	1	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008_extracts	208339	2026-08-06 06:05	a397fa90e9d8814d4171170378b56fb0f5ae58f4
+docs/update0008_extracts/WFM-MAP-01.txt	WFM-MAP	1	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0008_extracts	744231	2026-08-06 06:05	64417bd7b0ce3cbcb8ee543d5c4a14f60dcd234e
+docs/update0009/ACTION_BINDING_LEDGER.csv	ACTION_BINDING_LEDGER	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0009	51544	2026-08-06 15:50	d553aca023502b55282963c75b77bbab9acb39b8
+docs/update0009/ACTION_USAGE_MATRIX.csv	ACTION_USAGE_MATRIX	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0009	51393	2026-08-06 15:24	693496df738774cac3a4d56e1ebc41f3d0930d29
+docs/update0009/DECISIONS_ADOPTED_ar.md	DECISIONS_ADOPTED_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0009	6364	2026-08-06 15:40	4e6d2a3d434753918aca2505c00722c9aecf220c
+docs/update0009/EXECUTION_CLOSEOUT_ar.md	EXECUTION_CLOSEOUT_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0009	8672	2026-08-06 16:17	88a18eb0e50bed4cea7f0109fc14330a3ab95589
+docs/update0009/INJAZ-CORE-01 — الدستور والمعمارية والحوكمة.docx	INJAZ-CORE-01 — الدستور والمعمارية والحوكمة	0	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	44893	2026-08-06 14:39	3253891026c6b3066d1645d0b5cb05cfd8e38b56
+docs/update0009/INJAZ-DELIVERY-01 — التنفيذ والتتبع والاختبار والتشغيل.docx	INJAZ-DELIVERY-01 — التنفيذ والتتبع والاختبار والتشغيل	0	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	35686	2026-08-06 14:39	ca1c59f1c52aa719d67009897086de6094da658d
+docs/update0009/INJAZ-FRD-01 — المتطلبات الوظيفية الموحّدة.docx	INJAZ-FRD-01 — المتطلبات الوظيفية الموحّدة	0	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	90942	2026-08-06 14:39	83c26306d11f4afbf7d2d797b93b36f37905b42b
+docs/update0009/INJAZ-MASTER-MAP-2.xlsx	INJAZ-MASTER-MAP	2	مستبدلة	9	استبدلها MASTER-MAP-7	1023199	2026-08-06 14:39	4e1dd2fa4c74da0e15a169fb5201283e5ec4c487
+docs/update0009/INJAZ-UX-01 — الشاشات وتجربة المستخدم والنظام التصميمي.docx	INJAZ-UX-01 — الشاشات وتجربة المستخدم والنظام التصميمي	0	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	45560	2026-08-06 14:39	24075366f0372f3089d0046e5b58eb49ec818ff9
+docs/update0009/REVERSE_AUDIT_ar.md	REVERSE_AUDIT_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0009	14211	2026-08-06 15:28	5e0bb3f89c46d1d5f5d7a9086b1b9ab2d20200c5
+docs/update0010/AUDIT_COVERAGE_LEDGER.csv	AUDIT_COVERAGE_LEDGER	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	38192	2026-08-06 20:37	4affe7e0411b097ef832b6edc37fcf782ef2c994
+docs/update0010/CM00_SEED_LEDGER.csv	CM00_SEED_LEDGER	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	1137	2026-08-06 21:47	09696eedaccb52ffad04b535ea2320f990609800
+docs/update0010/COMPONENTS_CORE_ar.md	COMPONENTS_CORE_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	3251	2026-08-06 20:44	f5e8efe518d2f0dcb977eef2cd2fe27c1f71188b
+docs/update0010/DEC_D_CLASSIFICATION.csv	DEC_D_CLASSIFICATION	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	7800	2026-08-06 20:56	339eb7cae125a7b8cb45d075e6f2a05d9a984dd3
+docs/update0010/EXECUTION_FINAL_REPORT_ar.md	EXECUTION_FINAL_REPORT_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	6681	2026-08-06 21:19	8cdd5b3efc727596f8022403bf5811528bc461ba
+docs/update0010/GOV32_LEDGER.csv	GOV32_LEDGER	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	3793	2026-08-06 20:45	c3e05eb33941822ac5c50a85344ad75a91dca513
+docs/update0010/INJAZ-CORE-01 — الدستور والمعمارية والحوكمة-2.docx	INJAZ-CORE-01 — الدستور والمعمارية والحوكمة	2	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	60063	2026-08-06 16:43	dc91610994b02d96acb0992dc158f2575e786571
+docs/update0010/INJAZ-DELIVERY-01 — التنفيذ والتتبع والاختبار والتشغيل-1.docx	INJAZ-DELIVERY-01 — التنفيذ والتتبع والاختبار والتشغيل	1	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	54137	2026-08-06 16:43	9f1caf6920bef9a0a5533373258d969ff41f0801
+docs/update0010/INJAZ-FRD-01 — المتطلبات الوظيفية الموحّدة-1.docx	INJAZ-FRD-01 — المتطلبات الوظيفية الموحّدة	1	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	99108	2026-08-06 16:43	5256d9a25f551850382801eb2ebb78232e013b4e
+docs/update0010/INJAZ-MASTER-MAP-1.xlsx	INJAZ-MASTER-MAP	1	مستبدلة	9	استبدلها MASTER-MAP-7	1292558	2026-08-06 16:43	b6ce1b9e814089be8edf05294487a579589d16bc
+docs/update0010/INJAZ-UX-01 — الشاشات وتجربة المستخدم والنظام التصميمي-1.docx	INJAZ-UX-01 — الشاشات وتجربة المستخدم والنظام التصميمي	1	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	58330	2026-08-06 16:43	4d023d86a510667b386b620d7a41a6e248f15548
+docs/update0010/LEDGER_RECONCILIATION_ar.md	LEDGER_RECONCILIATION_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	6286	2026-08-06 21:14	9df8c909ee7e0e0984e3ecd8ad37dc06ab8acc49
+docs/update0010/NFR_EVIDENCE_BOARD_ar.md	NFR_EVIDENCE_BOARD_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	5529	2026-08-06 21:10	ddac5e6d90a600ab4ffc3b8ffd7056423bb33367
+docs/update0010/NFR_P95_RESULTS.csv	NFR_P95_RESULTS	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	641	2026-08-06 21:09	135b25d645ef92bba6e6a7748ce8c2224264f9bf
+docs/update0010/REMAINING_WORK_ASSESSMENT_ar.md	REMAINING_WORK_ASSESSMENT_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	9919	2026-08-06 19:26	22fd49c7b34b89f55def3b9e1eae306fa50a7a52
+docs/update0010/REVERSE_AUDIT_EXECUTION_ar.md	REVERSE_AUDIT_EXECUTION_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	5617	2026-08-06 21:50	3d74fd7d80806b8f9f59efa6540693e884001070
+docs/update0010/SCREEN_NATURE_ACCEPTED.csv	SCREEN_NATURE_ACCEPTED	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	55731	2026-08-06 20:53	52315f612da5bc17d3bc016016113f9929e8a31a
+docs/update0010/SURPLUS_RECONCILIATION_ar.csv	SURPLUS_RECONCILIATION_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	409619	2026-08-06 21:15	f9ac8a9d86776a002761c4fedee38e577c2fff97
+docs/update0010/TASK_LEDGER_ar.md	TASK_LEDGER_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	6231	2026-08-06 20:10	e4d44eab8a9d0f31443b51731658650f267259a0
+docs/update0010/nfr_login_backup_u4.txt	nfr_login_backup_u4	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	96	2026-08-06 21:01	eaece7017c9ff8a65b583231ef950a4a39e299ca
+docs/update0010/nfr_login_backup_u72.txt	nfr_login_backup_u72	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	96	2026-08-06 20:59	8190df8c28bbad35c327c0134de9a5923d98e3a4
+docs/update0010/tmp_SCRDES-backup-def016-20260806.xlsx	tmp_SCRDES-backup-def016	20260806	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0010	402260	2026-08-06 20:51	cb09ae4b99d40fce8c109063d62d9cb61fa70008
+docs/update0011/BUILD-MANIFEST — بيان البناء.docx	BUILD-MANIFEST — بيان البناء	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0011	24998	2026-08-07 00:08	b1d221e8372324a3ef7ffe1dd43134d4c297775d
+docs/update0011/EXECUTION_FINAL_REPORT_ar.md	EXECUTION_FINAL_REPORT_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0011	10330	2026-08-07 02:32	8136e0174e6ae87096c06a87d508969bccca5885
+docs/update0011/G_BLOCK_METRICS_ar.md	G_BLOCK_METRICS_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0011	6584	2026-08-07 02:29	0d4528ae4ec71bb8b7f27eab2c9206e8c83efe0d
+docs/update0011/INJAZ-CORE-01 — الدستور والمعمارية والحوكمة-3.docx	INJAZ-CORE-01 — الدستور والمعمارية والحوكمة	3	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	61662	2026-08-07 00:08	f97256b8a536e60b854e01d0e9c630a5690bb23d
+docs/update0011/INJAZ-DELIVERY-01 — التنفيذ والتتبع والاختبار والتشغيل-3.docx	INJAZ-DELIVERY-01 — التنفيذ والتتبع والاختبار والتشغيل	3	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	60087	2026-08-07 00:09	728a29582c7ffd44f29c1c7456f9e242a3a0a0a9
+docs/update0011/INJAZ-FRD-01 — المتطلبات الوظيفية الموحّدة-3 (1).docx	INJAZ-FRD-01 — المتطلبات الوظيفية الموحّدة	3	غير صالحة	9	نسخة تنزيل مكررة "(N)"	113441	2026-08-07 00:09	89a3d3fe79dc45bff91dd3d7ba04f0d1a97d4970
+docs/update0011/INJAZ-FRD-01 — المتطلبات الوظيفية الموحّدة-3.docx	INJAZ-FRD-01 — المتطلبات الوظيفية الموحّدة	3	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	113441	2026-08-07 00:09	89a3d3fe79dc45bff91dd3d7ba04f0d1a97d4970
+docs/update0011/INJAZ-MASTER-MAP-5.xlsx	INJAZ-MASTER-MAP	5	مستبدلة	9	استبدلها MASTER-MAP-7	1440084	2026-08-07 00:08	b569feb131323705ad3323cb13f35b2efa8919aa
+docs/update0011/INJAZ-UX-01 — الشاشات وتجربة المستخدم والنظام التصميمي-3.docx	INJAZ-UX-01 — الشاشات وتجربة المستخدم والنظام التصميمي	3	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	60738	2026-08-07 00:08	da81736e6dc309268783ed6f0db998733d6ccfb2
+docs/update0011/M-14 — الحوكمة والالتزام.docx	M-14 — الحوكمة والالتزام	0	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	154041	2026-08-07 00:08	b59c34177e2f8658536da38a556758ea6905cd3f
+docs/update0011/M-16 — إدارة المخاطر المؤسسية.docx	M-16 — إدارة المخاطر المؤسسية	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0011	169178	2026-08-07 00:08	38f54208422d1f362983d4da0657e31b013fa24b
+docs/update0011/M14_ALIGNMENT_ar.md	M14_ALIGNMENT_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0011	4406	2026-08-07 02:30	2b585ebb63d77c0283e5d7cd548c16c9a1bfdd06
+docs/update0011/TASK_LEDGER_ar.md	TASK_LEDGER_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0011	6794	2026-08-07 00:33	fabc8227df91eb38b6338e19ce3aeab67699be85
+docs/update0011/UXR-01 — إعادة بناء واجهة المستخدم وتجربته  (عرض تنفيذي).docx	UXR-01 — إعادة بناء واجهة المستخدم وتجربته  (عرض تنفيذي)	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0011	24678	2026-08-07 00:08	38c4ea8557e7919896dea1b7034a380228cb4e0d
+docs/update0011/UXR-01 — إعادة بناء واجهة المستخدم وتجربته.docx	UXR-01 — إعادة بناء واجهة المستخدم وتجربته	0	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	47516	2026-08-07 00:08	4075914d8564e0dafa6c9c64248d273a2fc1040b
+docs/update0012/DEBT_LEDGERS_ar.md	DEBT_LEDGERS_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	2268	2026-08-08 18:21	fbc257b55b6f6e5d3bc2d5e6a8bda6d1d62074e2
+docs/update0012/EQUIPATION-COA-01 — دليل الحسابات المعاد هيكلته.xlsx	EQUIPATION-COA-01 — دليل الحسابات المعاد هيكلته	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	159381	2026-08-08 14:48	9635d0fcd90768ee9642589cb8c9ebcf6f9751df
+docs/update0012/EXECUTION_REPORT_ar.md	EXECUTION_REPORT_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	19702	2026-08-08 19:54	b69f9620a1060194f85cb5af8d8d1b2b36030df7
+docs/update0012/INJAZ-CORE-01 — الدستور والمعمارية والحوكمة-4.docx	INJAZ-CORE-01 — الدستور والمعمارية والحوكمة	4	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	66055	2026-08-08 13:26	476731acddd8ee31447ffd3a287bdcc03f108a28
+docs/update0012/INJAZ-CORE-01 — الدستور والمعمارية والحوكمة-5.docx	INJAZ-CORE-01 — الدستور والمعمارية والحوكمة	5	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	66054	2026-08-08 14:48	a7318cdd6c8b51b482e2f3e291a9188e1b1b3d35
+docs/update0012/INJAZ-DELIVERY-01 — التنفيذ والتتبع والاختبار والتشغيل-4.docx	INJAZ-DELIVERY-01 — التنفيذ والتتبع والاختبار والتشغيل	4	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	60086	2026-08-08 13:26	518c037391be2a74fd4933c7ff0f6640ffe82d79
+docs/update0012/INJAZ-FRD-01 — المتطلبات الوظيفية الموحّدة-4.docx	INJAZ-FRD-01 — المتطلبات الوظيفية الموحّدة	4	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	113463	2026-08-08 13:26	400e04b4fa7156251972ea10a98f5fcc8eb813e2
+docs/update0012/INJAZ-FRD-01 — المتطلبات الوظيفية الموحّدة-5.docx	INJAZ-FRD-01 — المتطلبات الوظيفية الموحّدة	5	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	113620	2026-08-08 14:48	9b5f9e002a6a4be68532311e7877fb1bb041b6b3
+docs/update0012/INJAZ-MASTER-MAP-6.xlsx	INJAZ-MASTER-MAP	6	مستبدلة	9	استبدلها MASTER-MAP-7	1477280	2026-08-08 13:26	1a8525b00649b0e5d7836165821e84a4660d1800
+docs/update0012/INJAZ-MASTER-MAP-7.xlsx	INJAZ-MASTER-MAP	7	حاكمة نافذة	1	سجل التجميد والأحكام النهائية (5,934 حكمًا) — الأعلى عند التعارض	1582201	2026-08-08 14:48	92888b0282d086ae0f6f1ba2183a1b3fcba0a6d9
+docs/update0012/INJAZ-UX-01 — الشاشات وتجربة المستخدم والنظام التصميمي-4.docx	INJAZ-UX-01 — الشاشات وتجربة المستخدم والنظام التصميمي	4	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	60742	2026-08-08 13:26	994e56ecb5d9965e5c0d003ff4cac4374476b711
+docs/update0012/M-10 — المالية والخزينة  (عرض تنفيذي).docx	M-10 — المالية والخزينة  (عرض تنفيذي)	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	58858	2026-08-08 14:48	c0327e1075c65877ddeb01825f0e24dc0f0dd913
+docs/update0012/M-10 — المالية والخزينة-1.docx	M-10 — المالية والخزينة	1	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	218696	2026-08-08 14:48	90bfa7c65a9c70f9ca43d15ca964700be634cc90
+docs/update0012/M-10 — المالية والخزينة.docx	M-10 — المالية والخزينة	0	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	166902	2026-08-08 13:26	df7f8e89a33647d84d6391db16429065362cb668
+docs/update0012/M-14 — الحوكمة والالتزام-1.docx	M-14 — الحوكمة والالتزام	1	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	154762	2026-08-08 13:26	a9338f6a769cbaff1edab210fd64461d24fc5dec
+docs/update0012/METRIC_DICTIONARY_ar.md	METRIC_DICTIONARY_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3548	2026-08-08 18:26	a54ba77ff966a9ef098a9d421341528eb11e592f
+docs/update0012/REVERSE_AUDIT_ar.md	REVERSE_AUDIT_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	6527	2026-08-08 19:51	ca657dbb3089df8f84d1353a7dd524ad1885a0b0
+docs/update0012/UIDEF_LADDER_ar.md	UIDEF_LADDER_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	7698	2026-08-08 18:15	356851ee82c96541b62779b796d9bfa00bd2d22d
+docs/update0012/UXR-01 — إعادة بناء واجهة المستخدم وتجربته-1.docx	UXR-01 — إعادة بناء واجهة المستخدم وتجربته	1	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	65246	2026-08-08 13:26	02ea4e5ec3c13b6dac340a21dd398c8d16c74818
+docs/update0012/VT_SCAN_ar.md	VT_SCAN_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3706	2026-08-08 18:05	562a4b12cf1c307617a78b9e5473c1edfcf40315
+docs/update0012/debt_baseline.json	debt_baseline	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	372	2026-08-08 20:20	a4696ed93ba3b27ea055af226b5edb750b3671db
+docs/update0012/extracted/FRD-v5.md	FRD-v5	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	153437	2026-08-08 19:32	1563392b63143a6ab2d5f3ac7078c06ad0e35276
+docs/update0012/extracted/M-10.md	M	10	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	673655	2026-08-08 19:32	59c7aa4bd433feb5597ab96dc82ebd79ede4d17a
+docs/update0012/extracted/M-14.md	M	14	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	425289	2026-08-08 19:32	fc6b6d7f3fc3023f085547bdd4750eccadd52f08
+docs/update0012/extracted/UX-01.md	UX	1	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	82741	2026-08-08 19:32	25a9328047cf5367a6aa125f277b0123d1bb4e70
+docs/update0012/extracted/UXR-01.md	UXR	1	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	144926	2026-08-08 19:32	bf40b120bbb7c46da3ac870db5477a36333ef26b
+docs/update0012/pilot_minutes/Contracts__contracts.md	Contracts__contracts	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	1931	2026-08-08 18:22	6667b8f3513bd5045029874621aad1cdab1eaa05
+docs/update0012/pilot_minutes/Maintenance__orders.md	Maintenance__orders	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	1888	2026-08-08 18:22	e41f6bfc214b891a707367409726cbc1f0e9b682
+docs/update0012/pilot_minutes/README.md	README	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	1552	2026-08-08 18:22	9f3bc5bf22ecaef239ebcef94adda85c43f835b3
+docs/update0012/pilot_minutes/Risk__risk_board.md	Risk__risk_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	1889	2026-08-08 18:22	b2e676cd225099457a6b7081cb82b22a148f3d8b
+docs/update0012/pilot_minutes/Suppliers__supplier_profile.md	Suppliers__supplier_profile	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	1949	2026-08-08 18:22	2b6fc03da7571608f9e2e9e8943e13545ceb072e
+docs/update0012/pilot_minutes/Timesheet__timesheet.md	Timesheet__timesheet	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	1938	2026-08-08 18:22	3e43b3c862f35106f450f2e998ed139c274f4fd5
+docs/update0012/pilot_minutes/main__dashboard.md	main__dashboard	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	1882	2026-08-08 18:22	57f3c8ab0a0cbe65997524ded1cc5c09e1cb1a89
+docs/update0012/pilot_minutes/main__my_workspace.md	main__my_workspace	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	1931	2026-08-08 18:22	b7b56689b28ed816e51e4397a080e1feff54ac5a
+docs/update0012/pilot_minutes/main__role_board.md	main__role_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	1893	2026-08-08 18:22	5f83ae641c0a06ac9dcaad26f3fa90d9aa42c798
+docs/update0012/visual_audit/ActivityLogs__activity_logs.md	ActivityLogs__activity_logs	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3950	2026-08-08 17:05	f318c3cd785580a6d4a1d991dcb5ad9afd307626
+docs/update0012/visual_audit/Approvals__attribution_board.md	Approvals__attribution_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3951	2026-08-08 17:05	eed61cc3d33cda1c319d6d00aaac2655ecff8566
+docs/update0012/visual_audit/Approvals__hours_approval.md	Approvals__hours_approval	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3948	2026-08-08 17:05	a2272de8db68b94f2d5742da3dffa0673b08770a
+docs/update0012/visual_audit/Approvals__requests.md	Approvals__requests	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3942	2026-08-08 17:05	070eabf466828f30e0d2325e26ac53e655760644
+docs/update0012/visual_audit/Clients__activities.md	Clients__activities	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3942	2026-08-08 17:05	77371e17ed708e2f99792dc3bcf0560404d18dff
+docs/update0012/visual_audit/Clients__client_profile.md	Clients__client_profile	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	2a25584dbfe02af14358b8dfcf73b9062f5c4f9d
+docs/update0012/visual_audit/Clients__clients.md	Clients__clients	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3939	2026-08-08 17:05	22bdd9b923b72db95419f98157c40a7ed56f44d0
+docs/update0012/visual_audit/Clients__commercial_risks.md	Clients__commercial_risks	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	dff57f9528ddd96394b6df9d220b9d22fbcd7427
+docs/update0012/visual_audit/Clients__contract_amendments.md	Clients__contract_amendments	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	b0efcbeec5fb88cd669ec26ce27e5fa706e783ee
+docs/update0012/visual_audit/Clients__contract_commitments.md	Clients__contract_commitments	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3903	2026-08-08 17:05	961c42eb4f31810c778256899fb216a795223d59
+docs/update0012/visual_audit/Clients__contract_events.md	Clients__contract_events	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	6e05b908b446ab69f294d7ebd5e0e6001711aaaf
+docs/update0012/visual_audit/Clients__pricelists.md	Clients__pricelists	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3893	2026-08-08 17:05	85867c91f2afa4476a71722a68adb56399a60ad7
+docs/update0012/visual_audit/Clients__products.md	Clients__products	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3891	2026-08-08 17:05	c3a088f23e71272b3b9990db6cfaae83bd7f05b3
+docs/update0012/visual_audit/Clients__quotations.md	Clients__quotations	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3893	2026-08-08 17:05	f5deee4aab9cf1ed649aee9e727825fe6226a8a7
+docs/update0012/visual_audit/Clients__rate_books.md	Clients__rate_books	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3942	2026-08-08 17:05	7df3a0cc07d293647551b32fa5825099967bd87a
+docs/update0012/visual_audit/Clients__readiness_lines.md	Clients__readiness_lines	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	87ad242ce37be5f97c014f90f013d50e69fae8d9
+docs/update0012/visual_audit/Clients__tenders.md	Clients__tenders	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3890	2026-08-08 17:05	8a267f1f38fbd598c8c92fa7e6bdac0a841ad88b
+docs/update0012/visual_audit/Clients__units_of_measure.md	Clients__units_of_measure	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	d9bbafb8fb87daf18389df5826231183ce9a4564
+docs/update0012/visual_audit/Contracts__claims.md	Contracts__claims	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3891	2026-08-08 17:05	135231ced5756c594d88ef53b5349050cad2e6c3
+docs/update0012/visual_audit/Contracts__client_statement.md	Contracts__client_statement	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3950	2026-08-08 17:05	80162d31fe365206cbf505a3127a4b62d91ae478
+docs/update0012/visual_audit/Contracts__collections.md	Contracts__collections	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3896	2026-08-08 17:05	7e70eed43102f38b6fb2c5f85aa4a4235fdcf1b1
+docs/update0012/visual_audit/Contracts__commercial_board.md	Contracts__commercial_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3901	2026-08-08 17:05	5cd99c25c9c78edc9d6b980384e089f8672f5a0a
+docs/update0012/visual_audit/Contracts__contract_baseline.md	Contracts__contract_baseline	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	331695d9c0ed55ec8ef101f1014636b6e258759f
+docs/update0012/visual_audit/Contracts__contract_card.md	Contracts__contract_card	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	32b4aed3c154331b2369b09952907bf46860855d
+docs/update0012/visual_audit/Contracts__contract_coverage.md	Contracts__contract_coverage	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3951	2026-08-08 17:05	2916cb9c1fd916a668f0aed2b9bec8c91f7c401e
+docs/update0012/visual_audit/Contracts__contract_guarantees.md	Contracts__contract_guarantees	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3904	2026-08-08 17:05	4f604a0ab32e99cfce4416f239e510571432357f
+docs/update0012/visual_audit/Contracts__contract_lifecycle.md	Contracts__contract_lifecycle	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3903	2026-08-08 17:05	63cc7ff94fde787ca1f7f0d82ea97dd77769b20e
+docs/update0012/visual_audit/Contracts__contract_lines.md	Contracts__contract_lines	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	81639304b3d0bf7886396f67ce92b03be99acd4a
+docs/update0012/visual_audit/Contracts__contract_monthly_plan.md	Contracts__contract_monthly_plan	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3955	2026-08-08 17:05	ddc758f0f116f03f74f7169f7d72b11255869be7
+docs/update0012/visual_audit/Contracts__contract_obligations.md	Contracts__contract_obligations	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3954	2026-08-08 17:05	12fb7c30607d9f791655037153db2af0684a52c3
+docs/update0012/visual_audit/Contracts__contract_payment_schedule.md	Contracts__contract_payment_schedule	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3910	2026-08-08 17:05	c3f3185a5c37273d5860e5eb89d4d4064110cbe0
+docs/update0012/visual_audit/Contracts__contract_resource_plan.md	Contracts__contract_resource_plan	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3907	2026-08-08 17:05	d4bb817eb440ba03aed405a9a9d7037392a90b89
+docs/update0012/visual_audit/Contracts__contract_sites.md	Contracts__contract_sites	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	6d8592640640c66d3c193ae003a336b0c9006d03
+docs/update0012/visual_audit/Contracts__contracts.md	Contracts__contracts	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3943	2026-08-08 17:05	0446d4627772fdd28ab425e03a013db9839e649e
+docs/update0012/visual_audit/Contracts__contracts_details.md	Contracts__contracts_details	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3951	2026-08-08 17:05	60faeffbb2b1f63a90bbf2a8af2d6f8e79ce2af0
+docs/update0012/visual_audit/Contracts__penalties.md	Contracts__penalties	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3943	2026-08-08 17:05	e460eb2f5526912f94dd81bdc1da24b01d2cae1c
+docs/update0012/visual_audit/Contracts__plan_actual_link.md	Contracts__plan_actual_link	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3901	2026-08-08 17:05	2e30f00cf0a9b2366b3e0d7c5866536c5cd66083
+docs/update0012/visual_audit/Contracts__price_terms.md	Contracts__price_terms	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3945	2026-08-08 17:05	5f81ae9db66ba77429216282385e116050167aeb
+docs/update0012/visual_audit/Contracts__tax_invoices.md	Contracts__tax_invoices	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	31564276af7fcb47ac479aab4d7b83444e272036
+docs/update0012/visual_audit/Employees__employee_card.md	Employees__employee_card	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	252e68d2e81fc81ccf779582639839cd1cead373
+docs/update0012/visual_audit/Employees__employee_contracts.md	Employees__employee_contracts	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3903	2026-08-08 17:05	0bfe944bb416a5a55857aede853dd7e6ac685874
+docs/update0012/visual_audit/Employees__employee_contracts_details.md	Employees__employee_contracts_details	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3960	2026-08-08 17:05	88a04b5ebe2a91972456f5668296aa2a4dce3548
+docs/update0012/visual_audit/Employees__employee_equipment_history.md	Employees__employee_equipment_history	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3911	2026-08-08 17:05	21c9ff772e8e742c019ddd8ecebacc4ee161efde
+docs/update0012/visual_audit/Employees__employee_profile.md	Employees__employee_profile	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3957	2026-08-08 17:05	7bf8ef44c5283f510969907c0f77cd4d76491eff
+docs/update0012/visual_audit/Employees__employee_roles.md	Employees__employee_roles	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	e40a7306126d75b3beae6e99514b386d98651ffa
+docs/update0012/visual_audit/Employees__employees.md	Employees__employees	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3894	2026-08-08 17:05	a833bb4e2547d2a69c5ece70f54b8a4a9abc1bf5
+docs/update0012/visual_audit/Employees__equipment_operators.md	Employees__equipment_operators	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3904	2026-08-08 17:05	f9ab84ec502780ce56ed0d894ba0cf9f3403055e
+docs/update0012/visual_audit/Employees__job_titles.md	Employees__job_titles	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	116197fc45d02dc17de352faa26c5db7aa90207f
+docs/update0012/visual_audit/Employees__showcontractemployee.md	Employees__showcontractemployee	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3890	2026-08-08 17:05	52a57d7c50db560fc774a83e3be7b04cff8aad08
+docs/update0012/visual_audit/Equipments__asset_recon.md	Equipments__asset_recon	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	336ea3fd33ddb7880e84d367c36d2afee0ce5005
+docs/update0012/visual_audit/Equipments__code_bridge.md	Equipments__code_bridge	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	06ffc8a30d5dc43761e2155a1ee6e164c3706c0c
+docs/update0012/visual_audit/Equipments__equipment_documents.md	Equipments__equipment_documents	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3954	2026-08-08 17:05	4ab093509dad774419d83cc05dde58b16ed1f282
+docs/update0012/visual_audit/Equipments__equipment_profile.md	Equipments__equipment_profile	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3952	2026-08-08 17:05	a9e2cc72ad91023b47b005a3a816c3c3de252084
+docs/update0012/visual_audit/Equipments__equipment_sourcing.md	Equipments__equipment_sourcing	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3904	2026-08-08 17:05	a170fbbbb3be870ae6fcef2cf8486c4234c9020c
+docs/update0012/visual_audit/Equipments__equipments.md	Equipments__equipments	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3896	2026-08-08 17:05	dd431b50a549f7b088fc002706df3e910274186c
+docs/update0012/visual_audit/Equipments__equipments_drivers.md	Equipments__equipments_drivers	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3904	2026-08-08 17:05	2d5b6ac3cf20ac9ff5c85fd9caebcbbb27f393f4
+docs/update0012/visual_audit/Equipments__equipments_fleet.md	Equipments__equipments_fleet	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3951	2026-08-08 17:05	11c93786f3bd30a3e06d88b2ee693ceb305516be
+docs/update0012/visual_audit/Equipments__equipments_types.md	Equipments__equipments_types	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	4e75a47a176fb2629f8de83411b1388089a7499c
+docs/update0012/visual_audit/Equipments__fin_assets.md	Equipments__fin_assets	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3896	2026-08-08 17:05	78d7bb3467c5fd37681e249d3a99a31c128a22b7
+docs/update0012/visual_audit/Equipments__fleet_depreciation_profiles.md	Equipments__fleet_depreciation_profiles	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3962	2026-08-08 17:05	763c0832346e16d4a974be0f35e86356fe9baa47
+docs/update0012/visual_audit/Equipments__fleet_failures.md	Equipments__fleet_failures	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3949	2026-08-08 17:05	6c641bd54afa1d22022968f53a0405bc1425fc26
+docs/update0012/visual_audit/Equipments__fleet_models.md	Equipments__fleet_models	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	c48430e48abb42709f09f359437f0bcc6db1994b
+docs/update0012/visual_audit/Equipments__manage_failure_codes.md	Equipments__manage_failure_codes	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3906	2026-08-08 17:05	b5fbf72c7d8ee2d9bf1333a5e3aa5a0a54fb07d7
+docs/update0012/visual_audit/Equipments__meter_readings.md	Equipments__meter_readings	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3949	2026-08-08 17:05	bcd750cbe231d92e418f23b72fb2bc5106774ac7
+docs/update0012/visual_audit/Equipments__select_project.md	Equipments__select_project	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3885	2026-08-08 17:05	5dafd36184ca20f53148d8887a30520ebdfd8f4c
+docs/update0012/visual_audit/FinRequests__accountant_desk.md	FinRequests__accountant_desk	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3887	2026-08-08 17:05	b362fff71fe24d4b1ab897bb460c6d93bd669e6b
+docs/update0012/visual_audit/FinRequests__cycle_time_board.md	FinRequests__cycle_time_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3903	2026-08-08 17:05	3bf7631ef2ef143a6c3745a99e4a65f063f7db9d
+docs/update0012/visual_audit/FinRequests__dept_inbox.md	FinRequests__dept_inbox	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3882	2026-08-08 17:05	683dc2879e023b8a997b72e75d9a18f63a410b80
+docs/update0012/visual_audit/FinRequests__effect_map.md	FinRequests__effect_map	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	fbc77781a6e532f5518831b51cc740f489ccfafb
+docs/update0012/visual_audit/FinRequests__finance_gateway.md	FinRequests__finance_gateway	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	50f2b073b7d07fe94f813ca1c6c6da6cc335daf3
+docs/update0012/visual_audit/FinRequests__my_requests.md	FinRequests__my_requests	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	51031b98151959176b691851af407cff2f8c23d8
+docs/update0012/visual_audit/FinRequests__request_form.md	FinRequests__request_form	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	287d260a870ae884400720f4dd145ee7a8d612b5
+docs/update0012/visual_audit/FinRequests__requests_reports.md	FinRequests__requests_reports	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3903	2026-08-08 17:05	3cd77e8a7aa32dcb8b82ad986a9a222410a85e29
+docs/update0012/visual_audit/FinRequests__routing_admin.md	FinRequests__routing_admin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	cabc6810f477eeca68345f1ba929a5928c52cf68
+docs/update0012/visual_audit/Finance__accountants_fin.md	Finance__accountants_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	a04427b637514149ffff6ad3ab5ae5c027e77cb3
+docs/update0012/visual_audit/Finance__accounts_fin.md	Finance__accounts_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	efb50ec636356dff8522aa202a0bdebf8e9796ae
+docs/update0012/visual_audit/Finance__approvals_inbox.md	Finance__approvals_inbox	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	00ac00207118f438ea2170e6f48f9355b7396f95
+docs/update0012/visual_audit/Finance__assets_fin.md	Finance__assets_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3942	2026-08-08 17:05	cd9016e69081725893cc361f220404d17cd0bc8b
+docs/update0012/visual_audit/Finance__bank_reconciliation_fin.md	Finance__bank_reconciliation_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3955	2026-08-08 17:05	4acdefea30aa5314e25582fc7d7a83f70e5aa819
+docs/update0012/visual_audit/Finance__budget_dept.md	Finance__budget_dept	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3943	2026-08-08 17:05	e3c7433d6764a8918222a113265b82eafa68b96b
+docs/update0012/visual_audit/Finance__budget_form_fin.md	Finance__budget_form_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3947	2026-08-08 17:05	ad7813b6d198a2be9d5a13fb2dae4f0ed32680d5
+docs/update0012/visual_audit/Finance__budget_master.md	Finance__budget_master	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3945	2026-08-08 17:05	f8122eac99c2dbcd90cf7ad2cf6734b470d37cf4
+docs/update0012/visual_audit/Finance__cash_forecast_fin.md	Finance__cash_forecast_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3949	2026-08-08 17:05	97156408e2cfe2af376b7f5c7ea48e3aba61a40d
+docs/update0012/visual_audit/Finance__cfo_daily_board_fin.md	Finance__cfo_daily_board_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3951	2026-08-08 17:05	6d1e338c3bca1dfda6723803103d4dcdd87205c0
+docs/update0012/visual_audit/Finance__cost_report_fin.md	Finance__cost_report_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3947	2026-08-08 17:05	95643d6f5fbd622a435298c36b5752f40fa03f79
+docs/update0012/visual_audit/Finance__currencies_fin.md	Finance__currencies_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3946	2026-08-08 17:05	736bd5f592cda03d789e31d4e4c2ac07e93ba69d
+docs/update0012/visual_audit/Finance__dues_fin.md	Finance__dues_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3940	2026-08-08 17:05	c336510764e984fa6f51962ab412814d285e0165
+docs/update0012/visual_audit/Finance__entitlement.md	Finance__entitlement	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3943	2026-08-08 17:05	4e612a70adc5c912a4aea571b12aee0e020b3004
+docs/update0012/visual_audit/Finance__entitlement_gate.md	Finance__entitlement_gate	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	ee1fed868f3df2c859876e59383612ad1f1de334
+docs/update0012/visual_audit/Finance__events_list_fin.md	Finance__events_list_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	2682ebef6c2d41a8737f033b9ae6b4b79d0aacf2
+docs/update0012/visual_audit/Finance__executive_dashboard_fin.md	Finance__executive_dashboard_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3906	2026-08-08 17:05	ec4ec7ad3abe6005509832744d02bcfcf0f93246
+docs/update0012/visual_audit/Finance__financial_statements_fin.md	Finance__financial_statements_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3907	2026-08-08 17:05	ac8bbd601df51ee77b150a3b6a17c0fee173112f
+docs/update0012/visual_audit/Finance__funding_fin.md	Finance__funding_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3943	2026-08-08 17:05	86737ce6fb657e083379f3507a7e5257fc03c6a1
+docs/update0012/visual_audit/Finance__import_events_fin.md	Finance__import_events_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	f1dfeca809d28d9ed3dbacd12ad76dd6cde79bf5
+docs/update0012/visual_audit/Finance__journal_form_fin.md	Finance__journal_form_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3948	2026-08-08 17:05	32da50bb9e86c6dde223347c4952eab7c73938af
+docs/update0012/visual_audit/Finance__maintenance_provision_fin.md	Finance__maintenance_provision_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3908	2026-08-08 17:05	19e5f7b9bc3afe4b332ee3565c8d1bef0fdcf86d
+docs/update0012/visual_audit/Finance__management_accounting_fin.md	Finance__management_accounting_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3908	2026-08-08 17:05	d131e89799734433f2e6d80407d8ea24b4ab2cba
+docs/update0012/visual_audit/Finance__operator_pay_fin.md	Finance__operator_pay_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	4d6b109dc0534897b4ea019821f1adf1ff4bacba
+docs/update0012/visual_audit/Finance__operator_pay_policies_fin.md	Finance__operator_pay_policies_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3908	2026-08-08 17:05	a1f614b70d6be9377902edf570a3602fa9f26e64
+docs/update0012/visual_audit/Finance__payments_fin.md	Finance__payments_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3944	2026-08-08 17:05	244d083b4a84f8d03c8b688f28ee153c050bdd01
+docs/update0012/visual_audit/Finance__periodic_events_fin.md	Finance__periodic_events_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3951	2026-08-08 17:05	9c09cdee041e2c5335423c02cdb9206ac4ba5a6b
+docs/update0012/visual_audit/Finance__periods_fin.md	Finance__periods_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3943	2026-08-08 17:05	9658e49dba0803b25e957f2409a8379307d7eb74
+docs/update0012/visual_audit/Finance__supplier_statement_fin.md	Finance__supplier_statement_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3954	2026-08-08 17:05	155f2fc4997046590f10d1e1487d1d000dd1542b
+docs/update0012/visual_audit/Finance__tax_fin.md	Finance__tax_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3939	2026-08-08 17:05	ba15f1f8c129156a522dd2413b2b794a415e1240
+docs/update0012/visual_audit/Finance__unit_records_fin.md	Finance__unit_records_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	8f2f75f1e21598b34dc225fbb9e932dfbdfd1525
+docs/update0012/visual_audit/Finance__variance_monitor_fin.md	Finance__variance_monitor_fin	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3903	2026-08-08 17:05	87da8e1997bae30cd33dea4a001ef732eba5afd0
+docs/update0012/visual_audit/Financing__asset_disposal.md	Financing__asset_disposal	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3884	2026-08-08 17:05	c657a72a97584cf51be179e2e8554c2ef9e7a008
+docs/update0012/visual_audit/Financing__cost_allocation.md	Financing__cost_allocation	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	046205ae756517ef769552394cda3cb421214f39
+docs/update0012/visual_audit/Financing__deviations.md	Financing__deviations	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	fdb5a7f37108eb0f2ce3f8b55ab8d8c5862e56d8
+docs/update0012/visual_audit/Financing__fin_changes.md	Financing__fin_changes	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3896	2026-08-08 17:05	cf6739fa92e3b428e3a458fa988a3cd52e1d17ed
+docs/update0012/visual_audit/Financing__fin_models.md	Financing__fin_models	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	ad5982eea6581b2f49e2179d1c9ea956859bae43
+docs/update0012/visual_audit/Financing__financiers_registry.md	Financing__financiers_registry	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3904	2026-08-08 17:05	3b4a0dfd186034c07166b8727c972ad34547d90d
+docs/update0012/visual_audit/Financing__financing_board.md	Financing__financing_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	4c39ca7bca59478f4885dc5373669692d19fd5e8
+docs/update0012/visual_audit/Financing__financing_operation_new.md	Financing__financing_operation_new	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3957	2026-08-08 17:05	36c1bf4199335b0eca90c88c11c6ea858bfba79f
+docs/update0012/visual_audit/Financing__installments.md	Financing__installments	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3946	2026-08-08 17:05	e2a0546616c209fc94e42eba1c7ca170814ab6d8
+docs/update0012/visual_audit/Financing__operation_profile.md	Financing__operation_profile	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	f1a9048bfc7cdb62770d908af6c523808ea2918b
+docs/update0012/visual_audit/Financing__owners_registry.md	Financing__owners_registry	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	d0d7d64c539f9dfbdbce0512e458dfa7f5bf8fbd
+docs/update0012/visual_audit/Financing__ownership_links.md	Financing__ownership_links	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	adcad40fcf285c995d27b1b3c51784ea169243ac
+docs/update0012/visual_audit/Fleet__readiness_board.md	Fleet__readiness_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3881	2026-08-08 17:05	972d987947cae1134da02452e6ee5ca1ae17025b
+docs/update0012/visual_audit/Governance__access_review.md	Governance__access_review	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	6fb2125c8a728a9a76df35652d3244eeed6cf2fc
+docs/update0012/visual_audit/Governance__activation_patterns.md	Governance__activation_patterns	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3905	2026-08-08 17:05	bcfe50276fc80b6582d648baf1e637e5cf398e7b
+docs/update0012/visual_audit/Governance__break_glass.md	Governance__break_glass	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	b7badf4ecc639a2beeb8f0946da853a131951ff6
+docs/update0012/visual_audit/Governance__canonical_names.md	Governance__canonical_names	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3901	2026-08-08 17:05	343fe2042cbda29b23fafb3f80831aa719828b54
+docs/update0012/visual_audit/Governance__doc_types.md	Governance__doc_types	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	72ce444d2f6d760fbf211afa2879846ae8a2a228
+docs/update0012/visual_audit/Governance__entities_registry.md	Governance__entities_registry	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3903	2026-08-08 17:05	00ee639d528fc73e38765c1345607cfbe6c1b41c
+docs/update0012/visual_audit/Governance__exceptions.md	Governance__exceptions	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3896	2026-08-08 17:05	f1b554c35170a126c06a58b6a206cc40290502f0
+docs/update0012/visual_audit/Governance__gov_reports.md	Governance__gov_reports	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3946	2026-08-08 17:05	7c3e5c69f607b560073dc05a1db33def333bbb31
+docs/update0012/visual_audit/Governance__guard_denials.md	Governance__guard_denials	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	36144fa8a25a30119cc1d7a7f30bdd37a22fa7e8
+docs/update0012/visual_audit/Governance__guards.md	Governance__guards	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3892	2026-08-08 17:05	1219522d80eb7e0810944544408a7701380f479d
+docs/update0012/visual_audit/Governance__licenses_guarantees.md	Governance__licenses_guarantees	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3905	2026-08-08 17:05	c37c4464b2d1a1d32d0b569b59598ddce1e61797
+docs/update0012/visual_audit/Governance__ownership_grants.md	Governance__ownership_grants	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3951	2026-08-08 17:05	d086c59d8e280108b7dfdc784b7230ab3a22765e
+docs/update0012/visual_audit/Governance__perm_explain.md	Governance__perm_explain	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	0dff2f217ce10fe3dbc80a106289666dbef44cde
+docs/update0012/visual_audit/Governance__portal_users.md	Governance__portal_users	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	38743e7a722f7341968ddd898fa1a5b32319b16b
+docs/update0012/visual_audit/Governance__sensitive_fields.md	Governance__sensitive_fields	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	f716ca8d887eb1a1324b6b80400f58308d29392e
+docs/update0012/visual_audit/Governance__signing_authority.md	Governance__signing_authority	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3952	2026-08-08 17:05	4e946c276d2dc66967ac1297dad6add58c1b35d9
+docs/update0012/visual_audit/Governance__state_machines.md	Governance__state_machines	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	9a80e94e9cd62e7deac0afd3f8bf17f7317bb066
+docs/update0012/visual_audit/Maintenance__dashboard_mnt.md	Maintenance__dashboard_mnt	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3934	2026-08-08 17:05	50480ba5e7eb84285b5382c2267396e4ccb33b3c
+docs/update0012/visual_audit/Maintenance__equipment_hours_preventive.md	Maintenance__equipment_hours_preventive	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3913	2026-08-08 17:05	96fc33da7170db71d9fac4c47cb35f07c404a1b3
+docs/update0012/visual_audit/Maintenance__failure_report.md	Maintenance__failure_report	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3950	2026-08-08 17:05	4a03ee75986b63d633602842fbed36a5c92a55b2
+docs/update0012/visual_audit/Maintenance__inspections.md	Maintenance__inspections	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3947	2026-08-08 17:05	8aec27a4491681cf148c5d12d7bf15e131f41d1e
+docs/update0012/visual_audit/Maintenance__master_data.md	Maintenance__master_data	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	2c6696bb20add55b57e148dfdd55f713261b53ce
+docs/update0012/visual_audit/Maintenance__orders.md	Maintenance__orders	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3942	2026-08-08 17:05	47f48d0759effe7c0f6a2e1a8ecbe9549a0c3c5e
+docs/update0012/visual_audit/Maintenance__preventive_plans.md	Maintenance__preventive_plans	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3952	2026-08-08 17:05	97f4b242770aaa7a05e87f6ad2fc9f4ba715ee18
+docs/update0012/visual_audit/Maintenance__return_to_service.md	Maintenance__return_to_service	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3904	2026-08-08 17:05	76dc22ab456c43c7063a8fb248765f2b36bad545
+docs/update0012/visual_audit/Maintenance__workshop.md	Maintenance__workshop	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	397e39d2d242ce7155aaf4c0278a690bd4a213be
+docs/update0012/visual_audit/Operations__attendance.md	Operations__attendance	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3896	2026-08-08 17:05	6156a8f4b11b31d30c2f13ceb7bdca6f1f6ac506
+docs/update0012/visual_audit/Operations__containers.md	Operations__containers	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3945	2026-08-08 17:05	86731f2490398165cd19ee03ead0482e69c38a88
+docs/update0012/visual_audit/Operations__daily_plan.md	Operations__daily_plan	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3945	2026-08-08 17:05	def714fac9156e27e1f1d3f2cab0600d6be3ccea
+docs/update0012/visual_audit/Operations__distribution_space.md	Operations__distribution_space	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3953	2026-08-08 17:05	479347ce8395cfb9587a5ad02a30d3e310700de1
+docs/update0012/visual_audit/Operations__equipment_quota.md	Operations__equipment_quota	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3901	2026-08-08 17:05	9d78830d81ee32d790515b5bc5465b0932191684
+docs/update0012/visual_audit/Operations__fleet_calendar.md	Operations__fleet_calendar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3949	2026-08-08 17:05	a077ce440c5f369de1330127d1e7d15f2cbad341
+docs/update0012/visual_audit/Operations__fleet_utilization.md	Operations__fleet_utilization	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3952	2026-08-08 17:05	a9d6a001b8527e8c3d2f98bad3d26c4532ce36c4
+docs/update0012/visual_audit/Operations__monthly_close.md	Operations__monthly_close	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	3f8be5ea58f6ccb7d727b3edb5070921c241c676
+docs/update0012/visual_audit/Operations__operations_room.md	Operations__operations_room	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3950	2026-08-08 17:05	40b85bc505522c0861605e7bd8d68135912e4dc2
+docs/update0012/visual_audit/Operations__production.md	Operations__production	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3896	2026-08-08 17:05	39f960f98cf79f3900794ffc08843b731ff15d73
+docs/update0012/visual_audit/Operations__shift_log.md	Operations__shift_log	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	acb41045ad2d1343fa8be4e532544569ed9fb8dd
+docs/update0012/visual_audit/Operations__site_gate_equip.md	Operations__site_gate_equip	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3901	2026-08-08 17:05	33bb6cb428ad6819cf9dbdfff64fc02205f125d1
+docs/update0012/visual_audit/Operations__site_gate_person.md	Operations__site_gate_person	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	8e1be296ad1cbdd235555ad14393f69836f167a3
+docs/update0012/visual_audit/Operations__site_shift_plan.md	Operations__site_shift_plan	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3901	2026-08-08 17:05	450f54dd950965aba9e0aad36d2cf9edfbafadf8
+docs/update0012/visual_audit/Operations__site_work_calendar.md	Operations__site_work_calendar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3904	2026-08-08 17:05	23e58d46435e076ca94ff65aa712b4485822c23c
+docs/update0012/visual_audit/Operations__sites_board.md	Operations__sites_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	150c04cdda50ef46362ad83943dae46cae33cd50
+docs/update0012/visual_audit/Operations__stops_unattributed.md	Operations__stops_unattributed	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3904	2026-08-08 17:05	1ccd658730a0817e4fa9912b1d9d69d956e72d0e
+docs/update0012/visual_audit/Operations__swap_request.md	Operations__swap_request	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3883	2026-08-08 17:05	a83cef37342927a20762bdcc23d602e3577cdae1
+docs/update0012/visual_audit/Operations__unbilled.md	Operations__unbilled	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3894	2026-08-08 17:05	f09e3419cd6551ddaec41416ed3a8d5dbf29320b
+docs/update0012/visual_audit/Operations__unit_perf.md	Operations__unit_perf	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	1624ed861038ced9854951418b8caadb4d20d00f
+docs/update0012/visual_audit/Opportunities__opportunities.md	Opportunities__opportunities	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	1ff96bb58b498973dc56d4c7c375027fae9acd0b
+docs/update0012/visual_audit/Oprators__oprators.md	Oprators__oprators	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3892	2026-08-08 17:05	f1c1736669f1646813caae5c087cf2a1a04efbc2
+docs/update0012/visual_audit/Oprators__select_project.md	Oprators__select_project	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3883	2026-08-08 17:05	442355106180748add340d7a58acf12516859466
+docs/update0012/visual_audit/Portal__approvals_inbox.md	Portal__approvals_inbox	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	282c29e82e1a3cedf86a112da972e0ec55706bd0
+docs/update0012/visual_audit/Portal__business_models.md	Portal__business_models	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	262a0f5058477c838b6525b2371ca231834de8c8
+docs/update0012/visual_audit/Portal__ceo_approvals.md	Portal__ceo_approvals	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3944	2026-08-08 17:05	c6117a88a623686ab64978dc34759f91990a72cf
+docs/update0012/visual_audit/Portal__ceo_board.md	Portal__ceo_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3891	2026-08-08 17:05	72e229775b224f27edab3aba8b66585d59f2e15d
+docs/update0012/visual_audit/Portal__ceo_contracts.md	Portal__ceo_contracts	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3944	2026-08-08 17:05	78a0fe4293fa6e7bdb0ee03f1d4ea4b4c669c966
+docs/update0012/visual_audit/Portal__ceo_reports.md	Portal__ceo_reports	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3893	2026-08-08 17:05	96f1bc654d00d9a6e6b0b080e4fbc47da3b2323d
+docs/update0012/visual_audit/Portal__ceo_risk.md	Portal__ceo_risk	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3939	2026-08-08 17:05	e9533df840741df98b519d443c3281fdd5f97d85
+docs/update0012/visual_audit/Portal__contract_review.md	Portal__contract_review	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	68d2f52a9b7e6f740ffcb8d0a0159fe23c21b1c0
+docs/update0012/visual_audit/Portal__dept_achievement.md	Portal__dept_achievement	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3932	2026-08-08 17:05	e94b57b3eda1c472ea7c3a40ad460f3d68f2d140
+docs/update0012/visual_audit/Portal__dept_board.md	Portal__dept_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3941	2026-08-08 17:05	af25fdbfbb3c799bd1b05a5baa1b63dc7f8f378a
+docs/update0012/visual_audit/Portal__founding_mode.md	Portal__founding_mode	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	f79b71484080e96e31476123603d347a880c00e1
+docs/update0012/visual_audit/Portal__my_achievement.md	Portal__my_achievement	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3945	2026-08-08 17:05	3ba9a1a66c00c3aff26621508065d2ba5d704a37
+docs/update0012/visual_audit/Portal__my_certificate.md	Portal__my_certificate	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3896	2026-08-08 17:05	dc839c756b32c70ed97fdb1118c8585868c912b5
+docs/update0012/visual_audit/Portal__my_evaluation.md	Portal__my_evaluation	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3929	2026-08-08 17:05	70a1f8156fab0a5b0ea22ccab62f5abbf7a73ed4
+docs/update0012/visual_audit/Portal__my_kpi.md	Portal__my_kpi	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3937	2026-08-08 17:05	06a9fe9e4586192da830d895113a430bb60b408b
+docs/update0012/visual_audit/Portal__my_portal.md	Portal__my_portal	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3891	2026-08-08 17:05	6994b5c5d16017ae190f51fa48829f382e43d100
+docs/update0012/visual_audit/Portal__my_requests.md	Portal__my_requests	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3893	2026-08-08 17:05	4a97db0e57e9f5180399e72f3ead80f41ab0c561
+docs/update0012/visual_audit/Portal__my_tasks.md	Portal__my_tasks	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3939	2026-08-08 17:05	e6c45ac768ef247c0b2b111f1050594e5963b389
+docs/update0012/visual_audit/Portal__notifications.md	Portal__notifications	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3944	2026-08-08 17:05	1a20cdbb6c2897d68f29c41e6215aa4143fe655d
+docs/update0012/visual_audit/Portal__portal_elements.md	Portal__portal_elements	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	5c016973fae7376f5b26b140ce2dc22df6b15f9e
+docs/update0012/visual_audit/Portal__project_charter.md	Portal__project_charter	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3946	2026-08-08 17:05	ff749654367fe1975db68c1e572570136343648f
+docs/update0012/visual_audit/Portal__release_stamp.md	Portal__release_stamp	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	c0ee2d3cb2971380d6c9d5f0f5b769cb50b590e7
+docs/update0012/visual_audit/Portal__visibility_audit.md	Portal__visibility_audit	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	f777305c61f2cd2ae86920fb657bf6a9d11959f8
+docs/update0012/visual_audit/Portal__visibility_keys.md	Portal__visibility_keys	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	c7c9f98b88917fe5a25231238bdab70a2979d390
+docs/update0012/visual_audit/Portal__visibility_simulator.md	Portal__visibility_simulator	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	9eeac896cac4fde627486e51cc9bb0585fec361d
+docs/update0012/visual_audit/Portal__workspace.md	Portal__workspace	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3876	2026-08-08 17:05	55a9d07b1b3b078434816a4dbd6420eaec26d0d9
+docs/update0012/visual_audit/Procurement__consumption_rate.md	Procurement__consumption_rate	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3903	2026-08-08 17:05	8041c106189aeda0f93fae2b8a344259dbfedc3a
+docs/update0012/visual_audit/Procurement__dashboard_proc.md	Procurement__dashboard_proc	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3950	2026-08-08 17:05	be365f10895f36f26f8858f56f01b09a54cf8cce
+docs/update0012/visual_audit/Procurement__issue_proc.md	Procurement__issue_proc	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	c9d357fa7356dc173a85b689441437c0e5103277
+docs/update0012/visual_audit/Procurement__items_proc.md	Procurement__items_proc	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	4594b02027e14d829ab7a1112cfe802e69e77a58
+docs/update0012/visual_audit/Procurement__master_data_proc.md	Procurement__master_data_proc	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3903	2026-08-08 17:05	3bc6cd8db4fbc0069d98fbcd93073e3cc4de4e86
+docs/update0012/visual_audit/Procurement__orders_proc.md	Procurement__orders_proc	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3947	2026-08-08 17:05	3b5e4ea287fb65cf29a2b4983e44863f9a2eb5ea
+docs/update0012/visual_audit/Procurement__po_match.md	Procurement__po_match	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	f3d6eef95a329d673de1f6e61952378d56cb2402
+docs/update0012/visual_audit/Procurement__receipt_custody_proc.md	Procurement__receipt_custody_proc	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3907	2026-08-08 17:05	4b1bb1658cc3d805e73690e39dd84d193353b561
+docs/update0012/visual_audit/Procurement__reordering_proc.md	Procurement__reordering_proc	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	059a3b695ea9516c945463d03d4b007fd68b805b
+docs/update0012/visual_audit/Procurement__requests_proc.md	Procurement__requests_proc	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	7c844ffd613f1557326467a167674340e28f2575
+docs/update0012/visual_audit/Procurement__rfq_compare_award.md	Procurement__rfq_compare_award	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3904	2026-08-08 17:05	d908457c7c298ee814f7de7d95f336ef88b17735
+docs/update0012/visual_audit/Procurement__stock_proc.md	Procurement__stock_proc	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	39d3766a8d9ae51cece2b1c9905ac5b7723e31b2
+docs/update0012/visual_audit/Procurement__supplier_card_proc.md	Procurement__supplier_card_proc	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3905	2026-08-08 17:05	848cc89ffef35406c63cc555ef127409b26db429
+docs/update0012/visual_audit/Procurement__suppliers_proc.md	Procurement__suppliers_proc	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3901	2026-08-08 17:05	f853fd1ca80c3ced1e0900cee1fe4b17f8adf809
+docs/update0012/visual_audit/Procurement__warehouse_board.md	Procurement__warehouse_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	2e4a83baf9e208a68f8f8c770eaaf2e497028109
+docs/update0012/visual_audit/Procurement__wh_count.md	Procurement__wh_count	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	a36fd22ab4c43f8799d73acd61f8068398d0d9e6
+docs/update0012/visual_audit/Procurement__wh_receipt.md	Procurement__wh_receipt	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	e20b644a96d19fd09133e9b5ac8965a980d84240
+docs/update0012/visual_audit/Procurement__wh_returns.md	Procurement__wh_returns	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	94a3dafadbd5538158e6dde80cc5d8700b95ff15
+docs/update0012/visual_audit/Procurement__wh_transfer.md	Procurement__wh_transfer	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3947	2026-08-08 17:05	05d858586d2b503c0c80e5ea98092520759c5aca
+docs/update0012/visual_audit/Projects__project_profile.md	Projects__project_profile	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	8c3e2a9717cee2e7e8ac37e3a57f37d4e2fb92c4
+docs/update0012/visual_audit/Projects__projects.md	Projects__projects	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3941	2026-08-08 17:05	a0e6c9bb33bff1be52c6ded7b95ce19a93a1db73
+docs/update0012/visual_audit/Projects__sites.md	Projects__sites	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3889	2026-08-08 17:05	78242fc7cd6ad5602c978282f10837b61db44b29
+docs/update0012/visual_audit/README.md	README	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	29198	2026-08-08 17:05	5c298c5c17714823781b449d1c6e2032855f7cf3
+docs/update0012/visual_audit/Reports__approval_lag_report.md	Reports__approval_lag_report	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3951	2026-08-08 17:05	d973af1eafa54c14d9108cc08b9ae2ad60a470b7
+docs/update0012/visual_audit/Reports__contract_report.md	Reports__contract_report	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3905	2026-08-08 17:05	e19e12f6be2cbda62f50699024149b375a8d0178
+docs/update0012/visual_audit/Reports__contractall.md	Reports__contractall	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3894	2026-08-08 17:05	c082e5979b0717775404b98406284538fc610243
+docs/update0012/visual_audit/Reports__daily_units_report.md	Reports__daily_units_report	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3950	2026-08-08 17:05	290159f5039f7eb10c865d0333446476e33636c5
+docs/update0012/visual_audit/Reports__deliy.md	Reports__deliy	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3888	2026-08-08 17:05	1042babb453cc3f2fd2613ea8822fca288952d5b
+docs/update0012/visual_audit/Reports__deriver.md	Reports__deriver	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3890	2026-08-08 17:05	80fc9ac131600d1138f215eb61c8e06e0315c6ed
+docs/update0012/visual_audit/Reports__driverAndsupplerscontract.md	Reports__driverAndsupplerscontract	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3908	2026-08-08 17:05	1297272de097f878c7c08b59a6da69a04fa98290
+docs/update0012/visual_audit/Reports__equipments_reports.md	Reports__equipments_reports	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3950	2026-08-08 17:05	d27b1d757b8e20dfb5c5ec71b3c2307ebcde843a
+docs/update0012/visual_audit/Reports__exceptions_report.md	Reports__exceptions_report	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	960c86c7f3b62fd345eb0e8a8639b313e663df03
+docs/update0012/visual_audit/Reports__guard_denials_report.md	Reports__guard_denials_report	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3903	2026-08-08 17:05	150d1aa3c56db55c84684c53218a5b85162dbffa
+docs/update0012/visual_audit/Reports__margin_report.md	Reports__margin_report	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3945	2026-08-08 17:05	42f62e0059d23303dae93bfd4f5d98f3258a2f2e
+docs/update0012/visual_audit/Reports__new_reports.md	Reports__new_reports	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3879	2026-08-08 17:05	f036053910ccfcf87683388f0ea272f3727c0a0d
+docs/update0012/visual_audit/Reports__projects_reports.md	Reports__projects_reports	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3948	2026-08-08 17:05	4a04041ea92e500ca4010d6d03a464e65879a278
+docs/update0012/visual_audit/Reports__reports.md	Reports__reports	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3890	2026-08-08 17:05	493c4fef089c05f4b8954068832c5cdfcb53fda1
+docs/update0012/visual_audit/Reports__timesheet_reports.md	Reports__timesheet_reports	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3949	2026-08-08 17:05	ac4b3b981517ce68dae6b9919163362a30e03cec
+docs/update0012/visual_audit/Reports__timesheetdeliy.md	Reports__timesheetdeliy	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	64fdd72639bed301f2bdd0d0d45767a17030b1ee
+docs/update0012/visual_audit/Risk__dept_risk_space.md	Risk__dept_risk_space	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	efbe2d6dc75bfb946f217d9fc0c3957284847cd7
+docs/update0012/visual_audit/Risk__gov_dept_rsk.md	Risk__gov_dept_rsk	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3892	2026-08-08 17:05	181c9145387cb173b2967b304f11e4268409dc1e
+docs/update0012/visual_audit/Risk__risk_acceptance.md	Risk__risk_acceptance	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	659599f85af5c1b1c745de7e53c862af0610e6da
+docs/update0012/visual_audit/Risk__risk_appetite.md	Risk__risk_appetite	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3893	2026-08-08 17:05	b963f4bb50ea9b52fdc634d039b1c610ebcce026
+docs/update0012/visual_audit/Risk__risk_assessment.md	Risk__risk_assessment	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	d884e8f2d1a59b1923d0069f73b0b98727dc3d78
+docs/update0012/visual_audit/Risk__risk_board.md	Risk__risk_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3939	2026-08-08 17:05	cdf2e560b9208c8dbb583c742b481d5cbf6022d8
+docs/update0012/visual_audit/Risk__risk_card.md	Risk__risk_card	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3889	2026-08-08 17:05	e9271ca7b62b146ed8dcad2685eaaf9e9ee8454f
+docs/update0012/visual_audit/Risk__risk_committee.md	Risk__risk_committee	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3894	2026-08-08 17:05	8d7cb6c8bf83d186f54b7b5a4c8e4f3a74ce5e93
+docs/update0012/visual_audit/Risk__risk_control_verify.md	Risk__risk_control_verify	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3948	2026-08-08 17:05	60f2a879e7e390c00f7d8357c99d6883e53c7839
+docs/update0012/visual_audit/Risk__risk_controls.md	Risk__risk_controls	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3893	2026-08-08 17:05	fca193191080916ab6471efd6f76eec4f85bd164
+docs/update0012/visual_audit/Risk__risk_field.md	Risk__risk_field	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3939	2026-08-08 17:05	b0c764a8ca487be66246a81d745c34d5ad15ff5f
+docs/update0012/visual_audit/Risk__risk_incidents.md	Risk__risk_incidents	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3894	2026-08-08 17:05	091bee62de0081ac1743598d01685424d0069dd4
+docs/update0012/visual_audit/Risk__risk_kris.md	Risk__risk_kris	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3889	2026-08-08 17:05	44fb274a5cfd18b978873db15f38090d0e68e0f1
+docs/update0012/visual_audit/Risk__risk_register.md	Risk__risk_register	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3893	2026-08-08 17:05	865746161e6ee7f4cfb0e32ecc459a346a0a998a
+docs/update0012/visual_audit/Risk__risk_reports.md	Risk__risk_reports	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3892	2026-08-08 17:05	5de11618aed67d4a67f84ca09578e2643b8f00c3
+docs/update0012/visual_audit/Risk__risk_reviews.md	Risk__risk_reviews	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3941	2026-08-08 17:05	b0bba39907ee4b57d7494a5c60cc232bbb89839f
+docs/update0012/visual_audit/Risk__risk_settings.md	Risk__risk_settings	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3893	2026-08-08 17:05	41c8b9d0cbf10a53f1ce1084edf51eecbced574d
+docs/update0012/visual_audit/Risk__risk_signals.md	Risk__risk_signals	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3892	2026-08-08 17:05	6700720693f9002e3b2dba1f34ea815a5de54945
+docs/update0012/visual_audit/Risk__risk_treatments.md	Risk__risk_treatments	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	870a67d66ff801451602ad28b34467a4952519ad
+docs/update0012/visual_audit/Risk__risk_units.md	Risk__risk_units	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3890	2026-08-08 17:05	cb9200b72b443b8a293e80cd55a4a2eb007a5be5
+docs/update0012/visual_audit/Settings__change_password.md	Settings__change_password	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3933	2026-08-08 17:05	12573d0f45d867a574d7f7672d5d4962a077910d
+docs/update0012/visual_audit/Settings__guard_classification.md	Settings__guard_classification	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3953	2026-08-08 17:05	20604a6004141df91a849f551a5210a908a6f1d4
+docs/update0012/visual_audit/Settings__modules.md	Settings__modules	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3891	2026-08-08 17:05	b2aa8c4480c2932bf8d5fb30b96e1e6a62522c26
+docs/update0012/visual_audit/Settings__role_permissions.md	Settings__role_permissions	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	c174f1529d94082ea46b20de8cb947f5a840353b
+docs/update0012/visual_audit/Settings__roles.md	Settings__roles	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3938	2026-08-08 17:05	468f148a579b1a17271e70b2204b619762e9e07c
+docs/update0012/visual_audit/Settings__settings.md	Settings__settings	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3877	2026-08-08 17:05	b746f00497ab9e081bcf7bd9fbf0066c99861e25
+docs/update0012/visual_audit/Suppliers__equipment_plan.md	Suppliers__equipment_plan	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	a755f6c63741ec9b36c455ecee26193670b0da56
+docs/update0012/visual_audit/Suppliers__rfq_requests.md	Suppliers__rfq_requests	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	5866ed561b1aa1f91171df935ae4d15e0f1eeb2f
+docs/update0012/visual_audit/Suppliers__settlements.md	Suppliers__settlements	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3896	2026-08-08 17:05	0e738d8a175382ab92eb78e3d59cc99da6b9c61b
+docs/update0012/visual_audit/Suppliers__shares_coverage.md	Suppliers__shares_coverage	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	01b78410d5ef504b514bda3fdc3febba9cae415d
+docs/update0012/visual_audit/Suppliers__showcontractsuppliers.md	Suppliers__showcontractsuppliers	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3891	2026-08-08 17:05	deecae166babbd6b911fd870ca1216bc8ea0e056
+docs/update0012/visual_audit/Suppliers__supplier_advances.md	Suppliers__supplier_advances	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	e1e71e26bc34c3c6492c1ddea8e2bbb73ccadcbf
+docs/update0012/visual_audit/Suppliers__supplier_bank.md	Suppliers__supplier_bank	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	d2bebf6fdd8d388548514914caa34e8aa0a7bb22
+docs/update0012/visual_audit/Suppliers__supplier_capacity.md	Suppliers__supplier_capacity	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3951	2026-08-08 17:05	ef87bda1354c83733899372f0e08e71ae420de25
+docs/update0012/visual_audit/Suppliers__supplier_closure.md	Suppliers__supplier_closure	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3950	2026-08-08 17:05	c063816516df2b083c0ece2e335ce72f09be26ac
+docs/update0012/visual_audit/Suppliers__supplier_contract_lines.md	Suppliers__supplier_contract_lines	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3908	2026-08-08 17:05	7c557bc5954ac33081eef50a375071c739b5ab63
+docs/update0012/visual_audit/Suppliers__supplier_documents.md	Suppliers__supplier_documents	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3952	2026-08-08 17:05	5ba5b58f834936a82db660af18cdb250a534f850
+docs/update0012/visual_audit/Suppliers__supplier_evaluation.md	Suppliers__supplier_evaluation	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3953	2026-08-08 17:05	94bf13b049adba25cbebb18b8d3e761168cd91b9
+docs/update0012/visual_audit/Suppliers__supplier_profile.md	Suppliers__supplier_profile	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3901	2026-08-08 17:05	2549321f8af81336042d7f33f31300e906b78edd
+docs/update0012/visual_audit/Suppliers__supplier_rules.md	Suppliers__supplier_rules	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	e943eabba89afc85c9825f5445807231d2be390b
+docs/update0012/visual_audit/Suppliers__suppliers.md	Suppliers__suppliers	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3943	2026-08-08 17:05	4c7a761f6dd2e7157b16f95c53388b1d0901acf0
+docs/update0012/visual_audit/Suppliers__suppliers_details.md	Suppliers__suppliers_details	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	b1e0cfcdb5c3fd24cbdbbe9042def5c85cd2c02f
+docs/update0012/visual_audit/Suppliers__supplierscontracts.md	Suppliers__supplierscontracts	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3903	2026-08-08 17:05	fda39e77d491b0102ebe10942d33add5387cddfa
+docs/update0012/visual_audit/Suppliers__supplierscontracts_details.md	Suppliers__supplierscontracts_details	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3960	2026-08-08 17:05	c13773c559bc7b5b01ea1044305d505a4a94ef9d
+docs/update0012/visual_audit/Tickets__admin_close.md	Tickets__admin_close	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3894	2026-08-08 17:05	99783479d9fb160938a4310a266c4f66fa14ce79
+docs/update0012/visual_audit/Tickets__dept_inbox.md	Tickets__dept_inbox	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3893	2026-08-08 17:05	90c3df2d27d5df099fc9497896060707e17a8b6c
+docs/update0012/visual_audit/Tickets__inquiry.md	Tickets__inquiry	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3890	2026-08-08 17:05	cd06e76586a2a647fc8e6f8c82463b8421ed8236
+docs/update0012/visual_audit/Tickets__intake_classify.md	Tickets__intake_classify	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	c4fc89e08685758069c390098c0c884ba369b0e9
+docs/update0012/visual_audit/Tickets__ticket_categories_config.md	Tickets__ticket_categories_config	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3907	2026-08-08 17:05	d07a40df4b0633a8b80edcedbead065efe6fc3d5
+docs/update0012/visual_audit/Tickets__ticket_contextual_open.md	Tickets__ticket_contextual_open	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3890	2026-08-08 17:05	983d0375ea3fb0543267950e1c92c17dfab532ef
+docs/update0012/visual_audit/Tickets__ticket_dashboard.md	Tickets__ticket_dashboard	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3948	2026-08-08 17:05	24b5d3130ad8c127d9b8eecac39d88fbf319247e
+docs/update0012/visual_audit/Tickets__ticket_escalation_config.md	Tickets__ticket_escalation_config	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3907	2026-08-08 17:05	1bfd20c0ad1d8cf45539050adcea2faa8dfe868f
+docs/update0012/visual_audit/Tickets__ticket_form.md	Tickets__ticket_form	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3943	2026-08-08 17:05	6c7b5f66be0b71529f66287386575865842f477d
+docs/update0012/visual_audit/Tickets__ticket_recurrence.md	Tickets__ticket_recurrence	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3949	2026-08-08 17:05	572b151c72415248ca16132530dde6874abff92a
+docs/update0012/visual_audit/Tickets__ticket_sla_config.md	Tickets__ticket_sla_config	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	c70424c94fb19f4b9dfa8245b187ee55d253d0dd
+docs/update0012/visual_audit/Tickets__ticket_types_config.md	Tickets__ticket_types_config	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	fc5c96f7c0b0d63c8b858146e0b0f37a2becc215
+docs/update0012/visual_audit/Tickets__ticket_workstreams_board.md	Tickets__ticket_workstreams_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3907	2026-08-08 17:05	2b972a0acf9d7a449da23eff34073f1c337ebef2
+docs/update0012/visual_audit/Tickets__tickets_list.md	Tickets__tickets_list	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	753f3260180a47a6603e4f03e988655455657fd8
+docs/update0012/visual_audit/Tickets__watchtower.md	Tickets__watchtower	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3893	2026-08-08 17:05	95506830694dd49d8b1ad50e2ec8f2f8668e4459
+docs/update0012/visual_audit/Timesheet__aprovment.md	Timesheet__aprovment	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3879	2026-08-08 17:05	d54995745ba31355bbc6ab9bd31b87318b09b958
+docs/update0012/visual_audit/Timesheet__timesheet.md	Timesheet__timesheet	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3943	2026-08-08 17:05	4459e90814bbf4c2f3a93c23d6bd48d91b26fc57
+docs/update0012/visual_audit/Timesheet__timesheet_details.md	Timesheet__timesheet_details	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3951	2026-08-08 17:05	e9da4c236e51fb17f2e66c7dfd7b072fa299c57f
+docs/update0012/visual_audit/Timesheet__timesheet_type.md	Timesheet__timesheet_type	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3884	2026-08-08 17:05	c1f93508de7b9482a82bf30d1301791866e503a9
+docs/update0012/visual_audit/Timesheet__view_timesheet.md	Timesheet__view_timesheet	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3948	2026-08-08 17:05	b03f20af3440b03b4c87eb770641b4bc96f88463
+docs/update0012/visual_audit/Transport__transfer_arrival.md	Transport__transfer_arrival	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3901	2026-08-08 17:05	e87afe2637618f5aca98fe511d135b3a49a82cbd
+docs/update0012/visual_audit/Transport__transfer_close_cost.md	Transport__transfer_close_cost	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3904	2026-08-08 17:05	869f7c3eed38a6d43d9b79462aa7810775685738
+docs/update0012/visual_audit/Transport__transfer_cost_rules_config.md	Transport__transfer_cost_rules_config	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3911	2026-08-08 17:05	53317d82e623517947a3114b7cd42e207cfd8ec2
+docs/update0012/visual_audit/Transport__transfer_dashboard.md	Transport__transfer_dashboard	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3937	2026-08-08 17:05	c669f81e6ad7c65aa3f2ee7bdbd64443a93cf6dc
+docs/update0012/visual_audit/Transport__transfer_fleet.md	Transport__transfer_fleet	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3899	2026-08-08 17:05	a534b2feb452be12f238c6d84de4098c8dde0780
+docs/update0012/visual_audit/Transport__transfer_in_transit.md	Transport__transfer_in_transit	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3904	2026-08-08 17:05	0eb5711aadc810a4739dec9d06f280506e9f3ec1
+docs/update0012/visual_audit/Transport__transfer_order_form.md	Transport__transfer_order_form	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3953	2026-08-08 17:05	919ccee1c45260e688f635deedcf564c6b9935f7
+docs/update0012/visual_audit/Transport__transfer_orders_list.md	Transport__transfer_orders_list	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3905	2026-08-08 17:05	c61de387261d75926163544d2a2fd7b6d021ec71
+docs/update0012/visual_audit/Transport__transfer_permits.md	Transport__transfer_permits	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3901	2026-08-08 17:05	d815c2412f6da5fb665297d1134a5cd459b1da4a
+docs/update0012/visual_audit/Transport__transfer_requests.md	Transport__transfer_requests	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3951	2026-08-08 17:05	47dbca73a65044f07a83014de0d6021e053bd12c
+docs/update0012/visual_audit/Transport__transfer_tariffs.md	Transport__transfer_tariffs	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3901	2026-08-08 17:05	d0f8c4e9eeef9a30b4f9c86df18791793b673a53
+docs/update0012/visual_audit/Transport__transfer_types_config.md	Transport__transfer_types_config	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3906	2026-08-08 17:05	5cc998ad332686b31f755da17119b84f8ed6a552
+docs/update0012/visual_audit/Transport__trs_locations_config.md	Transport__trs_locations_config	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3905	2026-08-08 17:05	f9e3ab4798c59fdd4657451a52ae6ff9da3a5c06
+docs/update0012/visual_audit/Workforce__contract_registry.md	Workforce__contract_registry	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	2afc161a24f9769338c51f0d9fec01a7720fab1b
+docs/update0012/visual_audit/Workforce__deductions.md	Workforce__deductions	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	70ee09794992115a867e6903a5bbc2b3c4b40de8
+docs/update0012/visual_audit/Workforce__employee_advances.md	Workforce__employee_advances	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	c284f71ceab4d9635bf9f91ae0d9757a4bfa06ba
+docs/update0012/visual_audit/Workforce__employee_settlements.md	Workforce__employee_settlements	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3905	2026-08-08 17:05	159f4f3103781605d3d56c1d597cc1a895633a41
+docs/update0012/visual_audit/Workforce__final_settlement.md	Workforce__final_settlement	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3950	2026-08-08 17:05	e2ce780ddcbf5085337de1c0dedbe3cb660a58ab
+docs/update0012/visual_audit/Workforce__housing_units.md	Workforce__housing_units	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	4d9fc0a55dadfb36870eb9229b52d7d0e89c8d98
+docs/update0012/visual_audit/Workforce__op_codes.md	Workforce__op_codes	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3893	2026-08-08 17:05	7668da44e57cb11e84d90a5c83ff4344cf07e419
+docs/update0012/visual_audit/Workforce__op_monthly.md	Workforce__op_monthly	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	406d4d7a3db6da6fc039d12e63f6a4d44f40969a
+docs/update0012/visual_audit/Workforce__op_qual.md	Workforce__op_qual	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3892	2026-08-08 17:05	046159e5cac978a1237b53c835c1d39a92276a22
+docs/update0012/visual_audit/Workforce__payroll_runs.md	Workforce__payroll_runs	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3897	2026-08-08 17:05	01c288b8674a08878c46552bb6fed392ad43b3b1
+docs/update0012/visual_audit/Workforce__project_contracts.md	Workforce__project_contracts	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	6197cdcc8ca3247460b19ab54caf735f1590752f
+docs/update0012/visual_audit/Workforce__proposed_deductions.md	Workforce__proposed_deductions	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3904	2026-08-08 17:05	44df466c64e0ad8480197bb8920530fb3feaf747
+docs/update0012/visual_audit/Workforce__recruitment_pipeline.md	Workforce__recruitment_pipeline	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3954	2026-08-08 17:05	8fb2a251644e1b6bcb9daf24e1e607c064da30ef
+docs/update0012/visual_audit/Workforce__rotation.md	Workforce__rotation	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3893	2026-08-08 17:05	d567f7bf1eeca4885823b1f0d699b6b2d373028d
+docs/update0012/visual_audit/Workforce__worker_contract.md	Workforce__worker_contract	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	cc6513b4d60d85c87f06c2a698e9ec11fb9bc7d8
+docs/update0012/visual_audit/Workforce__worker_evaluation.md	Workforce__worker_evaluation	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	c5cf4663b0238f34c65293f1e93ea1bb4ad03477
+docs/update0012/visual_audit/Workforce__worker_leave_absence.md	Workforce__worker_leave_absence	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3905	2026-08-08 17:05	51b3cfca142d2a7ef751b6bb4dc066e6dd88c40d
+docs/update0012/visual_audit/Workforce__worker_movement.md	Workforce__worker_movement	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	03626cf98f7cdda463fa4a0e37b8b5cb29bcf79b
+docs/update0012/visual_audit/Workforce__worker_register.md	Workforce__worker_register	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3949	2026-08-08 17:05	08492a78648a941c09a56fb3fc1c105685cdba83
+docs/update0012/visual_audit/Workforce__worker_settlement.md	Workforce__worker_settlement	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3902	2026-08-08 17:05	22124cbc4f74da64bf41e1acb1aafc5a4538527c
+docs/update0012/visual_audit/Workforce__worker_worklog.md	Workforce__worker_worklog	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3948	2026-08-08 17:05	ce3c9cb0d046ec0bdf4e0b89f154f49cd6c14a31
+docs/update0012/visual_audit/Workforce__workforce_requirement.md	Workforce__workforce_requirement	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3906	2026-08-08 17:05	ff7671d4a6897b4f6bdb6a76cfb5a8e9ec957d99
+docs/update0012/visual_audit/admin__ops_manager_board.md	admin__ops_manager_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3898	2026-08-08 17:05	856775d62dd22aef490b3be9821afa8a6ea8e180
+docs/update0012/visual_audit/admin__org_assignments.md	admin__org_assignments	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3896	2026-08-08 17:05	c1c8f1378b899fafc55243016cd98263ea9e3c1e
+docs/update0012/visual_audit/admin__org_permits.md	admin__org_permits	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3892	2026-08-08 17:05	10ae71c9aa315d12a00079e2091d76b6f70addb5
+docs/update0012/visual_audit/admin__org_structure.md	admin__org_structure	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3879	2026-08-08 17:05	d04cd3f916423970a6aa2cc0d18276f8d0d000e2
+docs/update0012/visual_audit/admin__sec_employee_wizard.md	admin__sec_employee_wizard	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3900	2026-08-08 17:05	4d19f45de645f723167497a21df2842950887d5b
+docs/update0012/visual_audit/admin__sec_governance.md	admin__sec_governance	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3895	2026-08-08 17:05	5a13b3b33058cb1c4f75ef45fb8e61ece5febdaa
+docs/update0012/visual_audit/emsreports__index.md	emsreports__index	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3876	2026-08-08 17:05	712549620421a343a8835a9be66dc8ee1c2fd934
+docs/update0012/visual_audit/main__all_assistants.md	main__all_assistants	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3943	2026-08-08 17:05	f4cdd9ff1763cef4dd6e1d02df5999b927e2a376
+docs/update0012/visual_audit/main__dashboard.md	main__dashboard	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3930	2026-08-08 17:05	a5b0e3b327f11c8875790ffa451d61fbdba49085
+docs/update0012/visual_audit/main__global_search.md	main__global_search	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3878	2026-08-08 17:05	7cf72c902dd80feec49fcba9876eb1520c6a157a
+docs/update0012/visual_audit/main__my_workspace.md	main__my_workspace	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3877	2026-08-08 17:05	9386db16d95ce1249fbae294d21527e571fa6441
+docs/update0012/visual_audit/main__profile.md	main__profile	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3943	2026-08-08 17:05	46682f05eb8d53fb8cbd635ffcfb8f9489184b9f
+docs/update0012/visual_audit/main__project_users.md	main__project_users	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3942	2026-08-08 17:05	b0c2bed2584bb051f6fa5bc32769c1ea3e7daa43
+docs/update0012/visual_audit/main__role_board.md	main__role_board	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3924	2026-08-08 17:05	17f875ed2f7a7cdd90c250369a3aee178360bdc7
+docs/update0012/visual_audit/main__soon.md	main__soon	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3884	2026-08-08 17:05	c9a8c09c0c2e77a19e91728d6e53381947f11063
+docs/update0012/visual_audit/main__user_profile.md	main__user_profile	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3892	2026-08-08 17:05	9ab98d3edc89e0b2a7713350034edf7806354c37
+docs/update0012/visual_audit/main__users.md	main__users	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3934	2026-08-08 17:05	e06f09d61fa0842ada0f49ae96432608163f5ab7
+docs/update0012/visual_audit/movement__add_drivers.md	movement__add_drivers	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3944	2026-08-08 17:05	0ccf81f78a9ca2729253cc20c61c8fa258b6a030
+docs/update0012/visual_audit/movement__client_tree.md	movement__client_tree	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3929	2026-08-08 17:05	b69cba5e48929ee286bd81713d2cc90c98973eab
+docs/update0012/visual_audit/movement__map_page.md	movement__map_page	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3877	2026-08-08 17:05	d1fa64c0d3f6fa25aa1731aff089c899df25f2c5
+docs/update0012/visual_audit/movement__move_oprators.md	movement__move_oprators	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3946	2026-08-08 17:05	c1642d22f6a0a59525848f522ae086d95e680bb9
+docs/update0012/visual_audit/movement__movement_operations.md	movement__movement_operations	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3952	2026-08-08 17:05	c0781845a008e6feccd2259dbe181d95dc709a52
+docs/update0012/visual_audit/movement__project_drivers.md	movement__project_drivers	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0012	3948	2026-08-08 17:05	0019a7b0dfc0d0c18d8860d2801980ed366636a3
+docs/update0013/EXECUTION_REPORT_ar.md	EXECUTION_REPORT_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0013	19045	2026-08-09 00:22	9115fe8f3f4724ad6210c365abfdf6f6618f4ff0
+docs/update0013/FIN-ACC-01 — محاسبو الإدارات والتخصصات المحاسبية.docx	FIN-ACC-01 — محاسبو الإدارات والتخصصات المحاسبية	0	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	43583	2026-08-08 21:13	6606070d9e3aaa0ccbc44207ad574b3f74c9dcfe
+docs/update0013/FIN-CTRL-01 — رئيس الحسابات والرقابة المحاسبية.docx	FIN-CTRL-01 — رئيس الحسابات والرقابة المحاسبية	0	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	41757	2026-08-08 21:13	9fca8bb0179310101b34a698c1c9995cdac6a7d2
+docs/update0013/FIN-MGR-01 — قيادة الإدارة المالية.docx	FIN-MGR-01 — قيادة الإدارة المالية	0	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	39231	2026-08-08 21:13	ab8333db3641bc59e972a680c7d9a473b0d3a10d
+docs/update0013/FIN-OBL-01 — محرّك التوجيه والالتزامات-1.docx	FIN-OBL-01 — محرّك التوجيه والالتزامات	1	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	99059	2026-08-08 21:13	c9a94a80d6ca050e7a29e9ec3ce5ab40d31ad6d5
+docs/update0013/FIN-OBL-01 — محرّك التوجيه والالتزامات.docx	FIN-OBL-01 — محرّك التوجيه والالتزامات	0	مستبدلة	9	نسخة أقدم داخل حقبة مغلقة	87760	2026-08-08 21:13	0c37b50ac1b4471c37172d98a15970ee961b60df
+docs/update0013/FIN-TRE-01 — الخزينة والبنوك والتحصيل والمدفوعات.docx	FIN-TRE-01 — الخزينة والبنوك والتحصيل والمدفوعات	0	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	41987	2026-08-08 21:13	ef2681681dd211cf32575965678346e24343ed8b
+docs/update0013/GATE_ar.md	GATE_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0013	23291	2026-08-09 00:21	783015daa90daaa442ecde4d2f9398d9470dbfd3
+docs/update0013/IAF-01 — المراجعة الداخلية.docx	IAF-01 — المراجعة الداخلية	0	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	42017	2026-08-08 21:13	f7a4e3407a8e6035b9272cd02c607807b5b1ca5a
+docs/update0013/PROP-01 — انتشار التعديلات على الإدارات-1.docx	PROP-01 — انتشار التعديلات على الإدارات	1	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	57080	2026-08-08 21:13	3dcef9605de0b8e0d60278e0fe19e18d394fb29e
+docs/update0013/REVERSE_AUDIT_ar.md	REVERSE_AUDIT_ar	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0013	4270	2026-08-09 00:19	738f0abb84ab476df307ed833a79dae05152d9a9
+docs/update0013/extracted/FIN-ACC-01.md	FIN-ACC	1	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	86840	2026-08-08 21:17	6c9e3605704f586e89bda823ec721562db1dfe98
+docs/update0013/extracted/FIN-CTRL-01.md	FIN-CTRL	1	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	88563	2026-08-08 21:18	c7d851e53ab6e73d3e8bc13e0bc72bf0664bfe72
+docs/update0013/extracted/FIN-MGR-01.md	FIN-MGR	1	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	72093	2026-08-08 21:18	a636714b735b0a106bcab93f8ff627a105b844cd
+docs/update0013/extracted/FIN-OBL-01-v1.md	FIN-OBL-01-v1	0	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	291866	2026-08-08 21:18	1b5a41632baa13241e54c39898a120daa7124755
+docs/update0013/extracted/FIN-OBL-01.md	FIN-OBL	1	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	245064	2026-08-08 21:18	586ec069f3b5b4e32737cb7f53203084c994c4a0
+docs/update0013/extracted/FIN-TRE-01.md	FIN-TRE	1	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	82936	2026-08-08 21:18	3fd44424d51bce78b8e3e297db7767f848685026
+docs/update0013/extracted/IAF-01.md	IAF	1	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	80231	2026-08-08 21:18	3286d6b07daa9b410342dce9d49d3995527978f5
+docs/update0013/extracted/PROP-01.md	PROP	1	متخصصة نافذة	4	أحدث حقبة مالية — لا بديل أحدث	124712	2026-08-08 21:18	0b61c19449635105f75ef490436960582ec69686
+docs/update0013/families.json	families	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0013	187251	2026-08-09 01:39	d6f3a456d18c83f7462ae3ab97a58656acf99c42
+docs/update0013/spec.json	spec	0	تاريخية	9	حقبة بناء مغلقة ببوابتها — update0013	134216	2026-08-09 00:19	70f7c92fad9fa920908c673cad163fa5e73064ff
+docs/~$EMS_دليل_شاشات_الإدارات_20260719.xlsx	~$EMS_دليل_شاشات_الإدارات_20260719	0	غير صالحة	9	قفل Word مؤقت	165	2026-07-18 22:58	df650bbb6b1bc0776d7434e056f9c4d6885eb19d
+docs/~$EMS_دليل_شاشات_السايدبار_20260725.xlsx	~$EMS_دليل_شاشات_السايدبار_20260725	0	غير صالحة	9	قفل Word مؤقت	165	2026-08-01 20:13	df650bbb6b1bc0776d7434e056f9c4d6885eb19d

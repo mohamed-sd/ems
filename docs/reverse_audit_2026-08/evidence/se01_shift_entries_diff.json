@@ -1,0 +1,240 @@
+{
+    "spec_cols": 29,
+    "both": 8,
+    "one": 12,
+    "none": 9,
+    "rows": [
+        {
+            "col": "id",
+            "spec_type": "BIGINT UNSIGNED AI PK",
+            "timesheet": "id",
+            "unit_entries": "id",
+            "fill": "48746\/48746 = 100%",
+            "verdict": "نظيرٌ في الاثنين"
+        },
+        {
+            "col": "company_id",
+            "spec_type": "INT UNSIGNED NOT NULL",
+            "timesheet": "company_id",
+            "unit_entries": "company_id",
+            "fill": "48746\/48746 = 100%",
+            "verdict": "نظيرٌ في الاثنين"
+        },
+        {
+            "col": "entity_layer",
+            "spec_type": "ENUM(operations,contracting,holding)",
+            "timesheet": null,
+            "unit_entries": null,
+            "fill": "—",
+            "verdict": "✖ لا نظير"
+        },
+        {
+            "col": "work_date",
+            "spec_type": "DATE NOT NULL",
+            "timesheet": "date",
+            "unit_entries": "entry_date",
+            "fill": "48746\/48746 = 100%",
+            "verdict": "نظيرٌ في الاثنين"
+        },
+        {
+            "col": "shift_no",
+            "spec_type": "TINYINT UNSIGNED NOT NULL",
+            "timesheet": "shift",
+            "unit_entries": "shift",
+            "fill": "0\/48746 = 0%",
+            "verdict": "نظيرٌ في الاثنين"
+        },
+        {
+            "col": "slot_id",
+            "spec_type": "BIGINT UNSIGNED NOT NULL",
+            "timesheet": null,
+            "unit_entries": "contract_line_id",
+            "fill": "0\/10142 = 0%",
+            "verdict": "نظيرٌ في واحد"
+        },
+        {
+            "col": "machine_code",
+            "spec_type": "VARCHAR(32) NOT NULL",
+            "timesheet": null,
+            "unit_entries": "equipment_id",
+            "fill": "10142\/10142 = 100%",
+            "verdict": "نظيرٌ في واحد"
+        },
+        {
+            "col": "operator_id",
+            "spec_type": "INT UNSIGNED NOT NULL",
+            "timesheet": "employee_id",
+            "unit_entries": "operator_employee_id",
+            "fill": "31807\/48746 = 65%",
+            "verdict": "نظيرٌ في الاثنين"
+        },
+        {
+            "col": "supplier_id",
+            "spec_type": "INT UNSIGNED NOT NULL",
+            "timesheet": null,
+            "unit_entries": "supplier_entity_id",
+            "fill": "142\/10142 = 1%",
+            "verdict": "نظيرٌ في واحد"
+        },
+        {
+            "col": "container_key",
+            "spec_type": "VARCHAR(32) NOT NULL",
+            "timesheet": null,
+            "unit_entries": null,
+            "fill": "—",
+            "verdict": "✖ لا نظير"
+        },
+        {
+            "col": "contract_id",
+            "spec_type": "INT UNSIGNED NOT NULL",
+            "timesheet": null,
+            "unit_entries": "contract_id",
+            "fill": "10142\/10142 = 100%",
+            "verdict": "نظيرٌ في واحد"
+        },
+        {
+            "col": "client_id",
+            "spec_type": "INT UNSIGNED NOT NULL",
+            "timesheet": null,
+            "unit_entries": null,
+            "fill": "—",
+            "verdict": "✖ لا نظير"
+        },
+        {
+            "col": "run_hours",
+            "spec_type": "DECIMAL(6,2) NOT NULL DEFAULT 0",
+            "timesheet": "executed_hours",
+            "unit_entries": null,
+            "fill": "46071\/48746 = 95%",
+            "verdict": "نظيرٌ في واحد"
+        },
+        {
+            "col": "standby_hours",
+            "spec_type": "DECIMAL(6,2) NOT NULL DEFAULT 0",
+            "timesheet": "standby_hours",
+            "unit_entries": null,
+            "fill": "16747\/48746 = 34%",
+            "verdict": "نظيرٌ في واحد"
+        },
+        {
+            "col": "breakdown_hours",
+            "spec_type": "DECIMAL(6,2) NOT NULL DEFAULT 0",
+            "timesheet": "total_fault_hours",
+            "unit_entries": null,
+            "fill": "11782\/48746 = 24%",
+            "verdict": "نظيرٌ في واحد"
+        },
+        {
+            "col": "stop_reason_code",
+            "spec_type": "VARCHAR(32) NULL",
+            "timesheet": "fault_type",
+            "unit_entries": null,
+            "fill": "0\/48746 = 0%",
+            "verdict": "نظيرٌ في واحد"
+        },
+        {
+            "col": "liable_party",
+            "spec_type": "ENUM(client,company,supplier)",
+            "timesheet": "fault_department",
+            "unit_entries": null,
+            "fill": "0\/48746 = 0%",
+            "verdict": "نظيرٌ في واحد"
+        },
+        {
+            "col": "meter_before",
+            "spec_type": "DECIMAL(12,2) NULL",
+            "timesheet": null,
+            "unit_entries": null,
+            "fill": "—",
+            "verdict": "✖ لا نظير"
+        },
+        {
+            "col": "meter_after",
+            "spec_type": "DECIMAL(12,2) NULL",
+            "timesheet": null,
+            "unit_entries": null,
+            "fill": "—",
+            "verdict": "✖ لا نظير"
+        },
+        {
+            "col": "fuel_received_qty",
+            "spec_type": "DECIMAL(10,2) NOT NULL DEFAULT 0",
+            "timesheet": null,
+            "unit_entries": null,
+            "fill": "—",
+            "verdict": "✖ لا نظير"
+        },
+        {
+            "col": "fuel_issued_qty",
+            "spec_type": "DECIMAL(10,2) NOT NULL DEFAULT 0",
+            "timesheet": null,
+            "unit_entries": null,
+            "fill": "—",
+            "verdict": "✖ لا نظير"
+        },
+        {
+            "col": "tons",
+            "spec_type": "DECIMAL(12,2) NULL",
+            "timesheet": "tons_count",
+            "unit_entries": null,
+            "fill": "668\/48746 = 1%",
+            "verdict": "نظيرٌ في واحد"
+        },
+        {
+            "col": "meters",
+            "spec_type": "DECIMAL(12,2) NULL",
+            "timesheet": "meters_count",
+            "unit_entries": null,
+            "fill": "1556\/48746 = 3%",
+            "verdict": "نظيرٌ في واحد"
+        },
+        {
+            "col": "field_notes",
+            "spec_type": "TEXT NULL",
+            "timesheet": "work_notes",
+            "unit_entries": "note",
+            "fill": "0\/48746 = 0%",
+            "verdict": "نظيرٌ في الاثنين"
+        },
+        {
+            "col": "entry_state",
+            "spec_type": "ENUM(draft,submitted,site_approved,corrected)",
+            "timesheet": "status",
+            "unit_entries": "state",
+            "fill": "48746\/48746 = 100%",
+            "verdict": "نظيرٌ في الاثنين"
+        },
+        {
+            "col": "created_by",
+            "spec_type": "INT UNSIGNED NOT NULL",
+            "timesheet": "user_id",
+            "unit_entries": "entered_by",
+            "fill": "48746\/48746 = 100%",
+            "verdict": "نظيرٌ في الاثنين"
+        },
+        {
+            "col": "created_by_role",
+            "spec_type": "SMALLINT UNSIGNED NOT NULL",
+            "timesheet": null,
+            "unit_entries": null,
+            "fill": "—",
+            "verdict": "✖ لا نظير"
+        },
+        {
+            "col": "created_at",
+            "spec_type": "DATETIME NOT NULL",
+            "timesheet": null,
+            "unit_entries": "created_at",
+            "fill": "10142\/10142 = 100%",
+            "verdict": "نظيرٌ في واحد"
+        },
+        {
+            "col": "seed_tag",
+            "spec_type": "VARCHAR(32) NULL",
+            "timesheet": null,
+            "unit_entries": null,
+            "fill": "—",
+            "verdict": "✖ لا نظير"
+        }
+    ]
+}

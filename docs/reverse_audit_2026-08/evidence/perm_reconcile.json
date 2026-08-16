@@ -1,0 +1,46 @@
+{
+    "admin": {
+        "role_id": 1,
+        "declared_grants": 134,
+        "grant_render": 115,
+        "grant_denied": [
+            "movement\/move_oprators.php"
+        ],
+        "nogranт_denied": 309,
+        "nogrant_render": [
+            "Suppliers\/showcontractsuppliers.php",
+            "Suppliers\/suppliers_details.php",
+            "Tickets\/ticket_form.php"
+        ],
+        "param_redirect": 19,
+        "error": [
+            "ActivityLogs\/activity_logs.php",
+            "Timesheet\/timesheet_details.php",
+            "user_capacities.php"
+        ],
+        "total": 448
+    },
+    "reader": {
+        "role_id": 22,
+        "declared_grants": 83,
+        "grant_render": 77,
+        "grant_denied": [],
+        "nogranт_denied": 345,
+        "nogrant_render": [
+            "Employees\/showcontractemployee.php",
+            "Reports\/contract_report.php",
+            "Reports\/contractall.php",
+            "Reports\/driverAndsupplerscontract.php",
+            "Suppliers\/showcontractsuppliers.php",
+            "Suppliers\/suppliers_details.php",
+            "Tickets\/ticket_form.php",
+            "Timesheet\/timesheet_type.php"
+        ],
+        "param_redirect": 17,
+        "error": [
+            "Timesheet\/timesheet_details.php",
+            "user_capacities.php"
+        ],
+        "total": 448
+    }
+}

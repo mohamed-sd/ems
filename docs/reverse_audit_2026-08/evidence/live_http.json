@@ -1,0 +1,40 @@
+{
+    "base": "http:\/\/localhost\/ems",
+    "targets": 448,
+    "logins": {
+        "admin": {
+            "ok": true,
+            "code": 302,
+            "location": "main\/dashboard.php"
+        },
+        "reader": {
+            "ok": true,
+            "code": 302,
+            "location": "main\/dashboard.php"
+        }
+    },
+    "roles": {
+        "admin": {
+            "ok200": 118,
+            "redirect_login": 1,
+            "redirect_dash": 328,
+            "forbidden": 0,
+            "server_error": 1,
+            "php_error_marker": 2,
+            "has_shell": 118,
+            "other": 0,
+            "total": 448
+        },
+        "reader": {
+            "ok200": 85,
+            "redirect_login": 1,
+            "redirect_dash": 361,
+            "forbidden": 0,
+            "server_error": 1,
+            "php_error_marker": 1,
+            "has_shell": 85,
+            "other": 0,
+            "total": 448
+        }
+    }
+}
