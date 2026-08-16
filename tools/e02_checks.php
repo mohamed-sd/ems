@@ -45,6 +45,9 @@ $r = mysqli_query($conn,
         /* المرساة created_at لا updated_at: أي لمسة بيانات (كجسر sync_uuid)
            تحدّث updated_at فتُدخل الموروثَ كذبًا في نافذة الفحص */
         AND ue.created_at >= '{$CUTOFF}'
+        /* TS-05: الموسومُ بذرًا يُعزل عن فحوصِ الإنتاجِ بلا لمسِ بيانٍ حقيقيّ —
+           1,092 صفَّ بذرٍ (وُسمت 2026-08-16) كانت ترسِّب الفحصَ وهي ليست إنتاجًا */
+        AND ue.seed_tag IS NULL
         AND NOT " . ems_uc_prechain_sql('ue') . "
         AND l.decided_at IS NULL
         AND (l.objection_state IS NULL OR l.objection_state='none')");
