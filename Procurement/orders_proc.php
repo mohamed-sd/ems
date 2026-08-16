@@ -355,6 +355,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                 </div>
             <?php elseif ($can_edit): ?>
                 <form action="orders_proc.php" method="post" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+        <?= csrf_field() ?>
                     <input type="hidden" name="action" value="match_invoice">
                     <input type="hidden" name="id" value="<?php echo intval($edit['id']); ?>">
                     <div class="form-group"><label for="emsf_400_90de2">رقم الفاتورة</label>
@@ -412,6 +413,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                             <td>
                                 <?php if ($can_edit): ?>
                                 <form method="post" style="display:inline" onsubmit="return confirm('أرشفةُ المصروف وإخراجُ نصيبه من التكلفة؟')">
+        <?= csrf_field() ?>
                                     <input type="hidden" name="action" value="archive_landed_cost">
                                     <input type="hidden" name="id" value="<?php echo intval($edit['id']); ?>">
                                     <input type="hidden" name="landed_id" value="<?php echo intval($__l['id']); ?>">
@@ -427,6 +429,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
             <?php endif; ?>
             <?php if ($can_edit && $__gated): ?>
             <form action="orders_proc.php" method="post" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+        <?= csrf_field() ?>
                 <input type="hidden" name="action" value="add_landed_cost">
                 <input type="hidden" name="id" value="<?php echo intval($edit['id']); ?>">
                 <div class="form-group"><label for="emsf_403_f20f4">رقم المستند <span class="required">*</span></label>
@@ -450,7 +453,8 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
     </div>
     <?php endif; ?>
 
-    <form id="procForm" action="orders_proc.php" method="post" class="allforms<?php echo $edit ? ' allforms-visible' : ''; ?>">
+    <form id="procForm" action="orders_proc.php" method="post" class="allforms<?php echo $edit ? ' allforms-visible' : ''; ?>
+        <?= csrf_field() ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?php echo $edit ? 'تعديل أمر شراء' : 'أمر شراء جديد'; ?></h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="id" value="<?php echo $edit ? intval($edit['id']) : ''; ?>">

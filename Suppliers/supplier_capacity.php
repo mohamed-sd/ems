@@ -171,6 +171,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <p style="color:#666">«لكل معدةٍ مخصَّصةٍ <strong>طاقةٌ نظريةٌ يوميةٌ بنموذجها</strong> …
             <strong>تُثبَّت في العقد</strong> — ومنها يُقاس أداءُ المورد <strong>لا من تقديرٍ لاحق</strong>» (§3).</p>
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="cap_action" value="capacity">
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <div class="form-grid">

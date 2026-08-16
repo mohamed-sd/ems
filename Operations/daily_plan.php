@@ -193,6 +193,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <p>لا خطةَ لهذا اليوم بعد — الاحتياجُ يُولَّد من حاويات المعدات النشطة (لا من اليد).</p>
             <?php if ($can_add): ?>
             <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                 <input type="hidden" name="dp_action" value="generate">
                 <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                 <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
@@ -213,12 +214,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">
                 <?php if ($editable): ?>
                 <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                     <input type="hidden" name="dp_action" value="generate">
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                     <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
                     <button type="submit" class="btn btn-sm btn-secondary">حدّث الاحتياج</button>
                 </form>
                 <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                     <input type="hidden" name="dp_action" value="approve">
                     <input type="hidden" name="plan_id" value="<?php echo intval($plan['id']); ?>">
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
@@ -227,6 +230,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </form>
                 <?php elseif ($plan['state'] === 'approved' && $can_edit): ?>
                 <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                     <input type="hidden" name="dp_action" value="open">
                     <input type="hidden" name="plan_id" value="<?php echo intval($plan['id']); ?>">
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
@@ -236,6 +240,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php endif; ?>
                 <?php if (in_array(strval($plan['state']), array('approved', 'opened'), true) && $can_edit): ?>
                 <form method="post" style="display:inline-flex;gap:4px">
+        <?= csrf_field() ?>
                     <input type="hidden" name="dp_action" value="reopen">
                     <input type="hidden" name="plan_id" value="<?php echo intval($plan['id']); ?>">
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
@@ -290,6 +295,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php if ($editable): ?>
                             <td>
                                 <form method="post" style="display:inline-flex;gap:4px">
+        <?= csrf_field() ?>
                                     <input type="hidden" name="dp_action" value="assign">
                                     <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">

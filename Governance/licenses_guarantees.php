@@ -156,6 +156,7 @@ include '../insidebar.php';
             <td>
                 <?php if ($gov_write): ?>
                 <form method="post" style="display:flex;gap:4px">
+        <?= csrf_field() ?>
                     <input type="hidden" name="op" value="renew">
                     <input type="hidden" name="lic_id" value="<?php echo intval($l['lic_id']); ?>">
                     <input type="date" name="new_expiry" required>
@@ -193,6 +194,7 @@ include '../insidebar.php';
         <div class="card" style="flex:1;min-width:340px"><div class="card-body">
             <h4>ترخيص جديد</h4>
             <form method="post" class="ems-form" style="display:grid;gap:8px">
+        <?= csrf_field() ?>
                 <input type="hidden" name="op" value="license">
                 <select name="entity_id" required>
                     <option value="">— الكيان *</option>
@@ -211,6 +213,7 @@ include '../insidebar.php';
         <div class="card" style="flex:1;min-width:340px"><div class="card-body">
             <h4>كفالة / خطاب ضمان</h4>
             <form method="post" class="ems-form" style="display:grid;gap:8px">
+        <?= csrf_field() ?>
                 <input type="hidden" name="op" value="guarantee">
                 <select name="direction" required>
                     <option value="issued">صادرة منا (التزام محتمل)</option>

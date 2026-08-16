@@ -169,6 +169,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <div class="card-body">
         <?php if ($can_add): ?>
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="ev_action" value="weight">
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
@@ -208,6 +209,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <?php if ($can_add && $selected > 0): ?>
     <div class="card"><div class="card-body">
         <form method="post" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <?= csrf_field() ?>
             <input type="hidden" name="ev_action" value="generate">
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
             <input type="hidden" name="from" value="<?php echo htmlspecialchars($pFrom); ?>">
@@ -304,6 +306,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
 
         <?php if ($can_edit && (string)$openEval['state'] === 'draft'): ?>
         <form method="post" class="ems-form" style="margin-top:14px">
+        <?= csrf_field() ?>
             <input type="hidden" name="ev_action" value="decide">
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
             <input type="hidden" name="evaluation_id" value="<?php echo intval($openEval['id']); ?>">

@@ -122,6 +122,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php if (!$ev || $state === 'SelfDraft'): ?>
         <h6>① التقييمُ الذاتي</h6>
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="ev_action" value="self_save">
             <input type="hidden" name="capacity_id" value="<?php echo $capId; ?>">
             <input type="hidden" name="from" value="<?php echo htmlspecialchars($from); ?>">
@@ -140,6 +141,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </form>
         <?php if ($ev): ?>
         <form method="post" style="margin-top:8px">
+        <?= csrf_field() ?>
             <input type="hidden" name="ev_action" value="self_close">
             <input type="hidden" name="eval_id" value="<?php echo intval($ev['id']); ?>">
             <input type="hidden" name="version" value="<?php echo intval($ev['version']); ?>">
@@ -155,6 +157,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <h6>② تقييمُ المدير <small style="color:#888">(يرى الذاتيَّ الآن — بعد إقفاله)</small></h6>
         <p><small>الذاتي: <?php echo htmlspecialchars((string)$ev['self_scores_json']); ?></small></p>
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="ev_action" value="mgr_submit">
             <input type="hidden" name="eval_id" value="<?php echo intval($ev['id']); ?>">
             <input type="hidden" name="version" value="<?php echo intval($ev['version']); ?>">
@@ -177,6 +180,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php if ($ev && $state === 'MgrDraft'): ?>
         <h6 style="margin-top:14px">③ المناقشة</h6>
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="ev_action" value="discuss">
             <input type="hidden" name="eval_id" value="<?php echo intval($ev['id']); ?>">
             <input type="hidden" name="version" value="<?php echo intval($ev['version']); ?>">
@@ -192,6 +196,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php if ($ev && $state === 'Discussed'): ?>
         <h6 style="margin-top:14px">④ الاعتماد <small style="color:#888">(لا اعتمادَ للذات)</small></h6>
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="ev_action" value="approve">
             <input type="hidden" name="eval_id" value="<?php echo intval($ev['id']); ?>">
             <input type="hidden" name="version" value="<?php echo intval($ev['version']); ?>">

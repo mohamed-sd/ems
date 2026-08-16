@@ -115,6 +115,7 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars($o['eq_name'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= intval($o['status']) === 1 ? 'عاملة' : 'متوقفة' ?></td>
         <form method="post">
+        <?= csrf_field() ?>
           <input type="hidden" name="rts_order" value="<?= intval($o['id']) ?>">
           <td><input type="text" name="readiness_note" class="form-control form-control-sm" placeholder="فُحصت وجاهزة — التوقيع الفني" required aria-label="فُحصت وجاهزة — التوقيع الفني"></td>
           <td><button class="action-btn" type="submit"><i class="fa fa-undo"></i> أعد للخدمة وأقفل</button></td>

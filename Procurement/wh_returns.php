@@ -106,6 +106,7 @@ include __DIR__ . '/../includes/page_header.php';
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <form method="post" class="ems-form" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:16px">
+        <?= csrf_field() ?>
     <div><label for="wr_issue_line">سطرُ سندِ الصرف الأصلي</label>
       <select id="wr_issue_line" name="issue_line" class="form-control" required><option value="">—</option>
       <?php foreach ($issues as $i): if ($i['available'] <= 0) { continue; } ?>

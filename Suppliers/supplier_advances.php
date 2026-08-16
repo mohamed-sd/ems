@@ -138,6 +138,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($can_add): ?>
     <form method="post" class="allforms" id="sadvForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="sa_action" value="open">
         <div class="card"><div class="card-header"><h5><i class="fa fa-money-bill-transfer"></i> سلفةٌ جديدة</h5></div>
         <div class="card-body"><div class="form-grid">
@@ -243,6 +244,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td>
                     <?php if ($can_edit && (string)$a['state'] === 'draft'): ?>
                         <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                             <input type="hidden" name="sa_action" value="approve">
                             <input type="hidden" name="advance_id" value="<?php echo intval($a['id']); ?>">
                             <button type="submit" class="action-btn edit" title="اعتماد (فصلُ اليدين)">

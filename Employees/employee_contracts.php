@@ -82,6 +82,7 @@ include('../insidebar.php'); ?>
 
     <!-- فورم إضافة عقد -->
     <form id="projectForm" action="" method="post" class="allforms">
+        <?= csrf_field() ?>
 
       <div class="card">
         <div class="card-header">

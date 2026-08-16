@@ -195,6 +195,7 @@ include __DIR__ . '/../includes/page_header.php';
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
 
   <form method="post" class="ems-form" style="max-width:640px">
+        <?= csrf_field() ?>
     <input type="hidden" name="site" value="<?= $site ?>">
     <input type="hidden" name="equipment" value="<?= $equipment ?>">
     <div class="form-group">

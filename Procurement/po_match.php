@@ -262,6 +262,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $tol   = proc_match_tolerance($oAmt);
     ?>
     <form action="po_match.php" method="post" class="allforms allforms-visible">
+        <?= csrf_field() ?>
         <div class="card-header"><h5><i class="fas fa-file-invoice"></i>
             تسجيل فاتورة المورد — أمر <?php echo htmlspecialchars((string) $match_order['code']); ?></h5></div>
         <div class="card"><div class="card-body">
@@ -313,6 +314,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $rInv = (float) $resolve_order['invoice_amount'];
     ?>
     <form action="po_match.php" method="post" class="allforms allforms-visible">
+        <?= csrf_field() ?>
         <div class="card-header"><h5><i class="fas fa-gavel"></i>
             حسم الفرق المعلَّق — أمر <?php echo htmlspecialchars((string) $resolve_order['code']); ?></h5></div>
         <div class="card"><div class="card-body">

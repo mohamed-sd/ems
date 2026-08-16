@@ -152,6 +152,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <h4>كيان جديد — ابحث بالثلاثية أولًا فالسجل واحد لا يتكرر</h4>
         <form method="post" class="ems-form" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <?= csrf_field() ?>
             <input type="hidden" name="op" value="create">
             <input type="text" name="legal_name" placeholder="الاسم القانوني الكامل *" required aria-label="الاسم القانوني الكامل">
             <input type="text" name="legal_form" placeholder="الشكل النظامي (ذ.م.م …)" aria-label="الشكل النظامي (ذ.م.م …)">

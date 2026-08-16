@@ -187,6 +187,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <!-- فورم إضافة عقد -->
   <?php if ($can_add || $can_edit): ?>
     <form id="projectForm" action="" method="post" class="allforms">
+        <?= csrf_field() ?>
         <div class="card-header">
           <h5>
             <i class="fas fa-file-signature"></i> إضافة / تعديل عقد المورد

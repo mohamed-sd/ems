@@ -323,6 +323,7 @@ include __DIR__ . '/../includes/page_header.php';
   <details style="margin-bottom:14px"><summary style="cursor:pointer;font-weight:bold">
     <i class="fa fa-user-plus"></i> تكليف عضوٍ من إدارتي (SRC-01)</summary>
     <form method="post" class="ems-form" style="display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-top:10px">
+        <?= csrf_field() ?>
       <input type="hidden" name="action" value="dept_assign">
       <div><label for="emsf_1170_47df2">المكلَّف</label>
         <select name="to_user" class="form-control" required id="emsf_1170_47df2">

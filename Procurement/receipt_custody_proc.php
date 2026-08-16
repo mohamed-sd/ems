@@ -229,7 +229,8 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
 
     <?php proc_msg_banner(); ?>
 
-    <form id="procForm" action="receipt_custody_proc.php" method="post" class="allforms<?php echo $edit ? ' allforms-visible' : ''; ?>">
+    <form id="procForm" action="receipt_custody_proc.php" method="post" class="allforms<?php echo $edit ? ' allforms-visible' : ''; ?>
+        <?= csrf_field() ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?php echo $edit ? 'تعديل عهدة استلام' : 'عهدة استلام جديدة'; ?></h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="id" value="<?php echo $edit ? intval($edit['id']) : ''; ?>">

@@ -332,6 +332,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- ══ فورم إضافة / تعديل مورد ══════════════════════════════════════════ -->
     <form id="projectForm" action="" method="post" class="allforms">
+        <?= csrf_field() ?>
            <div class="card-header">
                 <h5><i class="fas fa-edit"></i> إضافة / تعديل مورد</h5>
             </div>

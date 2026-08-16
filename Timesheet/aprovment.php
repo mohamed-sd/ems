@@ -114,6 +114,7 @@ include __DIR__ . '/../includes/page_header.php';
     <h2 style="text-align:center;"><?= $typetext; ?></h2>
 
     <form id="timesheetForm" action="" method="post" style="margin-top:40px; text-align:center; max-width:600px; margin-left:auto; margin-right:auto;">
+        <?= csrf_field() ?>
         <div>
             <input name="t" type="hidden" value="<?= $_GET['t']; ?>"/>
             <textarea name="time_notes" required placeholder="أدخل ملاحظاتك هنا" 

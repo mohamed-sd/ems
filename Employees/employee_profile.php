@@ -405,6 +405,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </a>
                         <form method="post" style="display:inline;margin:0;"
                               onsubmit="return confirm('هل تريد سحب حساب الدخول من هذا الموظف وتعطيله؟');">
+        <?= csrf_field() ?>
                             <input type="hidden" name="account_action" value="revoke">
                             <input type="hidden" name="target_uid" value="<?php echo intval($linked_user['id']); ?>">
                             <button type="submit" class="add-btn" style="background:#c81f24;border-color:#c81f24;">

@@ -216,6 +216,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
 
     <?php if ($can_add): ?>
     <form method="post" class="allforms" id="runForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="pr_action" value="open_run">
         <div class="card"><div class="card-header"><h5><i class="fa fa-calendar"></i> دورةُ مسيّرٍ جديدة</h5></div>
         <div class="card-body"><div class="form-grid">
@@ -254,6 +255,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                       && in_array((string)$run['state'], array('Open','Blocked'), true)): ?>
                 </form>
                 <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                     <input type="hidden" name="pr_action" value="bind">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
                     <button type="submit" class="btn-primary"><i class="fa fa-link"></i> اربط اللقطات</button>
@@ -262,16 +264,19 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
             <?php if ($run !== null && $can_edit
                       && in_array((string)$run['state'], array('Calculated','Blocked'), true)): ?>
                 <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                     <input type="hidden" name="pr_action" value="time_path">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
                     <button type="submit" class="btn-primary"><i class="fa fa-clock"></i> المسارُ الزمني</button>
                 </form>
                 <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                     <input type="hidden" name="pr_action" value="production_path">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
                     <button type="submit" class="btn-primary"><i class="fa fa-cubes"></i> المسارُ الإنتاجي</button>
                 </form>
                 <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                     <input type="hidden" name="pr_action" value="offsets">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
                     <button type="submit" class="btn-primary"><i class="fa fa-scale-balanced"></i> المقاصّة</button>
@@ -286,6 +291,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
             <strong>الانتقال:</strong>
             <?php foreach ($allowed as $to): ?>
                 <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                     <input type="hidden" name="pr_action" value="transition">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
                     <input type="hidden" name="to_state" value="<?php echo htmlspecialchars($to); ?>">
@@ -356,6 +362,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
             رقمٌ يزيد أجرًا بلا سند. ولا مصدرَ آليًّا لهذه المدخلات في النظام اليوم.
         </p>
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="pr_action" value="time_input">
             <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
             <div class="form-grid">

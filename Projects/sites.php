@@ -183,6 +183,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($can_add || $can_edit): ?>
     <form method="post" class="allforms" id="siteForm">
+        <?= csrf_field() ?>
         <div class="card"><div class="card-header"><h5><i class="fa fa-map-location-dot"></i> بيانات الموقع</h5></div>
         <div class="card-body"><div class="form-grid">
             <input type="hidden" name="site_id" id="f_site_id" value="">

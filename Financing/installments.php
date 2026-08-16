@@ -176,6 +176,7 @@ include __DIR__ . '/../includes/page_header.php';
         <td>
           <?php if (!$paid): ?>
           <form method="post" style="display:flex;gap:6px">
+        <?= csrf_field() ?>
             <input type="hidden" name="pay_inst" value="<?= intval($i['inst_id']) ?>">
             <input type="text" name="payment_ref" class="form-control form-control-sm" placeholder="مرجعُ السند" style="max-width:130px" required aria-label="مرجعُ السند">
             <button class="action-btn" type="submit">سدّد</button>

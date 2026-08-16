@@ -813,6 +813,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
         <?php if ($can_edit): ?>
             <form id="addDriverForm" action="" method="post" class="allforms add-driver-form">
+        <?= csrf_field() ?>
                 <input type="hidden" name="action" value="add_driver_assignment">
                 <div class="card">
                     <div class="card-header">
@@ -968,6 +969,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </div>
                     </div>
                     <form method="post" id="manageDriversForm">
+        <?= csrf_field() ?>
                         <div class="modal-body">
                             <input type="hidden" name="action" value="manage_equipment_drivers">
                             <input type="hidden" name="equipment_id" id="manageEquipmentId" value="">

@@ -235,7 +235,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
 
     <!-- ═══ فورم تصنيف/تعديل العامل ═══ -->
-    <form id="workerForm" action="" method="post" class="allforms" style="<?= $show_form ? '' : 'display:none;' ?>">
+    <form id="workerForm" action="" method="post" class="allforms" style="<?= $show_form ? '' : 'display:none;' ?>
+        <?= csrf_field() ?>">
         <input type="hidden" name="action" value="save_worker">
         <input type="hidden" name="id" value="<?= $edit_worker ? intval($edit_worker['id']) : 0 ?>">
         <div class="card-header">
@@ -368,6 +369,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="allforms" id="qualsPanel">
         <div class="card-header"><h5><i class="fas fa-certificate"></i> المهارات والرخص والاعتمادات</h5></div>
         <form action="" method="post" class="form-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
+        <?= csrf_field() ?>
             <input type="hidden" name="action" value="save_qualification">
             <input type="hidden" name="worker_id" value="<?= intval($edit_worker['id']) ?>">
             <div class="field"><label for="emsf_615_b4a08">النوع</label>
@@ -408,6 +410,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?= intval($q['is_critical']) ? '⚠️' : '—' ?></td>
                     <td><?php if ($can_delete): ?>
                         <form action="" method="post" onsubmit="return confirm('حذف الاعتماد؟');" style="display:inline;">
+        <?= csrf_field() ?>
                             <input type="hidden" name="action" value="delete_qualification">
                             <input type="hidden" name="qid" value="<?= intval($q['id']) ?>">
                             <input type="hidden" name="worker_id" value="<?= intval($edit_worker['id']) ?>">

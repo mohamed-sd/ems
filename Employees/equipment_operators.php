@@ -171,7 +171,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     <?php endif; ?>
 
-    <form id="opForm" action="" method="post" class="allforms" style="<?= $edit ? '' : 'display:none;' ?>">
+    <form id="opForm" action="" method="post" class="allforms" style="<?= $edit ? '' : 'display:none;' ?>
+        <?= csrf_field() ?>">
         <input type="hidden" name="id" value="<?= $edit ? intval($edit['id']) : 0 ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $edit ? 'تعديل بيانات المشغّل' : 'تسجيل سائق/مشغّل' ?></h5></div>
         <div class="form-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:14px;">

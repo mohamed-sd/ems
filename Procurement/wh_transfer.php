@@ -83,6 +83,7 @@ include __DIR__ . '/../includes/page_header.php';
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <form method="post" class="ems-form" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:16px">
+        <?= csrf_field() ?>
     <div><label for="emsf_1350_8dfe1">الصنف</label><select name="item_id" class="form-control" required id="emsf_1350_8dfe1"><option value="">—</option>
       <?php foreach ($items as $i): ?><option value="<?= intval($i['id']) ?>"><?= htmlspecialchars($i['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
     <div><label for="emsf_1351_042e3">من مخزن</label><select name="from_wh" class="form-control" required id="emsf_1351_042e3"><option value="">—</option>

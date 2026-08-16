@@ -262,37 +262,44 @@ include '../insidebar.php';
                     <td style="min-width:170px">
                         <?php $s = (string) $t['status']; ?>
                         <?php if ($isExec && $s === 'assigned'): ?>
-                            <form method="post" style="display:inline"><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="accepted">
+                            <form method="post" style="display:inline">
+        <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="accepted">
                                 <button class="btn btn-sm btn-secondary">استلام</button></form>
                         <?php endif; ?>
                         <?php if ($isExec && in_array($s, array('accepted', 'returned', 'reopened', 'blocked'), true)): ?>
-                            <form method="post" style="display:inline"><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="in_progress">
+                            <form method="post" style="display:inline">
+        <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="in_progress">
                                 <button class="btn btn-sm btn-secondary">بدء</button></form>
                         <?php endif; ?>
                         <?php if ($isExec && in_array($s, array('accepted', 'in_progress'), true)): ?>
                             <details style="display:inline-block"><summary class="btn btn-sm btn-secondary" style="display:inline-block">توقف</summary>
-                                <form method="post" style="margin-top:4px"><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="blocked">
+                                <form method="post" style="margin-top:4px">
+        <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="blocked">
                                     <select name="reason" class="form-control form-control-sm" style="margin-bottom:4px">
                                         <option value="awaiting_part">انتظار قطعة</option><option value="awaiting_client">قرار عميل</option>
                                         <option value="awaiting_higher_approval">اعتماد أعلى</option><option value="awaiting_external">طرف خارجي</option>
                                         <option value="force_majeure">قوة قاهرة</option></select>
                                     <button class="btn btn-sm btn-secondary">تأكيد التوقف</button></form></details>
                             <details style="display:inline-block"><summary class="btn btn-sm btn-primary" style="display:inline-block">إكمال</summary>
-                                <form method="post" style="margin-top:4px"><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="done_pending_verify">
+                                <form method="post" style="margin-top:4px">
+        <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="done_pending_verify">
                                     <input name="evidence" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="دليل الإنجاز (إلزامي منطقًا: <?php echo htmlspecialchars((string) $t['evidence_required']); ?>)" required aria-label="دليل الإنجاز (إلزامي منطقًا: )">
                                     <button class="btn btn-sm btn-primary">تقديم للتحقق</button></form></details>
                         <?php endif; ?>
                         <?php if ($isVerifier && $s === 'done_pending_verify'): ?>
-                            <form method="post" style="display:inline"><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="closed_accepted">
+                            <form method="post" style="display:inline">
+        <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="closed_accepted">
                                 <button class="btn btn-sm btn-primary" title="الدليل: <?php echo htmlspecialchars((string) $t['evidence_ref']); ?>">قبول وإغلاق</button></form>
                             <details style="display:inline-block"><summary class="btn btn-sm btn-danger" style="display:inline-block">إعادة</summary>
-                                <form method="post" style="margin-top:4px"><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="returned">
+                                <form method="post" style="margin-top:4px">
+        <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="returned">
                                     <input name="reason" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="سبب الإعادة (إلزامي)" required aria-label="سبب الإعادة (إلزامي)">
                                     <button class="btn btn-sm btn-danger">إعادة للمنفِّذ</button></form></details>
                         <?php endif; ?>
                         <?php if ($isOwner && in_array($s, array('assigned', 'accepted', 'in_progress', 'blocked', 'overdue'), true)): ?>
                             <details style="display:inline-block"><summary class="btn btn-sm btn-secondary" style="display:inline-block">نقل</summary>
-                                <form method="post" style="margin-top:4px"><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="reassign">
+                                <form method="post" style="margin-top:4px">
+        <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="reassign">
                                     <input name="to_user" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="معرّف المنفِّذ الجديد" required aria-label="معرّف المنفِّذ الجديد">
                                     <input name="reason" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="السبب (إلزامي — العدُّ يستمر)" required aria-label="السبب (إلزامي — العدُّ يستمر)">
                                     <button class="btn btn-sm btn-secondary">نقل</button></form></details>

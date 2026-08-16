@@ -140,6 +140,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <?php if ($isCeo): ?>
                     <td><?php if ($x['state'] === 'draft'): ?>
                         <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                             <input type="hidden" name="cmt_do" value="approve">
                             <input type="hidden" name="minute_id" value="<?php echo (int) $x['id']; ?>">
                             <button class="btn btn-sm btn-primary" type="submit">اعتماد</button>
@@ -157,6 +158,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="card" id="cmtNewCard" style="display:none;margin-top:16px"><div class="card-body">
         <h5>محضر لجنة جديد (مسوَّدة)</h5>
         <form method="post" class="allforms">
+        <?= csrf_field() ?>
             <input type="hidden" name="cmt_do" value="create">
             <div class="row">
                 <div class="col-md-3"><label>تاريخ الاجتماع *<input name="meeting_date" type="date" class="form-control" required></label></div>

@@ -364,7 +364,8 @@ include __DIR__ . '/../includes/page_header.php';
     <?php endif; ?>
 
     <!-- فورم إضافة / تعديل -->
-    <form id="moduleForm" action="" method="post" class="ems-form" style="display:<?= !empty($editData) ? 'block' : 'none'; ?>">
+    <form id="moduleForm" action="" method="post" class="ems-form" style="display:<?= !empty($editData) ? 'block' : 'none'; ?>
+        <?= csrf_field() ?>">
         <div class="card">
             <div class="card-header">
                 <h5><i class="fas fa-edit"></i> <?= !empty($editData) ? 'تعديل الصفحة' : 'إضافة صفحة جديدة'; ?></h5>

@@ -171,6 +171,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-plus"></i> تسجيلُ قراءة</h5></div>
     <div class="card-body">
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="mr_action" value="record">
             <input type="hidden" name="equipment_id" value="<?php echo $selected; ?>">
             <input type="hidden" name="meter_type" value="<?php echo htmlspecialchars($mtype); ?>">
@@ -254,6 +255,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             (UX-10 §8). والسببُ ومرجعُ المستند <strong>إلزاميان</strong>.
         </p>
         <form method="post" class="ems-form" onsubmit="return confirm('تأكيدُ التصفير — يفتح سلسلةً جديدة؟');">
+        <?= csrf_field() ?>
             <input type="hidden" name="mr_action" value="reset">
             <input type="hidden" name="equipment_id" value="<?php echo $selected; ?>">
             <input type="hidden" name="meter_type" value="<?php echo htmlspecialchars($mtype); ?>">

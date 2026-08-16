@@ -236,6 +236,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
 
     <?php if ($can_add): ?>
     <form method="post" class="allforms" id="contractForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="sc_action" value="create_contract">
         <div class="card"><div class="card-header"><h5><i class="fa fa-handshake"></i> عقدُ مورد جديد (يُنشأ مسودةً)</h5></div>
         <div class="card-body"><div class="form-grid">
@@ -432,6 +433,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
 
         <?php if (($can_add || $can_edit) && $head !== null && $blocked === null): ?>
         <form method="post" class="ems-form" id="lineForm" style="margin-top:16px">
+        <?= csrf_field() ?>
             <input type="hidden" name="sc_action" value="save_line">
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <input type="hidden" name="line_id" id="f_line_id" value="">

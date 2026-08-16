@@ -384,6 +384,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
     <form method="post" action="" class="allforms" id="cmp03AddForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="cmp03_action" value="add">
         <div class="card"><div class="card-header">
             <h5><i class="fa fa-plus"></i> إضافة — قرار فتح مشروع جديد</h5>
@@ -463,6 +464,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $canCharter = $is_super_admin || strval($_SESSION['user']['role'] ?? '') === '9';
     if ($canCharter && $charterable): ?>
     <form method="post" action="" class="allforms allforms-visible" id="cmp03CharterForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="cmp03_action" value="charter">
         <div class="card"><div class="card-header">
             <h5><i class="fa fa-folder-open"></i> اعتماد الفتح — الأثر الخماسي: مشروع · مركز تكلفة · مواقع · مدير · حجز</h5>

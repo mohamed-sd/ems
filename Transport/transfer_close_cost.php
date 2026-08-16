@@ -148,6 +148,7 @@ include __DIR__ . '/../includes/page_header.php';
         <td>—</td>
           <?php else: ?>
           <form method="post" style="display:flex;gap:6px">
+        <?= csrf_field() ?>
             <input type="hidden" name="close_id" value="<?= $rid ?>">
             <label class="visually-hidden" for="cls_cost_<?= $rid ?>">التكلفةُ الفعلية</label>
             <input id="cls_cost_<?= $rid ?>" type="number" step="0.01" min="0.01" name="actual_cost" class="form-control form-control-sm"

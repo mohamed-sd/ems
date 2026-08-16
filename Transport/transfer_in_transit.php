@@ -105,7 +105,8 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars($o['driver'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($o['departure_datetime'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= $hrs !== null ? $hrs . ' ساعة' : '—' ?></td>
-        <td><form method="post" style="display:inline"><input type="hidden" name="arrive_id" value="<?= intval($o['id']) ?>">
+        <td><form method="post" style="display:inline">
+        <?= csrf_field() ?><input type="hidden" name="arrive_id" value="<?= intval($o['id']) ?>">
             <button class="action-btn" type="submit"><i class="fa fa-flag-checkered"></i> وصلت</button></form></td>
       </tr>
     <?php endforeach; ?>

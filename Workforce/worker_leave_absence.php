@@ -89,6 +89,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
     <form id="lForm" action="" method="post" class="allforms" style="display:none;">
+        <?= csrf_field() ?>
         <input type="hidden" name="action" value="save">
         <div class="card-header"><h5><i class="fas fa-plus"></i> إجازة / غياب</h5></div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
@@ -158,7 +159,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             ]); ?>
             <tr><td><div class="action-btns" style="gap:4px;align-items:center;">
                 <?= ems_wf_view_button($r['id']) ?>
-                <form action="" method="post" style="display:inline;"><input type="hidden" name="action" value="set_state"><input type="hidden" name="id" value="<?= intval($r['id']) ?>">
+                <form action="" method="post" style="display:inline;">
+        <?= csrf_field() ?><input type="hidden" name="action" value="set_state"><input type="hidden" name="id" value="<?= intval($r['id']) ?>">
                     <select name="new_state" onchange="this.form.submit()" <?= $can_edit?'':'disabled' ?> style="padding:2px;"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= ($r['state']===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select>
                 </form>
                 <?php if($can_delete): ?><a href="worker_leave_absence.php?delete=<?= intval($r['id']) ?>" class="action-btn delete" onclick="return confirm('حذف؟')"><i class="fas fa-trash"></i></a><?php endif; ?>

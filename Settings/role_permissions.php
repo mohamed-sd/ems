@@ -802,6 +802,7 @@ include __DIR__ . '/../includes/page_header.php';
                             </div>
                             <div class="action-buttons">
                                 <form method="POST" style="margin: 0;">
+        <?= csrf_field() ?>
                                     <input type="hidden" name="action" value="grant_all">
                                     <input type="hidden" name="role_id" value="<?php echo $selected_role_id; ?>">
                                     <button type="submit" class="btn btn-sm btn-primary" style="background: linear-gradient(135deg, var(--teal) 0%, #059669 100%); color: white; border: none;">
@@ -809,6 +810,7 @@ include __DIR__ . '/../includes/page_header.php';
                                     </button>
                                 </form>
                                 <form method="POST" style="margin: 0;">
+        <?= csrf_field() ?>
                                     <input type="hidden" name="action" value="revoke_all">
                                     <input type="hidden" name="role_id" value="<?php echo $selected_role_id; ?>">
                                     <button type="submit" class="btn btn-sm btn-danger" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none;">
@@ -826,6 +828,7 @@ include __DIR__ . '/../includes/page_header.php';
                                         <div class="permission-code"><?php echo htmlspecialchars($module['code']); ?></div>
 
                                         <form method="POST">
+        <?= csrf_field() ?>
                                             <input type="hidden" name="action" value="save_permissions">
                                             <input type="hidden" name="role_id" value="<?php echo $selected_role_id; ?>">
                                             <input type="hidden" name="module_id" value="<?php echo $module['id']; ?>">
@@ -936,6 +939,7 @@ include __DIR__ . '/../includes/page_header.php';
                                         </span></td>
                                         <td>
                                             <form method="POST" style="display: inline;">
+        <?= csrf_field() ?>
                                                 <input type="hidden" name="action" value="delete_permission">
                                                 <input type="hidden" name="id" value="<?php echo $perm['id']; ?>">
                                                 <button type="submit" class="btn btn-sm btn-danger" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 0.3rem 0.8rem;">
@@ -962,6 +966,7 @@ include __DIR__ . '/../includes/page_header.php';
                         </div>
                         <div class="card-body-custom">
                             <form method="POST">
+        <?= csrf_field() ?>
                                 <input type="hidden" name="action" value="grant_all">
                                 <div class="mb-3">
                                     <label class="form-label">اختر الدور</label>
@@ -990,6 +995,7 @@ include __DIR__ . '/../includes/page_header.php';
                         </div>
                         <div class="card-body-custom">
                             <form method="POST">
+        <?= csrf_field() ?>
                                 <input type="hidden" name="action" value="revoke_all">
                                 <div class="mb-3">
                                     <label class="form-label" for="emsf_470_22ae4">اختر الدور</label>

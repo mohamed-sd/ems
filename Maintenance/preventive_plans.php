@@ -284,6 +284,7 @@ function mnt_opt($value, $label, $selected) {
     include('../includes/page_header.php');
     ?>
     <form method="post" action="" class="allforms allforms-visible" id="planForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="action" value="save_plan">
         <input type="hidden" name="id" value="<?php echo intval($plan['id']); ?>">
         <div class="card-header"><h5><i class="fas fa-calendar-check"></i> بيانات الخطة</h5></div>
@@ -387,6 +388,7 @@ function mnt_opt($value, $label, $selected) {
     <?php if ($can_add): ?>
     <!-- فورم إنشاء خطة (نمط العملاء/المشاريع: يُفتح بزر «خطة جديدة»، ولا يُحفظ شيء إلا عند الإرسال) -->
     <form method="post" action="" class="allforms" id="planCreateForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="action" value="new_plan">
         <div class="card-header"><h5><i class="fas fa-calendar-check"></i> إنشاء خطة وقائية جديدة</h5></div>
         <div class="card"><div class="card-body">
@@ -476,6 +478,7 @@ function mnt_opt($value, $label, $selected) {
                     <td>
                         <?php if ($can_add): ?>
                         <form method="post" action="" style="display:inline" onsubmit="return confirm('توليد أمر صيانة وقائي من هذه الخطة؟')">
+        <?= csrf_field() ?>
                             <input type="hidden" name="action" value="generate_order">
                             <input type="hidden" name="plan_id" value="<?php echo intval($r['id']); ?>">
                             <button type="submit" class="add-btn" title="توليد أمر"><i class="fas fa-wrench"></i> توليد أمر</button>
@@ -492,6 +495,7 @@ function mnt_opt($value, $label, $selected) {
                         <?php if ($can_edit && $r['trigger_basis'] === 'زمن'): ?>
                         <form method="post" style="display:inline-flex;gap:4px;margin-inline-start:6px"
                               onsubmit="return this.reason.value.trim() !== '' || (alert('السببُ إلزامي'), false)">
+        <?= csrf_field() ?>
                             <input type="hidden" name="action" value="postpone_plan">
                             <input type="hidden" name="plan_id" value="<?php echo intval($r['id']); ?>">
                             <input type="number" name="days" min="1" max="90" value="7" style="width:56px" title="أيام التأجيل" aria-label="أيام التأجيل">

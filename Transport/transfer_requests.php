@@ -157,6 +157,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php trs_msg_banner(); ?>
 
     <form id="trsForm" action="transfer_requests.php" method="post" class="allforms">
+        <?= csrf_field() ?>
         <input type="hidden" name="action" value="create">
         <div class="card-header"><h5><i class="fas fa-edit"></i> طلب ترحيل جديد</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
@@ -229,8 +230,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             echo "<tr>";
             echo "<td><div class='action-btns' style='gap:4px'>";
             if ($can_edit && $state === 'submitted') {
-                echo "<form method='post' style='display:inline'><input type='hidden' name='action' value='approve'><input type='hidden' name='request_id' value='" . intval($row['id']) . "'><button class='action-btn' style='color:#198754' title='اعتماد'><i class='fas fa-check'></i></button></form>";
-                echo "<form method='post' style='display:inline' onsubmit='return confirm(\"رفض الطلب؟\")'><input type='hidden' name='action' value='reject'><input type='hidden' name='request_id' value='" . intval($row['id']) . "'><button class='action-btn delete' title='رفض'><i class='fas fa-times'></i></button></form>";
+                echo "<form method='post' style='display:inline'>
+        <?= csrf_field() ?><input type='hidden' name='action' value='approve'><input type='hidden' name='request_id' value='" . intval($row['id']) . "'><button class='action-btn' style='color:#198754' title='اعتماد'><i class='fas fa-check'></i></button></form>";
+                echo "<form method='post' style='display:inline' onsubmit='return confirm(\"رفض الطلب؟\")'>
+        <?= csrf_field() ?><input type='hidden' name='action' value='reject'><input type='hidden' name='request_id' value='" . intval($row['id']) . "'><button class='action-btn delete' title='رفض'><i class='fas fa-times'></i></button></form>";
             }
             if ($can_edit && $state === 'approved') {
                 echo "<button type='button' class='action-btn edit convertBtn' data-id='" . intval($row['id']) . "' title='تحويل لأمر'><i class='fas fa-right-to-bracket'></i></button>";
@@ -258,6 +261,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <div style="background:#fff;border-radius:12px;padding:24px;min-width:320px;max-width:90%">
     <h5 style="margin-top:0"><i class="fa fa-arrows-turn-right"></i> تحويل الطلب إلى أمر</h5>
     <form method="post">
+        <?= csrf_field() ?>
       <input type="hidden" name="action" value="convert">
       <input type="hidden" name="request_id" id="convert_rid" value="">
       <div class="form-group"><label for="emsf_1604_5b717">الاتجاه (إلزامي) <span class="required">*</span></label>

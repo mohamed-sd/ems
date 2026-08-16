@@ -141,6 +141,7 @@ include '../insidebar.php';
     <div class="card-body">
         <form method="post" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end"
               onsubmit="return confirm('المنح قرار حوكمة موثَّق بتوقيعه — أتؤكد؟');">
+        <?= csrf_field() ?>
             <input type="hidden" name="op" value="grant">
             <div><label>المستخدم</label><br>
                 <select name="person_id" required>
@@ -195,6 +196,7 @@ include '../insidebar.php';
                 <?php if ($g['state'] === 'active'): ?>
                 <form method="post" style="display:flex;gap:6px"
                       onsubmit="return confirm('إلغاء المنحة يحجب الباب عن صاحبها فورًا — أتؤكد بقرار موثَّق؟');">
+        <?= csrf_field() ?>
                     <input type="hidden" name="op" value="revoke">
                     <input type="hidden" name="grant_id" value="<?php echo intval($g['grant_id']); ?>">
                     <input type="text" name="revoke_reason" placeholder="سبب الإلغاء — إلزامي" style="width:150px" aria-label="سبب الإلغاء — إلزامي">

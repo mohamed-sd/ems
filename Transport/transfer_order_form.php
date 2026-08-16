@@ -619,7 +619,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             );
             foreach ($line_rows as $x) {
                 echo "<tr><td><div class='action-btns'>";
-                if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' style='display:inline' onsubmit='return confirm(\"حذف العنصر؟\")'><input type='hidden' name='action' value='del_line'><input type='hidden' name='id' value='" . intval($order_id) . "'><input type='hidden' name='line_id' value='" . intval($x['id']) . "'><button class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></button></form>";
+                if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' style='display:inline' onsubmit='return confirm(\"حذف العنصر؟\")'>
+        <?= csrf_field() ?><input type='hidden' name='action' value='del_line'><input type='hidden' name='id' value='" . intval($order_id) . "'><input type='hidden' name='line_id' value='" . intval($x['id']) . "'><button class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></button></form>";
                 echo "</div></td>";
                 echo "<td>" . htmlspecialchars(trs_label($item_types, $x['item_type'])) . "</td>";
                 echo "<td>" . htmlspecialchars((string)($x['ecode'] ?? '—')) . "</td>";
@@ -667,7 +668,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             foreach ($cost_rows as $x) {
                 $sum += (float)$x['amount_usd'];
                 echo "<tr><td><div class='action-btns'>";
-                if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' style='display:inline' onsubmit='return confirm(\"حذف البند؟\")'><input type='hidden' name='action' value='del_cost'><input type='hidden' name='id' value='" . intval($order_id) . "'><input type='hidden' name='cost_id' value='" . intval($x['id']) . "'><button class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></button></form>";
+                if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' style='display:inline' onsubmit='return confirm(\"حذف البند؟\")'>
+        <?= csrf_field() ?><input type='hidden' name='action' value='del_cost'><input type='hidden' name='id' value='" . intval($order_id) . "'><input type='hidden' name='cost_id' value='" . intval($x['id']) . "'><button class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></button></form>";
                 echo "</div></td>";
                 echo "<td>" . htmlspecialchars(trs_label($cost_types, $x['cost_type'])) . "</td>";
                 echo "<td>" . number_format((float)$x['amount_local'], 2) . "</td>";
@@ -713,7 +715,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             ));
             foreach ($permit_rows as $x) {
                 echo "<tr><td><div class='action-btns'>";
-                if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' style='display:inline' onsubmit='return confirm(\"حذف التصريح؟\")'><input type='hidden' name='action' value='del_permit'><input type='hidden' name='id' value='" . intval($order_id) . "'><input type='hidden' name='permit_id' value='" . intval($x['id']) . "'><button class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></button></form>";
+                if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' style='display:inline' onsubmit='return confirm(\"حذف التصريح؟\")'>
+        <?= csrf_field() ?><input type='hidden' name='action' value='del_permit'><input type='hidden' name='id' value='" . intval($order_id) . "'><input type='hidden' name='permit_id' value='" . intval($x['id']) . "'><button class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></button></form>";
                 echo "</div></td>";
                 echo "<td>" . htmlspecialchars(trs_label($permit_types, $x['permit_type'])) . "</td>";
                 echo "<td>" . htmlspecialchars((string)($x['authority'] ?? '—')) . "</td>";

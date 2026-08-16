@@ -123,7 +123,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <!-- فورم إضافة/تعديل -->
-    <form id="erForm" action="" method="post" class="allforms" style="<?= $editData ? '' : 'display:none;' ?>">
+    <form id="erForm" action="" method="post" class="allforms" style="<?= $editData ? '' : 'display:none;' ?>
+        <?= csrf_field() ?>">
         <input type="hidden" name="edit_id" id="edit_id" value="<?= $editData ? intval($editData['id']) : '' ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $editData ? 'تعديل دور' : 'إضافة دور' ?></h5></div>
         <div class="form-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:14px;">

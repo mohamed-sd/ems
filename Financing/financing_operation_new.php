@@ -120,6 +120,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <h4>② العملية — رأس المال والعائد والأقساط</h4>
         <form method="post" id="opform" class="ems-form" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <?= csrf_field() ?>
             <input type="hidden" name="model_code" id="model_code" value="">
             <input type="text" name="op_code" placeholder="كود العملية *" required aria-label="كود العملية">
             <select name="financier_entity_id" required>

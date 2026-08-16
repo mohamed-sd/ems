@@ -581,6 +581,7 @@ function mnt_state_class($st) {
 
     <!-- فورم رأس الأمر -->
     <form method="post" action="" class="allforms allforms-visible" id="orderForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="action" value="save_order">
         <input type="hidden" name="id" value="<?php echo intval($order['id']); ?>">
         <div class="card-header"><h5><i class="fas fa-clipboard-list"></i> بيانات أمر الصيانة</h5></div>
@@ -879,6 +880,7 @@ function mnt_state_class($st) {
     <?php if ($can_add): ?>
     <!-- فورم إنشاء أمر (نمط العملاء/المشاريع: يُفتح بزر «أمر صيانة جديد»، ولا يُحفظ شيء إلا عند الإرسال) -->
     <form method="post" action="" class="allforms" id="orderCreateForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="action" value="new_order">
         <div class="card-header"><h5><i class="fas fa-wrench"></i> إنشاء أمر صيانة جديد</h5></div>
         <div class="card"><div class="card-body">

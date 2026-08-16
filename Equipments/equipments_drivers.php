@@ -345,7 +345,8 @@ include __DIR__ . '/../includes/page_header.php';
 
     <?php if ($_SESSION['user']['role'] != "10") { ?>
     <!-- فورم إضافة / تعديل معدة -->
-    <form id="projectForm" action="" method="post" class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>">
+    <form id="projectForm" action="" method="post" class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>
+        <?= csrf_field() ?>">
         <div class="card">
             <div class="card-header">
                 <h5>

@@ -179,6 +179,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <h5 style="margin:0 0 10px;"><i class="fas fa-plus"></i> وثيقة جديدة / تجديد</h5>
         <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;">
+        <?= csrf_field() ?>
             <input type="hidden" name="add_doc" value="1">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">

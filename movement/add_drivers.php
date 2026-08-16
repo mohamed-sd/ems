@@ -968,6 +968,7 @@ include("../inheader.php");
             </div>
 
             <form method="POST" action="save_equipment_drivers.php">
+        <?= csrf_field() ?>
                 <input type="hidden" name="equipment_id" value="<?php echo $equipment_id; ?>">
 
                 <div class="form-grid">

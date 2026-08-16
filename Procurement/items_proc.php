@@ -127,6 +127,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- فورم إضافة/تعديل -->
     <form id="procForm" action="" method="post" class="allforms">
+        <?= csrf_field() ?>
         <div class="card-header"><h5><i class="fas fa-edit"></i> إضافة / تعديل صنف</h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="id" id="p_id" value="">

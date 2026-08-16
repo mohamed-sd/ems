@@ -164,6 +164,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <p style="color:#666">«ما يُحمَّل عليه من مصروفاتنا … <strong>بأسعارٍ وقواعدَ مكتوبة</strong>» (§2-⑥)
             — و<strong>قاعدةٌ بلا سعرٍ مكتوبٍ مرفوضة</strong>.</p>
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="sr_action" value="charge_rule">
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
@@ -249,6 +250,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <p style="color:#666">«الجزاءاتُ … <strong>وسقوفُها</strong>» (§2-⑦) — و<strong>«له أن يشدّد جزاءَه
             لا أن يعكس إسنادًا»</strong> (§4): نقضُ الإسناد الموروث يلزمه سببٌ مكتوب.</p>
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="sr_action" value="penalty_rule">
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <div class="form-grid">

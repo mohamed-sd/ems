@@ -362,6 +362,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
         <details style="display:inline-block">
             <summary style="cursor:pointer" class="action-btn edit" title="جهات التحمّل">تحمّل</summary>
             <form method="post" style="margin-top:6px">
+        <?= csrf_field() ?>
                 <input type="hidden" name="do" value="bearer_set">
                 <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                 <input type="hidden" name="owner_type" value="<?php echo htmlspecialchars($ownerType); ?>">
@@ -445,6 +446,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                             <td>
                                 <?php if ($pc['state'] === 'active'): ?>
                                 <form method="post" style="display:inline-flex;gap:4px">
+        <?= csrf_field() ?>
                                     <input type="hidden" name="do" value="comp_end">
                                     <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                                     <input type="hidden" name="component_id" value="<?php echo intval($pc['id']); ?>">
@@ -465,6 +467,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
 
             <?php if ($vc_editable): ?>
             <form method="post" class="allforms allforms-visible" style="margin-top:14px">
+        <?= csrf_field() ?>
                 <input type="hidden" name="do" value="comp_add">
                 <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                 <div class="form-grid">
@@ -551,6 +554,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                 <details style="display:inline-block">
                                     <summary class="action-btn edit" style="cursor:pointer" title="توزيع">توزيع</summary>
                                     <form method="post" style="margin-top:6px">
+        <?= csrf_field() ?>
                                         <input type="hidden" name="do" value="inc_alloc">
                                         <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                                         <input type="hidden" name="rule_id" value="<?php echo $rid; ?>">
@@ -569,6 +573,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                     </form>
                                 </details>
                                 <form method="post" style="display:inline-flex;gap:4px">
+        <?= csrf_field() ?>
                                     <input type="hidden" name="do" value="inc_end">
                                     <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                                     <input type="hidden" name="rule_id" value="<?php echo $rid; ?>">
@@ -589,6 +594,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
 
             <?php if ($vc_editable): ?>
             <form method="post" class="allforms allforms-visible" style="margin-top:10px">
+        <?= csrf_field() ?>
                 <input type="hidden" name="do" value="inc_add">
                 <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                 <div class="form-grid">
@@ -648,6 +654,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                 <details style="display:inline-block">
                                     <summary class="action-btn edit" style="cursor:pointer" title="توزيع">توزيع</summary>
                                     <form method="post" style="margin-top:6px">
+        <?= csrf_field() ?>
                                         <input type="hidden" name="do" value="inc_alloc">
                                         <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                                         <input type="hidden" name="rule_id" value="<?php echo $rid; ?>">
@@ -666,6 +673,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                     </form>
                                 </details>
                                 <form method="post" style="display:inline-flex;gap:4px">
+        <?= csrf_field() ?>
                                     <input type="hidden" name="do" value="inc_end">
                                     <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                                     <input type="hidden" name="rule_id" value="<?php echo $rid; ?>">
@@ -686,6 +694,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
 
             <?php if ($vc_editable): ?>
             <form method="post" class="allforms allforms-visible" style="margin-top:10px">
+        <?= csrf_field() ?>
                 <input type="hidden" name="do" value="inc_add">
                 <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                 <div class="form-grid">
@@ -775,12 +784,14 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                             <td>
                                 <?php if ($am['state'] === 'draft'): ?>
                                 <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                                     <input type="hidden" name="do" value="amd_approve">
                                     <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                                     <input type="hidden" name="amendment_id" value="<?php echo $aid; ?>">
                                     <button type="submit" class="action-btn edit" title="اعتماد (لا اعتمادَ لمن أنشأ)"><i class="fas fa-check"></i></button>
                                 </form>
                                 <form method="post" style="display:inline-flex;gap:4px">
+        <?= csrf_field() ?>
                                     <input type="hidden" name="do" value="amd_reject">
                                     <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                                     <input type="hidden" name="amendment_id" value="<?php echo $aid; ?>">
@@ -801,6 +812,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
 
             <?php if ($isAmendable): ?>
             <form method="post" class="allforms allforms-visible" style="margin-top:10px">
+        <?= csrf_field() ?>
                 <input type="hidden" name="do" value="amd_add">
                 <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                 <input type="hidden" name="version" value="<?php echo intval($view_contract['version']); ?>">
@@ -827,6 +839,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                           && $vcState === ECSM::ACCEPTED && ($can_add || $can_edit)): ?>
             <!-- النسخةُ الموقَّعة — شرطُ Accepted → Signed · «ثابتةٌ لا تُستبدل» -->
             <form method="post" class="allforms allforms-visible" style="margin-top:10px">
+        <?= csrf_field() ?>
                 <input type="hidden" name="do" value="sign_attach">
                 <input type="hidden" name="contract_id" value="<?php echo intval($view_contract['id']); ?>">
                 <div class="form-grid">
@@ -845,6 +858,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
 
     <?php if ($can_add): ?>
     <form method="post" class="allforms" id="headForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="do" value="create">
         <div class="card"><div class="card-header"><h5><i class="fa fa-file-signature"></i> رأسُ عقدٍ جديد (مسودة — المكوّناتُ والحوافزُ والتحمّل مع الشرائح التالية)</h5></div>
         <div class="card-body"><div class="form-grid">
@@ -965,6 +979,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                 <?php $allowed = ECSM::allowedFrom($state); ?>
                                 <?php if ($allowed): ?>
                                 <form method="post" style="display:inline-flex;gap:4px;align-items:center">
+        <?= csrf_field() ?>
                                     <input type="hidden" name="do" value="transition">
                                     <input type="hidden" name="contract_id" value="<?php echo intval($r['id']); ?>">
                                     <input type="hidden" name="version" value="<?php echo intval($r['version']); ?>">
@@ -979,6 +994,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                 <?php endif; ?>
                                 <?php if (in_array($state, ECSM::HOLDABLE, true)): ?>
                                 <form method="post" style="display:inline-flex;gap:4px;align-items:center">
+        <?= csrf_field() ?>
                                     <input type="hidden" name="do" value="hold">
                                     <input type="hidden" name="contract_id" value="<?php echo intval($r['id']); ?>">
                                     <select name="hold_kind">
@@ -990,6 +1006,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                 </form>
                                 <?php elseif ($state === ECSM::SUSPENDED || $state === ECSM::SECONDED): ?>
                                 <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                                     <input type="hidden" name="do" value="resume">
                                     <input type="hidden" name="contract_id" value="<?php echo intval($r['id']); ?>">
                                     <input type="hidden" name="note" value="استئناف">

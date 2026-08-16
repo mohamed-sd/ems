@@ -87,6 +87,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-sliders"></i> ضبطُ مفتاح</h5></div>
     <div class="card-body">
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="vk_action" value="set">
             <div class="form-grid">
                 <div class="form-group"><label for="emsf_1249_f8679">العنصر *</label>

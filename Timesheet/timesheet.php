@@ -894,6 +894,7 @@ try {
            وعند عودةِ الشبكةِ يُرسَل **مرةً واحدةً** بمفتاحِ عطالتِه. */ ?>
   <form id="projectForm" action="" method="post" class="allforms"
         data-ems-outbox="1" data-ems-outbox-label="إدخالُ ورديةٍ">
+        <?= csrf_field() ?>
     <?php if ($_GET['type'] == "1") {
       // نوع المعدة كان حفار
       ?>

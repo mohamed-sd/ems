@@ -180,6 +180,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <?php endif; ?>
         <?php if ($can_edit): ?>
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="sd_action" value="bank">
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
@@ -208,6 +209,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             و<strong>السجلُّ التجاري والشهادةُ الضريبية يلزمهما تاريخُ صلاحية</strong>،
             فتنبيهٌ بلا تاريخٍ وعدٌ لا يُنفَّذ.</p>
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="sd_action" value="document">
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
             <div class="form-grid">

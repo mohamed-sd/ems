@@ -224,6 +224,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <h5 style="margin:0 0 10px;"><i class="fas fa-plus"></i> تسويةٌ جديدة</h5>
         <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;">
+        <?= csrf_field() ?>
             <input type="hidden" name="generate" value="1">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
@@ -335,6 +336,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <a class="btn btn-sm btn-secondary" href="?open=<?php echo intval($s['id']); ?>">البنود</a>
                         <?php if ($can_edit && (string) $s['state'] === 'draft'): ?>
                         <form action="" method="post" style="display:inline;">
+        <?= csrf_field() ?>
                             <input type="hidden" name="action" value="submit">
                             <input type="hidden" name="sid" value="<?php echo intval($s['id']); ?>">
                             <button class="btn btn-sm btn-primary" type="submit">للمراجعة</button>
@@ -342,6 +344,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php endif; ?>
                         <?php if ($can_approve && (string) $s['state'] === 'review'): ?>
                         <form action="" method="post" style="display:inline;">
+        <?= csrf_field() ?>
                             <input type="hidden" name="action" value="approve">
                             <input type="hidden" name="sid" value="<?php echo intval($s['id']); ?>">
                             <button class="btn btn-sm btn-primary" type="submit">إجازة</button>
@@ -355,6 +358,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php if ($can_approve && (string) $s['state'] === 'paid'): ?>
                         <form action="" method="post" style="display:inline;"
                               onsubmit="return confirm('الإقفال نهائيّ — والتصحيحُ بعده بعكسٍ موثَّقٍ لا بتعديل. متابعة؟');">
+        <?= csrf_field() ?>
                             <input type="hidden" name="action" value="close">
                             <input type="hidden" name="sid" value="<?php echo intval($s['id']); ?>">
                             <button class="btn btn-sm btn-secondary" type="submit">إقفال</button>
@@ -387,6 +391,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             الصافي لا يتغير، و<strong>الاختلافُ يفتح فرقًا بقرارٍ لا تعديلًا صامتًا</strong> (ENT-02 §4/§5).
         </p>
         <form action="" method="post">
+        <?= csrf_field() ?>
             <input type="hidden" name="action" value="invoice">
             <input type="hidden" name="sid" value="<?php echo $open; ?>">
             <div class="form-grid">
@@ -475,6 +480,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td style="white-space:nowrap;">
                         <?php if ($can_edit && intval($l['objected']) === 0): ?>
                         <form action="" method="post" style="display:inline;">
+        <?= csrf_field() ?>
                             <input type="hidden" name="action" value="object">
                             <input type="hidden" name="sid" value="<?php echo $open; ?>">
                             <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
@@ -484,6 +490,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </form>
                         <?php elseif ($can_edit): ?>
                         <form action="" method="post" style="display:inline;">
+        <?= csrf_field() ?>
                             <input type="hidden" name="action" value="resolve">
                             <input type="hidden" name="sid" value="<?php echo $open; ?>">
                             <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">

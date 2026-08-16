@@ -365,6 +365,7 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
 
     <?php if ($can_add): ?>
     <form method="post" style="margin-bottom:12px">
+        <?= csrf_field() ?>
         <input type="hidden" name="action" value="generate_needs">
         <button type="submit" class="add-btn" style="background:#166534"
                 title="جسر الصيانة + كناس حدود الطلب — بعطالة فلا ازدواج">
@@ -387,7 +388,8 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
     </div>
     <?php endif; ?>
 
-    <form id="procForm" action="requests_proc.php" method="post" class="allforms<?php echo $edit ? ' allforms-visible' : ''; ?>">
+    <form id="procForm" action="requests_proc.php" method="post" class="allforms<?php echo $edit ? ' allforms-visible' : ''; ?>
+        <?= csrf_field() ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?php echo $edit ? 'تعديل طلب شراء' : 'طلب شراء جديد'; ?></h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="id" value="<?php echo $edit ? intval($edit['id']) : ''; ?>">
@@ -574,18 +576,21 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                         if ($can_edit && (string)$row['state'] === 'مقدَّم') {
                             $rid = intval($row['id']);
                             echo "<div style='display:flex;gap:3px;margin-top:4px;flex-wrap:wrap'>"
-                               . "<form method='post' style='display:inline'>"
+                               . "<form method='post' style='display:inline'>
+        <?= csrf_field() ?>"
                                . "<input type='hidden' name='action' value='e21_decide'>"
                                . "<input type='hidden' name='request_id' value='{$rid}'>"
                                . "<input type='hidden' name='decision' value='approve'>"
                                . "<button type='submit' class='btn-primary' title='اعتماد'>✓</button></form>"
-                               . "<form method='post' style='display:inline-flex;gap:2px'>"
+                               . "<form method='post' style='display:inline-flex;gap:2px'>
+        <?= csrf_field() ?>"
                                . "<input type='hidden' name='action' value='e21_decide'>"
                                . "<input type='hidden' name='request_id' value='{$rid}'>"
                                . "<input type='hidden' name='decision' value='return'>"
                                . "<input type='text' name='reason' placeholder='سببُ الإعادة *' required style='width:90px'>"
                                . "<button type='submit' class='btn-primary' title='إعادةٌ للاستكمال'>↩</button></form>"
-                               . "<form method='post' style='display:inline-flex;gap:2px'>"
+                               . "<form method='post' style='display:inline-flex;gap:2px'>
+        <?= csrf_field() ?>"
                                . "<input type='hidden' name='action' value='e21_decide'>"
                                . "<input type='hidden' name='request_id' value='{$rid}'>"
                                . "<input type='hidden' name='decision' value='reject'>"

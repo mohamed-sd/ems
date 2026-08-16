@@ -140,7 +140,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if(!empty($_GET['msg'])): $ok=strpos($_GET['msg'],'✅')!==false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
-    <form id="sForm" action="" method="post" class="allforms" style="<?= $edit?'display:block;':'display:none;' ?>">
+    <form id="sForm" action="" method="post" class="allforms" style="<?= $edit?'display:block;':'display:none;' ?>
+        <?= csrf_field() ?>">
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= $edit?intval($edit['id']):0 ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $edit?'تعديل تسوية':'تسوية جديدة' ?></h5></div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
@@ -161,6 +162,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="allforms" style="display:block;">
         <div class="card-header"><h5><i class="fas fa-list"></i> بنود المستحقات والخصومات — الصافي المحسوب: <?= number_format($sum,2) ?></h5></div>
         <form action="" method="post" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
+        <?= csrf_field() ?>
             <input type="hidden" name="action" value="add_line"><input type="hidden" name="settlement_id" value="<?= intval($edit['id']) ?>">
             <div class="field"><label for="emsf_631_06f0f">النوع</label><select name="line_type" id="emsf_631_06f0f"><option>مستحق</option><option>خصم</option></select></div>
             <div class="field"><label for="emsf_632_4e9a8">الوصف</label><input type="text" name="description" id="emsf_632_4e9a8"></div>

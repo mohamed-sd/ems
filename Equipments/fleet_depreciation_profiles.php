@@ -224,7 +224,8 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
     </div>
 
     <!-- نموذج إضافة / تعديل -->
-    <form id="projectForm" method="post" class="allforms<?= (!empty($editData) || !empty($errors)) ? ' allforms-visible' : ''; ?>" style="margin:10px;">
+    <form id="projectForm" method="post" class="allforms<?= (!empty($editData) || !empty($errors)) ? ' allforms-visible' : ''; ?>
+        <?= csrf_field() ?>" style="margin:10px;">
     <div class="card-header">
                 <h5><i class="fas fa-coins"></i> <?= !empty($editData) ? 'تعديل الملف' : 'إضافة ملف جديد'; ?>
                     <?php if (!empty($editData) && $editData['state'] === 'approved'): ?>
@@ -385,6 +386,7 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                                         <?php endif; ?>
                                         <?php if ($can_approve && $row['state'] === 'draft'): ?>
                                             <form method="post" class="d-inline" onsubmit="return confirm('اعتماد هذا الملف؟ سيصبح متاحاً للربط بالموديلات.');">
+        <?= csrf_field() ?>
                                                 <input type="hidden" name="approve_id" value="<?= (int) $row['id']; ?>">
                                                 <button type="submit" class="action-btn" style="color:#1f9d55" title="اعتماد">
                                                     <i class="fa-solid fa-circle-check"></i>
@@ -393,6 +395,7 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                                         <?php endif; ?>
                                         <?php if ($perms['can_delete']): ?>
                                             <form method="post" class="d-inline" onsubmit="return confirm('تعطيل هذا الملف؟');">
+        <?= csrf_field() ?>
                                                 <input type="hidden" name="delete_id" value="<?= (int) $row['id']; ?>">
                                                 <button type="submit" class="action-btn delete" title="تعطيل"><i class="fa-solid fa-trash"></i></button>
                                             </form>

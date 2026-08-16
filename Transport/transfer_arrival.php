@@ -117,6 +117,7 @@ include __DIR__ . '/../includes/page_header.php';
                    يُرسَل مرةً واحدةً بمفتاحِ عطالتِه. */ ?>
           <form method="post" class="ta-arrival-form" data-ems-outbox="1"
                 data-ems-outbox-label="تأكيدُ وصول">
+        <?= csrf_field() ?>
             <input type="hidden" name="deliver_id" value="<?= $rid ?>">
             <label class="visually-hidden" for="dlv_wit_<?= $rid ?>">شاهدُ التسليم</label>
             <input id="dlv_wit_<?= $rid ?>" type="text" name="witness_name" required

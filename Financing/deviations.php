@@ -188,6 +188,7 @@ include __DIR__ . '/../includes/page_header.php';
         <td>
           <?php if ($open): ?>
           <form method="post" style="display:flex;gap:6px">
+        <?= csrf_field() ?>
             <input type="hidden" name="close_dev" value="<?= intval($d['dev_id']) ?>">
             <input type="text" name="decision" class="form-control form-control-sm" placeholder="القرار" style="max-width:160px" required aria-label="القرار">
             <input type="text" name="decision_doc" class="form-control form-control-sm" placeholder="مرجعُ المستند" style="max-width:120px" aria-label="مرجعُ المستند">

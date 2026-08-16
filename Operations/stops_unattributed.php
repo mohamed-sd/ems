@@ -144,6 +144,7 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars($t['fault_type'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td>
           <form method="post" style="display:flex;gap:6px">
+        <?= csrf_field() ?>
             <input type="hidden" name="assign_ts" value="<?= intval($t['id']) ?>">
             <select name="fault_department" class="form-control form-control-sm" required style="max-width:130px">
               <option value="">— الجهة —</option>

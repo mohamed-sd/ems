@@ -123,6 +123,7 @@ include __DIR__ . '/../includes/page_header.php';
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <form method="post" class="ems-form" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;max-width:900px">
+        <?= csrf_field() ?>
     <div><label for="emsf_443_7b91c">الحصةُ السارية</label>
       <select name="share_id" class="form-control" required id="emsf_443_7b91c"><option value="">—</option>
         <?php foreach ($shares as $s): ?>

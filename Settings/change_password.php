@@ -349,6 +349,7 @@ include __DIR__ . '/../includes/page_header.php';
             </div>
             <div class="card-body">
                 <form method="POST" id="changePasswordForm">
+        <?= csrf_field() ?>
                     <div class="form-grid">
 
                         <!-- كلمة السر القديمة -->

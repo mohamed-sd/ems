@@ -561,7 +561,8 @@ function mnt_seg_kind($c) {
         // فورمٌ مصغَّرٌ داخل رأس الصفحة (رمزُ CSRF يُحقن مركزيًّا — لا يُضاف يدويًّا).
         $header_actions[] = array('raw' =>
             '<form method="post" action="" style="display:inline" '
-            . 'onsubmit="return confirm(\'توليد أمر صيانة من هذا التفتيش (' . $cnt_crit . ' بندًا حرجًا)؟\');">'
+            . 'onsubmit="return confirm(\'توليد أمر صيانة من هذا التفتيش (' . $cnt_crit . ' بندًا حرجًا)؟\');">
+        <?= csrf_field() ?>'
             . '<input type="hidden" name="action" value="generate_order">'
             . '<input type="hidden" name="inspection_id" value="' . intval($ins['id']) . '">'
             . '<button type="submit" class="add-btn" title="ينشئ أمر صيانةٍ معبَّأً بالمعدة والمشروع والبنود الحرجة">'
@@ -579,6 +580,7 @@ function mnt_seg_kind($c) {
     include('../includes/page_header.php');
     ?>
     <form method="post" action="" class="allforms allforms-visible" id="inspForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="action" value="save_inspection">
         <input type="hidden" name="id" value="<?php echo intval($ins['id']); ?>">
 
@@ -753,6 +755,7 @@ function mnt_seg_kind($c) {
                                            title="بلاغُ هذه الملاحظة"><i class="fas fa-tower-observation"></i> بلاغ #<?php echo intval($l['converted_ticket_id']); ?></a>
                                     <?php elseif (trim((string)($l['note'] ?? '')) !== '' || trim((string)($l['recommendation'] ?? '')) !== ''): ?>
                                         <form method="post" style="display:inline" onsubmit="return confirm('تحويلُ هذه الملاحظة بلاغًا؟')">
+        <?= csrf_field() ?>
                                             <input type="hidden" name="action" value="convert_note_ticket">
                                             <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                                             <button type="submit" class="action-btn view" title="حوّلها بلاغًا (NoteConverted)"><i class="fas fa-tower-observation"></i></button>
@@ -808,6 +811,7 @@ function mnt_seg_kind($c) {
 ?>
     <?php if ($can_add): ?>
     <form method="post" action="" class="allforms" id="inspCreateForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="action" value="new_inspection">
         <div class="card-header"><h5><i class="fas fa-clipboard-check"></i> إنشاء تفتيش جديد</h5></div>
         <div class="card"><div class="card-body">

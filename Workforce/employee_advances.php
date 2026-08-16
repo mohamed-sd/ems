@@ -165,6 +165,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php endif; ?>
         <?php if ($can_edit): ?>
         <form method="post" style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
+        <?= csrf_field() ?>
             <input type="hidden" name="ad_action" value="set_protection">
             <input type="number" step="0.01" min="0" max="100" name="protection_percent"
                    value="<?php echo $protection === null ? '' : htmlspecialchars((string)$protection); ?>"
@@ -176,6 +177,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($can_add): ?>
     <form method="post" class="allforms" id="advForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="ad_action" value="open">
         <div class="card"><div class="card-header"><h5><i class="fa fa-hand-holding-dollar"></i> سلفةٌ جديدة</h5></div>
         <div class="card-body"><div class="form-grid">
@@ -260,6 +262,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td>
                     <?php if ($can_edit && (string)$a['state'] === 'draft'): ?>
                         <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                             <input type="hidden" name="ad_action" value="approve">
                             <input type="hidden" name="advance_id" value="<?php echo intval($a['id']); ?>">
                             <button type="submit" class="action-btn edit" title="اعتماد (من أنشأ لا يعتمد)">

@@ -74,6 +74,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
     <form id="hForm" action="" method="post" class="allforms" style="display:none;">
+        <?= csrf_field() ?>
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="0">
         <div class="card-header"><h5><i class="fas fa-plus"></i> وحدة سكن/مخيم</h5></div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:14px;">

@@ -271,6 +271,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
 
             <?php if ($can_add): ?>
             <form method="post" class="ems-form" style="margin-top:14px">
+        <?= csrf_field() ?>
                 <input type="hidden" name="fs_action" value="open">
                 <input type="hidden" name="contract_id" value="<?php echo $previewFor; ?>">
                 <input type="hidden" name="effective_date" value="<?php echo htmlspecialchars($previewOn); ?>">
@@ -335,6 +336,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                 <?php if ((string)$s['state'] === 'draft'): ?>
                     <?php if ($can_edit): ?>
                     <form method="post" class="ems-form" style="margin-top:12px">
+        <?= csrf_field() ?>
                         <input type="hidden" name="fs_action" value="approve">
                         <input type="hidden" name="settlement_id" value="<?php echo intval($s['id']); ?>">
                         <div class="form-grid">
@@ -350,6 +352,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                     <?php endif; ?>
                     <?php if ($can_add): ?>
                     <form method="post" class="ems-form" style="margin-top:8px">
+        <?= csrf_field() ?>
                         <input type="hidden" name="fs_action" value="cancel">
                         <input type="hidden" name="settlement_id" value="<?php echo intval($s['id']); ?>">
                         <div class="form-grid">

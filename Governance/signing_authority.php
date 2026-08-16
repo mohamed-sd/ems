@@ -155,6 +155,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <h4>تعيين مدير الحركة والتشغيل أو نائبه (DEC-01 ① — سقف نطاقي)</h4>
         <form method="post" class="ems-form" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <?= csrf_field() ?>
             <input type="hidden" name="op" value="movement">
             <input type="number" name="person_id" placeholder="users.id للمعيَّن *" required aria-label="users.id للمعيَّن">
             <select name="entity_id" required>
@@ -180,6 +181,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <h4>تفويض عام (مالي · تعاقدي · بنكي) — بسقفه النقدي</h4>
         <form method="post" class="ems-form" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <?= csrf_field() ?>
             <input type="hidden" name="op" value="general">
             <input type="number" name="person_id" placeholder="users.id للمفوَّض *" required aria-label="users.id للمفوَّض">
             <select name="entity_id" required>

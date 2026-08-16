@@ -178,7 +178,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if(!empty($_GET['msg'])): $ok=strpos($_GET['msg'],'✅')!==false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
-    <form id="eForm" action="" method="post" class="allforms" style="<?= $edit?'display:block;':'display:none;' ?>">
+    <form id="eForm" action="" method="post" class="allforms" style="<?= $edit?'display:block;':'display:none;' ?>
+        <?= csrf_field() ?>">
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= $edit?intval($edit['id']):0 ?>">
         <div class="card-header"><h5><i class="fas <?= $edit?'fa-edit':'fa-plus' ?>"></i> <?= $edit?'تعديل تقييم':'تقييم عامل' ?></h5></div>
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
@@ -210,6 +211,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </h5></div>
         <?php if($can_edit): ?>
         <form action="" method="post" style="display:grid;grid-template-columns:2fr 1fr 1fr 2fr auto;gap:12px;padding:14px;align-items:flex-end;">
+        <?= csrf_field() ?>
             <input type="hidden" name="action" value="add_kpi"><input type="hidden" name="evaluation_id" value="<?= intval($edit['id']) ?>">
             <div class="field"><label for="emsf_604_ddef9">اسم المؤشّر</label><input type="text" name="kpi_name" required id="emsf_604_ddef9"></div>
             <div class="field"><label for="emsf_605_a8e92">الوزن</label><input type="number" step="0.01" name="weight" placeholder="مثال 30" id="emsf_605_a8e92"></div>
@@ -275,7 +277,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <tr><td><div class="action-btns" style="gap:4px;align-items:center;">
                 <?= ems_wf_view_button($r['id']) ?>
                 <?php if($can_edit): ?><a href="worker_evaluation.php?edit=<?= intval($r['id']) ?>" class="action-btn edit" title="تعديل + بنود المؤشّرات"><i class="fas fa-edit"></i></a><?php endif; ?>
-                <form action="" method="post" style="display:inline;"><input type="hidden" name="action" value="set_state"><input type="hidden" name="id" value="<?= intval($r['id']) ?>">
+                <form action="" method="post" style="display:inline;">
+        <?= csrf_field() ?><input type="hidden" name="action" value="set_state"><input type="hidden" name="id" value="<?= intval($r['id']) ?>">
                     <select name="new_state" onchange="this.form.submit()" <?= $can_edit?'':'disabled' ?> style="padding:2px;"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= ($r['state']===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select>
                 </form>
                 <?php if($can_delete): ?><a href="worker_evaluation.php?delete=<?= intval($r['id']) ?>" class="action-btn delete" onclick="return confirm('حذف؟')"><i class="fas fa-trash"></i></a><?php endif; ?>

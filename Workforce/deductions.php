@@ -385,6 +385,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
     <form method="post" action="" class="allforms" id="cmp03AddForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="cmp03_action" value="add">
         <div class="card"><div class="card-header">
             <h5><i class="fa fa-plus"></i> إضافة — الخصومات والجزاءات</h5>
@@ -555,6 +556,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td>
                 <?php if (!$ch || $ch['status'] === 'rejected'): ?>
                     <form method="post" action="" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <?= csrf_field() ?>
                         <input type="hidden" name="cmp03_action" value="request_approval">
                         <input type="hidden" name="row_id" value="<?php echo $rid; ?>">
                         <select name="proposal_ref" required style="max-width:340px">
@@ -592,6 +594,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             — لا يدَك</span>
                     <?php else: ?>
                     <form method="post" action="" style="display:flex;gap:6px;align-items:center">
+        <?= csrf_field() ?>
                         <input type="hidden" name="cmp03_action" value="approve_step">
                         <input type="hidden" name="row_id" value="<?php echo $rid; ?>">
                         <input type="hidden" name="request_id" value="<?php echo (int) $ch['id']; ?>">

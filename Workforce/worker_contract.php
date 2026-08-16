@@ -145,7 +145,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
 
-    <form id="cForm" action="" method="post" class="allforms" style="<?= $edit ? '' : 'display:none;' ?>">
+    <form id="cForm" action="" method="post" class="allforms" style="<?= $edit ? '' : 'display:none;' ?>
+        <?= csrf_field() ?>">
         <input type="hidden" name="action" value="save_contract">
         <input type="hidden" name="id" value="<?= $edit ? intval($edit['id']) : 0 ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $edit ? 'تعديل عقد' : 'عقد عاملٍ جديد' ?></h5></div>

@@ -217,7 +217,8 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
 
     <!-- ══ نموذج الإضافة / التعديل (بنفس بنية وتصميم فورم صفحة العملاء) ══ -->
     <?php if ($can_add): ?>
-    <form method="POST" action="" id="fcForm" class="allforms<?= ($edit_data || $error_msg) ? ' allforms-visible' : '' ?>">
+    <form method="POST" action="" id="fcForm" class="allforms<?= ($edit_data || $error_msg) ? ' allforms-visible' : '' ?>
+        <?= csrf_field() ?>">
         <div class="card-header">
             <h5>
                 <i class="fas fa-<?= $edit_data ? 'edit' : 'plus-circle' ?>"></i>
@@ -487,12 +488,14 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                                     <?php if ($can_delete): ?>
                                         <?php if ($is_active): ?>
                                         <form method="POST" class="fc-inline-form" onsubmit="return confirm('تأكيد تعطيل هذا الكود؟')">
+        <?= csrf_field() ?>
                                             <input type="hidden" name="action" value="delete">
                                             <input type="hidden" name="del_id" value="<?= $row['id'] ?>">
                                             <button type="submit" class="btn-danger"><i class="fas fa-ban"></i></button>
                                         </form>
                                         <?php else: ?>
                                         <form method="POST" class="fc-inline-form">
+        <?= csrf_field() ?>
                                             <input type="hidden" name="action" value="restore">
                                             <input type="hidden" name="res_id" value="<?= $row['id'] ?>">
                                             <button type="submit" class="btn-secondary"><i class="fas fa-redo"></i></button>
@@ -524,6 +527,7 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
             <div class="modal-body">هل أنت متأكد من حذف هذا الكود نهائياً؟ لا يمكن التراجع عن هذا الإجراء.</div>
             <div class="modal-footer">
                 <form method="POST" id="hardDeleteForm">
+        <?= csrf_field() ?>
                     <input type="hidden" name="action" value="hard_delete">
                     <input type="hidden" name="del_id" id="hardDelId">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>

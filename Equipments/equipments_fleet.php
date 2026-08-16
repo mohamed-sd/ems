@@ -564,7 +564,8 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
     <?php if ($can_add || $can_edit) { ?>
         <!-- فورم إضافة / تعديل معدة -->
         <form id="projectForm" action="" method="post"
-            class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>">
+            class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>
+        <?= csrf_field() ?>">
               <div class="card-header">
                     <h5>
                         <i class="fas fa-<?php echo !empty($editData) ? 'edit' : 'plus-circle'; ?>"></i>
@@ -1283,7 +1284,8 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                             } else {
                                 echo "<span class='badge-busy' title='كرت مسودة' style='margin-inline-start:4px'><i class='fas fa-id-card'></i> مسودة</span>";
                                 if ($can_edit) {
-                                    echo "<form method='post' action='approve_card.php' class='d-inline' onsubmit=\"return confirm('اعتماد كرت هذه المعدة؟');\">"
+                                    echo "<form method='post' action='approve_card.php' class='d-inline' onsubmit=\"return confirm('اعتماد كرت هذه المعدة؟');\">
+        <?= csrf_field() ?>"
                                         . "<input type='hidden' name='equipment_id' value='" . intval($row['id']) . "'>"
                                         . "<input type='hidden' name='return' value='equipments_fleet.php'>"
                                         . "<button type='submit' class='action-btn' style='color:#1f9d55' title='اعتماد الكرت'><i class='fas fa-circle-check'></i></button>"

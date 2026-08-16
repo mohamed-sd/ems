@@ -674,6 +674,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <!-- فورم إضافة تشغيل -->
         <?php if ($can_add || $can_edit): ?>
             <form id="projectForm" action="" method="post" class="allforms">
+        <?= csrf_field() ?>
 
               <div class="card-header">
                         <h5><i class="fas fa-edit"></i> <span id="formTitle">اضافة تشغيل آلية جديد</span></h5>
@@ -1086,6 +1087,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     $action_buttons .= "<a href='#' class='end-service-btn btn btn-sm btn-secondary' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a> ";
                                 } elseif ($status_value === 0 && $can_edit) {
                                     $action_buttons .= "<form method='post' class='operation-inline-form'>
+        <?= csrf_field() ?>
                                     <input type='hidden' name='action' value='change_status'>
                                     <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
                                     <input type='hidden' name='new_status' value='1'>
@@ -1273,6 +1275,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="modal-dialog">
                 <div class="modal-content">
                     <form method="post" action="">
+        <?= csrf_field() ?>
                         <div class="modal-header">
                             <h5 class="modal-title" id="endServiceLabel">إنهاء الخدمة</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

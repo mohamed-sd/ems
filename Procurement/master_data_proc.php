@@ -149,6 +149,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- ══════════════ (أ) القيم المرجعية ══════════════ -->
     <form id="lookupForm" action="" method="post" class="allforms">
+        <?= csrf_field() ?>
         <input type="hidden" name="entity" value="lookup">
         <div class="card-header"><h5><i class="fas fa-list"></i> إضافة / تعديل قيمة مرجعية</h5></div>
         <div class="card"><div class="card-body">
@@ -232,6 +233,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- ══════════════ (ب) المخازن ══════════════ -->
     <form id="whForm" action="" method="post" class="allforms">
+        <?= csrf_field() ?>
         <input type="hidden" name="entity" value="warehouse">
         <div class="card-header"><h5><i class="fas fa-warehouse"></i> إضافة / تعديل مخزن</h5></div>
         <div class="card"><div class="card-body">

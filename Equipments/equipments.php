@@ -328,7 +328,8 @@ include __DIR__ . '/../includes/page_header.php';
 
     <?php if ($_SESSION['user']['role'] != "10") { ?>
     <!-- فورم إضافة / تعديل معدة -->
-    <form id="projectForm" action="" method="post" class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>">
+    <form id="projectForm" action="" method="post" class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>
+        <?= csrf_field() ?>">
         <div class="card">
             <div class="card-header">
                 <h5>
@@ -1061,7 +1062,8 @@ include __DIR__ . '/../includes/page_header.php';
                                                 } else {
                                                     echo "<span class='badge-busy' title='كرت مسودة' data-ems-c='eq-4'><i class='fas fa-id-card'></i> مسودة</span>";
                                                     if ($can_edit) {
-                                                        echo "<form method='post' action='approve_card.php' class='d-inline' onsubmit=\"return confirm('اعتماد كرت هذه المعدة؟');\">"
+                                                        echo "<form method='post' action='approve_card.php' class='d-inline' onsubmit=\"return confirm('اعتماد كرت هذه المعدة؟');\">
+        <?= csrf_field() ?>"
                                                             . "<input type='hidden' name='equipment_id' value='" . intval($row['id']) . "'>"
                                                             . "<input type='hidden' name='return' value='equipments.php'>"
                                                             . "<button type='submit' class='action-btn' data-ems-c='eq-5' title='اعتماد الكرت'><i class='fas fa-circle-check'></i></button>"

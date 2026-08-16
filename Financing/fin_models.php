@@ -187,6 +187,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
          قوائمَ مغلقةً — فـENUM يبتلع القيمةَ الغريبةَ صامتًا، والنصُّ الحرُّ كان
          يُكتب في مخزنٍ بينيٍّ لا يقرؤه أحد. -->
     <form method="post" action="" class="allforms" id="cmp03AddForm">
+        <?= csrf_field() ?>
         <div class="card"><div class="card-header">
             <h5><i class="fa fa-plus"></i> إضافة/تحديث — نماذج التمويل ومعالجتها</h5>
         </div><div class="card-body">

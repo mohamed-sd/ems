@@ -115,6 +115,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card-body">
         <?php foreach ($approved as $e): ?>
             <form method="post" style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+        <?= csrf_field() ?>
                 <input type="hidden" name="ct_action" value="issue">
                 <input type="hidden" name="eval_id" value="<?php echo intval($e['id']); ?>">
                 <span>تقييمُ <?php echo htmlspecialchars($e['period_from'] . ' → ' . $e['period_to']); ?>

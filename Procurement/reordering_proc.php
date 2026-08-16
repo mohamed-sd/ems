@@ -141,9 +141,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             حتى تُقفل. والمتوسطُ اليوميُّ (آخر 90 يومًا) يُعرض <strong>مصدرًا مقترحًا للحد</strong> (M-51).</p>
         <?php if ($can_add): ?>
         <div style="display:flex;gap:8px">
-            <form method="post"><input type="hidden" name="reorder_action" value="dry">
+            <form method="post">
+        <?= csrf_field() ?><input type="hidden" name="reorder_action" value="dry">
                 <button type="submit" class="btn-primary"><i class="fa fa-flask"></i> جرّب (بلا كتابة)</button></form>
-            <form method="post"><input type="hidden" name="reorder_action" value="apply">
+            <form method="post">
+        <?= csrf_field() ?><input type="hidden" name="reorder_action" value="apply">
                 <button type="submit" class="btn-primary"><i class="fa fa-play"></i> ولّد فعلًا</button></form>
         </div>
         <?php endif; ?>
@@ -167,7 +169,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div></div>
 
     <!-- فورم إضافة/تعديل -->
-    <form id="procForm" action="" method="post" class="allforms<?php echo $edit_row ? ' allforms-visible' : ''; ?>">
+    <form id="procForm" action="" method="post" class="allforms<?php echo $edit_row ? ' allforms-visible' : ''; ?>
+        <?= csrf_field() ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> إضافة / تعديل قاعدة إعادة طلب</h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="id" id="p_id" value="<?php echo $edit_row ? intval($edit_row['id']) : ''; ?>">

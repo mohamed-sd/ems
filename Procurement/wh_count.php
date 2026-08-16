@@ -162,6 +162,7 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars($it['name'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><strong><?= floatval($it['book']) ?></strong></td>
         <form method="post">
+        <?= csrf_field() ?>
           <input type="hidden" name="adjust_item" value="<?= intval($it['id']) ?>">
           <input type="hidden" name="book_qty" value="<?= floatval($it['book']) ?>">
           <td><input type="number" step="0.01" name="actual_qty" class="form-control form-control-sm" value="<?= floatval($it['book']) ?>" style="max-width:110px"></td>

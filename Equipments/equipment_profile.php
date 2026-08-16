@@ -567,6 +567,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <span class="ep-pill status-inactive"><i class="fas fa-id-card"></i> كرت مسودة</span>
                     <?php if (!empty($can_edit)): ?>
                         <form method="post" action="approve_card.php" class="d-inline" onsubmit="return confirm('اعتماد كرت هذه المعدة؟');">
+        <?= csrf_field() ?>
                             <input type="hidden" name="equipment_id" value="<?php echo intval($equipment_id); ?>">
                             <input type="hidden" name="return" value="equipment_profile.php">
                             <input type="hidden" name="return_id" value="<?php echo intval($equipment_id); ?>">
@@ -856,6 +857,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-body">
             <?php if ($can_edit_card): ?>
             <form id="add-docs" class="child-add-form ems-form" method="post" action="equipment_child_save.php" enctype="multipart/form-data" style="display:none;margin-bottom:14px;">
+        <?= csrf_field() ?>
                 <input type="hidden" name="entity" value="compliance"><input type="hidden" name="action" value="add"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>">
                 <div class="form-grid">
                     <div><label for="emsf_98_e8d4a">نوع الوثيقة *</label><select name="doc_type" required id="emsf_98_e8d4a"><option value="">-- اختر --</option><?php foreach ($DOC_TYPES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>
@@ -883,7 +885,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <td><?= !empty($cr['is_critical']) ? '<span class="status-inactive">حرجة</span>' : '—'; ?></td>
                                 <td><?php echo $st['cls'] ? "<span class='{$st['cls']}'>" . $ee($st['label']) . "</span>" : $ee($st['label']); ?></td>
                                 <td><?php if (!empty($cr['attachment_path'])): ?><a href="fleet_file.php?f=<?= $ee(basename($cr['attachment_path'])); ?>" target="_blank"><i class="fas fa-paperclip"></i> عرض</a><?php else: ?>—<?php endif; ?></td>
-                                <?php if ($can_edit_card): ?><td><form method="post" action="equipment_child_save.php" onsubmit="return confirm('حذف هذه الوثيقة؟');" style="margin:0;"><input type="hidden" name="entity" value="compliance"><input type="hidden" name="action" value="delete"><input type="hidden" name="row_id" value="<?= (int) $cr['id']; ?>"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>"><button class="action-btn delete" title="حذف"><i class="fa-solid fa-trash"></i></button></form></td><?php endif; ?>
+                                <?php if ($can_edit_card): ?><td><form method="post" action="equipment_child_save.php" onsubmit="return confirm('حذف هذه الوثيقة؟');" style="margin:0;">
+        <?= csrf_field() ?><input type="hidden" name="entity" value="compliance"><input type="hidden" name="action" value="delete"><input type="hidden" name="row_id" value="<?= (int) $cr['id']; ?>"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>"><button class="action-btn delete" title="حذف"><i class="fa-solid fa-trash"></i></button></form></td><?php endif; ?>
                             </tr>
                         <?php endforeach; endif; ?>
                     </tbody>
@@ -901,6 +904,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-body">
             <?php if ($can_edit_card): ?>
             <form id="add-prot" class="child-add-form ems-form" method="post" action="equipment_child_save.php" enctype="multipart/form-data" style="display:none;margin-bottom:14px;">
+        <?= csrf_field() ?>
                 <input type="hidden" name="entity" value="protection"><input type="hidden" name="action" value="add"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>">
                 <div class="form-grid">
                     <div><label>نوع الحماية *</label><select name="protection_type" required><option value="">-- اختر --</option><?php foreach ($PROTECTION_TYPES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>
@@ -932,7 +936,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <td><?= $ee($pr['renewal_date'] ?: '—'); ?></td>
                                 <td><?= $ee($pr['partner_name'] ?: '—'); ?></td>
                                 <td><?php if (!empty($pr['attachment_path'])): ?><a href="fleet_file.php?f=<?= $ee(basename($pr['attachment_path'])); ?>" target="_blank"><i class="fas fa-paperclip"></i> عرض</a><?php else: ?>—<?php endif; ?></td>
-                                <?php if ($can_edit_card): ?><td><form method="post" action="equipment_child_save.php" onsubmit="return confirm('حذف هذا التجهيز؟');" style="margin:0;"><input type="hidden" name="entity" value="protection"><input type="hidden" name="action" value="delete"><input type="hidden" name="row_id" value="<?= (int) $pr['id']; ?>"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>"><button class="action-btn delete" title="حذف"><i class="fa-solid fa-trash"></i></button></form></td><?php endif; ?>
+                                <?php if ($can_edit_card): ?><td><form method="post" action="equipment_child_save.php" onsubmit="return confirm('حذف هذا التجهيز؟');" style="margin:0;">
+        <?= csrf_field() ?><input type="hidden" name="entity" value="protection"><input type="hidden" name="action" value="delete"><input type="hidden" name="row_id" value="<?= (int) $pr['id']; ?>"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>"><button class="action-btn delete" title="حذف"><i class="fa-solid fa-trash"></i></button></form></td><?php endif; ?>
                             </tr>
                         <?php endforeach; endif; ?>
                     </tbody>
@@ -950,6 +955,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-body">
             <?php if ($can_edit_card): ?>
             <form id="add-comp" class="child-add-form ems-form" method="post" action="equipment_child_save.php" style="display:none;margin-bottom:14px;">
+        <?= csrf_field() ?>
                 <input type="hidden" name="entity" value="component"><input type="hidden" name="action" value="add"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>">
                 <div class="form-grid">
                     <div><label for="emsf_111_0499d">نوع المكوّن *</label><select name="component_type" required id="emsf_111_0499d"><option value="">-- اختر --</option><?php foreach ($COMPONENT_TYPES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>
@@ -975,7 +981,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <td style="color:#aaa;">لاحقاً</td>
                                 <td style="color:#aaa;">لاحقاً</td>
                                 <td style="color:#aaa;">لاحقاً</td>
-                                <?php if ($can_edit_card): ?><td><form method="post" action="equipment_child_save.php" onsubmit="return confirm('حذف هذا المكوّن؟');" style="margin:0;"><input type="hidden" name="entity" value="component"><input type="hidden" name="action" value="delete"><input type="hidden" name="row_id" value="<?= (int) $cm['id']; ?>"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>"><button class="action-btn delete" title="حذف"><i class="fa-solid fa-trash"></i></button></form></td><?php endif; ?>
+                                <?php if ($can_edit_card): ?><td><form method="post" action="equipment_child_save.php" onsubmit="return confirm('حذف هذا المكوّن؟');" style="margin:0;">
+        <?= csrf_field() ?><input type="hidden" name="entity" value="component"><input type="hidden" name="action" value="delete"><input type="hidden" name="row_id" value="<?= (int) $cm['id']; ?>"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>"><button class="action-btn delete" title="حذف"><i class="fa-solid fa-trash"></i></button></form></td><?php endif; ?>
                             </tr>
                         <?php endforeach; endif; ?>
                     </tbody>
@@ -993,6 +1000,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-body">
             <?php if ($can_edit_card): ?>
             <form id="add-hist" class="child-add-form ems-form" method="post" action="equipment_child_save.php" style="display:none;margin-bottom:14px;">
+        <?= csrf_field() ?>
                 <input type="hidden" name="entity" value="history"><input type="hidden" name="action" value="add"><input type="hidden" name="equipment_id" value="<?= (int) $equipment_id; ?>">
                 <div class="form-grid">
                     <div><label>نوع الحدث *</label><select name="event_type" required><option value="">-- اختر --</option><?php foreach ($EVENT_TYPES as $o) echo '<option>' . $ee($o) . '</option>'; ?></select></div>

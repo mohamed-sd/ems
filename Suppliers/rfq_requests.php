@@ -162,6 +162,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </p>
         <?php if ($can_add): ?>
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="rfq_action" value="open">
             <div class="form-grid">
                 <div class="form-group"><label for="emsf_1379_7d57e">عقدُ العميل <span style="color:#c00">*</span>
@@ -196,6 +197,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         }
         ?>
         <form method="post" class="ems-form" style="margin-top:14px;padding-top:12px;border-top:1px dashed #ddd">
+        <?= csrf_field() ?>
             <input type="hidden" name="rfq_action" value="open_from_request">
             <div class="form-grid">
                 <div class="form-group"><label for="emsf_rfq_pr">طلبُ شراءٍ معتمد <span style="color:#c00">*</span>
@@ -260,6 +262,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <?php foreach (array('send' => 'أرسِل للمؤهلين', 'close' => 'أقفل الطلب',
                                  'contracted' => 'انتقل إلى متعاقَد') as $a => $lbl): ?>
             <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                 <input type="hidden" name="rfq_action" value="<?php echo $a; ?>">
                 <input type="hidden" name="rfq_id" value="<?php echo $sel; ?>">
                 <button type="submit" class="btn-primary"><?php echo $lbl; ?></button>
@@ -318,6 +321,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <?php if ($can_edit && (string)$head['state'] === 'sent'): ?>
             <form method="post" class="ems-form" style="margin-top:10px">
+        <?= csrf_field() ?>
                 <input type="hidden" name="rfq_action" value="quote">
                 <input type="hidden" name="rfq_id" value="<?php echo $sel; ?>">
                 <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">

@@ -219,6 +219,7 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars(mb_substr($q['note'] ?? '', 0, 40), ENT_QUOTES, 'UTF-8') ?></td>
         <td>
           <form method="post" style="display:flex;gap:6px">
+        <?= csrf_field() ?>
             <input type="hidden" name="rfq" value="<?= $rfq ?>">
             <input type="hidden" name="award_quote" value="<?= intval($q['id']) ?>">
             <input type="text" name="award_reason" class="form-control form-control-sm" placeholder="سببُ الترسية" style="max-width:160px" required aria-label="سببُ الترسية">

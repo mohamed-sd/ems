@@ -191,6 +191,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         ? htmlspecialchars((string)$c['guarantee_retention_days']) . ' يومًا' : '—'; ?></td>
                     <td>
                         <form method="post" style="margin:0">
+        <?= csrf_field() ?>
                             <input type="hidden" name="cl_action" value="open">
                             <input type="hidden" name="contract_id" value="<?php echo intval($c['id']); ?>">
                             <button type="submit" class="btn-primary"><i class="fa fa-play"></i> افتح التصفية</button>
@@ -237,6 +238,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <?php endif; ?></td>
                 <td><?php if ($can_edit && $cl['quota_closed_at'] === null && (string)$cl['state'] !== 'closed'): ?>
                     <form method="post" style="margin:0;display:flex;gap:6px">
+        <?= csrf_field() ?>
                         <input type="hidden" name="cl_action" value="quota">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
                         <input type="text" name="reason" maxlength="255" placeholder="سببُ إقفال ما لم يُستهلك" aria-label="سببُ إقفال ما لم يُستهلك">
@@ -252,6 +254,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     ? '<span class="badge badge-success">مسوّاة</span>' : '<span class="badge badge-warning">قائمة</span>'; ?></td>
                 <td><?php if ($can_edit && $cl['advances_settled_at'] === null && (string)$cl['state'] !== 'closed'): ?>
                     <form method="post" style="margin:0">
+        <?= csrf_field() ?>
                         <input type="hidden" name="cl_action" value="advances">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
                         <button type="submit" class="btn-primary">تحقّق وسوِّ</button>
@@ -270,6 +273,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <td><?php if ($can_edit && $cl['guarantee_amount'] !== null
                             && $cl['guarantee_released_at'] === null && (string)$cl['state'] !== 'closed'): ?>
                     <form method="post" style="margin:0">
+        <?= csrf_field() ?>
                         <input type="hidden" name="cl_action" value="guarantee">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
                         <button type="submit" class="btn-primary">ردَّ الضمان</button>
@@ -284,6 +288,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     ? '<span class="badge badge-success">أُخلي</span>' : '<span class="badge badge-warning">قيد التصفية</span>'; ?></td>
                 <td><?php if ($can_edit && (string)$cl['state'] !== 'closed'): ?>
                     <form method="post" style="margin:0;display:flex;gap:6px">
+        <?= csrf_field() ?>
                         <input type="hidden" name="cl_action" value="close">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
                         <input type="text" name="clearance_doc" maxlength="120" placeholder="مرجعُ شهادة الإخلاء" required aria-label="مرجعُ شهادة الإخلاء">

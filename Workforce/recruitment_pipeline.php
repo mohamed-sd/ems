@@ -140,12 +140,14 @@ include __DIR__ . '/../includes/page_header.php';
 
   <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:16px">
     <form method="post" class="ems-form" style="display:flex;gap:8px;align-items:end">
+        <?= csrf_field() ?>
       <input type="hidden" name="new_vacancy" value="1">
       <div><label for="emsf_1785_5c43b">① طلبُ شاغرٍ جديد</label><input type="text" name="title_text" class="form-control" placeholder="المسمّى" required id="emsf_1785_5c43b"></div>
       <div><label for="emsf_1786_048c7">السبب</label><input type="text" name="reason" class="form-control" id="emsf_1786_048c7"></div>
       <button class="btn btn-primary">افتح وانشر</button>
     </form>
     <form method="post" class="ems-form" style="display:flex;gap:8px;align-items:end">
+        <?= csrf_field() ?>
       <input type="hidden" name="new_applicant" value="1">
       <div><label for="emsf_1787_75453">③ سيرةٌ لمتقدم</label>
         <select name="vac_id" class="form-control" required id="emsf_1787_75453"><option value="">— الشاغر —</option>
@@ -204,6 +206,7 @@ include __DIR__ . '/../includes/page_header.php';
         <td>
           <?php if ($nextLabel): ?>
           <form method="post" style="display:flex;gap:6px">
+        <?= csrf_field() ?>
             <input type="hidden" name="advance_app" value="<?= intval($a2['app_id']) ?>">
             <?php if ($a2['stage'] === 'practical_test'): ?>
               <input type="number" step="0.5" name="test_score" class="form-control form-control-sm" placeholder="الدرجة" style="max-width:90px" aria-label="الدرجة">
@@ -218,6 +221,7 @@ include __DIR__ . '/../includes/page_header.php';
         </td>
         <td>
           <form method="post" style="display:flex;gap:4px">
+        <?= csrf_field() ?>
             <input type="hidden" name="reject_app" value="<?= intval($a2['app_id']) ?>">
             <input type="text" name="reject_reason" class="form-control form-control-sm" placeholder="السبب" style="max-width:110px" required aria-label="السبب">
             <button class="action-btn" type="submit" style="color:#dc3545">رفض</button>

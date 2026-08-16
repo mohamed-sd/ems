@@ -190,6 +190,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-plus"></i> تعرفةٌ جديدة</h5></div>
     <div class="card-body">
         <form method="post" class="ems-form">
+        <?= csrf_field() ?>
             <input type="hidden" name="tar_action" value="add">
             <div class="form-grid">
                 <div class="form-group"><label for="emsf_1605_f6ff7">المورد <small>— فارغٌ = الأعمّ</small></label>
@@ -293,6 +294,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php if ($can_edit): ?>
                     <td><?php if ((string)$t['state'] === 'active'): ?>
                         <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                             <input type="hidden" name="tar_action" value="end">
                             <input type="hidden" name="tariff_id" value="<?php echo intval($t['id']); ?>">
                             <button type="submit" class="badge badge-danger" style="border:0;padding:5px 10px"
@@ -326,6 +328,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php echo htmlspecialchars((string)$o['distance_km']); ?> كم
                         <?php elseif ($can_edit): ?>
                             <form method="post" style="display:flex;gap:5px">
+        <?= csrf_field() ?>
                                 <input type="hidden" name="tar_action" value="distance">
                                 <input type="hidden" name="order_id" value="<?php echo intval($o['id']); ?>">
                                 <input type="number" name="distance_km" step="0.01" min="0.01"
@@ -342,6 +345,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?php if ($o['charge_supplier_id'] === null): ?>—
                         <?php elseif ($o['tariff_amount'] === null): ?>
                         <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                             <input type="hidden" name="tar_action" value="price">
                             <input type="hidden" name="order_id" value="<?php echo intval($o['id']); ?>">
                             <button type="submit" class="badge badge-success" style="border:0;padding:5px 10px">
@@ -349,6 +353,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </form>
                         <?php else: ?>
                         <form method="post" style="display:flex;gap:5px;align-items:center">
+        <?= csrf_field() ?>
                             <input type="hidden" name="tar_action" value="price">
                             <input type="hidden" name="order_id" value="<?php echo intval($o['id']); ?>">
                             <input type="text" name="reprice_reason" maxlength="90" required

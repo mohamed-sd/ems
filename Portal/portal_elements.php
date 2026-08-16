@@ -125,6 +125,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         : "<span class='badge badge-secondary'>موقوف — لا يُصيَّر</span>"; ?></td>
                     <td><?php if ($can_edit): ?>
                         <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                             <input type="hidden" name="pe_action" value="toggle">
                             <input type="hidden" name="element_code" value="<?php echo htmlspecialchars((string)$e['element_code']); ?>">
                             <button type="submit" class="btn-primary">

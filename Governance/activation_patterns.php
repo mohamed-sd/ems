@@ -134,6 +134,7 @@ include '../insidebar.php';
               onsubmit="var el=this.element_code.value, en=this.enable.value==='1';
                         var fx={<?php foreach ($ELEMENTS as $k => $v) { echo "'" . $k . "':'" . htmlspecialchars($v[1], ENT_QUOTES) . "',"; } ?>};
                         return confirm('معاينة الأثر قبل الحفظ:\n' + (fx[el]||'') + '\n\n' + (en?'تفعيل':'تعطيل — بسبب موثَّق') + '. أتؤكد؟');">
+            <?= csrf_field() ?>
             <select name="element_code" required>
                 <?php foreach ($ELEMENTS as $k => $v): ?>
                 <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v[0]); ?></option>

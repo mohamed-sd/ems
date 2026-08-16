@@ -299,6 +299,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
     <form method="post" action="" class="allforms" id="cmp03AddForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="cmp03_action" value="add">
         <div class="card"><div class="card-header">
             <h5><i class="fa fa-plus"></i> إضافة — اعتمادات المدير التنفيذي</h5>
@@ -357,6 +358,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $canDecide = $is_super_admin || strval($_SESSION['user']['role'] ?? '') === '9';
     if ($canDecide && $decidable): ?>
     <form method="post" action="" class="allforms allforms-visible" id="cmp03DecideForm">
+        <?= csrf_field() ?>
         <input type="hidden" name="cmp03_action" value="decide">
         <div class="card"><div class="card-header">
             <h5><i class="fa fa-gavel"></i> قرار الاعتماد الأعلى — الخيارات الأربعة</h5>

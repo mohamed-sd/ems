@@ -153,6 +153,7 @@ include '../insidebar.php';
         <div class="card-header"><strong><i class="fas fa-plus-circle"></i> تقديم طلب — من القاموس الحاكم (<?php echo count($types); ?> نوعًا)</strong></div>
         <div class="card-body">
             <form method="post" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;">
+        <?= csrf_field() ?>
                 <input type="hidden" name="action" value="rq_submit">
                 <?php if ($is_super_admin && $company_id <= 0): ?><input type="hidden" name="company_id" value="4"><?php endif; ?>
                 <div style="min-width:280px"><label style="font-size:.85rem" for="emsf_1202_ee646">نوع الطلب</label>
@@ -192,16 +193,19 @@ include '../insidebar.php';
                     <td><?php echo htmlspecialchars($STATE_AR[$q['status']] ?? $q['status']); ?></td>
                     <td style="min-width:220px">
                         <?php if (in_array($q['status'], array('submitted', 'routed', 'in_approval'), true)): ?>
-                            <form method="post" style="display:inline"><input type="hidden" name="action" value="rq_decide"><input type="hidden" name="req_id" value="<?php echo $id; ?>"><input type="hidden" name="decision" value="approve">
+                            <form method="post" style="display:inline">
+        <?= csrf_field() ?><input type="hidden" name="action" value="rq_decide"><input type="hidden" name="req_id" value="<?php echo $id; ?>"><input type="hidden" name="decision" value="approve">
                                 <button class="btn btn-sm btn-primary">اعتماد</button></form>
                             <details style="display:inline-block"><summary class="btn btn-sm btn-danger" style="display:inline-block">رفض/إعادة</summary>
-                                <form method="post" style="margin-top:4px"><input type="hidden" name="action" value="rq_decide"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
+                                <form method="post" style="margin-top:4px">
+        <?= csrf_field() ?><input type="hidden" name="action" value="rq_decide"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
                                     <select name="decision" class="form-control form-control-sm" style="margin-bottom:4px"><option value="return">إعادة لاستكمال</option><option value="reject">رفض</option></select>
                                     <input name="note" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="السبب (إلزامي)" required aria-label="السبب (إلزامي)">
                                     <button class="btn btn-sm btn-danger">تأكيد</button></form></details>
                         <?php elseif ($q['status'] === 'approved'): ?>
                             <details><summary class="btn btn-sm btn-primary">تنفيذ وإغلاق (الرد التسعة)</summary>
-                                <form method="post" style="margin-top:4px;max-width:300px"><input type="hidden" name="action" value="rq_execute"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
+                                <form method="post" style="margin-top:4px;max-width:300px">
+        <?= csrf_field() ?><input type="hidden" name="action" value="rq_execute"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
                                     <input name="result_doc_ref" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑦ المستند الناتج (إلزامي)" required aria-label="?? المستند الناتج (إلزامي)">
                                     <input name="executed_summary" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑧ التنفيذ الذي تم (إلزامي)" required aria-label="?? التنفيذ الذي تم (إلزامي)">
                                     <input name="action_required" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑥ ما يجب فعله" aria-label="?? ما يجب فعله">
@@ -252,7 +256,8 @@ include '../insidebar.php';
                     <?php else: ?>—<?php endif; ?></td>
                 <td><?php if (in_array($q['status'], array('submitted', 'routed', 'returned'), true)): ?>
                     <details><summary class="btn btn-sm btn-danger" style="display:inline-block">سحب</summary>
-                        <form method="post" style="margin-top:4px"><input type="hidden" name="action" value="rq_cancel"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
+                        <form method="post" style="margin-top:4px">
+        <?= csrf_field() ?><input type="hidden" name="action" value="rq_cancel"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
                             <input name="reason" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="السبب" required aria-label="السبب">
                             <button class="btn btn-sm btn-danger">تأكيد السحب</button></form></details>
                     <?php endif; ?></td>

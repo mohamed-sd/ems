@@ -303,7 +303,8 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 
     <!-- نموذج إضافة / تعديل -->
     <form id="projectForm" method="post" enctype="multipart/form-data"
-          class="allforms<?= (!empty($editData) || !empty($errors)) ? ' allforms-visible' : ''; ?>">
+          class="allforms<?= (!empty($editData) || !empty($errors)) ? ' allforms-visible' : ''; ?>
+        <?= csrf_field() ?>">
          <div class="card-header">
                 <h5><i class="fas fa-clipboard-list"></i>
                     <?= !empty($editData) ? 'تعديل الموديل' : 'إضافة موديل جديد'; ?>
@@ -622,6 +623,7 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                         <?php endif; ?>
                                         <?php if ($perms['can_delete']): ?>
                                             <form method="post" class="d-inline delete-model-form" onsubmit="return confirm('هل تريد حذف هذا الموديل؟ (تعطيل ناعم)');">
+        <?= csrf_field() ?>
                                                 <input type="hidden" name="delete_id" value="<?= (int) $row['id']; ?>">
                                                 <button type="submit" class="action-btn delete" title="حذف">
                                                     <i class="fa-solid fa-trash"></i>

@@ -241,6 +241,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
         <td style="white-space:nowrap">
             <?php if ($can_manage && $pending): ?>
             <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                 <input type="hidden" name="cnt_action" value="acknowledge">
                 <input type="hidden" name="container_id" value="<?php echo $id; ?>">
                 <input type="hidden" name="contract_id" value="<?php echo (int) $contract; ?>">
@@ -265,6 +266,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
             <details style="display:inline-block">
                 <summary class="btn btn-sm btn-secondary" style="cursor:pointer">دورة</summary>
                 <form method="post" style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
+        <?= csrf_field() ?>
                     <input type="hidden" name="cnt_action" value="rotation">
                     <input type="hidden" name="container_id" value="<?php echo $id; ?>">
                     <input type="hidden" name="contract_id" value="<?php echo (int) $contract; ?>">
@@ -335,6 +337,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
         <?php if ($can_manage): ?>
         <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap">
             <form method="post" style="display:inline">
+        <?= csrf_field() ?>
                 <input type="hidden" name="cnt_action" value="generate_main">
                 <input type="hidden" name="contract_id" value="<?php echo $contract; ?>">
                 <input type="hidden" name="cnt_csrf" value="<?php echo cnt_e($CSRF); ?>">
@@ -343,6 +346,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
             </form>
             <form method="post" style="display:inline"
                   onsubmit="return confirm('التوليدُ الرجعيُّ يستنتج الحصصَ من صفوف التشغيل، ويوسمها «مشتقّة» حتى تُقرّها الإدارة. متابعة؟');">
+        <?= csrf_field() ?>
                 <input type="hidden" name="cnt_action" value="derive">
                 <input type="hidden" name="contract_id" value="<?php echo $contract; ?>">
                 <input type="hidden" name="cnt_csrf" value="<?php echo cnt_e($CSRF); ?>">
@@ -465,6 +469,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
             توزيعُ حصةٍ من <span id="allocParentNo"></span></h5>
         <p class="text-muted" style="margin:0 0 10px">المتاحُ للتوزيع: <strong id="allocFree">—</strong></p>
         <form method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0">
+        <?= csrf_field() ?>
             <input type="hidden" name="cnt_action" value="allocate">
             <input type="hidden" name="contract_id" value="<?php echo $contract; ?>">
             <input type="hidden" name="cnt_csrf" value="<?php echo cnt_e($CSRF); ?>">
@@ -494,6 +499,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
     <div class="card" id="swapCard" style="display:none"><div class="card-body">
         <h5 style="margin:0 0 10px"><i class="fa fa-right-left"></i> تبديل</h5>
         <form method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0">
+        <?= csrf_field() ?>
             <input type="hidden" name="cnt_action" value="swap">
             <input type="hidden" name="contract_id" value="<?php echo $contract; ?>">
             <input type="hidden" name="cnt_csrf" value="<?php echo cnt_e($CSRF); ?>">
