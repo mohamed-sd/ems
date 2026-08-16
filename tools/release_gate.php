@@ -55,8 +55,9 @@ if ($gateFailed === null) {
     $say('▌ البوابة ② — التكامل (يشهد: قائد التطوير)');
     /* AC-T12: الفحوصُ العشرةُ (CK-01..10) وفاحصُ سلامةِ الترحيلِ بوابةُ دمجٍ
        ترسب افتراضًا — رسوبُ أيِّ فحصٍ يوقف العبورَ هنا لا في تقريرٍ لاحق. */
+    /* e05 بلا --enforce كان يطبع خرقًا حاكمًا ويخرج 0 — فتعبره البوابةُ وهو أحمر */
     foreach (array('tools/act_checks.php --enforce', 'tools/e02_checks.php --enforce',
-                   'tools/e05_checks.php', 'tools/wfm_checks.php --enforce',
+                   'tools/e05_checks.php --enforce', 'tools/wfm_checks.php --enforce',
                    'tools/se03_ten_checks.php', 'tools/fin01_posting_verify.php') as $t) {
         list($f, $a) = array_pad(explode(' ', $t, 2), 2, '');
         $r = run_step($PHP, $ROOT, $f, $a);

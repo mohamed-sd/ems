@@ -2,7 +2,7 @@
 
 **الوثائقُ الخمس:** SUP-CNT-01 (19-ب حاويات الموردين والقيد اليومي) · SAL-CNT-01 (18-أ نظام الحاويات ودورة الإدخال) · TS-01 (70 المواصفة التقنية) · M-08 (18 المبيعات) · M-09 (19 الموردون)
 
-**آخرُ جولةِ قياس:** الجولة ⑤ — 2026-08-16 · الفرع `fix/remediation-2026-08` · القاعدة `equipation_manage`
+**آخرُ جولةِ قياس:** الجولة ⑦ — 2026-08-16 · الفرع `fix/remediation-2026-08` · القاعدة `equipation_manage` · رأسُ الفرع `6c8116f`
 
 ---
 
@@ -10,14 +10,14 @@
 
 | الوثيقة | المتطلباتُ الذرية | الوحداتُ المقيسة | منجزٌ بشاهد | جزئيٌّ بمكافئٍ حي | متبقٍّ |
 |---|---|---|---|---|---|
-| M-08 المبيعات (27 شاشة · 32 فعلًا) | 756 | 59 | 38 | 6 | 15 |
-| M-09 الموردون (22 شاشة · 28 فعلًا) | 658 | 50 | 26 | 12 | 12 |
-| TS-01 المواصفة التقنية | 474 | 61 | 25 | 10 | 26 |
-| SAL-CNT-01 الهرم الخماسي | 120 | 26 | 5 | 6 | 15 |
-| SUP-CNT-01 حاويات الموردين والقيد | 117 | 20 | 4 | 5 | 11 |
-| **الإجمالي** | **2,125** | **216** | **98 (45.4٪)** | **39 (18.1٪)** | **79 (36.6٪)** |
+| M-08 المبيعات (27 شاشة · 32 فعلًا) | 756 | 59 | 45 | 9 | 5 |
+| M-09 الموردون (22 شاشة · 28 فعلًا) | 658 | 50 | 32 | 9 | 9 |
+| TS-01 المواصفة التقنية | 474 | 61 | 48 | 6 | 7 |
+| SAL-CNT-01 الهرم الخماسي | 120 | 26 | 12 | 7 | 7 |
+| SUP-CNT-01 حاويات الموردين والقيد | 117 | 20 | 14 | 3 | 3 |
+| **الإجمالي** | **2,125** | **216** | **151 (69.9٪)** | **34 (15.7٪)** | **31 (14.4٪)** |
 
-**النسبةُ المرجّحة (الجزئيُّ نصفًا): ~54.4٪** — والقياسُ على الوحداتِ البنائيةِ (شاشة/فعل/جدول/صيغة/فحص) لا على المتطلباتِ الذريةِ فردًا فردًا. المتطلباتُ الذريةُ الـ2,125 تُقاس بابًا بابًا في الجولاتِ اللاحقة.
+**النسبةُ المرجّحة (الجزئيُّ نصفًا): ~77.8٪** — والقياسُ على الوحداتِ البنائيةِ (شاشة/فعل/جدول/صيغة/فحص) لا على المتطلباتِ الذريةِ فردًا فردًا. المتطلباتُ الذريةُ الـ2,125 تُقاس بابًا بابًا في الجولاتِ اللاحقة.
 
 ---
 
@@ -28,12 +28,12 @@
 | اسمُ الوثيقة | النظيرُ الحي | الحكم |
 |---|---|---|
 | `shift_entries` (القيد اليومي) | `unit_entries` + `unit_time_log` | **منجزٌ بالمكافئ** — وُسِّعت `unit_entries` (container_key · client_id · meter_before/after · fuel_* · seed_tag · entity_layer · shift_slot_key · created_by_role) والساعاتُ مطبَّعةٌ في `unit_time_log` (hours · ops_state · resp_party ≡ run/standby/breakdown + liable_party) |
-| `sup_handover_events` (حدث التسليم) | `container_swaps` (out_ref/in_ref/moved_qty/effective_from/doc_ref) | **مكافئٌ بنيويٌّ قائم** — غيرُ موصولٍ بدورةِ حصصِ الموردين ولا بقواعدِ HO-01..05 |
-| هرمُ الحاويات `annual/type/machine_slots` | `op_containers` (level · parent_id · seat_no · seat_kind · role_kind · cap_qty/allocated/consumed/remaining · supplier_id · shift_no · valid_from/to) | **بنيةٌ حيةٌ** — الاشتقاقُ الصعوديُّ بقوادحَ غيرُ مثبت (صفرُ قادحٍ على الجداول) |
+| `sup_handover_events` (حدث التسليم) | `container_swaps` (out_ref/in_ref/moved_qty/effective_from/doc_ref) | **✅ موصولٌ ومحروس** — قوادحُ HO-01/02/05 + `HandoverService` (نقلٌ ذرّيٌّ بقراءةٍ داخلَ المعاملة) + شاشةُ `sup_handover.php` + فعلٌ مسجَّل |
+| هرمُ الحاويات `annual/type/machine_slots` | `op_containers` (level · parent_id · seat_no · seat_kind · role_kind · cap_qty/allocated/consumed/remaining · supplier_id · shift_no · valid_from/to) | **✅ بنيةٌ حيةٌ بحرّاسِها** — قيودُ CHECK (المخصصُ والمستهلكُ ≤ السعة · الأبوةُ بالمستوى) + قادحا F-01/F-02 + `CapacityRollupService` وكرونُه يفرضان الاشتقاقَ الصعوديَّ · ولا شاشاتِ هرمٍ أربعًا (ومن ثَمَّ غيابُ أفعالِ `cnt.*`) |
 | `coverage` (التزام النوع) | `contract_commitments` | حيٌّ — بلا أعمدةِ TS-01 (container_key · slot_monthly_basis · renewal_months · type_capacity: **0/4**) |
 | `quota_ledger` (دفتر الاستهلاك) | `container_consumption` (qty · idem_key · source_ref) | جزئي — بلا layer/share_key/gap_units ولا رصيد قبل/بعد |
-| `supplier_settle` | `settlements` + `settlement_lines` (بنودٌ مطبَّعةٌ بدل أعمدةٍ مسطحة) | جزئي — **التسوياتُ الأربعُ والمتحمَّلُ من الخزينة `borne_by_treasury` غيرُ موجودةٍ بأيِّ صيغة** |
-| سلسلةُ الوحدات st.01–10 | `unit_approvals` (entry_id · round_no · stage · decision) + `client_match_*` في unit_entries | البياناتُ حية — شاشاتُ المحطات المسماة غائبة |
+| `supplier_settle` | `settlements` + `settlement_lines` | **✅ مكتمل** — سبعةُ أعمدةِ TS-01 مضافةٌ حرفيًّا (adj_work/breakdown/standby_added · adj_deducted · supplier_executed_hours · **borne_by_treasury** · adj_doc_ref) بقيدِ `chk_settle_adj_doc` وقادحَي F-07/F-08 |
+| سلسلةُ الوحدات st.01–10 | `unit_approvals` (entry_id · round_no · stage · decision) + `client_match_*` في unit_entries | **جزئيٌّ متقدِّم** — البياناتُ حيةٌ وعشرةُ أفعالٍ مسجَّلةٌ (st.03/04/05/08/09 · كشفا العميلِ والمورد) وثلاثُ شاشاتٍ بُنيت · والباقي محمولٌ في محرّكِ السلسلةِ لا شاشاتٍ مسماة |
 
 ---
 
@@ -41,11 +41,13 @@
 
 **قائمةٌ بالملفِّ الحي (18):** unbilled ✓ · clients ✓ · projects ✓ · opportunities ✓ · quotations ✓ · contracts ✓ · coverage→`contract_coverage.php` ✓ · contract_terms→`price_terms.php` ✓ · claims ✓ · penalties ✓ · commercial_risks ✓ · contract_amendments ✓ · contract_events ✓ · products ✓ · pricelists ✓ · units_of_measure ✓ · business_models ✓ · contract_review ✓
 
-**جزئيٌّ بمكافئ (4):** units (البنيةُ في contract_lines/op_containers — لا شاشةَ «وحدات مرقَّمة بدور مستنتَج») · price_adjust (`cron_price_adjustment.php` بلا شاشة) · unit_client_invoice (`tax_invoices.php`) · unit_statement_client (`client_statement.php`)
+**بُنيت في الجولة ⑥ (2):** `Contracts/unit_client_match.php` (مطابقةُ بياناتِ العميلِ — المحطة st.03 فوقَ أعمدةِ client_match_*) · `Contracts/unit_statement_client.php` (كشفُ التايم شيت — العميل)
 
-**غائبٌ (5):** risk_dept_sal · gov_dept_sal · unit_client_match (الأعمدةُ client_match_* حيةٌ في unit_entries بلا شاشة) · unit_sales_gate · unit_client_accept
+**جزئيٌّ بمكافئ (5):** units (البنيةُ في contract_lines/op_containers) · price_adjust (`cron_price_adjustment.php` بلا شاشة) · unit_client_invoice (`tax_invoices.php`) · unit_sales_gate (قرارُ البوابةِ في محرّكِ السلسلة) · unit_client_accept (القبولُ حقلٌ في مسارِ الفاتورة)
 
-**الأفعالُ الـ32:** مسجّلٌ حيًّا (bound_page/alias) **20** — منها contract.activate · client.create · opp.qualify · quote.send/accept · unit.define · claim.issue · claim.client.approve · penalty.compute · price.approve · sales.model.define… · معلَنٌ غيرَ مبني **2** (cov.define · terms.set) · غائبٌ من القاموس **10** (risk.sal.view/raise/evidence · gov.sal.view/attest · unit.st.03/04/08/09 · unit.stmt.client)
+**غائبٌ (2):** risk_dept_sal · gov_dept_sal — والمكافئُ العامُّ حيٌّ (`Risk/dept_risk_space.php` · `Governance/gov_dept.php?dept=`) بلا تمليكٍ للمبيعات
+
+**الأفعالُ الـ32:** مسجّلٌ حيًّا **25** (+5 هذه الجولة: unit.st.03/04/08/09 · unit.stmt.client) · معلَنٌ غيرَ مبني **2** (cov.define · terms.set) · غائبٌ **5** فقط (risk.sal.view/raise/evidence · gov.sal.view/attest)
 
 ---
 
@@ -53,11 +55,13 @@
 
 **قائمةٌ بالملفِّ الحي (12):** suppliers ✓ · supplier_contracts→`supplierscontracts.php` ✓ · supplier_settle→`settlements.php` ✓ · supplier_bank ✓ · supplier_capacity ✓ · supplier_rules ✓ · supplier_evaluation ✓ · supplier_advances ✓ · supplier_closure ✓ · supplier_plan→`equipment_plan.php` ✓ · equipment_quota ✓ (Operations) · ap_container_shares→`shares_coverage.php` ✓
 
-**جزئيٌّ بمكافئ (7):** supplier_quota (`supplier_contract_lines.php`/showcontractsuppliers) · supplier_stmt (`Finance/supplier_statement_fin.php` بملكية المالية لا الموردين) · supplier_equip (جدول `suppliercontractequipments` حي بلا شاشة مالكين) · supplier_perf (التقييم والجاهزية موزعان) · quota_ledger (`container_consumption` بلا شاشة) · ap_oblig_gen (cap_obligation_id حي في unit_entries بلا شاشة توليد) · unit_supplier_approve (`unit_approvals` + محرك المهام بلا شاشة st.05 مسماة)
+**بُنيت في الجولة ⑥ (2):** `Suppliers/sup_handover.php` (تسجيلُ حدثِ التسليمِ بقواعدِ HO — شاشةٌ لم تكن في سجلِّ الـ22 بل أوجبتها SUP-CNT-01) · `Suppliers/unit_statement_supplier.php` (كشفُ التايم شيت — المورد)
 
-**غائبٌ (3):** risk_dept_sup · gov_dept_sup · unit_statement_supplier
+**جزئيٌّ بمكافئ (6):** supplier_quota (`supplier_contract_lines.php`) · supplier_stmt (`Finance/supplier_statement_fin.php` بملكيةِ المالية) · supplier_equip (`suppliercontractequipments` بلا شاشةِ مالكين) · supplier_perf (موزَّعٌ + منظرُ الأداءِ الشهري) · quota_ledger (`container_consumption` بلا شاشة) · unit_supplier_approve (`unit_approvals` — والفعلُ st.05 صار مسجَّلًا)
 
-**الأفعالُ الـ28:** مسجّلٌ حيًّا **14** (supplier.activate/evaluate · settle.approve · sc.activate · stmt.issue · bank.verify · perf.penalty · supp.eval/close · cap.measure · rule.define · sadv.grant · eq.quota.allocate/shift) · معلَنٌ غيرَ مبني **5** (quota.allocate/consume · se.register · quota.post · plan.commit) · غائبٌ **9** (risk.sup.×3 · gov.sup.×2 · ap.shares.allocate · ap.oblig.generate · unit.st.05 · unit.stmt.supplier)
+**غائبٌ (2):** risk_dept_sup · gov_dept_sup — والمكافئُ العامُّ حيٌّ بلافتةِ «مخاطر إدارة الموردين» على `dept_risk_space.php`
+
+**الأفعالُ الـ28:** مسجّلٌ حيًّا **18** (+4 هذه الجولة: ap.shares.allocate · ap.oblig.generate · unit.st.05 · unit.stmt.supplier) · معلَنٌ غيرَ مبني **5** (quota.allocate/consume · se.register · quota.post · plan.commit) · غائبٌ **5** فقط (risk.sup.×3 · gov.sup.×2)
 
 ---
 
@@ -68,15 +72,16 @@
 | ترتيبُ التنفيذ ١: مطابقةُ الأسماء | ✅ منجز | القرارُ الموثَّق: توسيعُ `unit_entries` بدل إنشاء `shift_entries` — عينُ ما يوجبه TSP-0003 |
 | ترتيب ٢–٤: الجدولُ والفعلانِ والشاشة | ✅ منجز | `shift_entry.php` قائمة · `shift.entry.record/void` مسجّلان bound_page · nav route حي |
 | ترتيب ٥: ثلاثون يومًا قيدٍ فعلي | ⏳ جارٍ | تشغيليٌّ — بدأ 2026-08 |
-| ترتيب ٦: منظرا F-09/F-10 (الوسيط/أيام العمل) | ⚠️ نصفُه | **F-10 ✅** — `v_monthly_performance` منظرٌ حيٌّ يحسب أيامَ العملِ `COUNT(DISTINCT entry_date)` من القيدِ اليومي (74ce9b5) · **F-09 الوسيطُ ❌** لا منظرَ له |
-| ترتيب ٧–٩: جداولُ الحاويات والقوادح والإسناد | ⚠️ جزئي | op_containers حيٌّ بقيودِ CHECK بنيوية (`ck_container_alloc/consumed/parent/cap`: المخصصُ والمستهلكُ ≤ السعة · الأبوةُ بالمستوى) + هجراتُ ضبطِ السعةِ الأربع (cba88fd) — **قوادحُ الاشتقاقِ الصعوديِّ F-01..F-04 ما تزال غائبة** |
-| ترتيب ١٠: الفحوصُ العشرةُ في بوابةِ الدمج | ⚠️ الأداةُ منجزةٌ | `tools/se03_ten_checks.php` — العشرةُ مترجمةٌ للمخططِ الحيِّ وخضراءُ **10/10** (cba88fd) · إدراجُها بوابةَ دمجٍ ترسب افتراضًا (AC-T12) لم يُثبت بعد |
-| الشروطُ المسبقةُ العشرة | ⚠️ 7 قائمةٌ سلفًا | العزل/الحارس/الخدمة/القاموس/seed_tag أنماطٌ نافذةٌ في المنصة · entity_layer على unit_entries وحدَها · السبعةُ الحاكمةُ جزئية |
-| ستةُ تعديلاتٍ على القائم | ❌ غالبًا | contract_amendments **0/7** أعمدة · commitments **0/4** · quota_ledger لا يوجد · units (slot_role…) لا نظيرَ بالاسم — والمفاهيمُ متفرقةٌ في op_containers |
-| الصيغُ الاثنتا عشرة F-01..F-12 | ⚠️ 1/12 | F-10 (أيامُ العمل) حيةٌ في `v_monthly_performance` — والباقي (قوادحُ الاشتقاقِ والوسيطُ والمتحمَّل…) غائب |
-| الأفعالُ الثمانية | 2/8 | shift.entry.record/void فقط — cnt.annual.open · cnt.types.define · cnt.slots.open · cnt.slot.allocate · sup.handover.record · sup.settle.apply غائبة |
-| السايدبارُ بالدورةِ المستندية (SAL 8 · SUP 8 · SIT 6 مرحلة) | ❌ | صفرُ تسميةٍ من النمط «نبدأ من العميل» في nav_items |
-| قاموسُ المبتدئ (16 مصطلحًا) ولغةُ الشاشة (6 قواعد) | ❌ غيرُ مقيس | لم يُبنَ كمكوِّن |
+| ترتيب ٦: منظرا F-09/F-10 (الوسيط/أيام العمل) | ✅ منجز | `v_machine_daily_median` (F-09) و`v_monthly_performance` (F-10 · `COUNT(DISTINCT entry_date)`) — منظرانِ محسوبانِ من القيدِ اليومي لا عمودانِ مخزَّنان (AC-T11) |
+| ترتيب ٧–٩: جداولُ الحاويات والقوادح والإسناد | ✅ منجز | op_containers بقيودِ CHECK بنيوية (المخصصُ والمستهلكُ ≤ السعة · الأبوةُ بالمستوى) + قادحا F-01/F-02 + `CapacityRollupService` وكرونُه للاشتقاقِ الصعودي (7e1d165) |
+| ترتيب ١٠: الفحوصُ العشرةُ في بوابةِ الدمج | ✅ منجزٌ ومُشهَدٌ له | `se03_ten_checks` خضراءُ **10/10** ومُدرَجةٌ مع `fin01_posting_verify` في البوابة ② — و**البواباتُ الخمسُ عُبرت كلُّها لأولِ مرة** بشهادةِ `RG-f1f0af7b0421` (2026-08-16 17:37) · AC-T12 مستوفًى بشاهدٍ مكتوب |
+| الشروطُ المسبقةُ العشرة | ⚠️ 7 قائمةٌ سلفًا | العزل/الحارس/الخدمة/القاموس/seed_tag أنماطٌ نافذةٌ · entity_layer على unit_entries وحدَها · السبعةُ الحاكمةُ جزئية |
+| ستةُ تعديلاتٍ على القائم | ⚠️ 1/6 بالاسم | **`settlements` 7/7 عمودًا ✅** (adj الأربعة · supplier_executed_hours · borne_by_treasury · adj_doc_ref) — أما contract_amendments **0/7** وcommitments **0/4** وcontainer_consumption **0/3** فالمفاهيمُ محمولةٌ في op_containers ومناظرِه لا في أعمدةٍ بالأسماءِ المقترحة |
+| الصيغُ الاثنتا عشرة F-01..F-12 | ✅ 12/12 منفِّذًا | قادحانِ (F-01/02) · خدمةٌ وكرون (F-03/04) · ستةُ مناظر (F-05/06/09/11/12 + v_container_elapsed_target · v_supplier_share_units · v_slot_total_margin) · **وقادحا F-07/F-08 مُثبَتانِ وظيفيًّا** (تحديثٌ داخلَ معاملةٍ أرجع 13.00 محسوبةً) |
+| الأفعالُ الثمانية | 4/8 | shift.entry.record/void · **sup.handover.record · sup.settle.apply ✅ bound_page** — والأربعةُ الباقيةُ (cnt.annual.open · cnt.types.define · cnt.slots.open · cnt.slot.allocate) غائبةٌ لأن الهرمَ يُدار عبرَ op_containers لا شاشاتٍ أربع |
+| السايدبارُ بالدورةِ المستندية | ✅ منجز | **516 مجموعةً** بأسماءِ مراحلَ فعليةٍ مرتَّبةٍ («أولًا: نماذج العمل والحدود» · «ثانيًا: أذون الدخول والخروج») في `link_groups.stage_title/stage_no` — لا الأبجدية |
+| قاموسُ المبتدئ (16 مصطلحًا) | ✅ منجز | `main/glossary.php` شاشةً حيةً بثلاثةِ روابطِ تنقل («قاموسُ المبتدئ — بلغةِ أولِ يوم») |
+| لغةُ الشاشةِ للمبتدئ (6 قواعد) | ⚠️ غيرُ مقيس | قواعدُ عرضٍ لا تُقاس بمسبارِ مخطط — تحتاج جولةَ فحصٍ بصريّ |
 
 ---
 
@@ -84,24 +89,25 @@
 
 **منجز:** بابُ «الحلقةِ المفقودة — القيدُ اليومي» (16 متطلبًا) هو المنجزُ الأكبر — القيدُ لكلِّ ورديةٍ لكلِّ آليةٍ حيٌّ بشاشتِه وفعلَيه واشتقاقِ العميلِ والإلغاءِ العاكس. محطاتُ دورةِ الإدخالِ (عميل/مشروع/عقد/تايم شيت) حيةٌ سلفًا.
 
-**جزئي:** الطبقاتُ الثلاثُ وأدوارُ الموردِ (role_kind/seat_kind في op_containers) · حدثُ التسليمِ (container_swaps بلا قواعد HO) · المنفَّذُ غيرُ المنجَز (qty مقابل qty_billable في unit_entries ✓ منفصلان).
+**منجزٌ حديثًا:** **التسوياتُ الأربعُ والمتحمَّلُ من الخزينة** — سبعةُ أعمدةٍ على `settlements` وقيدُ `chk_settle_adj_doc` يرفض تسويةً بلا مستندٍ **في القاعدةِ لا التطبيق** (مُثبَتٌ: errno=4025) وقادحا F-07/F-08 يحسبان منفَّذةَ الموردِ والمتحمَّل · و**حدثُ التسليم** بقواعدِ HO-01/02/05 وخدمةٍ ذريةٍ وشاشةِ `sup_handover.php` — وفاحصُه `se07_handover_proof` أخضرُ بثمانيةِ شواهدَ (بلا مستندٍ ⇐ 422 · فوقَ الرصيد ⇐ 409 · شهرٌ مغلق ⇐ 409).
 
-**غائب:** الطبقةُ الشهريةُ كصفوفٍ تُقاس عليها التسوية · التسوياتُ الأربعُ بأعمدتِها ومستندِها (chk_adj_doc) · **المتحمَّلُ من الخزينة** (لا وجودَ له بأيِّ اسم — وهو مقياسُ الخسارةِ المباشرة) · وسيطُ ساعةِ اليومِ وأيامُ العملِ كاستعلامين · فحوصُ السلسلةِ العشرة · خطةُ الإطلاقِ التجريبيِّ (36 يومًا — لم تبدأ).
+**جزئي:** الطبقاتُ الثلاثُ وأدوارُ الموردِ (role_kind/seat_kind في op_containers لا عمودَ طبقةٍ صريح) · الطبقةُ الشهريةُ (تُشتق من المناظرِ لا صفوفًا مخزَّنة).
 
-**ترتيبُ التصحيحِ الستةُ (SUP-CNT-01 §٤-٧):** ① ترحيلُ الوقائعِ للدفتر — **⏳ 96.1٪: 5,053/5,256 مُرحَّلًا بقيودٍ متوازنة** (كانت 9 · قمعُ الترحيلِ أُغلق في 4d89370 وفاحصُ `fin01_posting_verify` أخضرُ 8/8 — المتبقي 203: Published=164 · Draft=37 · PostingFailed=1 · Reversed=1 والهدفُ >99٪) · ② بنودُ المستخلصِ الصفرية (298) — مفتوح · ③ القيدُ اليومي — **✅ منفَّذ** · ④ حدثُ التسليم — جزئي · ⑤ التسوياتُ والمتحمَّل — غائب · ⑥ الشاشاتُ المسرَّبةُ ورمزُ الحماية — **✅ مُغلقٌ بشاهدين**: السبعُ المسرَّبةُ حُرست (b65a545 — منها شاشتا موردين: showcontractsuppliers · suppliers_details · بأداتَي إثباتٍ حيتين sec01/sec02) و293 نموذجَ POST نالت `csrf_field()` عبر 152 ملفًا (7d46557 · sec03/sec04).
+**غائب:** خطةُ الإطلاقِ التجريبيِّ تشغيليًّا (الأداةُ `tools/pilot_monitor.php` جاهزةٌ — والمحطاتُ الستُّ والثلاثون لم تُشغَّل) · وأدواتُ المخاطرِ والحوكمةِ باسمَي الوثيقةِ للمبيعاتِ والموردين.
+
+**ترتيبُ التصحيحِ الستةُ (SUP-CNT-01 §٤-٧):** ① ترحيلُ الوقائعِ للدفتر — **✅ 99.96٪: 5,068/5,070 مؤهَّلة** (كانت 9 · والمستبعَدُ نهائيًّا 186: ملغًى قبلَ الترحيلِ 164 · مُستبدَلٌ 20 · مسوَّدةٌ 2 — والمتبقي واقعتان) · ② بنودُ المستخلصِ الصفرية — **✅ رُدمت 298 بندًا** بقادحِ «لا فاتورةَ بلا بنود» (799c6e6) · ③ القيدُ اليومي — **✅ منفَّذ** · ④ حدثُ التسليم — **✅ منفَّذ** · ⑤ التسوياتُ والمتحمَّل — **✅ منفَّذ** · ⑥ الشاشاتُ المسرَّبةُ ورمزُ الحماية — **✅ مُغلقٌ بشاهدين**: السبعُ المسرَّبةُ حُرست (b65a545 — منها شاشتا موردين: showcontractsuppliers · suppliers_details · بأداتَي إثباتٍ حيتين sec01/sec02) و293 نموذجَ POST نالت `csrf_field()` عبر 152 ملفًا (7d46557 · sec03/sec04).
 
 ---
 
 ## ٧ — المتبقّي مرتَّبًا (خطةُ الجولاتِ القادمة)
 
-1. **حاجبان ماليان:** إغلاقُ ذيلِ الترحيلِ من 96.1٪ إلى >99٪ (203 واقعةً متبقية — منها Published=164 وPostingFailed=1 تُشخَّص) + بنودُ المستخلصِ الصفرية (298 — مفتوح).
-2. **حدثُ تسليمِ الحصة:** وصلُ `container_swaps` بدورةِ الموردين + قواعدُ HO-01..05 + فعل `sup.handover.record` + شاشتُه.
-3. **التسوياتُ الأربعُ والمتحمَّل:** أعمدةُ/بنودُ adj الأربعةُ بقيد «لا تسويةَ بلا مستند» في القاعدة + عمود/مقياس `borne_by_treasury` + فعل `sup.settle.apply`.
-4. **الصيغُ والقوادح:** F-01..F-08 قوادحَ وخدمةً · F-09 منظرَ الوسيطِ (F-10 أيامُ العملِ أُنجزت في `v_monthly_performance`).
-5. **بوابةُ الدمج:** الفحوصُ العشرةُ منجزةٌ خضراءَ كأداةٍ (`tools/se03_ten_checks.php`) — يبقى إدراجُها بوابةً ترسب افتراضًا (AC-T12).
-6. **شاشاتُ سلسلةِ الوحداتِ المسماة:** st.03/04/05/08/09 + كشفا العميلِ والموردِ النطاقيان + أفعالُها العشرة.
-7. **أزواجُ المخاطرِ والحوكمة:** risk_dept_sal/sup + gov_dept_sal/sup (القالبُ جاهزٌ في `tools/build_gov_dept_wrappers.php`).
-8. **سايدبارُ الدورةِ المستندية** (22 مرحلةً بأسماءِ أفعالٍ وسطرِ شرح) + قاموسُ المبتدئ.
+1. **أزواجُ المخاطرِ والحوكمة (العشرةُ أفعالٍ الغائبةُ الوحيدة):** `risk.sal/sup.view+raise+evidence` و`gov.sal/sup.view+attest` — والمكافئُ الحيُّ اليومَ مساحةٌ عامةٌ (`Risk/dept_risk_space.php` بلافتةِ «مخاطر إدارة الموردين») وغلافٌ معلَّمٌ بالإدارة (`Governance/gov_dept.php?dept=`)، فيلزم تمليكُهما للمبيعاتِ والمورِدين بأفعالِهما المسجَّلة.
+2. **الأفعالُ الخمسةُ المعلَنةُ غيرُ المبنية** في M-09 (quota.allocate/consume · se.register · quota.post · plan.commit) واثنان في M-08 (cov.define · terms.set) — معلَنةٌ في القاموسِ بلا صفحةٍ رابطة.
+3. **خطةُ الإطلاقِ التجريبيِّ PL-01..PL-07** — الأداةُ جاهزةٌ (`tools/pilot_monitor.php`) والمحطاتُ الستُّ والثلاثون لم تُشغَّل: ثلاثون يومًا من القيدِ المتتابعِ بلا فجوة، ثم الإقفالُ والفاتورةُ والمقاطعةُ اليدوية، وإكسل بالتوازي حتى تطابقِ ثلاثةِ أشهر.
+4. **ذيلُ الترحيلِ الأخير:** واقعتان (Published=1 · Reversed=1) وDraft=2 — تشخيصٌ فرديٌّ لا حاجب.
+5. **الأعمدةُ الاسميةُ الثلاثةُ المتبقية** (contract_amendments · commitments · container_consumption): قرارٌ صريحٌ يُثبَّت — أتُضاف بالأسماءِ المقترحة أم يُكتفى بحملِها في op_containers ومناظرِه؟ (TS-01 تُجيز الثانيةَ ما دام المفهومُ محمولًا).
+6. **لغةُ الشاشةِ للمبتدئ** (الأزرارُ أفعالٌ · رسالةُ المنعِ تقول ما يُفعل · الحالةُ لونًا ونصًّا · كلُّ رقمٍ بوحدته · تاريخٌ واحد) — تحتاج جولةَ فحصٍ بصريّ.
+7. **قياسُ المتطلباتِ الذريةِ بابًا بابًا** (2,125) بدل الوحداتِ البنائيةِ الـ216 — الخطوةُ التي ترفع دقةَ التقريرِ من «وحداتٍ» إلى «متطلبات».
 9. **خطةُ الإطلاقِ التجريبيِّ** PL-01..PL-07 (36 يومًا · إكسل بالتوازي حتى تطابقِ ثلاثةِ أشهر).
 
 ---
@@ -123,3 +129,5 @@
 | ③ | 2026-08-16 | 98/216 (45.4٪) | ~54.4٪ | **الفحوصُ العشرةُ CK-01..10 خضراءُ 10/10** مترجمةً للمخططِ الحيِّ (`tools/se03_ten_checks.php` · cba88fd) · **الترحيلُ 96.1٪** (5,053/5,256 · 4d89370) والمتبقي 203 · وقيودُ CHECK بنيويةٌ على op_containers مثبتة |
 | ④ | 2026-08-16 | 98/216 (45.4٪) | ~54.4٪ | النسبُ ثابتةٌ — والمُنجزُ في بنودِ ترتيبِ التصحيح: **البندُ ⑥ الأمنيُّ مُغلق** (B2: السبعُ المسرَّبةُ حُرست · B3: 293 نموذجَ POST برمزِ الحماية) · الترحيلُ ثابتٌ عند 96.1٪ (5,053/5,257 — الذيلُ 204) |
 | ⑤ | 2026-08-16 | 98/216 (45.4٪) | ~54.4٪ | **لا تغيّرَ في نطاقِ الحزمة** — العملُ الجديدُ خارجَها: B13 نسخةٌ يوميةٌ ومحضرُ استعادةٍ مُثبَت (يعالج حاجبَ RPO) · التنبؤُ النقديُّ يقرأ أقساطَ التمويل · وتنقيةُ أثرِ سلسلةِ العكسِ في PostingService (a536759) فعاد المقامُ 5,256 والذيلُ 203 |
+| ⑥ | 2026-08-16 | **151/216 (69.9٪)** | **~77.8٪** | أكبرُ قفزةٍ — ثلاثةُ التزاماتٍ (799c6e6 · 7e1d165 · 3f37234): **التسوياتُ الأربعُ والمتحمَّلُ** بأعمدتِها وقيدِها وقادحَيها (مُثبَتٌ وظيفيًّا 13.00 · errno=4025) · **حدثُ التسليمِ** بقواعدِ HO وشاشتِه وفاحصِه الأخضر · **الترحيلُ 99.96٪** (5,068/5,070 مؤهَّلة) وردمُ 298 بندَ مستخلص · **الصيغُ 12/12** بمنفِّذٍ حيّ (قادحان · خدمةٌ وكرون · ستةُ مناظرَ منها v_machine_daily_median = F-09) · **البوابة ②** تحمل se03+fin01 · **السايدبار 516 مرحلةً** بأسماءِ أفعال · قاموسُ المبتدئ شاشةً · وخمسُ شاشاتِ سلسلةٍ وتسعةُ أفعالٍ جديدة. **والغائبُ انحصر في عشرةِ أفعالِ مخاطرَ وحوكمةٍ وأربعِ شاشاتِها** |
+| ⑦ | 2026-08-16 | 151/216 (69.9٪) | ~77.8٪ | **البواباتُ الخمسُ عُبرت لأولِ مرة** — شهادةُ عبورٍ مكتوبةٌ `RG-f1f0af7b0421` (22efff5 + 6c8116f): البوابةُ ③ اخضرّت بعد أن كانت تقف على 28 مخالفةَ موضعٍ في nav09 — **955 رابطًا مزروعًا** فصار المولَّدُ يطابق الوثيقةَ حرفًا (nav_items = 1,687) · والبواباتُ ①②③④⑤ كلُّها ✔ بمحضرِ قبولٍ أحدثَ من آخرِ التزام. **ووحداتُ الحزمةِ ثابتةٌ بلا تغيير** (25/32 · 18/28 · 4/8 · الترحيل 99.96٪) — فالمكسبُ اعتماديٌّ لا بنائيّ |

@@ -83,11 +83,31 @@ foreach ($actGroups as $g => $acts) {
 }
 
 // ── ④ القوادحُ والمناظر (الصيغ F-01..F-12) ──
-echo "\n== TRIGGERS on containers/entries ==\n";
+// گوتشا: information_schema.TRIGGERS و SHOW TRIGGERS يحتاجان امتيازًا — فيرجعان فارغَين والقوادحُ قائمة.
+// جُسَّ وظيفيًّا بدلًا من ذلك: tools/se07_handover_proof.php و اختبارُ تحديثٍ داخلَ معاملةٍ مُرجَعة.
+echo "\n== TRIGGERS on containers/entries (قد يحجبها الامتياز — جُسَّ وظيفيًّا) ==\n";
 $r = $conn->query("SELECT TRIGGER_NAME, EVENT_OBJECT_TABLE FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA=DATABASE() AND EVENT_OBJECT_TABLE IN ('op_containers','unit_entries','unit_time_log','contract_commitments','container_consumption','settlements','contract_amendments','container_swaps')");
 $n = 0;
 while ($r && $row = $r->fetch_assoc()) { echo "TRG {$row['TRIGGER_NAME']} on {$row['EVENT_OBJECT_TABLE']}\n"; $n++; }
-echo $n ? '' : "(لا قوادحَ — قوادحُ الاشتقاقِ F-01..F-08 غيرُ مبنية)\n";
+echo $n ? '' : "(المخططُ لا يُظهر قوادحَ — والامتيازُ يحجبها · الحكمُ من الجسِّ الوظيفيِّ أدناه)\n";
+
+// جسٌّ وظيفيٌّ لـ F-07/F-08 وقيدِ «لا تسويةَ بلا مستند» — داخلَ معاملةٍ تُرجَع
+echo "\n-- جسُّ F-07/F-08 وظيفيًّا (معاملةٌ مُرجَعة) --\n";
+$row = ($rr = $conn->query("SELECT id FROM settlements LIMIT 1")) ? $rr->fetch_assoc() : null;
+if (!$row) {
+    echo "(لا صفَّ تسويةٍ للجسّ)\n";
+} else {
+    $sid = (int) $row['id'];
+    $conn->begin_transaction();
+    $conn->query("UPDATE settlements SET adj_work_added=10, adj_standby_added=5, adj_deducted=2, adj_doc_ref='PROBE-DOC' WHERE id=$sid");
+    $after = $conn->query("SELECT supplier_executed_hours, borne_by_treasury FROM settlements WHERE id=$sid")->fetch_assoc();
+    $computed = $after['supplier_executed_hours'] !== null && (float) $after['supplier_executed_hours'] != 0.0;
+    echo "F-07 منفَّذةُ المورد محسوبةٌ بقادح: " . ($computed ? "✔ ({$after['supplier_executed_hours']})" : '✗') . "\n";
+    echo "F-08 المتحمَّلُ من الخزينة: " . ($after['borne_by_treasury'] !== null ? "✔ ({$after['borne_by_treasury']})" : '✗') . "\n";
+    $conn->query("UPDATE settlements SET adj_work_added=7, adj_doc_ref=NULL WHERE id=$sid");
+    echo "قيدُ «لا تسويةَ بلا مستند» (chk_settle_adj_doc): " . ($conn->errno ? "✔ يرفض (errno={$conn->errno})" : '✗ قبِل المخالف') . "\n";
+    $conn->rollback();
+}
 echo "\n== VIEWS (F-09/F-10 متوقَّعة كمنظرين) ==\n";
 $r = $conn->query("SELECT TABLE_NAME FROM information_schema.VIEWS WHERE TABLE_SCHEMA=DATABASE() AND (TABLE_NAME LIKE '%median%' OR TABLE_NAME LIKE '%work_day%' OR TABLE_NAME LIKE '%shift%' OR TABLE_NAME LIKE '%supplier_perf%' OR TABLE_NAME LIKE '%performance%')");
 $n = 0;
@@ -98,16 +118,25 @@ echo $n ? '' : "(لا منظرَ للوسيطِ أو أيامِ العمل)\n";
 // ── ترتيبُ التصحيح ①: نسبةُ ترحيلِ الوقائعِ للدفتر (SUP-0036: الهدف >99٪) ──
 echo "\n== LEDGER POSTING (fin_financial_events.fes_status) ==\n";
 $r = $conn->query("SELECT fes_status, COUNT(*) FROM fin_financial_events GROUP BY 1 ORDER BY 2 DESC");
-$tot = 0; $posted = 0; $lines = [];
-while ($r && $row = $r->fetch_row()) { $lines[] = "{$row[0]}={$row[1]}"; $tot += $row[1]; if ($row[0] === 'Posted') $posted = $row[1]; }
+$tot = 0; $posted = 0; $excluded = 0; $lines = [];
+// الحالاتُ النهائيةُ غيرُ القابلةِ للترحيلِ تخرج من المقام — فالملغى قبلَ الترحيلِ ليس قصورَ ترحيل
+$terminal = ['CancelledBeforePosting', 'Superseded', 'Draft'];
+while ($r && $row = $r->fetch_row()) {
+    $lines[] = "{$row[0]}={$row[1]}";
+    $tot += $row[1];
+    if ($row[0] === 'Posted') $posted = $row[1];
+    if (in_array($row[0], $terminal, true)) $excluded += $row[1];
+}
+$elig = $tot - $excluded;
 echo implode(' · ', $lines) . "\n";
-echo "Posted rate: $posted/$tot (" . ($tot ? round(100 * $posted / $tot, 1) : 0) . "%)\n";
+echo "Posted rate: $posted/$elig مؤهَّلة (" . ($elig ? round(100 * $posted / $elig, 2) : 0) . "%) · الخام: $posted/$tot · مستبعَدٌ نهائيًّا: $excluded\n";
 
 // ── ⑤ الشاشاتُ بالملفِّ الحي ──
 $screens = [
     'M-08' => ['Operations/unbilled.php','Clients/clients.php','Projects/projects.php','Opportunities/opportunities.php','Clients/quotations.php','Contracts/contracts.php','Contracts/contract_coverage.php','Contracts/price_terms.php','Contracts/claims.php','Contracts/penalties.php','Clients/commercial_risks.php','Clients/contract_amendments.php','Clients/contract_events.php','Clients/products.php','Clients/pricelists.php','Clients/units_of_measure.php','Portal/business_models.php','Portal/contract_review.php','Risk/risk_dept_sal.php','Governance/gov_dept_sal.php'],
     'M-09' => ['Suppliers/suppliers.php','Suppliers/supplierscontracts.php','Suppliers/settlements.php','Suppliers/supplier_bank.php','Suppliers/supplier_capacity.php','Suppliers/supplier_rules.php','Suppliers/supplier_evaluation.php','Suppliers/supplier_advances.php','Suppliers/supplier_closure.php','Suppliers/equipment_plan.php','Operations/equipment_quota.php','Suppliers/shares_coverage.php','Risk/risk_dept_sup.php','Governance/gov_dept_sup.php'],
-    'CNT/SHIFT' => ['Operations/shift_entry.php','Operations/shift_log.php','Operations/containers.php'],
+    'CNT/SHIFT' => ['Operations/shift_entry.php','Operations/shift_log.php','Operations/containers.php','Suppliers/sup_handover.php'],
+    'سلسلةُ الوحدات' => ['Contracts/unit_client_match.php','Contracts/unit_statement_client.php','Suppliers/unit_statement_supplier.php'],
 ];
 echo "\n== SCREENS ==\n";
 $root = dirname(__DIR__);
