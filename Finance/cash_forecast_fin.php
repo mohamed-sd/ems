@@ -55,7 +55,41 @@ if (isset($_GET['generate'])) {
     $out_fund = $ssum('f', 'fin_funding_schedules',
         "SELECT COALESCE(SUM(f.total_due-f.paid_amount),0) v FROM fin_funding_schedules f WHERE {TENANT_SCOPE} AND f.state<>'paid' AND f.due_date<=?",
         array($until));
-    $outflow = round($out_dues + $out_fund, 2);
+    /* ── أقساطُ التمويل (N-18) ────────────────────────────────────────────
+       ترويسةُ هذه الشاشةِ تقول منذ كُتبت: «الخارجُ من المستحقاتِ **وأقساطِ
+       التمويل**» — والقياسُ أظهر صفرَ قراءةٍ لـ`financing_installments` فيها،
+       و2,136 قسطًا في القاعدةِ منها 72 مستحقًّا. فالوعدُ كان في الترويسةِ ولم
+       يكن في الكود. و`CashflowService::financingOutlook` مبنيٌّ لهذا الغرضِ
+       تحديدًا وبلا نداءٍ حتى اليوم — فيُنادى ولا يُعاد بناؤه. */
+    require_once __DIR__ . '/../app/Services/Financing/CashflowService.php';
+    $out_inst = 0.0;
+    $inst_by_cur = array();
+    $st = $conn->prepare(
+        "SELECT COALESCE(SUM(i.amount_total),0) s, i.currency
+           FROM financing_installments i JOIN financing_operations o ON o.op_id = i.op_id
+          WHERE o.company_id = ? AND i.state IN ('scheduled','due','overdue')
+            AND i.due_date <= ?
+          GROUP BY i.currency");
+    if ($st) {
+        $st->bind_param('is', $company_id, $until);
+        $st->execute();
+        $rs = $st->get_result();
+        while ($x = $rs->fetch_assoc()) {
+            $inst_by_cur[(string) $x['currency']] = (float) $x['s'];
+            $out_inst += (float) $x['s'];
+        }
+        $st->close();
+    }
+    $outflow = round($out_dues + $out_fund + $out_inst, 2);
+    /* ◆ والعملاتُ لا تُجمع في رقمٍ صادق: الشاشةُ تعرض مجموعًا واحدًا أصلًا،
+       فيُسجَّل تقسيمُها في الملاحظةِ كي لا يُخفيه الرقم. */
+    $inst_note = '';
+    if (count($inst_by_cur) > 0) {
+        $parts = array();
+        foreach ($inst_by_cur as $cur => $v) { $parts[] = number_format($v, 2) . ' ' . $cur; }
+        $inst_note = ' · أقساطُ تمويلٍ مستحقة: ' . implode(' + ', $parts)
+                   . (count($inst_by_cur) > 1 ? ' (عملاتٌ مختلفةٌ جُمعت في الرقمِ الواحد)' : '');
+    }
 
     // نقد افتتاحي = آخر وضع متوقّع سابق أو قيمة تجريبية
     $prev = $gate->selectOne('fin_cash_forecasts', array('columns' => array('expected_position'), 'orderBy' => 'id DESC'));
@@ -69,7 +103,7 @@ if (isset($_GET['generate'])) {
         'forecast_date' => $today, 'horizon_type' => $horizon, 'opening_cash' => $opening,
         'expected_inflow' => $inflow, 'expected_outflow' => $outflow, 'min_required' => $min_required,
         'funding_gap' => $gap, 'cash_priority' => $prio, 'source' => 'manual',
-        'note' => 'توليد آلي من البيانات الحية', 'created_by' => $current_user_id,
+        'note' => mb_substr('توليد آلي من البيانات الحية' . $inst_note, 0, 250), 'created_by' => $current_user_id,
     ));
     ems_gov_flash_redirect('cash_forecast_fin.php', 'تم توليد تنبؤ ' . $horizon . ' (الوضع=' . number_format($position, 0) . ') ✅', 'GOV-OK-200', '');
 }
