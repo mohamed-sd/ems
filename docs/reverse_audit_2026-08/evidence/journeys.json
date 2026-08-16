@@ -1,5 +1,5 @@
 {
-    "measured_at": "2026-08-16T07:40:25+00:00",
+    "measured_at": "2026-08-16T09:43:03+00:00",
     "journeys": {
         "C": {
             "key": "C",
@@ -842,7 +842,7 @@
                     "table": "fin_routing_log",
                     "filter": "",
                     "exists": true,
-                    "rows": 29,
+                    "rows": 32,
                     "verdict": "HAS_DATA"
                 },
                 {
@@ -1340,7 +1340,7 @@
                     "table": "activity_logs",
                     "filter": "",
                     "exists": true,
-                    "rows": 205998,
+                    "rows": 206088,
                     "verdict": "HAS_DATA"
                 },
                 {

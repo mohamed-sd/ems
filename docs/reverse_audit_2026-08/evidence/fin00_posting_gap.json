@@ -1,19 +1,24 @@
 {
-    "measured_at": "2026-08-16T05:33:30+00:00",
+    "measured_at": "2026-08-16T09:43:40+00:00",
     "funnel": {
-        "Published": 5207,
+        "Posted": 5053,
+        "Published": 164,
         "Draft": 37,
-        "Posted": 9,
-        "UnderReview": 2
+        "PostingFailed": 1,
+        "Reversed": 1
     },
     "legacy_mirror_has_published": false,
-    "published_but_legacy_draft": 5207,
+    "published_but_legacy_draft": 164,
     "callsites": {
-        "UnderReview": [],
+        "UnderReview": [
+            "app\/Services\/Finance\/PostingService.php"
+        ],
         "Approved": [
+            "app\/Services\/Finance\/PostingService.php",
             "app\/Services\/Portal\/EvaluationService.php"
         ],
         "Posted": [
+            "app\/Services\/Finance\/PostingService.php",
             "Finance\/journal_form_fin.php"
         ],
         "ReturnedToSource": [
@@ -24,12 +29,12 @@
         ]
     },
     "posted_events": {
-        "linked": 9,
-        "with_posted_by": 0,
-        "with_posted_at": 0
+        "linked": 5054,
+        "with_posted_by": 5045,
+        "with_posted_at": 5045
     },
     "journal": {
-        "entries": 1653,
-        "with_event_ref": 9
+        "entries": 6698,
+        "with_event_ref": 5054
     }
 }
