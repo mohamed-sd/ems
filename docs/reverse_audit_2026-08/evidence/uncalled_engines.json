@@ -1,0 +1,1309 @@
+{
+    "measured_at": "2026-08-16T06:17:22+00:00",
+    "services_scanned": 182,
+    "suspects": [
+        {
+            "file": "app\/Services\/MonthlyPerformanceService.php",
+            "class": "MonthlyPerformanceService",
+            "lines": 207,
+            "methods": 4,
+            "uncalled": [
+                "openOrRefresh",
+                "addDowntime",
+                "closeMonth",
+                "billingImplications"
+            ],
+            "class_refs": 0,
+            "severity": "ميتٌ تمامًا"
+        },
+        {
+            "file": "app\/Services\/Financing\/CashflowService.php",
+            "class": "CashflowService",
+            "lines": 164,
+            "methods": 2,
+            "uncalled": [
+                "financingOutlook",
+                "allocateFinancingCost"
+            ],
+            "class_refs": 0,
+            "severity": "ميتٌ تمامًا"
+        },
+        {
+            "file": "app\/Services\/Capacity\/GapMonitor.php",
+            "class": "GapMonitor",
+            "lines": 161,
+            "methods": 1,
+            "uncalled": [
+                "runDaily"
+            ],
+            "class_refs": 0,
+            "severity": "ميتٌ تمامًا"
+        },
+        {
+            "file": "app\/Services\/Fleet\/AssetReconciliationService.php",
+            "class": "AssetReconciliationService",
+            "lines": 149,
+            "methods": 4,
+            "uncalled": [
+                "buildPeriod",
+                "explainDiff",
+                "decideSource",
+                "undecidedSources"
+            ],
+            "class_refs": 0,
+            "severity": "ميتٌ تمامًا"
+        },
+        {
+            "file": "app\/Services\/Capacity\/ObligationDistributor.php",
+            "class": "ObligationDistributor",
+            "lines": 112,
+            "methods": 1,
+            "uncalled": [
+                "saveShare"
+            ],
+            "class_refs": 0,
+            "severity": "ميتٌ تمامًا"
+        },
+        {
+            "file": "app\/Services\/CompensationService.php",
+            "class": "CompensationService",
+            "lines": 106,
+            "methods": 1,
+            "uncalled": [
+                "reverseEvent"
+            ],
+            "class_refs": 0,
+            "severity": "ميتٌ تمامًا"
+        },
+        {
+            "file": "app\/Services\/Risk\/RiskSignalEngine.php",
+            "class": "RiskSignalEngine",
+            "lines": 654,
+            "methods": 16,
+            "uncalled": [
+                "runAll",
+                "sg01",
+                "sg02",
+                "sg03",
+                "sg04",
+                "sg05",
+                "sg06",
+                "sg07",
+                "sg08",
+                "sg09",
+                "sg11",
+                "sg12",
+                "sg13",
+                "sg16",
+                "readKris",
+                "sweepOverdueReviews"
+            ],
+            "class_refs": 1,
+            "severity": "الصنفُ مذكورٌ ودوالُّه لا تُنادى"
+        },
+        {
+            "file": "app\/Services\/Contract\/StandbyCapService.php",
+            "class": "StandbyCapService",
+            "lines": 158,
+            "methods": 2,
+            "uncalled": [
+                "checkRegistration",
+                "compensationBasisOrFail"
+            ],
+            "class_refs": 1,
+            "severity": "الصنفُ مذكورٌ ودوالُّه لا تُنادى"
+        },
+        {
+            "file": "app\/Services\/Tickets\/ConfidentialityGuard.php",
+            "class": "ConfidentialityGuard",
+            "lines": 71,
+            "methods": 3,
+            "uncalled": [
+                "canReadPrivate",
+                "fetchTicket",
+                "operationalView"
+            ],
+            "class_refs": 1,
+            "severity": "الصنفُ مذكورٌ ودوالُّه لا تُنادى"
+        },
+        {
+            "file": "app\/Services\/Capacity\/CapacityEvents.php",
+            "class": "CapacityEvents",
+            "lines": 70,
+            "methods": 1,
+            "uncalled": [
+                "financialEffectAllowed"
+            ],
+            "class_refs": 2,
+            "severity": "الصنفُ مذكورٌ ودوالُّه لا تُنادى"
+        },
+        {
+            "file": "app\/Services\/Org\/DeputyResolver.php",
+            "class": "DeputyResolver",
+            "lines": 53,
+            "methods": 1,
+            "uncalled": [
+                "resolveActor"
+            ],
+            "class_refs": 2,
+            "severity": "الصنفُ مذكورٌ ودوالُّه لا تُنادى"
+        },
+        {
+            "file": "app\/Services\/Risk\/RiskService.php",
+            "class": "RiskService",
+            "lines": 1406,
+            "methods": 32,
+            "uncalled": [
+                "levelFromScore",
+                "dedupKey",
+                "dedupCandidates",
+                "aggregateEffectiveness",
+                "compareAppetite",
+                "recompareDomain"
+            ],
+            "class_refs": 13,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/EffectFanout.php",
+            "class": "EffectFanout",
+            "lines": 1352,
+            "methods": 8,
+            "uncalled": [
+                "partyAward"
+            ],
+            "class_refs": 21,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Unit\/TimesheetEntryService.php",
+            "class": "TimesheetEntryService",
+            "lines": 1223,
+            "methods": 14,
+            "uncalled": [
+                "resubmit",
+                "dto"
+            ],
+            "class_refs": 13,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Contract\/SupplierContractService.php",
+            "class": "SupplierContractService",
+            "lines": 789,
+            "methods": 11,
+            "uncalled": [
+                "standbyBasisFor"
+            ],
+            "class_refs": 6,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Contract\/EmployeeContractService.php",
+            "class": "EmployeeContractService",
+            "lines": 782,
+            "methods": 11,
+            "uncalled": [
+                "updateHead"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Finance\/FinanceM10Service.php",
+            "class": "FinanceM10Service",
+            "lines": 735,
+            "methods": 12,
+            "uncalled": [
+                "gateChecks"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Work\/WorkItemService.php",
+            "class": "WorkItemService",
+            "lines": 680,
+            "methods": 11,
+            "uncalled": [
+                "isDelegationLive",
+                "classifyAction"
+            ],
+            "class_refs": 18,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Contract\/PriceAdjustmentService.php",
+            "class": "PriceAdjustmentService",
+            "lines": 654,
+            "methods": 13,
+            "uncalled": [
+                "resolveIndex",
+                "periodKey",
+                "nextPeriodStart",
+                "autoAdjustEnabledFor"
+            ],
+            "class_refs": 7,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Contract\/ContractPaymentScheduleService.php",
+            "class": "ContractPaymentScheduleService",
+            "lines": 650,
+            "methods": 11,
+            "uncalled": [
+                "stateFor"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Finance\/BankReconService.php",
+            "class": "BankReconService",
+            "lines": 642,
+            "methods": 11,
+            "uncalled": [
+                "findCounterpart",
+                "matchOf"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Revenue\/CollectionService.php",
+            "class": "CollectionService",
+            "lines": 621,
+            "methods": 8,
+            "uncalled": [
+                "reflectClaimState",
+                "openReceivables"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Finance\/ObligationEngine.php",
+            "class": "ObligationEngine",
+            "lines": 607,
+            "methods": 12,
+            "uncalled": [
+                "specialStandardFor",
+                "buildPeriods",
+                "contractPeriods",
+                "horizons",
+                "hasAvoidanceVerdict"
+            ],
+            "class_refs": 3,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Payroll\/FinalSettlementService.php",
+            "class": "FinalSettlementService",
+            "lines": 600,
+            "methods": 13,
+            "uncalled": [
+                "componentBase",
+                "openDues",
+                "leaveDaysTaken",
+                "advanceBalance"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Finance\/RoutingEngine.php",
+            "class": "RoutingEngine",
+            "lines": 593,
+            "methods": 9,
+            "uncalled": [
+                "resolveRoute",
+                "specForDepartment",
+                "accountantFor",
+                "firstUserWithRole",
+                "backflow",
+                "closeOnCancel",
+                "assertRouted"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Procurement\/RFQService.php",
+            "class": "RFQService",
+            "lines": 585,
+            "methods": 14,
+            "uncalled": [
+                "quotesForSupplier",
+                "commitmentsOf"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Finance\/FinAnalysisService.php",
+            "class": "FinAnalysisService",
+            "lines": 584,
+            "methods": 9,
+            "uncalled": [
+                "balanceSheet",
+                "incomeStatement"
+            ],
+            "class_refs": 4,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Audit\/InternalAuditService.php",
+            "class": "InternalAuditService",
+            "lines": 537,
+            "methods": 17,
+            "uncalled": [
+                "assertCycle",
+                "deliverReport",
+                "roleOf"
+            ],
+            "class_refs": 11,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Finance\/DepreciationService.php",
+            "class": "DepreciationService",
+            "lines": 509,
+            "methods": 7,
+            "uncalled": [
+                "profileFor",
+                "postOne"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Workforce\/AttendanceService.php",
+            "class": "AttendanceService",
+            "lines": 506,
+            "methods": 11,
+            "uncalled": [
+                "resolvePolicy",
+                "impactOf",
+                "classify",
+                "sweepUnclassified",
+                "sweepEmergencyPending",
+                "transitionDeduction",
+                "reviewDeduction",
+                "approveDeduction",
+                "postDeduction"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Contract\/SupplierEvaluationService.php",
+            "class": "SupplierEvaluationService",
+            "lines": 496,
+            "methods": 11,
+            "uncalled": [
+                "measureIndicators",
+                "latestDecided"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Work\/RequestService.php",
+            "class": "RequestService",
+            "lines": 474,
+            "methods": 7,
+            "uncalled": [
+                "chainStepsOf"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Fleet\/MeterReadingService.php",
+            "class": "MeterReadingService",
+            "lines": 471,
+            "methods": 12,
+            "uncalled": [
+                "preventiveDue",
+                "currentChain",
+                "lastReading",
+                "nextReading",
+                "readingOn",
+                "legacyProxyHours"
+            ],
+            "class_refs": 4,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Contract\/ContractResourcePlanService.php",
+            "class": "ContractResourcePlanService",
+            "lines": 466,
+            "methods": 12,
+            "uncalled": [
+                "containerSeed",
+                "gapOf",
+                "planOfContract"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Financing\/FinancingService.php",
+            "class": "FinancingService",
+            "lines": 459,
+            "methods": 10,
+            "uncalled": [
+                "sharesAt",
+                "applyShares",
+                "correctShare",
+                "publishInstallmentDue",
+                "revalueOutstanding",
+                "deviationSweep",
+                "closeDeviation"
+            ],
+            "class_refs": 6,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Payroll\/PayrollRunService.php",
+            "class": "PayrollRunService",
+            "lines": 455,
+            "methods": 8,
+            "uncalled": [
+                "eligibleContracts",
+                "runByKey"
+            ],
+            "class_refs": 6,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Finance\/PeriodicEventService.php",
+            "class": "PeriodicEventService",
+            "lines": 436,
+            "methods": 7,
+            "uncalled": [
+                "provisionRule"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/ActivityLogService.php",
+            "class": "ActivityLogService",
+            "lines": 424,
+            "methods": 8,
+            "uncalled": [
+                "flush"
+            ],
+            "class_refs": 23,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Contract\/SupplierCapacityService.php",
+            "class": "SupplierCapacityService",
+            "lines": 422,
+            "methods": 5,
+            "uncalled": [
+                "activeCapacities"
+            ],
+            "class_refs": 3,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Contract\/PlanActualLinkService.php",
+            "class": "PlanActualLinkService",
+            "lines": 417,
+            "methods": 9,
+            "uncalled": [
+                "sumUnits",
+                "sumClaimLines",
+                "fillEventLines"
+            ],
+            "class_refs": 4,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Payroll\/TimePathService.php",
+            "class": "TimePathService",
+            "lines": 402,
+            "methods": 7,
+            "uncalled": [
+                "entitlementWindow",
+                "overtimeRate",
+                "unpaidAbsence",
+                "timeInput",
+                "daysBetween"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Settlement\/SupplierRuleService.php",
+            "class": "SupplierRuleService",
+            "lines": 394,
+            "methods": 8,
+            "uncalled": [
+                "activeChargeRule"
+            ],
+            "class_refs": 4,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Unit\/CapacityGuard.php",
+            "class": "CapacityGuard",
+            "lines": 385,
+            "methods": 7,
+            "uncalled": [
+                "limits",
+                "measuredHours",
+                "inspectSpans",
+                "scanLegacyTimesheet"
+            ],
+            "class_refs": 5,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Governance\/FieldGovernor.php",
+            "class": "FieldGovernor",
+            "lines": 381,
+            "methods": 11,
+            "uncalled": [
+                "inheritanceOf",
+                "assertNotInherited",
+                "onParentChange",
+                "classOf",
+                "assertClassified",
+                "canEdit",
+                "scanUnclassified",
+                "sensitiveFieldsOf",
+                "roleHasFieldGrant",
+                "isGoverning"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Policy\/UnitJourneyService.php",
+            "class": "UnitJourneyService",
+            "lines": 379,
+            "methods": 8,
+            "uncalled": [
+                "approveLink",
+                "applyPrimary",
+                "proposeEntitlements"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Portal\/CapacityService.php",
+            "class": "CapacityService",
+            "lines": 375,
+            "methods": 6,
+            "uncalled": [
+                "assertSupplierCapacity"
+            ],
+            "class_refs": 17,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Governance\/UnitStateChangeService.php",
+            "class": "UnitStateChangeService",
+            "lines": 369,
+            "methods": 9,
+            "uncalled": [
+                "movementScopeCovers",
+                "approveStep",
+                "emergencyApply",
+                "sweepEmergency",
+                "gmLoadReview"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Payroll\/ProductionPathService.php",
+            "class": "ProductionPathService",
+            "lines": 367,
+            "methods": 3,
+            "uncalled": [
+                "awardedQty",
+                "unitRate"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Transport\/TransferTariffService.php",
+            "class": "TransferTariffService",
+            "lines": 356,
+            "methods": 7,
+            "uncalled": [
+                "computeAmount",
+                "orderOf"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Payroll\/PayPolicyStateMachine.php",
+            "class": "PayPolicyStateMachine",
+            "lines": 346,
+            "methods": 10,
+            "uncalled": [
+                "isEditable",
+                "sqlReadable",
+                "policyOf",
+                "guardEdit"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Portal\/VisibilityPolicyService.php",
+            "class": "VisibilityPolicyService",
+            "lines": 336,
+            "methods": 9,
+            "uncalled": [
+                "affectedCount"
+            ],
+            "class_refs": 10,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Operations\/RotationSwapService.php",
+            "class": "RotationSwapService",
+            "lines": 333,
+            "methods": 4,
+            "uncalled": [
+                "autoTransferEnabledFor"
+            ],
+            "class_refs": 3,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Contract\/ContractLifecycleService.php",
+            "class": "ContractLifecycleService",
+            "lines": 330,
+            "methods": 5,
+            "uncalled": [
+                "effectsOf",
+                "executedQty"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Capacity\/SubstituteCoverageService.php",
+            "class": "SubstituteCoverageService",
+            "lines": 329,
+            "methods": 7,
+            "uncalled": [
+                "settle",
+                "zeroFailedGap",
+                "modifyOriginalShare",
+                "computeImpact"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Revenue\/TaxInvoiceService.php",
+            "class": "TaxInvoiceService",
+            "lines": 328,
+            "methods": 8,
+            "uncalled": [
+                "statutoryFields",
+                "byClaim"
+            ],
+            "class_refs": 3,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Transport\/TransferDeliveryService.php",
+            "class": "TransferDeliveryService",
+            "lines": 327,
+            "methods": 4,
+            "uncalled": [
+                "deliveryDocOf"
+            ],
+            "class_refs": 3,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Operations\/ContainerGate.php",
+            "class": "ContainerGate",
+            "lines": 319,
+            "methods": 8,
+            "uncalled": [
+                "leafFor"
+            ],
+            "class_refs": 3,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Exec\/AssignmentGate.php",
+            "class": "AssignmentGate",
+            "lines": 315,
+            "methods": 7,
+            "uncalled": [
+                "rolesHeldBy",
+                "roleOfUser"
+            ],
+            "class_refs": 4,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Finance\/FxSettlementService.php",
+            "class": "FxSettlementService",
+            "lines": 312,
+            "methods": 8,
+            "uncalled": [
+                "threeCurrencies",
+                "revalueOpen"
+            ],
+            "class_refs": 4,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Finance\/ApprovalGate.php",
+            "class": "ApprovalGate",
+            "lines": 309,
+            "methods": 3,
+            "uncalled": [
+                "status"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Org\/PermitGate.php",
+            "class": "PermitGate",
+            "lines": 309,
+            "methods": 7,
+            "uncalled": [
+                "approverAuthorized"
+            ],
+            "class_refs": 4,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Contract\/ContractGuaranteeService.php",
+            "class": "ContractGuaranteeService",
+            "lines": 300,
+            "methods": 8,
+            "uncalled": [
+                "deductibleInstruments",
+                "pendingReview"
+            ],
+            "class_refs": 3,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Security\/PermissionResolver.php",
+            "class": "PermissionResolver",
+            "lines": 298,
+            "methods": 6,
+            "uncalled": [
+                "gather"
+            ],
+            "class_refs": 8,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Contract\/ContractSiteService.php",
+            "class": "ContractSiteService",
+            "lines": 292,
+            "methods": 9,
+            "uncalled": [
+                "scopeOf"
+            ],
+            "class_refs": 3,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Portal\/WorkspaceFeedService.php",
+            "class": "WorkspaceFeedService",
+            "lines": 290,
+            "methods": 7,
+            "uncalled": [
+                "inScope",
+                "breadcrumb"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Finance\/PostingService.php",
+            "class": "PostingService",
+            "lines": 286,
+            "methods": 6,
+            "uncalled": [
+                "requiredLevel",
+                "periodOpen",
+                "accountId"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Unit\/DocumentGuard.php",
+            "class": "DocumentGuard",
+            "lines": 268,
+            "methods": 6,
+            "uncalled": [
+                "expiredFor",
+                "reasonOf",
+                "assertForRefs"
+            ],
+            "class_refs": 4,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Portal\/SupplierPortalGuard.php",
+            "class": "SupplierPortalGuard",
+            "lines": 255,
+            "methods": 10,
+            "uncalled": [
+                "isPortalScreen",
+                "scope",
+                "assertSupplier"
+            ],
+            "class_refs": 17,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Security\/PositionService.php",
+            "class": "PositionService",
+            "lines": 252,
+            "methods": 6,
+            "uncalled": [
+                "securitySuspend"
+            ],
+            "class_refs": 7,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Unit\/OperatorDue.php",
+            "class": "OperatorDue",
+            "lines": 252,
+            "methods": 3,
+            "uncalled": [
+                "applicablePolicies",
+                "ctxFromUnitEntry"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Contract\/ContractLifecycleActions.php",
+            "class": "ContractLifecycleActions",
+            "lines": 239,
+            "methods": 5,
+            "uncalled": [
+                "primary"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Capacity\/CapacityLedgerService.php",
+            "class": "CapacityLedgerService",
+            "lines": 225,
+            "methods": 4,
+            "uncalled": [
+                "linkFinancialEvent"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Revenue\/ClaimDisputeService.php",
+            "class": "ClaimDisputeService",
+            "lines": 220,
+            "methods": 5,
+            "uncalled": [
+                "assertDisputable",
+                "openCount"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Capacity\/SeatAssignmentService.php",
+            "class": "SeatAssignmentService",
+            "lines": 205,
+            "methods": 2,
+            "uncalled": [
+                "replace"
+            ],
+            "class_refs": 0,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Tickets\/TicketStateService.php",
+            "class": "TicketStateService",
+            "lines": 198,
+            "methods": 8,
+            "uncalled": [
+                "recomputeHead",
+                "closeHead"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Finance\/CoaService.php",
+            "class": "CoaService",
+            "lines": 194,
+            "methods": 6,
+            "uncalled": [
+                "assertDims",
+                "assertCreatable",
+                "resolveAccount",
+                "natureOf"
+            ],
+            "class_refs": 4,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Rental\/AvailabilityService.php",
+            "class": "AvailabilityService",
+            "lines": 193,
+            "methods": 5,
+            "uncalled": [
+                "isFree"
+            ],
+            "class_refs": 3,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/ContractSeatService.php",
+            "class": "ContractSeatService",
+            "lines": 188,
+            "methods": 6,
+            "uncalled": [
+                "deriveSeatKind",
+                "defineSeat",
+                "assignEquipment",
+                "endAssignment"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Security\/PermissionTemplateService.php",
+            "class": "PermissionTemplateService",
+            "lines": 181,
+            "methods": 5,
+            "uncalled": [
+                "amendVersion"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Capacity\/CapacityContextResolver.php",
+            "class": "CapacityContextResolver",
+            "lines": 176,
+            "methods": 4,
+            "uncalled": [
+                "assertTimesheetOpenable",
+                "stampProposed"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Org\/OrgAuthorityResolver.php",
+            "class": "OrgAuthorityResolver",
+            "lines": 176,
+            "methods": 5,
+            "uncalled": [
+                "capabilities"
+            ],
+            "class_refs": 7,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Queue\/JobQueueService.php",
+            "class": "JobQueueService",
+            "lines": 173,
+            "methods": 7,
+            "uncalled": [
+                "mustQueue",
+                "status"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Portal\/VisibilityGuard.php",
+            "class": "VisibilityGuard",
+            "lines": 172,
+            "methods": 3,
+            "uncalled": [
+                "relation",
+                "filterElements"
+            ],
+            "class_refs": 4,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Governance\/ExceptionService.php",
+            "class": "ExceptionService",
+            "lines": 169,
+            "methods": 4,
+            "uncalled": [
+                "riskOf"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Financing\/FinancingModelService.php",
+            "class": "FinancingModelService",
+            "lines": 165,
+            "methods": 3,
+            "uncalled": [
+                "deactivate"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Finance\/RoutingConsumer.php",
+            "class": "RoutingConsumer",
+            "lines": 161,
+            "methods": 3,
+            "uncalled": [
+                "routeFor",
+                "deptOf"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Finance\/UnitConversionService.php",
+            "class": "UnitConversionService",
+            "lines": 159,
+            "methods": 2,
+            "uncalled": [
+                "convertOne"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Security\/PermSourceService.php",
+            "class": "PermSourceService",
+            "lines": 156,
+            "methods": 6,
+            "uncalled": [
+                "legacyDecision",
+                "personIdOf",
+                "shadowCompare",
+                "zeroDiffStreakDays"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Security\/FoundingModeService.php",
+            "class": "FoundingModeService",
+            "lines": 154,
+            "methods": 4,
+            "uncalled": [
+                "discoveryActive",
+                "closeProtocol"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Excel\/Styler.php",
+            "class": "Styler",
+            "lines": 149,
+            "methods": 9,
+            "uncalled": [
+                "safeSheetTitle"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Procurement\/ProcCostingService.php",
+            "class": "ProcCostingService",
+            "lines": 146,
+            "methods": 5,
+            "uncalled": [
+                "orderUnitCosts"
+            ],
+            "class_refs": 4,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Capacity\/SupplierPerformanceAggregator.php",
+            "class": "SupplierPerformanceAggregator",
+            "lines": 145,
+            "methods": 3,
+            "uncalled": [
+                "assertNotCountingCoverage"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Tickets\/TicketEffectService.php",
+            "class": "TicketEffectService",
+            "lines": 144,
+            "methods": 4,
+            "uncalled": [
+                "onFaultReported",
+                "approveTechnicalCause",
+                "approveOperationalImpact"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Capacity\/CapacityOutbox.php",
+            "class": "CapacityOutbox",
+            "lines": 143,
+            "methods": 3,
+            "uncalled": [
+                "drain"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Procurement\/StockReturnService.php",
+            "class": "StockReturnService",
+            "lines": 136,
+            "methods": 2,
+            "uncalled": [
+                "returnableOf"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Security\/PermissionReviewService.php",
+            "class": "PermissionReviewService",
+            "lines": 134,
+            "methods": 4,
+            "uncalled": [
+                "decideLine"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Capacity\/BalanceCalculator.php",
+            "class": "BalanceCalculator",
+            "lines": 130,
+            "methods": 5,
+            "uncalled": [
+                "consumedOfRef",
+                "rebuildContainerCache",
+                "subtreeIds"
+            ],
+            "class_refs": 3,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Tickets\/SlaMonitor.php",
+            "class": "SlaMonitor",
+            "lines": 128,
+            "methods": 3,
+            "uncalled": [
+                "resumeFromHold"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Actions\/ActionContractService.php",
+            "class": "ActionContractService",
+            "lines": 118,
+            "methods": 3,
+            "uncalled": [
+                "resolveReverse",
+                "logExecution"
+            ],
+            "class_refs": 0,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Security\/SensitiveFieldGuard.php",
+            "class": "SensitiveFieldGuard",
+            "lines": 112,
+            "methods": 5,
+            "uncalled": [
+                "filterRow",
+                "maskPartial"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Policy\/PeriodicityService.php",
+            "class": "PeriodicityService",
+            "lines": 110,
+            "methods": 3,
+            "uncalled": [
+                "requestMonthly",
+                "sweepAutoRevert"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Fleet\/IntercompanyLoanService.php",
+            "class": "IntercompanyLoanService",
+            "lines": 100,
+            "methods": 2,
+            "uncalled": [
+                "accruePeriod"
+            ],
+            "class_refs": 0,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Capacity\/CapacitySourceService.php",
+            "class": "CapacitySourceService",
+            "lines": 93,
+            "methods": 4,
+            "uncalled": [
+                "shadowCompare",
+                "flipReadiness"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Actions\/ImpactResolver.php",
+            "class": "ImpactResolver",
+            "lines": 73,
+            "methods": 3,
+            "uncalled": [
+                "pendingFor",
+                "markSeen"
+            ],
+            "class_refs": 2,
+            "severity": "دوالُّ مفردة"
+        },
+        {
+            "file": "app\/Services\/Tickets\/WorkstreamActivator.php",
+            "class": "WorkstreamActivator",
+            "lines": 60,
+            "methods": 2,
+            "uncalled": [
+                "onEvent"
+            ],
+            "class_refs": 1,
+            "severity": "دوالُّ مفردة"
+        }
+    ]
+}
