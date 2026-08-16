@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-16 17:47:42
+-- المصدر: equipation_manage · التوليد: 2026-08-16 17:56:06
 -- الجداول: 555 · المناظير: 12
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -1102,6 +1102,11 @@ CREATE TABLE `container_consumption` (
   `note` varchar(200) DEFAULT NULL,
   `created_by` int(10) unsigned DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `layer` enum('daily','monthly','annual') NOT NULL DEFAULT 'daily' COMMENT 'طبقةُ الاستهلاك — الصفُّ يعرف طبقتَه',
+  `share_key` varchar(64) DEFAULT NULL COMMENT 'مفتاحُ الحصةِ المستهلَكة (الحاوية/الخانة)',
+  `gap_units` decimal(14,2) DEFAULT NULL COMMENT 'فجوةُ السقفِ بعد الصف — بقادحٍ لا إدخالًا',
+  `balance_before` decimal(14,2) DEFAULT NULL COMMENT 'الرصيدُ قبلَ الصف — بقادح',
+  `balance_after` decimal(14,2) DEFAULT NULL COMMENT 'الرصيدُ بعدَ الصف — بقادح',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_consumption_idem` (`company_id`,`idem_key`),
   KEY `ix_container` (`company_id`,`container_id`,`consumed_on`),
@@ -1184,6 +1189,13 @@ CREATE TABLE `contract_amendments` (
   `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
   `deleted_at` datetime DEFAULT NULL,
   `deleted_by` int(11) DEFAULT NULL,
+  `container_key` varchar(32) DEFAULT NULL COMMENT 'مفتاحُ الحاويةِ السنوية — من op_containers الرئيسية',
+  `capacity_units` decimal(14,2) DEFAULT NULL COMMENT 'سعةُ الحاوية — محسوبةٌ صعودًا (F-04) لا مُدخَلة',
+  `work_model` enum('hourly','tonnage','metering') DEFAULT NULL COMMENT 'نموذجُ العمل',
+  `unit_of_measure` enum('hour','ton','meter') DEFAULT NULL COMMENT 'الوحدة',
+  `actual_start` date DEFAULT NULL COMMENT 'البدايةُ التنفيذيةُ من العقد',
+  `actual_end` date DEFAULT NULL COMMENT 'النهايةُ التنفيذية',
+  `capacity_source` varchar(64) DEFAULT NULL COMMENT 'مصدرُ السعة — يُذكر لا يُدَّعى',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_contract_amendments_company_code` (`company_id`,`amendment_code`),
   KEY `idx_amd_scope` (`company_id`,`is_deleted`),
@@ -1262,6 +1274,10 @@ CREATE TABLE `contract_commitments` (
   `deleted_at` datetime DEFAULT NULL,
   `deleted_by` int(11) DEFAULT NULL,
   `obl_type_uq_key` varchar(130) GENERATED ALWAYS AS (if(`equipment_type_code` is not null and `is_deleted` = 0,concat(`company_id`,_utf8mb4':',`contract_ref`,_utf8mb4':',`equipment_type_code`,_utf8mb4':',ifnull(cast(`valid_from` as char charset utf8mb4),_utf8mb4'open')),NULL)) STORED COMMENT 'CAP-01: فهرسٌ فريدٌ مشروطٌ على عمودٍ مولَّد — UQ(contract, equipment_type_code, valid_from) للأحياء ذوي النوع (DEC-CAP-C) · CAST لا DATE_FORMAT لقابلية MariaDB',
+  `container_key` varchar(32) DEFAULT NULL COMMENT 'حاويةُ النوع — من op_containers مستوى مورد/نوع',
+  `slot_monthly_basis` decimal(8,2) DEFAULT NULL COMMENT 'أساسُ الخانةِ الشهري (F-02: اليومي×30)',
+  `renewal_months` decimal(6,2) DEFAULT NULL COMMENT 'أشهرُ التجديد — من مدةِ السريان',
+  `type_capacity` decimal(14,2) DEFAULT NULL COMMENT 'F-03: العددُ×الأساسُ الشهري×الأشهر — قادحٌ يفرضه ولا يُدخَل',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_commit_company_code` (`company_id`,`commitment_code`),
   UNIQUE KEY `uq_obl_type_from` (`obl_type_uq_key`),
