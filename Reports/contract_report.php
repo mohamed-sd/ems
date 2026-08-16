@@ -5,6 +5,12 @@ if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
     exit();
 }
+/* ── حارسُ الشاشة (B2) — الشاشةُ مسجَّلةٌ في `modules` وكانت تُفتح لأيِّ
+   مستخدمٍ مسجَّلِ الدخول لأنها لا تنادي الحارس. والتسجيلُ لا يحرس: الحارسُ
+   نداءٌ لا صفة. وموضعُه هنا قبلَ أيِّ تصييرٍ — فرفضٌ بعدَ خروجِ الرأسِ ليس رفضًا. */
+require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../includes/permissions_helper.php';
+enforce_current_page_view_permission($conn, '../main/dashboard.php');
 ?>
 <?php
 /* AC-U1 · SH-01 — قشرةٌ واحدةٌ: كان هنا رأسٌ محليٌّ كاملٌ بـ<!DOCTYPE>
