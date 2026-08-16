@@ -278,7 +278,15 @@ class TimesheetEntryService
             $row['fuel_issued_qty']   = (float) ($input['fuel_issued_qty'] ?? 0);
             $ck = trim((string) ($input['container_key'] ?? ''));
             if ($ck !== '') { $row['container_key'] = mb_substr($ck, 0, 32); }
-            if (!empty($input['client_id']))       { $row['client_id'] = (int) $input['client_id']; }
+            /* العميلُ **مشتقٌّ لا مُدخَل**: من مشروعِ المعدةِ المستنتَج. ولو مُرِّر
+               صراحةً احتُرم. وغيابُه يترك NULL ولا يُخمَّن. */
+            if (!empty($input['client_id'])) {
+                $row['client_id'] = (int) $input['client_id'];
+            } elseif (!empty($drv['project_id'])) {
+                $rc = $conn->query("SELECT client_id FROM project WHERE id = " . (int) $drv['project_id']);
+                $pc = $rc ? $rc->fetch_assoc() : null;
+                if ($pc && !empty($pc['client_id'])) { $row['client_id'] = (int) $pc['client_id']; }
+            }
             if (!empty($input['created_by_role'])) { $row['created_by_role'] = (int) $input['created_by_role']; }
             if (!empty($input['entity_layer']))    { $row['entity_layer'] = (string) $input['entity_layer']; }
             $sd = trim((string) ($input['seed_tag'] ?? ''));
@@ -868,6 +876,115 @@ class TimesheetEntryService
             }
         }
         return array('ok' => true, 'code' => 200, 'warnings' => $warnings);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // shift.entry.void — إلغاءُ قيدِ ورديةٍ بحركةٍ عاكسة (المواصفة 70 · TSP-0122)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /**
+     * «صفٌّ عاكسٌ بمرجعِ الأصلِ لا حذف». يُنشئ قيدًا مقابلًا بكميةٍ سالبةٍ وأسطرِ
+     * ساعاتٍ سالبة، ويربطه بالأصلِ في الاتجاهين (`revises_entry_id` ⇄
+     * `superseded_by_id`)، ويصيّر الأصلَ `reversed`.
+     *
+     * ◆ ولا يمسّ القفلَ: حالةُ `reversed` مستثناةٌ من مفتاحِ `shift_slot_key`
+     *   (مواءمةُ ق-18)، فيُفرَّغ مفتاحُ الأصلِ والعاكسِ معًا وتتحرّر الخانةُ
+     *   لبديلٍ مشروعٍ بلا تدخّل.
+     * ◆ والسببُ إلزاميّ: «لا عكسَ بلا سبب» — فالسجلُّ يُقرأ بعد شهر.
+     *
+     * @return array{ok:bool,code:int,void_entry_id:?int,reasons:array}
+     */
+    public static function voidEntry(\mysqli $conn, $gate, $companyId, $entryId, $reason, $actor)
+    {
+        $companyId = (int) $companyId;
+        $entryId   = (int) $entryId;
+        $reason    = trim((string) $reason);
+        if ($reason === '') {
+            return array('ok' => false, 'code' => 422, 'void_entry_id' => null,
+                         'reasons' => array('سببُ الإلغاءِ إلزاميّ — اكتبْ لماذا يُلغى هذا القيد'));
+        }
+
+        $orig = self::rawEntry($conn, $companyId, $entryId);
+        if (!$orig) {
+            return array('ok' => false, 'code' => 404, 'void_entry_id' => null,
+                         'reasons' => array('القيدُ غيرُ موجودٍ في كيانِك'));
+        }
+        $terminal = array('reversed', 'cancelled', 'superseded');
+        if (in_array((string) $orig['state'], $terminal, true)) {
+            return array('ok' => false, 'code' => 409, 'void_entry_id' => null,
+                         'reasons' => array('القيدُ في حالة «' . $orig['state'] . '» — لا يُعكس مرتين'));
+        }
+        if (!empty($orig['event_id'])) {
+            return array('ok' => false, 'code' => 409, 'void_entry_id' => null,
+                         'reasons' => array('للقيدِ واقعةٌ ماليةٌ منشورة — العكسُ الماليُّ بابُه محرّكُ العكسيات لا هذه الشاشة'));
+        }
+
+        $voidId = 0;
+        $gate->runInTransaction(function ($g) use (&$voidId, $conn, $companyId, $entryId, $orig, $reason, $actor) {
+            $row = array(
+                'entry_no'             => 'TMP-' . uniqid('', true),
+                'entry_date'           => $orig['entry_date'],
+                'project_id'           => $orig['project_id'],
+                'contract_id'          => $orig['contract_id'],
+                'equipment_id'         => $orig['equipment_id'],
+                'operator_employee_id' => $orig['operator_employee_id'],
+                'supplier_entity_id'   => $orig['supplier_entity_id'],
+                'unit_type'            => $orig['unit_type'],
+                'qty'                  => -1 * (float) $orig['qty'],
+                'record_basis'         => $orig['record_basis'],
+                'shift'                => $orig['shift'],
+                'source_ref'           => (string) $orig['source_ref'],
+                'note'                 => mb_substr('عكسُ القيد #' . $entryId . ' — ' . $reason, 0, 200),
+                'state'                => 'reversed',
+                'revises_entry_id'     => $entryId,
+                'revision_kind'        => 'reversal',
+                'entered_by'           => (int) $actor ?: null,
+                'client_id'            => isset($orig['client_id']) ? $orig['client_id'] : null,
+                'container_key'        => isset($orig['container_key']) ? $orig['container_key'] : null,
+            );
+            $voidId = (int) $g->insert('unit_entries', $row);
+            if ($voidId <= 0) { throw new \RuntimeException('voidEntry: فشل إدراجُ الصفِّ العاكس'); }
+            $g->update('unit_entries',
+                array('entry_no' => 'REV-' . str_pad((string) $voidId, 6, '0', STR_PAD_LEFT)),
+                array('id' => $voidId));
+
+            /* أسطرُ الساعاتِ العاكسةُ — سالبةٌ بالحالةِ والمسؤولِ نفسِهما */
+            $rs = $conn->query("SELECT ops_state, hours, resp_party, cause_note
+                                FROM unit_time_log WHERE entry_id = " . (int) $entryId);
+            if ($rs) {
+                while ($l = $rs->fetch_assoc()) {
+                    $g->insert('unit_time_log', array(
+                        'log_date'             => $orig['entry_date'],
+                        'shift'                => $orig['shift'],
+                        'project_id'           => $orig['project_id'],
+                        'equipment_id'         => $orig['equipment_id'],
+                        'operator_employee_id' => $orig['operator_employee_id'],
+                        'supplier_entity_id'   => $orig['supplier_entity_id'],
+                        'hours'                => -1 * (float) $l['hours'],
+                        'ops_state'            => $l['ops_state'],
+                        'resp_party'           => $l['resp_party'],
+                        'cause_note'           => mb_substr('عكس: ' . (string) $l['cause_note'], 0, 200),
+                        'entry_id'             => $voidId,
+                        'entered_by'           => (int) $actor ?: null,
+                    ));
+                }
+            }
+
+            /* الأصلُ يصير معكوسًا ويشير إلى عاكسِه — والوصلُ في الاتجاهين */
+            $g->update('unit_entries',
+                array('state' => 'reversed', 'superseded_by_id' => $voidId),
+                array('id' => $entryId));
+        });
+
+        if (function_exists('ems_audit_change')) {
+            ems_audit_change($conn, 'operations', 'shift_entry', 'void', $entryId,
+                array('state' => $orig['state']),
+                array('state' => 'reversed', 'superseded_by_id' => $voidId, 'reason' => $reason),
+                array('company_id' => $companyId, 'user_id' => (int) $actor,
+                      'contract_id' => (int) $orig['contract_id']));
+        }
+
+        return array('ok' => true, 'code' => 200, 'void_entry_id' => $voidId, 'reasons' => array());
     }
 
     private static function timeLinesFromTimesheet(array $t)

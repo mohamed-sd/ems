@@ -158,6 +158,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         }
+    } elseif ($act === 'void') {
+        if (!$CAN_VOID) {
+            http_response_code(403);
+            $flash = ['kind' => 'err', 'text' => 'لا تملك صلاحيةَ إلغاءِ القيود — راجِعْ مديرَك.'];
+        } else {
+            $vid    = (int) ($_POST['entry_id'] ?? 0);
+            $reason = trim((string) ($_POST['void_reason'] ?? ''));
+            if ($vid <= 0 || $reason === '') {
+                $flash = ['kind' => 'warn', 'text' => 'لم يُلغَ. اختَرِ القيدَ واكتبْ سببَ الإلغاء.'];
+            } else {
+                require_once __DIR__ . '/../app/Services/Unit/TimesheetEntryService.php';
+                $vres = \App\Services\Unit\TimesheetEntryService::voidEntry(
+                    $conn, ems_tenant_db(), $company_id, $vid, $reason, $uid);
+                if (!empty($vres['ok'])) {
+                    $flash = ['kind' => 'ok',
+                              'text' => 'أُلغي القيدُ بحركةٍ عاكسة — ولم يُحذف. والخانةُ صارت متاحةً لقيدٍ بديل.',
+                              'ref'  => 'REV-' . str_pad((string) $vres['void_entry_id'], 6, '0', STR_PAD_LEFT)];
+                } else {
+                    $flash = ['kind' => 'err',
+                              'text' => 'لم يُلغَ — ' . implode(' · ', (array) ($vres['reasons'] ?? []))];
+                }
+            }
+        }
     }
 }
 
@@ -408,6 +431,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
       <thead><tr>
         <th>رقمُ القيد</th><th>الآلية</th><th>الوردية</th><th>الكمية</th>
         <th>ساعاتُ التشغيل</th><th>مجموعُ الساعات</th><th>العدّاد</th><th>وقودٌ مصروف</th><th>الحالة</th>
+        <?= $CAN_VOID ? '<th>إلغاء</th>' : '' ?>
       </tr></thead>
       <tbody>
 <?php foreach ($todayRows as $r):
@@ -425,6 +449,22 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     : '—' ?></td>
           <td><?= number_format((float) $r['fuel_issued_qty'], 2) ?> <span class="se-unit">لتر</span></td>
           <td><span class="se-badge" style="background:<?= $sv[1] ?>"><?= htmlspecialchars($sv[0], ENT_QUOTES, 'UTF-8') ?></span></td>
+<?php if ($CAN_VOID): ?>
+          <td>
+<?php if (in_array($sk, ['reversed', 'cancelled', 'superseded'], true)): ?>
+            <span class="se-unit">—</span>
+<?php else: ?>
+            <form method="post" onsubmit="return seConfirmVoid(this)" style="display:flex;gap:6px">
+              <?= csrf_field() ?>
+              <input type="hidden" name="action" value="void">
+              <input type="hidden" name="entry_id" value="<?= (int) $r['id'] ?>">
+              <input type="text" name="void_reason" placeholder="سببُ الإلغاء" required maxlength="190"
+                     style="width:130px;padding:5px 7px;border:1px solid #cfd6dd;border-radius:6px;font-family:inherit">
+              <button type="submit" class="se-btn2" style="padding:5px 12px">ألغِ</button>
+            </form>
+<?php endif; ?>
+          </td>
+<?php endif; ?>
         </tr>
 <?php endforeach; ?>
       </tbody>
@@ -434,6 +474,11 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 </div>
 
 <script>
+function seConfirmVoid(f){
+  var r = f.void_reason.value.trim();
+  if (!r) { alert('اكتبْ سببَ الإلغاء أولًا.'); return false; }
+  return confirm('سيُنشأ قيدٌ عاكسٌ ولن يُحذف شيء، وتتحرّر الخانةُ لقيدٍ بديل.\n\nالسبب: ' + r);
+}
 function seAddRow(){
   var box = document.getElementById('se-hours');
   var first = box.querySelector('.se-hrow');
