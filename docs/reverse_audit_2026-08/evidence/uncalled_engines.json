@@ -1,5 +1,5 @@
 {
-    "measured_at": "2026-08-16T06:17:22+00:00",
+    "measured_at": "2026-08-16T06:27:02+00:00",
     "services_scanned": 182,
     "suspects": [
         {
@@ -24,17 +24,6 @@
             "uncalled": [
                 "financingOutlook",
                 "allocateFinancingCost"
-            ],
-            "class_refs": 0,
-            "severity": "ميتٌ تمامًا"
-        },
-        {
-            "file": "app\/Services\/Capacity\/GapMonitor.php",
-            "class": "GapMonitor",
-            "lines": 161,
-            "methods": 1,
-            "uncalled": [
-                "runDaily"
             ],
             "class_refs": 0,
             "severity": "ميتٌ تمامًا"
@@ -76,27 +65,12 @@
             "severity": "ميتٌ تمامًا"
         },
         {
-            "file": "app\/Services\/Risk\/RiskSignalEngine.php",
-            "class": "RiskSignalEngine",
-            "lines": 654,
-            "methods": 16,
+            "file": "app\/Services\/Capacity\/GapMonitor.php",
+            "class": "GapMonitor",
+            "lines": 161,
+            "methods": 1,
             "uncalled": [
-                "runAll",
-                "sg01",
-                "sg02",
-                "sg03",
-                "sg04",
-                "sg05",
-                "sg06",
-                "sg07",
-                "sg08",
-                "sg09",
-                "sg11",
-                "sg12",
-                "sg13",
-                "sg16",
-                "readKris",
-                "sweepOverdueReviews"
+                "runDaily"
             ],
             "class_refs": 1,
             "severity": "الصنفُ مذكورٌ ودوالُّه لا تُنادى"
@@ -149,22 +123,6 @@
             "severity": "الصنفُ مذكورٌ ودوالُّه لا تُنادى"
         },
         {
-            "file": "app\/Services\/Risk\/RiskService.php",
-            "class": "RiskService",
-            "lines": 1406,
-            "methods": 32,
-            "uncalled": [
-                "levelFromScore",
-                "dedupKey",
-                "dedupCandidates",
-                "aggregateEffectiveness",
-                "compareAppetite",
-                "recompareDomain"
-            ],
-            "class_refs": 13,
-            "severity": "دوالُّ مفردة"
-        },
-        {
             "file": "app\/Services\/EffectFanout.php",
             "class": "EffectFanout",
             "lines": 1352,
@@ -172,7 +130,7 @@
             "uncalled": [
                 "partyAward"
             ],
-            "class_refs": 21,
+            "class_refs": 25,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -184,7 +142,7 @@
                 "resubmit",
                 "dto"
             ],
-            "class_refs": 13,
+            "class_refs": 16,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -195,7 +153,7 @@
             "uncalled": [
                 "standbyBasisFor"
             ],
-            "class_refs": 6,
+            "class_refs": 7,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -210,17 +168,6 @@
             "severity": "دوالُّ مفردة"
         },
         {
-            "file": "app\/Services\/Finance\/FinanceM10Service.php",
-            "class": "FinanceM10Service",
-            "lines": 735,
-            "methods": 12,
-            "uncalled": [
-                "gateChecks"
-            ],
-            "class_refs": 1,
-            "severity": "دوالُّ مفردة"
-        },
-        {
             "file": "app\/Services\/Work\/WorkItemService.php",
             "class": "WorkItemService",
             "lines": 680,
@@ -229,7 +176,7 @@
                 "isDelegationLive",
                 "classifyAction"
             ],
-            "class_refs": 18,
+            "class_refs": 21,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -243,7 +190,7 @@
                 "nextPeriodStart",
                 "autoAdjustEnabledFor"
             ],
-            "class_refs": 7,
+            "class_refs": 8,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -278,21 +225,6 @@
                 "reflectClaimState",
                 "openReceivables"
             ],
-            "class_refs": 1,
-            "severity": "دوالُّ مفردة"
-        },
-        {
-            "file": "app\/Services\/Finance\/ObligationEngine.php",
-            "class": "ObligationEngine",
-            "lines": 607,
-            "methods": 12,
-            "uncalled": [
-                "specialStandardFor",
-                "buildPeriods",
-                "contractPeriods",
-                "horizons",
-                "hasAvoidanceVerdict"
-            ],
             "class_refs": 3,
             "severity": "دوالُّ مفردة"
         },
@@ -319,12 +251,9 @@
                 "resolveRoute",
                 "specForDepartment",
                 "accountantFor",
-                "firstUserWithRole",
-                "backflow",
-                "closeOnCancel",
-                "assertRouted"
+                "firstUserWithRole"
             ],
-            "class_refs": 2,
+            "class_refs": 6,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -336,32 +265,7 @@
                 "quotesForSupplier",
                 "commitmentsOf"
             ],
-            "class_refs": 2,
-            "severity": "دوالُّ مفردة"
-        },
-        {
-            "file": "app\/Services\/Finance\/FinAnalysisService.php",
-            "class": "FinAnalysisService",
-            "lines": 584,
-            "methods": 9,
-            "uncalled": [
-                "balanceSheet",
-                "incomeStatement"
-            ],
-            "class_refs": 4,
-            "severity": "دوالُّ مفردة"
-        },
-        {
-            "file": "app\/Services\/Audit\/InternalAuditService.php",
-            "class": "InternalAuditService",
-            "lines": 537,
-            "methods": 17,
-            "uncalled": [
-                "assertCycle",
-                "deliverReport",
-                "roleOf"
-            ],
-            "class_refs": 11,
+            "class_refs": 3,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -374,25 +278,6 @@
                 "postOne"
             ],
             "class_refs": 2,
-            "severity": "دوالُّ مفردة"
-        },
-        {
-            "file": "app\/Services\/Workforce\/AttendanceService.php",
-            "class": "AttendanceService",
-            "lines": 506,
-            "methods": 11,
-            "uncalled": [
-                "resolvePolicy",
-                "impactOf",
-                "classify",
-                "sweepUnclassified",
-                "sweepEmergencyPending",
-                "transitionDeduction",
-                "reviewDeduction",
-                "approveDeduction",
-                "postDeduction"
-            ],
-            "class_refs": 1,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -415,7 +300,7 @@
             "uncalled": [
                 "chainStepsOf"
             ],
-            "class_refs": 1,
+            "class_refs": 4,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -461,7 +346,7 @@
                 "deviationSweep",
                 "closeDeviation"
             ],
-            "class_refs": 6,
+            "class_refs": 7,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -473,7 +358,7 @@
                 "eligibleContracts",
                 "runByKey"
             ],
-            "class_refs": 6,
+            "class_refs": 8,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -484,7 +369,7 @@
             "uncalled": [
                 "provisionRule"
             ],
-            "class_refs": 2,
+            "class_refs": 4,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -563,26 +448,6 @@
             "severity": "دوالُّ مفردة"
         },
         {
-            "file": "app\/Services\/Governance\/FieldGovernor.php",
-            "class": "FieldGovernor",
-            "lines": 381,
-            "methods": 11,
-            "uncalled": [
-                "inheritanceOf",
-                "assertNotInherited",
-                "onParentChange",
-                "classOf",
-                "assertClassified",
-                "canEdit",
-                "scanUnclassified",
-                "sensitiveFieldsOf",
-                "roleHasFieldGrant",
-                "isGoverning"
-            ],
-            "class_refs": 1,
-            "severity": "دوالُّ مفردة"
-        },
-        {
             "file": "app\/Services\/Policy\/UnitJourneyService.php",
             "class": "UnitJourneyService",
             "lines": 379,
@@ -592,18 +457,7 @@
                 "applyPrimary",
                 "proposeEntitlements"
             ],
-            "class_refs": 1,
-            "severity": "دوالُّ مفردة"
-        },
-        {
-            "file": "app\/Services\/Portal\/CapacityService.php",
-            "class": "CapacityService",
-            "lines": 375,
-            "methods": 6,
-            "uncalled": [
-                "assertSupplierCapacity"
-            ],
-            "class_refs": 17,
+            "class_refs": 5,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -618,7 +472,7 @@
                 "sweepEmergency",
                 "gmLoadReview"
             ],
-            "class_refs": 2,
+            "class_refs": 4,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -660,17 +514,6 @@
             "severity": "دوالُّ مفردة"
         },
         {
-            "file": "app\/Services\/Portal\/VisibilityPolicyService.php",
-            "class": "VisibilityPolicyService",
-            "lines": 336,
-            "methods": 9,
-            "uncalled": [
-                "affectedCount"
-            ],
-            "class_refs": 10,
-            "severity": "دوالُّ مفردة"
-        },
-        {
             "file": "app\/Services\/Operations\/RotationSwapService.php",
             "class": "RotationSwapService",
             "lines": 333,
@@ -704,7 +547,7 @@
                 "modifyOriginalShare",
                 "computeImpact"
             ],
-            "class_refs": 1,
+            "class_refs": 2,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -716,7 +559,7 @@
                 "statutoryFields",
                 "byClaim"
             ],
-            "class_refs": 3,
+            "class_refs": 4,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -727,7 +570,7 @@
             "uncalled": [
                 "deliveryDocOf"
             ],
-            "class_refs": 3,
+            "class_refs": 4,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -739,18 +582,6 @@
                 "leafFor"
             ],
             "class_refs": 3,
-            "severity": "دوالُّ مفردة"
-        },
-        {
-            "file": "app\/Services\/Exec\/AssignmentGate.php",
-            "class": "AssignmentGate",
-            "lines": 315,
-            "methods": 7,
-            "uncalled": [
-                "rolesHeldBy",
-                "roleOfUser"
-            ],
-            "class_refs": 4,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -773,7 +604,7 @@
             "uncalled": [
                 "status"
             ],
-            "class_refs": 1,
+            "class_refs": 5,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -834,19 +665,6 @@
             "severity": "دوالُّ مفردة"
         },
         {
-            "file": "app\/Services\/Finance\/PostingService.php",
-            "class": "PostingService",
-            "lines": 286,
-            "methods": 6,
-            "uncalled": [
-                "requiredLevel",
-                "periodOpen",
-                "accountId"
-            ],
-            "class_refs": 2,
-            "severity": "دوالُّ مفردة"
-        },
-        {
             "file": "app\/Services\/Unit\/DocumentGuard.php",
             "class": "DocumentGuard",
             "lines": 268,
@@ -869,7 +687,7 @@
                 "scope",
                 "assertSupplier"
             ],
-            "class_refs": 17,
+            "class_refs": 18,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -914,7 +732,7 @@
             "uncalled": [
                 "linkFinancialEvent"
             ],
-            "class_refs": 2,
+            "class_refs": 3,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -950,31 +768,6 @@
                 "closeHead"
             ],
             "class_refs": 2,
-            "severity": "دوالُّ مفردة"
-        },
-        {
-            "file": "app\/Services\/Finance\/CoaService.php",
-            "class": "CoaService",
-            "lines": 194,
-            "methods": 6,
-            "uncalled": [
-                "assertDims",
-                "assertCreatable",
-                "resolveAccount",
-                "natureOf"
-            ],
-            "class_refs": 4,
-            "severity": "دوالُّ مفردة"
-        },
-        {
-            "file": "app\/Services\/Rental\/AvailabilityService.php",
-            "class": "AvailabilityService",
-            "lines": 193,
-            "methods": 5,
-            "uncalled": [
-                "isFree"
-            ],
-            "class_refs": 3,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -1038,29 +831,6 @@
             "severity": "دوالُّ مفردة"
         },
         {
-            "file": "app\/Services\/Portal\/VisibilityGuard.php",
-            "class": "VisibilityGuard",
-            "lines": 172,
-            "methods": 3,
-            "uncalled": [
-                "relation",
-                "filterElements"
-            ],
-            "class_refs": 4,
-            "severity": "دوالُّ مفردة"
-        },
-        {
-            "file": "app\/Services\/Governance\/ExceptionService.php",
-            "class": "ExceptionService",
-            "lines": 169,
-            "methods": 4,
-            "uncalled": [
-                "riskOf"
-            ],
-            "class_refs": 1,
-            "severity": "دوالُّ مفردة"
-        },
-        {
             "file": "app\/Services\/Financing\/FinancingModelService.php",
             "class": "FinancingModelService",
             "lines": 165,
@@ -1080,7 +850,7 @@
                 "routeFor",
                 "deptOf"
             ],
-            "class_refs": 1,
+            "class_refs": 3,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -1091,21 +861,7 @@
             "uncalled": [
                 "convertOne"
             ],
-            "class_refs": 1,
-            "severity": "دوالُّ مفردة"
-        },
-        {
-            "file": "app\/Services\/Security\/PermSourceService.php",
-            "class": "PermSourceService",
-            "lines": 156,
-            "methods": 6,
-            "uncalled": [
-                "legacyDecision",
-                "personIdOf",
-                "shadowCompare",
-                "zeroDiffStreakDays"
-            ],
-            "class_refs": 1,
+            "class_refs": 5,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -1150,7 +906,7 @@
             "uncalled": [
                 "assertNotCountingCoverage"
             ],
-            "class_refs": 2,
+            "class_refs": 3,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -1174,28 +930,6 @@
             "uncalled": [
                 "drain"
             ],
-            "class_refs": 1,
-            "severity": "دوالُّ مفردة"
-        },
-        {
-            "file": "app\/Services\/Procurement\/StockReturnService.php",
-            "class": "StockReturnService",
-            "lines": 136,
-            "methods": 2,
-            "uncalled": [
-                "returnableOf"
-            ],
-            "class_refs": 1,
-            "severity": "دوالُّ مفردة"
-        },
-        {
-            "file": "app\/Services\/Security\/PermissionReviewService.php",
-            "class": "PermissionReviewService",
-            "lines": 134,
-            "methods": 4,
-            "uncalled": [
-                "decideLine"
-            ],
             "class_refs": 2,
             "severity": "دوالُّ مفردة"
         },
@@ -1209,7 +943,7 @@
                 "rebuildContainerCache",
                 "subtreeIds"
             ],
-            "class_refs": 3,
+            "class_refs": 4,
             "severity": "دوالُّ مفردة"
         },
         {
@@ -1233,18 +967,6 @@
                 "logExecution"
             ],
             "class_refs": 0,
-            "severity": "دوالُّ مفردة"
-        },
-        {
-            "file": "app\/Services\/Security\/SensitiveFieldGuard.php",
-            "class": "SensitiveFieldGuard",
-            "lines": 112,
-            "methods": 5,
-            "uncalled": [
-                "filterRow",
-                "maskPartial"
-            ],
-            "class_refs": 2,
             "severity": "دوالُّ مفردة"
         },
         {

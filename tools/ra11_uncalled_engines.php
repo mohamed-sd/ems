@@ -40,7 +40,10 @@ $walk($ROOT);
 /* نصوصُ الملفاتِ مرةً واحدة */
 $src = [];
 foreach ($all as $f) { $src[$f] = (string) file_get_contents($f); }
-$isTest = fn(string $f): bool => (strpos($f, '/tests/') !== false || strpos($f, '/tools/') !== false);
+/* ◆ `tools/` **ليست اختبارات**: فيها كروناتٌ إنتاجيةٌ حقيقية (m16_risk_cron
+   مثلًا يشغّل ثلاثَ عشرةَ قاعدةَ إشارةٍ دوريًّا). واستبعادُها أنتج بلاغًا كاذبًا
+   عن RiskSignalEngine — فلا يُستبعد إلا `tests/`. */
+$isTest = fn(string $f): bool => (strpos($f, '/tests/') !== false);
 
 /* ── الخدماتُ ودوالُّها العامة ──────────────────────────────────── */
 $services = array_values(array_filter($all, fn($f) => strpos($f, '/app/Services/') !== false));
@@ -65,6 +68,18 @@ foreach ($services as $f) {
         if ($g === $f || $isTest($g)) { continue; }
         if (strpos($src[$g], $class) !== false) { $classRefs[] = str_replace($ROOT . '/', '', $g); }
     }
+
+    /* ◆ النداءُ الديناميكيُّ يُعمي البحثَ النصيّ: `get_class_methods` و
+       `call_user_func` و`$m()` تنادي بلا ذكرِ الاسمِ حرفًا. فإن وُجد في ملفٍ
+       يذكر الصنفَ، عُدَّ الصنفُ كلُّه منادى ولا يُبلَّغ عنه. (فخُّ risk_settings.) */
+    $dynamic = false;
+    foreach ($classRefs as $rel) {
+        $g = $ROOT . '/' . $rel;
+        if (isset($src[$g]) && preg_match('/get_class_methods|call_user_func|method_exists|\$\w+\s*\(\s*\)/', $src[$g])) {
+            $dynamic = true; break;
+        }
+    }
+    if ($dynamic) { continue; }
 
     /* دوالُّ بلا نداءٍ نصيٍّ خارجَ ملفِّها */
     $uncalled = [];
