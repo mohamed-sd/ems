@@ -64,9 +64,28 @@ $check('⑥-أ واقعةٌ Posted بلا قيد',
     "SELECT COUNT(*) FROM fin_financial_events
       WHERE company_id=$CO AND fes_status='Posted' AND (journal_entry_id IS NULL OR journal_entry_id=0)");
 
-$check('⑥-ب قيدٌ لواقعةٍ ليست Posted',
+/* ◆ `Reversed` حالةٌ مشروعةٌ لقيدٍ باقٍ: العكسُ حركةٌ مقابلةٌ **لا حذف**، فالقيدُ
+   الأصليُّ يبقى في الدفترِ ويقابله عاكسُه. وتوسيعُ الفحصِ هنا لا يُرخّيه لأن
+   الفحصَ التالي يشترط أن يكون لكلِّ معكوسٍ عاكسٌ بقيدِه فعلًا. */
+$check('⑥-ب قيدٌ لواقعةٍ ليست Posted ولا Reversed',
     "SELECT COUNT(*) FROM fin_journal_entries j JOIN fin_financial_events e ON e.id=j.event_id
-      WHERE j.company_id=$CO AND e.fes_status<>'Posted'");
+      WHERE j.company_id=$CO AND e.fes_status NOT IN ('Posted','Reversed')");
+
+$check('⑥-ج معكوسٌ بلا واقعةٍ معوِّضةٍ مُرحَّلة',
+    "SELECT COUNT(*) FROM fin_financial_events e
+      WHERE e.company_id=$CO AND e.fes_status='Reversed'
+        AND NOT EXISTS (SELECT 1 FROM fin_financial_events r
+                        WHERE r.reverses_event_id=e.id AND r.fes_status='Posted'
+                          AND COALESCE(r.journal_entry_id,0)>0)",
+    'كلُّ معكوسٍ يلزمه عاكسٌ مُرحَّلٌ يقابله — وإلا فالعكسُ محوٌ لا حركة');
+
+$check('⑥-د عاكسٌ لا يوازن أصلَه',
+    "SELECT COUNT(*) FROM fin_financial_events o
+       JOIN fin_financial_events r ON r.reverses_event_id=o.id
+       JOIN fin_journal_entries jo ON jo.id=o.journal_entry_id
+       JOIN fin_journal_entries jr ON jr.id=r.journal_entry_id
+      WHERE o.company_id=$CO AND ABS(jo.total_debit - jr.total_credit) > 0.005",
+    'مدينُ الأصلِ يجب أن يساوي دائنَ عاكسِه');
 
 $check('⑦ واقعةٌ برأسَي قيد',
     "SELECT COUNT(*) FROM (SELECT event_id FROM fin_journal_entries

@@ -248,6 +248,125 @@ class PostingService
         return $out;
     }
 
+    /** ──────────────────────────────────────────────────────────────────
+     * ④ Posted ⇐ Reversed — عكسُ قيدٍ رُحِّل، بحركةٍ مقابلةٍ لا بحذف
+     * ────────────────────────────────────────────────────────────────────
+     * رُحِّل 1,115 قيدًا ولم يكن لعكسِ واحدٍ منها سبيل — وهي ثغرةٌ في مسارِ
+     * الترحيلِ نفسِه لا في غيرِه: من يكتب في دفترٍ يلزمه بابُ خروجٍ من يومِه الأول.
+     *
+     * ◆ ولا يُعاد بناءُ ما هو مبنيّ: `CompensationService::reverseEvent` يُنشئ
+     *   **الواقعةَ المعوِّضةَ** (مبلغٌ سالبٌ · `reverses_event_id` · عطالةٌ بمفتاح
+     *   `rev:`) — لكنه لا يمسُّ الدفترَ لأنه سابقٌ لوجودِ مسارِ الترحيل. فتُنادى
+     *   كما هي ويُضاف إليها الشقُّ الدفتريُّ هنا:
+     *     · قيدٌ عاكسٌ بمدينٍ ودائنٍ **متبادلَين** ومبلغٍ موجب
+     *     · يُعلَّق على **الواقعةِ المعوِّضة** لا على الأصل — فيبقى «لكلِّ واقعةٍ
+     *       قيدٌ واحد» صحيحًا، ويبقى «لا قيدَ لواقعةٍ ليست Posted» صحيحًا
+     *     · والأصلُ ينتقل إلى Reversed بآلةِ الحالاتِ لا بكتابةٍ مباشرة
+     * ◆ والأصلُ لا يُحذف ولا يُعدَّل مبلغُه: يبقى في الدفترِ ويقابله عاكسُه.
+     */
+    public static function reversePosted($gate, \mysqli $conn, $companyId, $eventId, $reason, $actor)
+    {
+        $companyId = (int) $companyId;
+        $eventId   = (int) $eventId;
+        $reason    = trim((string) $reason);
+        if ($reason === '') {
+            return array('ok' => false, 'code' => 422, 'reasons' => array('سببُ العكسِ إلزاميّ — لا عكسَ بلا سببٍ مكتوب'));
+        }
+
+        $st = $conn->prepare("SELECT * FROM fin_financial_events WHERE id=? AND company_id=? LIMIT 1");
+        $st->bind_param('ii', $eventId, $companyId);
+        $st->execute();
+        $orig = $st->get_result()->fetch_assoc();
+        $st->close();
+        if (!$orig) { return array('ok' => false, 'code' => 404, 'reasons' => array('الواقعةُ غيرُ موجودةٍ في كيانِك')); }
+        if ((string) $orig['fes_status'] !== 'Posted') {
+            return array('ok' => false, 'code' => 409,
+                         'reasons' => array('الواقعةُ في حالة «' . $orig['fes_status'] . '» — العكسُ الدفتريُّ للمُرحَّلِ وحدَه'));
+        }
+        if (empty($orig['journal_entry_id'])) {
+            return array('ok' => false, 'code' => 409, 'reasons' => array('واقعةٌ Posted بلا قيد — حالةٌ لا تُعكس بل تُصحَّح'));
+        }
+        $date = substr((string) $orig['occurred_at'], 0, 10);
+        if (!self::periodOpen($conn, $companyId, $date)) {
+            return array('ok' => false, 'code' => 409,
+                         'reasons' => array('فترةُ الأصلِ مغلقةٌ — العكسُ في فترةٍ مغلقةٍ قرارُ إقفالٍ لا قرارُ شاشة'));
+        }
+
+        /* سطرا الأصلِ — منهما يُبنى العاكسُ بالتبادل */
+        $rs = $conn->query("SELECT account_id, debit, credit FROM fin_journal_lines
+                            WHERE entry_id = " . (int) $orig['journal_entry_id']);
+        $lines = array();
+        while ($rs && ($l = $rs->fetch_assoc())) { $lines[] = $l; }
+        if (count($lines) < 2) { return array('ok' => false, 'code' => 409, 'reasons' => array('قيدُ الأصلِ بأقلَّ من سطرين')); }
+
+        /* ① الواقعةُ المعوِّضةُ — بالخدمةِ القائمةِ لا ببناءٍ جديد */
+        require_once dirname(__DIR__) . '/CompensationService.php';
+        try {
+            $cmp = \App\Services\CompensationService::reverseEvent($conn, $eventId, $reason, (int) $actor);
+        } catch (\Throwable $e) {
+            return array('ok' => false, 'code' => 500, 'reasons' => array('تعذّر إنشاءُ الواقعةِ المعوِّضة: ' . $e->getMessage()));
+        }
+        $revEventId = (int) ($cmp['reversal_id'] ?? 0);
+        if ($revEventId <= 0) { return array('ok' => false, 'code' => 500, 'reasons' => array('الواقعةُ المعوِّضةُ لم تُنشأ')); }
+        if (!empty($cmp['duplicate'])) {
+            $q = $conn->query("SELECT journal_entry_id FROM fin_financial_events WHERE id=$revEventId");
+            $j = $q ? (int) ($q->fetch_row()[0] ?? 0) : 0;
+            if ($j > 0) {
+                return array('ok' => true, 'code' => 200, 'duplicate' => true,
+                             'reversal_event_id' => $revEventId, 'reversal_entry_id' => $j, 'reasons' => array());
+            }
+        }
+
+        /* ② القيدُ العاكسُ — مدينٌ ودائنٌ متبادلان */
+        $amt = round((float) $orig['amount'], 2);
+        $revEntryId = 0;
+        $gate->runInTransaction(function ($g) use (&$revEntryId, $orig, $lines, $amt, $date, $actor, $revEventId, $reason) {
+            $revEntryId = (int) $g->insert('fin_journal_entries', array(
+                'entry_no'     => 'TMP-' . uniqid('', true),
+                'event_id'     => $revEventId,
+                'posting_date' => $date,
+                'txn_date'     => $date,
+                'currency'     => (string) $orig['currency'],
+                'total_debit'  => $amt,
+                'total_credit' => $amt,
+                'memo'         => 'عكسُ القيد #' . $orig['journal_entry_id'] . ' — ' . mb_substr($reason, 0, 120),
+                'state'        => 'posted',
+                'posted_by'    => (int) $actor ?: null,
+                'posted_at'    => date('Y-m-d H:i:s'),
+                'created_by'   => (int) $actor ?: null,
+            ));
+            if ($revEntryId <= 0) { throw new \RuntimeException('reversePosted: فشل إدراجُ القيدِ العاكس'); }
+            $g->update('fin_journal_entries',
+                array('entry_no' => 'RJV-' . str_pad((string) $revEntryId, 6, '0', STR_PAD_LEFT)),
+                array('id' => $revEntryId));
+
+            foreach ($lines as $l) {
+                $g->insert('fin_journal_lines', array(
+                    'entry_id'   => $revEntryId,
+                    'account_id' => (int) $l['account_id'],
+                    'debit'      => round((float) $l['credit'], 2),   // التبادل
+                    'credit'     => round((float) $l['debit'], 2),
+                    'memo'       => 'عكسٌ آليٌّ للقيد #' . $orig['journal_entry_id'],
+                ));
+            }
+        });
+
+        /* ③ الواقعةُ المعوِّضةُ تصير Posted بقيدِها · والأصلُ Reversed */
+        $conn->query("UPDATE fin_financial_events
+                      SET journal_entry_id = $revEntryId, fes_status = 'Posted', state = 'posted',
+                          posted_by = " . (int) $actor . ", posted_at = NOW()
+                      WHERE id = $revEventId");
+        $t = EventStateMachine::transition($gate, $conn, $eventId, 'Reversed', $actor);
+        if (empty($t['ok'])) {
+            return array('ok' => false, 'code' => 500,
+                         'reasons' => array('القيدُ العاكسُ كُتب والأصلُ لم ينتقل: ' . implode(' · ', (array) ($t['reasons'] ?? array()))),
+                         'reversal_event_id' => $revEventId, 'reversal_entry_id' => $revEntryId);
+        }
+
+        return array('ok' => true, 'code' => 200, 'duplicate' => false,
+                     'reversal_event_id' => $revEventId, 'reversal_entry_id' => $revEntryId, 'reasons' => array());
+    }
+
     /* ── مساعداتٌ صغيرة ───────────────────────────────────────────── */
 
     private static function fail($gate, \mysqli $conn, $eventId, $actor)
