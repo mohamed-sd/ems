@@ -65,12 +65,6 @@ include __DIR__ . '/../inheader.php';
             padding: 18px;
         }
 
-        .report-table thead th {
-            background: var(--c-f8fafc, #f8fafc);
-            color: var(--c-0c1c3e, #0c1c3e);
-            font-weight: 800;
-        }
-
         .summary-list .list-group-item {
             border-color: var(--c-rgba122862008, rgba(12, 28, 62, 0.08));
             font-weight: 600;

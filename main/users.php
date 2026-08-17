@@ -612,7 +612,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                     <thead>
                         <tr>
                             <th>إجراءات</th>
-                            <th>#</th>
                             <th>الاسم </th>
                             <th>اسم المستخدم </th>
                             <th>كلمه المرور </th>
@@ -654,7 +653,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                 'includeDeleted' => true));
                         } catch (\Throwable $t) { error_log('users.php list: ' . $t->getMessage()); }
 
-                        $i = 1;
                         if ($result) {
                         foreach ($result as $row) {
                             $project_id = $row['project_id'];
@@ -719,7 +717,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                                                                 <a href='?delete={$row['id']}' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من الحذف؟\")' title='حذف'><i class='fas fa-trash-alt'></i></a>
                                                                 </div>
                                                             </td>";
-                            echo "<td><strong>" . $i++ . "</strong></td>";
                             echo "<td><a class='client-name-link' href='user_profile.php?id=" . intval($row['id']) . "'>" . htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8') . "</a>" . $project_info . "</td>";
                             echo "<td><strong>" . htmlspecialchars($row['username'], ENT_QUOTES, 'UTF-8') . "</strong></td>";
                             echo "<td><span class='password-cell pu-password-cell'>••••••••</span></td>";

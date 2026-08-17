@@ -320,10 +320,10 @@ require_once __DIR__ . '/../includes/layout_head.php';
 .sg-count{color:#6B7280;font-size:.8rem;margin-inline-start:auto}
 .sg-dept__tag{display:inline-block;background:#EEF4FB;color:#1E3A5F;font-size:.7rem;font-weight:600;padding:2px 7px;border-radius:20px;margin:1px 0 1px 3px;white-space:nowrap}
 .sg-dept__more{display:inline-block;background:#eef1f5;color:#6B7280;font-size:.68rem;padding:2px 6px;border-radius:20px;cursor:help}
-.sg-table-wrap{background:#fff;border:1px solid #e6e9ef;border-radius:12px;overflow:auto;max-height:64vh}
+.sg-table-wrap{overflow:auto;max-height:64vh;}
 .sg-table{margin:0;width:100%;font-size:.84rem}
-.sg-table thead th{position:sticky;top:0;background:#0C1C3E;color:#fff;font-weight:700;z-index:1;padding:9px 10px;white-space:nowrap}
-.sg-table td{padding:8px 10px;border-bottom:1px solid #eef1f5;vertical-align:top}
+.sg-table thead th{position:sticky;top:0;z-index:1;padding:9px 10px;white-space:nowrap;}
+.sg-table td{padding:8px 10px;vertical-align:top;}
 .sg-path{font-size:.76rem;color:#334155;direction:ltr;display:inline-block}
 .sg-desc{color:#4b5563;line-height:1.6;max-width:520px}
 .sg-muted{color:#9aa3af}

@@ -853,8 +853,7 @@ body.ems-site,
   .shot-session-row,
   .shot-stat-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-}
+  }}
 
 @media (max-width: 900px) {
   /* Sidebar mobile behavior (off-canvas) is governed by the unified
@@ -884,8 +883,7 @@ body.ems-site,
 
   .shot-stat-value {
     font-size: 4.2rem;
-  }
-}
+  }}
 
 /* ── سجل الموظفين — كتلُ الصفحةِ المنقولة (INJ-0442 · 0571 · 0237) ── */
 .equipments-fleet-main .form-section {
@@ -1272,8 +1270,7 @@ body.ems-site,
     .btn-secondary {
         width: 100%;
         justify-content: center;
-    }
-}
+    }}
 
 @keyframes modalSlideIn {
     from {
@@ -1300,80 +1297,6 @@ body.ems-site,
     background: var(--c-f8fafc);
     border-color: var(--c-cbd5e1);
 }
-
-/* ── العملاء — كتلُ الصفحةِ المنقولة (INJ-0442 · 0571 · 0237) ── */
-/* ── كاردات الإحصائيات — نفس تصميم شاشة المشاريع (Projects/projects.php) ── */
-    .clients-main .stats-section {
-        border: 1px solid var(--bdr);
-        border-radius: var(--rl);
-        background: linear-gradient(180deg, var(--c-s-rgba2552552559) 0%, var(--s2) 100%);
-        box-shadow: var(--sh);
-        padding: 14px;
-        margin-bottom: 14px;
-    }
-
-    .clients-main .stats-grid,
-.suppliers-main .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(170px, 1fr));
-        gap: 12px;
-    }
-
-    .clients-main .stats-card {
-        background: var(--c-s-eee);
-        border: 1px solid var(--c-s-aaa);
-        border-radius: 35px;
-        padding: 18px;
-        box-shadow: 0 2px 8px var(--c-s-rgba2618807);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .clients-main .stats-card .stats-icon {
-        width: 55px;
-        height: 55px;
-        border-radius: 12px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.3rem;
-        margin-bottom: 10px;
-        float: left;
-        vertical-align: middle;
-        margin-top: 15px;
-        border: 1px solid var(--c-ink-400);
-        background-color: var(--c-s-fff);
-        color: var(--c-s-000);
-    }
-
-    .clients-main .stats-card .stats-title {
-        color: var(--c-s-555);
-        font-size: 0.92rem;
-        font-weight: 700;
-        margin-top: 5px;
-        line-height: 1.3;
-    }
-
-    .clients-main .stats-card .stats-value {
-        color: var(--c-s-222);
-        line-height: 1;
-        font-weight: 900;
-        font-variant-numeric: tabular-nums;
-        margin-top: 10px;
-        font-size: 35px;
-    }
-
-    @media (max-width: 900px) {
-        .clients-main .stats-grid {
-            grid-template-columns: repeat(2, minmax(150px, 1fr));
-        }
-    }
-
-    @media (max-width: 560px) {
-        .clients-main .stats-grid {
-            grid-template-columns: 1fr;
-        }
-    }
 
     /* ── كروت القطاعات — بنفس لغة تصميم كاردات الإحصائيات ── */
     .clients-main .sector-cards-grid {
@@ -1436,8 +1359,7 @@ body.ems-site,
     @media (max-width: 560px) {
         .clients-main .sector-cards-grid {
             grid-template-columns: 1fr;
-        }
-    }
+        }}
 
     .clients-main .clients-summary-pill-danger,
     .clients-main .clients-inline-pill-danger {
@@ -1477,72 +1399,6 @@ body.ems-site,
         white-space: nowrap;
     }
 
-/* ── الموردون — كتلُ الصفحةِ المنقولة (INJ-0442 · 0571 · 0237) ── */
-.suppliers-main .stats-section {
-        border: 1px solid var(--bdr);
-        border-radius: var(--rl);
-        background: linear-gradient(180deg, var(--c-s-rgba2552552559) 0%, var(--s2) 100%);
-        box-shadow: var(--sh);
-        padding: 14px;
-        margin-bottom: 14px;
-    }
-
-    
-
-    .suppliers-main .stats-card {
-        background: var(--s1);
-        border: 1px solid var(--bdr);
-        border-radius: 12px;
-        padding: 12px;
-        box-shadow: 0 2px 8px var(--c-s-rgba2618807);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .suppliers-main .stats-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        left: 0;
-        height: 3px;
-        background: linear-gradient(90deg, var(--or), var(--or2));
-        opacity: .9;
-    }
-
-    .suppliers-main .stats-card .stats-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 12px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1rem;
-    }
-
-    .suppliers-main .stats-card .stats-title {
-        margin-top: 10px;
-        color: var(--t2);
-        font-size: .82rem;
-        font-weight: 700;
-    }
-
-    .suppliers-main .stats-card .stats-value {
-        margin-top: 7px;
-        color: var(--t1);
-        font-size: 1.62rem;
-        line-height: 1;
-        font-weight: 900;
-        font-variant-numeric: tabular-nums;
-    }
-
-    .suppliers-main .stats-primary .stats-icon { background: var(--c-s-rgba379923514); color: var(--c-state-info-deep); }
-    .suppliers-main .stats-success .stats-icon { background: var(--c-s-rgba221637414); color: var(--c-state-ok-deep); }
-    .suppliers-main .stats-danger .stats-icon { background: var(--c-s-rgba220383814); color: var(--c-badge-danger-b); }
-    .suppliers-main .stats-purple .stats-icon { background: var(--c-s-rgba1245823714); color: var(--c-badge-purple-b); }
-    .suppliers-main .stats-cyan .stats-icon { background: var(--c-s-rgba814517814); color: var(--c-badge-info-b); }
-    .suppliers-main .stats-orange .stats-icon { background: var(--c-s-rgba217119614); color: var(--c-badge-warning-b); }
-
     #projectsTable.suppliers-table-nowrap,
     #projectsTable.suppliers-table-nowrap th,
     #projectsTable.suppliers-table-nowrap td {
@@ -1569,18 +1425,6 @@ body.ems-site,
         background: linear-gradient(135deg, var(--c-1f4f7a), var(--c-2f6fa5));
     }
 
-    @media (max-width: 900px) {
-        .suppliers-main .stats-grid {
-            grid-template-columns: repeat(2, minmax(150px, 1fr));
-        }
-    }
-
-    @media (max-width: 560px) {
-        .suppliers-main .stats-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
 /* ── INJ-0441 · نبضةُ زرِّ «عن الشاشة» حيث تبقى البطاقةُ مطويّة ────────────────
      البطاقةُ لا تُفتح تلقائيًّا في شاشةِ جدولٍ (البياناتُ أولًا)، فيُعرَّف مكانُ
      الشرحِ بنبضةٍ قصيرةٍ تنتهي — لا بحركةٍ دائمةٍ تُشتّت. */
@@ -1592,8 +1436,7 @@ body.ems-site,
     50%      { box-shadow: 0 0 0 6px transparent; }
 }
 @media (prefers-reduced-motion: reduce) {
-    .ems-about-btn--hint { animation: none; outline: 2px solid var(--c-brand-gold-line); }
-}
+    .ems-about-btn--hint { animation: none; outline: 2px solid var(--c-brand-gold-line); }}
 
 /* ── INJ-0378 · INJ-0548 · لافتةُ صندوقِ الإرسالِ دونَ اتصال ──────────────────
      تُعلن ما لم يُرسَل بعد — فالوعدُ بالحفظِ لا يُصدَّق بلا عدّادٍ يراه المستخدم. */
@@ -1813,11 +1656,9 @@ body.ems-site,
         font-size: 35px;
     }
     @media (max-width: 900px) {
-        .mnt-orders-main .stats-grid { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
-    }
+        .mnt-orders-main .stats-grid { grid-template-columns: repeat(2, minmax(150px, 1fr)); }}
     @media (max-width: 560px) {
-        .mnt-orders-main .stats-grid { grid-template-columns: 1fr; }
-    }
+        .mnt-orders-main .stats-grid { grid-template-columns: 1fr; }}
 
     /* الهوية البصرية لأوامر الصيانة — متّسقة مع باقي الموقع (navy/gold) */
     .mnt-orders-main .mnt-pill { display:inline-flex; align-items:center; padding:4px 12px; border-radius:999px; font-size:.78rem; font-weight:800; }
@@ -1852,7 +1693,7 @@ body.ems-site,
     .mnt-toggles-head i { color:var(--c-e0ae2e); }
     .mnt-toggles-hint { color:var(--c-9a8c6c, #9a8c6c); font-weight:600; font-size:.78rem; }
     .mnt-toggles-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    @media (max-width:760px){ .mnt-toggles-grid { grid-template-columns:1fr; } }
+    @media (max-width:760px){ .mnt-toggles-grid { grid-template-columns:1fr; }}
     .mnt-toggle { display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:14px; border:1.5px solid var(--c-e7dcc4, #e7dcc4); background:var(--c-fdfbf6, #fdfbf6); cursor:pointer; transition:border-color .18s, background .18s, box-shadow .18s; margin:0; }
     .mnt-toggle:hover { border-color:var(--c-d7c79f, #d7c79f); }
     .mnt-toggle.is-on { border-color:var(--c-2f6fa5); background:linear-gradient(180deg,var(--c-f3f9ff, #f3f9ff),var(--c-eaf3fc, #eaf3fc)); box-shadow:0 2px 10px var(--c-rgba47111165012, rgba(47,111,165,.12)); }
@@ -1911,7 +1752,7 @@ body.ems-site,
     .mnt-empty-line i { font-size:1.9rem; opacity:.5; }
     .mnt-empty-line span { font-size:.9rem; font-weight:600; }
     .mnt-req-hint { color:var(--c-b45309); font-size:.72rem; font-weight:700; }
-    @media (max-width:992px){ .mnt-lines-grid{ grid-template-columns:1fr; } .mnt-orders-main .mnt-cost-summary{ grid-template-columns:repeat(2,1fr);} }
+    @media (max-width:992px){ .mnt-lines-grid{ grid-template-columns:1fr; } .mnt-orders-main .mnt-cost-summary{ grid-template-columns:repeat(2,1fr);}}
 
 /* ── Suppliers/supplier_profile.php ──
    بطاقةُ المورد على مكوّنِ «بطاقةِ الكِيان» (ems-profile.css) — فسقطت من هنا
@@ -2449,14 +2290,12 @@ body.ems-site,
   @media (max-width: 991px) {
     .supplier-contracts-page .form-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
+    }}
 
   @media (max-width: 640px) {
     .supplier-contracts-page .form-grid {
       grid-template-columns: 1fr;
-    }
-  }
+    }}
 
   .contracts-main .table-container {
     overflow-x: auto;
@@ -3107,8 +2946,7 @@ body.ems-site,
         .activity-logs-main .role-card-wrap {
             flex-basis: calc(50% - 10px) !important;
             max-width: calc(50% - 7px) !important;
-        }
-    }
+        }}
 
     @media (max-width:575px) {
         .activity-logs-main .role-card-wrap {
@@ -3124,8 +2962,7 @@ body.ems-site,
 
         .activity-logs-main .activity-page-hero-count {
             margin-inline-start: 0 !important;
-        }
-    }
+        }}
 
     /* ── UXW-01 ①②: أصنافُ الشاشةِ بدلَ الأنماطِ الموضعيةِ والقيمِ المثبَّتة ── */
     .activity-hero-sub { color: var(--c-surface) !important; }
@@ -3273,8 +3110,8 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     .risk-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-surface); color:var(--c-ink-max); }
     .risk-main .stats-card .stats-title { color: var(--c-555555, #555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
     .risk-main .stats-card .stats-value { color: var(--c-222222, #222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
-    @media (max-width: 900px) { .risk-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
-    @media (max-width: 560px) { .risk-main .stats-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .risk-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); }}
+    @media (max-width: 560px) { .risk-main .stats-grid { grid-template-columns: 1fr; }}
 
     .risk-main .risk-hidden { display: none; }
     .risk-main .risk-col-full { grid-column: 1 / -1; }
@@ -3298,8 +3135,8 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     .amd-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-surface); color:var(--c-ink-max); }
     .amd-main .stats-card .stats-title { color: var(--c-555555, #555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
     .amd-main .stats-card .stats-value { color: var(--c-222222, #222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
-    @media (max-width: 900px) { .amd-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
-    @media (max-width: 560px) { .amd-main .stats-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .amd-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); }}
+    @media (max-width: 560px) { .amd-main .stats-grid { grid-template-columns: 1fr; }}
 
     .amd-main .amd-hidden { display: none; }
     .amd-main .amd-col-full { grid-column: 1 / -1; }
@@ -3320,8 +3157,8 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     .evt-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-surface); color:var(--c-ink-max); }
     .evt-main .stats-card .stats-title { color: var(--c-555555, #555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
     .evt-main .stats-card .stats-value { color: var(--c-222222, #222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
-    @media (max-width: 900px) { .evt-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
-    @media (max-width: 560px) { .evt-main .stats-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .evt-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); }}
+    @media (max-width: 560px) { .evt-main .stats-grid { grid-template-columns: 1fr; }}
 
     .evt-main .evt-hidden { display: none; }
     .evt-main .evt-col-full { grid-column: 1 / -1; }
@@ -3346,8 +3183,8 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     .pl-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-surface); color:var(--c-ink-max); }
     .pl-main .stats-card .stats-title { color: var(--c-555555, #555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
     .pl-main .stats-card .stats-value { color: var(--c-222222, #222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
-    @media (max-width: 900px) { .pl-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
-    @media (max-width: 560px) { .pl-main .stats-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .pl-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); }}
+    @media (max-width: 560px) { .pl-main .stats-grid { grid-template-columns: 1fr; }}
 
     .pl-main .pl-hidden { display: none; }
     .pl-main .pl-col-full { grid-column: 1 / -1; }
@@ -3368,8 +3205,8 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     .prod-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-surface); color:var(--c-ink-max); }
     .prod-main .stats-card .stats-title { color: var(--c-555555, #555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
     .prod-main .stats-card .stats-value { color: var(--c-222222, #222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
-    @media (max-width: 900px) { .prod-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
-    @media (max-width: 560px) { .prod-main .stats-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .prod-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); }}
+    @media (max-width: 560px) { .prod-main .stats-grid { grid-template-columns: 1fr; }}
 
     .prod-main .prod-hidden { display: none; }
     .prod-main .prod-col-full { grid-column: 1 / -1; }
@@ -3390,8 +3227,8 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     .quo-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-surface); color:var(--c-ink-max); }
     .quo-main .stats-card .stats-title { color: var(--c-555555, #555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
     .quo-main .stats-card .stats-value { color: var(--c-222222, #222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
-    @media (max-width: 900px) { .quo-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
-    @media (max-width: 560px) { .quo-main .stats-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .quo-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); }}
+    @media (max-width: 560px) { .quo-main .stats-grid { grid-template-columns: 1fr; }}
 
     .quo-main .quo-hidden { display: none; }
     .quo-main .quo-col-full { grid-column: 1 / -1; }
@@ -3419,8 +3256,8 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     .uom-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-surface); color:var(--c-ink-max); }
     .uom-main .stats-card .stats-title { color: var(--c-555555, #555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
     .uom-main .stats-card .stats-value { color: var(--c-222222, #222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
-    @media (max-width: 900px) { .uom-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
-    @media (max-width: 560px) { .uom-main .stats-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .uom-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); }}
+    @media (max-width: 560px) { .uom-main .stats-grid { grid-template-columns: 1fr; }}
 
     .uom-main .uom-hidden { display: none; }
     .uom-main .uom-col-full { grid-column: 1 / -1; }
@@ -4240,8 +4077,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     @media (max-width: 900px) {
         .profile-analytics {
             grid-template-columns: 1fr;
-        }
-    }
+        }}
 
 /* ── main/users.php ── */
 /* قاعدة ems-forms.css ':is(.allforms,.ems-form) .form-grid > div { display:block !important }'
@@ -4374,7 +4210,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
 
     .mnt-inspections-main .mnt-empty-line { display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--c-b0a489,#b0a489); padding:24px 10px; }
     .mnt-inspections-main .mnt-empty-line i { font-size:1.9rem; opacity:.5; }
-    @media(max-width:780px){ .mnt-inspections-main .mnt-summary{grid-template-columns:repeat(2,1fr)} }
+    @media(max-width:780px){ .mnt-inspections-main .mnt-summary{grid-template-columns:repeat(2,1fr)}}
 
 /* ── Maintenance/preventive_plans.php ── */
 /* UXW-01 ①: الألوانُ كلُّها برموزِ اللوحة — وما لا رمزَ له بعدُ يُعلَن باسمِ
@@ -4429,7 +4265,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     .mnt-plans-main .mnt-empty-line i { font-size:1.9rem; opacity:.5; }
     .mnt-plans-main .mnt-empty-line span { font-size:.9rem; font-weight:600; }
 
-    @media (max-width:900px){ .mnt-plans-main .mnt-cost-summary{ grid-template-columns:1fr;} }
+    @media (max-width:900px){ .mnt-plans-main .mnt-cost-summary{ grid-template-columns:1fr;}}
 
 /* ── Maintenance/workshop.php ── */
 /* UXW-01 ②: النمطُ الموضعيُّ صار صنفًا — القيمُ ذاتُها بلا style= */
@@ -4508,37 +4344,29 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
 .se-deny{font-family:var(--font-ar, Tahoma);padding:24px}
 .se-deny{font-family:var(--font-ar, Tahoma);padding:24px}
 /* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — الألوانُ رموزٌ من design-tokens.css
+/* ── Operations/shift_entry.php — رُفعت أنماطُ غلافِها الخاصّ (توحيد 2026-08-17)
+   حُوِّلت الشاشةُ إلى الغلافِ الموحَّد، فصارت العُدَّةُ تحمل ما كانت تحمله
+   هذه القواعد: `se-wrap`→`.main.ems-unified-page-shell` · `se-card`→`.card`
+   · `se-grid`/`se-f`→`.form-grid`/`.form-group` · `se-flash`+`se-ok/warn/err`
+   →`alert alert-*` · `se-btn`→`.btn-primary` · `se-empty`→رسالةُ الجدولِ المعرَّبة.
+   وخمسَ عشرةَ قاعدةً صارت بلا مستعملٍ **في الشجرةِ كلِّها** (مقيسًا) فرُفعت —
+   ومنها `se-tbl` وأخواتُها: الجدولُ صار `alltables` فحدودُه وحشوتُه من ورقةِ
+   الجداولِ الموحَّدة، وإبقاءُ القاعدةِ القديمةِ كان يزاحمها لا يكمّلها.
+   وما بقي مستعمَلًا بقي: `se-deny` (شاشةُ المنع) · `se-badge`+`se-b-*` (حالاتُ
+   القيد) · `se-btn2` · `se-unit` · `se-req` · `se-h2b` · `se-hrow` · `se-void-*`. */
    (المطابقُ حرفيًّا بالرمزِ القائم، وما لا رمزَ له فبنمطِ var(--c-hex, قيمته)) */
-.se-wrap{max-width:1180px;margin:0 auto;padding:14px}
-.se-card{background:var(--white);border:1px solid var(--c-e3e6ea);border-radius:10px;padding:16px;margin-bottom:14px}
-.se-card h2{font-size:17px;margin:0 0 4px}
-.se-hint{color:var(--c-5b6572, #5b6572);font-size:13px;margin:0 0 14px}
-.se-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
-.se-f label{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
-.se-f input,.se-f select{width:100%;padding:8px 10px;border:1px solid var(--c-cfd6dd, #cfd6dd);border-radius:7px;font-size:14px;font-family:inherit}
 .se-req{color:var(--c-a12622, #a12622);font-weight:700}
 .se-unit{color:var(--c-5b6572, #5b6572);font-weight:400;font-size:12px}
-.se-flash{padding:11px 14px;border-radius:8px;margin-bottom:14px;font-size:14px;border:1px solid}
-.se-ok{background:var(--c-e8f5ee, #e8f5ee);border-color:var(--c-0b6b3a, #0b6b3a);color:var(--c-0b4a28, #0b4a28)}
-.se-warn{background:var(--c-fdf6e3, #fdf6e3);border-color:var(--c-b8860b, #b8860b);color:var(--c-7a5a06, #7a5a06)}
-.se-err{background:var(--c-fdeaea);border-color:var(--c-a12622, #a12622);color:var(--c-7a1a17, #7a1a17)}
-.se-btn{background:var(--c-0b6b3a, #0b6b3a);color:var(--white);border:0;border-radius:8px;padding:10px 20px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
-.se-btn[disabled]{background:var(--c-adb5bd);cursor:not-allowed}
 .se-btn2{background:var(--white);color:var(--c-33405a, #33405a);border:1px solid var(--c-cfd6dd, #cfd6dd);border-radius:8px;padding:10px 18px;font-size:14px;cursor:pointer;font-family:inherit}
 .se-btn2-sm{padding:5px 12px}
-.se-tbl{width:100%;border-collapse:collapse;font-size:13px}
-.se-tbl th,.se-tbl td{border:1px solid var(--c-e3e6ea);padding:7px 9px;text-align:right}
-.se-tbl th{background:var(--c-f5f7f9, #f5f7f9);font-weight:700}
 .se-badge{display:inline-block;padding:2px 9px;border-radius:11px;font-size:12px;font-weight:700;color:var(--white)}
 .se-b-muted{background:var(--c-6c757d)}
 .se-b-warn{background:var(--c-b8860b, #b8860b)}
 .se-b-ok{background:var(--c-0b6b3a, #0b6b3a)}
 .se-b-err{background:var(--c-a12622, #a12622)}
 .se-hrow{display:grid;grid-template-columns:1.5fr .7fr 1fr 1.6fr auto;gap:8px;margin-bottom:8px;align-items:end}
-.se-empty{text-align:center;color:var(--c-5b6572, #5b6572);padding:26px}
 .se-h2b{margin-top:20px;font-size:15px}
 .se-mt12{margin-top:12px}
-.se-mt18{margin-top:18px}
 .se-void-form{display:flex;gap:6px}
 .se-void-input{width:130px;padding:5px 7px;border:1px solid var(--c-cfd6dd, #cfd6dd);border-radius:6px;font-family:inherit}
 @media(max-width:760px){.se-hrow{grid-template-columns:1fr}}
@@ -4579,8 +4407,8 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     .opp-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-surface); color:var(--c-ink-max); }
     .opp-main .stats-card .stats-title { color: var(--c-555555, #555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
     .opp-main .stats-card .stats-value { color: var(--c-222222, #222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
-    @media (max-width: 900px) { .opp-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
-    @media (max-width: 560px) { .opp-main .stats-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 900px) { .opp-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); }}
+    @media (max-width: 560px) { .opp-main .stats-grid { grid-template-columns: 1fr; }}
 
     .opp-main .opp-hidden { display: none; }
     /* .form-grid هنا flexbox (ems-forms.css) بـ5 أعمدة صلبة — التمدّد لصفٍّ كامل
@@ -4633,10 +4461,10 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     .opp-main .opp-req-countfield label i { color: var(--c-e0ae2e); }
     .opp-main .opp-req-countfield input { width: 100%; text-align: center; }
     .opp-main .opp-req-fieldhint { font-size: .72rem; color: var(--c-8a8f98, #8a8f98); margin-top: 4px; }
-    @media (max-width: 900px) { .opp-main .opp-req-main { flex-direction: column; gap: 14px; } .opp-main .opp-req-counts { border-inline-start: 0; padding-inline-start: 0; border-top: 1px dashed var(--bdr, #D7DBE0); padding-top: 12px; } }
+    @media (max-width: 900px) { .opp-main .opp-req-main { flex-direction: column; gap: 14px; } .opp-main .opp-req-counts { border-inline-start: 0; padding-inline-start: 0; border-top: 1px dashed var(--bdr, #D7DBE0); padding-top: 12px; }}
     .opp-main .opp-req-legacy { background: var(--c-fdf6e3, #FDF6E3); border: 1px dashed var(--c-e0ae2e); border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; font-size: .84rem; color: var(--c-brand-gold-ink-deep); font-weight: 700; }
     .opp-main .opp-req-legacy .opp-req-legacy-hint { font-weight: 400; font-size: .74rem; color: var(--c-8a7a3a, #8a7a3a); margin-top: 3px; }
-    @media (max-width: 560px) { .opp-main .opp-req-summary { grid-template-columns: 1fr 1fr; } .opp-main .opp-req-counts { grid-template-columns: 1fr; } }
+    @media (max-width: 560px) { .opp-main .opp-req-summary { grid-template-columns: 1fr 1fr; } .opp-main .opp-req-counts { grid-template-columns: 1fr; }}
 
     /* ── عرض المتطلبات داخل مودال التفاصيل (خارج .opp-main — المودال في body) ── */
     .opp-reqv-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
@@ -4841,101 +4669,6 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
 .wht-form { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; margin-bottom: 16px; }
     .wht-qty-input { max-width: 110px; }
 
-/* ── Projects/projects.php ── */
-.projects-main .stats-section {
-        border: 1px solid var(--bdr);
-        border-radius: var(--rl);
-        background: linear-gradient(180deg, var(--c-rgba255255255095, rgba(255, 255, 255, .95)) 0%, var(--s2) 100%);
-        box-shadow: var(--sh);
-        padding: 14px;
-        margin-bottom: 14px;
-    }
-
-    .projects-main .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(170px, 1fr));
-        gap: 12px;
-    }
-
-    .projects-main .stats-card {
-        background: var(--c-eeeeee, #eee);
-        border: 1px solid var(--c-aaaaaa, #aaa);
-        border-radius: 35px;
-        padding: 18px;
-        box-shadow: 0 2px 8px var(--c-rgba26188007, rgba(26, 18, 8, .07));
-        position: relative;
-        overflow: hidden;
-    }
-
-    .projects-main .stats-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        right: 0;
-        left: 0;
-        height: 3px;
-        opacity: .9;
-    }
-
-    .projects-main .stats-card .stats-icon {
-        width: 55px;
-        height: 55px;
-        border-radius: 12px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.3rem;
-        margin-bottom: 10px;
-        float: left;
-        vertical-align: middle;
-        margin-top: 15px;
-        border: 1px solid var(--c-ink-400);
-        background-color: var(--c-surface);
-    }
-
-    .projects-main .stats-card .stats-title {
-        color: var(--c-555555, #555);
-        font-size: 0.92rem;
-        font-weight: 700;
-        margin-top: 5px;
-        line-height: 1.3;
-    }
-
-    .projects-main .stats-card .stats-value {
-        color: var(--c-222222, #222);
-        font-size: 1.8rem;
-        line-height: 1;
-        font-weight: 900;
-        font-variant-numeric: tabular-nums;
-        margin-top: 10px;
-        font-size: 35px;
-    }
-
-    .projects-main .stats-primary .stats-icon {
-        background: var(--c-surface);
-        color: var(--c-ink-max);
-    }
-
-    .projects-main .stats-success .stats-icon {
-       background: var(--c-surface);
-        color: var(--c-ink-max);
-    }
-
-    .projects-main .stats-danger .stats-icon {
-         background: var(--c-surface);
-        color: var(--c-ink-max);
-    }
-
-    .projects-main .stats-purple .stats-icon {
-          background: var(--c-surface);
-        color: var(--c-ink-max);
-    }
-
-    .projects-main .stats-cyan .stats-icon {
-         background: var(--c-surface);
-        color: var(--c-ink-max);
-    }
-
     #projectsTable.projects-w100 { width: 100%; }
     #projectsTable .projects-contract-count { font-size: 11px; font-weight: 700; margin-inline-start: 3px; }
 
@@ -4952,18 +4685,6 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     #projectsTable .action-btns {
         flex-wrap: nowrap;
         white-space: nowrap;
-    }
-
-    @media (max-width: 900px) {
-        .projects-main .stats-grid {
-            grid-template-columns: repeat(2, minmax(150px, 1fr));
-        }
-    }
-
-    @media (max-width: 560px) {
-        .projects-main .stats-grid {
-            grid-template-columns: 1fr;
-        }
     }
 
 /* ── Reports/margin_report.php ── */
@@ -5292,8 +5013,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
                 width: 100%;
                 justify-content: center;
                 padding: 13px 24px;
-            }
-        }
+            }}
 
 /* ── Settings/modules.php ── */
 .icon-picker-shell {
@@ -5494,8 +5214,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
 
         .icon-grid {
             grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
-        }
-    }
+        }}
 
 /* ── Suppliers/supplier_closure.php ── */
 /* أنماطُ الشاشةِ الصفحية — الألوانُ رموزٌ من design-tokens.css حصرًا */

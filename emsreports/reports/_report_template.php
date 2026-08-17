@@ -1286,7 +1286,29 @@ $exportQs = http_build_query(array_filter($_GET, function($v){ return $v !== '';
 <link rel="stylesheet" href="/ems/assets/css/bootstrap.min.css">
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+<?php
+/* ══ لوحةُ الرموزِ قبلَ مَن يستهلكها (قرارُ المالك 2026-08-17) ═══════════════
+   ◆ **العطبُ الذي عولج**: كانت شاشاتُ التقاريرِ الخمسُ والعشرون تُحمِّل
+     `ems.main.all.style.css` **بلا `design-tokens.css`** — وتلك الورقةُ مكتوبةٌ
+     كلُّها بـ`var(--c-…)`. فكلُّ رمزٍ يخرج **غيرَ معرَّفٍ**، وكلُّ إعلانٍ
+     يستهلكه يسقط بالتحليل. والمقيسُ بأوراقِ التقريرِ نفسِها قبلَ الإصلاح:
+     `--c-surface` · `--white` · `--c-ink-900` · `--ems-topbar-bg` — كلُّها
+     «غيرُ معرَّفة»، فالشريطُ العلويُّ **شفّافٌ** والرأسُ بلا خلفيةٍ ولا تدرّجٍ
+     والأيقوناتُ حدودُها سوداءُ ونصُّها أسود. صفحةٌ «بلا تصميم» حرفيًّا.
+   ◆ **ولِمَ لم يظهر في بقيةِ النظام**: الشاشاتُ العاديةُ تُضمِّن
+     `insidebar.php` وهو يحقن لوحةَ الرموزِ وقشرتَها بالجافاسكربت. والتقريرُ
+     يُضمِّن `topbar.php` وحدَه — يأخذ الترميزَ ولا يأخذ ما يُلبِسه.
+   ◆ **والترتيبُ مقصود**: الرموزُ **قبلَ** `ems.main.all.style.css` لا بعدَها،
+     فالمستهلِكُ لا يرى رمزًا يُعرَّف بعدَه… ولوحةُ الرموزِ إعلاناتٌ في `:root`
+     تُقرأ عند الحساب لا عند التحليل، لكنّ التقديمَ يبقى الأصحَّ قراءةً ويمنع
+     أيَّ اعتمادٍ على ترتيبٍ عكسيّ.
+   ◆ و`ems-shell.css` معها لأن الشريطَ المشتركَ يحمل قائمةَ الحساب
+     (`.ems-account-panel` · `.ems-ctx-*`) وأنماطُها هناك وحدَها. */
+?>
+<link rel="stylesheet" href="/ems/assets/css/design-tokens.css">
+<link rel="stylesheet" href="/ems/assets/css/uxui-tokens.css">
 <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css">
+<link rel="stylesheet" href="/ems/assets/css/ems-shell.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/dataTables.bootstrap5.min.css">
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.bootstrap5.min.css">
 <script src="/ems/assets/vendor/chartjs/chart.umd.min.js"></script>
@@ -1474,10 +1496,9 @@ body {
     /* وُصِلت بمفاتيحِ ems-tables.css (توحيد 2026-08-17): كانت ترويسةً برتقاليةً
        على أسود — تصميمٌ ثالثٌ للجدولِ الواحد. */
     background: var(--table-header-bg, #6b6b6b);
-    color: var(--table-header-text, #ffffff); font-size: .82rem; font-weight: 900;
+    color: var(--table-header-text, #ffffff); font-size: .82rem;
     border: none; white-space: nowrap; padding: 11px 14px;
-    text-align: center !important;
-}
+    text-align: center !important;}
 #rTable tbody td {
     font-size: .82rem; color: var(--table-text, #161616);
     vertical-align: middle; border-color: var(--table-border, #cccccc); padding: 9px 14px;

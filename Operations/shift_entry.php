@@ -257,204 +257,231 @@ $old = function (string $k, $d = '') use ($formOld) {
     return isset($formOld[$k]) ? htmlspecialchars((string) $formOld[$k], ENT_QUOTES, 'UTF-8') : $d;
 };
 
-/* ═══ ⑧ العرض ════════════════════════════════════════════════════════ */
+/* ═══ ⑧ العرض — الغلافُ الموحَّد (توحيدُ التصميم 2026-08-17) ═══════════════
+   كانت الشاشةُ تُصيَّر بغلافٍ خاصٍّ (`se-wrap` · `se-card` · `se-grid` · `se-f`)
+   لا يشبه بقيةَ النظام: بلا `.main.ems-unified-page-shell` وبلا رأسٍ موحَّد.
+   ولم يكن الفارقُ شكلًا فحسب — الرأسُ الموحَّدُ يحمل زرَّ «عن الشاشة» وسطرَ
+   السياقِ ومرساةَ شريطِ الرحلة، وثلاثتُها تسقط بغيابِه.
+   والأنماطُ الخاصةُ رُفعت من `ems-screens.css`: ما تحمله العُدَّةُ لا يُكرَّر. */
+/* `$page_title` قبلَ القشرةِ لا بعدَها: `inheader.php` يقرؤه في السطر 39، وكان
+   غائبًا فيُسجَّل تحذيرُ «متغيّرٌ غيرُ معرَّف» في **كلِّ** فتحةِ صفحة (مقيسٌ في
+   السجلِّ منذ 06:45)، ويخرج عنوانُ التبويبِ فارغًا. */
+$page_title = 'إيكوبيشن | قيدُ الوردية اليومي';
 require_once __DIR__ . '/../includes/screen_contract.php';
+ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-
-
-<div class="se-wrap ems-doc-cycle" dir="rtl">
+<div class="main ems-unified-page-shell ems-doc-cycle" dir="rtl">
 <?php
+$header_title   = 'قيدُ الوردية اليومي';
+$header_icon    = 'fa fa-clipboard-check';
+$header_actions = array();
+$header_back    = array('href' => '../main/dashboard.php', 'class' => '',
+                        'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
+include __DIR__ . '/../includes/page_header.php';
+
+/* بوابة ١٢: قيدُ الورديةِ دورةٌ مستندية — خطوتُها التالية مُعلَنة */
+echo ems_next_step('مراجعةُ الموقعِ واعتمادُ القيدِ المُرسَل');
 /* حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة */
 echo ems_states_bundle('لم يُسجَّل قيدُ ورديةٍ بعدُ', 'ابدأ بنموذجِ القيدِ أعلى الشاشة');
 ?>
 
-  <div class="se-card">
-    <h2>قيدُ الوردية اليومي</h2>
-    <?php /* بوابة ١٢: قيدُ الورديةِ دورةٌ مستندية — خطوتُها التاليةُ معلَنة */
-    echo ems_next_step('مراجعةُ الموقعِ واعتمادُ القيدِ المُرسَل'); ?>
-    <p class="se-hint">
-      سجّلْ سطرًا واحدًا لكلِّ آليةٍ في كلِّ ورديةٍ في كلِّ يوم: ساعاتُها ووقودُها وعدّادُها ومشغّلُها.
-      الحقولُ الموسومةُ <span class="se-req">*</span> إلزاميةٌ قبلَ الحفظ.
-    </p>
-
 <?php if ($flash): ?>
-    <div class="se-flash se-<?= $flash['kind'] === 'ok' ? 'ok' : ($flash['kind'] === 'warn' ? 'warn' : 'err') ?>">
-      <?= htmlspecialchars($flash['text'], ENT_QUOTES, 'UTF-8') ?>
-      <?php if (!empty($flash['ref'])): ?>
-        — رقمُ القيد: <strong><?= htmlspecialchars((string) $flash['ref'], ENT_QUOTES, 'UTF-8') ?></strong>
-      <?php endif; ?>
+    <div class="alert alert-<?= $flash['kind'] === 'ok' ? 'success' : ($flash['kind'] === 'warn' ? 'warning' : 'danger') ?>">
+      <span><?= htmlspecialchars($flash['text'], ENT_QUOTES, 'UTF-8') ?><?php
+        if (!empty($flash['ref'])): ?> — رقمُ القيد: <strong><?= htmlspecialchars((string) $flash['ref'], ENT_QUOTES, 'UTF-8') ?></strong><?php endif; ?></span>
     </div>
 <?php endif; ?>
 
 <?php if (!$CAN_RECORD): ?>
-    <div class="se-flash se-warn">
-      تستطيع الاطّلاعَ ولا تستطيع التسجيل. لا تملك صلاحيةَ تسجيلِ قيدِ الوردية — راجِعْ مديرَك.
+    <div class="alert alert-warning">
+      <span>تستطيع الاطّلاعَ ولا تستطيع التسجيل. لا تملك صلاحيةَ تسجيلِ قيدِ الوردية.</span>
     </div>
 <?php endif; ?>
 
-    <form method="post" autocomplete="off">
-      <?= csrf_field() ?>
-      <input type="hidden" name="action" value="record">
-
-      <div class="se-grid">
-        <div class="se-f">
-          <label>التاريخ <span class="se-req">*</span></label>
-          <input type="date" name="entry_date" aria-label="التاريخ" value="<?= $old('entry_date', $today) ?>" required>
+  <?php /* `ems-form` لا `allforms`: هذه شاشةُ إدخالٍ يوميٍّ نموذجُها هو العمل،
+           فيبقى مفتوحًا. والصنفُ يعطي جلدَ الحقولِ الموحَّدَ بلا سلوكِ الطيّ. */ ?>
+  <form method="post" autocomplete="off" class="ems-form">
+    <?= csrf_field() ?>
+    <input type="hidden" name="action" value="record">
+    <div class="card">
+      <div class="card-header"><h5><i class="fa fa-clipboard-check"></i> قيدُ الوردية اليومي</h5></div>
+      <div class="card-body">
+        <div class="alert alert-info">
+          <i class="fa fa-circle-info"></i>
+          <span>سجّلْ سطرًا واحدًا لكلِّ آليةٍ في كلِّ ورديةٍ في كلِّ يوم.
+            الحقولُ الموسومةُ <span class="se-req">*</span> إلزاميةٌ قبلَ الحفظ.</span>
         </div>
-        <div class="se-f">
-          <label>الآلية <span class="se-req">*</span></label>
-          <select name="equipment_id" aria-label="الآلية" required>
-            <option value="">— اختر الآلية —</option>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="se_date">التاريخ <span class="se-req">*</span></label>
+            <input type="date" name="entry_date" id="se_date" aria-label="التاريخ" value="<?= $old('entry_date', $today) ?>" required>
+          </div>
+          <div class="form-group">
+            <label for="se_equip">الآلية <span class="se-req">*</span></label>
+            <select name="equipment_id" id="se_equip" aria-label="الآلية" required>
+              <option value="">— اختر الآلية —</option>
 <?php foreach ($equipments as $e): ?>
-            <option value="<?= (int) $e['id'] ?>" <?= $old('equipment_id') == $e['id'] ? 'selected' : '' ?>>
-              <?= htmlspecialchars($e['code'], ENT_QUOTES, 'UTF-8') ?>
-            </option>
-<?php endforeach; ?>
-          </select>
-        </div>
-        <div class="se-f">
-          <label>الوردية <span class="se-req">*</span></label>
-          <select name="shift" aria-label="الوردية" required>
-            <option value="day"   <?= $old('shift') === 'day' ? 'selected' : '' ?>>نهار</option>
-            <option value="night" <?= $old('shift') === 'night' ? 'selected' : '' ?>>ليل</option>
-          </select>
-        </div>
-        <div class="se-f">
-          <label>الكمية المنفَّذة <span class="se-req">*</span></label>
-          <input type="number" step="0.01" min="0" name="qty" aria-label="الكمية المنفَّذة" value="<?= $old('qty') ?>" required>
-        </div>
-        <div class="se-f">
-          <label>وحدة القياس <span class="se-req">*</span></label>
-          <select name="unit_type" aria-label="وحدة القياس" required>
-            <option value="hour"  <?= $old('unit_type', 'hour') === 'hour'  ? 'selected' : '' ?>>ساعة</option>
-            <option value="ton"   <?= $old('unit_type') === 'ton'   ? 'selected' : '' ?>>طن</option>
-            <option value="meter" <?= $old('unit_type') === 'meter' ? 'selected' : '' ?>>متر</option>
-            <option value="trip"  <?= $old('unit_type') === 'trip'  ? 'selected' : '' ?>>رحلة</option>
-          </select>
-        </div>
-        <div class="se-f">
-          <label>قراءةُ العدّادِ قبل <span class="se-unit">(ساعة عدّاد)</span></label>
-          <input type="number" step="0.01" min="0" name="meter_before" aria-label="قراءةُ العدّادِ قبل" value="<?= $old('meter_before') ?>">
-        </div>
-        <div class="se-f">
-          <label>قراءةُ العدّادِ بعد <span class="se-unit">(ساعة عدّاد)</span></label>
-          <input type="number" step="0.01" min="0" name="meter_after" aria-label="قراءةُ العدّادِ بعد" value="<?= $old('meter_after') ?>">
-        </div>
-        <div class="se-f">
-          <label>وقودٌ مستلَم <span class="se-unit">(لتر)</span></label>
-          <input type="number" step="0.01" min="0" name="fuel_received_qty" aria-label="وقودٌ مستلَم باللتر" value="<?= $old('fuel_received_qty', '0') ?>">
-        </div>
-        <div class="se-f">
-          <label>وقودٌ مصروف <span class="se-unit">(لتر)</span></label>
-          <input type="number" step="0.01" min="0" name="fuel_issued_qty" aria-label="وقودٌ مصروف باللتر" value="<?= $old('fuel_issued_qty', '0') ?>">
-        </div>
-        <div class="se-f">
-          <label>مفتاحُ الحاوية <span class="se-unit">(اختياري)</span></label>
-          <input type="text" name="container_key" aria-label="مفتاحُ الحاوية" maxlength="32" value="<?= $old('container_key') ?>">
-        </div>
-      </div>
-
-      <h2 class="se-h2b">توزيعُ ساعاتِ الوردية <span class="se-req">*</span></h2>
-      <p class="se-hint">
-        كلُّ سطرٍ حالةٌ واحدةٌ بساعاتِها وطرفِها المسؤول. يمكنك إضافةُ أكثرَ من سببِ توقفٍ في الورديةِ نفسِها.
-        ومجموعُ الساعاتِ لا يتجاوز <strong>٢٤ ساعة</strong>.
-      </p>
-      <div id="se-hours">
-        <div class="se-hrow">
-          <div class="se-f">
-            <label>الحالة</label>
-            <select name="h_state[]" aria-label="حالةُ سطرِ الساعات">
-              <option value="">— اختر —</option>
-<?php foreach ($OPS_STATES as $s): ?>
-              <option value="<?= htmlspecialchars($s, ENT_QUOTES, 'UTF-8') ?>" <?= $s === 'actual_work' ? 'selected' : '' ?>>
-                <?= htmlspecialchars($OPS_AR[$s] ?? $s, ENT_QUOTES, 'UTF-8') ?>
+              <option value="<?= (int) $e['id'] ?>" <?= $old('equipment_id') == $e['id'] ? 'selected' : '' ?>>
+                <?= htmlspecialchars($e['code'], ENT_QUOTES, 'UTF-8') ?>
               </option>
 <?php endforeach; ?>
             </select>
           </div>
-          <div class="se-f">
-            <label>الساعات <span class="se-unit">(ساعة)</span></label>
-            <input type="number" step="0.25" min="0" max="24" name="h_hours[]" aria-label="ساعاتُ السطر">
-          </div>
-          <div class="se-f">
-            <label>الطرفُ المسؤول</label>
-            <select name="h_party[]" aria-label="الطرفُ المسؤول">
-<?php foreach ($PARTY_AR as $k => $v): ?>
-              <option value="<?= $k ?>" <?= $k === 'company' ? 'selected' : '' ?>><?= $v ?></option>
-<?php endforeach; ?>
+          <div class="form-group">
+            <label for="se_shift">الوردية <span class="se-req">*</span></label>
+            <select name="shift" id="se_shift" aria-label="الوردية" required>
+              <option value="day"   <?= $old('shift') === 'day' ? 'selected' : '' ?>>نهار</option>
+              <option value="night" <?= $old('shift') === 'night' ? 'selected' : '' ?>>ليل</option>
             </select>
           </div>
-          <div class="se-f">
-            <label>سببُ التوقف <span class="se-unit">(عند التوقف)</span></label>
-            <input type="text" name="h_note[]" aria-label="سببُ التوقف" maxlength="190">
+          <div class="form-group">
+            <label for="se_qty">الكمية المنفَّذة <span class="se-req">*</span></label>
+            <input type="number" step="0.01" min="0" name="qty" id="se_qty" aria-label="الكمية المنفَّذة" value="<?= $old('qty') ?>" required>
           </div>
-          <div><button type="button" class="se-btn2" onclick="seAddRow()">+ سطر</button></div>
+          <div class="form-group">
+            <label for="se_unit">وحدة القياس <span class="se-req">*</span></label>
+            <select name="unit_type" id="se_unit" aria-label="وحدة القياس" required>
+              <option value="hour"  <?= $old('unit_type', 'hour') === 'hour'  ? 'selected' : '' ?>>ساعة</option>
+              <option value="ton"   <?= $old('unit_type') === 'ton'   ? 'selected' : '' ?>>طن</option>
+              <option value="meter" <?= $old('unit_type') === 'meter' ? 'selected' : '' ?>>متر</option>
+              <option value="trip"  <?= $old('unit_type') === 'trip'  ? 'selected' : '' ?>>رحلة</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="se_mb">قراءةُ العدّادِ قبل <span class="se-unit">(ساعة عدّاد)</span></label>
+            <input type="number" step="0.01" min="0" name="meter_before" id="se_mb" aria-label="قراءةُ العدّادِ قبل" value="<?= $old('meter_before') ?>">
+          </div>
+          <div class="form-group">
+            <label for="se_ma">قراءةُ العدّادِ بعد <span class="se-unit">(ساعة عدّاد)</span></label>
+            <input type="number" step="0.01" min="0" name="meter_after" id="se_ma" aria-label="قراءةُ العدّادِ بعد" value="<?= $old('meter_after') ?>">
+          </div>
+          <div class="form-group">
+            <label for="se_fr">وقودٌ مستلَم <span class="se-unit">(لتر)</span></label>
+            <input type="number" step="0.01" min="0" name="fuel_received_qty" id="se_fr" aria-label="وقودٌ مستلَم باللتر" value="<?= $old('fuel_received_qty') ?>">
+          </div>
+          <div class="form-group">
+            <label for="se_fi">وقودٌ مصروف <span class="se-unit">(لتر)</span></label>
+            <input type="number" step="0.01" min="0" name="fuel_issued_qty" id="se_fi" aria-label="وقودٌ مصروف باللتر" value="<?= $old('fuel_issued_qty') ?>">
+          </div>
+          <div class="form-group">
+            <label for="se_ck">مفتاحُ الحاوية <span class="se-unit">(اختياري)</span></label>
+            <input type="text" name="container_key" id="se_ck" aria-label="مفتاحُ الحاوية" maxlength="32" value="<?= $old('container_key') ?>">
+          </div>
+        </div>
+
+        <h3 class="se-h2b">توزيعُ ساعاتِ الوردية <span class="se-req">*</span></h3>
+        <div class="alert alert-info">
+          <i class="fa fa-circle-info"></i>
+          <span>كلُّ سطرٍ حالةٌ واحدةٌ بساعاتِها وطرفِها المسؤول. يمكنك إضافةُ أسطر،
+            ومجموعُ الساعاتِ لا يتجاوز <strong>٢٤ ساعة</strong>.</span>
+        </div>
+        <?php /* `se-hrow` و`se-hours` يبقيان: الجافاسكربت يستنسخ الصفَّ بهما.
+                 و`form-grid` معهما فيأخذ الصفُّ تخطيطَ الشبكةِ الموحَّدة. */ ?>
+        <div id="se-hours">
+          <div class="se-hrow form-grid">
+            <div class="form-group">
+              <label>الحالة</label>
+              <select name="h_state[]" aria-label="حالةُ سطرِ الساعات">
+                <option value="">— اختر —</option>
+<?php foreach ($OPS_STATES as $s): ?>
+                <option value="<?= htmlspecialchars($s, ENT_QUOTES, 'UTF-8') ?>" <?= $s === 'actual_work' ? 'selected' : '' ?>>
+                  <?= htmlspecialchars($OPS_AR[$s] ?? $s, ENT_QUOTES, 'UTF-8') ?>
+                </option>
+<?php endforeach; ?>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>الساعات <span class="se-unit">(ساعة)</span></label>
+              <input type="number" step="0.25" min="0" max="24" name="h_hours[]" aria-label="ساعاتُ السطر">
+            </div>
+            <div class="form-group">
+              <label>الطرفُ المسؤول</label>
+              <select name="h_party[]" aria-label="الطرفُ المسؤول">
+<?php foreach ($PARTY_AR as $k => $v): ?>
+                <option value="<?= $k ?>" <?= $k === 'company' ? 'selected' : '' ?>><?= $v ?></option>
+<?php endforeach; ?>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>سببُ التوقف <span class="se-unit">(عند التوقف)</span></label>
+              <input type="text" name="h_note[]" aria-label="سببُ التوقف" maxlength="190">
+            </div>
+            <div class="se-hrow-act"><button type="button" class="btn-secondary se-btn2" onclick="seAddRow()">+ سطر</button></div>
+          </div>
+        </div>
+
+        <div class="form-grid se-mt12">
+          <div class="form-group form-grid-full">
+            <label for="se_note">ملاحظاتٌ ميدانية</label>
+            <input type="text" name="note" id="se_note" aria-label="ملاحظاتٌ ميدانية" maxlength="500" value="<?= $old('note') ?>">
+          </div>
+        </div>
+
+        <div class="pu-form-actions">
+          <button type="submit" class="btn-primary" <?= $CAN_RECORD ? '' : 'disabled' ?>><i class="fas fa-save"></i> احفظ القيدَ وأرسِلْه</button>
         </div>
       </div>
+    </div>
+  </form>
 
-      <div class="se-f se-mt12">
-        <label>ملاحظاتٌ ميدانية</label>
-        <input type="text" name="note" aria-label="ملاحظاتٌ ميدانية" maxlength="500" value="<?= $old('note') ?>">
+  <div class="card">
+    <div class="card-header"><h5><i class="fa fa-list"></i> ما سُجِّل اليوم — <?= htmlspecialchars($today, ENT_QUOTES, 'UTF-8') ?></h5></div>
+    <div class="card-body">
+      <div class="alert alert-info">
+        <i class="fa fa-circle-info"></i>
+        <span>قيودُ هذا اليومِ في كيانِك. الحالةُ بلونٍ ونصٍّ معًا.</span>
       </div>
-
-      <div class="se-mt18">
-        <button type="submit" class="se-btn" <?= $CAN_RECORD ? '' : 'disabled' ?>>احفظ القيدَ وأرسِلْه للمراجعة</button>
-      </div>
-    </form>
-  </div>
-
-  <div class="se-card">
-    <h2>ما سُجِّل اليوم — <?= htmlspecialchars($today, ENT_QUOTES, 'UTF-8') ?></h2>
-    <p class="se-hint">قيودُ هذا اليومِ في كيانِك. الحالةُ بلونٍ ونصٍّ معًا.</p>
-<?php if (!$todayRows): ?>
-    <div class="se-empty">لم يُسجَّل قيدٌ اليومَ بعد. ابدأْ بالنموذجِ أعلاه.</div>
-<?php else: ?>
-    <table class="se-tbl">
-      <thead><tr>
-        <th>رقمُ القيد</th><th>الآلية</th><th>الوردية</th><th>الكمية</th>
-        <th>ساعاتُ التشغيل</th><th>مجموعُ الساعات</th><th>العدّاد</th><th>وقودٌ مصروف</th><th>الحالة</th>
-        <?= $CAN_VOID ? '<th>إلغاء</th>' : '' ?>
-      </tr></thead>
-      <tbody>
+      <div class="table-container">
+        <?php /* الجدولُ يُصيَّر دائمًا — والفراغُ تحمله رسالةُ العُدَّةِ المعرَّبة،
+                 فلا فقرةُ فراغٍ محليّةٌ تخصُّ شاشةً واحدة. */ ?>
+        <table class="alltables display nowrap">
+          <thead><tr>
+            <th>رقمُ القيد</th><th>الآلية</th><th>الوردية</th><th>الكمية</th>
+            <th>ساعاتُ التشغيل</th><th>مجموعُ الساعات</th><th>العدّاد</th><th>وقودٌ مصروف</th><th>الحالة</th>
+            <?= $CAN_VOID ? '<th>إلغاء</th>' : '' ?>
+          </tr></thead>
+          <tbody>
 <?php foreach ($todayRows as $r):
         $sk = (string) $r['state'];
         $sv = $STATE_AR[$sk] ?? [$sk, 'se-b-muted']; ?>
-        <tr>
-          <td><?= htmlspecialchars((string) $r['entry_no'], ENT_QUOTES, 'UTF-8') ?></td>
-          <td><?= htmlspecialchars((string) $r['machine'], ENT_QUOTES, 'UTF-8') ?></td>
-          <td><?= $r['shift'] === 'night' ? 'ليل' : 'نهار' ?></td>
-          <td><?= number_format((float) $r['qty'], 2) ?> <span class="se-unit"><?= htmlspecialchars((string) $r['unit_type'], ENT_QUOTES, 'UTF-8') ?></span></td>
-          <td><?= $r['run_h'] !== null ? number_format((float) $r['run_h'], 2) . ' <span class="se-unit">ساعة</span>' : '—' ?></td>
-          <td><?= $r['total_hours'] !== null ? number_format((float) $r['total_hours'], 2) . ' <span class="se-unit">ساعة</span>' : '—' ?></td>
-          <td><?= ($r['meter_before'] !== null && $r['meter_after'] !== null)
-                    ? number_format((float) $r['meter_after'] - (float) $r['meter_before'], 2) . ' <span class="se-unit">ساعة عدّاد</span>'
-                    : '—' ?></td>
-          <td><?= number_format((float) $r['fuel_issued_qty'], 2) ?> <span class="se-unit">لتر</span></td>
-          <td><span class="se-badge <?= htmlspecialchars($sv[1], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($sv[0], ENT_QUOTES, 'UTF-8') ?></span></td>
+            <tr>
+              <td><?= htmlspecialchars((string) $r['entry_no'], ENT_QUOTES, 'UTF-8') ?></td>
+              <td><?= htmlspecialchars((string) $r['machine'], ENT_QUOTES, 'UTF-8') ?></td>
+              <td><?= $r['shift'] === 'night' ? 'ليل' : 'نهار' ?></td>
+              <td><?= number_format((float) $r['qty'], 2) ?> <span class="se-unit"><?= htmlspecialchars((string) $r['unit_type'], ENT_QUOTES, 'UTF-8') ?></span></td>
+              <td><?= $r['run_h'] !== null ? number_format((float) $r['run_h'], 2) . ' <span class="se-unit">ساعة</span>' : '—' ?></td>
+              <td><?= $r['total_hours'] !== null ? number_format((float) $r['total_hours'], 2) . ' <span class="se-unit">ساعة</span>' : '—' ?></td>
+              <td><?= ($r['meter_before'] !== null && $r['meter_after'] !== null)
+                        ? number_format((float) $r['meter_after'] - (float) $r['meter_before'], 2) . ' <span class="se-unit">ساعة</span>'
+                        : '—' ?></td>
+              <td><?= number_format((float) $r['fuel_issued_qty'], 2) ?> <span class="se-unit">لتر</span></td>
+              <td><span class="se-badge <?= htmlspecialchars($sv[1], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($sv[0], ENT_QUOTES, 'UTF-8') ?></span></td>
 <?php if ($CAN_VOID): ?>
-          <td>
+              <td>
 <?php if (in_array($sk, ['reversed', 'cancelled', 'superseded'], true)): ?>
-            <span class="se-unit">—</span>
+                <span class="se-unit">—</span>
 <?php else: ?>
-            <form method="post" onsubmit="return seConfirmVoid(this)" class="se-void-form">
-              <?= csrf_field() ?>
-              <input type="hidden" name="action" value="void">
-              <input type="hidden" name="entry_id" value="<?= (int) $r['id'] ?>">
-              <input type="text" name="void_reason" placeholder="سببُ الإلغاء" required maxlength="190"
-                     class="se-void-input">
-              <button type="submit" class="se-btn2 se-btn2-sm">ألغِ</button>
-            </form>
+                <form method="post" onsubmit="return seConfirmVoid(this)" class="se-void-form">
+                  <?= csrf_field() ?>
+                  <input type="hidden" name="action" value="void">
+                  <input type="hidden" name="entry_id" value="<?= (int) $r['id'] ?>">
+                  <input type="text" name="void_reason" placeholder="سببُ الإلغاء" required maxlength="190"
+                         class="se-void-input">
+                  <button type="submit" class="btn-secondary se-btn2 se-btn2-sm">ألغِ</button>
+                </form>
 <?php endif; ?>
-          </td>
+              </td>
 <?php endif; ?>
-        </tr>
+            </tr>
 <?php endforeach; ?>
-      </tbody>
-    </table>
-<?php endif; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 

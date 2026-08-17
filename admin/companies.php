@@ -138,14 +138,13 @@ require_once __DIR__ . '/includes/layout_head.php';
         <table>
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th>الإجراءات</th>
                     <th>الشركة</th>
                     <th>البريد الإلكتروني</th>
                     <th>خطة الاشتراك</th>
                     <th>المستخدمون</th>
                     <th>الحالة</th>
                     <th>تاريخ الانضمام</th>
-                    <th>الإجراءات</th>
                 </tr>
             </thead>
             <tbody>
@@ -155,29 +154,6 @@ require_once __DIR__ . '/includes/layout_head.php';
                     $sl   = ['pending'=>'قيد المراجعة','active'=>'نشط','suspended'=>'موقوف','cancelled'=>'ملغاة'];
                 ?>
                 <tr>
-                    <td class="text-muted"><?php echo $offset + $i + 1; ?></td>
-                    <td>
-                        <div style="font-weight:700;"><?php echo e($co['display_name']); ?></div>
-                        <?php if (!empty($co['phone'])): ?>
-                        <div class="text-muted"><?php echo e($co['phone']); ?></div>
-                        <?php endif; ?>
-                    </td>
-                    <td><?php echo e($co['email']); ?></td>
-                    <td>
-                        <?php if ($co['plan_name']): ?>
-                            <span class="badge bg-blue"><?php echo e($co['plan_name']); ?></span>
-                        <?php else: ?>
-                            <span class="text-muted">—</span>
-                        <?php endif; ?>
-                    </td>
-                    <td><?php echo intval(isset($co['users_count']) ? $co['users_count'] : 0); ?></td>
-                    <td>
-                        <span class="badge <?php echo isset($sc[$st]) ? $sc[$st] : 'bg-gray'; ?>">
-                            <i class="fas fa-circle" style="font-size:0.5rem;"></i>
-                            <?php echo isset($sl[$st]) ? $sl[$st] : $st; ?>
-                        </span>
-                    </td>
-                    <td class="text-muted"><?php echo e(date('d/m/Y', strtotime($co['created_at']))); ?></td>
                     <td>
                         <div class="flex">
                             <a href="<?php echo e(super_admin_url('companies/' . intval($co['id']))); ?>"
@@ -245,6 +221,28 @@ require_once __DIR__ . '/includes/layout_head.php';
                             </form>
                         </div>
                     </td>
+                    <td>
+                        <div style="font-weight:700;"><?php echo e($co['display_name']); ?></div>
+                        <?php if (!empty($co['phone'])): ?>
+                        <div class="text-muted"><?php echo e($co['phone']); ?></div>
+                        <?php endif; ?>
+                    </td>
+                    <td><?php echo e($co['email']); ?></td>
+                    <td>
+                        <?php if ($co['plan_name']): ?>
+                            <span class="badge bg-blue"><?php echo e($co['plan_name']); ?></span>
+                        <?php else: ?>
+                            <span class="text-muted">—</span>
+                        <?php endif; ?>
+                    </td>
+                    <td><?php echo intval(isset($co['users_count']) ? $co['users_count'] : 0); ?></td>
+                    <td>
+                        <span class="badge <?php echo isset($sc[$st]) ? $sc[$st] : 'bg-gray'; ?>">
+                            <i class="fas fa-circle" style="font-size:0.5rem;"></i>
+                            <?php echo isset($sl[$st]) ? $sl[$st] : $st; ?>
+                        </span>
+                    </td>
+                    <td class="text-muted"><?php echo e(date('d/m/Y', strtotime($co['created_at']))); ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

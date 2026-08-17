@@ -892,11 +892,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <table id="projectDriversTable" class="display nowrap table-full-width">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>الإجراءات</th>
                                 <th>الآلية</th>
                                 <th>عدد السائقين</th>
                                 <th>السائقون</th>
-                                <th>الإجراءات</th>
                                                 <!-- U10-B12: النواة الحاكمة (الخلايا يحشوها ui-unification.js) -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                     <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المُنشئ — الاسم والصفة</th>
@@ -906,7 +905,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </thead>
                         <tbody>
                             <?php
-                            $idx = 1;
                             foreach ($project_equipments as $eq) {
                                 $eq_id = intval($eq['id']);
                                 $eq_label = trim((string) $eq['code']) . ' - ' . trim((string) $eq['name']);
@@ -930,11 +928,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 }
 
                                 echo '<tr>';
-                                echo '<td>' . $idx++ . '</td>';
-                                echo '<td><strong><a href="add_drivers.php?equipment_id=' . $eq_id . '" class="equipment-name-link" title="انقر لإدارة السائقين">' . htmlspecialchars($eq_label, ENT_QUOTES, 'UTF-8') . '</a></strong></td>';
-                                echo '<td><span class="drivers-count-badge"><i class="fas fa-user"></i>' . $driver_count . '</span></td>';
-                                echo '<td><div class="drivers-icons-wrap">' . $drivers_tooltip_html . '</div></td>';
-
                                 echo '<td>';
                                 if ($can_edit) {
                                     $eq_drivers_json = htmlspecialchars(json_encode($eq_drivers, JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8');
@@ -947,7 +940,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 } else {
                                     echo '<span class="driver-no-permission">لا توجد صلاحية تعديل</span>';
                                 }
-                                echo '</td>';
+                                echo '</td> ';
+                                echo '<td><strong><a href="add_drivers.php?equipment_id=' . $eq_id . '" class="equipment-name-link" title="انقر لإدارة السائقين">' . htmlspecialchars($eq_label, ENT_QUOTES, 'UTF-8') . '</a></strong></td>';
+                                echo '<td><span class="drivers-count-badge"><i class="fas fa-user"></i>' . $driver_count . '</span></td>';
+                                echo '<td><div class="drivers-icons-wrap">' . $drivers_tooltip_html . '</div></td>';
+
+                                echo '';
                                     echo '</tr>';
                             }
                             ?>

@@ -221,7 +221,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="table-wrap eop-table-wrap">
         <table class="data-table eop-table-full" id="opTable">
             <thead>
-                <tr><th>إجراءات</th><th>#</th><th>كود المشغّل</th><th>المسمى</th><th>الرخصة</th><th>فئة الرخصة</th><th>تاريخ انتهاء الرخصة</th><th>الصلاحية</th><th>الحالة</th>
+                <tr><th>إجراءات</th><th>كود المشغّل</th><th>المسمى</th><th>الرخصة</th><th>فئة الرخصة</th><th>تاريخ انتهاء الرخصة</th><th>الصلاحية</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">كود الموظف</th>
               <th class="ems-fn-th" data-fn="1">الاسم الرباعي</th>
@@ -261,7 +261,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     LEFT JOIN employees e ON e.id = o.employee_id
                     LEFT JOIN job_titles jt ON jt.id = e.job_title_id
                     WHERE {TENANT_SCOPE} ORDER BY o.id DESC", array());
-            $i = 1;
             { foreach ($op_rows as $row):
                 list($vtext, $vclass) = ems_license_validity($row['license_expiry_date']);
             ?>
@@ -270,7 +269,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php if ($can_edit): ?><a href="equipment_operators.php?edit=<?= intval($row['id']) ?>" class="action-btn edit" title="تعديل"><i class="fas fa-edit"></i></a><?php endif; ?>
                         <?php if ($can_delete): ?><a href="javascript:void(0);" class="action-btn delete" title="حذف" onclick="confirmDel(<?= intval($row['id']) ?>, '<?= htmlspecialchars($row['emp_name'], ENT_QUOTES) ?>')"><i class="fas fa-trash"></i></a><?php endif; ?>
                     </div></td>
-                    <td><?= $i++ ?></td>
                     <td><strong><?= htmlspecialchars($row['emp_name'] ?: '-') ?></strong></td>
                     <td><?= htmlspecialchars($row['title'] ?: '-') ?></td>
                     <td><?= htmlspecialchars($row['license_number'] ?: '-') ?></td>
@@ -281,7 +279,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tr>
             <?php endforeach; }
             if (empty($op_rows)): ?>
-                <tr><td colspan="9" class="eop-empty-cell">لا يوجد مشغّلون مسجّلون بعد.</td></tr>
+                <tr><td colspan="8" class="eop-empty-cell">لا يوجد مشغّلون مسجّلون بعد.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>

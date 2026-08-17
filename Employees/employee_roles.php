@@ -179,7 +179,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="table-wrap er-table-wrap">
         <table class="data-table er-table-full" id="erTable">
             <thead>
-                <tr><th>إجراءات</th><th>#</th><th>الدور</th><th>الوصف</th><th>الموظفون</th><th>النطاق</th><th>الحالة</th>
+                <tr><th>إجراءات</th><th>الدور</th><th>الوصف</th><th>الموظفون</th><th>النطاق</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
@@ -198,7 +198,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 'enrich' => array('e' => 'employees'),
             ), "SELECT er.*, (SELECT COUNT(*) FROM employees e WHERE e.employee_role_id = er.id) AS used_count
                     FROM employee_roles er WHERE {TENANT_SCOPE} ORDER BY er.sort_order, er.name", array());
-            $i = 1;
             { foreach ($er_rows as $row):
                 $is_global  = ($row['company_id'] === null);
                 $can_manage = $is_super_admin || (!$is_global && intval($row['company_id']) === $company_id);
@@ -215,7 +214,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php endif; ?>
                         <?php if (!$can_manage): ?><span class="badge er-badge-muted">عامّ</span><?php endif; ?>
                     </div></td>
-                    <td><?= $i++ ?></td>
                     <td><strong><?= htmlspecialchars($row['name']) ?></strong></td>
                     <td><?= htmlspecialchars($row['description'] ?: '-') ?></td>
                     <td><span class="badge badge-info"><?= intval($row['used_count']) ?></span></td>
@@ -224,7 +222,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tr>
             <?php endforeach; }
             if (empty($er_rows)): ?>
-                <tr><td colspan="7" class="er-empty-cell">لا توجد أدوار بعد.</td></tr>
+                <tr><td colspan="6" class="er-empty-cell">لا توجد أدوار بعد.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>

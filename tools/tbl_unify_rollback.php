@@ -52,7 +52,10 @@ $CREATED = array(
     'tools/tbl_unify_split_patch.php',
     'tools/flat_gray_surfaces_audit.php',
     'tools/gray_surfaces_by_department.php',
-    'tools/sticky_header_offset_probe.php',   // فاحصُ الطبقاتِ الرماديّة (بلاغُ contracts_details)
+    'tools/sticky_header_offset_probe.php',
+    'tools/table_style_ownership_audit.php',
+    'tools/inline_table_styles_report.php',
+    'tools/inline_table_styles_sweep.php',   // فاحصُ الطبقاتِ الرماديّة (بلاغُ contracts_details)
 );
 
 /* ── الرجوعُ/الإعادةُ الجراحيّان — كتلُ الجولةِ وحدَها ── */
@@ -72,8 +75,31 @@ if (($apply || $redo) && is_file($PATCH)) {
        . escapeshellarg($PATCH) . ' 2>&1', $out2, $code2);
     if ($code2 !== 0) { fwrite(STDERR, implode(PHP_EOL, $out2) . PHP_EOL); exit(1); }
 
-    echo ($apply ? '  ↩ عُكِست' : '  ⟳ أُعيدت') . ' كتلُ الجولةِ في ١٤ ملفًّا'
+    echo ($apply ? '  ↩ عُكِست' : '  ⟳ أُعيدت') . ' كتلُ الجولةِ في ملفاتِ القائمةِ الأصلية'
        . ' — وكتلُ غيرِها لم تُمسّ.' . PHP_EOL;
+
+    /* ── ملفاتُ الكنسِ وحدَها: استعادةٌ كاملةٌ لا رقعة ─────────────────────────
+       الكنسُ **حذفٌ محضٌ** بلا سطرٍ مضاف، فلا يحمل بصمةً تميّزه — فصنّفه فارزُ
+       الكتلِ «كتلَ غيري» وكان سيتركه بعدَ الرجوع. ولا يصحُّ توسيعُ البصماتِ
+       لتشمل ألوانًا عامّةً (`#f8f9fa`) لأنها تُطابق عملَ غيري أيضًا.
+       فهذه الملفاتُ الخمسةَ عشرَ لم يلمسها في هذه الجولةِ إلا الكنس، ونسخُها
+       أُخذ **لحظةَ** تنفيذه — فاستعادتُها كاملةً دقيقةٌ لا مُقارِبة. */
+    $sweepList = $BK . '/SWEEP_ONLY.txt';
+    if (is_file($sweepList)) {
+        $sw = array_values(array_filter(array_map('trim', file($sweepList))));
+        $swN = 0;
+        foreach ($sw as $rel) {
+            $src = $apply ? ($BK . '/' . $rel) : ($BK . '/_after/' . $rel);
+            $dst = $ROOT . '/' . $rel;
+            if (!is_file($src)) { echo '  ⚠ نسخةٌ مفقودة: ' . $rel . PHP_EOL; continue; }
+            if (is_file($dst) && file_get_contents($dst) === file_get_contents($src)) continue;
+            if (!is_dir(dirname($dst))) mkdir(dirname($dst), 0777, true);
+            copy($src, $dst);
+            $swN++;
+        }
+        echo '  ' . ($apply ? '↩ استُعيدت' : '⟳ أُعيدت') . ' ' . $swN
+           . ' من ' . count($sw) . ' ملفًّا لمسها الكنسُ وحدَه (استعادةٌ كاملة).' . PHP_EOL;
+    }
 
     $n = 0;
     foreach ($CREATED as $rel) {

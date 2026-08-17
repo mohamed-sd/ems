@@ -328,7 +328,6 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                     <thead>
                         <tr>
                             <th>الإجراءات</th>
-                            <th>#</th>
                             <th>كود السياسة</th>
                             <th>فئة الأصل</th>
                             <th>الماركة/الموديل</th>
@@ -375,7 +374,6 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                                LEFT JOIN fleet_model fm ON fm.id = p.model_id
                               WHERE {TENANT_SCOPE} AND p.is_deleted = 0
                               ORDER BY p.id DESC");
-                        $i = 1;
                         foreach ($dep_list as $row):
                             $unit = $row['method'] === 'sl' ? 'سنة' : 'ساعة';
                             $brand_model = trim(($row['brand'] ?? '') . (!empty($row['model_code']) ? (($row['brand'] ? ' / ' : '') . $row['model_code']) : ''));
@@ -406,7 +404,6 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                                         <?php endif; ?>
                                     </div>
                                 </td>
-                                <td><?= $i++; ?></td>
                                 <td><?= $e($row['code']); ?></td>
                                 <td><?= $e($row['asset_category']); ?></td>
                                 <td><?= $e($brand_model !== '' ? $brand_model : '—'); ?></td>

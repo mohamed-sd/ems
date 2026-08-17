@@ -258,7 +258,19 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
     }
     ?>
 
-    <ul>
+    <?php /* مُرشِّحُ القائمة — يُصيَّر للأدوارِ على المصدرِ الموحَّد فقط (حيث المجموعاتُ حيّة) */ ?>
+    <?php if (!empty($__nav_unified)) : ?>
+    <div class="nav-filter" id="navFilterBox">
+      <i class="fa fa-search nav-filter-icon" aria-hidden="true"></i>
+      <input type="search" id="navFilterInput" autocomplete="off"
+             placeholder="ابحث في القائمة…" aria-label="ابحث في قائمة التنقل"
+             aria-controls="sidebarNavList">
+      <button type="button" class="nav-filter-clear" id="navFilterClear" aria-label="مسح البحث">✕</button>
+      <div class="nav-filter-empty" role="status" aria-live="polite">لا رابطَ يطابق بحثك.</div>
+    </div>
+    <?php endif; ?>
+
+    <ul id="sidebarNavList">
       <?php
       /* «الرئيسية» لم تعد رابطًا ثابتًا (2026-07-27): انتقلت صفًّا في باب HOME
          بالمصدر الموحّد `nav_items` لكل الأدوار الـ23 — تحقيقًا لقاعدة الدستور
@@ -624,15 +636,29 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
      * ◆ ولا يُمَسُّ سلوكُ النقرِ (أكورديون بقرارِ المالك 2026-08-02) — هذا
      *   **الافتراضُ والاسترجاعُ** لا التفاعل.
      * ═══════════════════════════════════════════════════════════════════════ */
+    /* ── تحديثُ 2026-08-17 (قرارُ المالك): «مجموعةٌ واحدةٌ فاتحةٌ في كلِّ مرّة»
+     *   ◆ الافتراضُ صار **الكلُّ مطويّ** من الخادمِ نفسِه (`unified_nav.php`)،
+     *     فلا وميضَ فتحٍ ثم طيٍّ عند التحميل — الترميزُ يصل مطويًّا أصلًا.
+     *   ◆ **والاسترجاعُ يحترم الأكورديون**: كان يُعيد فتحَ **كلِّ** مفتاحٍ
+     *     محفوظ. والنقرُ لا يحفظ إلا واحدًا اليوم، لكنّ خبيئةً قديمةً في متصفّحٍ
+     *     زار النظامَ قبلَ الأكورديون تحمل عدّةَ مفاتيح — فيعود المستخدمُ إلى
+     *     ثلاثِ مجموعاتٍ مفتوحةٍ ويُنقض القرارُ من حيث لا يُرى. فيُؤخذ **آخرُ**
+     *     مفتاحٍ محفوظٍ لا غير، ويُعاد كتبُ المحفوظِ مُشذَّبًا فلا يتكرّر الأمر. */
     var saved = readOpen();
     if (saved.length) {
+      var only = null;
+      for (var si = saved.length - 1; si >= 0 && only === null; si--) {
+        for (var gi = 0; gi < groups.length; gi++) {
+          if (groups[gi].getAttribute('data-group-key') === saved[si]) { only = saved[si]; break; }
+        }
+      }
       groups.forEach(function (g) {
-        var k = g.getAttribute('data-group-key');
-        var want = saved.indexOf(k) !== -1;
+        var want = g.getAttribute('data-group-key') === only;
         g.classList.toggle('open', want);
         var h = g.querySelector('.nav-group-head');
         if (h) h.setAttribute('aria-expanded', want ? 'true' : 'false');
       });
+      writeOpen(only ? [only] : []);
     }
 
     // المجموعة المختارة: المحفوظة إن كانت لا تزال مرئيّة، وإلا فأوّل مجموعة.
@@ -656,6 +682,85 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
         setSelected(g.getAttribute('data-group-key'), true);
       });
     });
+
+    /* ═══════════════════════════════════════════════════════════════════════
+     * مُرشِّحُ القائمة — حرفانِ بدل نقرتين ومسحٍ بصريّ
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ **العلّةُ المقيسة**: الدورُ الثقيلُ يرى ٦٢–٩٢ رابطًا، وأكبرُ مجموعاتِه
+     *   خمسةٌ وثلاثون رابطًا، والطيُّ **أكورديونٌ** (واحدةٌ مفتوحةٌ لا غير) —
+     *   فالوصولُ إلى رابطٍ خارجَ المفتوحةِ نقرتان ومسحٌ بالعين.
+     * ◆ **ولا يُخرج رابطًا من مجموعتِه** (قرارُ المالك): الترشيحُ **إظهارٌ
+     *   وإخفاءٌ داخلَ البنيةِ نفسِها** — الرابطُ يبقى تحتَ رأسِ مجموعتِه.
+     * ◆ **ويردُّ ما كان**: تُلتقط حالةُ الفتحِ قبلَ أولِ حرفٍ وتُعاد عند المسح،
+     *   فلا يسرق الترشيحُ اختيارَ المستخدمِ المحفوظ.
+     * ◆ ولا يُلمس `localStorage` أثناءَ الترشيح — وإلا حُفظ فتحُ الترشيحِ كأنه
+     *   اختيارُ المستخدم. */
+    (function () {
+      var box = document.getElementById('navFilterBox');
+      var inp = document.getElementById('navFilterInput');
+      if (!box || !inp) return;
+      var clearBtn = document.getElementById('navFilterClear');
+      var snapshot = null;
+
+      function norm(s) {
+        return (s || '').toString().toLowerCase()
+          .replace(/[ً-ْٰ]/g, '')      /* التشكيل */
+          .replace(/[آأإٱ]/g, 'ا')  /* الألف بأشكالها */
+          .replace(/ى/g, 'ي').replace(/ة/g, 'ه')
+          .replace(/\s+/g, ' ').trim();
+      }
+
+      function restore() {
+        sb.classList.remove('is-filtering');
+        box.classList.remove('is-empty');
+        Array.prototype.forEach.call(sb.querySelectorAll('.nav-hidden'), function (el) {
+          el.classList.remove('nav-hidden');
+        });
+        if (snapshot) {
+          groups.forEach(function (g) {
+            var want = snapshot.indexOf(g.getAttribute('data-group-key')) !== -1;
+            g.classList.toggle('open', want);
+            var h = g.querySelector('.nav-group-head');
+            if (h) h.setAttribute('aria-expanded', want ? 'true' : 'false');
+          });
+          snapshot = null;
+        }
+      }
+
+      function apply(qRaw) {
+        var q = norm(qRaw);
+        box.classList.toggle('has-value', q !== '');
+        if (q === '') { restore(); return; }
+        if (snapshot === null) { snapshot = currentOpenKeys(); }
+        sb.classList.add('is-filtering');
+
+        var hits = 0;
+        groups.forEach(function (g) {
+          var found = 0;
+          Array.prototype.forEach.call(g.querySelectorAll('li'), function (li) {
+            var a = li.querySelector(':scope > a[href]');
+            if (!a) return;
+            var match = norm(a.textContent).indexOf(q) !== -1;
+            li.classList.toggle('nav-hidden', !match);
+            if (match) { found++; }
+          });
+          hits += found;
+          g.classList.toggle('nav-hidden', found === 0);
+          g.classList.toggle('open', found > 0);
+          var h = g.querySelector('.nav-group-head');
+          if (h) h.setAttribute('aria-expanded', found > 0 ? 'true' : 'false');
+        });
+        box.classList.toggle('is-empty', hits === 0);
+      }
+
+      inp.addEventListener('input', function () { apply(inp.value); });
+      inp.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { inp.value = ''; apply(''); inp.blur(); }
+      });
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function () { inp.value = ''; apply(''); inp.focus(); });
+      }
+    })();
   })();
 
   const sidebar       = document.getElementById('sidebar');

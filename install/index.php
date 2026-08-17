@@ -152,10 +152,9 @@ button{background:#f5c451;color:#14161b;border:0;border-radius:9px;padding:11px 
   font:600 15px inherit;cursor:pointer;margin-left:10px}
 button.ghost{background:transparent;color:#f5c451;border:1px solid #4a4433}
 table{width:100%;border-collapse:collapse;font-size:14px}
-td{padding:7px 6px;border-bottom:1px solid #22262f;vertical-align:top}
-td.st{width:26px;text-align:center;font-weight:700}
-td.lb{width:230px;color:#c3c9d4}
-td.dt{color:#8d95a3}
+td{padding:7px 6px;vertical-align:top;}
+td.st{width:26px;text-align:center;}
+td.lb{width:230px;}
 .ok{color:#5ec27f}.no{color:#e5706b}
 .banner{border-radius:10px;padding:13px 16px;margin-bottom:18px;font-size:14px}
 .b-ok{background:#12291b;border:1px solid #2c5c3c;color:#8fe0aa}

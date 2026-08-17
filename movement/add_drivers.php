@@ -642,28 +642,17 @@ include("../inheader.php");
     }
 
     table.dataTable thead th {
-        background: linear-gradient(135deg, var(--navy), var(--navy-l));
-        color: white;
         padding: 14px;
-        font-weight: 700;
         text-align: center;
-        border: none;
-        font-size: 0.9rem;
-    }
+        border: none;}
 
     table.dataTable tbody td {
         padding: 14px;
         text-align: center;
-        border-bottom: 1px solid var(--border);
-        vertical-align: middle;
-        font-size: 0.88rem;
-        color: var(--txt);
-    }
+        vertical-align: middle;}
 
     table.dataTable tbody tr:hover {
-        background: var(--gold-soft);
-        transition: all var(--ease);
-    }
+        transition: all var(--ease);}
 
     .status-badge {
         display: inline-flex;
@@ -1156,14 +1145,13 @@ include("../inheader.php");
                     <table id="projectsTable" class="display nowrap adrv-table-full" data-order='[[0,"asc"]]' data-page-length="25">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>الإجراءات</th>
                                 <th>اسم المشغل</th>
                                 <th>رقم الهاتف</th>
                                 <th>تاريخ البداية</th>
                                 <th>تاريخ النهاية</th>
                                 <th>نظام الوردية</th>
                                 <th>الحالة</th>
-                                <th>الإجراءات</th>
                                                 <!-- U10-B12: النواة الحاكمة (الخلايا يحشوها ui-unification.js) -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                     <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المُنشئ — الاسم والصفة</th>
@@ -1173,7 +1161,6 @@ include("../inheader.php");
                         </thead>
                         <tbody>
                             <?php
-                            $i = 1;
                             foreach ($linked as $row):
                                 $statusClass = $row['status'] ? 'status-active' : 'status-inactive';
                                 $statusIcon = $row['status'] ? 'check-circle' : 'times-circle';
@@ -1203,7 +1190,16 @@ include("../inheader.php");
                                 }
                                 ?>
                                 <tr>
-                                    <td><strong><?php echo $i++; ?></strong></td>
+                                    <td>
+                                        <div class="action-btns">
+                                            <a href="delete_equipment_driver.php?id=<?php echo $row['id']; ?>&equipment_id=<?php echo $equipment_id; ?>"
+                                                class="action-btn <?php echo $actionClass; ?>"
+                                                onclick="return confirm('هل أنت متأكد من <?php echo $actionText; ?> هذا المشغل؟')"
+                                                title="<?php echo $actionText; ?>">
+                                                <i class="fas fa-<?php echo $actionIcon; ?>"></i>
+                                            </a>
+                                        </div>
+                                    </td>
                                     <td><strong><?php echo htmlspecialchars($row['name']); ?></strong></td>
                                     <td><?php echo htmlspecialchars($row['phone']); ?></td>
                                     <td><?php echo $row['start_date'] ? date('Y-m-d', strtotime($row['start_date'])) : '-'; ?>
@@ -1224,16 +1220,6 @@ include("../inheader.php");
                                             <i class="fas fa-<?php echo $statusIcon; ?>"></i>
                                             <?php echo $statusText; ?>
                                         </span>
-                                    </td>
-                                    <td>
-                                        <div class="action-btns">
-                                            <a href="delete_equipment_driver.php?id=<?php echo $row['id']; ?>&equipment_id=<?php echo $equipment_id; ?>"
-                                                class="action-btn <?php echo $actionClass; ?>"
-                                                onclick="return confirm('هل أنت متأكد من <?php echo $actionText; ?> هذا المشغل؟')"
-                                                title="<?php echo $actionText; ?>">
-                                                <i class="fas fa-<?php echo $actionIcon; ?>"></i>
-                                            </a>
-                                        </div>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

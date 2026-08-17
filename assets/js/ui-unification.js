@@ -1291,13 +1291,53 @@
         });
     }
 
+    /* ══ الكنسُ يُكبَح: المراقبُ كان يُشعل نفسَه ═══════════════════════════════
+       ◆ **العطلُ المقيس** (شاشةُ الورديات · مشروعٌ بـ٢١٦ عملية): كان الرابطُ
+         `new MutationObserver(sweepTables)` على الجسمِ كلِّه بـ`subtree:true`،
+         و`sweepTables` **يُعدِّل ما يراقبه** (حشوُ خلايا الحوكمة · تهيئةُ
+         الجداول · إلحاقُ أزرارِ إكسل). فكلُّ تعديلٍ يُطلق كنسةً، وكلُّ كنسةٍ
+         تُطلق تعديلًا — بلا مكبحٍ ولا حارسِ إعادةِ دخول. وعلى صفحةٍ ثقيلةٍ
+         **يتجمّد المُصيِّرُ حتى لا تُفتح الصفحة**؛ وقِيس حيًّا: إدراجُ جدولٍ
+         واحدٍ صغيرٍ في تلك الصفحةِ يُعلّق التبويبةَ أكثرَ من ثلاثين ثانية.
+       ◆ **والعلاجُ ثلاثةُ قيودٍ لا تغيّر سلوكًا**:
+         ① **حارسُ إعادةِ الدخول**: كنسةٌ جاريةٌ لا تُستأنف من داخلِ نفسِها.
+         ② **فصلُ المراقبِ أثناءَ الكنس** ثم إعادةُ وصلِه — فتعديلاتُ الكنسِ
+            لا تُحسب حدثًا جديدًا.
+         ③ **تجميعُ النداءات** في نافذةٍ قصيرةٍ (١٢٠ مللي) — فعشرةُ تعديلاتٍ
+            متتاليةٍ كنسةٌ واحدة.
+       ◆ وما يُضاف من جداولَ ديناميكيةٍ يُطبَّع كما كان — بتأخيرٍ لا يُدرَك. */
     function bootUnifiedTables() {
-        sweepTables();
-        setTimeout(sweepTables, 250);
-        setTimeout(sweepTables, 900);
+        var sweeping = false;
+        var pending  = null;
+        var observer = null;
+
+        function reconnect() {
+            if (!observer) { return; }
+            try { observer.observe(document.body, { childList: true, subtree: true }); } catch (e) {}
+        }
+
+        function safeSweep() {
+            if (sweeping) { return; }
+            sweeping = true;
+            if (observer) { try { observer.disconnect(); } catch (e) {} }
+            try { sweepTables(); }
+            finally {
+                sweeping = false;
+                reconnect();
+            }
+        }
+
+        function scheduleSweep() {
+            if (pending) { return; }
+            pending = setTimeout(function () { pending = null; safeSweep(); }, 120);
+        }
+
+        safeSweep();
+        setTimeout(safeSweep, 250);
+        setTimeout(safeSweep, 900);
         if (window.MutationObserver) {
-            var observer = new MutationObserver(sweepTables);
-            observer.observe(document.body, { childList: true, subtree: true });
+            observer = new MutationObserver(scheduleSweep);
+            reconnect();
         }
     }
 

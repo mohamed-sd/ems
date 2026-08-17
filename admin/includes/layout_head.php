@@ -266,18 +266,12 @@ a { text-decoration: none; }
 /* ═══════════════════════════ TABLE ═══════════════════════════ */
 .tbl-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
-thead th {
-    background: var(--surface); padding: 10px 14px;
-    text-align: right; font-size: 0.78rem; font-weight: 700;
-    color: var(--ink-2); border-bottom: 2px solid var(--line);
-    white-space: nowrap;
-}
+thead th { padding: 10px 14px;
+    text-align: right; border-bottom: 2px solid var(--line);
+    white-space: nowrap;}
 tbody td {
-    padding: 11px 14px; border-bottom: 1px solid var(--line);
-    font-size: 0.86rem; vertical-align: middle;
-}
+    padding: 11px 14px; vertical-align: middle;}
 tbody tr:last-child td { border-bottom: none; }
-tbody tr:hover { background: #fafbfd; }
 
 /* ═══════════════════════════ BADGES ═══════════════════════════ */
 .badge {

@@ -210,8 +210,8 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <div class="table-container">
         <table class="alltables display nowrap orgasg-w100">
-            <thead><tr><th>#</th><th>الشخص</th><th>نوع التكليف</th><th>الوحدة المكلَّف بها</th><th>النطاق</th>
-                <th>من تاريخ</th><th>إلى تاريخ</th><th>النائب</th><th>الحالة</th><th>إجراءات</th>
+            <thead><tr><th>إجراءات</th> <th>#</th><th>الشخص</th><th>نوع التكليف</th><th>الوحدة المكلَّف بها</th><th>النطاق</th>
+                <th>من تاريخ</th><th>إلى تاريخ</th><th>النائب</th><th>الحالة</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                 <th class="ems-fn-th" data-fn="1">رقم التكليف</th>
                 <th class="ems-fn-th" data-fn="1">الموظف</th>
@@ -232,17 +232,6 @@ include '../insidebar.php';
             <tbody>
             <?php foreach ($rows as $x): ?>
                 <tr>
-                    <td><?php echo intval($x['asg_id']); ?></td>
-                    <td><?php echo htmlspecialchars($x['person_name'] ?: ('#' . $x['person_id'])); ?></td>
-                    <td><?php echo htmlspecialchars($x['type_name']); ?></td>
-                    <td><?php echo htmlspecialchars($x['unit_name']); ?></td>
-                    <td><?php echo htmlspecialchars($x['scope_label']); ?></td>
-                    <td><?php echo htmlspecialchars($x['valid_from']); ?></td>
-                    <td><?php echo htmlspecialchars($x['valid_to']); ?></td>
-                    <td><?php echo htmlspecialchars($x['deputy_name'] ?: '—'); ?></td>
-                    <td><?php echo $x['state'] === 'active' ? '<span class="badge badge-success">نافذ</span>'
-                            : ($x['state'] === 'suspended' ? '<span class="badge badge-warning">معلَّق</span>'
-                            : '<span class="badge badge-secondary">منتهٍ</span>'); ?></td>
                     <td>
                         <a class="action-btn" href="?audit=<?php echo intval($x['asg_id']); ?>" title="السجل"><i class="fas fa-history"></i></a>
                         <?php if ($can_edit && $x['state'] !== 'ended'): ?>
@@ -254,6 +243,17 @@ include '../insidebar.php';
                         </form>
                         <?php endif; ?>
                     </td>
+                    <td><?php echo intval($x['asg_id']); ?></td>
+                    <td><?php echo htmlspecialchars($x['person_name'] ?: ('#' . $x['person_id'])); ?></td>
+                    <td><?php echo htmlspecialchars($x['type_name']); ?></td>
+                    <td><?php echo htmlspecialchars($x['unit_name']); ?></td>
+                    <td><?php echo htmlspecialchars($x['scope_label']); ?></td>
+                    <td><?php echo htmlspecialchars($x['valid_from']); ?></td>
+                    <td><?php echo htmlspecialchars($x['valid_to']); ?></td>
+                    <td><?php echo htmlspecialchars($x['deputy_name'] ?: '—'); ?></td>
+                    <td><?php echo $x['state'] === 'active' ? '<span class="badge badge-success">نافذ</span>'
+                            : ($x['state'] === 'suspended' ? '<span class="badge badge-warning">معلَّق</span>'
+                            : '<span class="badge badge-secondary">منتهٍ</span>'); ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>

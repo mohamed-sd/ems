@@ -239,41 +239,24 @@ include __DIR__ . '/../inheader.php';
             width: 100%;
             border-collapse: separate;
             border-spacing: 0;
-            border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 3px 15px var(--c-rgba000008, rgba(0,0,0,0.08));
-            margin-bottom: 2rem;
-        }
-
-        .modern-table thead {
-            background: linear-gradient(135deg, var(--c-667eea, #667eea) 0%, var(--c-764ba2, #764ba2) 100%);
-            color: white;
-        }
+            margin-bottom: 2rem;}
 
         .modern-table thead th {
             padding: 1rem;
-            font-weight: 700;
-            text-align: center;
-            font-size: 1rem;
-        }
+            text-align: center;}
 
         .modern-table tbody tr {
-            transition: all 0.3s ease;
-            background: white;
-        }
+            transition: all 0.3s ease;}
 
         .modern-table tbody tr:hover {
-            background: linear-gradient(135deg, var(--c-f8f9fa, #f8f9fa) 0%, var(--c-e9ecef, #e9ecef) 100%);
             transform: scale(1.01);
-            box-shadow: 0 2px 10px var(--c-rgba00001, rgba(0,0,0,0.1));
-        }
+            box-shadow: 0 2px 10px var(--c-rgba00001, rgba(0,0,0,0.1));}
 
         .modern-table tbody td {
             padding: 1rem;
-            text-align: center;
-            border-bottom: 1px solid var(--c-e9ecef, #e9ecef);
-            font-weight: 500;
-        }
+            text-align: center;}
 
         /* Modals Enhancement */
         .modal-content {

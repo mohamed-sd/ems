@@ -536,6 +536,7 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
         <table>
             <thead>
                 <tr>
+                    <th>الإجراءات</th>
                     <th>الشركة</th>
                     <th>البريد الإلكتروني</th>
                     <th>الخطة المطلوبة</th>
@@ -545,12 +546,22 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
                     <th>ملاحظة المراجعة</th>
                     <th>تاريخ المراجعة</th>
                     <?php endif; ?>
-                    <?php if ($tab === 'pending'): ?><th>الإجراءات</th><?php endif; ?>
+                    <?php if ($tab === 'pending'): ?><?php endif; ?>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($requests as $req): ?>
                 <tr>
+                    <td>
+                        <div class="flex">
+                            <button class="btn btn-primary btn-sm" onclick="reviewRequest(<?php echo intval($req['id']); ?>, 'approve', '<?php echo e($req['company_name']); ?>')">
+                                <i class="fas fa-check"></i> قبول
+                            </button>
+                            <button class="btn btn-danger btn-sm" onclick="reviewRequest(<?php echo intval($req['id']); ?>, 'reject', '<?php echo e($req['company_name']); ?>')">
+                                <i class="fas fa-times"></i> رفض
+                            </button>
+                        </div>
+                    </td>
                     <td style="font-weight:700;"><?php echo e(isset($req['company_name']) ? $req['company_name'] : '—'); ?></td>
                     <td><?php echo e(isset($req['email']) ? $req['email'] : '—'); ?></td>
                     <td>
@@ -575,16 +586,6 @@ require_once dirname(__DIR__) . '/includes/layout_head.php';
                     <td class="text-muted"><?php echo $req['reviewed_at'] ? e(date('d/m/Y', strtotime($req['reviewed_at']))) : '—'; ?></td>
                     <?php endif; ?>
                     <?php if ($tab === 'pending'): ?>
-                    <td>
-                        <div class="flex">
-                            <button class="btn btn-primary btn-sm" onclick="reviewRequest(<?php echo intval($req['id']); ?>, 'approve', '<?php echo e($req['company_name']); ?>')">
-                                <i class="fas fa-check"></i> قبول
-                            </button>
-                            <button class="btn btn-danger btn-sm" onclick="reviewRequest(<?php echo intval($req['id']); ?>, 'reject', '<?php echo e($req['company_name']); ?>')">
-                                <i class="fas fa-times"></i> رفض
-                            </button>
-                        </div>
-                    </td>
                     <?php endif; ?>
                 </tr>
                 <?php endforeach; ?>

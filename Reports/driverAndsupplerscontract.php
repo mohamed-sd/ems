@@ -28,19 +28,6 @@ include __DIR__ . '/../inheader.php';
 <style>
         .main { font-family: 'Cairo', sans-serif; }
 
-        .report-table thead th {
-            background: var(--c-f8fafc, #f8fafc);
-            color: var(--c-0c1c3e, #0c1c3e);
-            font-weight: 800;
-            border-color: var(--c-rgba12286201, rgba(12, 28, 62, 0.1));
-        }
-
-        .report-table td {
-            border-color: var(--c-rgba122862008, rgba(12, 28, 62, 0.08));
-            color: var(--c-0c1c3e, #0c1c3e);
-            font-weight: 600;
-        }
-
         .total-hours-box {
             background: linear-gradient(135deg, var(--c-rgba13148136012, rgba(13, 148, 136, 0.12)), var(--c-rgba13148136006, rgba(13, 148, 136, 0.06)));
             border: 1px solid var(--c-rgba13148136025, rgba(13, 148, 136, 0.25));

@@ -231,16 +231,15 @@ echo ems_states_bundle('لا أدوارَ وظيفيةً معرَّفةً بعد
         </div>
         <div class="card-body">
             <div class="table-container">
-                <table id="rolesTable" class="display" data-column-defs='[{"orderable":false,"targets":[6]}]'>
+                <table id="rolesTable" class="display" data-column-defs='[{"orderable":false,"targets":[0]}]'>
                     <thead>
                         <tr>
-                            <th width="80"><i class="fas fa-barcode"></i> #</th>
+                            <th width="120"><i class="fas fa-cogs"></i> إجراءات</th>
                             <th><i class="fas fa-tag"></i> اسم الصلاحية</th>
                             <th><i class="fas fa-sitemap"></i> الدور الأب</th>
                             <th width="100"><i class="fas fa-layer-group"></i> المستوى التنظيمي</th>
                             <th width="100"><i class="fas fa-toggle-on"></i> الحالة</th>
                             <th width="120"><i class="fas fa-calendar"></i> تاريخ الإنشاء</th>
-                            <th width="120"><i class="fas fa-cogs"></i> إجراءات</th>
                             <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                             <th class="ems-fn-th" data-fn="1">كود الدور</th>
                             <th class="ems-fn-th" data-fn="1">اسم الدور</th>
@@ -279,7 +278,6 @@ echo ems_states_bundle('لا أدوارَ وظيفيةً معرَّفةً بعد
                         } else {
                             $roles_name_map = array();
                             foreach ($result as $rn) { $roles_name_map[intval($rn['id'])] = $rn['name']; }
-                            $i = 1;
                             foreach ($result as $row):
                                 $row['parent_name'] = ($row['parent_role_id'] !== null && isset($roles_name_map[intval($row['parent_role_id'])]))
                                     ? $roles_name_map[intval($row['parent_role_id'])] : null;
@@ -288,7 +286,18 @@ echo ems_states_bundle('لا أدوارَ وظيفيةً معرَّفةً بعد
                                     : '<span class="status-inactive"><i class="fas fa-times-circle"></i> غير نشط</span>';
                                 ?>
                                 <tr>
-                                    <td><strong><?= $i++; ?></strong></td>
+                                    <td class="text-center">
+                                        <a href="javascript:void(0);"
+                                            onclick="editRole(<?= htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8'); ?>)"
+                                            class="btn btn-sm btn-primary rls-edit-btn" title="تعديل">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="javascript:void(0);"
+                                            onclick="confirmDelete(<?= $row['id']; ?>, '<?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>')"
+                                            class="btn btn-sm btn-danger rls-del-btn" title="حذف">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
                                     <td>
                                         <a href="modules.php?role_id=<?= $row['id']; ?>" class="rls-role-link">
                                             <strong><?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?></strong>
@@ -314,18 +323,6 @@ echo ems_states_bundle('لا أدوارَ وظيفيةً معرَّفةً بعد
                                         <small class="rls-muted">
                                             <?= date('Y-m-d', strtotime($row['created_at'])); ?>
                                         </small>
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="javascript:void(0);"
-                                            onclick="editRole(<?= htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8'); ?>)"
-                                            class="btn btn-sm btn-primary rls-edit-btn" title="تعديل">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="javascript:void(0);"
-                                            onclick="confirmDelete(<?= $row['id']; ?>, '<?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>')"
-                                            class="btn btn-sm btn-danger rls-del-btn" title="حذف">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
                                     </td>
                                 </tr>
                             <?php

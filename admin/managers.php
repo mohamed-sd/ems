@@ -338,30 +338,17 @@ require_once __DIR__ . '/includes/layout_head.php';
         <table>
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th>الإجراءات</th>
                     <th>الاسم</th>
                     <th>البريد الإلكتروني</th>
                     <th>الحالة</th>
                     <th>آخر تسجيل دخول</th>
                     <th>تاريخ الإنشاء</th>
-                    <th>الإجراءات</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($managers as $i => $m): ?>
                 <tr>
-                    <td class="text-muted"><?php echo $offset + $i + 1; ?></td>
-                    <td style="font-weight:700;"><?php echo e($m['name']); ?></td>
-                    <td><?php echo e($m['email']); ?></td>
-                    <td>
-                        <?php if (intval($m['is_active']) === 1): ?>
-                        <span class="badge bg-green">نشط</span>
-                        <?php else: ?>
-                        <span class="badge bg-red">غير نشط</span>
-                        <?php endif; ?>
-                    </td>
-                    <td class="text-muted"><?php echo $m['last_login_at'] ? e(date('d/m/Y H:i', strtotime($m['last_login_at']))) : '—'; ?></td>
-                    <td class="text-muted"><?php echo e(date('d/m/Y', strtotime($m['created_at']))); ?></td>
                     <td>
                         <div class="flex" style="flex-wrap:wrap;gap:6px;">
                             <button type="button"
@@ -383,6 +370,17 @@ require_once __DIR__ . '/includes/layout_head.php';
                             </form>
                         </div>
                     </td>
+                    <td style="font-weight:700;"><?php echo e($m['name']); ?></td>
+                    <td><?php echo e($m['email']); ?></td>
+                    <td>
+                        <?php if (intval($m['is_active']) === 1): ?>
+                        <span class="badge bg-green">نشط</span>
+                        <?php else: ?>
+                        <span class="badge bg-red">غير نشط</span>
+                        <?php endif; ?>
+                    </td>
+                    <td class="text-muted"><?php echo $m['last_login_at'] ? e(date('d/m/Y H:i', strtotime($m['last_login_at']))) : '—'; ?></td>
+                    <td class="text-muted"><?php echo e(date('d/m/Y', strtotime($m['created_at']))); ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>
@@ -473,30 +471,17 @@ require_once __DIR__ . '/includes/layout_head.php';
         <table>
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th>الإجراءات</th>
                     <th>الاسم</th>
                     <th>البريد الإلكتروني</th>
                     <th>الحالة</th>
                     <th>آخر تسجيل دخول</th>
                     <th>تاريخ الإنشاء</th>
-                    <th>الإجراءات</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($managers as $i => $m): ?>
                 <tr>
-                    <td class="text-muted"><?php echo $offset + $i + 1; ?></td>
-                    <td style="font-weight:700;"><?php echo e($m['name']); ?></td>
-                    <td><?php echo e($m['email']); ?></td>
-                    <td>
-                        <?php if (intval($m['is_active']) === 1): ?>
-                        <span class="badge bg-green">نشط</span>
-                        <?php else: ?>
-                        <span class="badge bg-red">غير نشط</span>
-                        <?php endif; ?>
-                    </td>
-                    <td class="text-muted"><?php echo $m['last_login_at'] ? e(date('d/m/Y H:i', strtotime($m['last_login_at']))) : '—'; ?></td>
-                    <td class="text-muted"><?php echo e(date('d/m/Y', strtotime($m['created_at']))); ?></td>
                     <td>
                         <div class="flex" style="flex-wrap:wrap;gap:6px;">
                             <button type="button"
@@ -518,6 +503,17 @@ require_once __DIR__ . '/includes/layout_head.php';
                             </form>
                         </div>
                     </td>
+                    <td style="font-weight:700;"><?php echo e($m['name']); ?></td>
+                    <td><?php echo e($m['email']); ?></td>
+                    <td>
+                        <?php if (intval($m['is_active']) === 1): ?>
+                        <span class="badge bg-green">نشط</span>
+                        <?php else: ?>
+                        <span class="badge bg-red">غير نشط</span>
+                        <?php endif; ?>
+                    </td>
+                    <td class="text-muted"><?php echo $m['last_login_at'] ? e(date('d/m/Y H:i', strtotime($m['last_login_at']))) : '—'; ?></td>
+                    <td class="text-muted"><?php echo e(date('d/m/Y', strtotime($m['created_at']))); ?></td>
                 </tr>
                 <?php endforeach; ?>
             </tbody>

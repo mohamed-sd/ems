@@ -21,6 +21,7 @@
 
 require_once __DIR__ . '/dynamic_nav.php';
 require_once __DIR__ . '/nav_icon_map.php';
+require_once __DIR__ . '/nav_groups.php';
 
 /** الأبواب الثمانية (UX-00 §6 معدَّلًا بقرار DEC-01 ② الصريح — لا تنفيذ صامتًا).
  * HOME هو باب «① الرئيسية» الدستوري: عنصرٌ واحدٌ لكل دورٍ يفتح لوحتَه
@@ -745,10 +746,422 @@ function printUxuiCanonicalNav($items, $map, $basePrefix, $badges) {
     }
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+ * العشرُ مجموعاتٍ (نصُّ المالك 2026-08-17) — رأسٌ واحدٌ لكلِّ مجموعةٍ لا رأسان
+ * ══════════════════════════════════════════════════════════════════════════
+ * ◆ **العيبُ الذي تُغلقه هذه الطبقة**: الرؤوسُ كانت تُطبع من **مصدرين
+ *   منفصلَين** (`printUxuiCanonicalNav` للمعتمَدِ و`printUxuiCurrentNav`
+ *   للمعلَّق) وكلٌّ يفتح غلافَه — فبلغ وسطيُّ الرؤوسِ ٢١ رأسًا للإدارة وأعلاه
+ *   ٤٥. وهنا **مسارٌ واحدٌ للطباعة**: كلُّ البنودِ تُنسب ثم تُطبع مرةً واحدة.
+ *
+ * ◆ **طبقتان**: عشرُ رؤوسٍ للتوجُّه، وتحتَها أقسامٌ بعناوينِ المصفوفةِ الدقيقة
+ *   للمسح — فلا يُفقد المعنى الذي بُني عبرَ الجولات، بل يهبط درجةً.
+ *
+ * ◆ **والاسمُ لا يتغيّر بتغيُّرِ الموضع**: المعتمَدُ يأخذ `canonical_ar` والمعلَّقُ
+ *   `cur_label` والمرساةُ/المنظرُ اسمَه هو — كما كان حرفًا قبلَ هذه الطبقة.
+ * ══════════════════════════════════════════════════════════════════════════ */
+
+/** تعريفُ العشرةِ من القاعدةِ إن بُذرت، وإلا من الملفِّ — والفراغُ يعني: لا تُفعَّل. */
+function emsNavTaxonomy($conn) {
+    static $tax = null;
+    if ($tax !== null) { return $tax; }
+    $tax = array();
+    if (function_exists('ems_env') && strtolower((string) ems_env('EMS_NAV_TEN')) === 'off') { return $tax; }
+    $res = @mysqli_query($conn, "SELECT code, name_ar, icon, sort_no, open_default
+                                   FROM nav_group_taxonomy ORDER BY sort_no");
+    if (!$res) { return $tax; } /* لم تُبذر بعد = السلوكُ السابقُ حرفًا (fail-open) */
+    while ($row = mysqli_fetch_assoc($res)) { $tax[$row['code']] = $row; }
+    return $tax;
+}
+
+/** نسبةُ المساراتِ المخزَّنة — وما لا صفَّ له يُحكم عليه وقتَ التشغيلِ بالقاعدةِ نفسِها. */
+function emsNavRouteGroupMap($conn) {
+    static $map = null;
+    if ($map !== null) { return $map; }
+    $map = array();
+    $res = @mysqli_query($conn, "SELECT route, group_code FROM nav_route_group");
+    if ($res) { while ($row = mysqli_fetch_assoc($res)) { $map[strtolower(trim($row['route']))] = $row['group_code']; } }
+    return $map;
+}
+
+/**
+ * تصييرُ القائمةِ كلِّها في عشرِ مجموعاتٍ — بلوكٌ واحدٌ لا بلوكان.
+ *
+ * @param array  $items     بنودُ الدورِ الظاهرةُ (بعدَ الصلاحيةِ والمساحة)
+ * @param array  $uxMap     المصفوفةُ المعيارية (route => صفّ)
+ * @param array  $uxCurMap  موضعُ المعلَّقِ الحاليُّ لهذا الدور
+ * @param string $afterHome حقنةُ المراسلاتِ الخام — تُسقَط إن ولَّدها السجل
+ * @return bool هل طُبع شيء
+ */
+function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $badges, $afterHome = '') {
+    $tax = emsNavTaxonomy($conn);
+    if (empty($tax)) { return false; }
+    $rgMap = emsNavRouteGroupMap($conn);
+    if (!function_exists('ems_nav_group_for_route')) {
+        require_once __DIR__ . '/nav_groups.php';
+    }
+
+    /* مرساتا كلِّ سايدبار — اسمٌ واحدٌ وموضعٌ واحدٌ في كلِّ إدارة */
+    $ANCHOR_LABEL = array('main/role_board.php' => 'الرئيسية', 'chats/index.php' => 'المراسلات');
+
+    /* ══ «الرئيسية» أولُ رابطٍ في كلِّ شاشة (قرارُ المالك 2026-08-17) ═════════
+       ◆ **المقيسُ قبلَ الحكم**: «الرئيسية» كانت تهبط **خامسةً** في سايدبارِ
+         الأسطولِ و**ثانيةً** في المالية — لأنها تأخذ ترتيبَها من `sort_no`
+         في المصفوفة، وصفُّها هناك في طبقةِ التقارير (المستوى الرابع).
+       ◆ فتُنتزع من ترتيبِ المصفوفةِ نزعًا: **قسمُها الفراغُ** (فتقع في صدرِ
+         المجموعةِ المكشوفِ قبلَ كلِّ عنوانٍ فرعيّ) و**ترتيبُها أصغرُ من كلِّ
+         ترتيب**. والمراسلاتُ تليها مباشرةً — بالعُرفِ نفسِه الذي كان.
+       ◆ ولا يُغيَّر اسمٌ ولا مسارٌ ولا مجموعة: **الموضعُ داخلَ «مساحتي» فقط**. */
+    $ANCHOR_ORDER = array('main/role_board.php' => -1000000, 'chats/index.php' => -999999);
+
+    /* ── ① كلُّ بندٍ يُنسب: اسمُه · مجموعتُه · قسمُه · ترتيبُه ─────────────── */
+    $rows = array();
+    $covered = array();
+    foreach ($items as $idx => $it) {
+        $raw  = (string) $it['route'];
+        $base = uxuiNavBaseRoute($raw);
+        if ($base === '') { continue; }
+        $covered[$base] = true;
+        $isVariant = (strpbrk($raw, '#?') !== false); /* مدخلٌ ثانٍ مقصود — اسمُه له */
+        $c   = isset($uxMap[$base]) ? $uxMap[$base] : null;
+        $cur = isset($uxCurMap[$base]) ? $uxCurMap[$base] : null;
+
+        /* الاسمُ بالترتيبِ السابقِ حرفًا — **هذه الجولةُ تُعيد التبويبَ لا التسمية**:
+           المرساةُ/المنظرُ اسمُه له · والمعتمَدُ اسمَه المعياريّ · والمعلَّقُ اسمَه
+           الحاليَّ من السجل · ومن لا قياسَ current لدورِه يبقى على اسمِ صفِّه.
+           (وفرضُ المعياريِّ على الأخيرِ أسقط رابطًا: توأمانِ صارا باسمٍ واحدٍ
+            فابتلع حارسُ التكرارِ ثانيَهما — قِيس في الدور ٢٤.) */
+        if ($isVariant) { $name = $it['label_ar']; }
+        elseif ($c && $c['status'] === 'APPROVED') { $name = $c['canonical_ar']; }
+        elseif ($cur) { $name = $cur['cur_label']; }
+        else { $name = $it['label_ar']; }
+        /* ◆ **والمرساتانِ اسمُهما واحدٌ في كلِّ إدارة**: قرارُ المالكِ 2026-07-27
+             «التسميةُ موحَّدةٌ — صفٌّ واحدٌ لكلِّ الأدوارِ باسمِ ‹الرئيسية›»، وأربعةُ
+             أدوارٍ كانت تحمل اسمَ لوحتِها («لوحة مشرف اسطول» …) فتُقرأ صفحتين.
+             وموضعٌ واحدٌ باسمين يناقض «المكانَ نفسَه دائمًا». */
+        if (!$isVariant && isset($ANCHOR_LABEL[$base])) { $name = $ANCHOR_LABEL[$base]; }
+
+        $section = $c ? (string) $c['group_name'] : ($cur ? (string) $cur['cur_group'] : '');
+        if ($section === '— خارج التبويب') { $section = ''; }
+        /* قسمٌ مفروضٌ يغلب عنوانَ المصفوفة — «ما ينتظرني» يجمع صناديقَ الاعتماد،
+           و`'-'` تمحو القسمَ فيصعد الرابطُ إلى صدرِ مجموعتِه (عنوانُ مصفوفتِه
+           من مجالٍ آخر فلا يصلح رأسًا فرعيًّا تحتَ هذه المجموعة). */
+        $pinSec = ems_nav_pin_section($base);
+        if ($pinSec === '-') { $section = ''; }
+        elseif ($pinSec !== '') { $section = $pinSec; }
+        /* والمرساتانِ تسبقان كلَّ شيءٍ داخلَ «مساحتي» — بلا قسمٍ وبأصغرِ ترتيب */
+        if (!$isVariant && isset($ANCHOR_ORDER[$base])) { $section = ''; }
+        $sort = $c ? (int) $c['sort_no'] : ($cur ? (int) $cur['cur_order'] : 999);
+        if (!$isVariant && isset($ANCHOR_ORDER[$base])) { $sort = $ANCHOR_ORDER[$base]; }
+        $lvl  = $c ? (int) $c['level_no'] : 0;
+
+        if (isset($rgMap[$base])) { $code = $rgMap[$base]; }
+        else { list($code, ) = ems_nav_group_for_route($base, $lvl, $section); }
+        if (!isset($tax[$code])) { $code = isset($tax['DAILY']) ? 'DAILY' : key($tax); }
+
+        $rows[] = array('code' => $raw, 'name' => $name, 'icon' => $it['icon'],
+                        'group' => $code, 'section' => $section, 'sort' => $sort,
+                        'variant' => $isVariant ? 1 : 0, 'idx' => $idx);
+    }
+
+    /* ── ② ما يحمله السجلُّ ولا صفَّ تبعيةٍ له (الرئيسيةُ والمراسلاتُ لبعضِ
+           الأدوار) يُصطنع رابطُه — كما كان قبلَ هذه الطبقة: صفرُ فقد ───────── */
+    foreach ($uxCurMap as $base => $cur) {
+        if (isset($covered[$base]) || !isset($uxMap[$base])) { continue; }
+        $proper = $uxMap[$base]['route'];
+        $icon = ($base === 'main/role_board.php') ? 'fa fa-house'
+              : (($base === 'chats/index.php') ? 'fa fa-comments' : 'fa fa-link');
+        $section = (string) $uxMap[$base]['group_name'];
+        if ($section === '— خارج التبويب') { $section = ''; }
+        $code = isset($rgMap[$base]) ? $rgMap[$base]
+              : current(ems_nav_group_for_route($base, (int) $uxMap[$base]['level_no'], $section));
+        if (!isset($tax[$code])) { $code = isset($tax['DAILY']) ? 'DAILY' : key($tax); }
+        $nameSyn = $cur['cur_label'];
+        $sortSyn = (int) $cur['cur_order'];
+        /* والمرساتانِ هنا أيضًا: دورٌ صفُّه معطَّلٌ في `nav_items` تُولَّد له
+           «الرئيسية» من السجل — ولو لم يُطبَّق الحكمُ هنا لظهرت خامسةً لا أولى
+           (قِيس: الدوران ١٧ و٢٥ صفُّهما `active=0` فجاءت من هذا الفرع). */
+        if (isset($ANCHOR_ORDER[$base])) {
+            $section = '';
+            $sortSyn = $ANCHOR_ORDER[$base];
+            if (isset($ANCHOR_LABEL[$base])) { $nameSyn = $ANCHOR_LABEL[$base]; }
+        }
+        $rows[] = array('code' => $proper, 'name' => $nameSyn, 'icon' => $icon,
+                        'group' => $code, 'section' => $section, 'sort' => $sortSyn,
+                        'variant' => 0, 'idx' => 10000 + count($rows));
+        $covered[$base] = true;
+    }
+    /* ── ②-ب مرساتا كلِّ سايدبار: «الرئيسية» و«المراسلات» ────────────────────
+          كانتا تُحقنان في `printStageNav` لكلِّ دورٍ **لا يولّدهما سجلُّه**
+          (الأدوارُ الفرعيةُ ومن خارجِ قياسِ current). ومسارُ العشرةِ لا يمرُّ
+          بتلك الدالةِ — فلولا حقنُهما هنا لسقطتا عن أحدَ عشرَ دورًا صامتةً.
+          **وهما مُثبَّتتان في «مساحتي»**: مكانٌ واحدٌ في كلِّ إدارةٍ لا يتغير. */
+    $anchors = '';
+    if (!isset($covered['main/role_board.php'])) {
+        ob_start();
+        printNavLinkItem(array('code' => 'main/role_board.php', 'name' => 'الرئيسية', 'icon' => 'fa fa-house'), $basePrefix, $badges);
+        $one = ob_get_clean();
+        if (ems_nav_group_has_link($one)) { $anchors .= $one; $covered['main/role_board.php'] = true; }
+    }
+    if (!isset($covered['chats/index.php'])) {
+        /* المراسلاتُ لها وسمُها الخاصُّ (مُعرِّفُ الرابطِ وشارةُ غيرِ المقروء) —
+           فتُؤخذ حقنةُ `insidebar` إن جاءت، وإلا فالوسمُ المكافئُ حرفًا. */
+        ems_nav_mark_printed('chats/index.php||المراسلات');
+        $anchors .= ($afterHome !== '') ? $afterHome
+            : '<li><a href="' . $basePrefix . 'chats/index.php" id="sidebarChatLink">'
+              . '<i class="fa fa-comments"></i> <span>المراسلات</span>'
+              . '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>'
+              . '</a></li>' . "\n";
+        $covered['chats/index.php'] = true;
+    }
+    /* حقنةُ المراسلاتِ الصلبةُ تُسقَط متى ولَّدها السجلُّ — منعًا للازدواج */
+    $afterHome = '';
+
+    if (empty($rows) && $anchors === '') { return false; }
+
+    /* ── ③ الترتيب: المجموعةُ بترتيبِ التبويب · القسمُ بأصغرِ ترتيبٍ فيه ──── */
+    $tree = array();
+    foreach ($rows as $r) { $tree[$r['group']][$r['section']][] = $r; }
+
+    $printed = false;
+    $pending = array();  /* تُبنى المجموعاتُ كلُّها ثم تُطبع — لأن الفتحَ الافتراضيَّ
+                            لا يُعرف إلا بعد معرفةِ أيُّها أكبرُ في هذه الإدارة */
+    $anchorHome = isset($tax['MINE']) ? 'MINE' : key($tax); /* بيتُ المرساتين */
+    foreach ($tax as $code => $meta) {
+        $isAnchorHome = ($code === $anchorHome && $anchors !== '');
+        if (empty($tree[$code]) && !$isAnchorHome) { continue; }
+        $sections = isset($tree[$code]) ? $tree[$code] : array();
+        foreach ($sections as $sname => &$list) {
+            usort($list, function ($a, $b) {
+                if ($a['sort'] !== $b['sort']) { return $a['sort'] - $b['sort']; }
+                if ($a['variant'] !== $b['variant']) { return $a['variant'] - $b['variant']; }
+                return $a['idx'] - $b['idx'];
+            });
+        }
+        unset($list);
+        uasort($sections, function ($a, $b) {
+            $ma = PHP_INT_MAX; $mb = PHP_INT_MAX;
+            foreach ($a as $r) { if ($r['sort'] < $ma) { $ma = $r['sort']; } }
+            foreach ($b as $r) { if ($r['sort'] < $mb) { $mb = $r['sort']; } }
+            if ($ma !== $mb) { return $ma - $mb; }
+            return $a[0]['idx'] - $b[0]['idx'];
+        });
+
+        /* ── ④ الجسمُ أولًا ثم الغلاف — حارسُ الغلافِ الفارغ ───────────────
+              `printNavLinkItem` قد تُسقط الرابطَ (حارسُ التكرارِ أو كابحُ
+              المساحة)، فلا يُطبع عنوانُ قسمٍ بلا روابطَ تحته ولا رأسُ مجموعةٍ
+              خلا من كلِّ روابطِها. */
+        $bodies = array(); $liveSections = 0; $liveLinks = 0;
+        foreach ($sections as $sname => $list) {
+            $kept = array();
+            foreach ($list as $r) {
+                ob_start();
+                printNavLinkItem(array('code' => $r['code'], 'name' => $r['name'], 'icon' => $r['icon']), $basePrefix, $badges);
+                $one = ob_get_clean();
+                if (ems_nav_group_has_link($one)) { $kept[] = array('r' => $r, 'html' => $one); }
+            }
+            if (empty($kept)) { continue; }
+            $liveSections++; $liveLinks += count($kept);
+            $bodies[] = array('name' => (string) $sname, 'kept' => $kept);
+        }
+        if ($isAnchorHome) { $liveLinks += substr_count($anchors, '<a '); }
+        if ($liveLinks === 0) { continue; }
+
+        /* ── ⑤ متى يُفيد عنوانُ القسمِ ومتى يكون ضجيجًا ────────────────────
+              ◆ الحدُّ **تسعةٌ** لا رقمٌ مخترَع: ف٧-٢ يجعل التسعةَ حدَّ ما
+                يُقرأ بلمحة. فما دونها يُقرأ **بلا عناوين** — وعنوانٌ لكلِّ
+                رابطٍ يضاعف الأسطرَ ولا يضيف معنًى. وما بلغ عشرةً يلزمه بناءٌ.
+              ◆ وفي المجموعةِ الطويلة: العنوانُ لمن تحتَه **رابطان فأكثر**،
+                والوحيدُ يصعد إلى صدرِ المجموعةِ بلا عنوان — فلا يبدو تابعًا
+                لعنوانٍ ليس له، ولا يُفتتح عنوانٌ لسطرٍ واحد. */
+        /* ◆ **والمحوران**: ① عنوانُ الدورةِ المستنديةِ من المصفوفة · ② المجالُ
+             من الدليل. الأولُ أدقُّ حين تكون المجموعةُ مجالًا واحدًا؛ والثاني
+             أنفعُ في المجموعتين **العابرتين للمجالات** («التقارير» و«البيانات
+             والإعدادات») حيث يكون العنوانُ الأولُ مفردًا لكلِّ رابطٍ تقريبًا
+             فلا يبني شيئًا (قِيس: ثلاثةَ عشرَ سطرًا بلا بناءٍ في الدور ١٩).
+           ◆ وما بقي فوقَ التسعةِ بالمحورِ الأولِ يُعاد تقسيمُه بالثاني والعكس. */
+        $flat = array();
+        foreach ($bodies as $B) { foreach ($B['kept'] as $k) { $flat[] = $k; } }
+        $useSubheads = ($liveLinks > 9);
+        $lead = $flat; $headed = array();
+
+        /* ── ⑤-أ قسمٌ مفروضٌ يظهر عنوانُه ولو قصُرت المجموعة ─────────────────
+              «ما ينتظرني» أعلى مقاصدِ السايدبار تكرارًا؛ ولو دُفن بين الروابطِ
+              الشخصيةِ بلا فاصلٍ لضاع أثرُ دمجِه في «مساحتي». فيُفصَل دائمًا. */
+        $forced = ems_nav_forced_sections();
+        $forcedOut = array();
+        if (!empty($forced)) {
+            $rest = array();
+            foreach ($bodies as $B) {
+                if (isset($forced[$B['name']])) { $forcedOut[] = $B; } else { $rest[] = $B; }
+            }
+            if (!empty($forcedOut)) {
+                $bodies = $rest;
+                $flat = array();
+                foreach ($bodies as $B) { foreach ($B['kept'] as $k) { $flat[] = $k; } }
+                $lead = $flat;
+                $liveLinks = count($flat);
+                foreach ($forcedOut as $B) { $liveLinks += count($B['kept']); }
+                $useSubheads = ($liveLinks > 9);
+            }
+        }
+
+        if ($useSubheads && !empty($bodies)) {
+            $crossCut = ($code === 'REPORTS' || $code === 'SETUP');
+            $byDomain  = function ($k) use ($tax, $code) {
+                $dc = ems_nav_domain_for_route(uxuiNavBaseRoute($k['r']['code']));
+                return ($dc === $code || !isset($tax[$dc])) ? '' : $tax[$dc]['name_ar'];
+            };
+            $bySection = function ($k) { return (string) $k['r']['section']; };
+            $primary = $crossCut ? $byDomain  : $bySection;
+            $second  = $crossCut ? $bySection : $byDomain;
+
+            /* دلوٌ يُبنى بمفتاحٍ ثم يُنقّى: المفردُ وبلا اسمٍ يصعد إلى الصدرِ المكشوف */
+            $bucketize = function ($items, $key) {
+                $b = array();
+                foreach ($items as $k) { $b[$key($k)][] = $k; }
+                $ld = array(); $out = array();
+                foreach ($b as $n => $ks) {
+                    if ($n === '' || count($ks) < 2) { foreach ($ks as $k) { $ld[] = $k; } }
+                    else { $out[] = array('name' => (string) $n, 'kept' => $ks); }
+                }
+                return array($ld, $out);
+            };
+
+            list($lead, $headed) = $bucketize($flat, $primary);
+            if (count($lead) > 9) {
+                list($ld2, $more) = $bucketize($lead, $second);
+                if (!empty($more)) { $lead = $ld2; $headed = array_merge($headed, $more); }
+            }
+            $refined = array();
+            foreach ($headed as $H) {
+                if (count($H['kept']) <= 9) { $refined[] = $H; continue; }
+                list($subLead, $subs) = $bucketize($H['kept'], $second);
+                if (empty($subs)) { $refined[] = $H; continue; }
+                foreach ($subs as $S) { $refined[] = $S; }
+                if (!empty($subLead)) { $refined[] = array('name' => $H['name'], 'kept' => $subLead); }
+            }
+            /* عنوانان بالاسمِ نفسِه يُدمجان — وإلا قُرئ العنوانُ مرتين في مجموعة */
+            $headed = array();
+            foreach ($refined as $H) {
+                $hit = -1;
+                foreach ($headed as $i => $E) { if ($E['name'] === $H['name']) { $hit = $i; break; } }
+                if ($hit >= 0) { $headed[$hit]['kept'] = array_merge($headed[$hit]['kept'], $H['kept']); }
+                else { $headed[] = $H; }
+            }
+            if (empty($headed)) { $useSubheads = false; $lead = $flat; }
+        }
+
+        ob_start();
+        if ($isAnchorHome) { echo $anchors; $anchors = ''; } /* «الرئيسية» أولَ ما يُرى */
+        foreach ($lead as $k) { echo $k['html']; }
+        foreach ($forcedOut as $B) {   /* القسمُ المفروضُ يلي الصدرَ المكشوف */
+            echo '<li class="nav-subhead" aria-hidden="true"><span>'
+               . htmlspecialchars($B['name'], ENT_QUOTES, 'UTF-8') . '</span></li>' . "\n";
+            foreach ($B['kept'] as $k) { echo $k['html']; }
+        }
+        if ($useSubheads) {
+            foreach ($headed as $B) {
+                echo '<li class="nav-subhead" aria-hidden="true"><span>'
+                   . htmlspecialchars($B['name'], ENT_QUOTES, 'UTF-8') . '</span></li>' . "\n";
+                foreach ($B['kept'] as $k) { echo $k['html']; }
+            }
+        }
+        $body = ob_get_clean();
+
+        $key  = 'g-' . strtolower($code);
+        $open = ((int) $meta['open_default'] === 1);
+        $nm   = htmlspecialchars($meta['name_ar'], ENT_QUOTES, 'UTF-8');
+
+        /* ── ⑥ **لا رابطَ خارجَ مجموعة** (قرارُ المالك 2026-08-17) ─────────────
+              جُرِّبت مرحلةً طباعةُ المجموعةِ النحيفةِ (رابطٌ أو رابطان) مكشوفةً
+              بلا رأسِ طيٍّ توفيرًا للنقرة — **ورُدَّت بنصِّ المالك**: «لا تجعل
+              رابطًا خارجَ مجموعة». والقاعدةُ الآن قاطعة: **كلُّ رابطٍ يسكن
+              مجموعةً برأسٍ وأيقونةٍ واسم**، مهما قلَّ عددُه. فالقائمةُ تُقرأ
+              بالبنيةِ نفسِها في كلِّ إدارة، ولا يطفو سطرٌ بلا نسب. */
+        $total = 0;
+        foreach ($bodies as $B) { foreach ($B['kept'] as $k) { $total += isset($badges[$k['r']['code']]) ? intval($badges[$k['r']['code']]) : 0; } }
+
+        $pending[] = array(
+            'solo' => false, 'code' => $code, 'key' => $key, 'name' => $nm,
+            'icon' => $meta['icon'], 'body' => $body, 'links' => $liveLinks,
+            'badge' => $total, 'home' => $isAnchorHome, 'open' => $open,
+        );
+    }
+
+    /* ══ ⑦ الفتحُ الافتراضيُّ يتبع الإدارةَ لا قائمةً عامة ══════════════════
+       ◆ **المقيس**: كان المفتوحُ ابتداءً ثلاثةَ رموزٍ ثابتةٍ للجميع، فـ**تسعُ
+         إداراتٍ من تسعَ عشرةَ تفتح على مجموعةٍ ليست عملَها**: إدارةُ المالية
+         تُستقبَل بمجموعةٍ فيها ٣٨ رابطًا **مطويّة**، والصلاحياتُ بـ٢٢، والمراجعُ
+         الداخليُّ بـ٢٠. والافتراضُ الذي لا يعرف صاحبَه يُكلّفه نقرةً كلَّ يوم.
+       ◆ **والقاعدةُ الآن**: «مساحتي» مفتوحةٌ دائمًا (فيها «ما ينتظرني»)، و**أكبرُ
+         مجموعةٍ في هذه الإدارةِ بعينِها** مفتوحةٌ معها، وما عداهما مطويّ.
+         فيفتح كلُّ دورٍ على ما يعمل فيه — بلا تغييرِ ترتيبٍ ولا موضع.
+       ◆ **ولا يُمَسُّ اختيارُ المستخدم**: `insidebar.php` يحفظ المفتوحَ في
+         `localStorage`، فهذا افتراضُ **أولِ زيارةٍ** فقط ومن طوى بقيت مطويّةً له. */
+    $openCode = null; $openMax = -1;
+    foreach ($pending as $P) {
+        if (!empty($P['home']) || $P['code'] === $anchorHome) { continue; }
+        if ($P['links'] > $openMax) { $openMax = $P['links']; $openCode = $P['code']; }
+    }
+
+    foreach ($pending as $P) {
+        /* ══ أوّلُ دخولٍ: **كلُّ المجموعاتِ مطويّة** (قرارُ المالك 2026-08-17) ══
+           ◆ كانت القاعدةُ أعلاه تفتح اثنتين: «مساحتي» دائمًا، ومعها أكبرُ
+             مجموعةٍ في إدارةِ الدور. والمقيسُ في المُصيَّر: مجموعتان مفتوحتان
+             لكلِّ دورٍ جُرِّب (محمد · مصعب · مبيعات · اروينا).
+           ◆ **والقرارُ الآن**: يفتح النظامُ على قائمةٍ مطويّةٍ بالكامل، ثم
+             يفتح المستخدمُ ما يريد — ونقرتُه تطوي سواها (أكورديون)، فلا تُفتح
+             أكثرُ من واحدةٍ في أيِّ لحظة.
+           ◆ **والثمنُ مُعلَنٌ لا مسكوتٌ عنه**: هذا يعكس حكمَ INJ-0527 الذي
+             فُتحت المجموعاتُ لأجله — «المستخدمُ الجديدُ يفتح النظامَ فلا يرى
+             رابطًا واحدًا حتى يضغط». فمن يدخل أوّلَ مرّةٍ يرى رؤوسَ المجموعاتِ
+             وحدَها، وعليه نقرةٌ ليصل أوّلَ رابط. وهذا هو المطلوبُ صراحةً.
+           ◆ **ولا يُمَسُّ اختيارُ العائد**: `insidebar.php` يحفظ ما فُتح في
+             `localStorage`، فهذا افتراضُ أوّلِ زيارةٍ وحدَها. ولإعادةِ القديم:
+             أعِدْ سطرَ الحسابِ الملغى أدناه.
+           ◆ والحسابُ أعلاه (`$openCode`) تُرك كما هو: يبقى مُعبِّرًا عن «أكبرِ
+             مجموعةٍ في الإدارة» لو أُعيد الفتحُ الافتراضيُّ يومًا. */
+        // $open = (!empty($P['home']) || $P['code'] === $anchorHome || $P['code'] === $openCode);
+        $open = false;
+        $badge = $P['badge'] > 0
+            ? ' <span class="nav-count-badge nav-group-badge">' . ($P['badge'] > 99 ? '99+' : $P['badge']) . '</span>' : '';
+        echo '<li class="nav-group' . ($open ? ' open' : '') . '" data-group-key="' . $P['key'] . '">' . "\n";
+        /* الاسمُ على الزرِّ نفسِه لا في `span` وحدَه — طيُّ الشريطِ يُخفي الـspan
+           فيبقى الزرُّ بلا اسمٍ لقارئِ الشاشة (WCAG 2.2 AA · 4.1.2). */
+        echo '  <button type="button" class="nav-group-head" aria-expanded="' . ($open ? 'true' : 'false') . '"'
+           . ' aria-controls="navgrp-' . $P['key'] . '" aria-label="' . $P['name'] . '" title="' . $P['name'] . '">'
+           . '<i class="' . htmlspecialchars($P['icon'], ENT_QUOTES, 'UTF-8') . '" aria-hidden="true"></i> '
+           . '<span class="nav-group-name">' . $P['name'] . '</span>' . $badge
+           . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
+        echo '  <ul class="nav-group-items" id="navgrp-' . $P['key'] . '">' . "\n";
+        echo $P['body'];
+        echo '  </ul>' . "\n" . '</li>' . "\n";
+        $printed = true;
+    }
+    /* دورٌ لم تُطبع له «مساحتي» (لا يقع اليوم — محروسٌ باختبار): لا تُفقد المرساتان */
+    if ($anchors !== '') { echo $anchors; $printed = true; }
+    return $printed;
+}
+
 function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges = array(), $afterHome = '') {
     $items = getUnifiedNavItems($conn, $roleId);
     if (empty($items)) { return false; }
     emsNavLandingAnchors($items);
+
+    /* ══ العشرُ مجموعاتٍ (نصُّ المالك 2026-08-17) ═══════════════════════════
+       متى بُذر التبويبُ صار **مسارُ الطباعةِ واحدًا**: كلُّ البنودِ — المعتمَدُ
+       والمعلَّقُ وما بقي بأبوابِه ومراحلِه — تُنسب إلى عشرِ مجموعاتٍ وتُطبع مرةً
+       واحدة، فلا يُفتح للمجموعةِ الواحدةِ غلافان. وما دون البذرِ (أو
+       `EMS_NAV_TEN=off`) يسلك المسارَ السابقَ أدناه **حرفًا بحرف**. */
+    $tenTax = emsNavTaxonomy($conn);
+    if (!empty($tenTax)) {
+        $GLOBALS['__uxui_cur_role'] = (int) $roleId;
+        return printEmsTenGroupNav(
+            $conn, $items, uxuiCanonicalMap($conn), uxuiCurrentMap($conn, (int) $roleId),
+            $basePrefix, $badges, $afterHome
+        );
+    }
 
     /* ── UXUI-01 v3 (تفويض 2026-08-18): المصفوفةُ وحدَها مصدرُ التنقل ──
        APPROVED ⇐ الكتلةُ المعيارية · PENDING_OWNER وPENDING_OWNER_MERGE ⇐

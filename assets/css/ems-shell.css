@@ -86,13 +86,35 @@
 
 /* قائمة الحساب (UXR-0034-ب: اسمُ الشخص في قائمة الحساب لا صندوقًا دائمًا) */
 .ems-account-menu { position: relative; }
+/* ══ اللوحةُ تنفتح **داخلَ** الصفحةِ لا خارجَها (قرارُ المالك 2026-08-17) ══════
+   ◆ **العطب**: كان المرساةُ `inset-inline-end: 0`. والصفحةُ عربيةٌ (rtl) فتُترجَم
+     الطرفُ المنطقيُّ «end» إلى **يسارِ الزرّ**: أي أن حافةَ اللوحةِ اليسرى
+     تُثبَّت عند يسارِ الزرِّ ثم تمتدُّ **يمينًا** — نحوَ حافةِ النافذةِ لا نحوَ
+     الصفحة. وكتلةُ الأفعالِ ملتصقةٌ بأقصى اليمين أصلًا، فما جاوز الحافةَ قُطع.
+     وازداد الأمرُ بنقلِ أيقونةِ الحسابِ إلى أقصى اليمين: كان المقطوعُ ثلاثين
+     بكسلًا فصار مئتين.
+   ◆ **والعلاجُ منطقيٌّ لا صفيحيّ**: `inset-inline-start` — كتلةُ الأفعالِ في
+     المسارِ ① بـ`justify-self: start`، أي أنها دائمًا عند **بدايةِ** الشريط
+     (يمينًا في العربية · يسارًا في الإنجليزية). فلوحةٌ ترسو على البدايةِ وتمتدُّ
+     نحوَ النهايةِ تنفتح داخلَ الصفحةِ في الاتجاهين معًا — بلا `dir` مفترَض.
+   ◆ **وسقفٌ للعرضِ والارتفاع**: `min-width` وحدَه بلا سقفٍ يترك اسمًا طويلًا
+     يمطّ اللوحةَ فتخرج ثانيةً؛ والسقفُ يُبقيها داخل النافذةِ مهما طال الاسم.
+     والارتفاعُ يُمرَّر إن ضاقت النافذةُ فلا يسقط «تسجيل الخروج» تحتَ الطيّ. */
 .ems-account-panel {
-    position: absolute; top: calc(100% + 8px); inset-inline-end: 0;
-    min-width: 220px; z-index: 3000; background: var(--c-surface); color: var(--c-1f2937);
+    position: absolute; top: calc(100% + 8px); inset-inline-start: 0;
+    min-width: 220px; max-width: min(320px, calc(100vw - 24px));
+    max-height: calc(100vh - var(--ems-topbar-height, 50px) - 24px); overflow-y: auto;
+    z-index: 3000; background: var(--c-surface); color: var(--c-1f2937);
     border: 1px solid var(--c-e5e7eb); border-radius: 12px;
     box-shadow: 0 12px 32px var(--c-rgba000016); padding: var(--ems-sp-2) 0; display: none;
 }
 .ems-account-menu.open .ems-account-panel { display: block; }
+/* ◆ **وحاضنُ الأفعالِ يكفُّ عن القصِّ ما دامت اللوحةُ مفتوحة**: على الجوّال
+     يحمل `.ems-topbar-actions` قيمةَ `overflow-x: auto` حزامَ أمانٍ للأيقونات
+     (ems-topbar-mobile.css) — و`overflow` غيرُ `visible` **يقصُّ كلَّ سليلٍ
+     مُطلَقِ الموضع**، فكانت اللوحةُ تُقصُّ إلى شريحةٍ بارتفاعِ صفِّ الأيقونات.
+     الصنفُ يضعه الجافاسكربت لحظةَ الفتحِ ويرفعه لحظةَ الإغلاق. */
+.ems-topbar-actions.ems-actions-menu-open { overflow: visible; }
 .ems-account-panel .ems-acct-head {
     padding: var(--ems-sp-2) var(--ems-sp-4) var(--ems-sp-3);
     border-bottom: 1px solid var(--c-f3f4f6); font-size: .84rem;

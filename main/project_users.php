@@ -653,7 +653,6 @@ ems_screen_about(
                         <!-- الإجراءاتُ أولًا (قرارُ المالك 2026-08-09): الفعلُ يُطلب قبل
                              القراءةِ في شاشةِ إدارةٍ — فلا يُقطع الصفُّ بحثًا عن زرِّه. -->
                         <th class="pu-col-actions">الإجراءات</th>
-                        <th>#</th>
                         <th>الاسم</th>
                         <th>اسم المستخدم</th>
                         <th>رقم الهاتف</th>
@@ -679,7 +678,6 @@ ems_screen_about(
                          الهاتف يقبل NULL، و PHP 8.1+ يرمي Deprecated على كل صفٍّ
                          (كان يملأ php_errors.log فعلًا من هذا الملف بالذات). */
                     $pu_e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); };
-                    $i = 1;
                     foreach ($result as $row) {
                         $roleText = !empty($row['role_name'])
                             ? $pu_e($row['role_name'])
@@ -735,7 +733,6 @@ ems_screen_about(
                         }
                         echo '</div></td>';
 
-                        echo '<td>' . $i++ . '</td>';
                         echo '<td><strong>' . $pu_e($row['name']) . '</strong></td>';
                         echo "<td><code class='pu-code'>" . $pu_e($row['username']) . '</code></td>';
                         echo '<td>' . ($row['phone'] !== null && $row['phone'] !== '' ? $pu_e($row['phone']) : '<span class="pu-text-muted">—</span>') . '</td>';

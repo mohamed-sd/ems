@@ -537,7 +537,6 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                     <thead>
                         <tr>
                             <th>الإجراءات</th>
-                            <th>#</th>
                             <th>كود الموديل</th>
                             <th>الصانع</th>
                             <th>الموديل</th>
@@ -635,7 +634,6 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                         <?php endif; ?>
                                     </div>
                                 </td>
-                                <td><?= $i++; ?></td>
                                 <td><?= $e($row['code']); ?></td>
                                 <td><?= $e($row['manufacturer']); ?></td>
                                 <td><?= $e($row['model_name']); ?></td>

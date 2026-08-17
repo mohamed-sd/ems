@@ -428,7 +428,7 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                        data-order='[[0,"asc"]]' data-page-length="50">
                     <thead class="table-dark">
                         <tr>
-                            <th class="fc-col-id">#</th>
+                            <th class="fc-col-actions">إجراءات</th>
                             <th>نوع المعدة</th>
                             <th>كود الحدث</th>
                             <th>نوع الحدث</th>
@@ -438,7 +438,6 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                             <th>تفصيل العطل</th>
                             <th>الكود الكامل</th>
                             <th>الحالة</th>
-                            <th class="fc-col-actions">إجراءات</th>
                             <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                             <th class="ems-fn-th" data-fn="1">رقم السجل</th>
                             <th class="ems-fn-th" data-fn="1">تاريخ العطل</th>
@@ -467,28 +466,11 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                         2 => '<span class="badge-eq-2"><i class="fas fa-truck-moving"></i> قلاب</span>',
                         3 => '<span class="badge-eq-3"><i class="fas fa-cogs"></i> خرامة</span>',
                     ];
-                    $i = 1;
                     if (!empty($list_rows)):
                         foreach ($list_rows as $row):
                             $is_active = $row['status'] == 1;
                     ?>
                         <tr>
-                            <td><?= $i++ ?></td>
-                            <td><?= $eq_badge[$row['equipment_type']] ?? '<span class="badge-code">'.$row['equipment_type'].'</span>' ?></td>
-                            <td><span class="badge-code"><?= htmlspecialchars($row['event_type_code']) ?></span></td>
-                            <td><?= htmlspecialchars($row['event_type_name']) ?></td>
-                            <td><span class="badge-code"><?= htmlspecialchars($row['main_category_code']) ?></span></td>
-                            <td><?= htmlspecialchars($row['main_category_name']) ?></td>
-                            <td><?= htmlspecialchars($row['sub_category']) ?></td>
-                            <td><?= htmlspecialchars($row['failure_detail']) ?></td>
-                            <td><span class="badge-code"><?= htmlspecialchars($row['full_code']) ?></span></td>
-                            <td>
-                                <?php if ($is_active): ?>
-                                    <span class="badge-active"><i class="fas fa-check-circle"></i> نشط</span>
-                                <?php else: ?>
-                                    <span class="badge-inactive"><i class="fas fa-ban"></i> معطل</span>
-                                <?php endif; ?>
-                            </td>
                             <td>
                                 <div class="fc-row-actions">
                                     <?php if ($can_edit): ?>
@@ -516,9 +498,24 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                                     <?php endif; ?>
                                 </div>
                             </td>
+                            <td><?= $eq_badge[$row['equipment_type']] ?? '<span class="badge-code">'.$row['equipment_type'].'</span>' ?></td>
+                            <td><span class="badge-code"><?= htmlspecialchars($row['event_type_code']) ?></span></td>
+                            <td><?= htmlspecialchars($row['event_type_name']) ?></td>
+                            <td><span class="badge-code"><?= htmlspecialchars($row['main_category_code']) ?></span></td>
+                            <td><?= htmlspecialchars($row['main_category_name']) ?></td>
+                            <td><?= htmlspecialchars($row['sub_category']) ?></td>
+                            <td><?= htmlspecialchars($row['failure_detail']) ?></td>
+                            <td><span class="badge-code"><?= htmlspecialchars($row['full_code']) ?></span></td>
+                            <td>
+                                <?php if ($is_active): ?>
+                                    <span class="badge-active"><i class="fas fa-check-circle"></i> نشط</span>
+                                <?php else: ?>
+                                    <span class="badge-inactive"><i class="fas fa-ban"></i> معطل</span>
+                                <?php endif; ?>
+                            </td>
                         </tr>
                     <?php endforeach; else: ?>
-                        <tr><td colspan="11" class="text-center py-4">لا توجد أكواد للعرض</td></tr>
+                        <tr><td colspan="10" class="text-center py-4">لا توجد أكواد للعرض</td></tr>
                     <?php endif; ?>
                     </tbody>
                 </table>

@@ -848,7 +848,7 @@ include __DIR__ . '/../includes/page_header.php';
             <table id="projectsTable" class="display nowrap">
                 <thead>
                     <tr>
-                        <th data-group="basic"><i class="fas fa-hashtag"></i> #</th>
+                        <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
                         <th data-group="basic"><i class="fas fa-truck-loading"></i> المورد</th>
                         <th data-group="basic"><i class="fas fa-barcode"></i> كود المعدة</th>
                         <th data-group="identification"><i class="fas fa-hashtag"></i> رقم تسلسلي</th>
@@ -859,7 +859,6 @@ include __DIR__ . '/../includes/page_header.php';
                         <th data-group="technical"><i class="fas fa-cogs"></i> حالة المعدة</th>
                         <th data-group="technical"><i class="fas fa-traffic-light"></i> التوفر</th>
                         <th data-group="status"><i class="fas fa-toggle-on"></i> الحالة</th>
-                        <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
                         <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
                         <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                         <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
@@ -917,10 +916,19 @@ include __DIR__ . '/../includes/page_header.php';
                         'scope'  => array('m' => 'equipments'),
                         'enrich' => array('s' => 'suppliers', 'o' => 'operations', 'ed' => 'equipment_drivers', 'd' => 'employees'),
                     ), $list_sql, $list_params);
-                    $i = 1;
                     foreach ($rows as $row) {
                         echo "<tr>";
-                        echo "<td><strong>" . $i++ . "</strong></td>";
+
+                        /* الإجراءاتُ عمودٌ أوّلُ — تُطبَع قبلَ بياناتِ الصفِّ لا بعدَها */
+                        echo "<td>";
+                        echo "<a href='javascript:void(0)' class='action-btn view viewEquipmentBtn' data-id='" . $row['id'] . "' title='عرض التفاصيل'>
+                                <i class='fas fa-eye'></i>
+                            </a>";
+                        echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-secondary' title='إدارة المشغلين'>
+                                <i class='fas fa-user-cog'></i>
+                            </a>";
+                        echo "</td>";
+
                         echo "<td><strong class='supplier-name'>" . htmlspecialchars($row['supplier_name']) . "</strong></td>";
                         echo "<td><span class='mono code-badge'>" . htmlspecialchars($row['code']) . "</span></td>";
                         
@@ -994,20 +1002,7 @@ include __DIR__ . '/../includes/page_header.php';
                         $s = isset($status_map[$eq_status]) ? $status_map[$eq_status] : ["badge-type", "fa-question-circle", "غير محدد"];
                         echo "<td><span class='{$s[0]}'><i class='fas {$s[1]}'></i> {$s[2]}</span></td>";
 
-                        // الإجراءات
-                                                echo "<td>";
-                                                echo "<a href='javascript:void(0)' class='action-btn view viewEquipmentBtn' data-id='" . $row['id'] . "' title='عرض التفاصيل'>
-                                                        <i class='fas fa-eye'></i>
-                                                    </a>";
-                                                
-                                                                                                                echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-secondary' title='إدارة المشغلين'>
-                                                                        <i class='fas fa-user-cog'></i>
-                                                                    </a>";
-                                                
-                                                               
-                                                        // يمكن إضافة زر حذف هنا إذا لزم الأمر
-                                                
-                                                echo "</td>";
+                        // الإجراءاتُ طُبِعت في صدرِ الصفّ
 
                         echo "</tr>";
                     }

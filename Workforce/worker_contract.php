@@ -203,7 +203,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="table-wrap wc-table-wrap">
         <table class="data-table wc-table-full">
-            <thead><tr><th>إجراءات</th><th>#</th><th>الكود</th><th>الموظف</th><th>النوع</th><th>طريقة الأجر</th><th>التناوب</th><th>بداية</th><th>نهاية</th><th>الحالة</th>
+            <thead><tr><th>إجراءات</th><th>الكود</th><th>الموظف</th><th>النوع</th><th>طريقة الأجر</th><th>التناوب</th><th>بداية</th><th>نهاية</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
@@ -251,7 +251,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php if ($can_edit): ?><a href="worker_contract.php?edit=<?= intval($r['id']) ?>" class="action-btn edit"><i class="fas fa-edit"></i></a><?php endif; ?>
                         <?php if ($can_delete): ?><a href="worker_contract.php?delete=<?= intval($r['id']) ?>" class="action-btn delete" onclick="return confirm('حذف العقد؟')"><i class="fas fa-trash"></i></a><?php endif; ?>
                     </div></td>
-                    <td><?= $i++ ?></td>
                     <td><code><?= htmlspecialchars($r['code'] ?: ('C-'.$r['id'])) ?></code></td>
                     <td><strong><?= htmlspecialchars($r['wname'] ?: '-') ?></strong></td>
                     <td><span class="badge badge-info"><?= htmlspecialchars($r['contract_type']) ?></span></td>
@@ -262,7 +261,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td>
                 </tr>
             <?php endforeach; } if (!$list || $i===1): ?>
-                <tr><td colspan="10" class="wc-empty-cell">لا توجد عقودٌ بعد.</td></tr>
+                <tr><td colspan="9" class="wc-empty-cell">لا توجد عقودٌ بعد.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>

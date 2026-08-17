@@ -624,19 +624,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .table-custom thead th {
-        background: linear-gradient(135deg, var(--navy) 0%, var(--navy-m) 100%);
-        color: white;
-        font-weight: 600;
         border: none;
-        padding: 1rem;
-    }
+        padding: 1rem;}
 
     .table-custom tbody tr {
         border-bottom: 1px solid var(--c-e0e0e0, #e0e0e0);
-    }
-
-    .table-custom tbody tr:hover {
-        background-color: var(--c-f8f9fa, #f8f9fa);
     }
 
     .status-badge {

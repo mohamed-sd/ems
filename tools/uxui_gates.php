@@ -61,12 +61,14 @@ $byRoute = array();      // route_lc => أسماءُ **الأصلِ** ومجمو
 $byVariant = array();    // هويةُ المنظرِ/المرساةِ الكاملة => أسماؤها (لكلِّ مدخلٍ ثانٍ اسمٌ واحدٌ هو الآخر)
 $emptyGroups = array();  // U5
 $shellTotal  = 0;        // مقامُ U5: أغلفةُ المجموعاتِ المُصيَّرةُ كلُّها
-$bigGroups = array();    // U9: (دور، مجموعة، عدد) لِما بلغ عشرةً فأكثر
+$bigGroups = array();    // U9: (دور، قسم، عدد) لِما بلغ عشرةً فأكثر — بالقسمِ المقروء
 $groupStatus = array();  // «دور·مجموعة» => هل فيها مسارٌ APPROVED؟ (لنطاقِ إنفاذ U4 وU9)
+$headMax = array();      // خبرٌ لا حكم: أكبرُ رأسِ طيٍّ لكلِّ دور (دور، رأس، عدد)
 foreach ($roles as $rid) {
     $navHtml = uxp_render_role_html($conn, $rid);
     $pos = uxp_parse_nav_html($navHtml);
     $groupCounts = array();
+    $headCounts  = array();
     foreach ($pos as $p) {
         $lc = mb_strtolower(uxp_norm($p['href']));
         $isVariant = (strpbrk($p['href'], '#?') !== false);
@@ -84,10 +86,22 @@ foreach ($roles as $rid) {
             $byRoute[$lc]['labels'][$p['label']][$rid] = true;
         }
         $byRoute[$lc]['groups'][$p['group']][$rid] = true;
-        $groupCounts[$p['group']] = isset($groupCounts[$p['group']]) ? $groupCounts[$p['group']] + 1 : 1;
-        $gk = $rid . '·' . $p['group'];
-        if (!isset($groupStatus[$gk])) { $groupStatus[$gk] = false; }
-        if ($st === 'APPROVED') { $groupStatus[$gk] = true; }
+        /* U9 يقيس **القسمَ المقروء** لا رأسَ الطيّ (انظر الشرحَ عند U9) —
+           ومفتاحُه «الرأسُ ▸ القسم»: اسمُ قسمٍ قد يتكرر في مجموعتين، وجمعُهما
+           يخترع مخالفةً لا وجودَ لها في شاشةٍ واحدة. */
+        $sec = $p['group'] . ' ▸ ' . (isset($p['section']) ? $p['section'] : $p['group']);
+        $groupCounts[$sec] = isset($groupCounts[$sec]) ? $groupCounts[$sec] + 1 : 1;
+        $headCounts[$p['group']] = isset($headCounts[$p['group']]) ? $headCounts[$p['group']] + 1 : 1;
+        foreach (array($p['group'], $sec) as $gk0) {
+            $gk = $rid . '·' . $gk0;
+            if (!isset($groupStatus[$gk])) { $groupStatus[$gk] = false; }
+            if ($st === 'APPROVED') { $groupStatus[$gk] = true; }
+        }
+    }
+    if (!empty($headCounts)) {
+        arsort($headCounts);
+        $hk = key($headCounts);
+        $headMax[] = array($rid, $hk, $headCounts[$hk]);
     }
     /* ══ U5: رأسُ مجموعةٍ ظهر ولا رابطَ تحته — **من الشجرةِ المُصيَّرة** ═══════
        ◆ **البوابةُ الميتةُ التي أُحييت (2026-08-20)**: كان الحكمُ
@@ -105,7 +119,14 @@ foreach ($roles as $rid) {
     /* U9: حدُّ التسعةِ (ف٧-٢) — «مجموعةٌ بعشرةِ عناصرَ فأكثر» تُرسِّب.
        ◆ ويُقاس على **المُصيَّرِ لكلِّ دور** لا على السجل: المجموعةُ قد تحمل
          اثنيْ عشرَ صفًّا في `nav_canonical` ولا يرى دورٌ منها إلا ستةً —
-         والحدُّ حدُّ قراءةٍ بلمحةٍ في شاشةِ مستخدمٍ بعينِه لا حدُّ سجلّ. */
+         والحدُّ حدُّ قراءةٍ بلمحةٍ في شاشةِ مستخدمٍ بعينِه لا حدُّ سجلّ.
+       ◆ **ومحلُّه القسمُ المقروءُ بعدَ 2026-08-17**: نصُّ المالكِ قيَّد رؤوسَ
+         الطيِّ بعشرةٍ للإدارة، فصار السايدبار طبقتين — رأسٌ للتوجُّهِ وأقسامٌ
+         معنونةٌ للمسح. والحدَّان **يتناقضان رياضيًّا** على الرأس: أكبرُ دورٍ
+         ٩٣ رابطًا و١٠ رؤوسٍ × ٩ = ٩٠. فيبقى ف٧-٢ حيث ينفع — على **الكتلةِ
+         التي تقع عليها العينُ**: القسمُ إن وُجد وإلا الرأسُ نفسُه.
+       ◆ **وحجمُ الرأسِ يبقى مقيسًا ومُعلَنًا خبرًا** أدناه — فلا يختفي الرقمُ
+         الذي تغيَّر معناه، ولا يُقرأ تغييرُ محلِّ القياسِ إخفاءً لمخالفة. */
     foreach ($groupCounts as $g => $c) { if ($c >= 10) { $bigGroups[] = array($rid, $g, $c); } }
 }
 
@@ -139,13 +160,22 @@ foreach ($byVariant as $vk => $info) {
 $u4 = array(); $u4_pend = array();
 foreach ($all as $p) {
     $hits = array();
+    /* ◆ **يُفحص الرأسُ والقسمُ معًا** (2026-08-17): صار التبويبُ طبقتين، وفحصُ
+         الرأسِ وحدَه يُسقط من نطاقِ U4 كلَّ العناوينِ الدقيقةِ التي كان يفحصها
+         قبلَ الطبقتين — **وبوابةٌ ضاق نطاقُها بوابةٌ ضعفت**. */
+    $secNames = array($p['group']);
+    if (isset($p['section']) && $p['section'] !== $p['group']) { $secNames[] = $p['section']; }
     foreach ($FORBIDDEN as $t) {
-        if (mb_stripos($p['label'], $t) !== false || mb_stripos($p['group'], $t) !== false) {
+        if (mb_stripos($p['label'], $t) !== false) {
             $hits[] = "دور {$p['role']}: «{$p['group']} ⁄ {$p['label']}» يحمل «{$t}»";
+            continue;
+        }
+        foreach ($secNames as $sn) {
+            if (mb_stripos($sn, $t) !== false) { $hits[] = "دور {$p['role']}: «{$sn} ⁄ {$p['label']}» يحمل «{$t}»"; break; }
         }
     }
-    if (preg_match($CONVERSATIONAL, $p['group'])) {
-        $hits[] = "دور {$p['role']}: تبويبٌ محادثيٌّ «{$p['group']}»";
+    foreach ($secNames as $sn) {
+        if (preg_match($CONVERSATIONAL, $sn)) { $hits[] = "دور {$p['role']}: تبويبٌ محادثيٌّ «{$sn}»"; }
     }
     if (!$hits) { continue; }
     $enforceHere = !empty($groupStatus[$p['role'] . '·' . $p['group']]);
@@ -227,10 +257,23 @@ if (!empty($u6_matrix)) {
 }
 uxg_line('U7', 'قيمةُ حالةٍ داخليةٍ في نصِّ التنقل', count($u7), null, $fails, $ENFORCE, $u7);
 uxg_line('U8', 'مسارُ ملفٍّ أو معرِّفٌ تقنيٌّ في اسمٍ APPROVED', count($u8_appr), count($u8_pend), $fails, $ENFORCE, $u8_appr);
-uxg_line('U9', 'مجموعةٌ مُصيَّرةٌ بعشرةِ عناصرَ فأكثر (حدُّ ف٧-٢)', count($u9_appr), count($u9_pend), $fails, $ENFORCE, $u9_appr);
+uxg_line('U9', 'قسمٌ مقروءٌ بعشرةِ عناصرَ فأكثر (حدُّ ف٧-٢)', count($u9_appr), count($u9_pend), $fails, $ENFORCE, $u9_appr);
 if (!empty($u9_pend)) {
     echo "      ◆ مُبلَّغٌ ينتظر توقيعَ جلسةِ الإغلاق (سكّانُها معلَّقون):\n";
     foreach (array_slice($u9_pend, 0, 8) as $s) { echo "      · {$s}\n"; }
+}
+/* خبرٌ لا حكم: حجمُ رأسِ الطيِّ الأكبرِ لكلِّ دور — الرقمُ الذي تغيَّر محلُّ
+   قياسِه يبقى مرئيًّا، فلا يُقرأ نقلُ القياسِ إخفاءً لمخالفة. */
+if (!empty($headMax)) {
+    usort($headMax, function ($a, $b) { return $b[2] - $a[2]; });
+    $heads = 0; $roleHeads = array();
+    foreach ($all as $p) { $roleHeads[$p['role'] . '·' . $p['group']] = true; }
+    $heads = count($roleHeads);
+    echo "      ◆ خبرٌ (خارجَ الحكم): رؤوسُ الطيِّ " . $heads . " رأسًا على " . count($roles)
+       . " دورًا · أكبرُها: ";
+    $top = array();
+    foreach (array_slice($headMax, 0, 3) as $h) { $top[] = "دور {$h[0]} «{$h[1]}»={$h[2]}"; }
+    echo implode(' · ', $top) . "\n";
 }
 
 if ($fails === 0) {

@@ -97,14 +97,49 @@ if (!function_exists('uxp_render_role')) {
 if (!function_exists('uxp_parse_nav_html')) {
     function uxp_parse_nav_html($html)
     {
-        $positions = array(); $group = '— خارج التبويب';
-        if (preg_match_all('/<span class="nav-group-name">(?<g>[^<]*)<\/span>|<a\b[^>]*href="(?<h>[^"]*)"[^>]*>(?<in>.*?)<\/a>/us', $html, $mm, PREG_SET_ORDER)) {
+        /* ══ محوران لا واحد: رأسُ الطيِّ والقسمُ المقروء ═══════════════════════
+           ◆ **`group`** = رأسُ المجموعةِ القابلُ للطيِّ (`nav-group-name`) — وهو
+             وحدةُ **الموضع**: أين يسكن المسارُ في التبويب.
+           ◆ **`section`** = العنوانُ الفرعيُّ (`nav-subhead`) إن وُجد وإلا الرأسُ
+             نفسُه — وهو وحدةُ **القراءة**: ما تقع عليه العينُ ككتلةٍ واحدة.
+           ◆ **ولماذا فُصلا** (2026-08-17): صار السايدبار طبقتين — عشرُ رؤوسٍ
+             للتوجُّهِ وأقسامٌ للمسح. فقارئٌ يرى الرأسَ وحدَه يقيس الموضعَ صحيحًا
+             ويقيس القراءةَ خطأً (يعدُّ كتلةً واحدةً ما هو سبعُ كتلٍ معنونة)،
+             وقارئٌ يرى القسمَ وحدَه يعكس الخطأ. **والمحوران يُقاسان معًا.**
+           ◆ ورأسٌ جديدٌ يُصفِّر القسم — فلا يتسرَّب عنوانُ مجموعةٍ إلى تاليتِها. */
+        $positions = array(); $group = '— خارج التبويب'; $section = '';
+        /* ◆ و**المُعلِمُ المخفيُّ** (`nav-solo-marker`) ينسب الرابطَ المكشوفَ إلى
+             مجموعتِه: المجموعةُ النحيفةُ تُطبع بلا رأسٍ توفيرًا للنقرة، ولولا
+             المُعلِمُ لنُسب رابطُها إلى المجموعةِ التي سبقته فأُعلن «تشتّتٌ» كاذب. */
+        $re = '/<span class="nav-group-name">(?<g>[^<]*)<\/span>'
+            . '|<li class="nav-solo-marker"[^>]*data-group="(?<sg>[^"]*)"'
+            . '|<li class="nav-subhead"[^>]*><span>(?<s>[^<]*)<\/span>'
+            . '|<a\b[^>]*href="(?<h>[^"]*)"[^>]*>(?<in>.*?)<\/a>/us';
+        if (preg_match_all($re, $html, $mm, PREG_SET_ORDER)) {
             foreach ($mm as $m) {
-                if (isset($m['g']) && $m['g'] !== '') { $group = trim(html_entity_decode($m['g'], ENT_QUOTES, 'UTF-8')); continue; }
+                if (isset($m['g']) && $m['g'] !== '') {
+                    $group = trim(html_entity_decode($m['g'], ENT_QUOTES, 'UTF-8'));
+                    $section = '';
+                    continue;
+                }
+                if (isset($m['sg']) && $m['sg'] !== '') {
+                    $group = trim(html_entity_decode($m['sg'], ENT_QUOTES, 'UTF-8'));
+                    $section = '';
+                    continue;
+                }
+                if (isset($m['s']) && $m['s'] !== '') {
+                    $section = trim(html_entity_decode($m['s'], ENT_QUOTES, 'UTF-8'));
+                    continue;
+                }
                 $inner = preg_replace('/<span[^>]*nav-count-badge[^>]*>.*?<\/span>/us', '', $m['in']);
                 $label = trim(html_entity_decode(strip_tags($inner), ENT_QUOTES, 'UTF-8'));
                 $label = preg_replace('/\s+/u', ' ', $label);
-                $positions[] = array('group' => $group, 'label' => $label, 'href' => trim($m['h']));
+                $positions[] = array(
+                    'group'   => $group,
+                    'section' => ($section !== '' ? $section : $group),
+                    'label'   => $label,
+                    'href'    => trim($m['h']),
+                );
             }
         }
         return $positions;

@@ -848,7 +848,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <thead>
                     <tr>
                         <th>الإجراءات</th>
-                        <th>#</th>
                         <th>كود الموظف</th>
                         <th>نوع العقد</th>
                         <th>اسم الموظف</th>
@@ -900,7 +899,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                              LEFT JOIN employee_roles er ON er.id = d.employee_role_id
                              WHERE {TENANT_SCOPE}
                              ORDER BY d.id DESC", array());
-                    $i = 1;
 
                     { foreach ($emp_rows as $row) {
                         $statusBadge = $row['status'] == "1" ? '<span class="status-pill status-active">✅ مفعّل</span>' : '<span class="status-pill status-inactive">❌ موقف</span>';
@@ -984,7 +982,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                         echo "<tr $row_data>";
                         echo "<td>" . $actions_cell . "</td>";
-                        echo "<td>" . $i++ . "</td>";
+                        echo "";
                         echo "<td><code>" . htmlspecialchars($row['employee_code'] ?: 'N/A') . "</code></td>";
                         echo "<td><span class='badge badge-info'>" . htmlspecialchars($row['employee_type'] ?? '-') . "</span></td>";
                         echo "<td>" . $driver_name_cell . "</td>";

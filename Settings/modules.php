@@ -358,13 +358,12 @@ include __DIR__ . '/../includes/page_header.php';
                 <table id="modulesTable" class="display">
                     <thead>
                         <tr>
-                            <th width="80"><i class="fas fa-barcode"></i> #</th>
+                            <th width="150"><i class="fas fa-cogs"></i> إجراءات</th>
                             <th><i class="fas fa-book"></i> اسم الصفحة</th>
                             <th width="110"><i class="fas fa-icons"></i> الأيقونة</th>
                             <th width="150"><i class="fas fa-code"></i> كود الصفحة</th>
                             <th><i class="fas fa-user-tie"></i> الدور المسؤول</th>
                             <th width="80"><i class="fas fa-link"></i> رابط</th>
-                            <th width="150"><i class="fas fa-cogs"></i> إجراءات</th>
                             <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                             <th class="ems-fn-th" data-fn="1">اسم الشاشة</th>
                             <th class="ems-fn-th" data-fn="1">الملف التقني</th>
@@ -410,7 +409,6 @@ include __DIR__ . '/../includes/page_header.php';
                         } else {
                             $md_role_names = array();
                             foreach ($roles as $md_r) { $md_role_names[intval($md_r['id'])] = $md_r['name']; }
-                            $i = 1;
                             foreach ($result as $row):
                                 $md_icon_trim = trim((string)$row['icon']);
                                 $row['icon'] = ($md_icon_trim !== '') ? $md_icon_trim : $default_module_icon;
@@ -418,7 +416,18 @@ include __DIR__ . '/../includes/page_header.php';
                                     ? $md_role_names[intval($row['owner_role_id'])] : null;
                                 ?>
                                 <tr>
-                                    <td><strong><?= $i++; ?></strong></td>
+                                    <td class="text-center">
+                                        <a href="javascript:void(0);"
+                                           onclick="editModule(<?= htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8'); ?>)"
+                                           class="btn btn-sm btn-primary smod-edit-btn" title="تعديل">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="javascript:void(0);"
+                                           onclick="confirmDelete(<?= $row['id']; ?>, '<?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>')"
+                                           class="btn btn-sm btn-danger smod-del-btn" title="حذف">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
                                     <td>
                                         <strong><?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?></strong>
                                     </td>
@@ -450,18 +459,6 @@ include __DIR__ . '/../includes/page_header.php';
                                                 <i class="fas fa-times-circle"></i> لا
                                             </span>
                                         <?php endif; ?>
-                                    </td>
-                                    <td class="text-center">
-                                        <a href="javascript:void(0);"
-                                           onclick="editModule(<?= htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8'); ?>)"
-                                           class="btn btn-sm btn-primary smod-edit-btn" title="تعديل">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="javascript:void(0);"
-                                           onclick="confirmDelete(<?= $row['id']; ?>, '<?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>')"
-                                           class="btn btn-sm btn-danger smod-del-btn" title="حذف">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
                                     </td>
                                 </tr>
                             <?php

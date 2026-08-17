@@ -1075,7 +1075,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     .equipment-profile-page .ep-movements-table { font-size:13px; width:100%; }
     .equipment-profile-page .ep-movements-table thead th { white-space:nowrap; }
     .equipment-profile-page .ep-movements-table td { vertical-align:middle; }
-    .equipment-profile-page .ep-movements-table td.ep-note { white-space:normal; min-width:160px; color:var(--c-555555); }
+    .equipment-profile-page .ep-movements-table td.ep-note { white-space:normal; min-width:160px;}
     .equipment-profile-page .ep-elapsed { font-weight:700; color:var(--c-0b6b3a, #0b6b3a); white-space:nowrap; font-variant-numeric:tabular-nums; }
     .equipment-profile-page .ep-ev { display:inline-block; padding:3px 11px; border-radius:20px; font-size:12px; font-weight:700; white-space:nowrap; }
     .equipment-profile-page .ep-ev-sys   { background:var(--c-e0ecff, #e0ecff); color:var(--c-1e40af); }

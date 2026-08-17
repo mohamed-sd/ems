@@ -445,14 +445,10 @@ $db_name = ems_dbtool_db_name();
             <?php else: ?>
             <div class="tbl-wrap">
                 <table>
-                    <thead><tr><th>الملف</th><th>النوع</th><th>الحجم</th><th>التاريخ</th><th>إجراءات</th></tr></thead>
+                    <thead><tr><th>إجراءات</th> <th>الملف</th><th>النوع</th><th>الحجم</th><th>التاريخ</th></tr></thead>
                     <tbody>
                     <?php foreach ($backups as $b): ?>
                         <tr>
-                            <td style="font-family:monospace;font-size:0.78rem;"><?php echo e($b['name']); ?></td>
-                            <td><?php echo $b['is_auto'] ? '<span class="badge bg-gray">تلقائية</span>' : '<span class="badge bg-blue">يدوية</span>'; ?></td>
-                            <td><?php echo e($b['size_h']); ?></td>
-                            <td><?php echo e(date('Y/m/d H:i', $b['mtime'])); ?></td>
                             <td>
                                 <div class="flex" style="gap:5px;">
                                     <form method="post" style="display:inline;margin:0;">
@@ -469,6 +465,10 @@ $db_name = ems_dbtool_db_name();
                                     </form>
                                 </div>
                             </td>
+                            <td style="font-family:monospace;font-size:0.78rem;"><?php echo e($b['name']); ?></td>
+                            <td><?php echo $b['is_auto'] ? '<span class="badge bg-gray">تلقائية</span>' : '<span class="badge bg-blue">يدوية</span>'; ?></td>
+                            <td><?php echo e($b['size_h']); ?></td>
+                            <td><?php echo e(date('Y/m/d H:i', $b['mtime'])); ?></td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>

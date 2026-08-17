@@ -1,0 +1,177 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ems-statcards.css — بطاقةُ الإحصاء · مصدرُ تصميمِها الوحيدُ في النظام
+   ───────────────────────────────────────────────────────────────────────────
+   ◆ **الأصل**: شاشتا المشاريعِ والعملاء. وقد قِيستا معًا فخرجتا **متطابقتَين
+     حرفًا** (`tools/_stat_probe.php`) — فالأصلُ واحدٌ لا اثنان. والقيمُ أدناه
+     هي المحسوبُ من المتصفحِ لا نقلٌ عن مصدر:
+        القسم    حدٌّ 1px #e3e6ea · قطر 12px · حشو 14px · هامشٌ سفليٌّ 14px
+                 تدرُّجٌ rgba(255,255,255,.95) ⇐ #f2f3f5
+                 ظلٌّ 0 1px 3px rgba(16,24,40,.06) · 0 4px 12px rgba(16,24,40,.05)
+        الشبكة   grid · repeat(4, minmax(170px, 1fr)) · فجوة 12px
+        البطاقة  #eeeeee · حدٌّ 1px #aaaaaa · **قطر 35px** · حشو 18px
+                 ظلٌّ 0 2px 8px rgba(26,18,8,.07) · relative · overflow hidden
+        الأيقونة 55×55 · قطر 12px · عائمةٌ يسارًا · حدٌّ 1px #999 · أبيضُ على أسود
+                 هامشٌ علويٌّ 15px · سفليٌّ 10px · خطٌّ 1.3rem
+        القيمة   #222 · 35px · ثقل 900 · سطرٌ 1 · هامشٌ علويٌّ 10px · tabular-nums
+        العنوان  #555 · 0.92rem · ثقل 700 · هامشٌ علويٌّ 5px · سطرٌ 1.3
+        الانكسار ≤900px عمودان · ≤560px عمودٌ واحد
+
+   ◆ **لماذا ملفٌّ جديد**: كان التصميمُ **مكرَّرًا ثلاثَ مرّاتٍ** في
+     `ems-screens.css` تحت `.clients-main` و`.projects-main` و`.suppliers-main`
+     — ثلاثُ نسخٍ تتفرّق بمرورِ الوقتِ ولا يملكها أحد. نُقلت هنا مرةً واحدة،
+     و**نُزع تنطيقُها بالإدارة** فصارت تعمل في أيِّ شاشة.
+
+   ◆ **المقام**: ٨٤ صفحةً فيها بطاقاتُ إحصاء، تكتبها بـ**٤٣ اسمًا مختلفًا**
+     (`stats-card` · `stat-card` · `kpi-card` · `metric-box` · `wl-kpi-card` …
+     و١٨ اسمًا يتيمًا يظهر مرةً واحدة). فبدلَ إعادةِ تسميةِ ٤٣ عائلةً في ٨٤
+     ملفًّا — وهو تعديلٌ واسعٌ عالي الخطر — يسم `assets/js/ems-statcards.js`
+     كلَّ بطاقةٍ وأجزاءَها **بالدورِ لا بالاسم**، فيصير للنمطِ خُطّافٌ واحدٌ
+     ثابتٌ (`ems-statcard`) مهما تسمّت الشاشة. والقواعدُ أدناه تُنطَّق على
+     الاسمِ الأصليِّ **والخطّافِ** معًا.
+   ◆ **حرَسا `:not(.dt-button):not(.btn-close)`** ليسا زخرفة: قاعدةُ الشارات
+     في `ems.main.all.style.css` تحمل عشرةَ `:not(element)` فخصوصيتُها
+     (0,3,11) وتغلب (0,3,1). وبطاقةٌ صنفُها `badge` (`Financing/financing_board`
+     · `admin/sec_governance`) كانت تخرج بقطرِ 999px وخلفيةٍ #f3f3f3. والحرَسان
+     يرفعان العدَّ إلى (0,5,1) — والمقارنةُ بالأصنافِ قبلَ العناصر — بلا أثرٍ
+     بصريّ: البطاقةُ ليست زرَّ داتاتيبلز ولا زرَّ إغلاق.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── ① القسمُ الحاوي ───────────────────────────────────────────────────── */
+body.ems-site .main :is(.stats-section, .ems-statsection):not(.dt-button):not(.btn-close) {
+  border: 1px solid var(--bdr, #e3e6ea) !important;
+  border-radius: 12px !important;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .95) 0%, var(--s2, #f2f3f5) 100%) !important;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, .06), 0 4px 12px rgba(16, 24, 40, .05) !important;
+  padding: 14px !important;
+  margin-bottom: 14px !important;
+}
+
+/* ── ② الشبكة ──────────────────────────────────────────────────────────── */
+body.ems-site .main :is(.stats-grid, .ems-statgrid):not(.dt-button):not(.btn-close) {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(170px, 1fr)) !important;
+  gap: 12px !important;
+  align-items: stretch !important;
+  /* بعضُ الشاشاتِ تضبط `justify-items:start` على شبكتِها، فيقف عنصرُ الخليةِ
+     بعرضِ محتواه لا بعرضِ خليتِه — قِيس في `main/dashboard.php`: بطاقةٌ
+     بعرضِ ٤٣ بكسلًا داخلَ خليةٍ عرضُها ٣٤٣ فاض محتواها. */
+  justify-items: stretch !important;
+  justify-content: stretch !important;
+  /* أدواتُ الشبكةِ الموروثةُ من الشاشات (`flex` · أعمدةُ بوتستراب) تُبطَل
+     داخلَ الشبكةِ الموحَّدة، وإلا بقيت البطاقةُ بعرضِ عمودٍ قديمٍ لا بعرضِ خليتِها. */
+  flex-wrap: unset !important;
+  margin: 0 !important;
+  width: auto !important;
+}
+body.ems-site .main :is(.stats-grid, .ems-statgrid):not(.dt-button):not(.btn-close) > * {
+  width: auto !important;
+  max-width: none !important;
+  flex: unset !important;
+  margin: 0 !important;
+}
+
+/* ── ③ البطاقة ─────────────────────────────────────────────────────────── */
+body.ems-site .main :is(.stats-card, .ems-statcard):not(.dt-button):not(.btn-close) {
+  background: var(--c-s-eee, #eeeeee) !important;
+  background-image: none !important;
+  border: 1px solid var(--c-s-aaa, #aaaaaa) !important;
+  border-radius: 35px !important;
+  padding: 18px !important;
+  box-shadow: 0 2px 8px rgba(26, 18, 8, .07) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
+  color: inherit !important;
+  text-decoration: none !important;
+  display: block !important;
+}
+/* شريطُ اللونِ العلويُّ الذي كانت ترسمه بعضُ الشاشاتِ يُرفع — الأصلُ بلا شريط */
+body.ems-site .main :is(.stats-card, .ems-statcard):not(.dt-button):not(.btn-close)::before,
+body.ems-site .main :is(.stats-card, .ems-statcard):not(.dt-button):not(.btn-close)::after { content: none !important; }
+
+/* ── ④ الأيقونة ────────────────────────────────────────────────────────── */
+body.ems-site .main :is(.stats-card, .ems-statcard):not(.dt-button):not(.btn-close) :is(.stats-icon, .ems-statcard__icon) {
+  width: 55px !important;
+  height: 55px !important;
+  min-width: 55px !important;
+  border-radius: 12px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 1.3rem !important;
+  margin: 15px 0 10px 0 !important;
+  float: left !important;
+  vertical-align: middle !important;
+  border: 1px solid var(--c-ink-400, #999999) !important;
+  background: var(--c-s-fff, #ffffff) !important;
+  background-image: none !important;
+  color: var(--c-s-000, #000000) !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}
+body.ems-site .main :is(.stats-card, .ems-statcard):not(.dt-button):not(.btn-close) :is(.stats-icon, .ems-statcard__icon) > i,
+body.ems-site .main :is(.stats-card, .ems-statcard):not(.dt-button):not(.btn-close) :is(.stats-icon, .ems-statcard__icon) > svg {
+  font-size: inherit !important;
+  color: inherit !important;
+  margin: 0 !important;
+}
+
+/* ── ⑤ القيمة ──────────────────────────────────────────────────────────── */
+body.ems-site .main :is(.stats-card, .ems-statcard):not(.dt-button):not(.btn-close) :is(.stats-value, .ems-statcard__value) {
+  display: block !important;
+  color: var(--c-s-222, #222222) !important;
+  font-size: 35px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+  margin: 10px 0 0 0 !important;
+  padding: 0 !important;
+  font-variant-numeric: tabular-nums !important;
+  background: none !important;
+  border: none !important;
+  text-align: start !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* ── ⑥ العنوان ─────────────────────────────────────────────────────────── */
+body.ems-site .main :is(.stats-card, .ems-statcard):not(.dt-button):not(.btn-close) :is(.stats-title, .ems-statcard__title) {
+  display: block !important;
+  color: var(--c-s-555, #555555) !important;
+  font-size: .92rem !important;
+  font-weight: 700 !important;
+  margin: 5px 0 0 0 !important;
+  padding: 0 !important;
+  line-height: 1.3 !important;
+  background: none !important;
+  border: none !important;
+  text-align: start !important;
+}
+
+/* ── ⑦ ما زاد على الثلاثةِ يبقى تابعًا هادئًا ──────────────────────────── */
+/* بعضُ الشاشاتِ تضع في البطاقةِ سطرًا ثالثًا (فرقٌ · مدًى · تلميح). لا يُحذف
+   — قاعدةُ الجولةِ صفرُ فقد — بل يُهدَّأ فلا ينازع القيمةَ ولا العنوان. */
+body.ems-site .main :is(.stats-card, .ems-statcard):not(.dt-button):not(.btn-close) .ems-statcard__meta {
+  display: block !important;
+  clear: both !important;
+  color: var(--c-s-555, #555555) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1.4 !important;
+  margin: 6px 0 0 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  border: none !important;
+}
+
+/* ── ⑧ الانكسار — كما في الأصل ─────────────────────────────────────────── */
+@media (max-width: 900px) {
+  body.ems-site .main :is(.stats-grid, .ems-statgrid):not(.dt-button):not(.btn-close) {
+    grid-template-columns: repeat(2, minmax(150px, 1fr)) !important;
+  }
+}
+@media (max-width: 560px) {
+  body.ems-site .main :is(.stats-grid, .ems-statgrid):not(.dt-button):not(.btn-close) {
+    grid-template-columns: 1fr !important;
+  }
+}

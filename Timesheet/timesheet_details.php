@@ -456,7 +456,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         .tsd-scroll-x { overflow-x: auto; }
         .timesheet-details-page table.tsd-table { font-size: 13.5px; }
         .timesheet-details-page table.tsd-table-flush { margin-bottom: 0; }
-        .timesheet-details-page tr.tsd-thead-row { background: var(--primary); color: var(--c-fff, #fff); }
+        .timesheet-details-page tr.tsd-thead-row { color: var(--c-fff, #fff);}
         .timesheet-details-page .tsd-cell { padding: 8px 12px; }
         .timesheet-details-page .tsd-cell-sm { padding: 7px 12px; }
         .timesheet-details-page .tsd-center { text-align: center; }

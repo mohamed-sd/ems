@@ -388,8 +388,9 @@ echo ems_states_bundle('لا حجوزاتِ أسطولٍ في هذه الناف�
     <h5 class="fc-tight"><i class="fa fa-bookmark"></i> حجوزاتُ النافذة</h5>
     <div class="table-responsive"><table class="table display" id="fcTable" data-order='[[3,"desc"]]' data-page-length="25" data-state-save="false">
       <thead><tr>
+        <th>إجراءات</th>
         <th>رقم الحجز</th><th>المعدة/الفئة</th><th>العميل</th><th>من</th><th>إلى</th>
-        <th>الأيام</th><th>الحالة</th><th>الغرض</th><th>إجراءات</th>
+        <th>الأيام</th><th>الحالة</th><th>الغرض</th>
         <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
         <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
         <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
@@ -408,15 +409,6 @@ echo ems_states_bundle('لا حجوزاتِ أسطولٍ في هذه الناف�
         $tone = array('مبدئي' => 'fc-t-draft', 'مؤكَّد' => 'fc-t-ok', 'محوَّل لعقد' => 'fc-t-contract',
                       'منتهٍ' => 'fc-t-done', 'ملغى' => 'fc-t-cancel'); ?>
         <tr>
-          <td><?php echo fc_e($r['reservation_no']); ?></td>
-          <td><?php echo fc_e($what); ?></td>
-          <td><?php echo fc_e($r['client_name'] ?: '—'); ?></td>
-          <td><?php echo fc_e($r['start_date']); ?></td>
-          <td><?php echo fc_e($r['end_date']); ?></td>
-          <td><?php echo $days; ?></td>
-          <td><span class="fc-strong <?php echo $tone[$r['state']] ?? 'fc-t-default'; ?>">
-              <?php echo fc_e($r['state']); ?></span></td>
-          <td><?php echo fc_e($r['purpose'] ?: '—'); ?></td>
           <td>
             <?php if ($can_edit && $r['state'] !== 'ملغى'): ?>
             <form method="post" class="fc-inline" onsubmit="return confirm('إلغاءُ الحجز؟ السجلُّ يبقى.')">
@@ -428,6 +420,15 @@ echo ems_states_bundle('لا حجوزاتِ أسطولٍ في هذه الناف�
             </form>
             <?php else: ?>—<?php endif; ?>
           </td>
+          <td><?php echo fc_e($r['reservation_no']); ?></td>
+          <td><?php echo fc_e($what); ?></td>
+          <td><?php echo fc_e($r['client_name'] ?: '—'); ?></td>
+          <td><?php echo fc_e($r['start_date']); ?></td>
+          <td><?php echo fc_e($r['end_date']); ?></td>
+          <td><?php echo $days; ?></td>
+          <td><span class="fc-strong <?php echo $tone[$r['state']] ?? 'fc-t-default'; ?>">
+              <?php echo fc_e($r['state']); ?></span></td>
+          <td><?php echo fc_e($r['purpose'] ?: '—'); ?></td>
         </tr>
       <?php endforeach; ?>
       </tbody>

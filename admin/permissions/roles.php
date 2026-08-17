@@ -187,15 +187,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
 }
 
 .display thead th {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-m) 100%);
-    color: white;
-    font-weight: 600;
-    border: none;
-}
-
-.display tbody tr:hover {
-    background-color: #f8f9fa;
-}
+    border: none;}
 
 .btn {
     padding: 0.5rem 1rem;
@@ -369,14 +361,13 @@ require_once __DIR__ . '/../includes/layout_head.php';
                 <table id="rolesTable" class="display">
                     <thead>
                         <tr>
-                            <th width="80"><i class="fas fa-barcode"></i> #</th>
+                            <th width="120"><i class="fas fa-cogs"></i> إجراءات</th>
                             <th><i class="fas fa-tag"></i> اسم الدور</th>
                             <th><i class="fas fa-sitemap"></i> الدور الأب</th>
                             <th width="100"><i class="fas fa-layer-group"></i> المستوى</th>
                             <th width="140"><i class="fas fa-globe"></i> النطاق</th>
                             <th width="100"><i class="fas fa-toggle-on"></i> الحالة</th>
                             <th width="120"><i class="fas fa-calendar"></i> تاريخ الإنشاء</th>
-                            <th width="120"><i class="fas fa-cogs"></i> إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -394,11 +385,17 @@ require_once __DIR__ . '/../includes/layout_head.php';
                         } catch (\Throwable $t) { error_log('admin/permissions/roles list: ' . $t->getMessage()); }
 
                         if ($result) {
-                            $i = 1;
                             foreach ($result as $row):
                                 ?>
                                 <tr>
-                                    <td><strong><?= $i++; ?></strong></td>
+                                    <td class="text-center">
+                                        <a href="?edit_id=<?= $row['id']; ?>&action=edit" class="btn btn-sm btn-primary" title="تعديل">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="?delete_id=<?= $row['id']; ?>" onclick="return confirm('هل أنت متأكد من حذف هذا الدور؟');" class="btn btn-sm btn-danger" title="حذف">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
                                     <td><strong><?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?></strong></td>
                                     <td><?= htmlspecialchars($row['parent_name'], ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td class="text-center">
@@ -429,14 +426,6 @@ require_once __DIR__ . '/../includes/layout_head.php';
                                         <?php endif; ?>
                                     </td>
                                     <td><?= htmlspecialchars($row['created_at'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                    <td class="text-center">
-                                        <a href="?edit_id=<?= $row['id']; ?>&action=edit" class="btn btn-sm btn-primary" title="تعديل">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="?delete_id=<?= $row['id']; ?>" onclick="return confirm('هل أنت متأكد من حذف هذا الدور؟');" class="btn btn-sm btn-danger" title="حذف">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </td>
                                 </tr>
                             <?php
                             endforeach;
@@ -459,7 +448,7 @@ $(document).ready(function () {
             url: "/ems/assets/i18n/datatables/ar.json"
         },
         columnDefs: [
-            { "orderable": false, "targets": [7] }
+            { "orderable": false, "targets": [0] }
         ]
     });
 

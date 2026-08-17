@@ -2040,6 +2040,7 @@ try {
       <table id="projectsTable" class="display" data-order='[[3, "desc"]]' data-page-length="10">
         <thead>
           <tr>
+            <th>إجراءات</th>
             <th>#</th>
             <th>ID</th>
             <th>المعدة</th>
@@ -2054,7 +2055,6 @@ try {
             <th>ساعات العمل</th>
             <th>الإجمالي</th>
             <th>الحالة</th>
-            <th>إجراءات</th>
             <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
             <th class="ems-fn-th" data-fn="1">رقم الصف</th>
             <th class="ems-fn-th" data-fn="1">الموقع</th>
@@ -2107,7 +2107,11 @@ try {
 
             $id = intval($row['id']);
             echo "<tr>";
-            echo "<td><span data-ems-c='ts-56'>" . $row_index . "</span></td>";
+            echo "<td><div data-ems-c='ts-66'>"
+              . "<a href='javascript:void(0)' class='editBtn' data-id='" . $id . "' title='تعديل' data-ems-c='ts-67'><i class='fas fa-edit'></i></a>"
+              . "<a href='delete_timesheet.php?id=" . $id . "' onclick='return confirm(\"هل أنت متأكد؟\")' title='حذف' data-ems-c='ts-68'><i class='fas fa-trash'></i></a>"
+              . "<a href='timesheet_details.php?id=" . $id . "' title='عرض التفاصيل' data-ems-c='ts-69'><i class='fas fa-eye'></i></a>"
+              . "</div></td> <td><span data-ems-c='ts-56'>" . $row_index . "</span></td>";
             echo "<td><span data-ems-c='ts-57'>" . $id . "</span></td>";
             echo "<td><span data-ems-c='ts-58'>" . htmlspecialchars($row['eq_code'], ENT_QUOTES, 'UTF-8') . " - " . htmlspecialchars($row['eq_name'], ENT_QUOTES, 'UTF-8') . "</span></td>";
             echo "<td>" . htmlspecialchars($row['date'], ENT_QUOTES, 'UTF-8') . "</td>";
@@ -2121,11 +2125,7 @@ try {
             echo "<td><span data-ems-c='ts-63'>" . $totalwork . "</span></td>";
             echo "<td><span data-ems-c='ts-64'>" . $totalall . "</span></td>";
             echo "<td><div data-ems-c='ts-65'>" . $status . "</div></td>";
-            echo "<td><div data-ems-c='ts-66'>"
-              . "<a href='javascript:void(0)' class='editBtn' data-id='" . $id . "' title='تعديل' data-ems-c='ts-67'><i class='fas fa-edit'></i></a>"
-              . "<a href='delete_timesheet.php?id=" . $id . "' onclick='return confirm(\"هل أنت متأكد؟\")' title='حذف' data-ems-c='ts-68'><i class='fas fa-trash'></i></a>"
-              . "<a href='timesheet_details.php?id=" . $id . "' title='عرض التفاصيل' data-ems-c='ts-69'><i class='fas fa-eye'></i></a>"
-              . "</div></td>";
+            echo "";
             echo "</tr>";
 
             $row_index++;

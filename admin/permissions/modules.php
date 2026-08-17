@@ -240,15 +240,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
 }
 
 .display thead th {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-m) 100%);
-    color: white;
-    font-weight: 600;
-    border: none;
-}
-
-.display tbody tr:hover {
-    background-color: #f8f9fa;
-}
+    border: none;}
 
 .btn {
     padding: 0.5rem 1rem;
@@ -531,7 +523,7 @@ input[type="radio"] {
                 <table id="modulesTable" class="display">
                     <thead>
                         <tr>
-                            <th width="80"><i class="fas fa-barcode"></i> #</th>
+                            <th width="150"><i class="fas fa-cogs"></i> إجراءات</th>
                             <th width="80"><i class="fas fa-sort-numeric-down"></i> الترتيب</th>
                             <th width="80"><i class="fas fa-icons"></i> الأيقونة</th>
                             <th><i class="fas fa-book"></i> اسم الصفحة</th>
@@ -540,7 +532,6 @@ input[type="radio"] {
                             <th width="140"><i class="fas fa-folder-tree"></i> المجموعة</th>
                             <th width="80"><i class="fas fa-link"></i> رابط</th>
                             <th width="90"><i class="fas fa-bolt"></i> وصول سريع</th>
-                            <th width="150"><i class="fas fa-cogs"></i> إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -564,11 +555,17 @@ input[type="radio"] {
                         } catch (\Throwable $t) { error_log('admin/permissions/modules list: ' . $t->getMessage()); }
 
                         if ($result) {
-                            $i = 1;
                             foreach ($result as $row):
                                 ?>
                                 <tr>
-                                    <td><strong><?= $i++; ?></strong></td>
+                                    <td class="text-center">
+                                        <a href="?edit_id=<?= $row['id']; ?>&action=edit" class="btn btn-sm btn-primary" title="تعديل">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="?delete_id=<?= $row['id']; ?>" onclick="return confirm('هل أنت متأكد من حذف هذه الصفحة؟');" class="btn btn-sm btn-danger" title="حذف">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
                                     <td class="text-center">
                                         <span style="display: inline-block; background: var(--blue-soft); color: var(--blue); padding: 4px 10px; border-radius: 6px; font-weight: 700; font-size: 0.9rem;">
                                             <?= htmlspecialchars($row['display_order'] ?? '0', ENT_QUOTES, 'UTF-8'); ?>
@@ -630,14 +627,6 @@ input[type="radio"] {
                                             </span>
                                         <?php endif; ?>
                                     </td>
-                                    <td class="text-center">
-                                        <a href="?edit_id=<?= $row['id']; ?>&action=edit" class="btn btn-sm btn-primary" title="تعديل">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <a href="?delete_id=<?= $row['id']; ?>" onclick="return confirm('هل أنت متأكد من حذف هذه الصفحة؟');" class="btn btn-sm btn-danger" title="حذف">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </td>
                                 </tr>
                             <?php
                             endforeach;
@@ -661,7 +650,7 @@ $(document).ready(function () {
         },
         order: [[1, 'asc']], // الترتيب الافتراضي حسب عمود الترتيب
         columnDefs: [
-            { "orderable": false, "targets": [9] } // منع ترتيب عمود الإجراءات (تحرّك بعد إضافة عمودي الوصول السريع والمجموعة)
+            { "orderable": false, "targets": [0] } // منع ترتيب عمود الإجراءات — صار العمودَ الأوّل
         ]
     });
 

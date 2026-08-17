@@ -567,6 +567,9 @@ class TenantRegistry
         'nav_canonical' => array('type' => self::T_GLOBAL, 'soft' => false),
         'nav_canonical_current' => array('type' => self::T_GLOBAL, 'soft' => false),
         'nav_canonical_variants' => array('type' => self::T_GLOBAL, 'soft' => false),
+        // العشرُ مجموعاتٍ (2026-08-17): تعريفُ التبويبِ ونسبةُ كلِّ مسارٍ إليه — تعريفُ نظامٍ لا بياناتُ شركة
+        'nav_group_taxonomy' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'nav_route_group' => array('type' => self::T_GLOBAL, 'soft' => false),
         // UXUI-01 (ج): مقترحاتُ السقوفِ وحجرُ قواعدِ الاعتماد — مراجعُ نظامٍ عامّة
         'gov_cap_proposals' => array('type' => self::T_GLOBAL, 'soft' => false),
         // ف١٣ (تعديل 2026-08-18): سجلُّ تغييرِ الأحكامِ الحاكمة — تاريخُ سياسةٍ لا بياناتُ شركة

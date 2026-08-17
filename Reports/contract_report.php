@@ -60,11 +60,6 @@ include __DIR__ . '/../inheader.php';
             font-size: 12px;
         }
         .card-header h5 { margin: 0; }
-        .table thead th {
-            background: var(--c-f8fafc, #f8fafc);
-            color: var(--c-0c1c3e, #0c1c3e);
-            font-weight: 800;
-        }
         /* UXW-01 ②: أنماطٌ كانت موضعيةً — بادئةُ الشاشةِ rpt-con */
         .rpt-con-actions { display: flex; gap: 10px; flex-wrap: wrap; }
         .rpt-con-filter { align-items: end; }

@@ -147,9 +147,10 @@ echo ems_states_bundle('لا طلباتِ موافقاتٍ في هذا التب�
             <div class="table-responsive">
                 <table id="approvalsTable" class="display table table-hover mb-0 apr-req-table"
                        data-page-length="25" data-order="[[0,&quot;desc&quot;]]"
-                       data-column-defs="[{&quot;orderable&quot;:false,&quot;targets&quot;:[7]}]">
+                       data-column-defs="[{&quot;orderable&quot;:false,&quot;targets&quot;:[0]}]">
                     <thead class="table-light">
                     <tr>
+                        <th class="apr-req-w16">إجراءات</th>
                         <th class="apr-req-w5">م</th>
                         <th class="apr-req-w12">الكيان</th>
                         <th class="apr-req-w12">الإجراء</th>
@@ -157,7 +158,6 @@ echo ems_states_bundle('لا طلباتِ موافقاتٍ في هذا التب�
                         <th class="apr-req-w15">المرحلة الحالية</th>
                         <th class="apr-req-w10">الحالة</th>
                         <th class="apr-req-w18">تاريخ الإنشاء</th>
-                        <th class="apr-req-w16">إجراءات</th>
                         <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
                         <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
                         <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
@@ -204,6 +204,28 @@ echo ems_states_bundle('لا طلباتِ موافقاتٍ في هذا التب�
                             }
                             ?>
                             <tr>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button type="button" class="btn btn-secondary viewPayloadBtn" 
+                                                data-payload="<?php echo e($payload_preview); ?>"
+                                                title="عرض التفاصيل">
+                                            <i class="fas fa-eye"></i> عرض
+                                        </button>
+
+                                        <?php if ($can_act): ?>
+                                            <button type="button" class="btn btn-primary approveBtn" 
+                                                    data-id="<?php echo intval($row['id']); ?>"
+                                                    title="الموافقة على الطلب">
+                                                <i class="fas fa-check"></i> اعتماد
+                                            </button>
+                                            <button type="button" class="btn btn-danger rejectBtn" 
+                                                    data-id="<?php echo intval($row['id']); ?>"
+                                                    title="رفض الطلب">
+                                                <i class="fas fa-ban"></i> رفض
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
                                 <td><strong><?php echo intval($row['id']); ?></strong></td>
                                 <td>
                                     <span class="badge bg-info">
@@ -251,28 +273,6 @@ echo ems_states_bundle('لا طلباتِ موافقاتٍ في هذا التب�
                                         <i class="fas fa-clock"></i>
                                         <?php echo date('H:i', strtotime($row['created_at'])); ?>
                                     </small>
-                                </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <button type="button" class="btn btn-secondary viewPayloadBtn" 
-                                                data-payload="<?php echo e($payload_preview); ?>"
-                                                title="عرض التفاصيل">
-                                            <i class="fas fa-eye"></i> عرض
-                                        </button>
-
-                                        <?php if ($can_act): ?>
-                                            <button type="button" class="btn btn-primary approveBtn" 
-                                                    data-id="<?php echo intval($row['id']); ?>"
-                                                    title="الموافقة على الطلب">
-                                                <i class="fas fa-check"></i> اعتماد
-                                            </button>
-                                            <button type="button" class="btn btn-danger rejectBtn" 
-                                                    data-id="<?php echo intval($row['id']); ?>"
-                                                    title="رفض الطلب">
-                                                <i class="fas fa-ban"></i> رفض
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -384,10 +384,6 @@ echo ems_states_bundle('لا طلباتِ موافقاتٍ في هذا التب�
 
 .border-left-info {
     border-left: 4px solid var(--c-17a2b8, #17a2b8) !important;
-}
-
-.table-hover tbody tr:hover {
-    background-color: var(--c-f8f9fa, #f8f9fa);
 }
 
 .nav-tabs .nav-link {

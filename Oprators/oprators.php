@@ -912,7 +912,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <table id="primaryTable" class="display nowrap table-full-width">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>إجراءات</th>
                                 <th>المعدة</th>
                                 <th>نوع المعدة</th>
                                 <th>المورد</th>
@@ -923,7 +923,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <th>تاريخ البداية</th>
                                 <!-- <th>تاريخ النهاية</th> -->                                <!-- <th>عدد الساعات</th> -->
                                 <th>الحالة</th>
-                                <th>إجراءات</th>
 
                             </tr>
                         </thead>
@@ -1071,7 +1070,48 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             // دالة رسم صف تشغيل واحد (تُستخدم للجدولين)
                             $render_op_row = function ($row, $i) use ($opr_gate, $can_view, $can_edit, $can_delete, $selected_project_id) {
                                 echo "<tr>";
-                                echo "<td>" . $i . "</td>";
+                                echo "<td>
+                                                                <div class='action-btns'>
+                                                            " . ($can_view ? "<a href='javascript:void(0)' class='action-btn view viewOperationBtn'
+                                                                 data-id='" . $row['id'] . "'
+                                                                 data-equipment='" . htmlspecialchars($row['equipment_code'] . ' - ' . $row['equipment_name'], ENT_QUOTES) . "'
+                                                                 data-equipment-type='" . htmlspecialchars($row['equipment_type_name'] ?? '-', ENT_QUOTES) . "'
+                                                                 data-supplier='" . htmlspecialchars($row['suppliers_name'] ?? '-', ENT_QUOTES) . "'
+                                                                 data-contract='" . htmlspecialchars($contract_code_val, ENT_QUOTES) . "'
+                                                                 data-drivers='" . htmlspecialchars(!empty($row['driver_names']) ? $row['driver_names'] : '-', ENT_QUOTES) . "'
+                                                                 data-start='" . $row['start'] . "'
+                                                                 data-end='" . $row['end'] . "'
+                                                                 data-total-hours='" . $row['total_equipment_hours'] . "'
+                                                                 data-shift-hours='" . $row['shift_hours'] . "'
+                                                                 data-target-hours='" . ($row['target_daily_hours'] ?? '') . "'
+                                                                 data-shift-type='" . htmlspecialchars($row['shift_type'] ?? 'B', ENT_QUOTES) . "'
+                                                                 data-shift-type-label='" . htmlspecialchars($shift_type_label, ENT_QUOTES) . "'
+                                                                 data-category='" . htmlspecialchars($row['equipment_category'], ENT_QUOTES) . "'
+                                                                 data-status='" . $status_label . "'
+                                                                 data-status-class='" . $status_class . "'
+                                                                 data-reason='" . htmlspecialchars($row['reason'] ?? '', ENT_QUOTES) . "'
+                                                                 title='عرض التفاصيل'><i class='fa fa-eye'></i></a>" : "") . "
+                                                            " . ($can_edit ? "<a href='javascript:void(0)' class='action-btn edit editOperationBtn'
+                                                                 data-id='" . $row['id'] . "'
+                                                                 data-equipment='" . $row['equipment'] . "'
+                                                                 data-equipment-type='" . $row['equipment_type'] . "'
+                                                                 data-equipment-category='" . $row['equipment_category'] . "'
+                                                                 data-contract='" . $row['contract_id'] . "'
+                                                                 data-supplier='" . $row['supplier_id'] . "'
+                                                                 data-start='" . $row['start'] . "'
+                                                                 data-end='" . $row['end'] . "'
+                                                                 data-total-hours='" . $row['total_equipment_hours'] . "'
+                                                                 data-shift-hours='" . $row['shift_hours'] . "'
+                                                                 data-target-hours='" . ($row['target_daily_hours'] ?? '') . "'
+                                                                data-shift-type='" . htmlspecialchars($row['shift_type'] ?? 'B', ENT_QUOTES) . "'
+                                                                 data-status='" . $row['status'] . "'
+                                                                 title='تعديل'><i class='fa fa-edit'></i></a>" : "") . "
+                                                            " . ($can_delete ? "<a href='oprators.php?project_id=" . $selected_project_id . "&delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف التشغيل؟\")' title='حذف'>
+                                                                <i class='fa fa-trash'></i>
+                                                            </a>" : "") . "
+                                                                </div>
+                                                                " . $action_buttons . "
+                                                            </td>";
                                 echo "<td>" . $row['equipment_code'] . " - " . $row['equipment_name'] . "</td>";
                                 echo "<td>" . (!empty($row['equipment_type_name']) ? htmlspecialchars($row['equipment_type_name']) : "-") . "</td>";
 
@@ -1125,48 +1165,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 $contract_code_val = $contract_code_row ? $contract_code_row['contract_signing_date'] : '-';
 
                                 echo $status_cell;
-                                echo "<td>
-                                                                <div class='action-btns'>
-                                                            " . ($can_view ? "<a href='javascript:void(0)' class='action-btn view viewOperationBtn'
-                                                                 data-id='" . $row['id'] . "'
-                                                                 data-equipment='" . htmlspecialchars($row['equipment_code'] . ' - ' . $row['equipment_name'], ENT_QUOTES) . "'
-                                                                 data-equipment-type='" . htmlspecialchars($row['equipment_type_name'] ?? '-', ENT_QUOTES) . "'
-                                                                 data-supplier='" . htmlspecialchars($row['suppliers_name'] ?? '-', ENT_QUOTES) . "'
-                                                                 data-contract='" . htmlspecialchars($contract_code_val, ENT_QUOTES) . "'
-                                                                 data-drivers='" . htmlspecialchars(!empty($row['driver_names']) ? $row['driver_names'] : '-', ENT_QUOTES) . "'
-                                                                 data-start='" . $row['start'] . "'
-                                                                 data-end='" . $row['end'] . "'
-                                                                 data-total-hours='" . $row['total_equipment_hours'] . "'
-                                                                 data-shift-hours='" . $row['shift_hours'] . "'
-                                                                 data-target-hours='" . ($row['target_daily_hours'] ?? '') . "'
-                                                                 data-shift-type='" . htmlspecialchars($row['shift_type'] ?? 'B', ENT_QUOTES) . "'
-                                                                 data-shift-type-label='" . htmlspecialchars($shift_type_label, ENT_QUOTES) . "'
-                                                                 data-category='" . htmlspecialchars($row['equipment_category'], ENT_QUOTES) . "'
-                                                                 data-status='" . $status_label . "'
-                                                                 data-status-class='" . $status_class . "'
-                                                                 data-reason='" . htmlspecialchars($row['reason'] ?? '', ENT_QUOTES) . "'
-                                                                 title='عرض التفاصيل'><i class='fa fa-eye'></i></a>" : "") . "
-                                                            " . ($can_edit ? "<a href='javascript:void(0)' class='action-btn edit editOperationBtn'
-                                                                 data-id='" . $row['id'] . "'
-                                                                 data-equipment='" . $row['equipment'] . "'
-                                                                 data-equipment-type='" . $row['equipment_type'] . "'
-                                                                 data-equipment-category='" . $row['equipment_category'] . "'
-                                                                 data-contract='" . $row['contract_id'] . "'
-                                                                 data-supplier='" . $row['supplier_id'] . "'
-                                                                 data-start='" . $row['start'] . "'
-                                                                 data-end='" . $row['end'] . "'
-                                                                 data-total-hours='" . $row['total_equipment_hours'] . "'
-                                                                 data-shift-hours='" . $row['shift_hours'] . "'
-                                                                 data-target-hours='" . ($row['target_daily_hours'] ?? '') . "'
-                                                                data-shift-type='" . htmlspecialchars($row['shift_type'] ?? 'B', ENT_QUOTES) . "'
-                                                                 data-status='" . $row['status'] . "'
-                                                                 title='تعديل'><i class='fa fa-edit'></i></a>" : "") . "
-                                                            " . ($can_delete ? "<a href='oprators.php?project_id=" . $selected_project_id . "&delete_id=" . $row['id'] . "' class='action-btn delete' onclick='return confirm(\"هل أنت متأكد من حذف التشغيل؟\")' title='حذف'>
-                                                                <i class='fa fa-trash'></i>
-                                                            </a>" : "") . "
-                                                                </div>
-                                                                " . $action_buttons . "
-                                                            </td>";
+                                echo "";
                                 echo "</tr>";
                             };
                             // عرض صفوف الجدول الأول: المعدات الأساسية
@@ -1187,13 +1186,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <table id="reserveTable" class="display nowrap table-full-width">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>إجراءات</th>
                                 <th>المعدة</th>
                                 <th>نوع المعدة</th>                                <th>المورد</th>
                                 <th>ساعات الوردية</th>
                                 <th>نظام الوردية</th>
                                 <th>تاريخ البداية</th>                                <th>الحالة</th>
-                                <th>إجراءات</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1216,7 +1214,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <table id="brokenTable" class="display nowrap table-full-width">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>إجراءات</th>
                                 <th>المعدة</th>
                                 <th>نوع المعدة</th>
                                 <th>المورد</th>
@@ -1224,7 +1222,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <th>نظام الوردية</th>
                                 <th>تاريخ البداية</th>
                                 <th>الحالة</th>
-                                <th>إجراءات</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1247,7 +1244,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <table id="endedTable" class="display nowrap table-full-width">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>إجراءات</th>
                                 <th>المعدة</th>
                                 <th>نوع المعدة</th>
                                 <th>المورد</th>
@@ -1255,7 +1252,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <th>نظام الوردية</th>
                                 <th>تاريخ البداية</th>
                                 <th>الحالة</th>
-                                <th>إجراءات</th>
                             </tr>
                         </thead>
                         <tbody>

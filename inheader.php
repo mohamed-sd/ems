@@ -86,6 +86,11 @@ if (!function_exists('ems_css_ver')) {
          الفلاترِ الموضعيةَ للشاشاتِ المهاجرة (`fc-filter-bar` · `mkpi-filter`
          · `rpt-du-filter` …) فلا يُغلَب إلا بمن يليه. -->
     <link rel="stylesheet" href="/ems/assets/css/ems-filters.css<?php echo ems_css_ver('ems-filters.css'); ?>">
+    <!-- بطاقةُ الإحصاء — مصدرٌ واحدٌ لتصميمِها (أصلُه شاشتا المشاريعِ والعملاء،
+         وقد قِيستا متطابقتَين). كان مكرَّرًا ثلاثَ مرّاتٍ في `ems-screens.css`
+         تحت `.clients-main`/`.projects-main`/`.suppliers-main` فنُقل هنا مرةً
+         ونُزع تنطيقُه بالإدارة. يُحمَّل بعدَ `ems-screens.css` ليغلبَ بقاياه. -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-statcards.css<?php echo ems_css_ver('ems-statcards.css'); ?>">
     <!-- ══ تصميمُ الجداول — آخرُ ورقةٍ فعلًا (توحيد 2026-08-17) ══
          كان الوسمُ في موضعه السابقِ يحمل تعليقَ "loaded LAST" وهو ليس آخرًا:
          خمسةُ ملفاتٍ تُحمَّل بعدَه — أثقلُها ems-screens.css بستٍّ وعشرين قاعدةً
@@ -127,6 +132,9 @@ if (!function_exists('ems_css_ver')) {
          سطرِ الأزرار. لا ينقل عقدةً ولا يعيد بناءَ شجرةٍ — إضافةُ أصنافٍ فقط،
          فالبنيةُ مكتوبةٌ في PHP ظاهرةً للمراجعة. والصندوقُ صحيحٌ بدونه. -->
     <script src="/ems/assets/js/ems-filters.js<?php $__fltjs = __DIR__ . '/assets/js/ems-filters.js'; echo is_file($__fltjs) ? ('?v=' . filemtime($__fltjs)) : ''; ?>" defer></script>
+    <!-- عونُ بطاقةِ الإحصاء: يسم البطاقةَ وأجزاءَها **بالدورِ لا بالاسم** —
+         فـ٤٣ اسمًا مختلفًا في ٨٤ صفحةً لا يمسكها خُطّافٌ واحدٌ بغيرِ ذلك. -->
+    <script src="/ems/assets/js/ems-statcards.js<?php $__stjs = __DIR__ . '/assets/js/ems-statcards.js'; echo is_file($__stjs) ? ('?v=' . filemtime($__stjs)) : ''; ?>" defer></script>
     <!-- Unified Custom Select dropdown for forms (نظام القوائم المنسدلة الموحّد) -->
     <script src="/ems/assets/js/ems-select.js<?php $__emsjs=__DIR__.'/assets/js/ems-select.js'; echo is_file($__emsjs)?('?v='.filemtime($__emsjs)):''; ?>" defer></script>
     <!-- Bootstrap Bundle JS (local, CSP-safe) -->

@@ -337,10 +337,11 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <div class="table-container">
                 <table class="display pen-table no-datatable">
                     <thead><tr>
+                        <th>إجراءات</th>
                         <th>نوع البند</th><th>نسخة القاعدة المستعملة</th><th>الفترة</th>
                         <th>الملتزَم</th><th>المنفَّذ</th><th>الفارق</th>
                         <th>الأساس المحتسب</th><th>قبل السقف</th><th>السقف</th><th>المبلغ</th>
-                        <th>الحالة</th><th>إجراءات</th>
+                        <th>الحالة</th>
                         <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                         <th class="ems-fn-th" data-fn="1">رقم المحضر</th>
                         <th class="ems-fn-th" data-fn="1">العقد</th>
@@ -375,35 +376,6 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <?php else: foreach ($rows as $a):
                         $isPen = ($a['kind'] === 'penalty'); ?>
                         <tr class="pen-row-<?php echo pen_e($a['state']); ?>">
-                            <td><span class="pen-kind pen-kind-<?php echo pen_e($a['kind']); ?>">
-                                <?php echo pen_e($KIND[$a['kind']] ?? $a['kind']); ?></span></td>
-                            <td class="pen-small"><?php echo pen_e($RK[$a['rule_kind']] ?? $a['rule_kind']); ?>
-                                <?php if ($a['readiness_pct'] !== null): ?>
-                                    <br><span class="pen-muted">الجاهزية: <?php echo pen_n($a['readiness_pct']); ?>٪</span>
-                                <?php endif; ?></td>
-                            <td class="pen-small pen-nowrap"><?php echo pen_e($a['period_from']); ?><br><?php echo pen_e($a['period_to']); ?></td>
-                            <td class="pen-num"><?php echo pen_n($a['committed_qty']); ?></td>
-                            <td class="pen-num"><?php echo pen_n($a['actual_qty']); ?></td>
-                            <td class="pen-num"><?php echo pen_n($a['gap_qty']); ?></td>
-                            <td class="pen-num"><?php echo pen_n($a['base_amount']); ?></td>
-                            <td class="pen-num"><?php echo pen_n($a['raw_amount']); ?></td>
-                            <td class="pen-num"><?php echo pen_n($a['cap_amount']); ?>
-                                <?php if ($a['cap_amount'] !== null && (float) $a['raw_amount'] > (float) $a['cap_amount']): ?>
-                                    <br><span class="pen-capped">قُصّ بالسقف</span>
-                                <?php endif; ?></td>
-                            <td class="pen-num pen-amount <?php echo $isPen ? 'is-neg' : 'is-pos'; ?>">
-                                <?php echo ($isPen ? '−' : '+') . pen_n($a['amount']); ?>
-                                <br><span class="pen-muted"><?php echo pen_e($a['currency']); ?></span></td>
-                            <td class="pen-small">
-                                <span class="pen-state pen-state-<?php echo pen_e($a['state']); ?>">
-                                    <?php echo pen_e($STATE[$a['state']] ?? $a['state']); ?></span>
-                                <?php if ($a['state'] === 'waived' && $a['waive_reason']): ?>
-                                    <br><span class="pen-muted" title="<?php echo pen_e($a['waive_reason']); ?>">
-                                        سببُ الإعفاء مسجَّل</span>
-                                <?php endif; ?>
-                                <?php if ($a['reviewer']): ?><br><span class="pen-muted">راجع: <?php echo pen_e($a['reviewer']); ?></span><?php endif; ?>
-                                <?php if ($a['approver']): ?><br><span class="pen-muted">أجاز: <?php echo pen_e($a['approver']); ?></span><?php endif; ?>
-                            </td>
                             <td class="pen-small">
                                 <?php if ($can_assess && $a['state'] === 'computed'): ?>
                                     <form method="post" action="" class="pen-inline">
@@ -435,6 +407,35 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                                 <?php if ($a['state'] === 'posted'): ?>
                                     <span class="pen-muted">قيد #<?php echo intval($a['event_id']); ?></span>
                                 <?php endif; ?>
+                            </td>
+                            <td><span class="pen-kind pen-kind-<?php echo pen_e($a['kind']); ?>">
+                                <?php echo pen_e($KIND[$a['kind']] ?? $a['kind']); ?></span></td>
+                            <td class="pen-small"><?php echo pen_e($RK[$a['rule_kind']] ?? $a['rule_kind']); ?>
+                                <?php if ($a['readiness_pct'] !== null): ?>
+                                    <br><span class="pen-muted">الجاهزية: <?php echo pen_n($a['readiness_pct']); ?>٪</span>
+                                <?php endif; ?></td>
+                            <td class="pen-small pen-nowrap"><?php echo pen_e($a['period_from']); ?><br><?php echo pen_e($a['period_to']); ?></td>
+                            <td class="pen-num"><?php echo pen_n($a['committed_qty']); ?></td>
+                            <td class="pen-num"><?php echo pen_n($a['actual_qty']); ?></td>
+                            <td class="pen-num"><?php echo pen_n($a['gap_qty']); ?></td>
+                            <td class="pen-num"><?php echo pen_n($a['base_amount']); ?></td>
+                            <td class="pen-num"><?php echo pen_n($a['raw_amount']); ?></td>
+                            <td class="pen-num"><?php echo pen_n($a['cap_amount']); ?>
+                                <?php if ($a['cap_amount'] !== null && (float) $a['raw_amount'] > (float) $a['cap_amount']): ?>
+                                    <br><span class="pen-capped">قُصّ بالسقف</span>
+                                <?php endif; ?></td>
+                            <td class="pen-num pen-amount <?php echo $isPen ? 'is-neg' : 'is-pos'; ?>">
+                                <?php echo ($isPen ? '−' : '+') . pen_n($a['amount']); ?>
+                                <br><span class="pen-muted"><?php echo pen_e($a['currency']); ?></span></td>
+                            <td class="pen-small">
+                                <span class="pen-state pen-state-<?php echo pen_e($a['state']); ?>">
+                                    <?php echo pen_e($STATE[$a['state']] ?? $a['state']); ?></span>
+                                <?php if ($a['state'] === 'waived' && $a['waive_reason']): ?>
+                                    <br><span class="pen-muted" title="<?php echo pen_e($a['waive_reason']); ?>">
+                                        سببُ الإعفاء مسجَّل</span>
+                                <?php endif; ?>
+                                <?php if ($a['reviewer']): ?><br><span class="pen-muted">راجع: <?php echo pen_e($a['reviewer']); ?></span><?php endif; ?>
+                                <?php if ($a['approver']): ?><br><span class="pen-muted">أجاز: <?php echo pen_e($a['approver']); ?></span><?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; endif; ?>

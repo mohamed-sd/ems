@@ -874,7 +874,7 @@ include __DIR__ . '/../includes/page_header.php';
             <table id="projectsTable" class="display nowrap">
                 <thead>
                     <tr>
-                        <th data-group="basic"><i class="fas fa-hashtag"></i> #</th>
+                        <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
                         <th data-group="basic"><i class="fas fa-truck-loading"></i> المورد</th>
                         <th data-group="basic"><i class="fas fa-barcode"></i> كود المعدة</th>
                         <th data-group="identification"><i class="fas fa-hashtag"></i> الرقم التسلسلي</th>
@@ -885,7 +885,6 @@ include __DIR__ . '/../includes/page_header.php';
                         <th data-group="technical"><i class="fas fa-cogs"></i> حالة المعدة</th>
                         <th data-group="technical"><i class="fas fa-traffic-light"></i> التوفر</th>
                         <th data-group="status"><i class="fas fa-toggle-on"></i> الحالة</th>
-                        <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
                         <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                         <th class="ems-fn-th" data-fn="1">مسار التوزيع</th>
                         <th class="ems-fn-th" data-fn="1">الفئة التشغيلية</th>
@@ -980,10 +979,41 @@ include __DIR__ . '/../includes/page_header.php';
                         'scope'  => array('m' => 'equipments'),
                         'enrich' => array('s' => 'suppliers', 'o' => 'operations', 'ed' => 'equipment_drivers', 'd' => 'employees'),
                     ), $list_sql, $list_params);
-                    $i = 1;
                     foreach ($rows as $row) {
                         echo "<tr>";
-                        echo "<td><strong>" . $i++ . "</strong></td>";
+
+                        /* الإجراءاتُ عمودٌ أوّلُ — تُطبَع قبلَ بياناتِ الصفِّ لا بعدَها */
+                        echo "<td>";
+                        echo "<a href='javascript:void(0)' class='action-btn view viewEquipmentBtn' data-id='" . $row['id'] . "' title='عرض التفاصيل'>
+                                <i class='fas fa-eye'></i>
+                            </a>";
+                        if ($_SESSION['user']['role'] == "3" || $_SESSION['user']['role'] == "10") {
+                            echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-secondary' title='إدارة المشغلين'>
+                                    <i class='fas fa-user-cog'></i>
+                                </a>";
+                        } else {
+                            echo "<a href='equipments.php?edit=" . $row['id'] . "' class='action-btn btn-secondary' title='تعديل'>
+                                    <i class='fas fa-edit'></i>
+                                </a>";
+                        }
+                        // ── كرت المعدة: شارة الحالة + اعتماد ──
+                        $card_state = isset($row['card_state']) ? $row['card_state'] : 'active';
+                        if ($card_state === 'active') {
+                            echo "<span class='badge-available' title='كرت معتمد' data-ems-c='eq-4'><i class='fas fa-id-card'></i> نشط</span>";
+                        } else {
+                            echo "<span class='badge-busy' title='كرت مسودة' data-ems-c='eq-4'><i class='fas fa-id-card'></i> مسودة</span>";
+                            if ($can_edit) {
+                                // UXW-01: كان رمزُ الحماية وسمَ قالبٍ حرفيًّا داخلَ سلسلةٍ مطبوعةٍ فلا يُنفَّذ — صار نداءً حقيقيًّا
+                                echo "<form method='post' action='approve_card.php' class='d-inline' onsubmit=\"return confirm('اعتماد كرت هذه المعدة؟');\">"
+                                    . csrf_field()
+                                    . "<input type='hidden' name='equipment_id' value='" . intval($row['id']) . "'>"
+                                    . "<input type='hidden' name='return' value='equipments.php'>"
+                                    . "<button type='submit' class='action-btn' data-ems-c='eq-5' title='اعتماد الكرت'><i class='fas fa-circle-check'></i></button>"
+                                    . "</form>";
+                            }
+                        }
+                        echo "</td>";
+
                         echo "<td><strong class='supplier-name'>" . htmlspecialchars($row['supplier_name']) . "</strong></td>";
                         echo "<td><span class='mono code-badge'>" . htmlspecialchars($row['code']) . "</span></td>";
 
@@ -1048,38 +1078,7 @@ include __DIR__ . '/../includes/page_header.php';
                             }
                         }
 
-                        // الإجراءات
-                                                echo "<td>";
-                                                echo "<a href='javascript:void(0)' class='action-btn view viewEquipmentBtn' data-id='" . $row['id'] . "' title='عرض التفاصيل'>
-                                                        <i class='fas fa-eye'></i>
-                                                    </a>";
-                                                if ($_SESSION['user']['role'] == "3" || $_SESSION['user']['role'] == "10") {
-                                                                                                                echo "<a href='add_drivers.php?equipment_id=" . $row['id'] . "' class='action-btn btn-secondary' title='إدارة المشغلين'>
-                                                                        <i class='fas fa-user-cog'></i>
-                                                                    </a>";
-                                                } else {
-                                                                                                                echo "<a href='equipments.php?edit=" . $row['id'] . "' class='action-btn btn-secondary' title='تعديل'>
-                                                                        <i class='fas fa-edit'></i>
-                                                                    </a>";
-                                                        // يمكن إضافة زر حذف هنا إذا لزم الأمر
-                                                }
-                                                // ── كرت المعدة: شارة الحالة + اعتماد ──
-                                                $card_state = isset($row['card_state']) ? $row['card_state'] : 'active';
-                                                if ($card_state === 'active') {
-                                                    echo "<span class='badge-available' title='كرت معتمد' data-ems-c='eq-4'><i class='fas fa-id-card'></i> نشط</span>";
-                                                } else {
-                                                    echo "<span class='badge-busy' title='كرت مسودة' data-ems-c='eq-4'><i class='fas fa-id-card'></i> مسودة</span>";
-                                                    if ($can_edit) {
-                                                        // UXW-01: كان رمزُ الحماية وسمَ قالبٍ حرفيًّا داخلَ سلسلةٍ مطبوعةٍ فلا يُنفَّذ — صار نداءً حقيقيًّا
-                                                        echo "<form method='post' action='approve_card.php' class='d-inline' onsubmit=\"return confirm('اعتماد كرت هذه المعدة؟');\">"
-                                                            . csrf_field()
-                                                            . "<input type='hidden' name='equipment_id' value='" . intval($row['id']) . "'>"
-                                                            . "<input type='hidden' name='return' value='equipments.php'>"
-                                                            . "<button type='submit' class='action-btn' data-ems-c='eq-5' title='اعتماد الكرت'><i class='fas fa-circle-check'></i></button>"
-                                                            . "</form>";
-                                                    }
-                                                }
-                                                echo "</td>";
+                        // الإجراءاتُ طُبِعت في صدرِ الصفّ
 
                         echo "</tr>";
                     }

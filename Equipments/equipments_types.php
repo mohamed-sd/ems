@@ -159,11 +159,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <table id="projectsTable" class="display equipments-types-table">
                     <thead>
                         <tr>
-                            <th>#</th>
+                            <th>الإجراءات</th>
                             <th>الفئة التشغيلية</th>
                             <th>كود النوع</th>
                             <th>الحالة</th>
-                            <th>الإجراءات</th>
                             <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                             <th class="ems-fn-th" data-fn="1">اسم النوع</th>
                             <th class="ems-fn-th" data-fn="1">وحدة العدّاد</th>
@@ -183,11 +182,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <?php
                         $eq_types = ems_tenant_db()->select('equipments_types');
-                        $i = 1;
                         foreach ($eq_types as $row):
                             ?>
                             <tr>
-                                <td><?= $i++; ?></td>
+                                <td class="text-center">
+
+                                    <div class="action-btns">
+                                        <?php if ($perms['can_edit']): ?>
+                                            <a href="equipments_types.php?edit_id=<?= $row['id']; ?>" class="action-btn edit"
+                                                title="تعديل">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </a>
+                                        <?php endif; ?>
+                                        <?php if ($perms['can_delete']): ?>
+                                            <button type="button" class="action-btn delete delete-disabled" title="حذف">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        <?php endif; ?>
+                                    </div>
+
+                                </td>
                                 <td>
                                     <?php
                                     $form_badges = [
@@ -210,23 +224,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <?= $row['status'] === 'active'
                                         ? "<span class='status-active'>نشط</span>"
                                         : "<span class='status-inactive'>غير نشط</span>"; ?>
-                                </td>
-                                <td class="text-center">
-
-                                    <div class="action-btns">
-                                        <?php if ($perms['can_edit']): ?>
-                                            <a href="equipments_types.php?edit_id=<?= $row['id']; ?>" class="action-btn edit"
-                                                title="تعديل">
-                                                <i class="fa-solid fa-pen-to-square"></i>
-                                            </a>
-                                        <?php endif; ?>
-                                        <?php if ($perms['can_delete']): ?>
-                                            <button type="button" class="action-btn delete delete-disabled" title="حذف">
-                                                <i class="fa-solid fa-trash"></i>
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
-
                                 </td>
                             </tr>
                         <?php endforeach; ?>

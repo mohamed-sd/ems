@@ -224,7 +224,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
 .stats { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; }
 .stat { background:#fff; border-radius:10px; padding:.8rem 1.4rem; box-shadow:0 2px 6px rgba(12,28,62,.07); font-weight:600; color:var(--navy); }
 .stat b { font-size:1.3rem; display:block; }
-.door-head td { background:var(--table-group-row-bg,#eef4fb) !important; font-weight:700; color:var(--table-group-row-text,#1f4f7a); } /* وُصِل بمفاتيحِ ems-tables.css 2026-08-17 */
+.door-head td { background:var(--table-group-row-bg,#eef4fb) !important; color:var(--table-group-row-text,#1f4f7a);} /* وُصِل بمفاتيحِ ems-tables.css 2026-08-17 */
 .group-cell { color:#92700a; font-size:.85rem; }
 .badge { border-radius:6px; padding:.25rem .6rem; font-size:.78rem; font-weight:700; }
 .badge-shown { background:#d1f3d1; color:#059669; }
@@ -237,8 +237,8 @@ require_once __DIR__ . '/../includes/layout_head.php';
 .btn-danger { background:#ef4444; color:#fff; }
 .back-btn { background:#e5e7eb; color:var(--navy); }
 table.navtbl { width:100%; border-collapse:collapse; }
-table.navtbl th { background:linear-gradient(135deg,var(--navy) 0%,var(--navy-m) 100%); color:#fff; padding:.7rem; font-size:.85rem; }
-table.navtbl td { padding:.6rem .7rem; border-bottom:1px solid #eef1f5; font-size:.88rem; }
+table.navtbl th { padding:.7rem; font-size:.85rem;}
+table.navtbl td { padding:.6rem .7rem; font-size:.88rem;}
 table.navtbl tr:hover td { background:#f8fafc; }
 .route-code { direction:ltr; font-family:monospace; font-size:.78rem; color:#475569; }
 </style>
@@ -357,8 +357,9 @@ table.navtbl tr:hover td { background:#f8fafc; }
         <div class="card-body" style="padding:0;">
             <table class="navtbl">
                 <thead><tr>
+                    <th>إجراءات</th>
                     <th>الاسم</th><th>المسار</th><th>المجموعة</th><th>الترتيب</th>
-                    <th>العدّاد</th><th>الحالة الفعلية</th><th>إجراءات</th>
+                    <th>العدّاد</th><th>الحالة الفعلية</th>
                 </tr></thead>
                 <tbody>
                 <?php
@@ -374,18 +375,18 @@ table.navtbl tr:hover td { background:#f8fafc; }
                             ? '<span class="badge badge-perm">محجوب — بلا صلاحية عرض</span>'
                             : '<span class="badge badge-off">معطَّل — غير تابع</span>');
                     echo '<tr>';
-                    echo '<td>' . htmlspecialchars($it['label_ar']) . '</td>';
-                    echo '<td class="route-code">' . htmlspecialchars($it['route']) . '</td>';
-                    echo '<td class="group-cell">' . htmlspecialchars($it['group_name'] ?? '—') . '</td>';
-                    echo '<td>' . intval($it['sort_order']) . '</td>';
-                    echo '<td class="route-code">' . htmlspecialchars($it['counter_source'] ?? '—') . '</td>';
-                    echo '<td>' . $state . '</td>';
                     echo '<td style="white-space:nowrap;">';
                     echo '<a class="btn ' . (intval($it['active']) === 1 ? 'btn-danger' : 'btn-primary') . '" href="?toggle_id=' . intval($it['id']) . '&role_id=' . $selected_role_id . '">'
                         . (intval($it['active']) === 1 ? '<i class="fa fa-eye-slash"></i> تعطيل' : '<i class="fa fa-eye"></i> تفعيل') . '</a> ';
                     echo '<a class="btn btn-primary" href="?edit_id=' . intval($it['id']) . '"><i class="fa fa-pen"></i></a> ';
                     echo '<a class="btn btn-danger" href="?delete_id=' . intval($it['id']) . '&role_id=' . $selected_role_id . '" onclick="return confirm(\'حذف العنصر من قائمة الدور؟\')"><i class="fa fa-trash"></i></a>';
-                    echo '</td></tr>';
+                    echo '</td> <td>' . htmlspecialchars($it['label_ar']) . '</td>';
+                    echo '<td class="route-code">' . htmlspecialchars($it['route']) . '</td>';
+                    echo '<td class="group-cell">' . htmlspecialchars($it['group_name'] ?? '—') . '</td>';
+                    echo '<td>' . intval($it['sort_order']) . '</td>';
+                    echo '<td class="route-code">' . htmlspecialchars($it['counter_source'] ?? '—') . '</td>';
+                    echo '<td>' . $state . '</td>';
+                    echo '</tr>';
                 }
                 if (empty($items)) {
                     echo '<tr><td colspan="7" style="text-align:center;color:#64748b;padding:2rem;">لا عناصرَ لهذا الدور بعد — هذا الدور ما زال على مصادره القديمة حتى يُبذر ويُفعَّل في العلم.</td></tr>';

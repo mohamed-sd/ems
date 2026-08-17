@@ -446,7 +446,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="table-wrap wrg-table-wrap">
         <table class="data-table wrg-table-full">
             <thead>
-                <tr><th>إجراءات</th><th>#</th><th>الكود</th><th>الاسم</th><th>الفئة</th><th>المصدر</th><th>موقع القوة</th><th>الدرجة</th><th>الحالة</th><th>اللياقة</th><th>الاعتمادات</th>
+                <tr><th>إجراءات</th><th>الكود</th><th>الاسم</th><th>الفئة</th><th>المصدر</th><th>موقع القوة</th><th>الدرجة</th><th>الحالة</th><th>اللياقة</th><th>الاعتمادات</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
@@ -498,7 +498,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php if ($can_edit): ?><a href="worker_register.php?edit=<?= intval($row['id']) ?>" class="action-btn edit" title="تعديل"><i class="fas fa-edit"></i></a><?php endif; ?>
                         <a href="worker_register.php?edit=<?= intval($row['id']) ?>&tab=quals" class="action-btn view" title="المهارات والاعتمادات"><i class="fas fa-certificate"></i></a>
                     </div></td>
-                    <td><?= $i++ ?></td>
                     <td><code><?= htmlspecialchars($row['code'] ?: ('W-' . $row['id'])) ?></code></td>
                     <td><strong><?= htmlspecialchars($row['employee_name'] ?: '-') ?></strong></td>
                     <td><span class="badge badge-info"><?= htmlspecialchars($row['worker_category']) ?></span></td>
@@ -514,7 +513,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tr>
             <?php endforeach; }
             if (!$res || $i === 1): ?>
-                <tr><td colspan="11" class="wrg-empty-cell">لا يوجد عمالٌ مصنّفون بعد. استخدم «تصنيف عامل تشغيلي» لإضافة أول عامل.</td></tr>
+                <tr><td colspan="10" class="wrg-empty-cell">لا يوجد عمالٌ مصنّفون بعد. استخدم «تصنيف عامل تشغيلي» لإضافة أول عامل.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>

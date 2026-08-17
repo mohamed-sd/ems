@@ -175,7 +175,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="table-wrap jt-table-wrap">
         <table class="data-table jt-table-full" id="jtTable">
             <thead>
-                <tr><th>إجراءات</th><th>#</th><th>المسمى</th><th>الوصف</th><th>مشغّل؟</th><th>الموظفون</th><th>النطاق</th><th>الحالة</th>
+                <tr><th>إجراءات</th><th>المسمى</th><th>الوصف</th><th>مشغّل؟</th><th>الموظفون</th><th>النطاق</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
@@ -194,7 +194,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 'enrich' => array('e' => 'employees'),
             ), "SELECT jt.*, (SELECT COUNT(*) FROM employees e WHERE e.job_title_id = jt.id) AS used_count
                     FROM job_titles jt WHERE {TENANT_SCOPE} ORDER BY jt.sort_order, jt.name", array());
-            $i = 1;
             { foreach ($jt_rows as $row):
                 $is_global   = ($row['company_id'] === null);
                 $can_manage  = $is_super_admin || (!$is_global && intval($row['company_id']) === $company_id);
@@ -211,7 +210,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php endif; ?>
                         <?php if (!$can_manage): ?><span class="badge jt-badge-muted">عامّ</span><?php endif; ?>
                     </div></td>
-                    <td><?= $i++ ?></td>
                     <td><strong><?= htmlspecialchars($row['name']) ?></strong></td>
                     <td><?= htmlspecialchars($row['description'] ?: '-') ?></td>
                     <td><?= intval($row['is_operator']) ? '<span class="badge badge-info">مشغّل</span>' : '—' ?></td>
@@ -221,7 +219,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tr>
             <?php endforeach; }
             if (empty($jt_rows)): ?>
-                <tr><td colspan="8" class="jt-empty-cell">لا توجد مسمّيات بعد.</td></tr>
+                <tr><td colspan="7" class="jt-empty-cell">لا توجد مسمّيات بعد.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>

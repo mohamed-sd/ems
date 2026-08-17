@@ -274,7 +274,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <table id="aTable" class="display nowrap">
             <thead><tr>
-                <th>#</th><th>الاسم</th><th>اسم المستخدم</th><th>الدور</th><th>المدير الأب</th><th>الموظف المرتبط</th><th>رقم الهاتف</th><th>الإجراءات</th>
+                <th>الإجراءات</th><th>الاسم</th><th>اسم المستخدم</th><th>الدور</th><th>المدير الأب</th><th>الموظف المرتبط</th><th>رقم الهاتف</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                 <th class="ems-fn-th" data-fn="1">رقم التكليف</th>
                 <th class="ems-fn-th" data-fn="1">الأصيل</th>
@@ -310,7 +310,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     WHERE u.parent_id <> '0' AND u.parent_id <> '' AND u.role <> '-1' AND $users_not_deleted_sql AND {TENANT_SCOPE}
                     ORDER BY u.id DESC");
             } catch (\Throwable $t) { error_log('all_assistants.php list: ' . $t->getMessage()); }
-            $i = 1;
             if ($list) { foreach ($list as $row):
                 $roleText = $row['role_name'] ? htmlspecialchars($row['role_name'],ENT_QUOTES,'UTF-8') : '<span class="pu-text-muted">غير معروف</span>';
                 $eid = intval($row['employee_id']);
@@ -319,13 +318,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     : "<span class='pu-text-muted'>— غير مرتبط —</span>";
             ?>
                 <tr>
-                    <td><?= $i++ ?></td>
-                    <td><strong><?= htmlspecialchars($row['name']) ?></strong></td>
-                    <td><code class='pu-code'><?= htmlspecialchars($row['username']) ?></code></td>
-                    <td><?= $roleText ?></td>
-                    <td><?= htmlspecialchars($row['parent_name'] ?: ('#'.$row['parent_id'])) ?></td>
-                    <td><?= $empCell ?></td>
-                    <td><?= htmlspecialchars($row['phone']) ?></td>
                     <td><div class='action-btns'>
                         <?php if ($can_edit): ?>
                         <a href='javascript:void(0)' class='action-btn edit'
@@ -338,6 +330,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <a href='all_assistants.php?delete=<?= intval($row['id']) ?>' class='action-btn delete' onclick="return confirm('حذف هذا المعاون؟')" title='حذف'><i class='fas fa-trash'></i></a>
                         <?php endif; ?>
                     </div></td>
+                    <td><strong><?= htmlspecialchars($row['name']) ?></strong></td>
+                    <td><code class='pu-code'><?= htmlspecialchars($row['username']) ?></code></td>
+                    <td><?= $roleText ?></td>
+                    <td><?= htmlspecialchars($row['parent_name'] ?: ('#'.$row['parent_id'])) ?></td>
+                    <td><?= $empCell ?></td>
+                    <td><?= htmlspecialchars($row['phone']) ?></td>
                 </tr>
             <?php endforeach; } ?>
             </tbody>

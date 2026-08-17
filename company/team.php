@@ -269,7 +269,6 @@ ems_public_head('إدارة فريق الشركة | EMS', array('icons' => false
         .btn{border:none;background:#102443;color:#fff;padding:11px 13px;border-radius:10px;font-family:inherit;font-weight:800;cursor:pointer}
         table{width:100%;border-collapse:collapse}
         th,td{padding:9px;border-bottom:1px solid var(--line);font-size:.86rem;text-align:right}
-        th{background:#f6f9ff;color:#30527f}
         .top-links{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
         .linkbtn{display:inline-block;background:#fff;border:1px solid var(--line);color:#30527f;text-decoration:none;padding:8px 11px;border-radius:10px;font-weight:700;font-size:.84rem}
         @media(max-width:900px){.grid{grid-template-columns:1fr}}
@@ -378,18 +377,17 @@ ems_public_head('إدارة فريق الشركة | EMS', array('icons' => false
             <table>
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>الإجراءات</th>
                         <th>الاسم</th>
                         <th>البريد</th>
                         <th>الدور</th>
                         <th>الحالة</th>
                         <th>آخر دخول</th>
-                        <th>الإجراءات</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if (empty($list)): ?>
-                        <tr><td colspan="7">لا يوجد مستخدمون بعد.</td></tr>
+                        <tr><td colspan="6">لا يوجد مستخدمون بعد.</td></tr>
                     <?php else: foreach ($list as $idx => $u): ?>
                         <?php
                         // تحديد IDّ الدور: role_id أولاً، ثم role
@@ -419,7 +417,13 @@ ems_public_head('إدارة فريق الشركة | EMS', array('icons' => false
                         $stInfo = isset($statusLabels[$stKey]) ? $statusLabels[$stKey] : array('label' => e($u['status']), 'cls' => 'st-inactive');
                         ?>
                         <tr>
-                            <td><?php echo intval($idx + 1); ?></td>
+                            <td>
+                                <a href="javascript:void(0)"
+                                   onclick="openEditModal(<?php echo intval($u['id']); ?>, '<?php echo addslashes(e($u['name'])); ?>', '<?php echo addslashes(e($u['email'])); ?>', '<?php echo addslashes(e($u['phone'])); ?>', <?php echo intval(isset($u['role_id']) && intval($u['role_id']) > 0 ? $u['role_id'] : $u['role']); ?>, '<?php echo e(isset($u['status']) ? $u['status'] : 'active'); ?>')"
+                                   style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(16,36,67,.08);color:#30527f;font-size:.8rem;font-weight:700;text-decoration:none;">
+                                    تعديل
+                                </a>
+                            </td>
                             <td style="font-weight:700"><?php echo e($u['name']); ?></td>
                             <td style="color:#64748b"><?php echo e($u['email']); ?></td>
                             <td>
@@ -429,13 +433,6 @@ ems_public_head('إدارة فريق الشركة | EMS', array('icons' => false
                             </td>
                             <td><span class="status-badge <?php echo $stInfo['cls']; ?>"><?php echo $stInfo['label']; ?></span></td>
                             <td style="color:#94a3b8;font-size:.82rem"><?php echo !empty($u['last_login_at']) ? e(date('d/m/Y H:i', strtotime($u['last_login_at']))) : '—'; ?></td>
-                            <td>
-                                <a href="javascript:void(0)"
-                                   onclick="openEditModal(<?php echo intval($u['id']); ?>, '<?php echo addslashes(e($u['name'])); ?>', '<?php echo addslashes(e($u['email'])); ?>', '<?php echo addslashes(e($u['phone'])); ?>', <?php echo intval(isset($u['role_id']) && intval($u['role_id']) > 0 ? $u['role_id'] : $u['role']); ?>, '<?php echo e(isset($u['status']) ? $u['status'] : 'active'); ?>')"
-                                   style="display:inline-block;padding:4px 10px;border-radius:8px;background:rgba(16,36,67,.08);color:#30527f;font-size:.8rem;font-weight:700;text-decoration:none;">
-                                    تعديل
-                                </a>
-                            </td>
                         </tr>
                     <?php endforeach; endif; ?>
                 </tbody>

@@ -125,7 +125,6 @@ echo ems_states_bundle('لا آلياتِ ولا عقودَ مسجَّلةً ل�
         <table id="projectsTable" class="display sup-det-table">
             <thead>
                 <tr>
-                    <th>#</th>
                     <th class="sup-det-th-r">كود المعدة</th>
                     <th class="sup-det-th-r"> الاسم </th>
                     <th class="sup-det-th-r">نوع الآليه</th>
@@ -142,10 +141,8 @@ echo ems_states_bundle('لا آلياتِ ولا عقودَ مسجَّلةً ل�
                         'scope' => array('equipments' => 'equipments'),
                     ), "SELECT `id`, `code`, `type`, `name`, `status` FROM `equipments` WHERE {TENANT_SCOPE} AND suppliers = ? ORDER BY id DESC", array($project));
                 } catch (\Throwable $t) { $eq_rows = array(); }
-                $i = 1;
                 foreach ($eq_rows as $row) {
                     echo "<tr>";
-                    echo "<td>" . $i++ . "</td>";
                     echo "<td>" . $row['code'] . "</td>";
                     echo "<td>" . $row['name'] . "</td>";
                     echo $row['type'] == "1" ? "<td class='sup-det-type-a'> حفار </td>" : "<td class='sup-det-type-b'> قلاب </td>";
@@ -169,13 +166,12 @@ echo ems_states_bundle('لا آلياتِ ولا عقودَ مسجَّلةً ل�
         <table id="projectsTable1" class="projectsTable sup-det-table">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th class="sup-det-th-c">إجراءات</th>
                     <th>المشروع</th>
                     <th class="sup-det-th-c">تاريخ البداية</th>
                     <th class="sup-det-th-c">المستهدف شهرياً</th>
                     <th class="sup-det-th-c">إجمالي ساعات العقد</th>
                     <th class="sup-det-th-c">الحالة</th>
-                    <th class="sup-det-th-c">إجراءات</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                     <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
@@ -200,13 +196,12 @@ echo ems_states_bundle('لا آلياتِ ولا عقودَ مسجَّلةً ل�
                         WHERE {TENANT_SCOPE} AND sc.supplier_id = ?
                         ORDER BY sc.id DESC", array($project));
                 } catch (\Throwable $t) { $sc_rows = array(); }
-                $i = 1;
                 foreach ($sc_rows as $row) {
                      $status = $row['status']=="1" ? "<font color='green'>ساري</font>" : "
                     <font color='red'>منتهي</font>";
 
                     echo "<tr>";
-                    echo "<td>" . $i++ . "</td>";
+                    echo "<td><a href='../Contracts/contracts_details.php?id=" . $row['id'] . "' class='sup-det-view'><i class='fa fa-eye'></i></a></td>";
                     echo "<td><strong>" . ($row['project_name'] ?? 'غير محدد') . "</strong></td>";
                     echo "<td>" . $row['contract_signing_date'] . "</td>";
                     echo "<td class='sup-det-target'>" . number_format($row['hours_monthly_target']) . " ساعة</td>";
@@ -216,7 +211,6 @@ echo ems_states_bundle('لا آلياتِ ولا عقودَ مسجَّلةً ل�
                     //         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
                     //         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
                     //       </td>";
-                    echo "<td><a href='../Contracts/contracts_details.php?id=" . $row['id'] . "' class='sup-det-view'><i class='fa fa-eye'></i></a></td>";
                     echo "</tr>";
                 }
                 ?>

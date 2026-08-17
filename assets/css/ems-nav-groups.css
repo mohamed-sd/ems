@@ -225,6 +225,94 @@
 /* السايدبار المطويّ: الفاصل نصٌّ محض فلا معنى له — يُزال من التدفّق */
 .ems-site .sidebar.closed .nav-subhead { display: none; }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * مُرشِّحُ القائمة — الطريقُ الوحيدُ الأقصرُ من «افتح مجموعةً ثم امسح»
+ * ───────────────────────────────────────────────────────────────────────────
+ * ◆ **لماذا**: بعدَ حصرِ التبويبِ في عشرٍ بقي أنَّ الدورَ الثقيل (٦٢–٩٢ رابطًا)
+ *   يرى أكبرَ مجموعاتِه بخمسةٍ وثلاثين رابطًا، والطيُّ **أكورديونٌ** (واحدةٌ
+ *   مفتوحةٌ لا غير) — فالوصولُ إلى رابطٍ في مجموعةٍ أخرى نقرتان ومسحٌ بصريّ.
+ *   والحرفانِ في حقلِ الترشيحِ يختصران ذلك كلَّه، **بلا إخراجِ رابطٍ من مجموعتِه**.
+ * ◆ ولا يُخفي المُرشِّحُ صلاحيةً ولا يُنشئ رابطًا: يُظهر ما هو معروضٌ أصلًا.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+.ems-site .sidebar .nav-filter {
+  position: relative;
+  margin: 6px 10px 10px;
+}
+/* ══ حدُّ الحقلِ رماديٌّ يُرى · وذهبيٌّ عند الوقوف (قرارُ المالك 2026-08-17) ══
+   ◆ **العطبُ المقيس**: كان الحدُّ `rgba(255,255,255,.18)` والخلفيةُ
+     `rgba(255,255,255,.08)` — أبيضُ شفٌّ على سايدبارٍ **أبيضَ**
+     (`.sidebar { background: var(--c-surface) }`). فالحقلُ بلا حافّةٍ مرئيةٍ
+     البتّة: لا يُعرف أين يبدأ ولا أين ينتهي، ولا يبدو حقلًا يُكتب فيه.
+     (القيمتان مأخوذتان من قالبٍ لسايدبارٍ داكنٍ لم يعد قائمًا.)
+   ◆ **والحدُّ الآن رماديٌّ صريح** بالرمزِ نفسِه الذي تحمله حقولُ النظامِ كلُّها
+     (`--emsf-field-bdr` في ems-forms.css = `--c-999999`) — فالحقلُ في القائمةِ
+     يقول ما تقوله بقيةُ الحقول.
+   ◆ **وذهبيٌّ عند الوقوف**: `--or` هو ذهبُ الهوية (`#f4c542`) نفسُه الذي
+     يحدُّ الشريطَ الأصفرَ ويضيء أيقوناتِ التوبار عند المرور. والتحويمُ يُلتقط
+     على **الغلافِ** لا على الحقلِ وحدَه، فمرورُ الفأرةِ على أيقونةِ العدسةِ
+     أو زرِّ المسحِ يُضيء الحدَّ أيضًا — الحقلُ وما فيه شيءٌ واحدٌ في الحسّ.
+   ◆ **والتركيزُ يرث الذهبَ نفسَه** بدل `--c-amber-400`: لونان ذهبيّان
+     متقاربان في مكوّنٍ واحدٍ فرقٌ بلا معنى، والحلقةُ صارت ذهبيةً شفّافةً
+     تُرى على الأبيضِ بعدما كانت بيضاءَ عليه. */
+.ems-site .sidebar .nav-filter input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 7px 30px 7px 26px;
+  font: inherit;
+  font-size: var(--text-caption, 12.5px);
+  color: inherit;
+  background: var(--c-surface, #fff);
+  border: 1px solid var(--c-999999, #999);
+  border-radius: 6px;
+  outline: none;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.ems-site .sidebar .nav-filter input::placeholder { color: inherit; opacity: .55; }
+.ems-site .sidebar .nav-filter:hover input,
+.ems-site .sidebar .nav-filter input:hover {
+  border-color: var(--or, var(--c-brand-gold, #f4c542));
+}
+.ems-site .sidebar .nav-filter input:focus-visible {
+  border-color: var(--or, var(--c-brand-gold, #f4c542));
+  box-shadow: 0 0 0 2px var(--c-rgba24419766042, rgba(244, 197, 102, .42));
+}
+.ems-site .sidebar .nav-filter .nav-filter-icon {
+  position: absolute;
+  inset-inline-start: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: .55;
+  font-size: 12px;
+  pointer-events: none;
+}
+.ems-site .sidebar .nav-filter .nav-filter-clear {
+  position: absolute;
+  inset-inline-end: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: none;
+  border: 0;
+  background: none;
+  color: inherit;
+  opacity: .6;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+}
+.ems-site .sidebar .nav-filter.has-value .nav-filter-clear { display: block; }
+.ems-site .sidebar .nav-filter .nav-filter-empty {
+  display: none;
+  padding: 6px 2px 0;
+  font-size: var(--text-caption, 12px);
+  opacity: .7;
+}
+.ems-site .sidebar .nav-filter.is-empty .nav-filter-empty { display: block; }
+/* أثناءُ الترشيحِ تُخفى فواصلُ الأقسامِ: الناتجُ قائمةُ نتائجَ لا بناءُ دورة */
+.ems-site .sidebar.is-filtering .nav-subhead { display: none; }
+.ems-site .sidebar .nav-hidden { display: none !important; }
+/* السايدبار المطويُّ (شريطُ أيقونات) لا يتّسع لحقلٍ نصّيّ */
+.ems-site .sidebar.closed .nav-filter { display: none; }
+
 /* NM-05 (الوثيقة 70 §4-5): سطرُ شرحِ المرحلةِ تحتَ اسمِها — فالمبتدئُ لا يسأل زميلَه */
 .nav-group-head .nav-stage-desc {
   display: block;

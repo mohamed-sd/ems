@@ -953,8 +953,9 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
             <table class="alltables display nowrap cr-table-full" id="contractRegistryTable"
                    data-state-save="false" data-order="[]">
                 <thead><tr>
+                    <th>الإجراءات</th>
                     <th>#</th><th>الشخص</th><th>الفئة</th><th>نموذج الأجر</th><th>المشروع</th>
-                    <th>المدة</th><th>الحالة</th><th>المصدر</th><th>الإجراءات</th>
+                    <th>المدة</th><th>الحالة</th><th>المصدر</th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ($rows as $r):
@@ -963,27 +964,6 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                     $daysLeft = ($r['days_left'] !== null) ? intval($r['days_left']) : null;
                 ?>
                     <tr>
-                        <td><a href="?contract_id=<?php echo intval($r['id']); ?>" title="مكوّنات الأجر (H-08-②)"><?php echo intval($r['id']); ?></a></td>
-                        <td><strong><?php echo htmlspecialchars($r['employee_name'] ?? ('#' . intval($r['employee_id']))); ?></strong></td>
-                        <td><?php echo htmlspecialchars($CATEGORIES[$r['category']] ?? $r['category']); ?></td>
-                        <td><?php echo htmlspecialchars($r['pay_label'] ?? '—'); ?></td>
-                        <td><?php echo htmlspecialchars($r['project_name'] ?? '—'); ?></td>
-                        <td>
-                            <?php echo htmlspecialchars($r['start_date'] ?: '؟'); ?> → <?php echo htmlspecialchars($r['end_date'] ?: 'مفتوح'); ?>
-                            <?php if ($daysLeft !== null && $daysLeft >= 0 && $daysLeft <= 30 && ECSM::isReadable($state)): ?>
-                                <span class="badge badge-warning" title="CON-01 §6: شارةُ عقدٍ ينتهي خلال ثلاثين يومًا">ينتهي بعد <?php echo $daysLeft; ?> يومًا</span>
-                            <?php endif; ?>
-                        </td>
-                        <td><?php echo $stateChip($state); ?></td>
-                        <td>
-                            <?php if ($isMigrated): ?>
-                                <span class="badge badge-light" title="الترحيلُ قراءةً — الكتابةُ في مصدره القديم حتى إقفاله بمطابقة (N-04)">
-                                    مرحَّل قراءةً · <?php echo htmlspecialchars($SOURCES[$r['source_table']] ?? $r['source_table']); ?>
-                                </span>
-                            <?php else: ?>
-                                <span class="badge badge-primary">السجل الموحّد</span>
-                            <?php endif; ?>
-                        </td>
                         <td>
                             <?php if ($isMigrated || !$can_edit): ?>
                                 —
@@ -1025,6 +1005,27 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                                     <button type="submit" class="action-btn edit" title="استئناف — يعود إلى حيث كان"><i class="fas fa-play"></i></button>
                                 </form>
                                 <?php endif; ?>
+                            <?php endif; ?>
+                        </td>
+                        <td><a href="?contract_id=<?php echo intval($r['id']); ?>" title="مكوّنات الأجر (H-08-②)"><?php echo intval($r['id']); ?></a></td>
+                        <td><strong><?php echo htmlspecialchars($r['employee_name'] ?? ('#' . intval($r['employee_id']))); ?></strong></td>
+                        <td><?php echo htmlspecialchars($CATEGORIES[$r['category']] ?? $r['category']); ?></td>
+                        <td><?php echo htmlspecialchars($r['pay_label'] ?? '—'); ?></td>
+                        <td><?php echo htmlspecialchars($r['project_name'] ?? '—'); ?></td>
+                        <td>
+                            <?php echo htmlspecialchars($r['start_date'] ?: '؟'); ?> → <?php echo htmlspecialchars($r['end_date'] ?: 'مفتوح'); ?>
+                            <?php if ($daysLeft !== null && $daysLeft >= 0 && $daysLeft <= 30 && ECSM::isReadable($state)): ?>
+                                <span class="badge badge-warning" title="CON-01 §6: شارةُ عقدٍ ينتهي خلال ثلاثين يومًا">ينتهي بعد <?php echo $daysLeft; ?> يومًا</span>
+                            <?php endif; ?>
+                        </td>
+                        <td><?php echo $stateChip($state); ?></td>
+                        <td>
+                            <?php if ($isMigrated): ?>
+                                <span class="badge badge-light" title="الترحيلُ قراءةً — الكتابةُ في مصدره القديم حتى إقفاله بمطابقة (N-04)">
+                                    مرحَّل قراءةً · <?php echo htmlspecialchars($SOURCES[$r['source_table']] ?? $r['source_table']); ?>
+                                </span>
+                            <?php else: ?>
+                                <span class="badge badge-primary">السجل الموحّد</span>
                             <?php endif; ?>
                         </td>
                     </tr>

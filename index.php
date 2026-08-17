@@ -686,18 +686,11 @@ ul{list-style:none}
 .cmp-shell table{width:100%;border-collapse:collapse;min-width:540px}
 .cmp-shell th{
   padding:17px 22px;text-align:right;
-  font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
   border-bottom:1px solid rgba(180,130,20,.14);
-  background:rgba(248,244,234,1);
-  font-family:'Tajawal',sans-serif;
-}
-.cmp-shell th:nth-child(1){color:var(--tx3)}
-.cmp-shell th:nth-child(2){color:var(--au3)}
-.cmp-shell th:nth-child(3){color:var(--tx3)}
-.cmp-shell td{padding:14px 22px;font-size:.86rem;border-bottom:1px solid rgba(0,0,0,.05);font-family:'Tajawal',sans-serif}
+  font-family:'Tajawal',sans-serif;}
+.cmp-shell td{padding:14px 22px;font-size:.86rem;font-family:'Tajawal',sans-serif;}
 .cmp-shell tbody tr:last-child td{border-bottom:none}
-.cmp-shell tbody tr:hover{background:rgba(232,144,10,.05)}
-.cmp-shell td:first-child{color:var(--tx2);font-weight:500}
 
 .ty{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:700;color:var(--em5);background:var(--bg-em);border:1px solid var(--br-em);padding:4px 11px;border-radius:4px}
 .ty svg{width:12px;height:12px}

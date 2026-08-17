@@ -178,13 +178,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
 .table-container { overflow-x: auto; }
 
 .display thead th {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-m) 100%);
-    color: white;
-    font-weight: 600;
-    border: none;
-}
-
-.display tbody tr:hover { background-color: #f8f9fa; }
+    border: none;}
 
 .btn {
     padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; text-decoration: none;
@@ -372,14 +366,13 @@ input[type="radio"], input[type="checkbox"] { cursor: pointer; }
                 <table id="groupsTable" class="display">
                     <thead>
                         <tr>
-                            <th width="70"><i class="fas fa-barcode"></i> #</th>
+                            <th width="140"><i class="fas fa-cogs"></i> إجراءات</th>
                             <th width="80"><i class="fas fa-sort-numeric-down"></i> الترتيب</th>
                             <th width="80"><i class="fas fa-icons"></i> الأيقونة</th>
                             <th><i class="fas fa-folder"></i> اسم المجموعة</th>
                             <th><i class="fas fa-user-tie"></i> الدور المسؤول</th>
                             <th width="90"><i class="fas fa-link"></i> عدد الروابط</th>
                             <th width="80"><i class="fas fa-toggle-on"></i> الحالة</th>
-                            <th width="140"><i class="fas fa-cogs"></i> إجراءات</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -409,14 +402,18 @@ input[type="radio"], input[type="checkbox"] { cursor: pointer; }
                             $roleNames = array(); $linkCounts = array();
                         }
 
-                        $i = 1;
                         foreach ($groupRows as $row):
                             $gid = (int) $row['id'];
                             $roleName = isset($roleNames[(int) $row['owner_role_id']]) ? $roleNames[(int) $row['owner_role_id']] : '-';
                             $cnt = $linkCounts[$gid] ?? 0;
                             ?>
                             <tr>
-                                <td><strong><?= $i++; ?></strong></td>
+                                <td class="text-center">
+                                    <a href="?edit_id=<?= $gid; ?>&action=edit" class="btn btn-sm btn-primary" title="تعديل"><i class="fas fa-edit"></i></a>
+                                    <a href="?delete_id=<?= $gid; ?>"
+                                       onclick="return confirm('حذف المجموعة سيُعيد روابطها إلى المستوى الأعلى في الشريط الجانبي (لن تُحذف أي شاشة). متابعة؟');"
+                                       class="btn btn-sm btn-danger" title="حذف"><i class="fas fa-trash"></i></a>
+                                </td>
                                 <td class="text-center">
                                     <span style="display:inline-block; background:var(--blue-soft); color:var(--blue); padding:4px 10px; border-radius:6px; font-weight:700; font-size:0.9rem;">
                                         <?= (int) $row['display_order']; ?>
@@ -449,12 +446,6 @@ input[type="radio"], input[type="checkbox"] { cursor: pointer; }
                                         <span style="display:inline-block; background:#f0f0f0; color:#999; padding:4px 8px; border-radius:4px; font-weight:600;">✖ معطّلة</span>
                                     <?php endif; ?>
                                 </td>
-                                <td class="text-center">
-                                    <a href="?edit_id=<?= $gid; ?>&action=edit" class="btn btn-sm btn-primary" title="تعديل"><i class="fas fa-edit"></i></a>
-                                    <a href="?delete_id=<?= $gid; ?>"
-                                       onclick="return confirm('حذف المجموعة سيُعيد روابطها إلى المستوى الأعلى في الشريط الجانبي (لن تُحذف أي شاشة). متابعة؟');"
-                                       class="btn btn-sm btn-danger" title="حذف"><i class="fas fa-trash"></i></a>
-                                </td>
                             </tr>
                         <?php endforeach; ?>
                     </tbody>
@@ -471,7 +462,7 @@ $(document).ready(function () {
     var groupsTable = $('#groupsTable').DataTable({
         language: { url: "/ems/assets/i18n/datatables/ar.json" },
         order: [[1, 'asc']],
-        columnDefs: [{ "orderable": false, "targets": [7] }]
+        columnDefs: [{ "orderable": false, "targets": [0] }]
     });
 
     $('#roleFilterSelect').on('change', function () {

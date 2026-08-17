@@ -971,7 +971,7 @@ include("../inheader.php"); ?>
                     <table id="<?= htmlspecialchars($table['id'], ENT_QUOTES, 'UTF-8') ?>" class="display nowrap table-full-width">
                         <thead>
                             <tr>
-                                <th>#</th>
+                                <th>إجراءات</th>
                                 <th>المعدة</th>
                                 <th>نوع المعدة</th>
                                 <th>السائقين</th>
@@ -980,17 +980,15 @@ include("../inheader.php"); ?>
                                 <th>تاريخ البداية</th>
                                 <th>الفئة</th>
                                 <th>الحالة</th>
-                                <th>إجراءات</th>
                             </tr>
                         </thead>
                         <tbody>
                         <?php if (empty($table['rows'])): ?>
                         <tr>
-                            <td colspan="10">لا توجد آليات في هذا الجدول</td>
+                            <td colspan="9">لا توجد آليات في هذا الجدول</td>
                         </tr>
                         <?php else: ?>
                         <?php
-                        $i = 1;
                         foreach ($table['rows'] as $row):
                             $status_value    = intval($row['status']);
                             $shift_code      = $row['shift_type'] ?? 'B';
@@ -1014,38 +1012,6 @@ include("../inheader.php"); ?>
                             $category_class = ($row['equipment_category'] === 'أساسي') ? 'basic' : 'backup';
                         ?>
                         <tr>
-                            <td><?= $i++ ?></td>
-                            <td><?= $eq_display ?></td>
-                            <td><?= $eq_type_display ?></td>
-                            <td><?= $driver_display ?></td>
-                            <td><?= htmlspecialchars((string)($row['shift_hours'] ?? '0'), ENT_QUOTES, 'UTF-8') ?></td>
-
-                            <td class="shift-cell"
-                                data-operation-id="<?= intval($row['id']) ?>"
-                                data-current-shift="<?= htmlspecialchars($shift_code, ENT_QUOTES, 'UTF-8') ?>"
-                                title="انقر للتعديل السريع">
-                                <span class="shift-badge <?= $shift_info['class'] ?>">
-                                    <?= $shift_info['label'] ?>
-                                </span>
-                                <select class="shift-edit-select is-hidden" aria-label="وردية المشغّل"
-                                        data-operation-id="<?= intval($row['id']) ?>">
-                                    <option value="D" <?= $shift_code === 'D' ? 'selected' : '' ?>>☀️ نهاري فقط</option>
-                                    <option value="N" <?= $shift_code === 'N' ? 'selected' : '' ?>>🌙 ليلي فقط</option>
-                                    <option value="B" <?= $shift_code === 'B' ? 'selected' : '' ?>>🔄 نهاري + ليلي</option>
-                                </select>
-                            </td>
-
-                            <td><?= htmlspecialchars($row['start'] ?? '-', ENT_QUOTES, 'UTF-8') ?></td>
-                            <td>
-                                <span class="category-badge <?= $category_class ?>">
-                                    <?= $category_display ?>
-                                </span>
-                            </td>
-                            <td>
-                                <span class="status-pill <?= $status_class ?>">
-                                    <?= $status_label ?>
-                                </span>
-                            </td>
                             <td>
                                 <div class="action-btns">
 
@@ -1114,6 +1080,37 @@ include("../inheader.php"); ?>
                                 </a>
                                 <?php endif; ?>
 
+                            </td>
+                            <td><?= $eq_display ?></td>
+                            <td><?= $eq_type_display ?></td>
+                            <td><?= $driver_display ?></td>
+                            <td><?= htmlspecialchars((string)($row['shift_hours'] ?? '0'), ENT_QUOTES, 'UTF-8') ?></td>
+
+                            <td class="shift-cell"
+                                data-operation-id="<?= intval($row['id']) ?>"
+                                data-current-shift="<?= htmlspecialchars($shift_code, ENT_QUOTES, 'UTF-8') ?>"
+                                title="انقر للتعديل السريع">
+                                <span class="shift-badge <?= $shift_info['class'] ?>">
+                                    <?= $shift_info['label'] ?>
+                                </span>
+                                <select class="shift-edit-select is-hidden" aria-label="وردية المشغّل"
+                                        data-operation-id="<?= intval($row['id']) ?>">
+                                    <option value="D" <?= $shift_code === 'D' ? 'selected' : '' ?>>☀️ نهاري فقط</option>
+                                    <option value="N" <?= $shift_code === 'N' ? 'selected' : '' ?>>🌙 ليلي فقط</option>
+                                    <option value="B" <?= $shift_code === 'B' ? 'selected' : '' ?>>🔄 نهاري + ليلي</option>
+                                </select>
+                            </td>
+
+                            <td><?= htmlspecialchars($row['start'] ?? '-', ENT_QUOTES, 'UTF-8') ?></td>
+                            <td>
+                                <span class="category-badge <?= $category_class ?>">
+                                    <?= $category_display ?>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="status-pill <?= $status_class ?>">
+                                    <?= $status_label ?>
+                                </span>
                             </td>
                         </tr>
                         <?php endforeach; ?>

@@ -861,24 +861,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     .movement-unified-page table {
         width: 100%;
-        border-collapse: collapse;
-        background: var(--c-fff, #fff);
-    }
+        border-collapse: collapse;}
 
     .movement-unified-page table th {
-        background: var(--c-f0f5fa, #f0f5fa);
-        color: var(--c-0b4c8c, #0b4c8c);
-        font-weight: 700;
         padding: 10px;
         text-align: right;
-        border-bottom: 2px solid var(--c-d0deec, #d0deec);
-    }
+        border-bottom: 2px solid var(--c-d0deec, #d0deec);}
 
     .movement-unified-page table td {
         padding: 10px;
-        border-bottom: 1px solid var(--c-e6edf5, #e6edf5);
-        text-align: right;
-    }
+        text-align: right;}
 
     .movement-unified-page table input,
     .movement-unified-page table select {
@@ -1142,9 +1134,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     /* صفوف السائقين المدمجة */
     .movement-unified-page .drivers-sub-row > td {
         background: var(--c-f4f8fd, #f4f8fd);
-        padding: 0;
-        border-bottom: 2px solid var(--c-c0d4ea, #c0d4ea);
-    }
+        padding: 0;}
 
     .movement-unified-page .sub-drivers-wrap {
         padding: 14px 18px;
@@ -1155,25 +1145,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         border-collapse: collapse;
         margin-bottom: 14px;
         font-size: 13px;
-        border-radius: 8px;
-        overflow: hidden;
-    }
+        overflow: hidden;}
 
     .movement-unified-page .sub-drivers-table th {
-        background: var(--c-dce9f6, #dce9f6);
-        color: var(--c-0b4c8c, #0b4c8c);
-        font-weight: 700;
         padding: 8px 10px;
         text-align: right;
-        border-bottom: 1px solid var(--c-b8ceea, #b8ceea);
-        font-size: 12px;
-    }
+        border-bottom: 1px solid var(--c-b8ceea, #b8ceea);}
 
     .movement-unified-page .sub-drivers-table td {
         padding: 8px 10px;
-        border-bottom: 1px solid var(--c-e6edf5, #e6edf5);
-        background: var(--c-fff, #fff);
-    }
+        background: var(--c-fff, #fff);}
 
     .movement-unified-page .btn-secondary {
         background: var(--c-0b4c8c, #0b4c8c);
@@ -1294,15 +1275,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     /* UXW-01 ②: أنماطٌ ثابتةٌ نُقلت من سماتِ style الموضعيةِ إلى أصنافِ الشاشة */
     .movement-unified-page td.mvun-empty-cell {
         text-align: center;
-        color: var(--c-888, #888);
-        padding: 14px;
-    }
+        padding: 14px;}
 
     .movement-unified-page td.mvun-empty-cell-sm {
         text-align: center;
-        color: var(--c-888, #888);
-        padding: 10px;
-    }
+        padding: 10px;}
 
     .movement-unified-page .form-group.mvun-fg-end {
         justify-content: flex-end;
@@ -1485,102 +1462,53 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <tr id="op_drivers_<?php echo $tkey; ?>_<?php echo $op_id; ?>" class="drivers-sub-row is-hidden">
                                     <td colspan="7">
                                         <div class="sub-drivers-wrap">
-                                            <table class="sub-drivers-table no-datatable">
-                                                <thead>
-                                                    <tr>
-                                                        <th>#</th>
-                                                        <th>السائق</th>
-                                                        <th>الهاتف</th>
-                                                        <th>الوردية</th>
-                                                        <th>الحالة</th>
-                                                        <th>إجراء</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php if (empty($eq_drivers)): ?>
-                                                        <tr><td class="mvun-empty-cell-sm" colspan="6">لا يوجد سائقون مرتبطون بهذه الآلية</td></tr>
-                                                    <?php else: ?>
-                                                        <?php $didx = 1; foreach ($eq_drivers as $drv):
-                                                            $rel_id     = intval($drv['id']);
-                                                            $drv_shift  = isset($drv['shift_type']) ? $drv['shift_type'] : 'B';
-                                                            $drv_status = intval($drv['status']);
-                                                            $is_active  = ($drv_status === 1);
-                                                            $drv_shift_label = ($drv_shift === 'D') ? 'نهاري' : (($drv_shift === 'N') ? 'ليلي' : 'نهاري + ليلي');
-                                                        ?>
-                                                        <tr id="drv_row_<?php echo $rel_id; ?>">
-                                                            <td><?php echo $didx++; ?></td>
-                                                            <td><?php echo htmlspecialchars($drv['driver_name'] ?? '-'); ?></td>
-                                                            <td><?php echo htmlspecialchars($drv['driver_phone'] ?? '-'); ?></td>
-                                                            <td>
-                                                                <?php if ($is_active && $can_edit): ?>
-                                                                    <select class="drv_shift" aria-label="وردية السائق" data-rel="<?php echo $rel_id; ?>">
-                                                                        <option value="D" <?php echo $drv_shift === 'D' ? 'selected' : ''; ?>>نهاري</option>
-                                                                        <option value="N" <?php echo $drv_shift === 'N' ? 'selected' : ''; ?>>ليلي</option>
-                                                                        <option value="B" <?php echo $drv_shift === 'B' ? 'selected' : ''; ?>>نهاري + ليلي</option>
-                                                                    </select>
-                                                                <?php else: ?>
-                                                                    <span><?php echo htmlspecialchars($drv_shift_label); ?></span>
-                                                                <?php endif; ?>
-                                                            </td>
-                                                            <td>
-                                                                <?php if ($is_active): ?>
-                                                                    <span class="status-running">ساري</span>
-                                                                <?php else: ?>
-                                                                    <span class="status-idle">منتهي</span>
-                                                                <?php endif; ?>
-                                                            </td>
-                                                            <td>
-                                                                <?php if ($is_active && $can_edit): ?>
-                                                                    <button type="button" class="btn-primary" onclick="saveDriver(<?php echo $rel_id; ?>)"><i class="fas fa-save"></i> حفظ</button>
-                                                                    <button type="button" class="btn-secondary"  onclick="endDriver(<?php echo $rel_id; ?>)"><i class="fas fa-stop-circle"></i> إنهاء</button>
-                                                                <?php else: ?>
-                                                                    <span>-</span>
-                                                                <?php endif; ?>
-                                                            </td>
-                                                        </tr>
-                                                        <?php endforeach; ?>
-                                                    <?php endif; ?>
-                                                </tbody>
-                                            </table>
+                                            <?php
+                                            /* ══ جدولُ السائقين يُبنى عند الفتحِ لا مع الصفحة ═══════════════════
+                                               ◆ **السببُ الثاني للتجمُّد** (مقيسٌ في المتصفح): الصفحةُ كانت تُصيِّر
+                                                 **جدولًا داخلَ كلِّ صفٍّ** — ٤٤٠ جدولًا و٢١ ألفَ عقدةٍ لمشروعٍ
+                                                 بـ٢١٦ عملية. وطبقةُ الجداولِ المشتركةِ (`ui-unification.js`) تكنس
+                                                 **كلَّ جداولِ الصفحة** في `sweepTables`، وتُعيد الكنسَ عند كلِّ
+                                                 تغيُّرٍ في DOM عبر `MutationObserver` على الجسمِ كلِّه. فالكنسةُ
+                                                 الواحدةُ على ٤٤٠ جدولًا تُعيد نفسَها بلا انتهاء ويتجمّد المُصيِّر.
+                                                 (البرهان: الصفحةُ نفسُها **بلا أيِّ سكربت** تُحمَّل في ١٫٦ ثانية.)
+                                               ◆ **والعلاج بلا مساسٍ بالطبقةِ المشتركة** (تخدم ٤٠٠ شاشة): تُحمَل
+                                                 بياناتُ سائقي الآليةِ في سمةٍ واحدةٍ، ويُبنى الجدولُ **لحظةَ
+                                                 فتحِه** — فتنزل جداولُ الصفحةِ من ٤٤٠ إلى ثمانية.
+                                               ◆ صفرُ تغييرٍ في البيانات المعروضةِ ولا في الأفعال. */
+                                            $mvun_drv_payload = array();
+                                            foreach ($eq_drivers as $drv) {
+                                                $mvun_drv_payload[] = array(
+                                                    'id' => intval($drv['id']),
+                                                    'n'  => (string) ($drv['driver_name'] ?? '-'),
+                                                    'p'  => (string) ($drv['driver_phone'] ?? '-'),
+                                                    's'  => (string) (isset($drv['shift_type']) ? $drv['shift_type'] : 'B'),
+                                                    'a'  => intval($drv['status']) === 1 ? 1 : 0,
+                                                );
+                                            }
+                                            ?>
+                                            <div class="mvun-drivers-slot"
+                                                 data-mvun-drv="<?php echo htmlspecialchars(json_encode($mvun_drv_payload, JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8'); ?>"
+                                                 data-mvun-edit="<?php echo $can_edit ? 1 : 0; ?>"></div>
 
                                             <?php if ($can_add && $is_running): ?>
-                                            <div class="add-driver-inline">
-                                                <strong><i class="fas fa-plus-circle"></i> إضافة سائق لهذه الآلية</strong>
-                                                <form class="add-driver-form" onsubmit="submitAddDriver(event, this, <?php echo $eq_id; ?>)">
-                                                    <div class="inline-form-row">
-                                                        <div class="form-group">
-                                                            <label for="emsf_737_5def5">السائق *</label>
-                                                            <select name="employee_id" required id="emsf_737_5def5">
-                                                                <option value="">-- اختر السائق --</option>
-                                                                <?php foreach ($all_drivers as $d): ?>
-                                                                    <?php if (in_array(intval($d['id']), $active_driver_ids)) continue; ?>
-                                                                    <option value="<?php echo intval($d['id']); ?>"><?php echo htmlspecialchars($d['name'] . ' - ' . $d['phone']); ?></option>
-                                                                <?php endforeach; ?>
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="emsf_738_ad75c">الوردية</label>
-                                                            <select name="shift_type" id="emsf_738_ad75c">
-                                                                <option value="D">نهاري</option>
-                                                                <option value="N">ليلي</option>
-                                                                <option value="B" selected>نهاري + ليلي</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="emsf_739_b2962">بداية التعيين</label>
-                                                            <input type="date" name="start_date" id="emsf_739_b2962" value="<?php echo date('Y-m-d'); ?>">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="emsf_740_46196">نهاية التعيين</label>
-                                                            <input type="date" name="end_date" id="emsf_740_46196">
-                                                        </div>
-                                                        <div class="form-group mvun-fg-end">
-                                                            <label>&nbsp;</label>
-                                                            <button type="submit" class="btn-primary mvun-add-btn"><i class="fas fa-plus"></i> إضافة</button>
-                                                        </div>
-                                                    </div>
-                                                </form>
-                                            </div>
+                                            <?php
+                                            /* ══ نموذجُ «إضافةِ سائق» لا يُطبع مع كلِّ آلية ═══════════════════════
+                                               ◆ **المقيس**: النموذجُ ٣٫١ كيلوبايت، وفيه قائمةُ السائقين — وقائمتُها
+                                                 **واحدةٌ للصفحةِ كلِّها** (`$active_driver_ids` عامٌّ لا يتغيّر بالصف).
+                                                 ومشروعٌ بـ٢١٦ عمليةً كلُّها بوردية `B` يُصيَّر في **جدولَي النهارِ
+                                                 والليل** = ٤٣٢ صفًّا × ٢٩٣ خيارًا = **١٢٦٫٥٧٦ عنصرَ `<option>`**،
+                                                 فبلغ مخرَجُ الصفحةِ **٣٨ ميجابايت**. وعندها يتسلَّم
+                                                 `ems_inject_csrf_fields` المخزَنَ كلَّه ليمسحَه فيطلب نسخةً ثانية،
+                                                 فينفد حدُّ الذاكرةِ (١٢٨ ميجابايت) وتخرج الصفحةُ **500 بلا جسد** —
+                                                 وهو «تفتح تقيلة… وأحيانًا لا تفتح».
+                                               ◆ **والعلاج**: مَربطٌ خفيفٌ هنا، والنموذجُ كاملًا في قالبٍ واحدٍ أسفلَ
+                                                 الصفحة يُبنى **لحظةَ فتحِ جدولِ سائقي الآلية** لا قبلَها. صفرُ تغييرٍ
+                                                 في الخيارات ولا في الاستبعادِ ولا في ما يُرسَل عند الحفظ.
+                                               ◆ **والمعرِّفاتُ صارت فريدة**: كانت `emsf_737_5def5` وأخواتُها ثابتةً
+                                                 تتكرر في كلِّ صفّ، فـ`<label for>` يشير إلى حقلِ صفٍّ آخرَ دائمًا. */
+                                            ?>
+                                            <div class="add-driver-slot" data-mvun-eq="<?php echo $eq_id; ?>"
+                                                 data-mvun-fid="<?php echo htmlspecialchars($tkey . '_' . $op_id, ENT_QUOTES, 'UTF-8'); ?>"></div>
                                             <?php endif; ?>
                                         </div>
                                     </td>
@@ -1610,15 +1538,156 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 </div>
 
+<?php
+/* ══ قائمةُ السائقين المتاحين — تُطبع **مرّةً واحدةً للصفحة** ═══════════════
+   الاستبعادُ (`$active_driver_ids`) عامٌّ لا يختلف بصفّ، فلا معنى لتكرارِ
+   القائمةِ مع كلِّ آلية. و`<template>` لا يُصيَّر ولا يُحمِّل شيئًا حتى يُستنسَخ. */
+?>
+<template id="mvunDriverOptions">
+    <?php foreach ($all_drivers as $d): ?>
+        <?php if (in_array(intval($d['id']), $active_driver_ids)) continue; ?>
+        <option value="<?php echo intval($d['id']); ?>"><?php echo htmlspecialchars($d['name'] . ' - ' . $d['phone'], ENT_QUOTES, 'UTF-8'); ?></option>
+    <?php endforeach; ?>
+</template>
+
+<?php /* نموذجُ «إضافةِ سائق» — نصٌّ لا يُصيَّر؛ `__FID__` يُستبدل عند البناء */ ?>
+<script type="text/html" id="mvunAddDriverTpl">
+    <div class="add-driver-inline">
+        <strong><i class="fas fa-plus-circle"></i> إضافة سائق لهذه الآلية</strong>
+        <form class="add-driver-form">
+            <div class="inline-form-row">
+                <div class="form-group">
+                    <label for="emsf_drv___FID__">السائق *</label>
+                    <select name="employee_id" required id="emsf_drv___FID__" class="mvun-driver-picker" data-mvun-filled="0">
+                        <option value="">-- اختر السائق --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="emsf_shift___FID__">الوردية</label>
+                    <select name="shift_type" id="emsf_shift___FID__">
+                        <option value="D">نهاري</option>
+                        <option value="N">ليلي</option>
+                        <option value="B" selected>نهاري + ليلي</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="emsf_sd___FID__">بداية التعيين</label>
+                    <input type="date" name="start_date" id="emsf_sd___FID__" value="<?php echo date('Y-m-d'); ?>">
+                </div>
+                <div class="form-group">
+                    <label for="emsf_ed___FID__">نهاية التعيين</label>
+                    <input type="date" name="end_date" id="emsf_ed___FID__">
+                </div>
+                <div class="form-group mvun-fg-end">
+                    <label>&nbsp;</label>
+                    <button type="submit" class="btn-primary mvun-add-btn"><i class="fas fa-plus"></i> إضافة</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</script>
+
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
+    /* ══ ملءُ قائمةِ السائقين عند الحاجةِ لا مع كلِّ صفّ ══════════════════════
+       القائمةُ واحدةٌ للصفحةِ كلِّها، وكانت تُطبع داخلَ كلِّ صفٍّ فتضخَّم المخرَجُ
+       إلى ثمانيةِ ميجابايتَ من `<option>` وحدَها. الآن تُطبع مرّةً في القالبِ
+       أدناه، وتُنسَخ إلى قائمةِ الصفِّ **أوّلَ مرّةٍ يُفتح جدولُ سائقيه** — وما
+       لا يُفتح لا يُنسَخ إليه شيء. */
+    function mvunFillDriverPicker(scope) {
+        var tpl = document.getElementById('mvunDriverOptions');
+        if (!tpl || !scope) { return; }
+        var sels = scope.querySelectorAll('select.mvun-driver-picker[data-mvun-filled="0"]');
+        if (!sels.length) { return; }
+        Array.prototype.forEach.call(sels, function (sel) {
+            sel.appendChild(tpl.content.cloneNode(true));
+            sel.setAttribute('data-mvun-filled', '1');
+        });
+    }
+
+    /** بناءُ جدولِ سائقي الآليةِ من حمولتِه — مرّةً واحدةً عند أوّلِ فتح. */
+    function mvunBuildDriversTable(scope) {
+        if (!scope) { return; }
+        var slots = scope.querySelectorAll('.mvun-drivers-slot:empty');
+        if (!slots.length) { return; }
+        var esc = function (v) {
+            return String(v === null || v === undefined ? '' : v)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        };
+        var shiftLabel = function (s) { return s === 'D' ? 'نهاري' : (s === 'N' ? 'ليلي' : 'نهاري + ليلي'); };
+        Array.prototype.forEach.call(slots, function (slot) {
+            var rows = [];
+            try { rows = JSON.parse(slot.getAttribute('data-mvun-drv') || '[]') || []; } catch (e) { rows = []; }
+            var canEdit = slot.getAttribute('data-mvun-edit') === '1';
+            var body = '';
+            if (!rows.length) {
+                body = '<tr><td class="mvun-empty-cell-sm" colspan="6">لا يوجد سائقون مرتبطون بهذه الآلية</td></tr>';
+            } else {
+                rows.forEach(function (d, i) {
+                    var live = d.a === 1;
+                    var shiftCell = (live && canEdit)
+                        ? '<select class="drv_shift" aria-label="وردية السائق" data-rel="' + d.id + '">'
+                          + '<option value="D"' + (d.s === 'D' ? ' selected' : '') + '>نهاري</option>'
+                          + '<option value="N"' + (d.s === 'N' ? ' selected' : '') + '>ليلي</option>'
+                          + '<option value="B"' + (d.s === 'B' ? ' selected' : '') + '>نهاري + ليلي</option></select>'
+                        : '<span>' + esc(shiftLabel(d.s)) + '</span>';
+                    var actCell = (live && canEdit)
+                        ? '<button type="button" class="btn-primary" onclick="saveDriver(' + d.id + ')"><i class="fas fa-save"></i> حفظ</button>'
+                          + '<button type="button" class="btn-secondary" onclick="endDriver(' + d.id + ')"><i class="fas fa-stop-circle"></i> إنهاء</button>'
+                        : '<span>-</span>';
+                    body += '<tr id="drv_row_' + d.id + '">'
+                          + '<td>' + (i + 1) + '</td>'
+                          + '<td>' + esc(d.n) + '</td>'
+                          + '<td>' + esc(d.p) + '</td>'
+                          + '<td>' + shiftCell + '</td>'
+                          + '<td>' + (live ? '<span class="status-running">ساري</span>' : '<span class="status-idle">منتهي</span>') + '</td>'
+                          + '<td>' + actCell + '</td></tr>';
+                });
+            }
+            /* ◆ `data-no-dt="hard"` هو **بابُ الخروجِ الصريح** الذي تعترف به
+                 `ui-unification.js`؛ و`no-datatable` وحدَه صار **استشاريًّا**
+                 (لا يمنع إلا مع تهيئةٍ يدويةٍ في الصفحة). ولولا التصريحُ
+                 لهُيِّئت DataTables على كلِّ جدولِ سائقين — بحثٌ وترقيمٌ وغلافٌ
+                 لجدولٍ من صفٍّ أو صفّين، وهو أصلُ الجمودِ حين كانت ٤٣٢ جدولًا. */
+            slot.innerHTML = '<table class="sub-drivers-table no-datatable" data-no-dt="hard" data-ems-empty="off">'
+                + '<thead><tr><th>#</th><th>السائق</th><th>الهاتف</th><th>الوردية</th><th>الحالة</th><th>إجراء</th></tr></thead>'
+                + '<tbody>' + body + '</tbody></table>';
+        });
+    }
+
+    /** بناءُ نموذجِ «إضافةِ سائق» في مَربطِه — مرّةً واحدةً لكلِّ آلية عند أوّلِ فتح. */
+    function mvunBuildAddDriver(scope) {
+        var tplEl = document.getElementById('mvunAddDriverTpl');
+        if (!tplEl || !scope) { return; }
+        var slots = scope.querySelectorAll('.add-driver-slot:empty');
+        if (!slots.length) { return; }
+        var raw = tplEl.textContent;
+        Array.prototype.forEach.call(slots, function (slot) {
+            var fid = slot.getAttribute('data-mvun-fid') || '';
+            var eq  = parseInt(slot.getAttribute('data-mvun-eq') || '0', 10);
+            slot.innerHTML = raw.split('__FID__').join(fid);
+            var form = slot.querySelector('form.add-driver-form');
+            /* الحدثُ يُربط في JS لا في `onsubmit`: النموذجُ نصٌّ في قالبٍ واحد،
+               ومعرِّفُ الآليةِ يأتي من المَربطِ لا من طباعةِ الخادمِ في كلِّ صفّ. */
+            if (form) {
+                form.addEventListener('submit', function (e) { submitAddDriver(e, form, eq); });
+            }
+        });
+    }
+
     function toggleDrivers(tableKey, opId) {
         var subRow = document.getElementById('op_drivers_' + tableKey + '_' + opId);
         var btn    = document.getElementById('toggle_btn_' + tableKey + '_' + opId);
         if (!subRow) return;
         var isOpen = !subRow.classList.contains('is-hidden');
+        if (!isOpen) {                       /* قبلَ الإظهارِ لا بعدَه */
+            mvunBuildDriversTable(subRow);
+            mvunBuildAddDriver(subRow);
+            mvunFillDriverPicker(subRow);
+        }
         subRow.classList.toggle('is-hidden', isOpen);
         if (btn) btn.classList.toggle('open', !isOpen);
     }

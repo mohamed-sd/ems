@@ -432,56 +432,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="commercial_registration">رقم التسجيل التجاري/الرخصة</label>
-                        <div class="checkbox-grid">
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="حفارات" aria-label="حفارات" checked>
-                                <span>حفارات</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="مكنات تخريم" aria-label="مكنات تخريم">
-                                <span>مكنات تخريم</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="دوازر" aria-label="دوازر">
-                                <span>دوازر</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="شاحنات قلابة" aria-label="شاحنات قلابة">
-                                <span>شاحنات قلابة</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="شاحنات تناكر" aria-label="شاحنات تناكر">
-                                <span>شاحنات تناكر</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="جرافات" aria-label="جرافات">
-                                <span>جرافات</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="معدات معالجة" aria-label="معدات معالجة">
-                                <span>معدات معالجة</span>
-                            </label>
-
-                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="السيارات والكرفانات" aria-label="السيارات والكرفانات">
-                                <span> السيارات والكرفانات</span>
-                            </label>
-
-                                <label class="checkbox-label">
-                                    <input type="checkbox" name="equipment_types[]" value="معدات أخرى" aria-label="معدات أخرى">
-                                    <span>معدات أخرى</span>
-                            </label>
-
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. البيانات القانونية والتعريفية -->
-                <div class="form-section">
-                    <h6><i class="fas fa-file-contract"></i> البيانات القانونية والتعريفية</h6>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="commercial_registration">رقم التسجيل التجاري/الرخصة</label>
                             <input type="text" name="commercial_registration" id="commercial_registration" />
                         </div>
                         <div class="form-group">
