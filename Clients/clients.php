@@ -760,7 +760,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <!-- ══════════════════════════════════════════════════════ -->
 
                     <div>
-                        <label for="client_name"><i class="fas fa-barcode"></i> كود العميل *</label>
+                        <label for="client_code"><i class="fas fa-barcode"></i> كود العميل *</label>
                         <!-- الكودُ المولَّدُ مكتوبٌ سلفًا **وقابلٌ للتعديل** (طلبُ المالك):
                              فأكثرُ الحالات تقبله كما هو، ومَن أراد كودَه الخاصّ كتبه فوقه.
                              ووضعُه في السمة `value` لا بجافاسكربت مقصود: `resetClientForm()`
@@ -771,18 +771,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
-                        <label><i class="fas fa-user"></i> اسم العميل *</label>
-                        <!-- الكودُ المولَّدُ مكتوبٌ سلفًا **وقابلٌ للتعديل** (طلبُ المالك):
-                             فأكثرُ الحالات تقبله كما هو، ومَن أراد كودَه الخاصّ كتبه فوقه.
-                             ووضعُه في السمة `value` لا بجافاسكربت مقصود: `resetClientForm()`
-                             تستدعي `reset()` الأصليّ، وهو يعيد كلَّ حقلٍ إلى سمته — فيعود
-                             الكودُ المولَّدُ تلقائيًّا بعد كل إلغاءٍ أو خروجٍ من وضع التعديل. -->
-                        <input type="text" name="client_code" id="client_code" placeholder="مثال: CL-001" required
-                            value="<?php echo clients_e($next_client_code); ?>"
-                            pattern="[A-Za-z0-9_\-]+" />
-                    </div>
-                    <div>
-                        <label><i class="fas fa-user"></i> اسم العميل *</label>
+                        <label for="client_name"><i class="fas fa-user"></i> اسم العميل *</label>
                         <input type="text" name="client_name" id="client_name" placeholder="أدخل اسم العميل" required />
                     </div>
                     <div>

@@ -462,7 +462,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <div class="smod-span-all">
-                        <label for="owner_role_id"><i class="fas fa-icons"></i> أيقونة القائمة</label>
+                        <label for="iconSearch"><i class="fas fa-icons"></i> أيقونة القائمة</label>
                         <div class="icon-picker-shell">
                             <input type="hidden" name="icon" id="icon" value="<?= htmlspecialchars($default_module_icon, ENT_QUOTES, 'UTF-8'); ?>" />
                             <input type="hidden" id="icon_manually_selected" value="0" />
@@ -506,51 +506,7 @@ include __DIR__ . '/../includes/page_header.php';
 
                     <!-- الدور المسؤول -->
                     <div>
-                        <label><i class="fas fa-user-tie"></i> الدور المسؤول *</label>
-                        <div class="icon-picker-shell">
-                            <input type="hidden" name="icon" id="icon" value="<?= htmlspecialchars($default_module_icon, ENT_QUOTES, 'UTF-8'); ?>" />
-                            <input type="hidden" id="icon_manually_selected" value="0" />
-
-                            <div class="icon-preview-card">
-                                <div class="icon-preview-box"><i id="icon_preview" class="<?= htmlspecialchars($default_module_icon, ENT_QUOTES, 'UTF-8'); ?>"></i></div>
-                                <div class="icon-preview-meta">
-                                    <strong>الأيقونة المختارة للـ sidebar</strong>
-                                    <span id="icon_preview_text"><?= htmlspecialchars($default_module_icon, ENT_QUOTES, 'UTF-8'); ?></span>
-                                </div>
-                            </div>
-
-                            <div class="icon-picker-toolbar">
-                                <input type="text" id="iconSearch" class="icon-picker-search" placeholder="ابحث باسم الأيقونة أو معناها مثل: تقارير، مستخدمين، معدات" />
-                                <button type="button" id="autoSuggestIcon" class="back-btn icon-suggest-btn">
-                                    <i class="fas fa-wand-magic-sparkles"></i> اقتراح تلقائي
-                                </button>
-                            </div>
-
-                            <div id="iconGrid" class="icon-grid">
-                                <?php foreach ($common_sidebar_icons as $sidebar_icon): ?>
-                                    <button type="button"
-                                            class="icon-option"
-                                            data-icon="<?= htmlspecialchars($sidebar_icon['class'], ENT_QUOTES, 'UTF-8'); ?>"
-                                            data-label="<?= htmlspecialchars($sidebar_icon['label'], ENT_QUOTES, 'UTF-8'); ?>"
-                                            data-search="<?= htmlspecialchars($sidebar_icon['label'] . ' ' . $sidebar_icon['class'], ENT_QUOTES, 'UTF-8'); ?>">
-                                        <i class="<?= htmlspecialchars($sidebar_icon['class'], ENT_QUOTES, 'UTF-8'); ?>"></i>
-                                        <span><?= htmlspecialchars($sidebar_icon['label'], ENT_QUOTES, 'UTF-8'); ?></span>
-                                    </button>
-                                <?php endforeach; ?>
-                            </div>
-
-                            <div class="icon-picker-note">
-                                يتم عرض أشهر أيقونات الشريط الجانبي الجاهزة للاختيار السريع، مع اقتراح تلقائي حسب اسم الصفحة ومسارها.
-                                <?php if (!$module_has_icon_column): ?>
-                                    <br>ملاحظة: قاعدة البيانات الحالية لا تحتوي بعد على عمود `icon`، لذا ستظهر الأيقونة بعد تنفيذ ملف التحديث داخل مجلد `database`.
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- الدور المسؤول -->
-                    <div>
-                        <label><i class="fas fa-user-tie"></i> الدور المسؤول *</label>
+                        <label for="owner_role_id"><i class="fas fa-user-tie"></i> الدور المسؤول *</label>
                         <select name="owner_role_id" id="owner_role_id" required>
                             <option value="">-- اختر الدور المسؤول --</option>
                             <?php foreach ($roles as $role): ?>

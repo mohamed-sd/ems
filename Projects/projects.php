@@ -1125,27 +1125,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .projects-main .stats-primary .stats-icon {
-        background: fff;
+        background: var(--c-surface);
         color: var(--c-ink-max);
     }
 
     .projects-main .stats-success .stats-icon {
-       background: fff;
+       background: var(--c-surface);
         color: var(--c-ink-max);
     }
 
     .projects-main .stats-danger .stats-icon {
-         background: fff;
+         background: var(--c-surface);
         color: var(--c-ink-max);
     }
 
     .projects-main .stats-purple .stats-icon {
-          background: fff;
+          background: var(--c-surface);
         color: var(--c-ink-max);
     }
 
     .projects-main .stats-cyan .stats-icon {
-         background: fff;
+         background: var(--c-surface);
         color: var(--c-ink-max);
     }
 

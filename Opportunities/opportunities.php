@@ -751,44 +751,7 @@ function opp_stage_tone($stage)
                                     <div class="opp-req-seclbl"><i class="fas fa-users-gear"></i> الطاقم والموردون</div>
                                     <div class="opp-req-countgrid">
                                         <div class="opp-req-countfield">
-                                            <label><i class="fas fa-user-gear"></i> عدد المشغّلين</label>
-                        <div class="opp-req-panel">
-                            <div class="opp-req-summary" aria-live="polite">
-                                <div class="opp-req-sumcard">
-                                    <span class="opp-req-sumicon"><i class="fas fa-truck-monster"></i></span>
-                                    <span class="opp-req-sumnum" id="reqSumEquip">0</span>
-                                    <span class="opp-req-sumlbl">معدات</span>
-                                </div>
-                                <div class="opp-req-sumcard">
-                                    <span class="opp-req-sumicon"><i class="fas fa-user-gear"></i></span>
-                                    <span class="opp-req-sumnum" id="reqSumOps">0</span>
-                                    <span class="opp-req-sumlbl">مشغّلون</span>
-                                </div>
-                                <div class="opp-req-sumcard">
-                                    <span class="opp-req-sumicon"><i class="fas fa-industry"></i></span>
-                                    <span class="opp-req-sumnum" id="reqSumSupp">0</span>
-                                    <span class="opp-req-sumlbl">موردون</span>
-                                </div>
-                            </div>
-
-                            <div id="reqLegacyNote" class="opp-req-legacy opp-req-hidden">
-                                <i class="fas fa-clock-rotate-left"></i> متطلبات قديمة (نصّ حرّ): <span id="reqLegacyText"></span>
-                                <div class="opp-req-legacy-hint">أعد إدخالها بالحقول أدناه لتُحفظ بشكلٍ مُهيكل.</div>
-                            </div>
-
-                            <div class="opp-req-main">
-                                <div class="opp-req-eqsec">
-                                    <div class="opp-req-seclbl"><i class="fas fa-truck-monster"></i> المعدات المطلوبة (بالنوع)</div>
-                                    <div id="reqEquipRows" class="opp-req-rows"></div>
-                                    <div id="reqEquipEmpty" class="opp-req-empty">لم تُضف أنواع معدات بعد — اضغط «أضف نوع معدة».</div>
-                                    <button type="button" id="reqAddEquip" class="opp-req-add"><i class="fas fa-plus"></i> أضف نوع معدة</button>
-                                </div>
-
-                                <div class="opp-req-counts">
-                                    <div class="opp-req-seclbl"><i class="fas fa-users-gear"></i> الطاقم والموردون</div>
-                                    <div class="opp-req-countgrid">
-                                        <div class="opp-req-countfield">
-                                            <label><i class="fas fa-user-gear"></i> عدد المشغّلين</label>
+                                            <label for="req_operators"><i class="fas fa-user-gear"></i> عدد المشغّلين</label>
                                             <input type="number" min="0" step="1" name="req_operators" id="req_operators" placeholder="0" />
                                             <div class="opp-req-fieldhint" id="reqOpsHint">مقترح ≥ عدد المعدات</div>
                                         </div>
