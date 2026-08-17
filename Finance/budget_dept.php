@@ -52,9 +52,18 @@ $header_title_html = htmlspecialchars('ميزانيةُ إدارتي — ' . ($i
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الثلاثُ من المكوّنِ المركزيّ
+echo ems_states_bundle('لا ميزانيةَ لنطاقِك في هذه السنة', 'غيِّر السنةَ أو راجعْ اعتمادَ ميزانيةِ إدارتِك');
 ?>
-  <form method="get" style="margin-bottom:12px"><label for="emsf_222_9326f">السنة</label>
-    <input type="number" name="year" value="<?= $year ?>" class="form-control" style="max-width:120px;display:inline-block" onchange="this.form.submit()" id="emsf_222_9326f"></form>
+  <style>
+    /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
+    .bd-filter-form { margin-bottom: 12px; }
+    .bd-year-input  { max-width: 120px; display: inline-block; }
+    .bd-var-over    { color: var(--c-dc3545); }
+    .bd-var-under   { color: var(--c-198754); }
+  </style>
+  <form method="get" class="bd-filter-form"><label for="emsf_222_9326f">السنة</label>
+    <input type="number" name="year" id="emsf_222_9326f" class="form-control bd-year-input" value="<?= $year ?>" onchange="this.form.submit()"></form>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>الرقم</th><th>الإدارة</th><th>الفترة</th><th>المخطط</th><th>المصروف الفعلي</th><th>الانحراف</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -82,7 +91,7 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= intval($b['period_no']) ?></td>
         <td><?= number_format(floatval($b['planned']), 2) ?></td>
         <td><?= number_format(floatval($b['actual']), 2) ?></td>
-        <td style="color:<?= $var > 0 ? '#dc3545' : '#198754' ?>"><?= number_format($var, 2) ?></td>
+        <td class="<?= $var > 0 ? 'bd-var-over' : 'bd-var-under' ?>"><?= number_format($var, 2) ?></td>
         <td><?= htmlspecialchars($b['state'], ENT_QUOTES, 'UTF-8') ?></td>
       </tr>
     <?php endforeach; ?>

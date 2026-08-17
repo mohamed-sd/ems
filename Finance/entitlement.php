@@ -102,11 +102,33 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         array('افحص البوابةَ أولًا — الردُّ بسببٍ محكومٍ يقود لصاحب الحلقة الناقصة',
               'المتخطَّى في المروحة يُعلَن بسببِه («لا سعرَ عقد») ولا يُخترع له رقم',
               'إعادةُ التوليد ترجع المحضرَ الأول — العطالةُ بنيوية (AR-04)'));
+    // UXW-01 ⑨: حالاتُ الشاشةِ الثلاثُ من المكوّنِ المركزيّ
+    echo ems_states_bundle('لا وقائعَ ولا محاضرَ لهذه الفترة', 'غيِّر الفترةَ أو تحققْ من اعتمادِ الوقائع');
     ?>
+    <style>
+        /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
+        .ent-toolbar-filter { align-items: flex-end; }
+        .ent-filter-label { font-size: .8rem; }
+        .ent-w100 { width: 100%; }
+        .ent-mono { font-family: monospace; }
+        .ent-mono-sm { font-family: monospace; font-size: .7rem; }
+        .ent-mono-xs { font-family: monospace; font-size: .72rem; }
+        .ent-fs78 { font-size: .78rem; }
+        .ent-fs76 { font-size: .76rem; }
+        .ent-fs72 { font-size: .72rem; }
+        .ent-nowrap { white-space: nowrap; }
+        .ent-dim { opacity: .7; }
+        .ent-readonly-hint { opacity: .6; font-size: .76rem; }
+        .ent-reject-card { padding: 12px; margin: 10px 0; border-inline-start: 4px solid var(--c-dc3545); }
+        .ent-reject-title { color: var(--c-state-danger-deep); }
+        .ent-reject-note { color: var(--c-state-danger-deep); }
+        .ent-mt6 { margin-top: 6px; }
+        .ent-mt12 { margin-top: 12px; }
+    </style>
 
-    <form method="get" class="ems-toolbar" style="align-items:flex-end">
-        <label style="font-size:.8rem">الفترة
-            <input type="month" name="period" value="<?php echo htmlspecialchars($fPeriod); ?>" class="form-control form-control-sm">
+    <form method="get" class="ems-toolbar ent-toolbar-filter">
+        <label class="ent-filter-label" for="ent_period_input">الفترة
+            <input type="month" name="period" id="ent_period_input" class="form-control form-control-sm" value="<?php echo htmlspecialchars($fPeriod); ?>">
         </label>
         <button class="ems-btn-primary" type="submit">عرض</button>
     </form>
@@ -114,9 +136,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="card"><div class="card-body table-responsive">
         <h6>وقائعُ معتمدةٌ تنتظر التوليد (<?php echo count($pending); ?>)</h6>
         <?php if (!$pending): ?>
-            <?php if (function_exists('ems_state_empty')) { ems_state_empty('لا وقائعَ معتمدةً بلا محضرٍ في هذه الفترة — المروحةُ مكتملة ✨'); } else { echo '<p style="opacity:.7">لا وقائع.</p>'; } ?>
+            <?php if (function_exists('ems_state_empty')) { ems_state_empty('لا وقائعَ معتمدةً بلا محضرٍ في هذه الفترة — المروحةُ مكتملة ✨'); } else { echo '<p class="ent-dim">لا وقائع.</p>'; } ?>
         <?php else: ?>
-        <table class="table table-sm table-striped" style="width:100%" data-no-dt="1">
+        <table class="table table-sm table-striped ent-w100" data-no-dt="1">
             <thead><tr>
                 <th>الواقعة</th><th>التاريخ</th><th>النموذج</th><th>الكمية المعتمدة</th>
                 <th>حكم العميل</th><th>حكم المورد</th><th></th>
@@ -124,20 +146,20 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <tbody>
             <?php foreach ($pending as $x): ?>
                 <tr id="unit-row-<?php echo (int) $x['id']; ?>">
-                    <td style="font-family:monospace"><?php echo htmlspecialchars($x['record_no']); ?></td>
+                    <td class="ent-mono"><?php echo htmlspecialchars($x['record_no']); ?></td>
                     <td><?php echo htmlspecialchars($x['record_date']); ?></td>
                     <td><?php echo htmlspecialchars($x['work_model']); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['approved_qty']); ?></td>
-                    <td style="font-size:.78rem"><?php echo $x['client_unit_price'] !== null ? 'سعرٌ متاح — يُفوتر' : '<span style="color:#b02a37">لا سعرَ عميل — سيُتخطى معلَنًا</span>'; ?></td>
-                    <td style="font-size:.78rem"><?php
+                    <td class="ent-fs78"><?php echo $x['client_unit_price'] !== null ? 'سعرٌ متاح — يُفوتر' : '<span class="ent-reject-note">لا سعرَ عميل — سيُتخطى معلَنًا</span>'; ?></td>
+                    <td class="ent-fs78"><?php
                         if (empty($x['supplier_entity_id'])) { echo 'معدةٌ مملوكة — لا مورد'; }
-                        else { echo $x['supplier_unit_price'] !== null ? 'سعرٌ متاح — يستحق' : '<span style="color:#b02a37">لا سعرَ مورد</span>'; }
+                        else { echo $x['supplier_unit_price'] !== null ? 'سعرٌ متاح — يستحق' : '<span class="ent-reject-note">لا سعرَ مورد</span>'; }
                     ?></td>
-                    <td style="white-space:nowrap">
+                    <td class="ent-nowrap">
                         <?php if ($can_generate): ?>
                         <button class="ems-btn-secondary" onclick="m10Gate(<?php echo (int) $x['id']; ?>)">فحص البوابة</button>
                         <button class="ems-btn-primary" onclick="m10Entitle(<?php echo (int) $x['id']; ?>)">توليد المحضر</button>
-                        <?php else: ?><span style="opacity:.6;font-size:.76rem">قراءة — التوليدُ للمخوَّل</span><?php endif; ?>
+                        <?php else: ?><span class="ent-readonly-hint">قراءة — التوليدُ للمخوَّل</span><?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -147,15 +169,15 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     </div></div>
 
     <?php if ($rejects): ?>
-    <div class="ems-card" style="padding:12px;margin:10px 0;border-inline-start:4px solid #dc3545">
-        <strong style="color:#b02a37">وقائعُ ردّتها البوابةُ الرباعية — <?php echo count($rejects); ?></strong>
-        <table class="table table-sm" style="margin-top:6px">
+    <div class="ems-card ent-reject-card">
+        <strong class="ent-reject-title">وقائعُ ردّتها البوابةُ الرباعية — <?php echo count($rejects); ?></strong>
+        <table class="table table-sm ent-mt6">
             <thead><tr><th>البوابة</th><th>الواقعة</th><th>السببُ المحكوم</th><th>الوقت</th></tr></thead>
             <tbody>
             <?php foreach ($rejects as $x): ?>
                 <tr>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars($x['gate_code']); ?></td>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars((string) $x['record_no']); ?></td>
+                    <td class="ent-mono"><?php echo htmlspecialchars($x['gate_code']); ?></td>
+                    <td class="ent-mono"><?php echo htmlspecialchars((string) $x['record_no']); ?></td>
                     <td><span class="badge badge-danger"><?php echo htmlspecialchars($x['reject_code']); ?></span></td>
                     <td><small><?php echo htmlspecialchars($x['created_at']); ?></small></td>
                 </tr>
@@ -165,13 +187,13 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     </div>
     <?php endif; ?>
 
-    <div class="card" style="margin-top:12px"><div class="card-body table-responsive">
+    <div class="card ent-mt12"><div class="card-body table-responsive">
         <h6>محاضرُ التوليد — السجلُّ الكامل (<?php echo count($generated); ?>)</h6>
         <?php if (!$generated): ?>
-            <?php if (function_exists('ems_state_empty')) { ems_state_empty('لا محاضرَ في هذه الفترة بعد.'); } else { echo '<p style="opacity:.7">لا محاضر.</p>'; } ?>
+            <?php if (function_exists('ems_state_empty')) { ems_state_empty('لا محاضرَ في هذه الفترة بعد.'); } else { echo '<p class="ent-dim">لا محاضر.</p>'; } ?>
         <?php else: ?>
         <div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap ent-w100">
             <thead><tr>
                 <th>رقم المحضر</th><th>الفترة</th><th>الواقعة المرجعية</th>
                 <th>حكم العميل</th><th>قيمة إيراد العميل</th>
@@ -194,34 +216,34 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <tbody>
             <?php foreach ($generated as $g): ?>
                 <tr>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars($g['entitle_code']); ?></td>
+                    <td class="ent-mono"><?php echo htmlspecialchars($g['entitle_code']); ?></td>
                     <td><?php echo htmlspecialchars($g['period']); ?></td>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars((string) $g['record_no']); ?></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars($g['client_ruling']); ?></td>
+                    <td class="ent-mono"><?php echo htmlspecialchars((string) $g['record_no']); ?></td>
+                    <td class="ent-fs76"><?php echo htmlspecialchars($g['client_ruling']); ?></td>
                     <td><?php echo $g['client_amount'] !== null ? number_format((float) $g['client_amount'], 2) : '—'; ?></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars($g['supplier_ruling']); ?></td>
+                    <td class="ent-fs76"><?php echo htmlspecialchars($g['supplier_ruling']); ?></td>
                     <td><?php echo $g['supplier_amount'] !== null ? number_format((float) $g['supplier_amount'], 2) : '—'; ?></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars($g['operator_ruling']); ?></td>
+                    <td class="ent-fs76"><?php echo htmlspecialchars($g['operator_ruling']); ?></td>
                     <td><?php echo $g['operator_amount'] !== null ? number_format((float) $g['operator_amount'], 2) : '—'; ?></td>
                     <td><?php echo htmlspecialchars($g['currency']); ?></td>
                     <td><small><?php echo htmlspecialchars((string) $g['chain_completed_at']); ?></small></td>
                     <td><?php echo $g['fact_event_id'] !== null ? (int) $g['fact_event_id'] : '—'; ?></td>
                     <td><span class="badge badge-info"><?php echo htmlspecialchars($g['state']); ?></span></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars((string) $g['generator_name'])
+                    <td class="ent-fs76"><?php echo htmlspecialchars((string) $g['generator_name'])
                         . ' — ' . htmlspecialchars((string) ($g['generator_title'] ?: 'بلا مسمى')); ?></td>
                     <td><small><?php echo htmlspecialchars((string) $g['created_at']); ?></small></td>
-                    <td style="font-size:.72rem"><?php echo htmlspecialchars($g['authority_ref']); ?></td>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars($g['parent_ref']); ?></td>
-                    <td style="font-family:monospace;font-size:.7rem"><?php echo htmlspecialchars($g['idempotency_key']); ?></td>
+                    <td class="ent-fs72"><?php echo htmlspecialchars($g['authority_ref']); ?></td>
+                    <td class="ent-mono"><?php echo htmlspecialchars($g['parent_ref']); ?></td>
+                    <td class="ent-mono-sm"><?php echo htmlspecialchars($g['idempotency_key']); ?></td>
                     <td><?php echo htmlspecialchars($g['effect_grade']); ?></td>
                     <td><?php echo $g['reversed_by_ref'] !== '' ? htmlspecialchars($g['reversed_by_ref']) : '—'; ?></td>
-                    <td style="font-size:.72rem"><?php echo htmlspecialchars($g['ruleset_version']); ?></td>
+                    <td class="ent-fs72"><?php echo htmlspecialchars($g['ruleset_version']); ?></td>
                     <td><?php echo (int) $g['company_id']; ?></td>
-                    <td style="font-family:monospace"><?php echo $g['reverses_ref'] !== '' && $g['reverses_ref'] !== null
+                    <td class="ent-mono"><?php echo $g['reverses_ref'] !== '' && $g['reverses_ref'] !== null
                         ? htmlspecialchars((string) $g['reverses_ref']) : '—'; ?></td>
                     <td><?php echo $g['fx_rate'] !== null ? number_format((float) $g['fx_rate'], 6) : '—'; ?></td>
                     <td><?php echo $g['cost_center_id'] !== null ? (int) $g['cost_center_id'] : '—'; ?></td>
-                    <td style="font-family:monospace;font-size:.72rem"><?php echo $g['journal_ref'] !== '' && $g['journal_ref'] !== null
+                    <td class="ent-mono-xs"><?php echo $g['journal_ref'] !== '' && $g['journal_ref'] !== null
                         ? htmlspecialchars((string) $g['journal_ref']) : '—'; ?></td>
                 </tr>
             <?php endforeach; ?>

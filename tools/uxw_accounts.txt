@@ -8,5 +8,8 @@ Maintenance/	صيانة
 Suppliers/	مصعب
 Risk/	مخاطر
 FinRequests/	محمد
+FinRequests/accountant_desk.php	مشرف المالية
+FinRequests/effect_map.php	مشرف المالية
+FinRequests/routing_admin.php	مشرف المالية
 Finance/	مشرف المالية
 Operations/	محمد

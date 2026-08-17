@@ -99,13 +99,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array(array('href' => 'finance_gateway.php', 'class' => 'add-btn', 'icon' => 'fa fa-building-columns', 'label' => 'بوابة المالية'));
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
+    echo ems_states_bundle('لا صفوفَ توجيهٍ بعد', 'أضف توجيهَ إدارةٍ من نموذج «إضافة/تعديل توجيه إدارة» أدناه');
     ?>
+    <style>
+        /* UXW-01 ①/②: الأنماطُ الموضعيةُ صارت أصنافًا صفحية — والألوانُ برموزِ اللوحة حصرًا */
+        .fra-alert { margin-bottom:14px; font-weight:700; }
+        .fra-card { margin-bottom:14px; }
+        .fra-self-end { align-self:end; }
+        .fra-check { display:flex; gap:8px; align-items:center; }
+        .fra-hint { margin-top:10px; color:var(--c-6b4e2a); }
+    </style>
 
     <?php if (isset($_GET['msg']) && trim($_GET['msg']) !== ''): ?>
-        <div class="alert alert-info" style="margin-bottom:14px;font-weight:700;"><?php echo htmlspecialchars($_GET['msg']); ?></div>
+        <div class="alert alert-info fra-alert"><?php echo htmlspecialchars($_GET['msg']); ?></div>
     <?php endif; ?>
 
-    <div class="card" style="margin-bottom:14px;">
+    <div class="card fra-card">
         <div class="card-header"><h5><i class="fas fa-table"></i> صفوف التوجيه القائمة</h5></div>
         <div class="card-body">
             <table class="table table-bordered no-datatable" data-no-dt="1">
@@ -184,13 +194,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php foreach ($roles_map as $rid => $rname): ?><option value="<?php echo $rid; ?>"><?php echo htmlspecialchars($rname); ?></option><?php endforeach; ?>
                         </select>
                     </div>
-                    <div style="align-self:end;">
-                        <label style="display:flex;gap:8px;align-items:center;"><input type="checkbox" name="is_active" value="1"> مفعّلة (يبدأ الإنشاء فورًا)</label>
+                    <div class="fra-self-end">
+                        <label class="fra-check"><input type="checkbox" name="is_active" value="1" aria-label="مفعّلة — يبدأ الإنشاء فورًا"> مفعّلة (يبدأ الإنشاء فورًا)</label>
                     </div>
-                    <div style="align-self:end;"><button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> حفظ التوجيه</button></div>
+                    <div class="fra-self-end"><button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> حفظ التوجيه</button></div>
                 </div>
             </form>
-            <p style="margin-top:10px;color:#6b4e2a;">💡 التعميم المتدرج (القرار المقفل): فعّل إدارةً جديدة هنا متى نجحت سابقتها — لا حاجة لأي تعديل كود.</p>
+            <p class="fra-hint">💡 التعميم المتدرج (القرار المقفل): فعّل إدارةً جديدة هنا متى نجحت سابقتها — لا حاجة لأي تعديل كود.</p>
         </div>
     </div>
 </div>

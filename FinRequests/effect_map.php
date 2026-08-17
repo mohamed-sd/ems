@@ -116,14 +116,35 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array(array('href' => 'finance_gateway.php', 'class' => 'add-btn', 'icon' => 'fa fa-building-columns', 'label' => 'بوابة المالية'));
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
+    echo ems_states_bundle('لا خيطَ معروضًا بعد', 'أدخل رقمَ الطلب أو الحدث أو كشفِ الوحدة ثم تتبّع الخيط');
     ?>
+    <style>
+        /* UXW-01 ①/②: الأنماطُ الموضعيةُ صارت أصنافًا صفحية — والألوانُ برموزِ اللوحة
+           (ما لا رمزَ له بعدُ يُعلَن باسمِ قيمتِه مع قيمتِه الاحتياطيةِ حرفًا بحرف) */
+        .fem-card { margin-bottom:14px; }
+        .fem-search-form { display:flex; gap:10px; flex-wrap:wrap; align-items:end; }
+        .fem-w280 { min-width:280px; }
+        .fem-facts { display:flex; gap:18px; flex-wrap:wrap; }
+        .fem-note { color:var(--c-6b4e2a); font-weight:600; }
+        .fem-fanout { border-right:3px solid var(--c-d4b06a, #d4b06a); padding-right:16px; }
+        .fem-branch { padding:10px 0; border-bottom:1px dashed var(--c-e3d9c6, #e3d9c6); display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
+        .fem-branch-icon { font-size:1.3rem; }
+        .fem-branch-label { min-width:230px; }
+        .fem-amount-ok { color:var(--c-1a7a3a, #1a7a3a); }
+        .fem-amber-note { color:var(--c-9a6a00, #9a6a00); }
+        .fem-reason-sm { color:var(--c-9a6a00, #9a6a00); font-size:.9rem; }
+        .fem-pending-note { color:var(--c-6b4e2a); font-size:.9rem; }
+        .fem-cols { display:flex; gap:24px; flex-wrap:wrap; }
+        .fem-col { flex:1; min-width:280px; }
+    </style>
 
-    <div class="card" style="margin-bottom:14px;">
+    <div class="card fem-card">
         <div class="card-body">
-            <form method="get" class="allforms allforms-visible" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;">
-                <div style="min-width:280px;">
+            <form method="get" class="allforms allforms-visible fem-search-form">
+                <div class="fem-w280">
                     <label for="emsf_170_531d9">رقم الطلب (FR-…) · الحدث (#N) · أو كشف الوحدة (FIN-UR-…)</label>
-                    <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="FR-2026-0001 · #11 · FIN-UR-0001" id="emsf_170_531d9">
+                    <input type="text" name="q" id="emsf_170_531d9" placeholder="FR-2026-0001 · #11 · FIN-UR-0001" aria-label="رقم الطلب أو الحدث أو كشف الوحدة" value="<?php echo htmlspecialchars($q); ?>">
                 </div>
                 <button type="submit" class="btn btn-primary"><i class="fa fa-magnifying-glass"></i> تتبّع الخيط</button>
             </form>
@@ -136,19 +157,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($tsCtx): ?>
         <?php $u_lbl = array('hour' => 'ساعة', 'ton' => 'طن', 'meter' => 'متر'); ?>
-        <div class="card" style="margin-bottom:14px;">
+        <div class="card fem-card">
             <div class="card-header"><h5><i class="fa fa-calendar-day"></i> المصدر: يوم الدوام المعتمد (سجلّ الوحدات — D02)</h5></div>
-            <div class="card-body" style="display:flex;gap:18px;flex-wrap:wrap;">
+            <div class="card-body fem-facts">
                 <div><strong><?php echo htmlspecialchars($tsCtx['source_ref']); ?></strong></div>
                 <div><?php echo htmlspecialchars($tsCtx['work_date']); ?></div>
                 <div><span class="badge bg-info"><?php echo $tsCtx['unit'] === null ? 'لا كميةَ مسجّلة'
                     : number_format((float)$tsCtx['qty'], 2) . ' ' . ($u_lbl[$tsCtx['unit']] ?? $tsCtx['unit']); ?></span></div>
                 <div><strong>سعر العميل:</strong> <?php echo $tsCtx['client']['ok']
                     ? number_format((float)$tsCtx['client']['price'], 2) . ' ' . htmlspecialchars($tsCtx['client']['currency'])
-                    : '<span style="color:#9a6a00;">— ' . htmlspecialchars($tsCtx['client']['reason']) . '</span>'; ?></div>
+                    : '<span class="fem-amber-note">— ' . htmlspecialchars($tsCtx['client']['reason']) . '</span>'; ?></div>
                 <div><strong>سعر المورد:</strong> <?php echo $tsCtx['supplier']['ok']
                     ? number_format((float)$tsCtx['supplier']['price'], 2) . ' ' . htmlspecialchars($tsCtx['supplier']['currency'])
-                    : '<span style="color:#9a6a00;">— ' . htmlspecialchars($tsCtx['supplier']['reason']) . '</span>'; ?></div>
+                    : '<span class="fem-amber-note">— ' . htmlspecialchars($tsCtx['supplier']['reason']) . '</span>'; ?></div>
             </div>
         </div>
     <?php endif; ?>
@@ -158,9 +179,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $model_lbl = array('hour' => 'ساعة', 'ton' => 'طن', 'meter' => 'متر');
         $uq = ($unit['approved_qty'] !== null ? $unit['approved_qty'] : $unit['ops_qty']);
         ?>
-        <div class="card" style="margin-bottom:14px;">
+        <div class="card fem-card">
             <div class="card-header"><h5><i class="fa fa-cube"></i> المصدر: الوحدة التشغيلية المعتمدة</h5></div>
-            <div class="card-body" style="display:flex;gap:18px;flex-wrap:wrap;">
+            <div class="card-body fem-facts">
                 <div><strong><?php echo htmlspecialchars($unit['record_no']); ?></strong></div>
                 <div><?php echo htmlspecialchars($unit['record_date']); ?></div>
                 <div><span class="badge bg-info"><?php echo number_format((float)$uq, 2) . ' ' . ($model_lbl[$unit['work_model']] ?? $unit['work_model']); ?></span></div>
@@ -177,8 +198,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card">
             <div class="card-header"><h5><i class="fa fa-sitemap"></i> مروحة الأثر — الحدث الواحد والآثار المتعددة (§6.1)</h5></div>
             <div class="card-body">
-                <p style="color:#6b4e2a;font-weight:600;">كل أثرٍ مربوطٌ بأبيه في <code>fin_event_links</code>؛ وغيرُ المتاح مُعلَنٌ بسببه لا صامت.</p>
-                <div class="fanout-tree" style="border-right:3px solid #d4b06a;padding-right:16px;">
+                <p class="fem-note">كل أثرٍ مربوطٌ بأبيه في <code>fin_event_links</code>؛ وغيرُ المتاح مُعلَنٌ بسببه لا صامت.</p>
+                <div class="fanout-tree fem-fanout">
                 <?php foreach ($fanMap as $etype => $meta):
                     $gen = isset($fanEffects[$etype]) ? $fanEffects[$etype] : null;
                     $target = $gen ? $gen['target'] : null;
@@ -190,16 +211,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     $icon = array('revenue_event' => '💰', 'supplier_due' => '📦', 'cost_record' => '🚜',
                                   'employee_due' => '👷', 'metric_update' => '🔧');
                 ?>
-                    <div style="padding:10px 0;border-bottom:1px dashed #e3d9c6;display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
-                        <span style="font-size:1.3rem;"><?php echo $icon[$etype] ?? '•'; ?></span>
-                        <strong style="min-width:230px;"><?php echo htmlspecialchars($meta['effect_label']); ?></strong>
+                    <div class="fem-branch">
+                        <span class="fem-branch-icon"><?php echo $icon[$etype] ?? '•'; ?></span>
+                        <strong class="fem-branch-label"><?php echo htmlspecialchars($meta['effect_label']); ?></strong>
                         <?php if ($gen): ?>
                             <span class="badge bg-success">مولَّد</span>
                             <code><?php echo htmlspecialchars($gen['link']['target_table']); ?> #<?php echo intval($gen['link']['target_id']); ?></code>
-                            <?php if ($amount !== null): ?><strong style="color:#1a7a3a;"><?php echo number_format((float)$amount, 2); ?></strong><?php endif; ?>
+                            <?php if ($amount !== null): ?><strong class="fem-amount-ok"><?php echo number_format((float)$amount, 2); ?></strong><?php endif; ?>
                         <?php elseif (intval($meta['is_active']) !== 1): ?>
                             <span class="badge bg-secondary">غير متاح</span>
-                            <span style="color:#9a6a00;font-size:.9rem;"><?php echo htmlspecialchars($meta['unavailable_reason'] ?? ''); ?></span>
+                            <span class="fem-reason-sm"><?php echo htmlspecialchars($meta['unavailable_reason'] ?? ''); ?></span>
                         <?php else:
                             // مصدر الدوام: نعلن سببَ التعذّر الحقيقي (تسعيرٌ/عقدٌ/كمية) بدل «بانتظار» مبهمة
                             $blocked = '';
@@ -210,10 +231,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         ?>
                             <?php if ($blocked !== ''): ?>
                                 <span class="badge bg-secondary">متعذّر</span>
-                                <span style="color:#9a6a00;font-size:.9rem;"><?php echo htmlspecialchars($blocked); ?></span>
+                                <span class="fem-reason-sm"><?php echo htmlspecialchars($blocked); ?></span>
                             <?php else: ?>
                                 <span class="badge bg-warning">بانتظار التوليد</span>
-                                <span style="color:#6b4e2a;font-size:.9rem;">يُفرَّع عند الاعتماد الرابع أو بكنس المصالِح</span>
+                                <span class="fem-pending-note">يُفرَّع عند الاعتماد الرابع أو بكنس المصالِح</span>
                             <?php endif; ?>
                         <?php endif; ?>
                     </div>
@@ -224,9 +245,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <?php if ($req): ?>
-        <div class="card" style="margin-bottom:14px;">
+        <div class="card fem-card">
             <div class="card-header"><h5><i class="fa fa-file-lines"></i> ① المصدر: الطلب الموحّد</h5></div>
-            <div class="card-body" style="display:flex;gap:18px;flex-wrap:wrap;">
+            <div class="card-body fem-facts">
                 <div><strong><?php echo htmlspecialchars($req['request_no']); ?></strong></div>
                 <div><?php echo htmlspecialchars($catalog[$req['request_type']]['label'] ?? $req['request_type']); ?></div>
                 <div><?php echo finreq_state_badge($req['state']); ?></div>
@@ -238,9 +259,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <?php if ($ev): ?>
-        <div class="card" style="margin-bottom:14px;">
+        <div class="card fem-card">
             <div class="card-header"><h5><i class="fa fa-bolt"></i> ② الحدث المالي (D04)</h5></div>
-            <div class="card-body" style="display:flex;gap:18px;flex-wrap:wrap;">
+            <div class="card-body fem-facts">
                 <div><strong><?php echo htmlspecialchars($ev['event_no']); ?></strong> (#<?php echo intval($ev['id']); ?>)</div>
                 <div><code><?php echo htmlspecialchars($ev['event_key']); ?></code></div>
                 <div><span class="badge bg-info"><?php echo htmlspecialchars($ev['source_module']); ?></span></div>
@@ -250,7 +271,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
         </div>
 
-        <div class="card" style="margin-bottom:14px;">
+        <div class="card fem-card">
             <div class="card-header"><h5><i class="fa fa-book"></i> ③ القيود المتولّدة (<?php echo count($journals); ?>)</h5></div>
             <div class="card-body">
                 <?php if ($journals): ?>
@@ -290,16 +311,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
         </div>
 
-        <div class="card" style="margin-bottom:14px;">
+        <div class="card fem-card">
             <div class="card-header"><h5><i class="fa fa-money-check-dollar"></i> ④ الدفعات والمستحقات</h5></div>
-            <div class="card-body" style="display:flex;gap:24px;flex-wrap:wrap;">
-                <div style="flex:1;min-width:280px;">
+            <div class="card-body fem-cols">
+                <div class="fem-col">
                     <h6>الدفعات (<?php echo count($payments); ?>)</h6>
                     <?php foreach ($payments as $p): ?>
                         <div>💳 <strong><?php echo htmlspecialchars($p['payment_no']); ?></strong> — <?php echo number_format(floatval($p['amount']), 2); ?> · <?php echo htmlspecialchars($p['method']); ?> · <?php echo htmlspecialchars($p['state']); ?></div>
                     <?php endforeach; if (!$payments): ?><div>لا دفعات بعد</div><?php endif; ?>
                 </div>
-                <div style="flex:1;min-width:280px;">
+                <div class="fem-col">
                     <h6>المستحقات (<?php echo count($dues); ?>)</h6>
                     <?php foreach ($dues as $d): ?>
                         <div>🧾 <?php echo htmlspecialchars($d['party_type']); ?> — <?php echo number_format(floatval($d['amount']), 2); ?></div>

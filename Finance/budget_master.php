@@ -36,7 +36,15 @@ $header_title_html = htmlspecialchars('الموازنةُ العامة — ' . (
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الثلاثُ من المكوّنِ المركزيّ
+echo ems_states_bundle('لا ميزانياتَ معتمدةً لهذه السنة', 'تحققْ من اعتمادِ ميزانياتِ الإداراتِ للسنةِ المالية');
 ?>
+  <style>
+    /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
+    .bm-var-over  { color: var(--c-dc3545); }
+    .bm-var-under { color: var(--c-198754); }
+    .bm-total-row { font-weight: bold; background: var(--c-f8f9fa); }
+  </style>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>الإدارة</th><th>ميزانيات</th><th>المخطط</th><th>الفعلي</th><th>الانحراف</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -64,10 +72,10 @@ include __DIR__ . '/../includes/page_header.php';
           <td><?= intval($b['budgets']) ?></td>
           <td><?= number_format(floatval($b['planned']), 2) ?></td>
           <td><?= number_format(floatval($b['actual']), 2) ?></td>
-          <td style="color:<?= $var > 0 ? '#dc3545' : '#198754' ?>"><?= number_format($var, 2) ?></td></tr>
+          <td class="<?= $var > 0 ? 'bm-var-over' : 'bm-var-under' ?>"><?= number_format($var, 2) ?></td></tr>
     <?php endforeach; ?>
     </tbody>
-    <tfoot><tr style="font-weight:bold;background:#f8f9fa">
+    <tfoot><tr class="bm-total-row">
       <td>الإجمالي الموحَّد</td><td></td>
       <td><?= number_format($tp, 2) ?></td><td><?= number_format($ta, 2) ?></td>
       <td><?= number_format($ta - $tp, 2) ?></td></tr></tfoot>

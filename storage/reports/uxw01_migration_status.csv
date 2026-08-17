@@ -29,3 +29,14 @@ Finance/fin_ratios.php,نعم,0,موجود,مُرحَّلة — بوابات ص�
 Finance/fin_early_warning.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
 Finance/fin_unit_economics.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
 Finance/fin_contract_margin.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Finance/budget_master.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Finance/budget_dept.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Finance/entitlement.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Finance/entitlement_gate.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Finance/fin_posting_matrix.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Finance/gov_dept_fin.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Finance/ob_schedule.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+FinRequests/accountant_desk.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+FinRequests/effect_map.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+FinRequests/my_requests.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+FinRequests/routing_admin.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس

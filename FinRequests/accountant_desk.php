@@ -51,24 +51,43 @@ include('../inheader.php');
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main ems-unified-page-shell finreq-main">
+<div class="main ems-unified-page-shell finreq-main ems-doc-cycle">
     <?php
     $header_title   = 'مكتب المحاسب — ولادة الحدث المالي';
     $header_icon    = 'fa fa-calculator';
     $header_actions = array(array('href' => 'finance_gateway.php', 'class' => 'add-btn', 'icon' => 'fa fa-building-columns', 'label' => 'بوابة المالية'));
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑫: شاشةُ دورةٍ مستندية — كلُّ ما يَرِدُ هنا معتمَدٌ إداريًّا (pending_approval بلا حدث)
+    // وخطوتُه التاليةُ التي تنطق بها الشاشةُ نفسُها: ولادةُ الحدثِ المالي.
+    echo ems_next_step('ولادة الحدث المالي (D04)');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
+    echo ems_states_bundle('لا مهامَّ تنتظر دورَك', 'ستظهر المعاملاتُ الواردةُ هنا فورَ إحالتِها');
     ?>
+    <style>
+        /* UXW-01 ②: الأنماطُ الموضعيةُ صارت أصنافًا صفحية — والألوانُ برموزِ اللوحة حصرًا */
+        .fad-alert { margin-bottom:14px; font-weight:700; }
+        .fad-card { margin-bottom:14px; }
+        .fad-card-head { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+        .fad-facts { display:flex; gap:18px; flex-wrap:wrap; margin-bottom:10px; }
+        .fad-warn { margin-bottom:10px; font-weight:700; }
+        .fad-self-end { align-self:end; }
+        .fad-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+        .fad-inline-form { display:flex; gap:8px; }
+        .fad-w240 { min-width:240px; }
+        .fad-w160 { min-width:160px; }
+        .fad-w150 { min-width:150px; }
+    </style>
 
     <?php if (isset($_GET['msg']) && trim($_GET['msg']) !== ''): ?>
-        <div class="alert alert-info" style="margin-bottom:14px;font-weight:700;"><?php echo htmlspecialchars($_GET['msg']); ?></div>
+        <div class="alert alert-info fad-alert"><?php echo htmlspecialchars($_GET['msg']); ?></div>
     <?php endif; ?>
 
     <?php foreach ($rows as $r):
         $rt = isset($route_map[$r['source_module']]) ? $route_map[$r['source_module']] : null;
     ?>
-        <div class="card" style="margin-bottom:14px;">
-            <div class="card-header" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div class="card fad-card">
+            <div class="card-header fad-card-head">
                 <h5><i class="<?php echo htmlspecialchars($catalog[$r['request_type']]['icon']); ?>"></i>
                     <?php echo htmlspecialchars($r['request_no']); ?> — <?php echo htmlspecialchars($catalog[$r['request_type']]['label']); ?>
                     <?php echo finreq_state_badge($r['state']); ?>
@@ -79,14 +98,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <a href="request_form.php?id=<?php echo intval($r['id']); ?>" class="btn btn-sm btn-secondary"><i class="fa fa-eye"></i> التفاصيل والسجل</a>
             </div>
             <div class="card-body">
-                <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="fad-facts">
                     <div><strong>المبرّر:</strong> <?php echo htmlspecialchars($r['justification']); ?></div>
                     <div><strong>المستفيد:</strong> <?php echo htmlspecialchars($r['beneficiary_name'] ?? '-'); ?> (<?php echo htmlspecialchars($r['beneficiary_type']); ?>)</div>
                     <div><strong>المبلغ:</strong> <?php echo number_format(floatval($r['amount']), 2) . ' ' . htmlspecialchars($r['currency']); ?></div>
                     <div><strong>المرجع المصدري:</strong> <?php echo htmlspecialchars($r['source_ref'] ?? '—'); ?></div>
                 </div>
                 <?php $frag = finreq_fragmentation($gate, $r); if ($frag): ?>
-                    <div class="alert alert-warning" style="margin-bottom:10px;font-weight:700;">
+                    <div class="alert alert-warning fad-warn">
                         ⚠️ كشف التجزئة (§8.5): <?php echo intval($frag['count']); ?> طلباتٍ حيّةٍ لنفس المستفيد والنوع خلال 30 يومًا
                         بمجموع <strong><?php echo number_format($frag['total'], 2) . ' ' . htmlspecialchars($r['currency']); ?></strong>
                         — طبّق مستوى الاعتماد على المجموع لا على هذا الطلب وحده (مصفوفة D04).
@@ -122,31 +141,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div><label for="emsf_167_981ed">مركز التكلفة</label><input type="text" name="cost_center" maxlength="60" value="<?php echo htmlspecialchars($r['cost_center'] ?? ''); ?>" id="emsf_167_981ed"></div>
-                        <div><label for="emsf_168_6e530">المشروع</label><input type="number" name="project_id" min="1" value="<?php echo htmlspecialchars($r['project_id'] ?? ''); ?>" id="emsf_168_6e530"></div>
-                        <div><label for="emsf_169_8be43">المعدة</label><input type="number" name="equipment_id" min="1" value="<?php echo htmlspecialchars($r['equipment_id'] ?? ''); ?>" id="emsf_169_8be43"></div>
-                        <div style="align-self:end;">
+                        <div><label for="emsf_167_981ed">مركز التكلفة</label><input type="text" name="cost_center" maxlength="60" id="emsf_167_981ed" aria-label="مركز التكلفة" value="<?php echo htmlspecialchars($r['cost_center'] ?? ''); ?>"></div>
+                        <div><label for="emsf_168_6e530">المشروع</label><input type="number" name="project_id" min="1" id="emsf_168_6e530" aria-label="المشروع" value="<?php echo htmlspecialchars($r['project_id'] ?? ''); ?>"></div>
+                        <div><label for="emsf_169_8be43">المعدة</label><input type="number" name="equipment_id" min="1" id="emsf_169_8be43" aria-label="المعدة" value="<?php echo htmlspecialchars($r['equipment_id'] ?? ''); ?>"></div>
+                        <div class="fad-self-end">
                             <button type="submit" class="btn btn-primary"><i class="fa fa-baby-carriage"></i> ولادة الحدث المالي (D04)</button>
                         </div>
                     </div>
                 </form>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
-                    <form action="request_actions.php" method="post" style="display:flex;gap:8px;">
+                <div class="fad-actions">
+                    <form action="request_actions.php" method="post" class="fad-inline-form">
         <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="return_request">
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="accountant_desk.php">
-                        <input type="text" name="reason" placeholder="إعادة للمصدر بسببٍ (نقص تصنيف/أبعاد)" required style="min-width:240px;" aria-label="إعادة للمصدر بسببٍ (نقص تصنيف/أبعاد)">
+                        <input type="text" name="reason" placeholder="إعادة للمصدر بسببٍ (نقص تصنيف/أبعاد)" required class="fad-w240" aria-label="إعادة للمصدر بسببٍ (نقص تصنيف/أبعاد)">
                         <button type="submit" class="btn btn-secondary"><i class="fa fa-rotate-left"></i> إعادة للمصدر</button>
                     </form>
                     <?php if (intval($r['duplicate_flag']) === 1): ?>
-                    <form action="request_actions.php" method="post" style="display:flex;gap:8px;">
+                    <form action="request_actions.php" method="post" class="fad-inline-form">
         <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="merge">
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="accountant_desk.php">
-                        <input type="text" name="merge_into_no" placeholder="رقم الطلب الأصل FR-…" required style="min-width:160px;" aria-label="رقم الطلب الأصل FR-…">
-                        <input type="text" name="reason" placeholder="سبب الدمج" required style="min-width:150px;" aria-label="سبب الدمج">
+                        <input type="text" name="merge_into_no" placeholder="رقم الطلب الأصل FR-…" required class="fad-w160" aria-label="رقم الطلب الأصل FR-…">
+                        <input type="text" name="reason" placeholder="سبب الدمج" required class="fad-w150" aria-label="سبب الدمج">
                         <button type="submit" class="btn btn-secondary"><i class="fa fa-code-merge"></i> دمج المكرّر</button>
                     </form>
                     <?php endif; ?>
@@ -154,7 +173,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
         </div>
     <?php endforeach; if (!$rows): ?>
-        <div class="card"><div class="card-body">📭 لا طلبات معتمدةً إداريًّا بانتظار ولادة حدثها</div></div>
+        <?php echo ems_state('empty', 'لا مهامَّ تنتظر دورَك', 'ستظهر المعاملاتُ الواردةُ هنا فورَ إحالتِها'); ?>
     <?php endif; ?>
 </div>
 </body>

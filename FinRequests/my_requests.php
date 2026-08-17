@@ -45,16 +45,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array(array('href' => 'request_form.php', 'class' => 'add-btn', 'icon' => 'fa fa-file-circle-plus', 'label' => 'طلب مالي جديد'));
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
+    echo ems_states_bundle('لا طلباتٍ مسجَّلةً بعد', 'أنشئ طلبَك الأول من زرِّ «طلب مالي جديد» أعلى الشاشة');
     ?>
+    <style>
+        /* UXW-01 ②: الأنماطُ الموضعيةُ صارت أصنافًا صفحية */
+        .fmr-alert { margin-bottom:14px; font-weight:700; }
+        .fmr-table-full { width:100%; }
+    </style>
 
     <?php if (isset($_GET['msg']) && trim($_GET['msg']) !== ''): ?>
-        <div class="alert alert-info" style="margin-bottom:14px;font-weight:700;"><?php echo htmlspecialchars($_GET['msg']); ?></div>
+        <div class="alert alert-info fmr-alert"><?php echo htmlspecialchars($_GET['msg']); ?></div>
     <?php endif; ?>
 
     <div class="card">
         <div class="card-header"><h5><i class="fas fa-table"></i> الطلبات (آخر 500)</h5></div>
         <div class="card-body table-container">
-            <table class="display" style="width:100%">
+            <table class="display fmr-table-full">
                 <thead>
                     <tr>
                         <th>رقم الطلب</th><th>نوع الطلب</th><th>المبرّر</th><th>المستفيد</th>

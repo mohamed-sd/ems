@@ -112,12 +112,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-door-closed';
 $header_title_html = htmlspecialchars('بوابةُ الاستحقاق المالي', ENT_QUOTES, 'UTF-8');
-ob_start(); ?><span class="badge" style="background:#fd7e14;font-size:.95em">بانتظار البوابة: <?= $queueFail === '' ? count($rows) : '—' ?></span><?php
+ob_start(); ?><span class="badge eg-badge-pending">بانتظار البوابة: <?= $queueFail === '' ? count($rows) : '—' ?></span><?php
 $header_actions = array(array('raw' => trim((string) ob_get_clean())));
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الثلاثُ من المكوّنِ المركزيّ
+echo ems_states_bundle('لا أثرَ أوليًّا ينتظر البوابة', 'ما يكتمل من سلاسلِ الاستحقاقِ يظهر هنا فورَ اقتراحِ أثرِه');
 ?>
-  <p class="text-muted" style="font-size:.9em">الأثرُ الأوليُّ ينتظر اعتمادَ مدير الإدارة + المالية — ولا يصير Posted قبلهما (POL-01).</p>
+  <style>
+    /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
+    .eg-badge-pending { background: var(--c-badge-warning-a); font-size: .95em; }
+    .eg-badge-blocked { background: var(--c-6c757d); }
+    .eg-note { font-size: .9em; }
+    .eg-blocked-note { font-size: .8em; max-width: 230px; }
+    .eg-action-form { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
+    .eg-mt4 { margin-top: 4px; }
+    .eg-w110 { max-width: 110px; }
+    .eg-w100 { max-width: 100px; }
+    .eg-w190 { max-width: 190px; }
+    .eg-inbox-link { margin-top: 4px; display: inline-block; }
+  </style>
+  <p class="text-muted eg-note">الأثرُ الأوليُّ ينتظر اعتمادَ مدير الإدارة + المالية — ولا يصير Posted قبلهما (POL-01).</p>
   <?php if ($msg !== ''): ?>
     <div class="alert <?= (mb_strpos($msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
       <?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?>
@@ -191,27 +206,27 @@ include __DIR__ . '/../includes/page_header.php';
           <?php if ($eid <= 0): ?>
             <!-- ◆ لا يُعرض زرٌّ يعلم النظامُ سلفًا أنَّه سيردُّ ٤٠٤: الفعلُ يقع على
                  الأثرِ الماليِّ المقترح (`unit_effects.pe_id`) لا على الاستحقاق. -->
-            <span class="badge" style="background:#6c757d" title="<?= htmlspecialchars((string) $r['blocked'], ENT_QUOTES, 'UTF-8') ?>">غيرُ قابلٍ للاعتمادِ بعد</span>
-            <div class="text-muted" style="font-size:.8em;max-width:230px"><?= htmlspecialchars((string) $r['blocked'], ENT_QUOTES, 'UTF-8') ?></div>
+            <span class="badge eg-badge-blocked" title="<?= htmlspecialchars((string) $r['blocked'], ENT_QUOTES, 'UTF-8') ?>">غيرُ قابلٍ للاعتمادِ بعد</span>
+            <div class="text-muted eg-blocked-note"><?= htmlspecialchars((string) $r['blocked'], ENT_QUOTES, 'UTF-8') ?></div>
           <?php else: ?>
           <!-- FN-03 · FIXC-0017: فعلان محروسان بالعقدِ السبعيّ — لا رابطٌ يُحيل
                إلى شاشةٍ أخرى ثم يُقال «الاعتمادُ عبر الخدمة». -->
-          <form method="post" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center">
+          <form method="post" class="eg-action-form">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="approve_pe" value="<?= $eid ?>">
             <label class="visually-hidden" for="eg_dm_<?= $eid ?>">مدير الإدارة المعتمِد</label>
-            <input id="eg_dm_<?= $eid ?>" type="number" name="dept_manager_id" required min="1"
-                   class="form-control form-control-sm" placeholder="مدير الإدارة" style="max-width:110px">
+            <input type="number" name="dept_manager_id" required min="1"
+                   class="form-control form-control-sm eg-w110" placeholder="مدير الإدارة" id="eg_dm_<?= $eid ?>">
             <label class="visually-hidden" for="eg_fm_<?= $eid ?>">المالية المعتمِدة</label>
-            <input id="eg_fm_<?= $eid ?>" type="number" name="finance_manager_id" required min="1"
-                   class="form-control form-control-sm" placeholder="المالية" style="max-width:100px">
+            <input type="number" name="finance_manager_id" required min="1"
+                   class="form-control form-control-sm eg-w100" placeholder="المالية" id="eg_fm_<?= $eid ?>">
             <button class="action-btn" type="submit"><i class="fa fa-check"></i> اعتمد</button>
           </form>
-          <form method="post" style="display:flex;gap:5px;flex-wrap:wrap;align-items:center;margin-top:4px">
+          <form method="post" class="eg-action-form eg-mt4">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="reject_pe" value="<?= $eid ?>">
             <label class="visually-hidden" for="eg_rc_<?= $eid ?>">سببُ الرد</label>
-            <select id="eg_rc_<?= $eid ?>" name="reason_code" required class="form-control form-control-sm" style="max-width:190px">
+            <select aria-label="سببُ الردِّ المحكوم" name="reason_code" required class="form-control form-control-sm eg-w190" id="eg_rc_<?= $eid ?>">
               <option value="">— سببُ الردِّ المحكوم —</option>
               <?php foreach ($REJECT_REASONS as $k => $v): ?>
                 <option value="<?= htmlspecialchars($k, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($v, ENT_QUOTES, 'UTF-8') ?></option>
@@ -220,7 +235,7 @@ include __DIR__ . '/../includes/page_header.php';
             <button class="action-btn" type="submit"><i class="fa fa-rotate-left"></i> ردّ</button>
           </form>
           <?php endif; ?>
-          <a class="action-btn" style="margin-top:4px;display:inline-block" href="../Finance/approvals_inbox.php">صندوق الاعتماد ←</a>
+          <a class="action-btn eg-inbox-link" href="../Finance/approvals_inbox.php">صندوق الاعتماد ←</a>
         </td>
       </tr>
     <?php endforeach; ?>

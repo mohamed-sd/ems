@@ -33,3 +33,15 @@ Finance/fin_ratios.php
 Finance/fin_early_warning.php
 Finance/fin_unit_economics.php
 Finance/fin_contract_margin.php
+# دفعةُ الماليةِ الثانية — رُحِّلت 2026-08-17
+Finance/budget_master.php
+Finance/budget_dept.php
+Finance/entitlement.php
+Finance/entitlement_gate.php
+Finance/fin_posting_matrix.php
+Finance/gov_dept_fin.php
+Finance/ob_schedule.php
+FinRequests/accountant_desk.php
+FinRequests/effect_map.php
+FinRequests/my_requests.php
+FinRequests/routing_admin.php

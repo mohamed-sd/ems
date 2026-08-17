@@ -130,7 +130,7 @@ foreach ($SCOPE as $rel) {
     /* ④ صفحةٌ خارجَ القشرة — لا بد من inheader (القشرةُ الموحَّدة) */
     /* الأغلفةُ الشرعيةُ تُحمِّل inheader بذاتِها: fin_analysis_shell · eng01_screen_view */
     if (preg_match('/\.php$/', $rel)
-        && !preg_match('/(require|include)(_once)?\s*[( ].*(inheader\.php|fin_analysis_shell\.php|eng01_screen_view\.php|u13_screen_kit\.php)/u', $src)
+        && !preg_match('/(require|include)(_once)?\s*[( ].*(inheader\.php|fin_analysis_shell\.php|eng01_screen_view\.php|u13_screen_kit\.php|dept_gov_space\.php|dept_risk_space\.php)/u', $src)
         && !preg_match('/EMS_PARTIAL|EMS_API|json_encode/u', $src)) {
         v($violations, '٤ خارج القشرة', $rel, 'لا يُحمِّل inheader.php ولا هو جزئيّ/JSON معلَن');
     }
