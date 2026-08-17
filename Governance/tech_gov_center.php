@@ -36,11 +36,16 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 
+/* AC-F2 · AC-P1A: الحارسُ المركزيُّ **أولَ ما يواجه الطلبَ الكاتب** — ويردُّ
+   برمزِه الحوكميِّ فيراه السجلُّ والفاحص. وموضعُه قبلَ المنعِ المحليِّ مقصود:
+   منعٌ محليٌّ بلا رمزٍ يسبقه = طلبٌ مُنع فعلًا ويُعلَن «لم يُمنع». */
+ems_require_action($conn, $SCREEN, 'write', array('deny_msg' => 'تسجيلُ القرارِ بيدِ الحوكمةِ حصرًا'));
+
 // ═══ ④ حارسُ الفعل ═══
 $__canDecide = $is_super_admin || !empty($__pp['can_edit']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$__canDecide) {
     http_response_code(403);
-    exit('غير مصرَّحٍ بتسجيلِ قرارٍ في هذه الشاشة — اطلبِ المنحةَ من مدير الصلاحيات');
+    exit('GOV-PERM-403-WRITE — غير مصرَّحٍ بتسجيلِ قرارٍ في هذه الشاشة — اطلبِ المنحةَ من مدير الصلاحيات');
 }
 
 // ═══ ⑤ رمزُ الحماية ═══
@@ -52,8 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ═══ ⑥ معالجُ POST — تسجيلُ قرارِ المالكِ على صفٍّ واحد ═══
-/* AC-F2: حارسُ الكتابةِ المركزيُّ **قبلَ** أولِ عبارةِ كتابة — fail-closed. */
-ems_require_action($conn, $SCREEN, 'edit', array('deny_msg' => 'تسجيلُ القرارِ بيدِ الحوكمةِ حصرًا'));
 $flash = null; $flashKind = 'info';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'record_decision') {
     $oid = (int) ($_POST['orphan_id'] ?? 0);

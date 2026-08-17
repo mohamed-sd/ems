@@ -567,6 +567,7 @@ class TenantRegistry
         'gov_cap_proposals' => array('type' => self::T_GLOBAL, 'soft' => false),
         // ف١٣ (تعديل 2026-08-18): سجلُّ تغييرِ الأحكامِ الحاكمة — تاريخُ سياسةٍ لا بياناتُ شركة
         'gov_policy_changes' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'gov_permission_corrections' => array('type' => self::T_GLOBAL, 'soft' => false),
         'uat_field_quarantine' => array('type' => self::T_GLOBAL, 'soft' => false),
         'gov_component_versions' => array('type' => self::T_GLOBAL, 'soft' => false),
         'gov_visual_measurements' => array('type' => self::T_GLOBAL, 'soft' => false),

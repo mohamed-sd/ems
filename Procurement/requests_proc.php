@@ -69,7 +69,7 @@ if (!function_exists('ems_proc_may_finance_approve')) {
 // (القناةُ الدورية cron_proc_replenish.php؛ والزرُّ لمن لا ينتظر الساعة)
 /* AC-F2: حارسُ الكتابةِ المركزيُّ **قبلَ** أولِ عبارةِ كتابة — fail-closed.
    وفحوصُ $can_add/$can_edit تبقى داخلَ فروعِها: تلك تميّز الفعلَ وهذا يحرس البوابة. */
-ems_require_action($conn, 'Procurement/requests_proc.php', 'edit', array('deny_msg' => 'طلباتُ الشراءِ تحتاج صلاحيةَ تحرير'));
+ems_require_action($conn, 'Procurement/requests_proc.php', 'write', array('deny_msg' => 'طلباتُ الشراءِ تحتاج صلاحيةَ تحرير'));
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'generate_needs') {
     if (!$can_add) { ems_gov_flash_redirect('requests_proc.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     require_once __DIR__ . '/../app/Services/Procurement/ProcReorderService.php';

@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-17 05:45:19
--- الجداول: 588 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-17 06:13:32
+-- الجداول: 589 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6568,6 +6568,20 @@ CREATE TABLE `gov_orphan_links` (
   UNIQUE KEY `uq_orphan` (`sheet_role`,`route`,`label_ar`),
   KEY `ix_decision` (`owner_decision`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXW-01 §8 — الروابطُ اليتيمةُ في مركزِ الحوكمةِ التقنيِّ حتى قرارِ المالك';
+
+-- ── Table: gov_permission_corrections ──
+CREATE TABLE `gov_permission_corrections` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `module_code` varchar(160) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `field` varchar(24) NOT NULL,
+  `old_value` tinyint(4) NOT NULL,
+  `new_value` tinyint(4) NOT NULL,
+  `policy_source` varchar(255) NOT NULL COMMENT 'نصُّ السياسةِ ومرجعُها — لا منحَ بلا سند',
+  `applied_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_mod_role` (`module_code`,`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='تصحيحاتُ صلاحياتٍ تُعبّر عن سياسةٍ منصوصة — بأثرٍ مقروءٍ لا صامت';
 
 -- ── Table: gov_policy_changes ──
 CREATE TABLE `gov_policy_changes` (

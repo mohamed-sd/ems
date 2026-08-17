@@ -42,7 +42,7 @@ if (!$can_view) {
 // ── تسجيلُ الفاتورة والمطابقة (المحرك الواحد proc_match_invoice) ──
 /* AC-F2: حارسُ الكتابةِ المركزيُّ **قبلَ** أولِ عبارةِ كتابة — fail-closed.
    ويبقى فحصُ $can_edit داخلَ كلِّ فرعٍ: ذاك يميّز الفعلَ وهذا يحرس البوابة. */
-ems_require_action($conn, 'Procurement/po_match.php', 'edit', array('deny_msg' => 'مطابقةُ الفواتيرِ تحتاج صلاحيةَ تحرير'));
+ems_require_action($conn, 'Procurement/po_match.php', 'write', array('deny_msg' => 'مطابقةُ الفواتيرِ تحتاج صلاحيةَ تحرير'));
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'match_invoice') {
     if (!$can_edit) { ems_gov_flash_redirect('po_match.php', 'لا توجد صلاحية ❌', 'GOV-PERM-403', ''); exit(); }
     $mid = intval($_POST['order_id'] ?? 0);

@@ -71,7 +71,7 @@ $from = (isset($_GET['from']) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['from
 $to   = (isset($_GET['to'])   && preg_match('/^\d{4}-\d{2}-\d{2}$/', $_GET['to']))   ? $_GET['to']   : date('Y-m-t');
 
 /* AC-F2: حارسُ الكتابةِ المركزيُّ **قبلَ** أولِ عبارةِ كتابة — fail-closed. */
-ems_require_action($conn, $MODULE_CODE, 'edit', array('deny_msg' => 'تسجيلُ الجزاءاتِ يحتاج صلاحيةَ تحرير'));
+ems_require_action($conn, $MODULE_CODE, 'write', array('deny_msg' => 'تسجيلُ الجزاءاتِ يحتاج صلاحيةَ تحرير'));
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pen_action'])) {
     $act = strval($_POST['pen_action']);
     $c = intval($_POST['contract'] ?? 0);

@@ -546,13 +546,14 @@ if (!function_exists('fix_check_write_permission_guard')) {
     function fix_check_write_permission_guard($db, $ROOT)
     {
         $pairs = array();
+        $skipped = array();
         $rs = $db->query("SELECT m.code, m.id,
                    SUM(rp.can_view=1 AND rp.can_add=0 AND rp.can_edit=0 AND rp.can_delete=0) vo,
                    SUM(rp.can_edit=1 OR rp.can_add=1) wr
               FROM modules m JOIN role_permissions rp ON rp.module_id = m.id
              WHERE m.code LIKE '%.php'
              GROUP BY m.code, m.id HAVING vo > 0 AND wr > 0
-             ORDER BY vo DESC LIMIT 6");
+             ORDER BY vo DESC LIMIT 12");
         while ($rs && ($x = $rs->fetch_assoc())) {
             $mid = (int) $x['id'];
             $ro = fix_one($db, "SELECT role_id FROM role_permissions WHERE module_id={$mid}
@@ -564,7 +565,18 @@ if (!function_exists('fix_check_write_permission_guard')) {
                  التقارير (`report_role_permissions`) لا `modules`، فيرتدُّ قبلَ
                  حارسِ الكتابة. إدراجُه هنا يقيس ما لا يكتب. */
             if (strpos($x['code'], 'emsreports/') === 0) { continue; }
+            /* ◆ والمبدأُ نفسُه **مقيسًا لكلِّ مرشَّح** لا لمجلدٍ بعينِه: عنوانُ هذا
+                 الفحصِ «صفرُ سطحٍ **يقبل كتابةً** بصلاحيةِ عرضٍ وحدَها» — وسطحٌ
+                 بصفرِ عبارةِ كتابةٍ وصفرِ معالجِ POST **لا يقبل كتابةً أصلًا**،
+                 فقياسُه يقيس ما ليس فيه ويُبلّغ «قارئًا لم يُمنع» حيث لا كتابةَ
+                 تُمنع. (قِيس فعلًا: `Tickets/tickets_list.php` و`dept_inbox.php`
+                 صفرُ كتابةٍ وصفرُ POST.) والاستبعادُ **يُعلَن بعددِه** أدناه
+                 فلا يختفي سطحٌ خلف رقمٍ أخضر. */
             if ($ro !== null && $rw !== null && is_file($ROOT . '/' . $x['code'])) {
+                $srcW = fix_strip_comments((string) @file_get_contents($ROOT . '/' . $x['code']));
+                $hasWrite = preg_match('~\b(INSERT\s+INTO|UPDATE\s+`?\w|DELETE\s+FROM|REPLACE\s+INTO)\b~i', $srcW)
+                          || preg_match('~\$_POST\s*\[~', $srcW);
+                if (!$hasWrite) { $skipped[] = $x['code']; continue; }
                 $pairs[] = array('file' => $x['code'], 'reader' => (int) $ro, 'writer' => (int) $rw);
             }
         }
@@ -585,6 +597,14 @@ if (!function_exists('fix_check_write_permission_guard')) {
             $a = $run($p['file'], $p['reader']);
             $b = $run($p['file'], $p['writer']);
             if (!is_array($a) || !is_array($b)) { $bad[] = $p['file'] . ' (لا حكم)'; continue; }
+            /* ◆ دورٌ **بلا مستخدمٍ حيّ** لا يُقاس: المسبارُ يلزمه جلسةُ مستخدمٍ
+                 حقيقيٍّ من الدورِ نفسِه (وإلا حكَم قالبُ مستخدمٍ آخرَ على دورٍ
+                 غيرِه). فتعذُّرُ القياسِ **يُعلَن ولا يُقرأ سماحًا** — وقراءتُه
+                 «لم يُمنع» تتَّهم سطحًا لم يُختبر. (قِيس: الدور 14 بلا مستخدم.) */
+            if (isset($a['err']) || isset($b['err'])) {
+                $bad[] = $p['file'] . ' (دورٌ بلا مستخدمٍ حيّ — غيرُ مقيسٍ هنا)';
+                continue;
+            }
             // ◆ لا يُحتسب سطحٌ يُمنع الاثنان فيه بسببٍ آخر (CSRF مثلًا) — يُعلَن.
             if (!$a['write_denied'] && !$b['write_denied'] && $a['bytes'] === 0 && $b['bytes'] === 0) {
                 $bad[] = $p['file'] . ' (مانعٌ أسبقُ — غيرُ مقيسٍ هنا)';
@@ -597,6 +617,7 @@ if (!function_exists('fix_check_write_permission_guard')) {
         return array(
             'ok' => ($measured > 0 && $denied === $measured && $passed === $measured),
             'evidence' => "أسطحٌ مقيسة: {$measured} · القارئُ مُنع: {$denied}/{$measured} · الكاتبُ مرَّ: {$passed}/{$measured}"
+                . ($skipped ? " · مستبعَدٌ بقياسِ صفرِ كتابة: " . count($skipped) : "")
                 . ($bad ? ' · ملاحظات: ' . implode(' · ', array_slice($bad, 0, 4)) : ''),
         );
     }

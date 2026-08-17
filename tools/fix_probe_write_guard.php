@@ -77,10 +77,19 @@ register_shutdown_function(static function () {
     if (isset($_SESSION['ems_flash_gov']) && is_array($_SESSION['ems_flash_gov'])) {
         foreach ($_SESSION['ems_flash_gov'] as $f) { $codes[] = (string) ($f['code'] ?? ''); }
     }
+    /* ◆ والمنعُ قد يقع **في الجسمِ لا في الجلسة**: حارسُ الكتابةِ المركزيُّ
+         (`ems_require_action`) يردُّ 403 فورًا برمزِه في الجسمِ ولا يرتدُّ بفلاشٍ
+         في الجلسة — وهو الصوابُ لطلبٍ كاتبٍ ممنوع. وقراءةُ الجلسةِ وحدَها
+         **تعمي المسبارَ عن منعٍ واقع**: قِيس خمسةُ أسطحٍ مُنع فيها القارئُ فعلًا
+         (77 بايتًا مقابل 146,955 للكاتب) وأُعلنت «لم يُمنع». فيُقرأ الرمزُ من
+         الموضعَين. */
+    $bodyHasCode = (strpos($body, 'GOV-PERM-403-WRITE') !== false);
+    if ($bodyHasCode) { $codes[] = 'GOV-PERM-403-WRITE'; }
     fwrite(STDOUT, "\nPW|" . json_encode(array(
         'bytes'       => strlen(trim($body)),
         'fatal'       => $fatal,
-        'codes'       => $codes,
+        'codes'       => array_values(array_unique(array_filter($codes))),
+        'code_source' => $bodyHasCode ? 'body' : (in_array('GOV-PERM-403-WRITE', $codes, true) ? 'session' : '-'),
         'write_denied' => in_array('GOV-PERM-403-WRITE', $codes, true),
     ), JSON_UNESCAPED_UNICODE) . "\n");
 });

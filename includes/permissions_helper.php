@@ -1262,11 +1262,29 @@ if (!function_exists('ems_require_action')) {
         $super = defined('EMS_ROLE_SUPER_ADMIN') ? EMS_ROLE_SUPER_ADMIN : '-1';
         $deny  = isset($opts['deny_msg']) ? $opts['deny_msg'] : 'لا صلاحيةَ لهذا الفعلِ على هذه الشاشة';
 
+        /* ◆ صيغةُ الردِّ تتبع صيغةَ الطلب: سطحٌ يردُّ JSON لا يُكسَر بنصٍّ خام.
+             (وإلا صار الحارسُ نفسُه عطلًا في شاشةٍ تعمل بـAJAX.) */
+        $wantsJson = !empty($opts['ajax'])
+            || (isset($_POST['ajax']) && (string) $_POST['ajax'] === '1')
+            || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
+        /* ◆ والمنعُ يُعلَن **برمزِه الحوكميِّ** لا بنصٍّ وحدَه: سجلُّ الحوكمةِ
+             وفواحصُه يقرآن الرمزَ `GOV-PERM-403-WRITE`، فمنعٌ بلا رمزٍ منعٌ
+             **لا يراه أحد**. وقد قِيس: خمسةُ أسطحٍ مُنع فيها القارئُ فعلًا
+             وأعلن المسبارُ «لم يُمنع» لأن الرمزَ غائب. */
+        $bail = function ($msg) use ($wantsJson) {
+            http_response_code(403);
+            if ($wantsJson) {
+                header('Content-Type: application/json; charset=utf-8');
+                exit(json_encode(array('success' => false, 'message' => $msg,
+                                       'code' => 'GOV-PERM-403-WRITE'), JSON_UNESCAPED_UNICODE));
+            }
+            exit('GOV-PERM-403-WRITE — ' . $msg);
+        };
+
         /* ① جلسة */
         if (!isset($_SESSION['user'])) {
             ems_require_action_log($screen, $verb, 'no_session');
-            http_response_code(403);
-            exit('انتهت الجلسةُ — أعدْ تسجيلَ الدخول');
+            $bail('انتهت الجلسةُ — أعدْ تسجيلَ الدخول');
         }
 
         /* ② رمزُ الحماية — قبلَ فحصِ الصلاحية: رمزٌ فاسدٌ يعني طلبًا مزوَّرًا أصلًا */
@@ -1275,8 +1293,7 @@ if (!function_exists('ems_require_action')) {
             $tok = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
             if (!function_exists('verify_csrf_token') || !verify_csrf_token($tok)) {
                 ems_require_action_log($screen, $verb, 'csrf_failed');
-                http_response_code(403);
-                exit('رمزُ الحمايةِ غيرُ صالح — أعدْ تحميلَ الصفحة');
+                $bail('رمزُ الحمايةِ غيرُ صالح — أعدْ تحميلَ الصفحة');
             }
         }
 
@@ -1285,13 +1302,21 @@ if (!function_exists('ems_require_action')) {
             return array('allowed' => true, 'perms' => array('can_edit' => 1, 'can_delete' => 1));
         }
         $perms = function_exists('check_page_permissions') ? check_page_permissions($conn, $screen) : array();
-        $key = 'can_' . preg_replace('/[^a-z]/', '', strtolower($verb));
-        $known = array('can_edit', 'can_delete', 'can_approve', 'can_export', 'can_view');
-        $ok = in_array($key, $known, true) && !empty($perms[$key]);
+        /* ◆ فعلُ `write` الجامع — لبوابةٍ على **مستوى الشاشة** قبلَ كلِّ فرعٍ كاتب:
+             تسأل «أله حقُّ كتابةٍ ما هنا؟»، والفرعُ بعدَها يسأل عن حقِّه بعينِه
+             (إضافةٌ أم تعديلٌ أم حذف). واشتراطُ `edit` وحدَها على شاشةٍ فعلُها
+             **إضافةٌ** يمنع كاتبًا صحيحًا — وقد قِيس: الدور 12 يملك `can_add`
+             على شاشةِ الجزاءاتِ ولا يملك `can_edit`، فمُنع خطأً. */
+        if (strtolower($verb) === 'write') {
+            $ok = !empty($perms['can_add']) || !empty($perms['can_edit']) || !empty($perms['can_delete']);
+        } else {
+            $key = 'can_' . preg_replace('/[^a-z]/', '', strtolower($verb));
+            $known = array('can_add', 'can_edit', 'can_delete', 'can_approve', 'can_export', 'can_view');
+            $ok = in_array($key, $known, true) && !empty($perms[$key]);
+        }
         if (!$ok) {
             ems_require_action_log($screen, $verb, 'denied');
-            http_response_code(403);
-            exit($deny);
+            $bail($deny);
         }
         return array('allowed' => true, 'perms' => $perms);
     }

@@ -32,9 +32,17 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 }
 
 // ═══ ④ حارسُ الفعل + ⑤ رمزُ الحماية ═══
+/* AC-F2 · AC-P1A: الحارسُ المركزيُّ **أولَ ما يواجه الطلبَ الكاتب** — يجمع
+   الجلسةَ والرمزَ والصلاحيةَ، ويردُّ 403 **برمزِه الحوكميِّ** فيراه السجلُّ
+   والفاحصُ معًا.
+   ◆ وموضعُه قبلَ حارسِ الشاشةِ الخاصِّ مقصود: كان بعدَه فيسبقه المنعُ المحليُّ
+     برسالةٍ **بلا رمز** — فيُمنع الطلبُ فعلًا ويُعلن المسبارُ «لم يُمنع»،
+     ومنعٌ لا يراه السجلُّ منعٌ لا يُحتسب. (قِيس: 77 بايتَ ردٍّ بلا رمز.) */
+ems_require_action($conn, $SCREEN, 'write', array('deny_msg' => 'السحبُ بيدِ الحوكمةِ حصرًا — اطلبِ المنحة'));
+
 $__canRevoke = $is_super_admin || !empty($__pp['can_edit']);
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!$__canRevoke) { http_response_code(403); exit('السحبُ بيدِ الحوكمةِ حصرًا — اطلبِ المنحة'); }
+    if (!$__canRevoke) { http_response_code(403); exit('GOV-PERM-403-WRITE — السحبُ بيدِ الحوكمةِ حصرًا — اطلبِ المنحة'); }
     if (!function_exists('verify_csrf_token') || !verify_csrf_token($_POST['csrf_token'] ?? '')) {
         http_response_code(403);
         exit('رمزُ الحمايةِ غيرُ صالح — أعدْ تحميلَ الصفحة');
@@ -42,9 +50,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ═══ ⑥ معالجُ POST — سحبُ منحٍ واحدٍ مسبَّبًا ═══
-/* AC-F2: حارسُ الكتابةِ المركزيُّ **قبلَ** أولِ عبارةِ كتابة — يجمع الجلسةَ
-   والرمزَ والصلاحيةَ ويسجّل المنع، ويخرج بـ403 فلا يبلغ التنفيذُ الكتابةَ. */
-ems_require_action($conn, $SCREEN, 'edit', array('deny_msg' => 'السحبُ بيدِ الحوكمةِ حصرًا — اطلبِ المنحة'));
 $flash = null; $flashKind = 'info';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'revoke_grant') {
     $gid = (int) ($_POST['grant_id'] ?? 0);
