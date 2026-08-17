@@ -915,6 +915,10 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" class="cr-filter-form">
             <strong>الفئة:</strong>
             <select name="category" aria-label="تصفية بفئة العقد" onchange="this.form.submit()">
@@ -940,6 +944,8 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
                 <?php endforeach; ?>
             </select>
         </form>
+            </div>
+        </div>
         <div class="table-container">
             <!-- فلاترُ الشاشة خارجيةٌ (GET) — التهيئةُ للمكوّنِ المركزيِّ (ui-unification)
                  مع تعطيلِ حفظِ الحالةِ بسمةِ data-state-save

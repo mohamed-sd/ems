@@ -65,4 +65,5 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <?php endif; ?>
   </div></div></section>
 </div>
-<?php include __DIR__ . '/../infooter.php'; ?>
+</body>
+</html>

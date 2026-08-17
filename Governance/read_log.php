@@ -162,6 +162,10 @@ echo ems_states_bundle('لا اطّلاعَ على حقلٍ حسّاسٍ مسج�
     </div>
   </div>
 
+    <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+  <div class="filter">
+      <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+      <div class="filter-body">
   <form method="get" class="ems-form gov-rl-filter">
     <div class="form-group gov-rl-fg">
       <label for="rl_from">من</label>
@@ -185,6 +189,8 @@ echo ems_states_bundle('لا اطّلاعَ على حقلٍ حسّاسٍ مسج�
     </div>
     <button type="submit" class="btn btn-primary btn-sm">تصفية</button>
   </form>
+      </div>
+  </div>
 
   <div class="card"><div class="card-body table-responsive">
     <table class="table table-sm table-striped gov-rl-table">

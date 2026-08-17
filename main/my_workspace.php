@@ -56,21 +56,58 @@ $myMsgs = $q1("SELECT COUNT(*) FROM personal_notifications WHERE company_id = {$
                 AND is_read = 0 AND (target_user_id = {$uid} OR target_user_id IS NULL)");
 
 /* UXR-0071 (UI-DEF: ترتيب الأولوية معكوس): ما ينتظر قراري وتنفيذي يتصدر —
-   القرارات (موافقاتي) أولًا ثم التنفيذ (مهامي) ثم متابعاتي، والمعلوماتي بعدها. */
+   القرارات (موافقاتي) أولًا ثم التنفيذ (مهامي) ثم متابعاتي، والمعلوماتي بعدها.
+
+   ◆ البلاطاتُ **حقولٌ مسمّاةٌ لا مواضعُ في مصفوفة**: كانت `$t[0]..$t[4]`
+     فتُقرأ بالعدِّ، وكانت الرتبةُ (①…⑩) **ملصوقةً في نصِّ العنوان** فلا سبيلَ
+     لعرضِها بحجمٍ أو لونٍ غيرِ حجمِ العنوانِ ولونِه. فصارت حقلًا مستقلًّا:
+     الترتيبُ الحاكمُ محفوظٌ كما هو، والعنوانُ نظيفٌ يُقرأ.
+   ◆ و`group`: البلاطاتُ نوعان لا نوعٌ واحد — **ما ينتظرني** (يحمل عددًا
+     فيُقرأ رقمُه) و**مداخلي** (تنقّلٌ بلا عدد). وكانت الأحدَ عشرةَ تُصيَّر
+     بمظهرٍ واحدٍ، فبلاطةٌ عليها 1,501 موافقةً تبدو كبلاطةِ «ملفي». والترتيبُ
+     داخلَ المجموعتين هو ترتيبُ NAV-01 §3 نفسُه بلا إزاحة. */
 $tiles = array(
-    array('① موافقاتي', 'صندوق الاعتماد الموحد: طلباتٌ وخطواتٌ وحلقاتُ سلسلةٍ — كلٌّ يقفز لموضع فعله', 'fa fa-check-double', '../Portal/approvals_inbox.php', $myApprovals),
-    array('② مهامي', 'كل ما ينتظر تنفيذي — لا ما ينتظر قراري', 'fa fa-tasks', '../Portal/my_tasks.php', $myTasks),
-    array('③ بلاغاتي', 'رفع بلاغ · المفتوحة · ما ينتظر ردي — فالبلاغ يخص الشخص لا الإدارة', 'fa fa-bullhorn', '../Tickets/ticket_contextual_open.php', $myTickets),
-    array('④ طلباتي', 'من قاموس الأنواع الـ62 — وكلُّ طلبٍ يُعرف عند مَن توقف', 'fa fa-paper-plane', '../Portal/my_requests.php', $myRequests),
+    array('group' => 'wait', 'ord' => '①', 'title' => 'موافقاتي',
+          'desc' => 'صندوق الاعتماد الموحد: طلباتٌ وخطواتٌ وحلقاتُ سلسلةٍ — كلٌّ يقفز لموضع فعله',
+          'icon' => 'fa fa-check-double', 'href' => '../Portal/approvals_inbox.php', 'count' => $myApprovals),
+    array('group' => 'wait', 'ord' => '②', 'title' => 'مهامي',
+          'desc' => 'كل ما ينتظر تنفيذي — لا ما ينتظر قراري',
+          'icon' => 'fa fa-tasks', 'href' => '../Portal/my_tasks.php', 'count' => $myTasks),
+    array('group' => 'wait', 'ord' => '③', 'title' => 'بلاغاتي',
+          'desc' => 'رفع بلاغ · المفتوحة · ما ينتظر ردي — فالبلاغ يخص الشخص لا الإدارة',
+          'icon' => 'fa fa-bullhorn', 'href' => '../Tickets/ticket_contextual_open.php', 'count' => $myTickets),
+    array('group' => 'wait', 'ord' => '④', 'title' => 'طلباتي',
+          'desc' => 'من قاموس الأنواع الـ62 — وكلُّ طلبٍ يُعرف عند مَن توقف',
+          'icon' => 'fa fa-paper-plane', 'href' => '../Portal/my_requests.php', 'count' => $myRequests),
     // INJ-0581: الماليةُ بلاطتُها وشاشتُها — فلا تُجمع في رقمٍ لا شاشةَ له ولا تُخفى
-    array('④-ب طلباتي المالية', 'بوابةُ الطلبات المالية — عدُّها من شاشتها لا من غيرها', 'fa fa-file-invoice-dollar', '../FinRequests/my_requests.php', $myFinRequests),
-    array('⑤ المراسلات والتنبيهات', 'تنبيهاتي (وذو الفعل يتحول مهمةً) والمراسلات من الشريط', 'fa fa-bell', '../Portal/notifications.php', $myMsgs),
-    array('⑥ طلب جديد', 'تقديمٌ من القاموس الحاكم — والمالي عبر بوابته', 'fa fa-plus-circle', '../Portal/my_requests.php', null),
-    array('⑦ لوحة دوري', 'ما ينتظرني اليوم بترتيب الإلحاح', 'fa fa-tachometer-alt', '../main/dashboard.php', null),
-    array('⑧ ملفي', 'ملفي الشخصي وكشوفي ووثائقي', 'fa fa-id-card', '../Portal/my_portal.php', null),
+    array('group' => 'wait', 'ord' => '④-ب', 'title' => 'طلباتي المالية',
+          'desc' => 'بوابةُ الطلبات المالية — عدُّها من شاشتها لا من غيرها',
+          'icon' => 'fa fa-file-invoice-dollar', 'href' => '../FinRequests/my_requests.php', 'count' => $myFinRequests),
+    array('group' => 'wait', 'ord' => '⑤', 'title' => 'المراسلات والتنبيهات',
+          'desc' => 'تنبيهاتي (وذو الفعل يتحول مهمةً) والمراسلات من الشريط',
+          'icon' => 'fa fa-bell', 'href' => '../Portal/notifications.php', 'count' => $myMsgs),
+    array('group' => 'door', 'ord' => '⑥', 'title' => 'طلب جديد',
+          'desc' => 'تقديمٌ من القاموس الحاكم — والمالي عبر بوابته',
+          'icon' => 'fa fa-plus-circle', 'href' => '../Portal/my_requests.php', 'count' => null),
+    array('group' => 'door', 'ord' => '⑦', 'title' => 'لوحة دوري',
+          'desc' => 'ما ينتظرني اليوم بترتيب الإلحاح',
+          'icon' => 'fa fa-tachometer-alt', 'href' => '../main/dashboard.php', 'count' => null),
+    array('group' => 'door', 'ord' => '⑧', 'title' => 'ملفي',
+          'desc' => 'ملفي الشخصي وكشوفي ووثائقي',
+          'icon' => 'fa fa-id-card', 'href' => '../Portal/my_portal.php', 'count' => null),
     // NAV-01 v6 §7 (update0007 S-03/S-04): عنصران إلزاميان لكل حسابٍ بلا استثناء
-    array('⑨ إنجازي', 'ما أنجزتُه أمسِ والأسبوعَ والشهرَ — وبمدةٍ أحددها بتاريخين · بلغة عملي', 'fa fa-trophy', '../Portal/my_achievement.php', null),
-    array('⑩ بوابتي', 'ما يخصّني ومحيطي المباشر: معدتي · ورديتي · موقعي — بحسب دوري', 'fa fa-door-open', '../Portal/my_portal.php?view=gateway', null),
+    array('group' => 'door', 'ord' => '⑨', 'title' => 'إنجازي',
+          'desc' => 'ما أنجزتُه أمسِ والأسبوعَ والشهرَ — وبمدةٍ أحددها بتاريخين · بلغة عملي',
+          'icon' => 'fa fa-trophy', 'href' => '../Portal/my_achievement.php', 'count' => null),
+    array('group' => 'door', 'ord' => '⑩', 'title' => 'بوابتي',
+          'desc' => 'ما يخصّني ومحيطي المباشر: معدتي · ورديتي · موقعي — بحسب دوري',
+          'icon' => 'fa fa-door-open', 'href' => '../Portal/my_portal.php?view=gateway', 'count' => null),
+);
+
+/* مجموعتان تُصيَّران بالترتيب — بطاقةٌ لكلٍّ برأسِ بطاقةٍ كسائرِ الشاشات. */
+$tileGroups = array(
+    'wait' => array('label' => 'ما ينتظرني', 'icon' => 'fas fa-hourglass-half'),
+    'door' => array('label' => 'مداخلي',     'icon' => 'fas fa-compass'),
 );
 
 $page_title = 'إيكوبيشن | مساحة عملي';
@@ -92,34 +129,59 @@ include '../insidebar.php';
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا بلاطاتِ مساحةِ عملٍ معروضةً لهذا الحساب', 'اختر كيانَ العملِ أولًا — ثم تظهر موافقاتُك ومهامُّك وطلباتُك');
     ?>
-    <style>
-      .mws-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-      .mws-link { text-decoration: none; color: inherit; }
-      .mws-tile { border: 1px solid var(--c-ddd, #ddd); border-radius: 10px; padding: 16px; height: 100%; position: relative; }
-      .mws-badge { position: absolute; top: 10px; inset-inline-end: 10px; font-size: 13px; }
-      .mws-icon { font-size: 26px; color: var(--c-b8860b, #b8860b); }
-      .mws-title { font-weight: bold; margin-top: 8px; }
-      .mws-desc { color: var(--c-666666); }
-    </style>
     <?php if ($__needsPick): ?>
         <!-- INJ-0425 · «السوبر بلا كيانٍ يرى منتقيَ كيانٍ **لا أرقامًا**»:
              فلا تُصيَّر البلاطاتُ أصلًا — رقمٌ بلا كيانٍ مُعلَنٍ يُقرأ خطأً. -->
         <?php echo ems_company_picker($conn, $company_id); ?>
     <?php else: ?>
-    <div class="card"><div class="card-body mws-grid">
-        <?php foreach ($tiles as $t): ?>
-        <a class="mws-link" href="<?php echo htmlspecialchars($t[3]); ?>">
-            <div class="mws-tile">
-                <?php if ($t[4] !== null && $t[4] > 0): ?>
-                    <span class="badge badge-danger mws-badge"><?php echo intval($t[4]); ?></span>
-                <?php endif; ?>
-                <div class="mws-icon"><i class="<?php echo htmlspecialchars($t[2]); ?>"></i></div>
-                <div class="mws-title"><?php echo htmlspecialchars($t[0]); ?></div>
-                <small class="mws-desc"><?php echo htmlspecialchars($t[1]); ?></small>
+    <?php
+    /* ══ التصييرُ بلغةِ الشاشاتِ الرئيسةِ نفسِها — بصفرِ CSS جديد ═════════
+       ◆ الشقيقةُ المباشرةُ لهذه الشاشةِ هي `Portal/my_portal.php`، ولغتُها
+         مكوّنُ `ems-ptp-*` في `ems-screens.css`: حدٌّ واحدٌ (1px) واستدارةُ 10
+         وحشوةُ 12 وخلفيةٌ فاتحةٌ — **بلا ظلٍّ ولا تدرُّجٍ ولا تحويمٍ ولا شكلٍ
+         سداسيّ**. وغلافُها `card` / `card-header` / `card-body` كما في كلِّ
+         شاشاتِ النظامِ الرئيسة (المعدات · العملاء · المشاريع · الموردون …).
+       ◆ فالبلاطةُ هنا **نفسُ بلاطةِ البوابة**: قيمةٌ كبيرةٌ فوق عنوانٍ خافت.
+         القيمةُ عددٌ في «ما ينتظرني»، وأيقونةٌ في «مداخلي» — مكوّنٌ واحدٌ
+         وموضعٌ واحدٌ للقيمة. والشرحُ في `title` فلا يُثقل البلاطة.
+       ◆ ولا نسخةَ محليةً: صفرُ `<style>` وصفرُ `style=` وصفرُ صنفٍ جديدٍ في
+         ورقةِ الأنماط. */
+    foreach ($tileGroups as $gKey => $g):
+        $gTiles = array_values(array_filter($tiles, function ($t) use ($gKey) { return $t['group'] === $gKey; }));
+        if (!$gTiles) { continue; }
+    ?>
+    <div class="card">
+        <div class="card-header">
+            <h5><i class="<?php echo htmlspecialchars($g['icon']); ?>"></i> <?php echo htmlspecialchars($g['label']); ?></h5>
+        </div>
+        <div class="card-body">
+            <div class="ems-ptp-grid-sm">
+                <?php foreach ($gTiles as $t): ?>
+                <?php /* ⚠ `href` أولُ سمةٍ عمدًا: شاهدُ INJ-0587
+                         (`tests/approvals_inbox_parity_test.php`) يمسك البلاطةَ
+                         بمرساةِ `<a href="../Portal/approvals_inbox.php"` حرفيًّا،
+                         وكان `class` يسبقه فلا يجدها فيقرأ الرقمَ NULL ويسقط.
+                         ويحمل موضعُ القيمةِ الوسمَ `ems-ws-badge` لأن الشاهدَ
+                         يقرأ الرقمَ بـ`~badge[^>]*>\s*([0-9]+)~`؛ ولا يحمل
+                         `badge-` لأن `span[class*="badge-"]` في `ems-tables.css`
+                         يمحو التصميمَ صامتًا. */ ?>
+                <a href="<?php echo htmlspecialchars($t['href']); ?>" class="ems-ptp-cardlink" title="<?php echo htmlspecialchars($t['desc']); ?>">
+                    <div class="ems-ptp-tile">
+                        <?php if ($t['count'] === null): ?>
+                            <div class="ems-ptp-tile-num"><i class="<?php echo htmlspecialchars($t['icon']); ?>"></i></div>
+                        <?php else: ?>
+                            <?php /* الرقمُ حاضرٌ ولو كان صفرًا: بلاطةٌ بلا رقمٍ
+                                     كانت تلتبس ببلاطةٍ عدَّادُها صفر. */ ?>
+                            <div class="ems-ptp-tile-num ems-ws-badge"><?php echo intval($t['count']); ?></div>
+                        <?php endif; ?>
+                        <div class="ems-ptp-tile-lbl"><?php echo htmlspecialchars($t['ord'] . ' ' . $t['title']); ?></div>
+                    </div>
+                </a>
+                <?php endforeach; ?>
             </div>
-        </a>
-        <?php endforeach; ?>
-    </div></div>
+        </div>
+    </div>
+    <?php endforeach; ?>
     <?php endif; ?>
 </div>
 

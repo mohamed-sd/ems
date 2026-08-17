@@ -59,10 +59,29 @@ if (!function_exists('ems_action_guard_registry')) {
             'timesheet/get_contract_hours.php'     => array('modules' => array('Timesheet/'), 'action' => 'view'),
 
             // ── Contracts ──
-            'contracts/get_contract_equipments.php'   => array('modules' => array('Contracts/'), 'action' => 'view'),
-            'contracts/get_equipments.php'            => array('modules' => array('Contracts/'), 'action' => 'view'),
-            'contracts/contract_actions_handler.php'  => array('modules' => array('Contracts/'), 'action' => 'auto'),
-            'contracts/contractequipments_handler.php'=> array('modules' => array('Contracts/'), 'action' => 'auto'),
+            // ⚠️ **الشاشةُ بكودها الكامل لا ببادئة المجلد** — وهو فخُّ `Approvals/`
+            //    الموثَّقُ أدناه، وقع هنا ثانيةً. بادئةُ `Contracts/` لا تُطابق أيَّ
+            //    `code` تطابقًا دقيقًا ولا ذيلًا `%/Contracts/.php`، فيسقط
+            //    `check_page_permissions` إلى آخرِ محاولاته:
+            //    `code LIKE '%Contracts/%' ORDER BY CHAR_LENGTH(code) ASC, id ASC
+            //    LIMIT 1` (permissions_helper.php:575) — فيعيد **أقصرَ** كودٍ تحت
+            //    المجلد: `Contracts/claims.php` (المستخلصات · #142)، لا شاشةَ العقد.
+            //    فقيست صلاحيةُ ملفِّ عقدِ المشروع على المستخلصات: دورُ المبيعات (12)
+            //    يملك `can_edit=1` على `Contracts/contracts_details.php` (#21) و`0`
+            //    على المستخلصات، فرُدَّ كلُّ إجراءٍ فعلُه `edit` بـ403 — pause ·
+            //    resume · terminate · complete · merge · settlement ·
+            //    change_obligation · update_project_info/services/parties/payment —
+            //    ونجا `renewal` وحدَه لأن «renewal» تحوي «new» فصنّفها
+            //    `ems_action_verb_map` فعلَ `add`، والمستخلصاتُ تحمل `can_add=1`.
+            //    **الدرسُ**: نجاةُ فعلٍ واحدٍ من اثني عشر ليست صلاحيةً جزئية — بل
+            //    دليلٌ على أن المقيسَ شاشةٌ أخرى. الأكوادُ أدناه هي الشاشاتُ الأمُّ
+            //    الفعليةُ لكلِّ معالجٍ كما تُنادَى في الرمز لا كما يُوحي المجلد.
+            'contracts/get_contract_equipments.php'   => array('modules' => array('Contracts/contracts_details.php'), 'action' => 'view'),
+            'contracts/get_equipments.php'            => array('modules' => array('Contracts/contracts.php'), 'action' => 'view'),
+            'contracts/contract_actions_handler.php'  => array('modules' => array('Contracts/contracts_details.php'), 'action' => 'auto'),
+            // يُضمَّن من `contracts.php` و`contracts_details.php` كلتيهما — وكلتاهما
+            // شاشةٌ أمٌّ مشروعة، ويكفي امتلاكُ الصلاحيةِ على إحداهما.
+            'contracts/contractequipments_handler.php'=> array('modules' => array('Contracts/contracts.php', 'Contracts/contracts_details.php'), 'action' => 'auto'),
 
             // ── Suppliers ──
             'suppliers/get_mine_contracts.php'                => array('modules' => array('Suppliers/'), 'action' => 'view'),

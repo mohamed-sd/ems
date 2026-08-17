@@ -10,6 +10,16 @@
  *   نسخٍ من شارةٍ واحدة. فحين تُطلب بطاقةُ المشروعِ يُنسخ أحدُ النسختين وتصير
  *   ثالثةً — وهذا بالضبطِ أصلُ «تعدّدِ ملفاتِ التصميمِ واتساخِ الكود».
  *
+ * ◆ **والتوقّعُ صحَّ بالقياس**: حين مُسحت الشجرةُ وُجدت **ثمانيَ بطاقاتٍ**
+ *   تعيد اختراعَ الشيءِ نفسِه — العميلُ · الموظفُ · المشروعُ · المورِّدُ ·
+ *   المعدّةُ · المستخدمُ · الملفُّ الشخصيُّ · عمليةُ التمويل. وأوضحُها
+ *   بطاقةُ المعدة: بنيةُ المكوّنِ حرفًا (`ep-hero`/`ep-chips`/`ep-facts`
+ *   بمفتاحٍ وقيمة) بأسماءٍ أخرى. كلُّها الآن على هذا الملفِّ الواحد.
+ *
+ * ◆ **ما ليس بطاقةَ كِيان لا يُقحَم فيها**: `fleet_depreciation_profiles.php`
+ *   و`auth_profiles.php` اسمُهما «profile» ومعناهما **سجلُّ قوالبَ** لا
+ *   بطاقةُ كِيانٍ واحد — فلا لوحَ هويةٍ لهما ولم تُمَسّا.
+ *
  * ◆ **العلاج**: الشاشةُ **تصف** بطاقتَها ولا **ترسمها**.
  *   والعُدّةُ تُخرج ترميزَ `ems-profile.css` وحدَه — فلا صنفَ يُكتب يدويًّا في
  *   صفحة، ولا كتلةَ `<style>` تُولَد من جديد.
@@ -244,7 +254,16 @@ if (!function_exists('ems_profile_tones')) {
 
             $body = '';
             foreach ($lines as $ln) {
-                $body .= '<div class="ems-profile__stat-value">' . ems_profile_e($ln) . $unit . '</div>';
+                /* ◆ **مقياسٌ غيرُ محسوبٍ ليس صفرًا ولا فراغًا**: MTBF بلا عطلٍ
+                     واحدٍ لا قيمةَ له — والفراغُ المطبوعُ يُقرأ «لا شيء» بينما
+                     الصفرُ يُقرأ «قِيس فكان صفرًا»، وكلاهما كذبٌ على غيرِ
+                     المحسوب. فالفارغُ يُعلَن «—» بصنفِ غيابٍ كما في شبكةِ
+                     الحقائقِ حرفًا — عقدٌ واحدٌ للغيابِ في المكوّنِ كلِّه.
+                     (قِيس على بطاقةِ المعدة: ثلاثةُ مقاييسَ من تسعةٍ تعود null.) */
+                $isEmpty = ($ln === null || (is_string($ln) && trim($ln) === ''));
+                $body .= '<div class="ems-profile__stat-value'
+                       . ($isEmpty ? ' ems-profile__stat-value--empty' : '') . '">'
+                       . ($isEmpty ? '—' : ems_profile_e($ln) . $unit) . '</div>';
             }
             $body .= '<div class="ems-profile__stat-label">' . ems_profile_e($it['label']) . '</div>';
 
@@ -281,12 +300,18 @@ if (!function_exists('ems_profile_tones')) {
 
     /**
      * فتحُ قسمٍ — وحدةُ المحتوى داخلَ مجموعةٍ أو خارجَها.
+     *
      * @param array $o title (إلزامي) · icon · meta · note (سطرُ تفسيرٍ فوق المحتوى)
+     *   · id     مرساةُ القسمِ حين تقصده روابطُ داخلَ الصفحة (`#sec-…`) —
+     *            بلا هذا يسقط الوصلُ صامتًا عند الترحيلِ إلى المكوّن
+     *   · actions ترميزٌ جاهزٌ يُوضع في رأسِ القسم (زرُّ إضافةٍ مثلًا)
      */
     function ems_profile_section_open(array $o)
     {
         $title = isset($o['title']) ? (string) $o['title'] : '';
-        $html  = '<section class="ems-profile__section"><div class="ems-profile__section-head">';
+        $html  = '<section class="ems-profile__section"'
+               . (empty($o['id']) ? '' : ' id="' . ems_profile_e($o['id']) . '"')
+               . '><div class="ems-profile__section-head">';
         $html .= '<h4 class="ems-profile__section-title">';
         if (!empty($o['icon'])) {
             $html .= '<i class="' . ems_profile_e($o['icon']) . '" aria-hidden="true"></i>';
@@ -294,6 +319,9 @@ if (!function_exists('ems_profile_tones')) {
         $html .= ems_profile_e($title) . '</h4>';
         if (!empty($o['meta'])) {
             $html .= '<span class="ems-profile__section-meta">' . ems_profile_e($o['meta']) . '</span>';
+        }
+        if (!empty($o['actions'])) {
+            $html .= '<div class="ems-profile__section-actions">' . $o['actions'] . '</div>';
         }
         $html .= '</div><div class="ems-profile__section-body">';
         if (!empty($o['note'])) {

@@ -700,6 +700,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <div class="card">
     <!-- أزرار التحكم في المجموعات -->
     <div class="card-body sc-filter-bar">
+            <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+      <div class="filter">
+          <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+          <div class="filter-body">
       <form method="get" action="supplierscontracts.php" class="sc-filter-form">
         <?php if ($has_supplier_filter): ?>
           <input type="hidden" name="id" value="<?php echo intval($supplier_id); ?>">
@@ -736,6 +740,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <a href="supplierscontracts.php<?php echo $has_supplier_filter ? '?id=' . intval($supplier_id) : ''; ?>"
           class="btn btn-secondary"><i class="fas fa-undo"></i> مسح</a>
       </form>
+          </div>
+      </div>
     </div>
 
     <!-- أزرار التحكم في المجموعات -->

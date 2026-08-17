@@ -8,18 +8,85 @@
 
   Framework: Bootstrap 5 + DataTables.
 
-  Scope note — table styling that intentionally lives ELSEWHERE (NOT moved here
-  to keep the cascade byte-for-byte identical; see FRONTEND_REFACTOR_AUDIT.md):
-    • ems.main.all.style.css — the "OFFICIAL UNIFIED THEME" table overrides
-      (dark-gray thead, zebra striping, toolbar colours). These are load-bearing
-      cascade WINNERS entangled with the shared theme block and must stay last.
-    • assets/css/style.css — table rules for Reports/Drivers/Settings pages that
-      load a separate stylesheet stack.
-    • assets/css/main_admin_style.css — the admin portal's own table styling
-      (admin layout never loads this file).
-    • Page-level inline <style> blocks — load-bearing overrides; lowering them
-      to this file would let conflicting rules re-emerge.
+  ── جولةُ التوحيد 2026-08-17 ──────────────────────────────────────────────
+  كان في الملفِّ هنا «مذكرةُ نطاقٍ» تُعدِّدُ أماكنَ تصميمِ الجداولِ خارجَ هذا
+  الملفِّ وتصفُها بأنها مقصودة. أُلغيت المذكرةُ لأن ما كانت تصفه هو العلّةُ
+  نفسُها: أربعةُ ملفاتٍ ومئةُ قاعدةٍ تتنازع لونَ الخليةِ الواحدة.
+
+  العقدُ الجديد — واحدٌ لا غير:
+    ① لوحةُ المفاتيحِ أدناه (كتلةُ TABLE DESIGN TOKENS) هي **المصدرُ الوحيدُ**
+       للونِ الجداولِ وحدودِها وخلفياتِها في كلِّ النظام. غيِّر قيمةً واحدةً
+       فيها فتتغيّرُ في كلِّ شاشةٍ فيها جدولٌ أو DataTable — بلا استثناء.
+    ② أيُّ ملفٍّ آخرَ يُلوّنُ جدولًا يجب أن يقرأ من هذه المفاتيحِ لا أن يكتبَ
+       لونًا صريحًا. القواعدُ المنافسةُ التي كانت تكتبُ ألوانَها حُوِّلت.
+    ③ هذا الملفُّ يُحمَّل **آخرًا** فعلًا — بعدَ ems-screens.css وكلِّ ما سواه —
+       لا كما كان يزعم التعليقُ القديمُ بينما يُحمَّل قبلَ خمسةِ ملفات.
+    ④ حارسُ tests/table_design_unification_test.php يرفضُ أيَّ عودةٍ للتشتُّت.
+  ─────────────────────────────────────────────────────────────────────────
   =============================================*/
+
+/* ══════════════════ TABLE DESIGN TOKENS — لوحةُ المفاتيح ══════════════════
+   هنا وحدَه تُغيَّرُ ألوانُ الجداولِ في النظام كلِّه.
+   القيمُ أدناه هي القيمُ السارية قبلَ الجولة، منقولةً كما هي، كي لا يتغيّرَ
+   المظهرُ بمجرّدِ التوحيد — التوحيدُ يمنحُك المِقبض، لا يُغيّرُ اللون.
+   ملاحظةٌ لازمة: كلُّ استعمالٍ لهذه المفاتيحِ يُكتب مع قيمةِ احتياطٍ
+   `var(--table-text, #161616)` كي تبقى الشاشةُ سليمةً حتى لو سبق ملفٌّ آخرُ
+   هذا الملفَّ في التحميل.                                                   */
+:root {
+    /* النصُّ والخلفيات */
+    --table-text:              #161616;   /* لونُ نصِّ الخلية */
+    --table-surface:           #ffffff;   /* خلفيةُ الجدول */
+    --table-row-odd-bg:        #ffffff;   /* الصفُّ الفردي */
+    --table-row-even-bg:       #e6e6e6;   /* الصفُّ الزوجي (التخطيط) */
+    --table-row-hover-bg:      #fcf3d6;   /* الصفُّ عندَ المرور */
+
+    /* الترويسة */
+    --table-header-text:       #ffffff;   /* نصُّ الترويسة */
+    --table-header-bg:         #6b6b6b;   /* خلفيةُ الترويسة */
+    --table-header-scroll-bg:  #3d3d3d;   /* ترويسةُ التمريرِ المستنسخة (scrollX) */
+
+    /* الحدود */
+    --table-border:            #cccccc;   /* حدُّ الخلية */
+    --table-border-soft:       #eceef1;   /* حدُّ الإطارِ الخارجيّ */
+    --table-radius:            12px;      /* استدارةُ الإطار */
+
+    /* روابطُ داخلَ الخلية */
+    --table-link-text:         #26405f;
+    --table-link-bg:           #edf2f8;
+    --table-link-border:       #bcc5d2;
+    --table-link-hover-text:   #1f3651;
+    --table-link-hover-bg:     #dfe9f5;
+    --table-link-hover-border: #9ba9be;
+
+    /* الصفُّ المحدَّد (شاشاتُ الاعتماد) */
+    --table-row-selected-bg:   #e8f4ff;
+
+    /* صفُّ عنوانِ المجموعة — فاصلٌ داخلَ الجدولِ لا خليةُ بيانات.
+       له مفتاحُه الخاصُّ عمدًا: توحيدُه مع نصِّ الخليةِ العاديّةِ يمحو
+       وظيفتَه البصريّةَ (شاشةُ فحوصِ الصيانةِ تعتمده فاصلًا للأقسام). */
+    --table-group-row-bg:      #eef4fb;
+    --table-group-row-text:    #1f4f7a;
+    --table-group-row-hover-bg:#e3eefa;
+
+    /* أيقوناتُ فرزِ DataTables */
+    --table-sort-icon:         #b7bec7;
+    --table-sort-icon-hover:   #d8dde4;
+    --table-sort-icon-active:  #f0bc00;
+
+    /* الطباعة — فاتحةٌ عمدًا لا سهوًا: ترويسةٌ رماديةٌ داكنةٌ على الورق تستهلك
+       حبرًا بلا فائدةٍ وتُخرج نصًّا أبيضَ على أسودَ يصعبُ قراؤه مصوَّرًا.
+       فلها مفاتيحُها المستقلّةُ — والمكانُ ما يزال واحدًا. */
+    --table-print-header-bg:   #f5f5f5;
+    --table-print-header-text: #111111;
+    --table-print-border:      #dddddd;
+
+    /* مؤشّراتُ شرائحِ الحوكمةِ الثلاث (CMP-03) — دلالةٌ لا زينة، فلا تُوحَّد
+       مع لونِ الترويسةِ وإلا ضاع تمييزُ الشريحة. */
+    --table-gov-slice-1:       #c9a227;   /* ① الأعمدةُ الحاكمة */
+    --table-gov-slice-2:       #8e44ad;   /* ② الأثرُ والعكس */
+    --table-gov-slice-3:       #2e86c1;   /* ③ المالُ والإثبات */
+    --table-gov-empty-text:    #9aa0a6;   /* خليةُ حوكمةٍ بلا قيمة */
+}
 
 /* ========== ROOT VARIABLES ========== */
 :root {
@@ -225,9 +292,14 @@ span[class*="badge-"] {
 table thead,
 .table thead,
 table.dataTable thead,
+/* ── هذه القواعدُ غيرُ مقيَّدةٍ بـbody.ems-site عمدًا ──────────────────────
+   كانت تُعطي ترويسةً رماديةً فاتحةً (#eeeeee/داكنُ النص) بينما تُعطي القواعدُ
+   المقيَّدةُ بـems-site ترويسةً داكنةً بنصٍّ أبيض — فتصميمان لجدولٍ واحدٍ
+   يفترقان بوجودِ صنفٍ يضيفُه JavaScript. وُحِّدا على المفاتيحِ نفسِها، فصار
+   المظهرُ واحدًا سواءٌ حضر الصنفُ أم غاب.                                  */
 .dataTables_scrollHead table thead {
-    background: var(--c-eeeeee) !important;
-    color: var(--c-ink-max) !important;
+    background: var(--table-header-scroll-bg, #3d3d3d) !important;
+    color: var(--table-header-text, #ffffff) !important;
     background-image: none !important;
 }
 
@@ -239,8 +311,8 @@ table.dataTable thead th,
 table.dataTable thead td,
 .dataTables_scrollHead table thead th,
 .dataTables_scrollHead table thead td {
-    background: var(--c-eeeeee) !important;
-    color: var(--c-ink-max) !important;
+    background: var(--table-header-bg, #6b6b6b) !important;
+    color: var(--table-header-text, #ffffff) !important;
     background-image: none !important;
 }
 
@@ -254,7 +326,7 @@ table.dataTable thead .sorting_asc::before,
 table.dataTable thead .sorting_asc::after,
 table.dataTable thead .sorting_desc::before,
 table.dataTable thead .sorting_desc::after {
-    color: var(--c-ink-max) !important;
+    color: var(--table-header-text, #ffffff) !important;
 }
 
 /* ========== PRICE CHIPS ========== */
@@ -481,14 +553,14 @@ body.ems-site .main .card-body:has(> .contracts-group-toolbar) {
     .modern-table,
     .contracts-table {
         box-shadow: none;
-        border: 1px solid var(--c-dddddd);
+        border: 1px solid var(--table-print-border, #dddddd);
     }
 
     .display thead,
     .modern-table thead,
     .contracts-table thead {
-        background: var(--c-f5f5f5) !important;
-        color: var(--c-ink-max) !important;
+        background: var(--table-print-header-bg, #f5f5f5) !important;
+        color: var(--table-print-header-text, #111111) !important;
     }
 
     .action-btn {
@@ -546,9 +618,9 @@ table.alltables tbody td > a:not(.action-btn),
 table.alltable tbody td > a:not(.action-btn),
 table.display tbody td > a:not(.action-btn),
 table.dataTable tbody td > a:not(.action-btn) {
-  background: var(--light-gray) !important;
-  border: 1px solid var(--line) !important;
-  color: var(--dark-blue) !important;
+  background: var(--table-link-bg, #f1f3f5) !important;
+  border: 1px solid var(--table-link-border, #dfe3e8) !important;
+  color: var(--table-link-text, #1f3864) !important;
 }
 .alltables tbody td > a:not(.action-btn):hover,
 .alltable tbody td > a:not(.action-btn):hover,
@@ -556,9 +628,9 @@ table.alltables tbody td > a:not(.action-btn):hover,
 table.alltable tbody td > a:not(.action-btn):hover,
 table.display tbody td > a:not(.action-btn):hover,
 table.dataTable tbody td > a:not(.action-btn):hover {
-  background: var(--dark-blue) !important;
-  border-color: var(--dark-blue) !important;
-  color: var(--c-surface) !important;
+  background: var(--table-link-hover-bg, #1f3864) !important;
+  border-color: var(--table-link-hover-bg, #1f3864) !important;
+  color: var(--table-link-hover-text, #ffffff) !important;
   box-shadow: 0 6px 14px var(--c-rgba305895022) !important;
 }
 
@@ -566,21 +638,22 @@ table.dataTable tbody td > a:not(.action-btn):hover {
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) {
   border-collapse: separate !important;
   border-spacing: 0 !important;
-  border: 1px solid var(--c-eceef1) !important;
-  border-radius: 12px !important;
+  border: 1px solid var(--table-border-soft, #eceef1) !important;
+  border-radius: var(--table-radius, 12px) !important;
   overflow: hidden !important;
-  background: var(--c-surface) !important;
+  background: var(--table-surface, #ffffff) !important;
   box-shadow: none !important;
 }
 
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead,
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead tr,
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead th {
-  background: var(--ref-head-bg) !important;
-  color: var(--c-surface) !important;
+  /* كان هنا تصريحُ background مرّتين (--ref-head-bg ثم --c-th-surface) والأولُ
+     ميّتٌ يُلغيه الثاني. أُبقيَ واحدٌ يقرأ من المفتاح. */
+  background: var(--table-header-bg, #6b6b6b) !important;
+  color: var(--table-header-text, #ffffff) !important;
   background-image: none !important;
-  border-color: var(--c-th-surface) !important;
-  background: var(--c-th-surface) !important;
+  border-color: var(--table-header-bg, #6b6b6b) !important;
 }
 
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) thead th {
@@ -598,7 +671,7 @@ body.ems-site table.dataTable thead .sorting_asc::before,
 body.ems-site table.dataTable thead .sorting_asc::after,
 body.ems-site table.dataTable thead .sorting_desc::before,
 body.ems-site table.dataTable thead .sorting_desc::after {
-  color: var(--c-surface) !important;
+  color: var(--table-header-text, #ffffff) !important;
   opacity: 0.9 !important;
 }
 
@@ -609,42 +682,42 @@ body.ems-site table.dataTable thead th.sorting_desc,
 body.ems-site table.dataTable thead td.sorting,
 body.ems-site table.dataTable thead td.sorting_asc,
 body.ems-site table.dataTable thead td.sorting_desc {
-  background: var(--c-th-surface) !important;
-  color: var(--c-surface) !important;
+  background: var(--table-header-bg, #6b6b6b) !important;
+  color: var(--table-header-text, #ffffff) !important;
 }
 
 /* DataTables scrollX clones the header into .dataTables_scrollHead — keep it dark too */
 body.ems-site .dataTables_scrollHead table thead th,
 body.ems-site .dataTables_scrollHead table thead td,
 body.ems-site .dataTables_scrollHeadInner table thead th {
-  background: var(--c-ink-700) !important;
-  color: var(--c-surface) !important;
+  background: var(--table-header-scroll-bg, #3d3d3d) !important;
+  color: var(--table-header-text, #ffffff) !important;
   background-image: none !important;
 }
 
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:nth-child(odd) {
-  background: var(--c-surface) !important;
+  background: var(--table-row-odd-bg, #ffffff) !important;
 }
 
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:nth-child(even) {
-  background: var(--c-e6e6e6) !important;
+  background: var(--table-row-even-bg, #e6e6e6) !important;
 }
 
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:hover,
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody tr:hover td {
-  background: var(--c-fcf3d6) !important;
+  background: var(--table-row-hover-bg, #fcf3d6) !important;
 }
 
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody td {
-  color: var(--c-161616) !important;
+  color: var(--table-text, #161616) !important;
   font-size: 0.95rem !important;
   font-weight: 600 !important;
   padding: 9px 12px !important;
-  border-bottom: 1px solid var(--c-eceef1) !important;
   border-left: 0 !important;
   text-align: center !important;
   vertical-align: middle !important;
-   border: 1px solid var(--c-cccccc) !important;
+  /* كان هنا border-bottom ثم border يُلغيه — أُبقيَ الشاملُ وحدَه. */
+  border: 1px solid var(--table-border, #cccccc) !important;
 }
 
 body.ems-site :is(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable) tbody td:last-child {
@@ -952,155 +1025,12 @@ body.ems-site :is(table, .table, .display, .dataTable, .alltable, .alltables) tb
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   قالب الفلاتر الموحّد — Reusable Filter Panel
+   قالبُ الفلاترِ — نُقل إلى `assets/css/ems-filters.css`
    ────────────────────────────────────────────────────────────────────
-   البنية المتوقّعة (نفس الأسماء تُستخدم في أي صفحة):
-
-   <div class="filter-container">
-     <div class="filter-title">
-       <span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span>
-       فلاتر البحث
-     </div>
-     <div class="filter-body">
-       <div class="filter-field">
-         <label><i class="fa fa-calendar"></i> من تاريخ</label>
-         <input type="date">
-       </div>
-       <!-- ... المزيد من .filter-field حسب الحاجة ... -->
-       <div class="filter-actions">           <!-- دائماً في الأخير -->
-         <button type="button" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button>
-         <button type="button" class="btn-secondary" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></button>
-       </div>
-     </div>
-   </div>
+   كان هنا تصميمُ `.filter` كاملًا (أصلُه شاشةُ العملاء). نُقل بحرفِه إلى
+   ملفٍّ يملكه وحدَه ليكون **مصدرًا واحدًا** لكلِّ صفحاتِ الترشيحِ في النظام،
+   ولأن ملفَّ الجداولِ ليس موضعَ تصميمِ نموذج. لا تُعِدْ كتابتَه هنا.
    ════════════════════════════════════════════════════════════════════ */
-
-/* ملاحظة تنطيق: القالب يُستخدم داخل .main في صفحات الجداول. نُنطّقه تحت
-   `body.ems-site .main` ونضيف حُرّاس :not(...) على الحقول والأزرار حتى تتجاوز
-   خصوصيتُه طبقةَ «التوحيد» العامة في ems.main.all.style.css (موحّد الأزرار
-   هناك يستخدم 4 × :not فيمنح خصوصية عالية تُسقِط ألوان الأزرار بدونها). */
-
-/* الحاوية الخارجية — رمادي فاتح #eee + خط علوي أصفر */
-body.ems-site .main .filter {
-  background: var(--c-eeeeee) !important;
-  border: 1px solid var(--c-dddddd) !important;
-  border-radius: 25px !important;
-  margin-bottom: 5px !important;
-  overflow: hidden !important;
-  direction: rtl !important;
-  padding: 10px !important;
-}
-
-/* شريط العنوان + الأيقونة (العنوان لليمين في RTL = flex-start) */
-body.ems-site .main .filter .filter-title {
-  background: var(--c-e6e6e6) !important;
-  border-radius:25px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: flex-start !important;   /* البداية = اليمين في RTL */
-  gap: 10px !important;
-  margin: 0 !important;
-  padding: 5px !important;
-  font-size: 20px !important;
-  font-weight: 800 !important;
-  color: var(--c-2c2c2c) !important;
-  margin-bottom: 10px !important;
-}
-
-/* صف الحقول + الأزرار */
-body.ems-site .main .filter .filter-body {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  align-items: flex-end !important;
-  gap: 14px !important;
-  padding: 0px!important;
-}
-
-/* الحقل الواحد: label فوق input/select */
-body.ems-site .main .filter .filter-field {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 6px !important;
-  flex: 1 1 180px !important;
-  min-width: 150px !important;
-  margin: 0 !important;
-    border-radius: 20px !important;
-}
-
-
-body.ems-site .main .filter .filter-field :is(input, select, textarea):not([type="checkbox"]):not([type="radio"]):focus {
-  border-color: var(--c-brand-gold) !important;
-  background: var(--c-fffdf5) !important;
-  box-shadow: 0 0 0 3px var(--c-rgba24419766025) !important;
-  outline: none !important;
-  border-radius: 20px !important;
-}
-
-/* مجموعة الأزرار — تُدفع دائماً لطرف السطر (يسار في RTL) */
-body.ems-site .main .filter .filter-actions {
-  display: flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  margin-inline-start: auto !important;
-}
-
-/* زر تطبيق الفلتر — أصفر (الحُرّاس :not ترفع الخصوصية فوق موحّد الأزرار) */
-body.ems-site .main .filter .filter-actions .btn-primary:not(.btn-close):not(.close):not(.dt-button) {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  gap: 8px !important;
-  height: 42px !important;
-  min-height: 42px !important;
-  box-sizing: border-box !important;
-  padding: 0 22px !important;
-  border: none !important;
-  border-radius: 999px !important;
-  background: var(--c-brand-gold) !important;
-  background-image: none !important;
-  color: var(--c-2a2300) !important;
-  font-size: 14px !important;
-  font-weight: 800 !important;
-  cursor: pointer !important;
-  box-shadow: 0 2px 6px var(--c-rgba24419766045) !important;
-  transition: background .18s ease, transform .18s ease !important;
-}
-body.ems-site .main .filter .filter-actions .btn-primary:not(.btn-close):not(.close):not(.dt-button):hover {
-  background: var(--c-e6b52f) !important;
-  background-image: none !important;
-  transform: translateY(-1px) !important;
-}
-
-/* زر إعادة تعيين الفلتر — دائري */
-body.ems-site .main .filter .filter-actions .btn-secondary:not(.btn-close):not(.close):not(.dt-button) {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 42px !important;
-  height: 42px !important;
-  min-height: 42px !important;
-  box-sizing: border-box !important;
-  padding: 0 !important;
-  border: 1px solid var(--c-cfcfcf) !important;
-  border-radius: 50% !important;
-  background: var(--c-surface) !important;
-  background-image: none !important;
-  color: var(--c-555555) !important;
-  font-size: 15px !important;
-  cursor: pointer !important;
-  transition: background .18s ease, color .18s ease, transform .25s ease !important;
-}
-body.ems-site .main .filter .filter-actions .btn-secondary:not(.btn-close):not(.close):not(.dt-button):hover {
-  background: var(--c-f0f0f0) !important;
-  color: var(--c-222222) !important;
-  transform: rotate(-90deg) !important;
-}
-
-/* موبايل: الأزرار تأخذ سطراً كاملاً */
-@media (max-width: 767.98px) {
-  body.ems-site .main .filter .filter-field { flex: 1 1 100% !important; }
-  body.ems-site .main .filter .filter-actions { width: 100% !important; justify-content: flex-start !important; }
-}
 
 /* ═══ CMP-03 ②③④: أعمدة طبقة الحوكمة المشتركة ═══
    رؤوس <th data-gov> تحقن حرفيا (tools/cmp03_apply.php) وخلاياها يحشوها
@@ -1116,13 +1046,13 @@ body.ems-site table th[data-gov]::before {
   bottom: 0;
   width: 3px;
   border-radius: 2px;
-  background: var(--c-c9a227); /* شريحة ① الأعمدة الحاكمة — ذهبي النظام */
+  background: var(--table-gov-slice-1, #c9a227); /* شريحة ① الأعمدة الحاكمة */
   opacity: .55;
 }
-body.ems-site table th[data-gov][data-slice="2"]::before { background: var(--c-8e44ad); } /* ② الأثر والعكس */
-body.ems-site table th[data-gov][data-slice="3"]::before { background: var(--c-2e86c1); } /* ③ المال والإثبات */
+body.ems-site table th[data-gov][data-slice="2"]::before { background: var(--table-gov-slice-2, #8e44ad); } /* ② الأثر والعكس */
+body.ems-site table th[data-gov][data-slice="3"]::before { background: var(--table-gov-slice-3, #2e86c1); } /* ③ المال والإثبات */
 body.ems-site table td.ems-gov-empty {
-  color: var(--c-9aa0a6);
+  color: var(--table-gov-empty-text, #9aa0a6);
   text-align: center;
 }
 
@@ -1172,7 +1102,27 @@ body.ems-site .ems-xscroll > table tbody td {
      `var(--ems-sticky-top)`، والمتغيّرُ يورَّث — فإعادةُ تعريفِه على الغلافِ
      تبلغ كلَّ ترويسةٍ بداخله بلا سباقِ أولوياتٍ مع `!important`، وتبقى
      الإزاحةُ عاملةً (INJ-0146) في كلِّ جدولٍ خارجَ غلافِ التمرير. */
-body.ems-site .ems-xscroll {
+/* ── إكمالُ الإصلاح 2026-08-17 · بلاغُ المالك على Contracts/contracts_details ──
+   الحكمُ أعلاه صحيحٌ لكنه كان مقصورًا على `.ems-xscroll` وحدَه، وأغلفةُ الجداولِ
+   في النظامِ أربعةٌ لا واحد. فالجدولُ داخلَ `.dataTables_wrapper` بقي يقرأ
+   `56px` فانفصلت خلاياه عن صفِّها.
+
+   القياسُ الحيُّ على contracts_details.php قبلَ الإصلاح:
+     صفُّ الترويسة (tr)      top = 1633   ارتفاع 36
+     خلايا الترويسة (th)     top = 1676   ← **٤٣ بكسلًا تحتَ صفِّها**
+     أوّلُ صفٍّ في الجسم      top = 1670   ← فالخلايا تطفو فوقَه
+   فيظهر شريطٌ داكنٌ **فارغٌ** (خلفيةُ الـ`tr` بلا خلاياها) وتحته ترويسةٌ
+   تحجب أوّلَ صفِّ بيانات. وهو ما وصفه المالكُ: «شكلُ الجدولِ لا يشبه بقيّته».
+   وعلى Clients/clients.php الإزاحةُ صفرٌ لأن جدولَها داخلَ `.ems-xscroll`.
+
+   ولا لصوقَ رأسيًّا مفقودًا بالتصفير: هذه الأغلفةُ بارتفاعِ محتواها
+   (clientHeight = scrollHeight مقيسًا)، فلا تمريرَ رأسيَّ فيها أصلًا. */
+body.ems-site .ems-xscroll,
+body.ems-site .dataTables_wrapper,
+body.ems-site .table-responsive-wrapper,
+body.ems-site .table-responsive,
+body.ems-site .table-container,
+body.ems-site .dataTables_scrollBody {
   --ems-sticky-top: 0px;
 }
 
@@ -1261,3 +1211,66 @@ body.ems-site .ems-density-comfortable table.dataTable > thead > tr > th {
     padding: calc(var(--space-2) * 1.5) var(--space-3) !important;
 }
 
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   الطبقةُ الكونيّة — UNIVERSAL TABLE BASE                     (توحيد 2026-08-17)
+   ═══════════════════════════════════════════════════════════════════════════
+   لماذا طبقةٌ ثانيةٌ بلا `body.ems-site`؟
+
+   لأن صنفَ `ems-site` يضيفه JavaScript في insidebar.php (أو يُكتب يدويًّا في
+   inheader.php). فالشاشةُ التي لا تمرُّ بأيِّ قشرةٍ منهما — وكانت إحدى وعشرين
+   شاشةً — تحمل الملفَّ ولا يمسُّها منه شيء: تصميمٌ يصلُ ولا يُطبَّق.
+
+   وقيدُ `body.ems-site` نفسُه كان يصنع تصميمَين لجدولٍ واحد: ترويسةٌ داكنةٌ
+   بنصٍّ أبيضَ حيث حضر الصنف، ورماديةٌ فاتحةٌ حيث غاب.
+
+   فهذه الطبقةُ تُطبِّق المفاتيحَ نفسَها بلا شرطٍ. خصوصيتُها أدنى من طبقةِ
+   `ems-site` فلا تعاركها، وقيمُها متطابقةٌ معها فلا تُنتج فرقًا — وظيفتُها
+   الوحيدةُ أن تُغطّيَ ما تتركه تلك خارجَها.
+
+   الاستثناءُ الوحيدُ المُعلَن: `.no-unify` على الجدولِ أو على أبٍ له.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:where(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable):not(.no-unify):not(.no-unify *) {
+    background: var(--table-surface, #ffffff);
+    border: 1px solid var(--table-border-soft, #eceef1);
+    border-radius: var(--table-radius, 12px);
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+}
+
+:where(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable):not(.no-unify):not(.no-unify *) > :where(thead) > tr > :where(th, td) {
+    background: var(--table-header-bg, #6b6b6b);
+    background-image: none;
+    color: var(--table-header-text, #ffffff);
+    border-color: var(--table-header-bg, #6b6b6b);
+    font-weight: 900;
+    text-align: center;
+}
+
+:where(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable):not(.no-unify):not(.no-unify *) > :where(tbody) > tr > :where(td, th) {
+    color: var(--table-text, #161616);
+    border: 1px solid var(--table-border, #cccccc);
+    vertical-align: middle;
+}
+
+:where(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable):not(.no-unify):not(.no-unify *) > :where(tbody) > tr:nth-child(odd) {
+    background: var(--table-row-odd-bg, #ffffff);
+}
+
+:where(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable):not(.no-unify):not(.no-unify *) > :where(tbody) > tr:nth-child(even) {
+    background: var(--table-row-even-bg, #e6e6e6);
+}
+
+:where(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable):not(.no-unify):not(.no-unify *) > :where(tbody) > tr:hover,
+:where(table, .table, table.dataTable, .dataTables_wrapper table, .alltables, .alltable):not(.no-unify):not(.no-unify *) > :where(tbody) > tr:hover > td {
+    background: var(--table-row-hover-bg, #fcf3d6);
+}
+
+/* ترويسةُ DataTables المستنسخةُ في وضعِ التمريرِ الأفقيِّ — خارجَ شجرةِ الجدولِ الأصل */
+:where(.dataTables_scrollHead, .dataTables_scrollHeadInner) table > thead > tr > :where(th, td) {
+    background: var(--table-header-scroll-bg, #3d3d3d);
+    background-image: none;
+    color: var(--table-header-text, #ffffff);
+}

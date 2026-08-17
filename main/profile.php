@@ -256,6 +256,7 @@ $logout_url = function_exists('ems_url') ? ems_url('logout.php') : '../logout.ph
 $page_title = "إيكويبيشن | الملف الشخصي";
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
+require_once __DIR__ . '/../includes/profile_kit.php';   // عُدّةُ بطاقةِ الكِيان — التأليفُ بديلُ النسخ
 ems_shell_axes(null);
 include("../inheader.php");
 include('../insidebar.php');
@@ -264,12 +265,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
-<div class="main profile-main ems-unified-page-shell">
+<div class="main profile-main ems-profile ems-unified-page-shell">
 
     <?php
     $header_title   = 'الملف الشخصي';
     $header_icon    = 'fas fa-id-badge';
-    $header_actions = array();
+    /* ◆ زرّا «كلمةُ المرور» و«الإعدادات» كانا داخلَ لوحِ الهويةِ بصنفَينِ
+         محليَّينِ (`profile-hero-btn primary|ghost`) — نسخةٌ سادسةٌ من زرٍّ.
+         وموضعُهما الصحيحُ شريطُ أفعالِ الرأسِ الموحَّد: مكانٌ واحدٌ للأفعالِ
+         في كلِّ شاشةٍ، وأصنافُ الأزرارِ المعتمدةُ وحدَها. */
+    $header_actions = array(
+        array('href' => $change_password_url, 'class' => 'add-btn', 'icon' => 'fas fa-key',  'label' => 'تغيير كلمة المرور'),
+        array('href' => $settings_url,        'class' => 'add-btn', 'icon' => 'fas fa-gear', 'label' => 'الإعدادات'),
+    );
     $header_back    = array('href' => 'dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
 
@@ -280,198 +288,125 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="profile-shell">
 
-        <!-- بطاقة الترويسة -->
-        <div class="profile-hero">
-            <div class="profile-avatar"><?php echo htmlspecialchars($avatar_initials, ENT_QUOTES, 'UTF-8'); ?></div>
-            <div class="profile-hero-info">
-                <h2><?php echo htmlspecialchars($display_name, ENT_QUOTES, 'UTF-8'); ?></h2>
-                <div class="profile-badges">
-                    <span class="profile-badge role"><i class="fas fa-user-shield"></i> <?php echo htmlspecialchars($role_text, ENT_QUOTES, 'UTF-8'); ?></span>
-                    <?php if (!empty($user['username'])): ?>
-                        <span class="profile-badge user"><i class="fas fa-at"></i> <?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?></span>
-                    <?php endif; ?>
-                    <span class="profile-badge <?php echo $is_active ? 'status-on' : 'status-off'; ?>">
-                        <i class="fas fa-circle pf-dot"></i> <?php echo $is_active ? 'حساب نشط' : 'حساب موقوف'; ?>
-                    </span>
-                </div>
-            </div>
-            <div class="profile-hero-actions">
-                <a href="<?php echo htmlspecialchars($change_password_url, ENT_QUOTES, 'UTF-8'); ?>" class="profile-hero-btn primary">
-                    <i class="fas fa-key"></i> تغيير كلمة المرور
-                </a>
-                <a href="<?php echo htmlspecialchars($settings_url, ENT_QUOTES, 'UTF-8'); ?>" class="profile-hero-btn ghost">
-                    <i class="fas fa-gear"></i> الإعدادات
-                </a>
-            </div>
-        </div>
+        <?php
+        /* ══ لوحُ الهوية ═══════════════════════════════════════════════════
+           كان بلغةٍ خاصةٍ كاملة: `profile-hero` و`profile-avatar` و
+           `profile-badges` و`profile-badge` بأربعِ حالاتٍ (`role` · `user` ·
+           `status-on` · `status-off`) — **نسخةٌ سادسةٌ** من لوحِ هويةٍ ومن
+           شارة. صار المكوّنَ نفسَه: الحرفانِ الأولانِ يحلُّهما رسمُ المكوّنِ
+           (`monogram`)، والدورُ واسمُ المستخدمِ رقيقتان، والحالةُ شارةً. */
+        echo ems_profile_hero(array(
+            'name'   => $display_name,
+            'icon'   => 'fas fa-id-badge',
+            'status' => array(
+                'text' => $is_active ? 'حساب نشط' : 'حساب موقوف',
+                'tone' => $is_active ? 'ok' : 'danger',
+                'icon' => $is_active ? 'fas fa-circle-check' : 'fas fa-circle-minus',
+            ),
+            'chips'  => array(
+                array('text' => $role_text, 'icon' => 'fas fa-user-shield'),
+                array('text' => isset($user['username']) ? $user['username'] : '', 'icon' => 'fas fa-at', 'mono' => true),
+            ),
+        ));
+        ?>
 
         <div class="profile-grid">
 
-            <!-- معلومات الحساب -->
-            <div class="profile-card">
-                <h3 class="profile-card-title"><i class="fas fa-user"></i> معلومات الحساب</h3>
+            <?php
+            /* ══ معلوماتُ الحساب ═══════════════════════════════════════════
+               كانت ستَّ `profile-row` كلٌّ منها `label` + `value` — أي شبكةَ
+               حقائقَ مبنيةً يدويًّا. صارت شبكةَ حقائقِ المكوّنِ نفسِها،
+               والغائبُ فيها يُعلَن «—» بصنفِ غيابٍ بدل نصٍّ باهتٍ يدويّ. */
+            echo ems_profile_section_open(array('title' => 'معلومات الحساب', 'icon' => 'fas fa-user'));
+            echo ems_profile_facts(array(
+                array('label' => 'الاسم الكامل',     'value' => $display_name),
+                array('label' => 'اسم المستخدم',     'value' => isset($user['username']) ? $user['username'] : ''),
+                array('label' => 'البريد الإلكتروني', 'value' => isset($user['email']) ? $user['email'] : ''),
+                array('label' => 'رقم الهاتف',       'value' => isset($user['phone']) ? $user['phone'] : ''),
+                array('label' => 'الدور / الصلاحية', 'value' => $role_text),
+            ));
+            ?>
+            <?php
+            echo ems_profile_section_close();
 
-                <div class="profile-row">
-                    <span class="profile-row-label"><i class="fas fa-signature"></i> الاسم الكامل</span>
-                    <span class="profile-row-value"><?php echo htmlspecialchars($display_name, ENT_QUOTES, 'UTF-8'); ?></span>
-                </div>
-                <div class="profile-row">
-                    <span class="profile-row-label"><i class="fas fa-at"></i> اسم المستخدم</span>
-                    <span class="profile-row-value"><?php echo htmlspecialchars(profile_val(isset($user['username']) ? $user['username'] : ''), ENT_QUOTES, 'UTF-8'); ?></span>
-                </div>
-                <div class="profile-row">
-                    <span class="profile-row-label"><i class="fas fa-envelope"></i> البريد الإلكتروني</span>
-                    <span class="profile-row-value"><?php echo htmlspecialchars(profile_val(isset($user['email']) ? $user['email'] : ''), ENT_QUOTES, 'UTF-8'); ?></span>
-                </div>
-                <div class="profile-row">
-                    <span class="profile-row-label"><i class="fas fa-phone"></i> رقم الهاتف</span>
-                    <span class="profile-row-value rtl-number"><?php echo htmlspecialchars(profile_val(isset($user['phone']) ? $user['phone'] : ''), ENT_QUOTES, 'UTF-8'); ?></span>
-                </div>
-                <div class="profile-row">
-                    <span class="profile-row-label"><i class="fas fa-user-shield"></i> الدور / الصلاحية</span>
-                    <span class="profile-row-value"><?php echo htmlspecialchars($role_text, ENT_QUOTES, 'UTF-8'); ?></span>
-                </div>
-                <div class="profile-row">
-                    <span class="profile-row-label"><i class="fas fa-toggle-on"></i> حالة الحساب</span>
-                    <span class="profile-row-value">
-                        <span class="profile-pill <?php echo $is_active ? 'on' : 'off'; ?>">
-                            <i class="fas fa-circle pf-dot"></i> <?php echo $is_active ? 'نشط' : 'موقوف'; ?>
-                        </span>
-                    </span>
-                </div>
-            </div>
+            /* ══ المؤسسةُ والعمل ══════════════════════════════════════════ */
+            echo ems_profile_section_open(array('title' => 'بيانات المؤسسة والعمل', 'icon' => 'fas fa-building'));
+            echo ems_profile_facts(array(
+                array('label' => 'الشركة',       'value' => $company_text),
+                array('label' => 'المشروع',      'value' => $project_text),
+                array('label' => 'رقم المستخدم', 'value' => '#' . intval($user_id)),
+            ));
+            echo ems_profile_section_close();
 
-            <!-- بيانات المؤسسة -->
-            <div class="profile-card">
-                <h3 class="profile-card-title"><i class="fas fa-building"></i> بيانات المؤسسة والعمل</h3>
+            /* ══ النشاطُ والتواريخ ════════════════════════════════════════ */
+            $last_login = '';
+            if (!empty($user['last_login_at'])) {
+                $last_login = $user['last_login_at'];
+            } elseif (!empty($session_user['last_login'])) {
+                $last_login = $session_user['last_login'];
+            }
+            echo ems_profile_section_open(array('title' => 'النشاط والتواريخ', 'icon' => 'fas fa-clock-rotate-left'));
+            echo ems_profile_facts(array(
+                array('label' => 'تاريخ الإنشاء',     'value' => profile_date(isset($user['created_at']) ? $user['created_at'] : '', false)),
+                array('label' => 'آخر تحديث',         'value' => profile_date(isset($user['updated_at']) ? $user['updated_at'] : '')),
+                array('label' => 'آخر تسجيل دخول',    'value' => profile_date($last_login)),
+            ));
+            echo ems_profile_section_close();
 
-                <div class="profile-row">
-                    <span class="profile-row-label"><i class="fas fa-city"></i> الشركة</span>
-                    <span class="profile-row-value <?php echo $company_text === '' ? 'muted' : ''; ?>">
-                        <?php echo htmlspecialchars(profile_val($company_text), ENT_QUOTES, 'UTF-8'); ?>
-                    </span>
-                </div>
-                <div class="profile-row">
-                    <span class="profile-row-label"><i class="fas fa-diagram-project"></i> المشروع</span>
-                    <span class="profile-row-value <?php echo $project_text === '' ? 'muted' : ''; ?>">
-                        <?php echo htmlspecialchars(profile_val($project_text, 'غير مرتبط بمشروع'), ENT_QUOTES, 'UTF-8'); ?>
-                    </span>
-                </div>
-                <div class="profile-row">
-                    <span class="profile-row-label"><i class="fas fa-hashtag"></i> رقم المستخدم</span>
-                    <span class="profile-row-value rtl-number">#<?php echo intval($user_id); ?></span>
-                </div>
-            </div>
-
-            <!-- النشاط والتواريخ -->
-            <div class="profile-card">
-                <h3 class="profile-card-title"><i class="fas fa-clock-rotate-left"></i> النشاط والتواريخ</h3>
-
-                <div class="profile-row">
-                    <span class="profile-row-label"><i class="fas fa-calendar-plus"></i> تاريخ الإنشاء</span>
-                    <span class="profile-row-value rtl-number"><?php echo htmlspecialchars(profile_date(isset($user['created_at']) ? $user['created_at'] : '', false), ENT_QUOTES, 'UTF-8'); ?></span>
-                </div>
-                <div class="profile-row">
-                    <span class="profile-row-label"><i class="fas fa-pen-to-square"></i> آخر تحديث</span>
-                    <span class="profile-row-value rtl-number"><?php echo htmlspecialchars(profile_date(isset($user['updated_at']) ? $user['updated_at'] : ''), ENT_QUOTES, 'UTF-8'); ?></span>
-                </div>
-                <div class="profile-row">
-                    <span class="profile-row-label"><i class="fas fa-right-to-bracket"></i> آخر تسجيل دخول</span>
-                    <span class="profile-row-value rtl-number">
-                        <?php
-                        $last_login = '';
-                        if (!empty($user['last_login_at'])) {
-                            $last_login = $user['last_login_at'];
-                        } elseif (!empty($session_user['last_login'])) {
-                            $last_login = $session_user['last_login'];
-                        }
-                        echo htmlspecialchars(profile_date($last_login), ENT_QUOTES, 'UTF-8');
-                        ?>
-                    </span>
-                </div>
-            </div>
-
-            <!-- إجراءات سريعة -->
-            <div class="profile-card">
-                <h3 class="profile-card-title"><i class="fas fa-bolt"></i> إجراءات سريعة</h3>
-
-                <a href="<?php echo htmlspecialchars($change_password_url, ENT_QUOTES, 'UTF-8'); ?>" class="profile-row pf-qlink">
-                    <span class="profile-row-label"><i class="fas fa-key"></i> تغيير كلمة المرور</span>
-                    <span class="profile-row-value"><i class="fas fa-arrow-left pf-arrow"></i></span>
+            /* ══ إجراءاتٌ سريعة ═══════════════════════════════════════════
+               روابطُ لا حقائق — فتبقى روابطَ في قسمِ المكوّن، بصنفِ `pf-qlink`
+               وحدَه (سلوكُ سطرٍ قابلٍ للنقر، لا لغةَ بطاقةٍ ثانية). */
+            echo ems_profile_section_open(array('title' => 'إجراءات سريعة', 'icon' => 'fas fa-bolt'));
+            ?>
+                <a href="<?php echo htmlspecialchars($change_password_url, ENT_QUOTES, 'UTF-8'); ?>" class="pf-qlink">
+                    <span><i class="fas fa-key"></i> تغيير كلمة المرور</span>
+                    <i class="fas fa-arrow-left pf-arrow"></i>
                 </a>
-                <a href="<?php echo htmlspecialchars($settings_url, ENT_QUOTES, 'UTF-8'); ?>" class="profile-row pf-qlink">
-                    <span class="profile-row-label"><i class="fas fa-gear"></i> إعدادات النظام</span>
-                    <span class="profile-row-value"><i class="fas fa-arrow-left pf-arrow"></i></span>
+                <a href="<?php echo htmlspecialchars($settings_url, ENT_QUOTES, 'UTF-8'); ?>" class="pf-qlink">
+                    <span><i class="fas fa-gear"></i> إعدادات النظام</span>
+                    <i class="fas fa-arrow-left pf-arrow"></i>
                 </a>
-                <a href="dashboard.php" class="profile-row pf-qlink">
-                    <span class="profile-row-label"><i class="fas fa-house"></i> لوحة التحكم</span>
-                    <span class="profile-row-value"><i class="fas fa-arrow-left pf-arrow"></i></span>
+                <a href="dashboard.php" class="pf-qlink">
+                    <span><i class="fas fa-house"></i> لوحة التحكم</span>
+                    <i class="fas fa-arrow-left pf-arrow"></i>
                 </a>
-                <a href="<?php echo htmlspecialchars($logout_url, ENT_QUOTES, 'UTF-8'); ?>" class="profile-row pf-qlink">
-                    <span class="profile-row-label pf-danger"><i class="fas fa-power-off pf-danger"></i> تسجيل الخروج</span>
-                    <span class="profile-row-value"><i class="fas fa-arrow-left pf-danger"></i></span>
+                <a href="<?php echo htmlspecialchars($logout_url, ENT_QUOTES, 'UTF-8'); ?>" class="pf-qlink pf-danger">
+                    <span><i class="fas fa-power-off"></i> تسجيل الخروج</span>
+                    <i class="fas fa-arrow-left"></i>
                 </a>
-            </div>
+            <?php echo ems_profile_section_close(); ?>
 
         </div>
 
         <?php if ($activity_available && $act_total > 0): ?>
 
-        <!-- بطاقات الإحصائيات -->
-        <div class="profile-stats">
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
-                <div class="stat-meta">
-                    <div class="stat-value rtl-number"><?php echo number_format($act_total); ?></div>
-                    <div class="stat-label">إجمالي الأنشطة</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon green"><i class="fas fa-right-to-bracket"></i></div>
-                <div class="stat-meta">
-                    <div class="stat-value rtl-number"><?php echo number_format($act_logins); ?></div>
-                    <div class="stat-label">مرات تسجيل الدخول</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon blue"><i class="fas fa-plus"></i></div>
-                <div class="stat-meta">
-                    <div class="stat-value rtl-number"><?php echo number_format($act_creates); ?></div>
-                    <div class="stat-label">عمليات إضافة</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon gray"><i class="fas fa-pen"></i></div>
-                <div class="stat-meta">
-                    <div class="stat-value rtl-number"><?php echo number_format($act_updates); ?></div>
-                    <div class="stat-label">عمليات تعديل</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon"><i class="fas fa-calendar-day"></i></div>
-                <div class="stat-meta">
-                    <div class="stat-value rtl-number"><?php echo number_format($act_today); ?></div>
-                    <div class="stat-label">نشاط اليوم</div>
-                </div>
-            </div>
-        </div>
+        <?php
+        /* ══ شريطُ الحصيلة ════════════════════════════════════════════════
+           كانت خمسَ `stat-card` كلٌّ منها أيقونةٌ بأربعةِ ألوانٍ محليةٍ
+           (`green` · `blue` · `gray` · الافتراضي) وقيمةٌ وتسمية — **نسخةٌ
+           سادسةٌ** من شريطِ مؤشرات. صارت شريطَ المكوّنِ بنغماتِه المعلَنة. */
+        echo ems_profile_stats(array(
+            array('value' => number_format($act_total),   'label' => 'إجمالي الأنشطة'),
+            array('value' => number_format($act_logins),  'label' => 'مرات تسجيل الدخول', 'tone' => 'ok'),
+            array('value' => number_format($act_creates), 'label' => 'عمليات إضافة',      'tone' => 'info'),
+            array('value' => number_format($act_updates), 'label' => 'عمليات تعديل',      'tone' => 'muted'),
+            array('value' => number_format($act_today),   'label' => 'نشاط اليوم',        'tone' => 'gold'),
+        ));
+        ?>
 
         <!-- الرسوم البيانية -->
         <div class="profile-analytics">
-            <div class="chart-card">
-                <h3 class="profile-card-title"><i class="fas fa-chart-column"></i> النشاط خلال آخر 14 يوماً</h3>
+            <?php echo ems_profile_section_open(array('title' => 'النشاط خلال آخر 14 يوماً', 'icon' => 'fas fa-chart-column')); ?>
                 <div class="chart-wrap"><canvas id="activityTrendChart"></canvas></div>
-            </div>
-            <div class="chart-card">
-                <h3 class="profile-card-title"><i class="fas fa-chart-pie"></i> توزيع أنواع النشاط</h3>
+            <?php echo ems_profile_section_close(); ?>
+            <?php echo ems_profile_section_open(array('title' => 'توزيع أنواع النشاط', 'icon' => 'fas fa-chart-pie')); ?>
                 <div class="chart-wrap small"><canvas id="activityTypeChart"></canvas></div>
-            </div>
+            <?php echo ems_profile_section_close(); ?>
         </div>
 
         <!-- آخر الأنشطة + أكثر الشاشات -->
         <div class="profile-analytics">
-            <div class="chart-card">
-                <h3 class="profile-card-title"><i class="fas fa-clock-rotate-left"></i> آخر الأنشطة</h3>
+            <?php echo ems_profile_section_open(array('title' => 'آخر الأنشطة', 'icon' => 'fas fa-clock-rotate-left')); ?>
                 <div class="activity-table-wrap">
                     <table class="activity-table">
                         <thead>
@@ -502,11 +437,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php foreach ($act_recent as $rec): ?>
                                 <?php
                                 $rtype = $rec['action_type'] !== null && $rec['action_type'] !== '' ? $rec['action_type'] : 'other';
-                                $badge_class = in_array($rtype, array('login', 'logout', 'create')) ? $rtype : '';
+                                /* الشارةُ كانت بصنفٍ محليٍّ لثلاثةِ أنواعٍ وحدَها والباقي بلا
+                                   لون. صارت بنغماتِ المكوّن — ولكلِّ نوعٍ نغمةٌ معلَنة. */
+                                $actTone = ems_profile_map($rtype, array(
+                                    'login'  => 'ok',
+                                    'logout' => 'muted',
+                                    'create' => 'info',
+                                    'update' => 'warn',
+                                    'delete' => 'danger',
+                                ));
                                 $screen = $rec['screen_name'] !== '' ? $rec['screen_name'] : $rec['module_name'];
                                 ?>
                                 <tr>
-                                    <td><span class="act-badge <?php echo $badge_class; ?>"><i class="fas <?php echo act_icon($rtype); ?>"></i> <?php echo htmlspecialchars(act_label($rtype), ENT_QUOTES, 'UTF-8'); ?></span></td>
+                                    <td><?php echo ems_profile_badge(act_label($rtype), $actTone, array('icon' => 'fas ' . act_icon($rtype))); ?></td>
                                     <td><?php echo htmlspecialchars(profile_val($screen, '—'), ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td><?php echo htmlspecialchars(profile_val($rec['module_name'], '—'), ENT_QUOTES, 'UTF-8'); ?></td>
                                     <td class="rtl-number"><?php echo htmlspecialchars(profile_date($rec['created_at']), ENT_QUOTES, 'UTF-8'); ?></td>
@@ -515,10 +458,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </tbody>
                     </table>
                 </div>
-            </div>
+            <?php echo ems_profile_section_close(); ?>
 
-            <div class="chart-card">
-                <h3 class="profile-card-title"><i class="fas fa-ranking-star"></i> أكثر الشاشات استخداماً</h3>
+            <?php echo ems_profile_section_open(array('title' => 'أكثر الشاشات استخداماً', 'icon' => 'fas fa-ranking-star')); ?>
                 <?php if (!empty($act_top_screens)): ?>
                     <?php $top_max = max(array_map(function ($x) { return $x['count']; }, $act_top_screens)); ?>
                     <?php foreach ($act_top_screens as $screen): ?>
@@ -533,15 +475,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <div class="profile-empty">لا توجد بيانات كافية.</div>
+                    <?php echo ems_profile_note('لا توجد بيانات كافية.', 'info'); ?>
                 <?php endif; ?>
-            </div>
+            <?php echo ems_profile_section_close(); ?>
         </div>
 
         <?php elseif ($activity_available): ?>
-        <div class="chart-card">
-            <div class="profile-empty"><i class="fas fa-circle-info"></i> لا يوجد سجل نشاط مسجّل لحسابك حتى الآن.</div>
-        </div>
+        <?php
+        echo ems_profile_section_open(array('title' => 'سجلُّ النشاط', 'icon' => 'fas fa-clock-rotate-left'));
+        echo ems_profile_note('لا يوجد سجل نشاط مسجّل لحسابك حتى الآن.', 'info');
+        echo ems_profile_section_close();
+        ?>
         <?php endif; ?>
 
     </div>

@@ -60,9 +60,12 @@ $all = array();          // المواضعُ كلُّها
 $byRoute = array();      // route_lc => أسماءُ **الأصلِ** ومجموعاتُه وحالتُه
 $byVariant = array();    // هويةُ المنظرِ/المرساةِ الكاملة => أسماؤها (لكلِّ مدخلٍ ثانٍ اسمٌ واحدٌ هو الآخر)
 $emptyGroups = array();  // U5
-$groupStatus = array();  // «دور·مجموعة» => هل فيها مسارٌ APPROVED؟ (لنطاقِ إنفاذ U4)
+$shellTotal  = 0;        // مقامُ U5: أغلفةُ المجموعاتِ المُصيَّرةُ كلُّها
+$bigGroups = array();    // U9: (دور، مجموعة، عدد) لِما بلغ عشرةً فأكثر
+$groupStatus = array();  // «دور·مجموعة» => هل فيها مسارٌ APPROVED؟ (لنطاقِ إنفاذ U4 وU9)
 foreach ($roles as $rid) {
-    $pos = uxp_render_role($conn, $rid);
+    $navHtml = uxp_render_role_html($conn, $rid);
+    $pos = uxp_parse_nav_html($navHtml);
     $groupCounts = array();
     foreach ($pos as $p) {
         $lc = mb_strtolower(uxp_norm($p['href']));
@@ -86,8 +89,24 @@ foreach ($roles as $rid) {
         if (!isset($groupStatus[$gk])) { $groupStatus[$gk] = false; }
         if ($st === 'APPROVED') { $groupStatus[$gk] = true; }
     }
-    /* U5: رأسُ مجموعةٍ ظهر ولا عنصرَ تحته — يُلتقط من HTML بمقارنةِ الرؤوسِ بالمحتوى */
-    foreach ($groupCounts as $g => $c) { if ($c === 0) { $emptyGroups[] = "دور {$rid}: {$g}"; } }
+    /* ══ U5: رأسُ مجموعةٍ ظهر ولا رابطَ تحته — **من الشجرةِ المُصيَّرة** ═══════
+       ◆ **البوابةُ الميتةُ التي أُحييت (2026-08-20)**: كان الحكمُ
+         `foreach ($groupCounts as $g => $c) if ($c === 0)` — و`$groupCounts`
+         خريطةٌ **لا يُنشأ مفتاحُها إلا بوجودِ عنصر**، فشرطُها لا يتحقق أبدًا.
+         بوابةٌ تقيس ما يستحيل وقوعُه تُعلن `إنفاذ=0` إلى الأبد وهي عمياء.
+       ◆ وحين قِيست الشجرةُ فعلًا ظهر **82 غلافًا فارغًا من 456 (18٪)**:
+         `printNavLinkItem` تُسقط الرابطَ (كابحُ المساحةِ أو حارسُ التكرار)
+         بعدَ طبعِ الغلافِ والرأس. والقاعدة: **ما يُقاس من المُصيَّرِ يُقرأ من
+         المُصيَّر** — لا من خريطةٍ اشتُقَّت منه فسقطت منها الحالةُ المطلوبة. */
+    foreach (uxp_nav_group_shells($navHtml) as $sh) {
+        $shellTotal++;
+        if ($sh['links'] === 0) { $emptyGroups[] = "دور {$rid}: «{$sh['name']}»"; }
+    }
+    /* U9: حدُّ التسعةِ (ف٧-٢) — «مجموعةٌ بعشرةِ عناصرَ فأكثر» تُرسِّب.
+       ◆ ويُقاس على **المُصيَّرِ لكلِّ دور** لا على السجل: المجموعةُ قد تحمل
+         اثنيْ عشرَ صفًّا في `nav_canonical` ولا يرى دورٌ منها إلا ستةً —
+         والحدُّ حدُّ قراءةٍ بلمحةٍ في شاشةِ مستخدمٍ بعينِه لا حدُّ سجلّ. */
+    foreach ($groupCounts as $g => $c) { if ($c >= 10) { $bigGroups[] = array($rid, $g, $c); } }
 }
 
 /* ── U1: مُصيَّرٌ بلا صف ── */
@@ -151,6 +170,16 @@ foreach ($byRoute as $lc => $info) {
     }
 }
 
+/* ── U9: حدُّ التسعةِ للمجموعةِ الواحدة — إنفاذٌ حيث تسكنها مساراتٌ APPROVED ──
+   ◆ والمجموعةُ التي كلُّ سكّانِها معلَّقون تُبلَّغ ولا تُرسِّب: موضعُها نفسُه
+     ينتظر توقيعَ جلسةِ الإغلاق، فتقسيمُها قبلَ توقيعِه حسمٌ بقرارِ مبرمج. */
+$u9_appr = array(); $u9_pend = array();
+foreach ($bigGroups as $bg) {
+    list($rid, $g, $c) = $bg;
+    $line = "دور {$rid}: «{$g}» = {$c} عنصرًا (الحدُّ ٩)";
+    if (!empty($groupStatus[$rid . '·' . $g])) { $u9_appr[] = $line; } else { $u9_pend[] = $line; }
+}
+
 /* ── U7: قيمُ الحالاتِ الداخليةُ نصًّا ظاهرًا ── */
 $u7 = array();
 $internal = ems_status_internal_values();
@@ -190,7 +219,7 @@ uxg_line('U1', 'مسارٌ مُصيَّرٌ بلا صفٍّ في المصفوف�
 uxg_line('U2', 'مسارٌ APPROVED باسمَين', count($u2_appr), count($u2_pend), $fails, $ENFORCE, $u2_appr);
 uxg_line('U3', 'مسارٌ APPROVED بمجموعتَين', count($u3_appr), count($u3_pend), $fails, $ENFORCE, $u3_appr);
 uxg_line('U4', 'مصطلحٌ ممنوعٌ أو تبويبٌ محادثيٌّ مُصيَّر', count($u4), count($u4_pend), $fails, $ENFORCE, $u4);
-uxg_line('U5', 'مجموعةٌ مُصيَّرةٌ بلا عناصر', count($emptyGroups), null, $fails, $ENFORCE, $emptyGroups);
+uxg_line('U5', "مجموعةٌ مُصيَّرةٌ بلا رابطٍ (المقام {$shellTotal} غلافًا)", count($emptyGroups), null, $fails, $ENFORCE, $emptyGroups);
 uxg_line('U6', 'اسمٌ APPROVED أطولُ من ستِّ كلمات', count($u6_appr), count($u6_pend), $fails, $ENFORCE, $u6_appr);
 if (!empty($u6_matrix)) {
     echo "      ◆ استثناءُ مصفوفةٍ (اسمُ السجلِّ المعتمَدُ نفسُه يجاوز الستَّ — قرارُه للمالك):\n";
@@ -198,9 +227,14 @@ if (!empty($u6_matrix)) {
 }
 uxg_line('U7', 'قيمةُ حالةٍ داخليةٍ في نصِّ التنقل', count($u7), null, $fails, $ENFORCE, $u7);
 uxg_line('U8', 'مسارُ ملفٍّ أو معرِّفٌ تقنيٌّ في اسمٍ APPROVED', count($u8_appr), count($u8_pend), $fails, $ENFORCE, $u8_appr);
+uxg_line('U9', 'مجموعةٌ مُصيَّرةٌ بعشرةِ عناصرَ فأكثر (حدُّ ف٧-٢)', count($u9_appr), count($u9_pend), $fails, $ENFORCE, $u9_appr);
+if (!empty($u9_pend)) {
+    echo "      ◆ مُبلَّغٌ ينتظر توقيعَ جلسةِ الإغلاق (سكّانُها معلَّقون):\n";
+    foreach (array_slice($u9_pend, 0, 8) as $s) { echo "      · {$s}\n"; }
+}
 
 if ($fails === 0) {
-    echo "✔ بواباتُ الجولةِ الثماني مجتازةٌ على النصِّ المُصيَّر\n";
+    echo "✔ بواباتُ الجولةِ التسعُ مجتازةٌ على النصِّ المُصيَّر\n";
     exit(0);
 }
 echo ($ENFORCE ? "✗ {$fails} بوابة/بوابات راسبة — البناءُ مرسَّب\n" : "⚠ {$fails} بوابة/بوابات ستُرسِّب عند --enforce\n");

@@ -7611,8 +7611,28 @@ table.d-bd {
   padding: 20px 14px;
 }
 
-.contracts-details-page .page-hero {
-  background: var(--c-dddddd);
+/* ═══════════════ لافتةُ رأسِ الصفحة — .page-hero ═══════════════
+   إصلاحُ 2026-08-17 · بلاغُ المالك: «طبقةٌ من الرمادي لا أفهمها».
+
+   ما كان: `background: var(--c-dddddd)` — رماديٌّ مسطَّحٌ على ١١٢١×٣٦٢ بكسل،
+   أي ١٣٫٥٪ من مساحةِ الشاشة. والقياسُ الحيُّ أثبت أنه خللٌ لا اختيار:
+     • `::after` دائرةٌ بيضاءُ ٣٠٠×٣٠٠ بشفافيّةِ **٤٪** — فوقَ #dddddd تُنتج
+       #dfdfdf، أي فرقَ وحدتَين: زخرفةٌ لا تُرى. وشفافيّةٌ كهذه لا تُقرأ إلا
+       فوقَ خلفيةٍ داكنةٍ أو مشبَعة.
+     • خطٌّ سفليٌّ ذهبيٌّ ٢px وإطارٌ ذهبيٌّ ٢٤٪ — لغةُ لافتةٍ ذاتِ لون، لا رمادي.
+   فالخلفيّةُ سُطِّحت وبقيت زخرفتُها يتيمةً معلَّقةً في الفراغ.
+
+   ما صار: عُرفُ اللافتاتِ في النظامِ نفسِه — تدرّجٌ كريميٌّ دافئٌ مطابقٌ
+   لـ`.activity-logs-main .activity-page-hero` حرفًا بحرف. فلا لونَ ثالثٌ
+   يُخترَع، والدائرةُ الذهبيّةُ ١٤٪ تُقرأ عليه أخيرًا.
+
+   ولماذا رُفع قيدُ `.contracts-details-page`؟ لأن **ثلاثَ شاشاتٍ** تستعمل وسمَ
+   `page-hero` والقاعدةُ كانت مقصورةً على صنفِ صفحةٍ واحدة، فأنتج الوسمُ الواحدُ
+   ثلاثةَ مظاهر: رماديٌّ · رماديٌّ · **شفّافٌ بلا تصميمٍ إطلاقًا**
+   (`Timesheet/timesheet_details.php` يحمل `timesheet-details-page`).
+   ═══════════════════════════════════════════════════════════════ */
+.page-hero {
+  background: linear-gradient(140deg, var(--c-fffdf9) 0%, var(--c-fff7eb) 100%);
   border: 1px solid var(--c-rgba24419766024);
   border-bottom: 2px solid var(--or);
   border-radius: var(--radius-lg);
@@ -7623,7 +7643,7 @@ table.d-bd {
   box-shadow: var(--shadow-lg);
 }
 
-.contracts-details-page .page-hero::before {
+.page-hero::before {
   content: '';
   position: absolute;
   top: -60px;
@@ -7634,14 +7654,16 @@ table.d-bd {
   border-radius: 50%;
 }
 
-.contracts-details-page .page-hero::after {
+.page-hero::after {
   content: '';
   position: absolute;
   bottom: -80px;
   left: 120px;
   width: 300px;
   height: 300px;
-  background: var(--c-rgba255255255004);
+  /* كانت `rgba(255,255,255,.04)` — بيضاءُ ٤٪ لا تُرى فوقَ خلفيةٍ فاتحةٍ ولا
+     فوقَ الرماديِّ السابق. صارت ذهبيّةً خفيفةً تُقرأ فعلًا على الكريميّ. */
+  background: var(--c-rgba24419766005, rgba(244, 197, 66, .05));
   border-radius: 50%;
 }
 
@@ -10050,7 +10072,7 @@ body.ems-site {
 }
 
 .hours-approval-main table.ha-table tr.selected-row td {
-  background: var(--c-e8f4ff) !important;
+  background: var(--table-row-selected-bg, #e8f4ff) !important;
 }
 
 .hours-approval-main .toolbar-row {
@@ -12423,7 +12445,7 @@ body.ems-site .main table.dataTable thead > tr > th.sorting_desc::after {
   inset-inline-end: 14px !important;
   width: 12px !important;
   text-align: center !important;
-  color: var(--ems-sort-neutral) !important;
+  color: var(--table-sort-icon, #b7bec7) !important;
   font-size: 11px !important;
   opacity: 0.62 !important;
   pointer-events: none !important;
@@ -12453,7 +12475,7 @@ body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting:
 body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting:hover::after,
 body.ems-site .main table.dataTable thead > tr > th.sorting:hover::before,
 body.ems-site .main table.dataTable thead > tr > th.sorting:hover::after {
-  color: var(--ems-sort-hover) !important;
+  color: var(--table-sort-icon-hover, #d8dde4) !important;
   opacity: 0.9 !important;
 }
 
@@ -12461,7 +12483,7 @@ body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_
 body.ems-site .main table.dataTable thead > tr > th.sorting_asc::before,
 body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_desc::after,
 body.ems-site .main table.dataTable thead > tr > th.sorting_desc::after {
-  color: var(--ems-sort-active) !important;
+  color: var(--table-sort-icon-active, #f0bc00) !important;
   opacity: 1 !important;
   text-shadow: 0 0 0 transparent !important;
 }
@@ -12470,7 +12492,7 @@ body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_
 body.ems-site .main table.dataTable thead > tr > th.sorting_asc::after,
 body.ems-site .main .dataTables_wrapper table.dataTable thead > tr > th.sorting_desc::before,
 body.ems-site .main table.dataTable thead > tr > th.sorting_desc::before {
-  color: var(--ems-sort-neutral) !important;
+  color: var(--table-sort-icon, #b7bec7) !important;
   opacity: 0.32 !important;
 }
 
@@ -12602,18 +12624,19 @@ body.ems-site .main :is(table, .table, .dataTable, .alltable, .alltables) tbody 
   max-width: 100% !important;
   padding: 4px 9px !important;
   border-radius: 999px !important;
-  border: 1px solid var(--c-bcc5d2) !important;
-  background: var(--c-edf2f8) !important;
-  color: var(--c-26405f) !important;
+  /* وُصِلت بمفاتيحِ ems-tables.css (توحيد 2026-08-17) */
+  border: 1px solid var(--table-link-border, #bcc5d2) !important;
+  background: var(--table-link-bg, #edf2f8) !important;
+  color: var(--table-link-text, #26405f) !important;
   font-weight: 800 !important;
   text-decoration: none !important;
   white-space: nowrap !important;
 }
 
 body.ems-site .main :is(table, .table, .dataTable, .alltable, .alltables) tbody td a:not(.btn):not(.action-btn):not(.eye-btn):not(.edit-btn):not(.delete-btn):not(.btn-secondary):not(.btn-secondary):not(.btn-danger):not(.ems-status-chip):hover {
-  background: var(--c-dfe9f5) !important;
-  border-color: var(--c-9ba9be) !important;
-  color: var(--c-1f3651) !important;
+  background: var(--table-link-hover-bg, #dfe9f5) !important;
+  border-color: var(--table-link-hover-border, #9ba9be) !important;
+  color: var(--table-link-hover-text, #1f3651) !important;
 }
 
 /* ── Unified badges/chips/status tokens ──

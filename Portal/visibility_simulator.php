@@ -91,6 +91,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </style>
 
     <div class="card"><div class="card-body">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" class="vsim-filter">
             <strong>ماذا يرى الحساب؟</strong>
             <select name="account_id" aria-label="الحسابُ المرادُ معرفةُ ما يراه">
@@ -111,6 +115,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </select>
             <button type="submit" class="btn-primary"><i class="fa fa-magnifying-glass"></i> أجب</button>
         </form>
+            </div>
+        </div>
     </div></div>
 
     <?php if ($simulation !== null): ?>

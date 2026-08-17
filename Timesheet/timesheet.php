@@ -975,7 +975,7 @@ try {
 
 
             <div>
-              <label for="billing_meters_count"> ⏱️ عداد البداية</label>
+              <label for="start_hours"> ⏱️ عداد البداية</label>
               <div class="counter-input-group">
                 <div class="counter-field">
                   <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
@@ -1004,50 +1004,14 @@ try {
                  `.form-grid > div { display:block !important }`، فتخسر أمامه
                  القيمةُ السطرية العادية وكذلك jQuery .hide()/.show(). ولهذا
                  يبدّل الجافاسكربت العرضَ بـsetProperty(...,'important'). -->
-            <div id="billing_qty_block" class="ts-16">
+            <div id="billing_qty_block" class="ts-16 form-grid-full">
               <h3 class="ts-17">
                 <i class="fas fa-file-invoice-dollar"></i> الكمية المفوترة —
                 <span id="billing_unit_label" class="ts-18"></span>
               </h3>
               <div id="billing_qty_fields" class="ts-19">
                 <div id="billing_field_meter" class="ts-20">
-                  <label>عدد الأمتار المنفذة <span class="ts-21">*</span></label>
-              <div class="counter-input-group">
-                <div class="counter-field">
-                  <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
-                  <span>ساعات</span>
-                </div>
-                <span class="counter-separator">:</span>
-                <div class="counter-field">
-                  <input type="number" value="0" id="start_minutes" name="start_minutes" min="0" max="59" placeholder="00"
-                    required>
-                  <span>دقائق</span>
-                </div>
-                <span class="counter-separator">:</span>
-                <div class="counter-field">
-                  <input type="number" value="0" id="start_seconds" name="start_seconds" min="0" max="59" placeholder="00"
-                    required>
-                  <span>ثواني</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- ══ الكمية المفوترة — تظهر بوحدة عقد هذا التشغيل (D02 §2.6) ══
-                 الساعات تُسجَّل دائمًا للتشغيل والصيانة والمشغّل؛ أما ما يُفوتر
-                 فتحدّده وحدةُ العقد لا نوعُ المعدة. فمعدةٌ من النوع 1 على عقدٍ
-                 يفوتر بالمتر كانت بلا خانةٍ تسجّل فيها أمتارها — فلا تُسعَّر. -->
-            <!-- ⚠️ display:none !important إلزامي: ems-forms.css يفرض
-                 `.form-grid > div { display:block !important }`، فتخسر أمامه
-                 القيمةُ السطرية العادية وكذلك jQuery .hide()/.show(). ولهذا
-                 يبدّل الجافاسكربت العرضَ بـsetProperty(...,'important'). -->
-            <div id="billing_qty_block" class="ts-16">
-              <h3 class="ts-17">
-                <i class="fas fa-file-invoice-dollar"></i> الكمية المفوترة —
-                <span id="billing_unit_label" class="ts-18"></span>
-              </h3>
-              <div id="billing_qty_fields" class="ts-19">
-                <div id="billing_field_meter" class="ts-20">
-                  <label>عدد الأمتار المنفذة <span class="ts-21">*</span></label>
+                  <label for="billing_meters_count">عدد الأمتار المنفذة <span class="ts-21">*</span></label>
                   <input type="number" step="0.01" min="0" name="meters_count" id="billing_meters_count" value="0">
                 </div>
                 <div id="billing_field_ton" class="ts-20">
@@ -1101,7 +1065,7 @@ try {
               ساعات الاعطال </h3>
 
             <!-- ⚠️ تنبيه مهم للمستخدم -->
-            <div class="ts-25">
+            <div class="ts-25 form-grid-full">
               <div class="ts-26">
                 <div class="ts-27">⚠️</div>
                 <div class="ts-28">
@@ -1172,7 +1136,7 @@ try {
 
 
             <div>
-              <label for="counter_diff_display"> ⏱️ عداد النهاية </label>
+              <label for="end_hours"> ⏱️ عداد النهاية </label>
               <div class="counter-input-group">
                 <div class="counter-field">
                   <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
@@ -1192,27 +1156,7 @@ try {
             </div>
 
             <div>
-              <label>⚡ فرق العداد</label>
-              <div class="counter-input-group">
-                <div class="counter-field">
-                  <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
-                  <span>ساعات</span>
-                </div>
-                <span class="counter-separator">:</span>
-                <div class="counter-field">
-                  <input type="number" value="0" id="end_minutes" name="end_minutes" min="0" max="59" placeholder="00">
-                  <span>دقائق</span>
-                </div>
-                <span class="counter-separator">:</span>
-                <div class="counter-field">
-                  <input type="number" value="0" id="end_seconds" name="end_seconds" min="0" max="59" placeholder="00">
-                  <span>ثواني</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label>⚡ فرق العداد</label>
+              <label for="counter_diff_display">⚡ فرق العداد</label>
               <input type="text" name="counter_diff" id="counter_diff_display" readonly>
               <input type="hidden" id="counter_diff" />
             </div>
@@ -1220,27 +1164,27 @@ try {
               الاعطال </h3>
 
             <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم الإضافة) -->
-            <div class="ts-35">
+            <div class="ts-35 form-grid-full">
               <div class="ts-36">
-                <div>
+                <div class="form-group">
                   <label for="fc_event_type" class="ts-37">📋 نوع الحدث</label>
                   <select id="fc_event_type" class="ts-38">
                     <option value="">-- اختر نوع الحدث --</option>
                   </select>
                 </div>
-                <div>
+                <div class="form-group">
                   <label for="fc_main_cat" class="ts-37">🔧 الفئة الرئيسية</label>
                   <select id="fc_main_cat" disabled class="ts-39">
                     <option value="">-- اختر الفئة --</option>
                   </select>
                 </div>
-                <div>
+                <div class="form-group">
                   <label for="fc_sub_cat" class="ts-37">⚙️ الجزء / السبب</label>
                   <select id="fc_sub_cat" disabled class="ts-39">
                     <option value="">-- اختر الجزء --</option>
                   </select>
                 </div>
-                <div>
+                <div class="form-group">
                   <label for="fc_detail" class="ts-37">📝 تفصيل العطل</label>
                   <select id="fc_detail" disabled class="ts-39">
                     <option value="">-- اختر التفصيل --</option>
@@ -1259,7 +1203,7 @@ try {
             <input type="hidden" name="fault_details" id="fault_details" />
             <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
 
-            <div class="ts-41">
+            <div class="ts-41 form-grid-full">
               <div class="ts-42">
                 <strong class="ts-43">الأعطال المضافة لهذا التايم شيت</strong>
                 <button type="button" id="addFaultBtn" class="ts-44">+
@@ -1289,7 +1233,7 @@ try {
               </div>
             </div>
 
-            <div class="ts-51">
+            <div class="form-grid-full">
               <label for="general_notes">ملاحظات عامة</label>
               <textarea name="general_notes" id="general_notes"></textarea>
             </div>
@@ -1315,23 +1259,25 @@ try {
             </div>
             <div>
               <label for="extra_operator_hours">➕ الساعات الإضافية</label>
-              <input type="text" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
+              <input type="text" name="extra_operator_hours" id="extra_operator_hours" value="0">
             </div>
             <div>
-              <label for="operator_standby_hours">👷   </label>
-              <input type="text" name="operator_standby_hours" id="operator_standby_hours" class="form-control" value="0">
+              <label for="operator_standby_hours">👷 ساعات استعداد المشغل</label>
+              <input type="text" name="operator_standby_hours" id="operator_standby_hours" value="0">
             </div>
             <div>
-              <label for="operator_notes">ðŸ“ ملاحظات المشغل</label>
-              <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
+              <label for="operator_notes">📝 ملاحظات المشغل</label>
+              <textarea name="operator_notes" id="operator_notes"></textarea>
 
             </div>
 
             <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
 
-            <button type="submit" class="ts-52">
-              <i class="fas fa-save"></i> حفظ الساعات
-            </button>
+            <div class="pu-form-actions">
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> حفظ الساعات
+              </button>
+            </div>
 
           </div>
         </div>
@@ -1388,7 +1334,7 @@ try {
             <input type="hidden" name="id" id="timesheet_id" value="">
             <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
             <div>
-              <label for="date">السائق</label>
+              <label for="driver">السائق</label>
               <!-- <select name="employee_id" aria-label="السائق" required>
             <option value="">-- اختر السائق --</option>
             <?php
@@ -1413,32 +1359,7 @@ try {
 
             </div>
             <div>
-              <label> التاريخ </label>
-              <!-- <select name="employee_id" aria-label="السائق" required>
-            <option value="">-- اختر السائق --</option>
-            <?php
-            // (كتلة معطَّلة في الواجهة — الاستعلام يبقى منفَّذًا عبر البوابة حفاظًا على البايتات داخل التعليق)
-            $dr_res = array();
-            try {
-              $dr_res = $ts_gate->scopedQuery(array('scope' => array('employees' => 'employees')),
-                "SELECT id, name FROM employees WHERE 1=1" . ems_operation_types_in_sql($conn, '') . " AND {TENANT_SCOPE}");
-            } catch (\Throwable $t) { error_log('timesheet drivers list: ' . $t->getMessage()); }
-            foreach ($dr_res as $dr) {
-              echo "<option value='" . $dr['id'] . "'>" . $dr['name'] . "</option>";
-            }
-            ?>
-          </select> -->
-
-
-
-              <select id="driver" name="employee_id" required>
-                <option value="">-- اختر السائق --</option>
-              </select>
-
-
-            </div>
-            <div>
-              <label> التاريخ </label>
+              <label for="date"> التاريخ </label>
               <input type="date" name="date" id="date" value="<?php echo date('Y-m-d'); ?>" required />
             </div>
 
@@ -1451,7 +1372,7 @@ try {
             </div>
 
             <div>
-              <label for="executed_hours"> ⏱️ عداد البداية</label>
+              <label for="start_hours"> ⏱️ عداد البداية</label>
               <div class="counter-input-group">
                 <div class="counter-field">
                   <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
@@ -1462,34 +1383,10 @@ try {
               <input type="hidden" value="0" id="start_seconds" name="start_seconds" min="0" max="59" required>
             </div>
 
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-
             <h3 class="ts-34">
               الساعات </h3>
             <div>
-              <label>الساعات المنفذة</label>
-              <div class="counter-input-group">
-                <div class="counter-field">
-                  <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
-                  <span>ساعات</span>
-                </div>
-              </div>
-              <input type="hidden" value="0" id="start_minutes" name="start_minutes" min="0" max="59" required>
-              <input type="hidden" value="0" id="start_seconds" name="start_seconds" min="0" max="59" required>
-            </div>
-
-            <div></div>
-            <div></div>
-            <div></div>
-            <div></div>
-
-            <h3 class="ts-34">
-              الساعات </h3>
-            <div>
-              <label>الساعات المنفذة</label>
+              <label for="executed_hours">الساعات المنفذة</label>
               <input type="number" name="executed_hours" id="executed_hours" value="0">
             </div>
 
@@ -1548,7 +1445,7 @@ try {
               ساعات الاعطال </h3>
 
             <!-- ⚠️ تنبيه مهم للمستخدم -->
-            <div class="ts-25">
+            <div class="ts-25 form-grid-full">
               <div class="ts-26">
                 <div class="ts-27">⚠️</div>
                 <div class="ts-28">
@@ -1618,7 +1515,7 @@ try {
             </div>
 
             <div>
-              <label for="counter_diff_display"> ⏱️ عداد النهاية </label>
+              <label for="end_hours"> ⏱️ عداد النهاية </label>
               <div class="counter-input-group">
                 <div class="counter-field">
                   <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
@@ -1630,54 +1527,41 @@ try {
             </div>
 
             <div>
-              <label>⚡ فرق العداد</label>
-              <div class="counter-input-group">
-                <div class="counter-field">
-                  <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
-                  <span>ساعات</span>
-                </div>
-              </div>
-              <input type="hidden" value="0" id="end_minutes" name="end_minutes" min="0" max="59">
-              <input type="hidden" value="0" id="end_seconds" name="end_seconds" min="0" max="59">
-            </div>
-
-            <div>
-              <label>⚡ فرق العداد</label>
+              <label for="counter_diff_display">⚡ فرق العداد</label>
               <input type="text" name="counter_diff" id="counter_diff_display" readonly>
               <input type="hidden" id="counter_diff" />
             </div>
-            <div></div>
 
 
             <h3 class="ts-34">
               الاعطال </h3>
 
             <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم التعديل) -->
-            <div class="ts-35">
+            <div class="ts-35 form-grid-full">
               <div class="ts-36">
 
-                <div>
+                <div class="form-group">
                   <label for="fc_event_type_edit" class="ts-37">📋 نوع الحدث</label>
                   <select id="fc_event_type_edit" class="ts-38">
                     <option value="">-- اختر نوع الحدث --</option>
                   </select>
                 </div>
 
-                <div>
+                <div class="form-group">
                   <label for="fc_main_cat_edit" class="ts-37">🔧 الفئة الرئيسية</label>
                   <select id="fc_main_cat_edit" disabled class="ts-39">
                     <option value="">-- اختر الفئة --</option>
                   </select>
                 </div>
 
-                <div>
+                <div class="form-group">
                   <label for="fc_sub_cat_edit" class="ts-37">⚙️ الجزء / السبب</label>
                   <select id="fc_sub_cat_edit" disabled class="ts-39">
                     <option value="">-- اختر الجزء --</option>
                   </select>
                 </div>
 
-                <div>
+                <div class="form-group">
                   <label for="fc_detail_edit" class="ts-37">📝 تفصيل العطل</label>
                   <select id="fc_detail_edit" disabled class="ts-39">
                     <option value="">-- اختر التفصيل --</option>
@@ -1698,7 +1582,7 @@ try {
             <input type="hidden" name="fault_details" id="fault_details" />
             <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
 
-            <div class="ts-41">
+            <div class="ts-41 form-grid-full">
               <div class="ts-42">
                 <strong class="ts-43">الأعطال المضافة لهذا التايم شيت</strong>
                 <button type="button" id="addFaultBtn" class="ts-44">+
@@ -1728,7 +1612,7 @@ try {
               </div>
             </div>
 
-            <div class="ts-51">
+            <div class="form-grid-full">
               <label for="general_notes">ملاحظات عامة</label>
               <textarea name="general_notes" id="general_notes"></textarea>
             </div>
@@ -1739,7 +1623,6 @@ try {
 
 
 
-            <div></div>
 
             <div>
               <label for="operator_hours">⏱️ ساعات عمل المشغل</label>
@@ -1751,25 +1634,25 @@ try {
             </div>
             <input type="hidden" name="jackhammer_standby_hours" id="jackhammer_standby_hours" value="0">
             <input type="hidden" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
-            <input type="hidden" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
+            <input type="hidden" name="extra_operator_hours" id="extra_operator_hours" value="0">
             <div>
-              <label for="emsf_1507_11f90">👷   </label>
-              <input type="text" name="operator_standby_hours" class="form-control" value="0" id="emsf_1507_11f90">
+              <label for="emsf_1507_11f90">👷 ساعات استعداد المشغل</label>
+              <input type="text" name="operator_standby_hours" value="0" id="emsf_1507_11f90">
             </div>
             <div>
-              <label for="operator_notes">ðŸ“ ملاحظات المشغل</label>
-              <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
+              <label for="operator_notes">📝 ملاحظات المشغل</label>
+              <textarea name="operator_notes" id="operator_notes"></textarea>
             </div>
 
 
-            <div></div>
-            <div></div>
 
             <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
 
-            <button type="submit" class="ts-52">
-              <i class="fas fa-save"></i> حفظ الساعات
-            </button>
+            <div class="pu-form-actions">
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> حفظ الساعات
+              </button>
+            </div>
 
           </div>
         </div>
@@ -1845,7 +1728,7 @@ try {
 
 
             <div>
-              <label for="executed_hours"> ⏱️ عداد البداية</label>
+              <label for="start_hours"> ⏱️ عداد البداية</label>
               <div class="counter-input-group">
                 <div class="counter-field">
                   <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
@@ -1870,32 +1753,7 @@ try {
               ساعات العمل </h3>
 
             <div>
-              <label>الساعات المنفذة</label>
-              <div class="counter-input-group">
-                <div class="counter-field">
-                  <input type="number" value="0" id="start_hours" name="start_hours" placeholder="00">
-                  <span>ساعات</span>
-                </div>
-                <span class="counter-separator">:</span>
-                <div class="counter-field">
-                  <input type="number" value="0" id="start_minutes" name="start_minutes" min="0" max="59" placeholder="00"
-                    required>
-                  <span>دقائق</span>
-                </div>
-                <span class="counter-separator">:</span>
-                <div class="counter-field">
-                  <input type="number" value="0" id="start_seconds" name="start_seconds" min="0" max="59" placeholder="00"
-                    required>
-                  <span>ثواني</span>
-                </div>
-              </div>
-            </div>
-
-            <h3 class="ts-23">
-              ساعات العمل </h3>
-
-            <div>
-              <label>الساعات المنفذة</label>
+              <label for="executed_hours">الساعات المنفذة</label>
               <input type="number" name="executed_hours" id="executed_hours" value="0">
             </div>
 
@@ -1954,7 +1812,7 @@ try {
               ساعات الاعطال </h3>
 
             <!-- ⚠️ تنبيه مهم للمستخدم -->
-            <div class="ts-25">
+            <div class="ts-25 form-grid-full">
               <div class="ts-26">
                 <div class="ts-27">⚠️</div>
                 <div class="ts-28">
@@ -2025,7 +1883,7 @@ try {
 
 
             <div>
-              <label for="counter_diff_display"> ⏱️ عداد النهاية </label>
+              <label for="end_hours"> ⏱️ عداد النهاية </label>
               <div class="counter-input-group">
                 <div class="counter-field">
                   <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
@@ -2045,27 +1903,7 @@ try {
             </div>
 
             <div>
-              <label>⚡ فرق العداد</label>
-              <div class="counter-input-group">
-                <div class="counter-field">
-                  <input type="number" value="0" id="end_hours" name="end_hours" placeholder="00">
-                  <span>ساعات</span>
-                </div>
-                <span class="counter-separator">:</span>
-                <div class="counter-field">
-                  <input type="number" value="0" id="end_minutes" name="end_minutes" min="0" max="59" placeholder="00">
-                  <span>دقائق</span>
-                </div>
-                <span class="counter-separator">:</span>
-                <div class="counter-field">
-                  <input type="number" value="0" id="end_seconds" name="end_seconds" min="0" max="59" placeholder="00">
-                  <span>ثواني</span>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label>⚡ فرق العداد</label>
+              <label for="counter_diff_display">⚡ فرق العداد</label>
               <input type="text" name="counter_diff" id="counter_diff_display" readonly>
               <input type="hidden" id="counter_diff" />
             </div>
@@ -2073,27 +1911,27 @@ try {
               الاعطال </h3>
 
             <!-- قوائم منسدلة متتالية لنظام الأعطال (فورم الإضافة 2) -->
-            <div class="ts-35">
+            <div class="ts-35 form-grid-full">
               <div class="ts-36">
-                <div>
+                <div class="form-group">
                   <label for="fc_event_type_f3" class="ts-37">📋 نوع الحدث</label>
                   <select id="fc_event_type_f3" class="ts-38">
                     <option value="">-- اختر نوع الحدث --</option>
                   </select>
                 </div>
-                <div>
+                <div class="form-group">
                   <label for="fc_main_cat_f3" class="ts-37">🔧 الفئة الرئيسية</label>
                   <select id="fc_main_cat_f3" disabled class="ts-39">
                     <option value="">-- اختر الفئة --</option>
                   </select>
                 </div>
-                <div>
+                <div class="form-group">
                   <label for="fc_sub_cat_f3" class="ts-37">⚙️ الجزء / السبب</label>
                   <select id="fc_sub_cat_f3" disabled class="ts-39">
                     <option value="">-- اختر الجزء --</option>
                   </select>
                 </div>
-                <div>
+                <div class="form-group">
                   <label for="fc_detail_f3" class="ts-37">📝 تفصيل العطل</label>
                   <select id="fc_detail_f3" disabled class="ts-39">
                     <option value="">-- اختر التفصيل --</option>
@@ -2112,7 +1950,7 @@ try {
             <input type="hidden" name="fault_details" id="fault_details" />
             <input type="hidden" name="fault_items_json" id="fault_items_json" value="[]" />
 
-            <div class="ts-41">
+            <div class="ts-41 form-grid-full">
               <div class="ts-42">
                 <strong class="ts-43">الأعطال المضافة لهذا التايم شيت</strong>
                 <button type="button" id="addFaultBtn" class="ts-44">+
@@ -2142,7 +1980,7 @@ try {
               </div>
             </div>
 
-            <div class="ts-51">
+            <div class="form-grid-full">
               <label for="general_notes">ملاحظات عامة</label>
               <textarea name="general_notes" id="general_notes"></textarea>
             </div>
@@ -2168,25 +2006,26 @@ try {
             </div>
             <div>
               <label for="extra_operator_hours">➕ الساعات الإضافية</label>
-              <input type="text" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
+              <input type="text" name="extra_operator_hours" id="extra_operator_hours" value="0">
             </div>
             <div>
-              <label for="operator_standby_hours">ðŸ'· ساعات استعداد المشغل</label>
-              <input type="text" name="operator_standby_hours" id="operator_standby_hours" class="form-control" value="0">
+              <label for="operator_standby_hours">👷 ساعات استعداد المشغل</label>
+              <input type="text" name="operator_standby_hours" id="operator_standby_hours" value="0">
             </div>
             <div>
-              <label for="operator_notes">ðŸ" ملاحظات المشغل</label>
-              <textarea name="operator_notes" id="operator_notes" class="form-control"></textarea>
+              <label for="operator_notes">📝 ملاحظات المشغل</label>
+              <textarea name="operator_notes" id="operator_notes"></textarea>
             </div>
 
 
-            <div></div>
 
             <input type="hidden" name="type" id="type" value="<?php echo $_GET['type']; ?>" />
 
-            <button type="submit" class="ts-52">
-              <i class="fas fa-save"></i> حفظ الساعات
-            </button>
+            <div class="pu-form-actions">
+              <button type="submit" class="btn-primary">
+                <i class="fas fa-save"></i> حفظ الساعات
+              </button>
+            </div>
 
           </div>
         </div>
@@ -2201,21 +2040,21 @@ try {
       <table id="projectsTable" class="display" data-order='[[3, "desc"]]' data-page-length="10">
         <thead>
           <tr>
-            <th><i class="fas fa-hashtag"></i> #</th>
-            <th><i class="fas fa-id-badge"></i> ID</th>
-            <th><i class="fas fa-tool"></i> المعدة</th>
-            <th><i class="fas fa-calendar"></i> التاريخ</th>
-            <th><i class="fas fa-sun"></i> الوردية</th>
-            <th><i class="fas fa-hourglass"></i> الساعات المنفذة</th>
-            <th><i class="fas fa-cube"></i> الجردل</th>
-            <th><i class="fas fa-gavel"></i> الجاكهمر</th>
-            <th><i class="fas fa-plus-circle"></i> الإضافية</th>
-            <th><i class="fas fa-pause"></i> ساعات الاستعداد</th>
-            <th><i class="fas fa-wrench"></i> الأعطال</th>
-            <th><i class="fas fa-briefcase"></i> ساعات العمل</th>
-            <th><i class="fas fa-chart-bar"></i> الإجمالي</th>
-            <th><i class="fas fa-toggle-on"></i> الحالة</th>
-            <th><i class="fas fa-cogs"></i> إجراءات</th>
+            <th>#</th>
+            <th>ID</th>
+            <th>المعدة</th>
+            <th>التاريخ</th>
+            <th>الوردية</th>
+            <th>الساعات المنفذة</th>
+            <th>الجردل</th>
+            <th>الجاكهمر</th>
+            <th>الإضافية</th>
+            <th>ساعات الاستعداد</th>
+            <th>الأعطال</th>
+            <th>ساعات العمل</th>
+            <th>الإجمالي</th>
+            <th>الحالة</th>
+            <th>إجراءات</th>
             <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
             <th class="ems-fn-th" data-fn="1">رقم الصف</th>
             <th class="ems-fn-th" data-fn="1">الموقع</th>

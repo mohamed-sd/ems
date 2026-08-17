@@ -144,6 +144,10 @@ echo ems_states_bundle('لا ساعاتِ عملِ سائقين مطابقةً �
             <h5><i class="fas fa-filter"></i> فلاتر التقرير</h5>
         </div>
         <div class="card-body">
+                        <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+            <div class="filter">
+                <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+                <div class="filter-body">
             <form method="GET" class="form-grid">
                 <div>
                     <label for="emsf_458_82abe"><i class="fas fa-diagram-project"></i> المشروع</label>
@@ -191,6 +195,8 @@ echo ems_states_bundle('لا ساعاتِ عملِ سائقين مطابقةً �
 
                 <button type="submit"><i class="fa fa-search"></i> بحث</button>
             </form>
+                </div>
+            </div>
         </div>
     </div>
 

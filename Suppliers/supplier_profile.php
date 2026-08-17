@@ -119,6 +119,7 @@ try {
 $page_title = 'إيكوبيشن | بطاقة المورد';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
+require_once __DIR__ . '/../includes/profile_kit.php';   // عُدّةُ بطاقةِ الكِيان — التأليفُ بديلُ النسخ
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
@@ -127,9 +128,11 @@ $sf_supplier_id = intval($_GET['id'] ?? 0); $sf_active = 'profile';
 if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php';
 ?>
 
-<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ)
+        وبطاقتُها الآن على مكوّنِ «بطاقةِ الكِيان» الواحد — `assets/css/ems-profile.css`
+        عبر `includes/profile_kit.php`، كبطاقتَي العميلِ والموظف. */ ?>
 
-<div class="main supplier-profile-page ems-unified-page-shell">
+<div class="main supplier-profile-page ems-profile ems-unified-page-shell">
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
     $header_title   = 'بطاقة المورد';
@@ -144,15 +147,36 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
 
     <?php echo ems_states_bundle('لا بياناتَ مسجَّلةً لهذا المورد بعد', 'ستظهر معداتُه وعقودُه هنا فورَ تسجيلِها'); ?>
 
-    <div class="profile-card spf-lead-card">
-        <h2 class="spf-lead-title"><?php echo htmlspecialchars($supplier['name']); ?></h2>
-        <div class="label">
-            الكود: <?php echo htmlspecialchars($supplier['supplier_code'] ?: '-'); ?> |
-            النوع: <?php echo htmlspecialchars($supplier['supplier_type'] ?: 'غير محدد'); ?> |
-            الهاتف: <?php echo htmlspecialchars($supplier['phone'] ?: '-'); ?> |
-            الحالة: <?php echo (intval($supplier['status']) === 1) ? 'نشط' : 'معلق'; ?>
-        </div>
-    </div>
+    <?php
+    /* ══ لوحُ الهوية ═══════════════════════════════════════════════════════
+       كان سطرًا واحدًا تفصلُه شُرَطٌ رأسية: «الكود | النوع | الهاتف | الحالة»
+       — يُقرأ بالبحثِ لا بالنظر، والحالةُ فيه **نصٌّ بلا لون** فلا يُميَّز
+       الموقوفُ من النشطِ إلا بالقراءة. صار: الحالةُ شارةً ملوَّنةً بجانبِ
+       الاسم، والهويةُ رقائقَ، والاتصالُ حقائقَ معنونةً — والغائبُ يُعلَن «—». */
+    echo ems_profile_hero(array(
+        'name'   => $supplier['name'],
+        'icon'   => 'fas fa-truck-field',
+        'status' => array(
+            'text' => (intval($supplier['status']) === 1) ? 'نشط' : 'معلق',
+            'tone' => (intval($supplier['status']) === 1) ? 'ok' : 'danger',
+            'icon' => (intval($supplier['status']) === 1) ? 'fas fa-circle-check' : 'fas fa-circle-pause',
+        ),
+        'chips'  => array(
+            array('text' => $supplier['supplier_code'], 'icon' => 'fas fa-hashtag', 'mono' => true),
+            array('text' => $supplier['supplier_type'] ?: 'نوعٌ غيرُ محدد', 'icon' => 'fas fa-tag'),
+        ),
+        /* الحقولُ من أعمدةِ `suppliers` المقيسةِ حرفًا — لا عمودَ يُفترض:
+           العنوانُ فيها `full_address` لا `address`. */
+        'facts'  => array(
+            array('label' => 'الهاتف',        'value' => $supplier['phone']),
+            array('label' => 'البريد',        'value' => $supplier['email']),
+            array('label' => 'جهةُ الاتصال',  'value' => $supplier['contact_person_name']),
+            array('label' => 'هاتفُ الاتصال', 'value' => $supplier['contact_person_phone']),
+            array('label' => 'السجلُّ التجاري', 'value' => $supplier['commercial_registration']),
+            array('label' => 'العنوان',       'value' => $supplier['full_address']),
+        ),
+    ));
+    ?>
 
     <?php
     /* ── INJ-0158 · بطاقاتُ المؤشرِ بعقدِها السباعيِّ ────────────────────────────
@@ -239,9 +263,22 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <?php endif; ?>
     </div>
 
-    <div class="card spf-section-card">
-        <div class="card-header"><h3 class="h5"><i class="fas fa-truck" aria-hidden="true"></i> المعدات المرتبطة بالمورد</h3></div>
-        <div class="card-body">
+    <?php
+    /* ══ محطّتا المورد ══════════════════════════════════════════════════════
+       كانت بطاقتانِ بوتستراب (`.card` + `.card-header` + `.card-body`) —
+       لغةٌ ثالثةٌ بجانبِ لغةِ العميلِ ولغةِ الموظف. صارتا قسمَين في المكوّنِ
+       الواحد: أعلى عشرِ معداتٍ بالساعات، ثم آخرُ عشرةِ عقود. */
+    echo ems_profile_group_open(array(
+        'title' => 'ما يقدّمه المورد',
+        'icon'  => 'fas fa-handshake',
+        'meta'  => 'معدّاتٌ ← عقودٌ',
+    ));
+    echo ems_profile_section_open(array(
+        'title' => 'المعدات المرتبطة بالمورد',
+        'icon'  => 'fas fa-truck',
+        'meta'  => 'أعلى عشرٍ بالساعات',
+    ));
+    ?>
             <table id="supplierEquipmentsTable" class="display spf-table">
                 <thead><tr><th>المعدة</th><th>الكود</th><th>عدد المشاريع</th><th>الساعات</th></tr></thead>
                 <tbody>
@@ -255,12 +292,13 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        </div>
-    </div>
+    <?php echo ems_profile_section_close(); ?>
 
-    <div class="card">
-        <div class="card-header"><h3 class="h5"><i class="fas fa-file-contract" aria-hidden="true"></i> آخر عقود المورد</h3></div>
-        <div class="card-body">
+    <?php echo ems_profile_section_open(array(
+        'title' => 'آخر عقود المورد',
+        'icon'  => 'fas fa-file-contract',
+        'meta'  => 'آخرُ عشرة',
+    )); ?>
             <table id="supplierContractsTable" class="display spf-table">
                 <thead><tr><th>المشروع</th><th>تاريخ التوقيع</th><th>مستهدف شهري</th><th>إجمالي ساعات</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -284,16 +322,18 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        </div>
-    </div>
+    <?php echo ems_profile_section_close(); ?>
+
+    <?php /* NAV-01 §5-④ (update0006 B-03): البلاغاتُ المتصلة — كانت تُضمَّن
+             **بعد** إغلاقِ الغلافِ فتظهر بجانبِ الشاشة. صارت قسمًا في محطّةِ
+             المورد، فتاريخُ بلاغاتِه جزءٌ من ملفِّه لا ملحقٌ خارجَه. */
+    $rt_kind = 'supplier'; $rt_ref = $supplier_id;
+    include __DIR__ . '/../includes/related_tickets_tab.php'; ?>
+
+    <?php echo ems_profile_group_close(); ?>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <!-- تهيئة الجدولين انتقلت إلى المكوّن المركزي (assets/js/ui-unification.js —
      initializeMissingDataTables): لغةٌ عربية وضبطُ أعمدةٍ وزرُّ إكسل موحَّد. -->
-
-
-<?php // NAV-01 §5-④ (update0006 B-03): البلاغاتُ المتصلة
-$rt_kind = 'supplier'; $rt_ref = $supplier_id;
-include __DIR__ . '/../includes/related_tickets_tab.php'; ?>

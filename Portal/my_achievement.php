@@ -68,6 +68,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
 
     <div class="card"><div class="card-body">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" class="ems-pta-filter">
             <strong>الصفة:</strong>
             <select name="capacity_id" aria-label="الصفة">
@@ -85,6 +89,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <a href="?capacity_id=<?php echo $capId; ?>&from=<?php echo date('Y-m-01'); ?>&to=<?php echo date('Y-m-d'); ?>">شهر</a> ·
                 <a href="?capacity_id=<?php echo $capId; ?>&from=<?php echo date('Y-01-01'); ?>&to=<?php echo date('Y-m-d'); ?>">سنة</a></small>
         </form>
+            </div>
+        </div>
     </div></div>
 
     <?php if ($res !== null && !$res['ok']): ?>

@@ -121,11 +121,17 @@ $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 echo ems_states_bundle('لا نشاطَ معتمدًا للإدارةِ في هذه المدة', 'وسّع «من/إلى» أعلاه أو تحقق من توفرِ السجلات');
 ?>
+    <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+  <div class="filter">
+      <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+      <div class="filter-body">
   <form method="get" class="ems-form ems-dach-filter">
     <div><label for="emsf_368_d3c6f">من</label><input type="date" name="from" class="form-control" id="emsf_368_d3c6f" aria-label="من — بداية المدة" value="<?= htmlspecialchars($from) ?>"></div>
     <div><label for="emsf_369_142f6">إلى</label><input type="date" name="to" class="form-control" id="emsf_369_142f6" aria-label="إلى — نهاية المدة" value="<?= htmlspecialchars($to) ?>"></div>
     <button class="btn btn-primary">عرض</button>
   </form>
+      </div>
+  </div>
   <?php $allZero = true; foreach ($metrics as $m2) if ($m2[1] > 0) { $allZero = false; break; }
   if ($allZero): ?>
     <div class="alert alert-warning">لا نشاطَ معتمدًا في هذه المدة — وسّع «من/إلى» أعلاه.</div>

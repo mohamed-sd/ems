@@ -99,6 +99,10 @@ include('../insidebar.php'); ?>
 			<h5><i class="fas fa-filter"></i> فلاتر التقرير</h5>
 		</div>
 		<div class="card-body">
+						<!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+			<div class="filter">
+			    <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+			    <div class="filter-body">
 			<form method="GET" class="form-grid fc-filter-grid">
 				<div>
 					<label class="fc-filter-label" for="emsf_455_dd138"><i class="fas fa-calendar-day"></i> التاريخ</label>
@@ -156,6 +160,8 @@ include('../insidebar.php'); ?>
 
 				<button type="submit" class="add-btn"><i class="fa fa-search"></i> بحث</button>
 			</form>
+			    </div>
+			</div>
 		</div>
 	</div>
 

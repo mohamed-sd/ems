@@ -128,6 +128,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <h5><i class="fas fa-filter"></i> فلاتر التقرير</h5>
         </div>
         <div class="card-body fc-filter-body">
+                        <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+            <div class="filter">
+                <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+                <div class="filter-body">
             <form method="GET" class="fc-filter-bar">
                 <div>
                     <label class="fc-filter-label" for="emsf_465_8d756"><i class="fas fa-calendar-day"></i> التاريخ:</label>
@@ -190,6 +194,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> بحث</button>
                 </div>
             </form>
+                </div>
+            </div>
         </div>
     </div>
 

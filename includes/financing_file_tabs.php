@@ -6,6 +6,7 @@
  * الاستعمال: $ff_op_id = ...; $ff_active = 'terms'; include هذا الملف.
  */
 if (!isset($ff_op_id)) { return; }
+require_once __DIR__ . '/file_tabs_kit.php';
 $ff_id  = intval($ff_op_id);
 $ff_act = isset($ff_active) ? $ff_active : 'terms';
 $ff_tabs = array(
@@ -16,12 +17,13 @@ $ff_tabs = array(
     'ledger'   => array('الحركةُ في الدفتر',    'Financing/operation_profile.php?id=%d&tab=ledger'),
     'docs'     => array('المستنداتُ والسجل',    'Financing/operation_profile.php?id=%d&tab=docs'),
 );
-?>
-<div class="ff-tabs" dir="rtl" style="margin:0 0 12px">
-  <ul class="nav nav-tabs" style="flex-wrap:wrap">
-    <?php foreach ($ff_tabs as $tk => $tv): ?>
-      <li class="nav-item"><a class="nav-link<?= $tk === $ff_act ? ' active' : '' ?>"
-          href="../<?= sprintf($tv[1], $ff_id) ?>"><?= $tv[0] ?></a></li>
-    <?php endforeach; ?>
-  </ul>
-</div>
+$ff_items = array();
+foreach ($ff_tabs as $tk => $tv) {
+    $ff_items[] = array('text' => $tv[0], 'href' => '../' . sprintf($tv[1], $ff_id),
+                        'active' => ($tk === $ff_act));
+}
+
+ems_file_tabs(array(
+    'label' => 'ملفُّ عمليةِ التمويل',
+    'tabs'  => $ff_items,
+));

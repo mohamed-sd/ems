@@ -1,0 +1,389 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   ems-filters.css — صندوقُ فلاترِ البحث · مصدرُ التصميمِ الوحيدُ في النظام
+   ───────────────────────────────────────────────────────────────────────────
+   ◆ **الأصل**: تصميمُ شاشةِ العملاء (`Clients/clients.php:860`). نُقلت قواعدُه
+     من `ems-tables.css` إلى هنا فصار للفلاترِ ملفٌّ يملكها بدلَ فقرةٍ تائهةٍ
+     في ملفِّ الجداول. والقيمُ ليست اجتهادًا — هي **المقيسُ المحسوبُ من
+     المتصفحِ** على الأصلِ قبلَ النقل (`tools/_filter_probe.php`):
+        الصندوق  #eeeeee · حدٌّ 1px #dddddd · نصفُ قطر 25px · حشو 10px
+        الترويسة #e6e6e6 · نصفُ قطر 25px · 20px/800 · #2c2c2c · فجوة 10px
+        الجسم    flex · wrap · align-items:flex-end · فجوة 14px
+        الحقل    عمودٌ · فجوة 6px · flex:1 1 180px · أدنى 150px
+        الضابط   ارتفاع 38px · نصفُ قطر 16px · حدٌّ 1px #999 · حشو 7px 12px
+        تطبيق    ارتفاع 42px · قرصٌ 999px ·  إعادةُ ضبط  دائرةٌ 42×42
+
+   ◆ **البنيةُ المعتمدة — وهي بنيةُ النظامِ القائمةُ لا اختراعًا**
+        <div class="filter">
+          <div class="filter-title">…فلاتر البحث…</div>
+          <div class="filter-body">
+            <form method="get" …>            ← اختياريٌّ: الصندوقُ يلفُّ النموذجَ
+              <div class="filter-field">…</div> × N
+              <div class="filter-actions">…</div>
+            </form>
+          </div>
+        </div>
+     ◆ ولماذا **يلفُّ** الصندوقُ النموذجَ ولا يكون النموذجُ هو الصندوق:
+       لأن الشاشاتِ الأربعَ والثلاثين تحمل في نماذجِها محدداتٍ من صنفِ
+       `#form > .form-group` في شفرتِها ووثائقِها. فوضعُ غلافٍ **حولَ** النموذج
+       لا يمسُّ أبناءَه المباشرين، بينما حقنُ `.filter-body` **داخلَه** يزيح
+       كلَّ ابنٍ درجةً ويكسر تلك المحددات. وهذه بنيةُ `Contracts/penalties.php`
+       و`Tickets/ticket_dashboard.php` القائمةُ سلفًا — فالتوحيدُ إلى مألوف.
+
+   ◆ **صفرُ مساحةٍ فارغة**: `flex:1 1 180px` يجعل حقولَ كلِّ سطرٍ تتقاسم فائضَه
+     فيمتلئ السطرُ الأخيرُ كما يمتلئ الأول. وقِيس قبلَ ذلك: ثلاثةُ `col-md-3`
+     تركت **187 بكسلًا فارغةً من 753** — ثلاثةُ أرباعٍ لا تملأ سطرًا. فتُبطَل
+     أعمدةُ بوتستراب وشبكاتُ الصفحاتِ داخلَ الصندوق.
+
+   ◆ **الوسمُ `.filter-field`** يضعه `assets/js/ems-filters.js` على كلِّ غلافِ
+     حقلٍ أيًّا كان اسمُه (`col-md-3` · `form-group` · `ems-col-3` · `field`)،
+     فالتخطيطُ لا يشترط اسمًا. وللشكلَين المسطَّحِ والملفوفِ **سنَدٌ موضعيٌّ**
+     أدناه يعمل حتى لو لم يُنفَّذ العون.
+
+   ◆ **التحميل**: آخرَ سلسلةِ الأنماطِ في `inheader.php` — بعدَ `ems-screens.css`
+     تحديدًا، فذاك يحمل بقايا الفلاترِ الموضعيةَ للشاشاتِ المهاجرة وهذا يغلبُها.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── ① الصندوق ─────────────────────────────────────────────────────────── */
+body.ems-site .main .filter {
+  background: var(--c-eeeeee, #eeeeee) !important;
+  border: 1px solid var(--c-dddddd, #dddddd) !important;
+  border-radius: 25px !important;
+  margin-bottom: 5px !important;
+  overflow: hidden !important;
+  direction: rtl !important;
+  padding: 10px !important;
+  display: block !important;
+  box-shadow: none !important;
+  grid-template-columns: none !important;
+}
+
+/* ── ② الترويسة ────────────────────────────────────────────────────────── */
+body.ems-site .main .filter > .filter-title {
+  background: var(--c-e6e6e6, #e6e6e6) !important;
+  border-radius: 25px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;   /* البداية = اليمين في RTL */
+  gap: 10px !important;
+  margin: 0 0 10px !important;
+  padding: 5px !important;
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: var(--c-2c2c2c, #2c2c2c) !important;
+  line-height: 1.5 !important;
+}
+body.ems-site .main .filter > .filter-title .filter-title-icon {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 auto !important;
+}
+
+/* عدّادُ المفعَّل — يشغل فراغَ الترويسةِ الأيسرَ بدلَ أن يبقى خاليًا، ويحفظ
+   قدرةً كانت في `.ems-filterbar` قبلَ التوحيد (عدُّ الفلاترِ المفعَّلة). */
+body.ems-site .main .filter > .filter-title .filter-count {
+  margin-inline-start: auto !important;
+  flex: 0 0 auto !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--c-555555, #555555) !important;
+  background: var(--c-surface, #ffffff) !important;
+  border: 1px solid var(--c-dddddd, #dddddd) !important;
+  border-radius: 999px !important;
+  padding: 3px 12px !important;
+  white-space: nowrap !important;
+}
+body.ems-site .main .filter.has-active > .filter-title .filter-count {
+  background: var(--c-fffdf5, #fffdf5) !important;
+  border-color: var(--c-brand-gold, #f4c542) !important;
+  color: var(--c-2a2300, #2a2300) !important;
+}
+
+/* ── ③ الحاويةُ الصفّية — الجسمُ، والنموذجُ الملفوفُ داخلَه ───────────── */
+body.ems-site .main .filter > .filter-body,
+body.ems-site .main .filter > .filter-body > form {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: flex-end !important;
+  gap: 14px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: auto !important;
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  grid-template-columns: none !important;
+}
+body.ems-site .main .filter > .filter-body > form { flex: 1 1 100% !important; }
+
+/* أغلفةُ الشبكاتِ الموروثةُ تذوب فيصير أبناؤها أبناءَ الصفّ — بلا تعديلِ DOM.
+   والعونُ يسم أبناءَها `.filter-field` فيلتقطُهم محدِّدُ الحقلِ أدناه. */
+/* ◆ `form` مستثنًى صراحةً: النموذجُ الملفوفُ يحمل غالبًا `form-grid` نفسَه،
+   ولو ذاب لفقدَ صندوقَه الصفّيَّ وانفرط أبناؤه على الجسمِ بلا فجوةٍ ولا محاذاة. */
+body.ems-site .main .filter :is(.row, .form-grid, .ems-grid, .form-row, .filter-grid):not(form) {
+  display: contents !important;
+}
+
+/* ── ④ الحقل ───────────────────────────────────────────────────────────── */
+/* ◆ **حرَسُ الشبكاتِ في السنَدِ الموضعيّ**: غلافُ `.row`/`.form-grid` يقع ابنًا
+   مباشرًا للمضيفِ كما يقع الحقلُ، فلولا استثناؤه لغلبَ السنَدُ الموضعيُّ
+   (خصوصيتُه ٠،٥،٨) قاعدةَ الذوبانِ (٠،٤،٢) فصارَ الغلافُ حقلًا واحدًا وانهار
+   الصفُّ إلى عمود. قِيس فعلًا في `fleet_failures`: ثلاثةُ أعمدةٍ كلٌّ في سطر. */
+/* ⓐ بالوسمِ الذي يضعه العون — يعمل مهما عمُقَ الغلافُ أو غرُب اسمُه */
+body.ems-site .main .filter .filter-field,
+/* ⓑ سنَدٌ موضعيٌّ بلا عون: ابنُ الجسمِ المباشرُ في الشكلِ المسطَّح */
+body.ems-site .main .filter > .filter-body > :not(.filter-actions):not(form):not(script):not(style):not(br):not(button):not(a):not(input):not(.filter-title):not(.row):not(.form-grid):not(.ems-grid):not(.form-row):not(.filter-grid),
+/* ⓒ وسنَدٌ موضعيٌّ في الشكلِ الملفوف */
+body.ems-site .main .filter > .filter-body > form > :not(.filter-actions):not(script):not(style):not(br):not(button):not(a):not(input):not(.row):not(.form-grid):not(.ems-grid):not(.form-row):not(.filter-grid),
+/* ⓓ وسنَدٌ لأبناءِ الغلافِ الذائبِ — درجةً أعمقَ، بلا عونٍ أيضًا */
+body.ems-site .main .filter > .filter-body > :is(.row, .form-grid, .ems-grid, .form-row, .filter-grid) > :not(.filter-actions):not(script):not(style):not(br):not(button):not(a):not(input),
+body.ems-site .main .filter > .filter-body > form > :is(.row, .form-grid, .ems-grid, .form-row, .filter-grid) > :not(.filter-actions):not(script):not(style):not(br):not(button):not(a):not(input) {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-end !important;
+  gap: 6px !important;
+  flex: 1 1 180px !important;      /* ← النموُّ هو مَن يملأ السطرَ الأخير */
+  min-width: 150px !important;
+  max-width: 100% !important;
+  width: auto !important;          /* يُبطل عرضَ col-md-* داخلَ الصندوق */
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  border-radius: 20px !important;
+}
+
+/* حقلٌ يطلب سطرًا كاملًا صراحةً (بحثٌ نصِّيٌّ طويل) */
+body.ems-site .main .filter .filter-field.is-wide { flex: 1 1 100% !important; }
+
+/* ملاحظةٌ نصّيةٌ داخلَ الصندوق — تمتدُّ على ما بقي فلا تترك حفرةً بعدَها */
+body.ems-site .main .filter .filter-note {
+  display: flex !important;
+  align-items: center !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 13px !important;
+  color: var(--c-555555, #555555) !important;
+}
+
+/* عنوانُ الحقل */
+body.ems-site .main .filter .filter-field > :is(label, .form-label),
+body.ems-site .main .filter > .filter-body > * > :is(label, .form-label),
+body.ems-site .main .filter > .filter-body > form > * > :is(label, .form-label) {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* الضابط — يُنسَّق بالموضعِ فالشاشةُ التي تكتب <select> عاريًا بلا
+   `.form-control` تبدو كالتي تكتبه بها. القيمُ مقيسةٌ من الأصل. */
+body.ems-site .main .filter > .filter-body :is(input, select, textarea):not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="hidden"]):not([type="reset"]) {
+  width: 100% !important;
+  /* عرضٌ أدنى موضعيٌّ على ضابطٍ يكسر الصندوقَ على الجوّال: قِيس في
+     `Suppliers/supplier_capacity.php` أن `min-width:360px` على قائمةِ العقودِ
+     دفعت الصندوقَ إلى ٣٦٠ بكسلًا داخلَ ٣٤١ متاحة. والضابطُ عرضُه من صفِّه. */
+  min-width: 0 !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  box-sizing: border-box !important;
+  border: 1px solid var(--c-999999, #999999) !important;
+  border-radius: 16px !important;
+  background-color: var(--c-surface, #ffffff) !important;
+  background-image: none !important;
+  padding: 7px 12px !important;
+  font-size: 14.4px !important;
+  font-family: inherit !important;
+  color: var(--c-171717, #171717) !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+body.ems-site .main .filter > .filter-body textarea {
+  height: auto !important;
+  min-height: 38px !important;
+  padding: 7px 12px !important;
+}
+body.ems-site .main .filter > .filter-body :is(input, select, textarea):not([type="checkbox"]):not([type="radio"]):focus {
+  border-color: var(--c-brand-gold, #f4c542) !important;
+  background-color: var(--c-fffdf5, #fffdf5) !important;
+  box-shadow: 0 0 0 3px var(--c-rgba24419766025, rgba(244,197,66,.25)) !important;
+  outline: none !important;
+  border-radius: 20px !important;
+}
+/* الاختيارُ والراديو يبقيان بحجمِهما */
+body.ems-site .main .filter > .filter-body :is(input[type="checkbox"], input[type="radio"]) {
+  width: auto !important; height: auto !important; min-height: 0 !important;
+  border-radius: 3px !important; padding: 0 !important;
+}
+
+/* ── ⑤ الأفعال ─────────────────────────────────────────────────────────── */
+body.ems-site .main .filter .filter-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex: 0 0 auto !important;
+  margin-inline-start: auto !important;
+  /* أدواتُ تباعدِ بوتستراب (`mb-3`) تُستعمل على غلافِ الأزرارِ في بعضِ
+     الشاشات، وهامشُها السفليُّ يزيح قاعَ المجموعةِ عن قاعِ صفِّها فتبدو
+     كأنها في سطرٍ آخر. يُصفَّر الهامشُ الرأسيُّ داخلَ الصندوقِ وحدَه. */
+  margin-block: 0 !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  width: auto !important;
+  border: none !important;
+  background: none !important;
+}
+/* أزرارٌ نزلت سطرًا وحدَها — بلا حفرةٍ قبلَها (يضع العونُ الوسمَ بالقياس) */
+body.ems-site .main .filter .filter-actions.is-alone {
+  margin-inline-start: 0 !important;
+  flex: 1 1 100% !important;
+  justify-content: flex-start !important;
+}
+/* زرٌّ سائبٌ لم يُجمَع في `.filter-actions` — يُدفع لطرفِ السطرِ كالمجموعة */
+body.ems-site .main .filter > .filter-body > :is(button, a.btn, input[type="submit"]),
+body.ems-site .main .filter > .filter-body > form > :is(button, a.btn, input[type="submit"]) {
+  flex: 0 0 auto !important;
+  margin-inline-start: auto !important;
+}
+body.ems-site .main .filter > .filter-body > :is(button, a.btn, input[type="submit"]) ~ :is(button, a.btn, input[type="submit"]),
+body.ems-site .main .filter > .filter-body > form > :is(button, a.btn, input[type="submit"]) ~ :is(button, a.btn, input[type="submit"]) {
+  margin-inline-start: 0 !important;
+}
+
+/* الزرُّ الرئيسيُّ — قرصٌ ذهبيّ */
+body.ems-site .main .filter :is(.filter-actions, .filter-body) :is(.btn-primary, button[type="submit"], input[type="submit"]):not(.btn-close):not(.close):not(.dt-button):not(.btn-secondary) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  width: auto !important;
+  box-sizing: border-box !important;
+  padding: 0 22px !important;
+  border: none !important;
+  border-radius: 999px !important;
+  background-color: var(--c-brand-gold, #f4c542) !important;
+  background-image: none !important;
+  color: var(--c-2a2300, #2a2300) !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  box-shadow: 0 2px 6px var(--c-rgba24419766045, rgba(244,197,66,.45)) !important;
+  transition: background-color .18s ease, transform .18s ease !important;
+  white-space: nowrap !important;
+}
+body.ems-site .main .filter :is(.filter-actions, .filter-body) :is(.btn-primary, button[type="submit"], input[type="submit"]):not(.btn-close):not(.close):not(.dt-button):not(.btn-secondary):hover {
+  background-color: var(--c-e6b52f, #e6b52f) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* زرُّ إعادةِ الضبط — دائرةٌ بيضاء */
+body.ems-site .main .filter :is(.filter-actions, .filter-body) .btn-secondary:not(.btn-close):not(.close):not(.dt-button) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 42px !important;
+  min-width: 42px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  box-sizing: border-box !important;
+  padding: 0 !important;
+  border: 1px solid var(--c-cfcfcf, #cfcfcf) !important;
+  border-radius: 50% !important;
+  background-color: var(--c-surface, #ffffff) !important;
+  background-image: none !important;
+  color: var(--c-555555, #555555) !important;
+  font-size: 15px !important;
+  font-weight: 400 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: background-color .18s ease, color .18s ease, transform .25s ease !important;
+}
+body.ems-site .main .filter :is(.filter-actions, .filter-body) .btn-secondary:not(.btn-close):not(.close):not(.dt-button):hover {
+  background-color: var(--c-f0f0f0, #f0f0f0) !important;
+  color: var(--c-222222, #222222) !important;
+  transform: rotate(-90deg) !important;
+}
+/* الدائرةُ أيقونةٌ لا كلمة — نصُّها يُخفى إن وُجد */
+body.ems-site .main .filter .filter-actions .btn-secondary .btn-label { display: none !important; }
+
+/* ومضةُ التأكيدِ بعدَ النقر (تستعملها شاشاتُ المعدّاتِ الثلاث) — صنفٌ مخصَّصٌ
+   لا يُنازع تصميمَ الزرِّ، بديلًا عن نزعِ `btn-secondary` الذي كان يُعرّي الزرَّ
+   من شكلِه بعدَ أولِ نقرةٍ ولا يُعيدُه. */
+body.ems-site .main .filter .filter-actions .btn-secondary.is-flash {
+  background-color: var(--c-brand-gold, #f4c542) !important;
+  color: var(--c-2a2300, #2a2300) !important;
+  border-color: var(--c-brand-gold, #f4c542) !important;
+}
+
+/* المخفيُّ لا يشغل حيّزًا في الصفّ */
+body.ems-site .main .filter > .filter-body [hidden],
+body.ems-site .main .filter > .filter-body > .is-hidden,
+body.ems-site .main .filter > .filter-body > form > .is-hidden { display: none !important; }
+
+/* ── ⑥ لا شريطَ ترشيحٍ ثانٍ فوقَ الصندوق ───────────────────────────────── */
+/* `ui-unification.js` كان يلفُّ نماذجَ get بشريطِ `.ems-filterbar` — ولو بقي
+   لظهر رأسان: «الترشيح» فوقَ «فلاتر البحث». والعُدَّةُ عُدِّلت لتتخطّى
+   `.filter`، وهذا الحارسُ يمنع الازدواجَ لو خُدم سكربتٌ قديمٌ من الذاكرة. */
+body.ems-site .main .filter .ems-filterbar-head { display: none !important; }
+body.ems-site .main .filter.ems-filterbar,
+body.ems-site .main .filter .ems-filterbar {
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+/* ── ⑦ صندوقٌ وحدَه في بطاقة ⇒ لا صندوقَ داخلَ صندوق ────────────────────
+   ستٌّ وعشرون من الأربعِ والثلاثين كان نموذجُها ساكنًا في `.card-body`. ولو
+   بقيت البطاقةُ بحُليّها لظهر صندوقٌ رماديٌّ داخلَ بطاقةٍ بيضاء — وهو **ليس**
+   شكلَ شاشةِ العملاءِ حيث يقف الصندوقُ حرًّا في `.main`.
+   فتُنزع حُليُّ البطاقةِ **بشرطٍ صارم**: أن يكون الصندوقُ ابنَها الوحيد
+   (`:only-child`). وبطاقةٌ فيها محتوًى آخرُ تبقى كما هي — فالقاعدةُ لا تمسُّ
+   إلا البطاقةَ التي وُجدت للفلاترِ وحدَها. */
+body.ems-site .main .card-body:has(> .filter:only-child) {
+  padding: 0 !important;
+  background: none !important;
+  border: none !important;
+}
+body.ems-site .main .card:has(> .card-body:only-child > .filter:only-child) {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+/* ── ⑧ الجوّال ─────────────────────────────────────────────────────────── */
+@media (max-width: 767.98px) {
+  body.ems-site .main .filter .filter-field,
+  body.ems-site .main .filter > .filter-body > :not(.filter-actions):not(form):not(button):not(a):not(input),
+  body.ems-site .main .filter > .filter-body > form > :not(.filter-actions):not(button):not(a):not(input) {
+    flex: 1 1 100% !important;
+  }
+  body.ems-site .main .filter .filter-actions {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+    margin-inline-start: 0 !important;
+    justify-content: flex-start !important;
+  }
+  body.ems-site .main .filter > .filter-title { font-size: 17px !important; }
+  body.ems-site .main .filter > .filter-title .filter-count { font-size: 12px !important; }
+}
+
+/* ── ⑨ تفضيلُ تقليلِ الحركة ────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  body.ems-site .main .filter :is(.btn-primary, .btn-secondary, button, a) { transition: none !important; }
+  body.ems-site .main .filter :is(.btn-primary, .btn-secondary, button, a):hover { transform: none !important; }
+}

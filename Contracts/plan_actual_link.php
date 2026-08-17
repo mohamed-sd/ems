@@ -172,6 +172,10 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-table-columns"></i>
         المخطَّطُ · المنفَّذُ · المفوتَر — للعقد #<?php echo $CID; ?></h5></div>
     <div class="card-body">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" class="ems-form pal-filter">
             <input type="hidden" name="contract" value="<?php echo $CID; ?>">
             <div class="form-group"><label for="emsf_81_e9776">من شهر</label>
@@ -183,6 +187,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <div class="pal-filter-go"><button type="submit" class="btn-primary">
                 <i class="fa fa-filter"></i> اعرض</button></div>
         </form>
+            </div>
+        </div>
 
         <div class="pal-chips">
             <span class="badge badge-secondary pal-badge-pad">مخطَّط

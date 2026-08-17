@@ -52,11 +52,58 @@ function ugi_login($user) {
  *    .nav-group-head`). فلمّا غيّر مولّدُ السايدبارِ عددَ المجموعاتِ تغيّر عددُ
  *    «أزرارِ الشاشة» في شاشاتٍ لم تُمَسّ، فأعلن الجردُ فقدًا لا وجودَ له.
  *    القاعدة: ما لا يخصُّ الشاشةَ لا يدخل جردَها. */
+/**
+ * ◆ عيبُ قياسٍ ثانٍ رُصد وأُصلح (2026-08-20): التجريدُ كان **بالتعبيرِ النمطيّ**،
+ *   و`<div class="sidebar">` **يحوي أقسامًا متداخلة** — والنمطُ غيرُ الجَشِع
+ *   `.*?</div>` يقف عند أولِ `</div>` فيترك بقيةَ السايدبار. ولمّا كانت بنودُه
+ *   **خارجَ `li.nav-group`** (روابطُ مستوًى أعلى) نجت من الأنماطِ الثلاثةِ بعدَه.
+ *   فبقيَ في «جسمِ الشاشة» **٢٧ بندَ سايدبارٍ و٦ روابطِ قشرةٍ علوية**، ولمّا
+ *   أزالت موجةُ عزلِ الإداراتِ ١٧٦ بندًا قرأها الجردُ **نقصَ محتوًى** في ثمانِ
+ *   شاشاتٍ لم يُمَسّ محتواها. أي أن بوابةَ صفرِ الفقدِ صارت تُرسِّب ما أذنت به
+ *   الوثيقةُ نفسُها — وهو إخفاقٌ كاذبٌ لا يقلُّ ضررًا عن نجاحٍ كاذب.
+ * ◆ والعلاجُ بنيويٌّ لا نمطيّ: **الشجرةُ تُقرأ شجرةً**. `DOMDocument` يحذف
+ *   العقدةَ بكاملِ نسلِها مهما تداخلت، فلا يبقى منها شيء. والتعبيرُ النمطيُّ
+ *   يبقى احتياطًا **مُعلَنًا** إن تعذَّر التحليلُ — ولا يُسكَت عن تعذُّره.
+ */
 function ugi_body($html) {
+    if ($html === '' || strpos($html, '<') === false) { return $html; }
+    $prevErr = libxml_use_internal_errors(true);
+    $doc = new DOMDocument();
+    $ok  = $doc->loadHTML('<?xml encoding="utf-8" ?>' . $html);
+    libxml_clear_errors();
+    libxml_use_internal_errors($prevErr);
+    if (!$ok) {
+        fwrite(STDERR, "  ⚠ تعذَّر تحليلُ الشجرة — سقط التجريدُ إلى النمطِ الاحتياطيّ\n");
+        return ugi_body_regex($html);
+    }
+    $xp = new DOMXPath($doc);
+    /* ما لا يخصُّ الشاشةَ لا يدخل جردَها — بعقدتِه وكلِّ نسلِها */
+    $kill = $xp->query(
+          '//script | //style | //nav | //aside | //footer'
+        . ' | //*[@role="navigation"]'
+        . ' | //*[@id="sidebar" or @id="sidebarOverlay" or @id="sidebarMobileHead"]'
+        . ' | //*[contains(concat(" ", normalize-space(@class), " "), " sidebar ")]'
+        . ' | //*[contains(@class, "sidebar-")]'
+        . ' | //*[contains(@class, "insidebar")]'
+        . ' | //*[contains(@class, "ems-topbar")]'
+        . ' | //*[contains(@class, "nav-group")]'
+    );
+    /* تُجمع أولًا: حذفُ عقدةٍ من قائمةٍ حيةٍ يُزحزح ما بعدَها */
+    $doomed = array();
+    foreach ($kill as $node) { $doomed[] = $node; }
+    foreach ($doomed as $node) { if ($node->parentNode) { $node->parentNode->removeChild($node); } }
+
+    $body = $doc->getElementsByTagName('body')->item(0);
+    if ($body === null) { return $doc->saveHTML(); }
+    $out = '';
+    foreach ($body->childNodes as $child) { $out .= $doc->saveHTML($child); }
+    return $out;
+}
+/** الاحتياطُ النمطيُّ — يُستعمل عندَ تعذُّرِ التحليلِ وحدَه، ويُعلَن حين يُستعمل */
+function ugi_body_regex($html) {
     $h = preg_replace('~<nav\b.*?</nav>~su', '', $html);
     $h = preg_replace('~<aside\b.*?</aside>~su', '', $h);
     $h = preg_replace('~<div[^>]*(?:id|class)="[^"]*(?:sidebar|insidebar|ems-topbar)[^"]*".*?</div>\s*(?=<)~su', '', $h);
-    /* غلافُ المجموعةِ كاملًا — رأسُها زرٌّ وعناصرُها روابط */
     $h = preg_replace('~<li[^>]*class="[^"]*nav-group[^"]*".*?</li>~su', '', $h);
     $h = preg_replace('~<ul[^>]*class="[^"]*nav-group-items[^"]*".*?</ul>~su', '', $h);
     $h = preg_replace('~<button[^>]*class="[^"]*nav-group-head[^"]*".*?</button>~su', '', $h);
@@ -184,14 +231,18 @@ if (!empty($args['check'])) {
         if (isset($c['error'])) { echo "  ⚠ {$c['screen']}: {$c['error']}\n"; $fails++; continue; }
         if (!isset($baseRows[$c['screen']])) { echo "  ⚠ {$c['screen']}: لا صفَّ له في الأساس\n"; continue; }
         $b = $baseRows[$c['screen']];
-        $bad = array();
+        $bad = array(); $delta = array();
         /* data_rows خبرٌ يفسّر ولا يحكم — والحكمُ على القدرةِ وقالبِ الصفّ */
         foreach (array('buttons', 'columns', 'filters', 'inputs', 'links', 'tables', 'forms',
                       'row_buttons', 'row_links', 'row_inputs') as $k) {
-            if ((int) $c[$k] < (int) $b[$k]) { $bad[] = "{$k}: {$b[$k]}⇐{$c[$k]}"; }
+            $o = (int) $b[$k]; $w = (int) $c[$k];
+            if ($w !== $o) { $delta[] = "{$k}: {$o}⇒{$w}" . ($w < $o ? ' ▼' : ' ▲'); }
+            if ($w < $o) { $bad[] = "{$k}: {$b[$k]}⇐{$c[$k]}"; }
         }
         if ($bad) { $fails++; echo "  ✗ {$c['screen']}: نقصٌ — " . implode(' · ', $bad) . "\n"; }
         else { echo "  ✔ {$c['screen']}: لا نقص\n"; }
+        /* ◆ الفرقُ كلُّه — صعودًا ونزولًا. فمن رأى النزولَ وحدَه لم يعرف سببَه */
+        if (!empty($args['diff']) && $delta) { echo "      ◆ " . implode(' · ', $delta) . "\n"; }
     }
     echo $fails === 0 ? "✔ صفرُ فقدٍ في العشرِ الذهبية\n" : "✗ {$fails} شاشة/شاشات فيها نقصٌ — الترحيلُ مرسَّب\n";
     exit($fails === 0 ? 0 : 1);

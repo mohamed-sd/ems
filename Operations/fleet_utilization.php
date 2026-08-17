@@ -90,6 +90,10 @@ if (function_exists('ems_screen_about')) {
 echo ems_states_bundle('لا معداتِ أسطولٍ بوقائعَ في هذه المدة', 'وسّعِ المدةَ أو أزِلْ مرشِّحَ الفئةِ ثمَّ اضغط «اقِس»');
 ?>
   <div class="card"><div class="card-body">
+        <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+    <div class="filter">
+        <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+        <div class="filter-body">
     <form method="get" class="fu-filter">
       <div><label for="emsf_364_d11dc">من</label><input type="date" name="from" id="emsf_364_d11dc" class="form-control" value="<?php echo fu_e($from); ?>"></div>
       <div><label for="emsf_365_be9da">إلى</label><input type="date" name="to" id="emsf_365_be9da" class="form-control" value="<?php echo fu_e($to); ?>"></div>
@@ -103,6 +107,8 @@ echo ems_states_bundle('لا معداتِ أسطولٍ بوقائعَ في هذ�
         </select></div>
       <div><button type="submit" class="btn btn-primary"><i class="fa fa-chart-line"></i> اقِس</button></div>
     </form>
+        </div>
+    </div>
   </div></div>
 
   <!-- المؤشراتُ العليا -->

@@ -142,6 +142,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     ?>
 
     <div class="card"><div class="card-body">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" class="sev-filter">
             <strong>المورد:</strong>
             <select name="supplier_id" onchange="this.form.submit()" class="sev-supplier-select" aria-label="اختيارُ الموردِ المُقيَّم">
@@ -155,6 +159,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <label for="emsf_502_5b9fd">إلى</label><input type="date" name="to" id="emsf_502_5b9fd" value="<?php echo htmlspecialchars($pTo); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اضبط الفترة</button>
         </form>
+            </div>
+        </div>
         <p class="sev-quote">
             «دوريٌّ <strong>بمؤشراتٍ من سجلات النظام لا انطباعًا</strong>» (§4) — فلا حقلَ هنا
             لكتابة نتيجةٍ ولا قيمةِ مؤشر: كلُّ رقمٍ <strong>يُقرأ من مصدره</strong>، والقرارُ وحدَه إنسانيّ.

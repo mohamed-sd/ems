@@ -1486,6 +1486,19 @@
        عدّادٌ ومخرجٌ — بصفرِ تعديلٍ في ملفِّ شاشة. */
     function emsFilterFormIsFilter(form) {
         if (!form || form.getAttribute('data-ems-filterbar') === 'off') { return false; }
+        /* ◆ التوحيد (٢٠٢٦-٠٨-١٧): صندوقُ `.filter` صار مصدرَ تصميمِ الفلاترِ
+           الوحيدَ (`assets/css/ems-filters.css`). فنموذجٌ داخلَ صندوقٍ — أو
+           هو الصندوقُ نفسُه — **لا يُلَفُّ بشريطٍ ثانٍ**، وإلا ظهر رأسان:
+           «الترشيح» فوقَ «فلاتر البحث». */
+        if (form.classList.contains('filter') || form.closest('.filter')) { return false; }
+        /* ◆ ونموذجُ الإدخالِ ليس ترشيحًا: الغائبةُ في HTML هي `get`، فكان كلُّ
+           نموذجٍ بلا `method` يُلَفُّ شريطَ فلاترٍ — وقِيس أثرُه: «ضابطٌ جديد»
+           في `Risk/risk_controls.php` و«إضافةُ سائق» في `movement_operations`
+           و«حاسبةُ أفضلِ سعر» في `Clients/rate_books.php` كانت كلُّها تُصيَّر
+           بعدّادِ فلاترٍ وزرِّ «تفريغُ الفلاتر». والحقلُ الإلزاميُّ شاهدٌ قاطع:
+           الترشيحُ لا يُلزِم حقلًا. */
+        if (form.querySelector('[required]')) { return false; }
+        if (form.classList.contains('allforms') || form.classList.contains('ems-form')) { return false; }
         var m = (form.getAttribute('method') || 'get').toLowerCase();
         if (m !== 'get') { return false; }                 /* نماذجُ الكتابةِ ليست ترشيحًا */
         var fields = form.querySelectorAll('input:not([type=hidden]):not([type=submit]), select, textarea');

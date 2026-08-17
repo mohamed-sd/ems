@@ -248,6 +248,11 @@
     color: var(--emsp-ink-muted);
     font-weight: var(--weight-regular, 400);
 }
+/* مقياسٌ غيرُ محسوبٍ في شريطِ المؤشرات — عقدُ الغيابِ نفسُه لا لونٌ ثانٍ له */
+.ems-profile__stat-value--empty {
+    color: var(--emsp-ink-muted);
+    font-weight: var(--weight-regular, 400);
+}
 
 /* ══ ٤ · شارةُ الحالة ═════════════════════════════════════════════════════
    مكوّنٌ واحدٌ يخدم: حالةَ الكِيانِ · مرحلةَ الفرصةِ · نتيجةَ المناقصةِ ·
@@ -441,6 +446,14 @@ a.ems-profile__stat:hover { text-decoration: none; }
     font-size: var(--text-caption, 12px);
     font-weight: var(--weight-medium, 500);
 }
+/* أفعالُ القسمِ في رأسِه — تُزاح إلى الطرفِ ما لم يسبقها `meta` أخذ المكان */
+.ems-profile__section-actions {
+    margin-inline-start: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+}
+.ems-profile__section-meta + .ems-profile__section-actions { margin-inline-start: 0; }
 .ems-profile__section-body { padding: var(--emsp-pad); }
 /* سطرُ تفسيرٍ تحت العنوان: ما الذي يشمله هذا القسمُ وما لا يشمله */
 .ems-profile__section-note {
@@ -665,6 +678,7 @@ a.ems-profile__stat:hover { text-decoration: none; }
 .ems-site .ems-profile .ems-profile__section-note,
 .ems-site .ems-profile .ems-profile__doc-empty,
 .ems-site .ems-profile .ems-profile__fact-value--empty,
+.ems-site .ems-profile .ems-profile__stat-value--empty,
 .ems-site .ems-profile .ems-profile__timeline-meta { color: var(--emsp-ink-muted); }
 
 .ems-site .ems-profile .ems-profile__ident-item { color: var(--emsp-ink-soft); }

@@ -302,6 +302,25 @@ function buildNavTree($links, $groups) {
  *
  * @return int عدد الشارة المطبوعة (لتجميعها على رأس المجموعة)
  */
+/* ══ مجموعةٌ بلا رابطٍ لا تُطبع — حارسُ الغلافِ الفارغ ══════════════════════
+   ◆ **العلّةُ المقيسة (2026-08-20)**: `printNavLinkItem` تُسقط الرابطَ لسببَين
+     مشروعَين — كابحُ مساحةِ العمل (عزلُ الإدارات) وحارسُ التكرار — **وتُسقطه
+     بعدَ أن يكون المُصيِّرُ قد طبعَ غلافَ المجموعةِ ورأسَها وفتحَ قائمتَها**.
+     فإذا سقطت روابطُ المجموعةِ كلُّها بقيَ رأسٌ بشيفرونٍ وقائمةٌ فارغة.
+     المقيس: **٨٢ غلافًا فارغًا من ٤٥٦ في ١٩ دورًا جذريًّا (١٨٪)**.
+   ◆ **ولم تكشفه U5**: بوابةُ «مجموعةٌ بلا عناصر» تعدُّ من `$groupCounts` —
+     وهي خريطةٌ لا تُنشأ مفاتيحُها إلا **بوجودِ عنصر**، فحكمُها لا يتحقق أبدًا.
+     بوابةٌ تقيس ما لا يقع تمرُّ خضراءَ إلى الأبد.
+   ◆ **والعلاجُ ترتيبٌ لا شرط**: تُطبع الروابطُ في مخزنٍ مؤقّتٍ أولًا، ثم
+     يُطبع الغلافُ **إن نجا رابط**. فالقرارُ يُبنى على ما خرج فعلًا لا على ما
+     كان مُزمَعًا. **ولا يُخفى رابطٌ ولا يُلغى مسار** — يُحذف رأسٌ فارغٌ لا غير.
+   ══════════════════════════════════════════════════════════════════════════ */
+if (!function_exists('ems_nav_group_has_link')) {
+    function ems_nav_group_has_link($html) {
+        return (bool) preg_match('~<a\b[^>]*\bhref=~i', (string) $html);
+    }
+}
+
 function printNavLinkItem($link, $basePrefix = '../', $badges = array(), $extraClass = '') {
     if (!isset($link['code']) || !isset($link['name'])) {
         return 0;
@@ -392,6 +411,15 @@ function printNavGroupItem($node, $basePrefix = '../', $badges = array()) {
     }
     $badge = $total > 0 ? ' <span class="nav-count-badge nav-group-badge">' . ($total > 99 ? '99+' : $total) . '</span>' : '';
 
+    /* ① الروابطُ في مخزنٍ مؤقّتٍ قبلَ الغلاف */
+    ob_start();
+    foreach ($node['links'] as $link) {
+        printNavLinkItem($link, $basePrefix, $badges);
+    }
+    $body = ob_get_clean();
+    /* ② ولا غلافَ لمجموعةٍ لم ينجُ منها رابط */
+    if (!ems_nav_group_has_link($body)) { return; }
+
     echo '<li class="nav-group" data-group-key="' . $key . '">' . "\n";
     echo '  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-' . $key . '" aria-label="' . $name . '" title="' . $name . '">'
        . '<i class="' . $icon . '" aria-hidden="true"></i> '
@@ -399,9 +427,7 @@ function printNavGroupItem($node, $basePrefix = '../', $badges = array()) {
        . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i>'
        . '</button>' . "\n";
     echo '  <ul class="nav-group-items" id="navgrp-' . $key . '">' . "\n";
-    foreach ($node['links'] as $link) {
-        printNavLinkItem($link, $basePrefix, $badges);
-    }
+    echo $body;
     echo '  </ul>' . "\n";
     echo '</li>' . "\n";
 }

@@ -4,8 +4,13 @@
  * ───────────────────────────────────────────────────────────────────────────
  * الاستعمال:  $sf_supplier_id = $supplier_id;  $sf_active = 'documents';
  *             include __DIR__ . '/../includes/supplier_file_tabs.php';
+ *
+ * ◆ العرضُ كلُّه في `includes/file_tabs_kit.php` — هذا الملفُّ يصف تبويباتِه
+ *   ولا يرسمها. وموضعُ الشريطِ تحتَ الشريطِ الأصفرِ يتكفّل به `page_header.php`.
  */
 if (!isset($sf_supplier_id)) { return; }
+require_once __DIR__ . '/file_tabs_kit.php';
+
 $sf_id  = intval($sf_supplier_id);
 $sf_act = isset($sf_active) ? $sf_active : 'profile';
 $sf_pre = (strpos($_SERVER['SCRIPT_NAME'] ?? '', '/Suppliers/') !== false
@@ -26,24 +31,22 @@ $sf_subs = array(
     'closure'    => array('الإقفال', 'Suppliers/supplier_closure.php?supplier_id=%d'),
 );
 $sf_top = isset($sf_tabs[$sf_act]) ? $sf_act : (isset($sf_subs[$sf_act]) ? 'rules' : 'profile');
-?>
-<div class="sf-tabs" dir="rtl" style="margin:0 0 12px">
-  <ul class="nav nav-tabs" style="flex-wrap:wrap">
-    <?php foreach ($sf_tabs as $tk => $tv): ?>
-      <li class="nav-item">
-        <a class="nav-link<?= $tk === $sf_top ? ' active' : '' ?>"
-           href="<?= $sf_pre . sprintf($tv[1], $sf_id) ?>"><?= $tv[0] ?></a>
-      </li>
-    <?php endforeach; ?>
-  </ul>
-  <?php if ($sf_top === 'rules'): ?>
-  <div style="padding:6px 4px;background:#f8f9fa;border:1px solid #dee2e6;border-top:0">
-    <?php foreach ($sf_subs as $sk => $sv): ?>
-      <a href="<?= $sf_pre . sprintf($sv[1], $sf_id) ?>"
-         class="badge" style="font-size:.85em;margin:0 2px;<?= $sk === $sf_act
-            ? 'background:#0d6efd;color:#fff' : 'background:#e9ecef;color:#333' ?>">
-        <?= $sv[0] ?></a>
-    <?php endforeach; ?>
-  </div>
-  <?php endif; ?>
-</div>
+
+$sf_items = array();
+foreach ($sf_tabs as $tk => $tv) {
+    $sf_items[] = array('text' => $tv[0], 'href' => $sf_pre . sprintf($tv[1], $sf_id),
+                        'active' => ($tk === $sf_top));
+}
+$sf_subItems = array();
+if ($sf_top === 'rules') {
+    foreach ($sf_subs as $sk => $sv) {
+        $sf_subItems[] = array('text' => $sv[0], 'href' => $sf_pre . sprintf($sv[1], $sf_id),
+                               'active' => ($sk === $sf_act));
+    }
+}
+
+ems_file_tabs(array(
+    'label' => 'ملفُّ المورد',
+    'tabs'  => $sf_items,
+    'subs'  => $sf_subItems,
+));

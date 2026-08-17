@@ -99,6 +99,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
 
     <div class="card"><div class="card-body">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" class="ems-pte-filter">
             <strong>الصفة:</strong>
             <select name="capacity_id" aria-label="الصفة">
@@ -111,6 +115,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <label for="emsf_373_beed6">إلى</label><input type="date" name="to" id="emsf_373_beed6" value="<?php echo htmlspecialchars($to); ?>">
             <button type="submit" class="btn-primary">افتح الفترة</button>
         </form>
+            </div>
+        </div>
         <p class="ems-pte-note">المعالج: <strong>ذاتيٌّ ← إقفالٌ ← مديرٌ ← مناقشةٌ ← اعتماد</strong> —
             والمديرُ <strong>لا يفتح قبل إقفال الذاتي</strong> (منعًا للتأثير)، وفارقُ درجتين فأكثرَ
             <strong>يوجب تعليقًا</strong>، والانتقالاتُ <strong>بفحص النسخة</strong>.</p>

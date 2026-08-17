@@ -60,8 +60,6 @@ if (!function_exists('ems_css_ver')) {
     <link rel="stylesheet" href="/ems/assets/css/uxui-components.css<?php echo ems_css_ver('uxui-components.css'); ?>">
     <!-- Unified page styles: Dashboard + Chat -->
     <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css<?php echo ems_css_ver('ems.main.all.style.css'); ?>">
-    <!-- Unified Table Styles — loaded LAST so ems-tables.css is the single authoritative source for all table design -->
-    <link rel="stylesheet" href="/ems/assets/css/ems-tables.css<?php echo ems_css_ver('ems-tables.css'); ?>">
     <!-- Unified Form Styles — loaded LAST so ems-forms.css is the single authoritative source for ALL form design -->
     <link rel="stylesheet" href="/ems/assets/css/ems-forms.css<?php echo ems_css_ver('ems-forms.css'); ?>">
     <!-- أنماطُ الأزرارِ الأربعةُ — تُحمَّل بعد بوتستراب لتَغلبَ أزرقَه بذهبيِّ العلامة -->
@@ -83,6 +81,18 @@ if (!function_exists('ems_css_ver')) {
          لتصميمِها كلِّها، مُنطاقٌ تحت .ems-profile فلا يتسرّب لشاشةٍ أخرى.
          يُحمَّل بعد ems-screens.css فيغلب أيَّ بقيةٍ صفحيةٍ لم تُرحَّل بعدُ. -->
     <link rel="stylesheet" href="/ems/assets/css/ems-profile.css<?php echo ems_css_ver('ems-profile.css'); ?>">
+    <!-- صندوقُ فلاترِ البحثِ — مصدرٌ واحدٌ لتصميمِه في النظامِ كلِّه (أصلُه
+         شاشةُ العملاء). يُحمَّل **آخرًا** عمدًا: `ems-screens.css` يحمل بقايا
+         الفلاترِ الموضعيةَ للشاشاتِ المهاجرة (`fc-filter-bar` · `mkpi-filter`
+         · `rpt-du-filter` …) فلا يُغلَب إلا بمن يليه. -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-filters.css<?php echo ems_css_ver('ems-filters.css'); ?>">
+    <!-- ══ تصميمُ الجداول — آخرُ ورقةٍ فعلًا (توحيد 2026-08-17) ══
+         كان الوسمُ في موضعه السابقِ يحمل تعليقَ "loaded LAST" وهو ليس آخرًا:
+         خمسةُ ملفاتٍ تُحمَّل بعدَه — أثقلُها ems-screens.css بستٍّ وعشرين قاعدةً
+         جدولية. ولا يكفي نقلُه إلى الذيلِ هنا، لأن الصفحاتِ تُدرج أوراقَها
+         بعدَ القشرةِ كلِّها. فالإدراجُ صار عبرَ مكوّنٍ واحدٍ يفرضُ الأخيريةَ
+         وقتَ التشغيل. التفصيلُ في includes/table_design.php. -->
+    <?php require_once __DIR__ . '/includes/table_design.php'; ?>
     <!-- INJ-0378 · INJ-0548: صندوقُ الإرسالِ دونَ اتصالٍ وعاملُ الخدمة —
          الطابورُ يعمل على النماذجِ الموسومةِ صراحةً وحدَها، والعاملُ يخزّن
          الأصولَ الساكنةَ لا صفحاتِ PHP (صفحةٌ محفوظةٌ ببياناتٍ قديمةٍ أخطرُ
@@ -113,6 +123,10 @@ if (!function_exists('ems_css_ver')) {
     <!-- بطاقة «عن الشاشة» الموحّدة: تبني القالبَ الصادرَ من screen_contract.php
          في موضعه الصحيح (تحت الرأس) وتزرع زرَّه — راجع رأس الملف للعلّة. -->
     <script src="/ems/assets/js/ems-screen-about.js<?php $__abtjs=__DIR__.'/assets/js/ems-screen-about.js'; echo is_file($__abtjs)?('?v='.filemtime($__abtjs)):''; ?>" defer></script>
+    <!-- عونُ صندوقِ الفلاتر: يسم أغلفةَ الحقولِ ويعدُّ المفعَّلَ ويمنع حفرةَ
+         سطرِ الأزرار. لا ينقل عقدةً ولا يعيد بناءَ شجرةٍ — إضافةُ أصنافٍ فقط،
+         فالبنيةُ مكتوبةٌ في PHP ظاهرةً للمراجعة. والصندوقُ صحيحٌ بدونه. -->
+    <script src="/ems/assets/js/ems-filters.js<?php $__fltjs = __DIR__ . '/assets/js/ems-filters.js'; echo is_file($__fltjs) ? ('?v=' . filemtime($__fltjs)) : ''; ?>" defer></script>
     <!-- Unified Custom Select dropdown for forms (نظام القوائم المنسدلة الموحّد) -->
     <script src="/ems/assets/js/ems-select.js<?php $__emsjs=__DIR__.'/assets/js/ems-select.js'; echo is_file($__emsjs)?('?v='.filemtime($__emsjs)):''; ?>" defer></script>
     <!-- Bootstrap Bundle JS (local, CSP-safe) -->

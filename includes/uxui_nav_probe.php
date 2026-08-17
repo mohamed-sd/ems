@@ -39,9 +39,12 @@ if (!function_exists('uxp_norm')) {
     }
 }
 
-/** تصييرُ سايدبارِ دورٍ والتقاطُ مواضعِه [['group','label','href'],…] بالترتيب */
-if (!function_exists('uxp_render_role')) {
-    function uxp_render_role($conn, $roleId, $uid = null)
+/** تصييرُ سايدبارِ دورٍ وإرجاعُ **HTML الخام** — مصدرٌ واحدٌ لكلِّ قياسٍ مُصيَّر
+ *  ◆ فُصلت عن `uxp_render_role` (2026-08-20) لأن قياساتٍ تحتاج البنيةَ لا
+ *    المواضعَ المستخرَجة: غلافُ المجموعةِ الفارغُ لا يظهر في قائمةِ المواضعِ
+ *    أصلًا — فمن قاس المواضعَ وحدَها **لا يستطيع** رؤيتَه (وهو ما أعمى U5). */
+if (!function_exists('uxp_render_role_html')) {
+    function uxp_render_role_html($conn, $roleId, $uid = null)
     {
         if ($uid === null) { $users = uxp_role_users($conn); $uid = isset($users[(int) $roleId]) ? $users[(int) $roleId] : 0; }
         $_SESSION['user'] = array('id' => (int) $uid, 'role' => (string) $roleId, 'company_id' => 4, 'name' => 'uxui-probe');
@@ -51,7 +54,41 @@ if (!function_exists('uxp_render_role')) {
         ob_start();
         $ok = renderUnifiedNavigationV2($conn, (string) $roleId, '../', array(), $chats);
         $html = ob_get_clean();
+        return $ok ? $html : '';
+    }
+}
+
+/** أغلفةُ المجموعاتِ المُصيَّرةُ وعددُ روابطِ كلٍّ — [['name','links'],…]
+ *  تُقرأ بالشجرةِ لا بنمط: غلافُ المجموعةِ يحوي أغلفةً متداخلةً («المزيد»). */
+if (!function_exists('uxp_nav_group_shells')) {
+    function uxp_nav_group_shells($html)
+    {
+        if (trim((string) $html) === '') { return array(); }
+        $prev = libxml_use_internal_errors(true);
+        $doc = new DOMDocument();
+        $ok = $doc->loadHTML('<?xml encoding="utf-8" ?><ul>' . $html . '</ul>');
+        libxml_clear_errors();
+        libxml_use_internal_errors($prev);
         if (!$ok) { return array(); }
+        $xp = new DOMXPath($doc);
+        $out = array();
+        foreach ($xp->query('//li[contains(concat(" ", normalize-space(@class), " "), " nav-group ")]') as $li) {
+            $nm = $xp->query('.//span[contains(@class,"nav-group-name")]', $li);
+            $out[] = array(
+                'name'  => $nm->length ? trim($nm->item(0)->textContent) : '(بلا اسم)',
+                'links' => $xp->query('.//a[@href]', $li)->length,
+            );
+        }
+        return $out;
+    }
+}
+
+/** تصييرُ سايدبارِ دورٍ والتقاطُ مواضعِه [['group','label','href'],…] بالترتيب */
+if (!function_exists('uxp_render_role')) {
+    function uxp_render_role($conn, $roleId, $uid = null)
+    {
+        $html = uxp_render_role_html($conn, $roleId, $uid);
+        if ($html === '') { return array(); }
         return uxp_parse_nav_html($html);
     }
 }

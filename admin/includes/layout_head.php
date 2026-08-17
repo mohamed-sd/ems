@@ -432,6 +432,12 @@ textarea.form-ctrl { resize: vertical; min-height: 80px; }
 <link rel="stylesheet" href="/ems/assets/css/ems-forms.css<?php $__emsf=__DIR__.'/../../assets/css/ems-forms.css'; echo is_file($__emsf)?('?v='.filemtime($__emsf)):''; ?>">
 <!-- Unified Custom Select dropdown for forms -->
 <script src="/ems/assets/js/ems-select.js<?php $__emsjs2=__DIR__.'/../../assets/js/ems-select.js'; echo is_file($__emsjs2)?('?v='.filemtime($__emsjs2)):''; ?>" defer></script>
+<!-- ══ تصميمُ الجداول الموحَّد (توحيد 2026-08-17) ══
+     القشرةُ الإداريةُ لا تمرُّ بـinheader، فكانت ستَّ عشرةَ شاشةً إداريةً فيها
+     جداولُ لا يصلها ملفُّ التصميمِ إطلاقًا — وتُصمَّم بكتلةِ <style> أعلاه
+     وحدَها. هذا السطرُ يصلها بالمصدرِ الواحد، ويُدرَج بعدَ الكتلةِ الداخليةِ
+     وبعدَ ems-forms فيغلبهما. -->
+<?php require_once dirname(__DIR__, 2) . '/includes/table_design.php'; ?>
 </head>
 <body>
 <div class="layout">

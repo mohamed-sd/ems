@@ -185,6 +185,85 @@
 }
 .ems-imp-strip .ems-imp-strip-form { display: inline-flex; margin: 0; }
 
+/* ══ شريطُ تبويباتِ الملفِّ — تحتَ الشريطِ الأصفرِ وفوقَ رحلةِ الكِيان ═══════
+   ◆ الترتيبُ يقرأ من العامِّ إلى الخاص: رأسُ الشاشةِ ← **أيُّ ملفٍّ نحن فيه**
+     (هذا الشريط) ← رحلةُ الكِيانِ ← المحتوى. فيَتميَّز عن أخيه أسفلَه بلكنةِ
+     العلامةِ لا بلونٍ ثالث: أرضٌ كريميةٌ وحدٌّ ذهبيٌّ على حافةِ البداية.
+   ◆ وكان قبلَه ثلاثةُ شرائطَ ببوتستراب (`nav nav-tabs`) وأنماطٍ موضعيةٍ فيها
+     ستةُ ألوانٍ مثبَّتةٍ عاريةٍ — سقطت كلُّها إلى هنا. */
+.ems-file-tabs {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin-block: var(--space-2) 0;
+  padding: var(--space-2) var(--space-3);
+  padding-inline-start: calc(var(--space-3) + 3px);
+  border: var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--c-brand-gold-soft, #fff8e6);
+  font-size: var(--text-caption);
+  overflow: hidden;
+}
+.ems-file-tabs::before {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: 3px;
+  background: var(--c-brand-gold-deep, #d4a500);
+}
+.ems-file-tabs-label {
+  color: var(--c-brand-gold-ink-deep, #6b5200);
+  font-weight: var(--weight-semi);
+  margin-inline-end: var(--space-1);
+}
+.ems-file-tabs-row { display: flex; flex-wrap: wrap; gap: var(--space-1); align-items: center; }
+.ems-file-tab {
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--gray-700);
+  text-decoration: none;
+  border: 1px solid transparent;
+  background: var(--white);
+}
+.ems-file-tab:hover { border-color: var(--c-brand-gold-line, #d9b44a); color: var(--gray-900); }
+.ems-file-tab.is-active {
+  background: var(--c-brand-gold-deep, #d4a500);
+  border-color: var(--c-brand-gold-deep, #d4a500);
+  color: var(--white);
+  font-weight: var(--weight-semi);
+}
+.ems-file-tab.is-unbuilt { color: var(--gray-500); opacity: .55; cursor: help; background: none; }
+/* سطرُ أقسامِ التبويبِ النشط — أدقُّ من التبويبِ فلا يزاحمه */
+.ems-file-tabs-subs {
+  flex-basis: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+  padding-top: var(--space-2);
+  border-top: 1px dashed var(--c-brand-gold-line, #d9b44a);
+}
+.ems-file-tabs-subs-label { color: var(--c-brand-gold-ink-deep, #6b5200); margin-inline-end: var(--space-1); }
+.ems-file-sub {
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-pill, 9999px);
+  color: var(--gray-700);
+  text-decoration: none;
+  border: 1px solid var(--gray-300);
+  background: var(--white);
+}
+.ems-file-sub:hover { border-color: var(--c-brand-gold-line, #d9b44a); }
+.ems-file-sub.is-active {
+  background: var(--gray-900);
+  border-color: var(--gray-900);
+  color: var(--white);
+  font-weight: var(--weight-semi);
+}
+
 /* شريطُ رحلةِ الكيان (UXW-01 §8-2) — الملفُّ الأمُّ وأبناؤه جسدٌ واحد */
 .ems-entity-tabs {
   display: flex;

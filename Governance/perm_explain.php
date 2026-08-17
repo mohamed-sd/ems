@@ -170,6 +170,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header">
         <h5><i class="fa fa-question-circle"></i> لماذا يرى هذا الدورُ هذه الشاشة — أو لا يراها؟</h5>
     </div><div class="card-body">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" action="" class="ems-form px-filter-form">
             <div class="form-group px-w-220"><label for="emsf_615_52acc">الدور</label>
                 <select name="px_role" class="form-control" id="emsf_615_52acc">
@@ -189,6 +193,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </select></div>
             <button type="submit" class="btn-primary"><i class="fa fa-search"></i> فسِّر</button>
         </form>
+            </div>
+        </div>
         <?php if ($px_result !== null): ?>
         <div class="px-result">
             <div class="px-result-verdict">

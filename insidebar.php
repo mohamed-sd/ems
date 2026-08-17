@@ -53,7 +53,6 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       // كاسرُ الذاكرةِ إلزاميّ — بدونه تُخدَم لوحةُ ألوانٍ قديمةٌ فتسقط كلُّ var()
       '/ems/assets/css/design-tokens.css<?php echo $__sb_ver('design-tokens.css'); ?>',
       '/ems/assets/css/ems.main.all.style.css<?php echo $__sb_ver('ems.main.all.style.css'); ?>',
-      '/ems/assets/css/ems-tables.css<?php echo $__sb_ver('ems-tables.css'); ?>',
       '/ems/assets/css/ems-forms.css<?php echo $__sb_ver('ems-forms.css'); ?>',
       // أنماطُ الأزرارِ الأربعةُ — بعد بوتستراب لتَغلبَ أزرقَه بذهبيِّ العلامة
       '/ems/assets/css/ems-buttons.css<?php echo $__sb_ver('ems-buttons.css'); ?>',
@@ -62,6 +61,10 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       // وكلُّ ما فيها محبوسٌ في @media (max-width:768px) فلا تمسّ الحاسوب.
       '/ems/assets/css/ems-sidebar-mobile.css<?php echo $__sb_ver('ems-sidebar-mobile.css'); ?>',
       '/ems/assets/css/ems-topbar-mobile.css<?php echo $__sb_ver('ems-topbar-mobile.css'); ?>'
+      // ems-tables.css خرج من هذه المصفوفةِ عمدًا (توحيد 2026-08-17): الحاقنُ
+      // أدناه يتخطّى أيَّ ورقةٍ حاضرةٍ أصلًا، وورقةُ الجداولِ حاضرةٌ دائمًا من
+      // inheader — فكان وجودُها هنا بلا أثرٍ منذ كُتب. صارت عبرَ مكوّنٍ يفرض
+      // الأخيريةَ نقلًا لا إدراجًا: includes/table_design.php
     ];
 
     cssFiles.forEach(function (href) {
@@ -85,6 +88,10 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       emsSelectScript.defer = true;
       head.appendChild(emsSelectScript);
     }
+
+    // ورقةُ الجداولِ إلى الذيلِ مرّةً أخرى — الصفحةُ أدرجت أوراقَها بين
+    // القشرتَين، وهذه النقطةُ بعدَها فتلتقطُها قبلَ الرسم. (توحيد 2026-08-17)
+    if (typeof window.emsTableDesignEnforce === 'function') window.emsTableDesignEnforce();
 
     if (document.body) {
       document.body.classList.add('ems-site');

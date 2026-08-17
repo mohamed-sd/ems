@@ -107,14 +107,15 @@ table {
 .table thead tr th,
 table thead,
 table thead th {
-  background: var(--c-f4f7fb) !important;
-  color: var(--ems-text) !important;
-  border-bottom: 2px solid var(--ems-line) !important;
+  /* وُصِلت بمفاتيحِ ems-tables.css (توحيد 2026-08-17) */
+  background: var(--table-header-bg, #6b6b6b) !important;
+  color: var(--table-header-text, #ffffff) !important;
+  border-bottom: 2px solid var(--table-header-scroll-bg, #3d3d3d) !important;
 }
 
 .table tbody tr:hover,
 table tbody tr:hover {
-  background: var(--ems-orange-soft) !important;
+  background: var(--table-row-hover-bg, #fcf3d6) !important;
 }
 
 input,

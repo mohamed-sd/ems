@@ -78,6 +78,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     ?>
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
+        <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+    <div class="filter">
+        <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+        <div class="filter-body">
     <form method="get" class="ems-toolbar rsk-filter-form">
         <input type="hidden" name="view" value="<?php echo htmlspecialchars($view); ?>">
         <label class="rsk-filter-label">الخطر (id)
@@ -91,6 +95,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             </select></label>
         <button type="submit" class="ems-btn-secondary"><i class="fa fa-filter"></i> ترشيح</button>
     </form>
+        </div>
+    </div>
 
     <?php if (empty($rows)): ?>
     <div class="ems-card" id="asEmpty"></div>

@@ -224,7 +224,7 @@ require_once __DIR__ . '/../includes/layout_head.php';
 .stats { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; }
 .stat { background:#fff; border-radius:10px; padding:.8rem 1.4rem; box-shadow:0 2px 6px rgba(12,28,62,.07); font-weight:600; color:var(--navy); }
 .stat b { font-size:1.3rem; display:block; }
-.door-head td { background:#eef2f7 !important; font-weight:700; color:var(--navy); }
+.door-head td { background:var(--table-group-row-bg,#eef4fb) !important; font-weight:700; color:var(--table-group-row-text,#1f4f7a); } /* وُصِل بمفاتيحِ ems-tables.css 2026-08-17 */
 .group-cell { color:#92700a; font-size:.85rem; }
 .badge { border-radius:6px; padding:.25rem .6rem; font-size:.78rem; font-weight:700; }
 .badge-shown { background:#d1f3d1; color:#059669; }

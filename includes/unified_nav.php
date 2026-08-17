@@ -178,34 +178,46 @@ function printUnifiedNavDoor($doorKey, $doorMeta, $items, $basePrefix = '../', $
     }
     $badge = $total > 0 ? ' <span class="nav-count-badge nav-group-badge">' . ($total > 99 ? '99+' : $total) . '</span>' : '';
 
-    echo '<li class="nav-group" data-group-key="' . $key . '">' . "\n";
-    echo '  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-' . $key . '" aria-label="' . $name . '" title="' . $name . '">'
-       . '<i class="' . $icon . '" aria-hidden="true"></i> <span class="nav-group-name">' . $name . '</span>' . $badge
-       . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
-    echo '  <ul class="nav-group-items" id="navgrp-' . $key . '">' . "\n";
-
-    // NAV-01 v6 §4 (update0007-ب): التكدّسُ يُدار بأدوات التعقيد — المجموعةُ
-    // الكثيفةُ (> 12) تعرض أولَها ويطوي «المزيدُ» بقيتَها قابلةً للفتح،
-    // «فلا تظهر المستوياتُ كلُّها دفعةً واحدة» — بلا حذفِ رابطٍ ولا تغييرِ بنية.
+    /* ══ الترتيبُ: الروابطُ أولًا ثم الغلاف — حارسُ الغلافِ الفارغ ═══════════
+       ◆ `printNavLinkItem` قد تُسقط الرابطَ (كابحُ مساحةِ العمل أو حارسُ
+         التكرار)، فتُبنى المجموعةُ من **الناجي** وحدَه: فلا عنوانَ فرعيٌّ بلا
+         روابطَ تحته · ولا عدَّ «المزيد» يعِد بما لا يوجد · ولا غلافَ لبابٍ
+         خلا من روابطِه. **ولا يُخفى رابطٌ ولا يُلغى مسار.** */
     $byGroup = array();
     foreach ($items as $it) {
         $g = isset($it['group_name']) && $it['group_name'] !== null ? $it['group_name'] : '';
         $byGroup[$g][] = $it;
     }
     static $moreSeq = 0;
+    ob_start();
     foreach ($byGroup as $gname => $gItems) {
+        $kept = array();
+        foreach ($gItems as $it) {
+            ob_start();
+            printNavLinkItem(array(
+                'code' => $it['route'],
+                'name' => $it['label_ar'],
+                'icon' => $it['icon'],
+            ), $basePrefix, $badges);
+            $one = ob_get_clean();
+            if (ems_nav_group_has_link($one)) { $kept[] = array('it' => $it, 'html' => $one); }
+        }
+        if (empty($kept)) { continue; }
         // UI-DEF-05: مجموعةٌ برابطٍ واحدٍ يحمل اسمَها نفسَه كانت تطبع النصَّ مرتين
         // (رأسًا ثم رابطًا) فتُقرأ تكرارًا — الرأسُ يسقط والرابطُ يبقى.
-        $soloSameName = (count($gItems) === 1 && trim((string) $gItems[0]['label_ar']) === trim((string) $gname));
+        $soloSameName = (count($kept) === 1 && trim((string) $kept[0]['it']['label_ar']) === trim((string) $gname));
         if ($gname !== '' && !$soloSameName) {
             echo '<li class="nav-subhead" aria-hidden="true"><span>'
                . htmlspecialchars($gname, ENT_QUOTES, 'UTF-8') . '</span></li>' . "\n";
         }
-        $dense = count($gItems) > 12;
-        foreach ($gItems as $idx => $it) {
+        // NAV-01 v6 §4 (update0007-ب): التكدّسُ يُدار بأدوات التعقيد — المجموعةُ
+        // الكثيفةُ (> 12) تعرض أولَها ويطوي «المزيدُ» بقيتَها قابلةً للفتح،
+        // «فلا تظهر المستوياتُ كلُّها دفعةً واحدة» — بلا حذفِ رابطٍ ولا تغييرِ بنية.
+        $dense = count($kept) > 12;
+        foreach ($kept as $idx => $k) {
             if ($dense && $idx === 7) {
                 $moreSeq++;
-                $rest = count($gItems) - 7;
+                $rest = count($kept) - 7;
                 echo '<li class="nav-more-toggle"><button type="button" class="nav-group-head" '
                    . 'style="font-size:.85em;opacity:.8" '
                    . 'onclick="var m=document.getElementById(\'navmore-' . $moreSeq . '\');'
@@ -214,15 +226,19 @@ function printUnifiedNavDoor($doorKey, $doorMeta, $items, $basePrefix = '../', $
                    . '<span>المزيد (' . $rest . ') ▾</span></button></li>' . "\n";
                 echo '<li><ul id="navmore-' . $moreSeq . '" style="display:none;list-style:none;padding:0;margin:0">' . "\n";
             }
-            printNavLinkItem(array(
-                'code' => $it['route'],
-                'name' => $it['label_ar'],
-                'icon' => $it['icon'],
-            ), $basePrefix, $badges);
+            echo $k['html'];
         }
         if ($dense) { echo '</ul></li>' . "\n"; }
     }
+    $body = ob_get_clean();
+    if (!ems_nav_group_has_link($body)) { return; }
 
+    echo '<li class="nav-group" data-group-key="' . $key . '">' . "\n";
+    echo '  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-' . $key . '" aria-label="' . $name . '" title="' . $name . '">'
+       . '<i class="' . $icon . '" aria-hidden="true"></i> <span class="nav-group-name">' . $name . '</span>' . $badge
+       . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
+    echo '  <ul class="nav-group-items" id="navgrp-' . $key . '">' . "\n";
+    echo $body;
     echo '  </ul>' . "\n";
     echo '</li>' . "\n";
 }
@@ -297,6 +313,51 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
         foreach ($sItems as $it) { if (isset($badges[$it['route']])) { $total += intval($badges[$it['route']]); } }
         $badge = $total > 0 ? ' <span class="nav-count-badge nav-group-badge">' . ($total > 99 ? '99+' : $total) . '</span>' : '';
 
+        /* ══ جسمُ المرحلةِ يُبنى قبلَ غلافِها — حارسُ الغلافِ الفارغ ═══════════
+           `printNavLinkItem` قد تُسقط الرابطَ (كابحُ المساحةِ أو حارسُ التكرار)،
+           فتُبنى المرحلةُ من **الناجي** وحدَه: لا عنوانَ فرعيٌّ بلا روابطَ تحته،
+           ولا «المزيد» يعِد بما لا يوجد، ولا مرحلةٌ ترأس فراغًا. */
+        $byGroup = array();
+        foreach ($sItems as $it) { $byGroup[(string) $it['group_name']][] = $it; }
+        static $stMoreSeq = 1000;
+        ob_start();
+        foreach ($byGroup as $gname => $gItems) {
+            $kept = array();
+            foreach ($gItems as $it) {
+                ob_start();
+                printNavLinkItem(array('code' => $it['route'], 'name' => $it['label_ar'], 'icon' => $it['icon']), $basePrefix, $badges);
+                $one = ob_get_clean();
+                if (ems_nav_group_has_link($one)) { $kept[] = array('it' => $it, 'html' => $one); }
+            }
+            if (empty($kept)) { continue; }
+            // UI-DEF-05 نفسه في وضع المراحل: رأسٌ يطابق رابطَه الوحيد لا يُطبع.
+            $soloSameName = (count($kept) === 1 && trim((string) $kept[0]['it']['label_ar']) === trim((string) $gname));
+            if ($gname !== '' && count($byGroup) > 1 && !$soloSameName) {
+                echo '<li class="nav-subhead" aria-hidden="true"><span>'
+                   . htmlspecialchars($gname, ENT_QUOTES, 'UTF-8') . '</span></li>' . "\n";
+            }
+            $dense = count($kept) > 12; // أداةُ التكدس نفسُها (NAV-01 §4)
+            foreach ($kept as $idx => $k) {
+                if ($dense && $idx === 7) {
+                    $stMoreSeq++;
+                    $rest = count($kept) - 7;
+                    echo '<li class="nav-more-toggle"><button type="button" class="nav-group-head" '
+                       . 'style="font-size:.85em;opacity:.8" '
+                       . 'onclick="var m=document.getElementById(\'navmore-' . $stMoreSeq . '\');'
+                       . 'var open=m.style.display!==\'none\';m.style.display=open?\'none\':\'block\';'
+                       . 'this.querySelector(\'span\').textContent=open?\'المزيد (' . $rest . ') ▾\':\'أقل ▴\';">'
+                       . '<span>المزيد (' . $rest . ') ▾</span></button></li>' . "\n";
+                    echo '<li><ul id="navmore-' . $stMoreSeq . '" style="display:none;list-style:none;padding:0;margin:0">' . "\n";
+                }
+                echo $k['html'];
+            }
+            if ($dense) { echo '</ul></li>' . "\n"; }
+        }
+        $stageBody = ob_get_clean();
+        /* ◆ ومرحلةٌ لم ينجُ منها رابطٌ لا تُطبع — ورأسا الإدارةِ ينتقلان
+             إلى أولِ مرحلةٍ تُطبع فعلًا (يُتحقَّق منه بفاحصٍ بعدَ التغيير). */
+        if (!ems_nav_group_has_link($stageBody)) { continue; }
+
         /* ◆ والقيمةُ **تُستعمل فعلًا**: كانت تُحسب ثم يُكتب `aria-expanded="false"`
              حرفيًّا فلا أثرَ لها — متغيّرٌ مُهمَلٌ يُوهم أنَّ القاعدةَ مطبَّقة. */
         echo '<li class="nav-group' . ($openDefault ? ' open' : '') . '" data-group-key="' . $key . '"'
@@ -321,6 +382,9 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
         // «المراسلات» بشارة غير المقروء الحية (يحدّثها مستطلِع insidebar
         // القائم عبر #nav-unread-badge) — أولَ رابطين في أول مرحلة، على
         // مستوى المصيّر فيصمدان أمام كل إعادة توليدٍ من الوثيقة.
+        /* ◆ وحارسُ الغلافِ الفارغ (2026-08-20): يُحقنان في أولِ مرحلةٍ **تُطبع
+             فعلًا** لا في أولِ مرحلةٍ مُزمَعة — فلو حُقنا في مرحلةٍ سقطت روابطُها
+             كلُّها لضاعا معها. ولذلك يُبنى جسمُ المرحلةِ قبلَهما ويُشترط نجاةُ رابط. */
         if (!$hdrPrinted) {
             $hdrPrinted = true;
             /* المفتاحُ بصيغةِ «المسار||التسمية» — نفسِ صيغةِ `printNavLinkItem`،
@@ -347,33 +411,7 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
             }
         }
 
-        $byGroup = array();
-        foreach ($sItems as $it) { $byGroup[(string) $it['group_name']][] = $it; }
-        static $stMoreSeq = 1000;
-        foreach ($byGroup as $gname => $gItems) {
-            // UI-DEF-05 نفسه في وضع المراحل: رأسٌ يطابق رابطَه الوحيد لا يُطبع.
-            $soloSameName = (count($gItems) === 1 && trim((string) $gItems[0]['label_ar']) === trim((string) $gname));
-            if ($gname !== '' && count($byGroup) > 1 && !$soloSameName) {
-                echo '<li class="nav-subhead" aria-hidden="true"><span>'
-                   . htmlspecialchars($gname, ENT_QUOTES, 'UTF-8') . '</span></li>' . "\n";
-            }
-            $dense = count($gItems) > 12; // أداةُ التكدس نفسُها (NAV-01 §4)
-            foreach ($gItems as $idx => $it) {
-                if ($dense && $idx === 7) {
-                    $stMoreSeq++;
-                    $rest = count($gItems) - 7;
-                    echo '<li class="nav-more-toggle"><button type="button" class="nav-group-head" '
-                       . 'style="font-size:.85em;opacity:.8" '
-                       . 'onclick="var m=document.getElementById(\'navmore-' . $stMoreSeq . '\');'
-                       . 'var open=m.style.display!==\'none\';m.style.display=open?\'none\':\'block\';'
-                       . 'this.querySelector(\'span\').textContent=open?\'المزيد (' . $rest . ') ▾\':\'أقل ▴\';">'
-                       . '<span>المزيد (' . $rest . ') ▾</span></button></li>' . "\n";
-                    echo '<li><ul id="navmore-' . $stMoreSeq . '" style="display:none;list-style:none;padding:0;margin:0">' . "\n";
-                }
-                printNavLinkItem(array('code' => $it['route'], 'name' => $it['label_ar'], 'icon' => $it['icon']), $basePrefix, $badges);
-            }
-            if ($dense) { echo '</ul></li>' . "\n"; }
-        }
+        echo $stageBody;
         echo '  </ul>' . "\n";
         echo '</li>' . "\n";
     }
@@ -608,6 +646,13 @@ function printUxuiCurrentNav($items, $curMap, $basePrefix, $badges, $mode = 'gro
         $total = 0;
         foreach ($G['items'] as $r) { $total += isset($badges[$r['code']]) ? intval($badges[$r['code']]) : 0; }
         $badge = $total > 0 ? ' <span class="nav-count-badge nav-group-badge">' . ($total > 99 ? '99+' : $total) . '</span>' : '';
+        /* ① الروابطُ أولًا · ② ثم الغلافُ إن نجا رابط (حارسُ الغلافِ الفارغ) */
+        ob_start();
+        foreach ($G['items'] as $r) {
+            printNavLinkItem(array('code' => $r['code'], 'name' => $r['name'], 'icon' => $r['icon']), $basePrefix, $badges);
+        }
+        $body = ob_get_clean();
+        if (!ems_nav_group_has_link($body)) { continue; }
         echo '<li class="nav-group open" data-group-key="' . $key . '">' . "\n";
         /* WCAG 2.2 AA · 4.1.2 — الاسمُ على الزرِّ لا في `span` قد يُخفيه الطيّ */
         $gnm = htmlspecialchars($G['name'], ENT_QUOTES, 'UTF-8');
@@ -617,9 +662,7 @@ function printUxuiCurrentNav($items, $curMap, $basePrefix, $badges, $mode = 'gro
            . $gnm . '</span>' . $badge
            . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
         echo '  <ul class="nav-group-items" id="navgrp-' . $key . '">' . "\n";
-        foreach ($G['items'] as $r) {
-            printNavLinkItem(array('code' => $r['code'], 'name' => $r['name'], 'icon' => $r['icon']), $basePrefix, $badges);
-        }
+        echo $body;
         echo '  </ul>' . "\n" . '</li>' . "\n";
     }
 }
@@ -676,6 +719,13 @@ function printUxuiCanonicalNav($items, $map, $basePrefix, $badges) {
         $total = 0;
         foreach ($G['items'] as $r) { $total += isset($badges[$r['code']]) ? intval($badges[$r['code']]) : 0; }
         $badge = $total > 0 ? ' <span class="nav-count-badge nav-group-badge">' . ($total > 99 ? '99+' : $total) . '</span>' : '';
+        /* ① الروابطُ أولًا · ② ثم الغلافُ إن نجا رابط (حارسُ الغلافِ الفارغ) */
+        ob_start();
+        foreach ($G['items'] as $r) {
+            printNavLinkItem(array('code' => $r['code'], 'name' => $r['name'], 'icon' => $r['icon']), $basePrefix, $badges);
+        }
+        $body = ob_get_clean();
+        if (!ems_nav_group_has_link($body)) { continue; }
         echo '<li class="nav-group' . ($open ? ' open' : '') . '" data-group-key="' . $key . '">' . "\n";
         /* الوصولُ الرقميُّ (WCAG 2.2 AA · بوابةُ الترقيةِ البند ٣): رأسُ المجموعةِ
            **زرٌّ**، واسمُه يعيش في `span` قد يُخفيه طيُّ السايدبار. و`innerText`
@@ -690,9 +740,7 @@ function printUxuiCanonicalNav($items, $map, $basePrefix, $badges) {
            . $gnameAttr . '</span>' . $badge
            . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
         echo '  <ul class="nav-group-items" id="navgrp-' . $key . '">' . "\n";
-        foreach ($G['items'] as $r) {
-            printNavLinkItem(array('code' => $r['code'], 'name' => $r['name'], 'icon' => $r['icon']), $basePrefix, $badges);
-        }
+        echo $body;
         echo '  </ul>' . "\n" . '</li>' . "\n";
     }
 }

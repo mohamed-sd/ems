@@ -276,6 +276,8 @@ ems_public_head('إدارة فريق الشركة | EMS', array('icons' => false
     </style>
     <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
     <link rel="stylesheet" href="/ems/assets/css/ems-forms.css">
+    <!-- تصميمُ الجداول الموحَّد — صفحةٌ قائمةٌ بذاتها لا تمرُّ بالقشرة (توحيد 2026-08-17) -->
+    <?php require_once dirname(__DIR__) . '/includes/table_design.php'; ?>
 </head>
 <body class="standalone-brand">
 <div class="wrap">

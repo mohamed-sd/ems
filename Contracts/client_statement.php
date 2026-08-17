@@ -86,6 +86,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('client', 'الذمم'); ?>
 
     <div class="card"><div class="card-body">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" class="cst-filter">
             <strong>العميل:</strong>
             <select name="client_id" aria-label="العميل" class="cst-client-select" onchange="this.form.submit()">
@@ -99,6 +103,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <label for="emsf_22_eabe1">إلى</label><input type="date" name="to" id="emsf_22_eabe1" value="<?php echo htmlspecialchars($to); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اقرأ الكشف</button>
         </form>
+            </div>
+        </div>
         <p class="cst-note">
             <strong>كلُّ رقمٍ برابط مصدره</strong> — ومن لا مصدرَ له <strong>يُعلَن</strong> ولا يُخفى.
             و<strong>المحتجزُ والمقدمةُ كلٌّ في طبقته</strong> لا يُخلطان بالذمة الجارية (§4)،

@@ -91,6 +91,10 @@ include('../insidebar.php'); ?>
         <div class="card-body fc-filter-body">
 
             <!-- فورم الفلاتر -->
+                        <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+            <div class="filter">
+                <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+                <div class="filter-body">
             <form method="GET" class="form-grid fc-filter-bar">
                 <div class="field md-3 sm-6">
                     <label class="fc-filter-label"><i class="fas fa-project-diagram rpt-drv-ico"></i> المشروع</label>
@@ -175,6 +179,8 @@ include('../insidebar.php'); ?>
                     </a>
                 </div>
             </form>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -187,17 +187,32 @@
 .ts-13, [data-ems-c~="ts-13"] { flex:1;min-width:140px;max-width:340px;background:var(--c-e5e7eb);border-radius:6px;height:10px;overflow:hidden; }
 .ts-14, [data-ems-c~="ts-14"] { color:var(--c-ink-500);font-size:13px; }
 .ts-15, [data-ems-c~="ts-15"] { color:var(--c-s-888);font-size:.8em; }
-.ts-16, [data-ems-c~="ts-16"] { grid-column:1/-1; display:none !important; margin:16px 0 8px;
+/* ══ الامتدادُ لصفٍّ كامل داخلَ الشبكةِ الموحَّدة (توحيد 2026-08-17) ═══════════
+   كانت الكتلُ العريضةُ هنا تُعلن امتدادَها بـ`grid-column:1/-1` — وهي **لاغيةٌ
+   في الشبكةِ الموحَّدة**: `ems-forms.css` يجعل `.form-grid` صندوقًا مرنًا
+   (flex) لا شبكةَ grid، وخاصيةُ `grid-column` لا أثرَ لها في المرن. فكانت كلُّ
+   كتلةٍ عريضة (بطاقةُ التنبيه · قوائمُ الأعطال · جدولُ التعطّلات · كتلةُ الكمية
+   المفوترة) تُحشر في عمودِ حقلٍ واحدٍ عرضُه ٢٦٦ بكسلًا وتمتدُّ طولًا مئاتِ
+   البكسلات. والعلاجُ **بمفتاحِ المكوّنِ المشترك** لا بنمطٍ محلّيّ: صنفُ
+   `form-grid-full` المُعلَنُ في `ems-forms.css` أُضيف في الترميز إلى كلِّ كتلةٍ
+   منها. و`grid-column` تُركت مكتوبةً هنا **بلا أثر** فرُفعت. */
+/* وإخفاءُ كتلةِ الكميةِ المفوترةِ ابتداءً يلزمه تخصيصٌ يغلب
+   `.form-grid > div { display:block !important }` — وإلا ظهرت الكتلةُ فارغةً
+   في كلِّ فتحةِ نموذجٍ قبلَ أن يعرف الجافاسكربت وحدةَ الفوترة. والجافاسكربت
+   يُظهرها بأولويةٍ سطريةٍ (`setProperty(...,'important')`) فتغلب هذا. */
+.ts-16, [data-ems-c~="ts-16"] { display:none !important; margin:16px 0 8px;
                  border:2px solid var(--c-d4a017); border-radius:10px; padding:14px 16px; background:var(--c-fffdf5); }
+.allforms .form-grid > .ts-16,
+.ems-form .form-grid > .ts-16 { display:none !important; }
 .ts-17, [data-ems-c~="ts-17"] { text-align:right; color:var(--c-s-8a6d00); margin:0 0 10px; font-weight:700; font-size:1rem; }
 .ts-18, [data-ems-c~="ts-18"] { color:var(--c-s-b8860b); }
 .ts-19, [data-ems-c~="ts-19"] { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
 .ts-20, [data-ems-c~="ts-20"] { display:none; }
 .ts-21, [data-ems-c~="ts-21"] { color:var(--c-state-danger-strong); }
 .ts-22, [data-ems-c~="ts-22"] { margin:10px 0 0; font-size:.86rem; color:var(--c-s-8a6d00); }
-.ts-23, [data-ems-c~="ts-23"] { grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem; }
+.ts-23, [data-ems-c~="ts-23"] { text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem; }
 .ts-24, [data-ems-c~="ts-24"] { background-color: var(--c-f0f0f0); cursor: not-allowed; }
-.ts-25, [data-ems-c~="ts-25"] { grid-column: 1/-1; background: linear-gradient(135deg, var(--c-fff3cd) 0%, var(--c-s-fff8e1) 100%); border-right: 5px solid var(--c-ffc107); padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--c-s-rgba2551937015); }
+.ts-25, [data-ems-c~="ts-25"] { background: linear-gradient(135deg, var(--c-fff3cd) 0%, var(--c-s-fff8e1) 100%); border-right: 5px solid var(--c-ffc107); padding: 15px 20px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px var(--c-s-rgba2551937015); }
 .ts-26, [data-ems-c~="ts-26"] { display: flex; align-items: start; gap: 12px; }
 .ts-27, [data-ems-c~="ts-27"] { font-size: 28px; line-height: 1; margin-top: -3px; }
 .ts-28, [data-ems-c~="ts-28"] { flex: 1; }
@@ -206,14 +221,16 @@
 .ts-31, [data-ems-c~="ts-31"] { color: var(--c-d32f2f); }
 .ts-32, [data-ems-c~="ts-32"] { margin: 8px 0 0 0; padding-right: 20px; color: var(--c-s-856404); font-size: 0.85rem; }
 .ts-33, [data-ems-c~="ts-33"] { margin: 8px 0 0 0; color: var(--c-d32f2f); font-size: 0.85rem; font-weight: 600; }
-.ts-34, [data-ems-c~="ts-34"] { grid-column: 1/-1; text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem;\; }
-.ts-35, [data-ems-c~="ts-35"] { grid-column: 1/-1; background: var(--card-bg, var(--c-f8f9fa)); border: 1px solid var(--border, var(--c-dee2e6)); border-radius: 8px; padding: 16px; }
+/* كان فيها إعلانٌ فاسدٌ `1rem;\;` — شرطةٌ مائلةٌ تبدأ إعلانًا لا اسمَ له فيسقط
+   بالتحليل. رُفع، فلم يبقَ في القاعدةِ ما يُهدَر. */
+.ts-34, [data-ems-c~="ts-34"] { text-align: right; color: var(--txt); margin: 16px 0 8px; font-weight: 700; font-size: 1rem; }
+.ts-35, [data-ems-c~="ts-35"] { background: var(--card-bg, var(--c-f8f9fa)); border: 1px solid var(--border, var(--c-dee2e6)); border-radius: 8px; padding: 16px; }
 .ts-36, [data-ems-c~="ts-36"] { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
 .ts-37, [data-ems-c~="ts-37"] { font-size:0.85rem; font-weight:600; }
 .ts-38, [data-ems-c~="ts-38"] { width:100%; padding:6px 10px; border-radius:6px; border:1px solid var(--c-s-ccc); }
 .ts-39, [data-ems-c~="ts-39"] { width:100%; padding:6px 10px; border-radius:6px; border:1px solid var(--c-s-ccc); opacity:0.6; }
 .ts-40, [data-ems-c~="ts-40"] { margin-top:10px; padding:8px 12px; background:var(--c-e9ecef); border-radius:6px; font-size:0.82rem; color:var(--c-495057); display:none; }
-.ts-41, [data-ems-c~="ts-41"] { grid-column: 1/-1; border:1px dashed var(--c-ced4da); border-radius:8px; padding:12px; background:var(--c-s-fff); }
+.ts-41, [data-ems-c~="ts-41"] { border:1px dashed var(--c-ced4da); border-radius:8px; padding:12px; background:var(--c-s-fff); }
 .ts-42, [data-ems-c~="ts-42"] { display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
 .ts-43, [data-ems-c~="ts-43"] { font-size:0.9rem; }
 .ts-44, [data-ems-c~="ts-44"] { padding:6px 12px; border-radius:6px; border:1px solid var(--c-0d6efd); background:var(--c-0d6efd); color:var(--c-s-fff); }
@@ -223,8 +240,6 @@
 .ts-48, [data-ems-c~="ts-48"] { background:var(--c-f8f9fa); }
 .ts-49, [data-ems-c~="ts-49"] { padding:6px; border:1px solid var(--c-e9ecef); }
 .ts-50, [data-ems-c~="ts-50"] { padding:8px; text-align:center; border:1px solid var(--c-e9ecef); color:var(--c-6c757d); }
-.ts-51, [data-ems-c~="ts-51"] { grid-column: 1/-1; }
-.ts-52, [data-ems-c~="ts-52"] { margin-top: 20px; }
 .ts-53, [data-ems-c~="ts-53"] { padding: 5px;background: var(--card-bg, var(--c-f8f9fa)); border-bottom: 1px solid var(--border, var(--c-dee2e6)); }
 .ts-54, [data-ems-c~="ts-54"] { background: var(--c-s-ffeaa7); padding: 4px 12px; border-radius: 15px; font-weight: 600; color: var(--c-s-2d3436); }
 .ts-55, [data-ems-c~="ts-55"] { background: var(--c-s-2d3436); padding: 4px 12px; border-radius: 15px; font-weight: 600; color: var(--c-s-fff); }
@@ -326,7 +341,7 @@
   #tsLinesBox .tsl-head { padding: 10px 14px; font-weight: 700; border-bottom: 1px solid var(--c-s-f3e8c8);
     display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   #tsLinesBox table { width: 100%; border-collapse: collapse; }
-  #tsLinesBox th, #tsLinesBox td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--c-s-f3ead1); }
+  #tsLinesBox th, #tsLinesBox td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--table-border, #cccccc); } /* وُصِل بمفاتيحِ ems-tables.css 2026-08-17 */
   #tsLinesBox input, #tsLinesBox select { width: 100%; padding: 6px 8px; border: 1px solid var(--c-s-ddd); border-radius: 6px; }
   #tsLinesBox .tsl-sum { padding: 8px 14px; color: var(--c-374151); font-size: 13px; display: flex; gap: 16px; flex-wrap: wrap; }
   .tsl-state-actual  { border-right: 4px solid var(--c-state-ok) !important; }
@@ -773,7 +788,6 @@ body.ems-site,
 .shot-chart-wrap.tall {
   height: 265px;
 }
-
 
 .shot-stat-grid {
   display: grid;
@@ -1619,7 +1633,6 @@ body.ems-site,
   padding:6px 14px;cursor:pointer;font-size:.9em;font-family:inherit;color:inherit}
 .u13-views .btn-secondary.is-active{background:var(--ems-primary,var(--c-s-f5c518));border-color:transparent;font-weight:600;color:var(--c-s-111)}
 
-
 /* ═══════════════════════════════════════════════════════════════════════════
    نُقل من كتلِ النمطِ المحليةِ في الشاشاتِ الذهبية (UXUI-01 · البند ٦)
    2026-08-18 18:31 — **نقلٌ حرفيٌّ بلا مسِّ قيمة**: صفرُ انحرافٍ بصريٍّ بالتصميم.
@@ -1900,14 +1913,14 @@ body.ems-site,
     .mnt-req-hint { color:var(--c-b45309); font-size:.72rem; font-weight:700; }
     @media (max-width:992px){ .mnt-lines-grid{ grid-template-columns:1fr; } .mnt-orders-main .mnt-cost-summary{ grid-template-columns:repeat(2,1fr);} }
 
-/* ── Suppliers/supplier_profile.php ── */
+/* ── Suppliers/supplier_profile.php ──
+   بطاقةُ المورد على مكوّنِ «بطاقةِ الكِيان» (ems-profile.css) — فسقطت من هنا
+   ستُّ قواعدَ كانت **نسخةً ثالثةً** من لغةِ البطاقة (`.profile-card` · `.kpi`
+   · `.label` · `.spf-lead-*` · `.spf-section-card`)، وهي عينُ ما تكرّر في
+   بطاقتَي العميلِ والموظف. ولم يبقَ إلا ما لا يملكه المكوّن:
+   شبكةُ بطاقاتِ المؤشرِ السباعيةِ (`ems_kpi_card` مكوّنٌ مستقلٌّ أغنى عقدًا،
+   يُحتفظ به) وعرضُ جدولِها. */
 .supplier-profile-page .profile-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:14px; }
-.supplier-profile-page .profile-card { background:var(--c-surface); border:1px solid var(--c-ece2d3); border-radius:12px; padding:12px; }
-.supplier-profile-page .kpi { font-weight:800; font-size:1.4rem; color:var(--c-0f766e); }
-.supplier-profile-page .label { color:var(--c-ink-500); font-size:.9rem; }
-.supplier-profile-page .spf-lead-card { margin-bottom:12px; }
-.supplier-profile-page .spf-lead-title { margin:0 0 8px 0; }
-.supplier-profile-page .spf-section-card { margin-bottom:14px; }
 .supplier-profile-page .spf-table { width:100%; }
 
 /* ── Risk/risk_register.php ── */
@@ -1980,7 +1993,6 @@ body.ems-site,
     border-color: var(--c-c81f24, #c81f24);
 }
 .employee-profile-page .eprof-flash { margin-bottom: 14px; font-weight: 700; }
-
 
 /* ═══════════════════════════════════════════════════════════════════════════
    نُقل من كتلِ النمطِ المحليةِ في الشاشاتِ الذهبية (UXUI-01 · البند ٦)
@@ -2128,14 +2140,14 @@ body.ems-site,
 .sup-shc-note { font-size: .9em; }
 
 /* ── Suppliers/sup_handover.php ── */
-/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصنافٍ — والألوانُ رموزٌ حصرًا */
-.suph-sub { color: var(--c-666666, #666); margin: 4px 0 0; }
-.suph-flash { display: flex; gap: 8px; align-items: center; }
-.suph-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصنافٍ — والألوانُ رموزٌ حصرًا.
+   وبعدَ توحيدِ التصميم (2026-08-17) سقطت أربعةُ أصنافٍ صارت العُدَّةُ تحملها:
+   `suph-sub` (سطرُ الشرحِ صار لافتةَ `alert alert-info`) · `suph-flash`
+   (لغةُ اللافتاتِ في ems-alerts.css) · `suph-grid` و`suph-span-all`
+   (شبكةُ الحقولِ وصفُّ الأزرارِ في ems-forms.css) · و`suph-empty-note`
+   (حالةُ الفراغِ من رسالةِ الجدولِ المعرَّبةِ الموحَّدة). */
 .suph-req { color: var(--c-state-danger-strong); }
-.suph-span-all { grid-column: 1 / -1; }
-.suph-empty-note { color: var(--c-777777, #777); }
-
+.suph-table { width: 100%; }
 
 /* ═══════════════════════════════════════════════════════════════════════════
    نُقل من كتلِ النمطِ المحليةِ في الشاشاتِ الذهبية (UXUI-01 · البند ٦)
@@ -2906,7 +2918,6 @@ body.ems-site,
 .wf-ded-req     { color: var(--c-c00, #c00); }
 .wf-ded-actions { margin-top: 10px; }
 .wf-ded-ok      { color: var(--c-198754, #198754); }
-
 
 /* ═══════════════════════════════════════════════════════════════════════════
    نُقل من كتلِ النمطِ المحليةِ في الشاشاتِ الذهبية (UXUI-01 · البند ٦)
@@ -4005,154 +4016,31 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     }
 
     /* ── بطاقة الترويسة (Hero) ── */
-    .profile-hero {
-        position: relative;
-        display: flex;
-        align-items: center;
-        gap: 22px;
-        flex-wrap: wrap;
-        background: var(--c-s-ccc);
-        border: 1px solid var(--c-rgba24419766032);
-        border-radius: var(--rl, 14px);
-        padding: 26px;
-        color: var(--c-s-fff);
-        box-shadow: var(--sh2);
-        overflow: hidden;
-    }
+    
 
-    .profile-hero::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background-image: radial-gradient(var(--c-rgba255255255005) 1px, transparent 1px);
-        background-size: 18px 18px;
-        pointer-events: none;
-    }
+    
 
-    .profile-hero::after {
-        content: "";
-        position: absolute;
-        left: -40px;
-        top: -50px;
-        width: 220px;
-        height: 220px;
-        border-radius: 50%;
-        background: radial-gradient(circle, var(--c-rgba24419766035) 0%, transparent 70%);
-        pointer-events: none;
-    }
+    
 
-    .profile-avatar {
-        position: relative;
-        z-index: 1;
-        width: 96px;
-        height: 96px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2.2rem;
-        font-weight: 900;
-        color: var(--c-2a2010);
-        background: linear-gradient(135deg, var(--primary-yellow, #F4C542), var(--c-d9ab32));
-        border: 3px solid var(--c-rgba255255255025, rgba(255, 255, 255, 0.25));
-        box-shadow: 0 8px 22px var(--c-rgba000025);
-        flex-shrink: 0;
-    }
+    
 
-    .profile-hero-info {
-        position: relative;
-        z-index: 1;
-        display: grid;
-        gap: 8px;
-        flex: 1;
-        min-width: 240px;
-    }
+    
 
-    .profile-hero-info h2 {
-        margin: 0;
-        font-size: 1.6rem;
-        font-weight: 900;
-        color: var(--c-s-fff);
-    }
+    
 
-    .profile-badges {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        align-items: center;
-    }
+    
 
-    .profile-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 13px;
-        border-radius: 999px;
-        font-size: 0.78rem;
-        font-weight: 700;
-    }
+    
 
-    .profile-badge.role {
-        background: var(--c-rgba24419766018);
-        border: 1px solid var(--c-rgba2441976604);
-        color: var(--c-ffe7b5, #ffe7b5);
-    }
+    
 
-    .profile-badge.user {
-        background: var(--c-rgba25525525501);
-        border: 1px solid var(--c-rgba255255255018);
-        color: var(--c-f3f4f6);
-    }
+    
 
-    .profile-badge.status-on {
-        background: var(--c-rgba2216374018, rgba(22, 163, 74, 0.18));
-        border: 1px solid var(--c-rgba2216374045, rgba(22, 163, 74, 0.45));
-        color: var(--c-bbf7d0);
-    }
+    
 
-    .profile-badge.status-off {
-        background: var(--c-rgba2203838018, rgba(220, 38, 38, 0.18));
-        border: 1px solid var(--c-rgba2203838045, rgba(220, 38, 38, 0.45));
-        color: var(--c-fecaca);
-    }
+    
 
-    .profile-hero-actions {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-    }
-
-    .profile-hero-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        padding: 9px 16px;
-        border-radius: 10px;
-        font-size: 0.85rem;
-        font-weight: 800;
-        text-decoration: none;
-        cursor: pointer;
-        border: 1.5px solid transparent;
-        transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
-    }
-
-    .profile-hero-btn.primary {
-        background: linear-gradient(135deg, var(--primary-yellow, #F4C542), var(--c-d9ab32));
-        color: var(--c-2a2010);
-    }
-
-    .profile-hero-btn.ghost {
-        background: var(--c-999999);
-        border-color: var(--c-rgba255255255022);
-        color: var(--c-s-000, #000);
-    }
-
-    .profile-hero-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 18px var(--c-rgba000025);
-    }
+    
 
     /* ── شبكة الأقسام ── */
     .profile-grid {
@@ -4161,108 +4049,26 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
         gap: 18px;
     }
 
-    .profile-card {
-        background: var(--s1, #fff);
-        border: 1.5px solid var(--bdr, #D7DBE0);
-        border-radius: var(--rl, 14px);
-        padding: 18px;
-        box-shadow: var(--sh);
-        display: grid;
-        gap: 6px;
-        align-content: start;
-    }
+    
 
-    .profile-card-title {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        margin: 0 0 8px;
-        padding-bottom: 12px;
-        border-bottom: 1px dashed var(--bdr, #D7DBE0);
-        color: var(--t1, #111);
-        font-size: 1rem;
-        font-weight: 800;
-    }
+    
 
-    .profile-card-title i {
-        width: 32px;
-        height: 32px;
-        border-radius: 9px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        background: var(--c-rgba24419766016);
-        color: var(--c-s-b8860b);
-        font-size: .9rem;
-    }
+    
 
-    .profile-row {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 14px;
-        padding: 11px 4px;
-        border-bottom: 1px solid var(--bdr2, #EEF0F3);
-    }
+    
 
-    .profile-row:last-child {
-        border-bottom: none;
-    }
+    
 
-    .profile-row-label {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        color: var(--t3, #666E78);
-        font-size: 0.85rem;
-        font-weight: 700;
-    }
+    
 
-    .profile-row-label i {
-        color: var(--or2, #D9AB32);
-        width: 16px;
-        text-align: center;
-    }
+    
 
-    .profile-row-value {
-        color: var(--t1, #111);
-        font-size: 0.9rem;
-        font-weight: 800;
-        text-align: left;
-        word-break: break-word;
-    }
+    
 
-    .profile-row-value.muted {
-        color: var(--t3, #9aa0a8);
-        font-weight: 700;
-    }
-
-    .profile-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 4px 12px;
-        border-radius: 999px;
-        font-size: 0.78rem;
-        font-weight: 800;
-    }
-
-    .profile-pill.on {
-        background: var(--c-rgba2216374012);
-        color: var(--c-15803d);
-    }
-
-    .profile-pill.off {
-        background: var(--c-rgba2203838012);
-        color: var(--c-b91c1c);
-    }
+    
 
     /* ── بطاقات الإحصائيات ── */
-    .profile-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-        gap: 14px;
-    }
+    
 
     .stat-card {
         display: flex;
@@ -4302,12 +4108,9 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
 
     .stat-icon.blue { background: var(--c-rgba305895012, rgba(30, 58, 95, 0.12)); color: var(--c-1e3a5f, #1E3A5F); }
     .stat-icon.green { background: var(--c-rgba2216374013, rgba(22, 163, 74, 0.13)); color: var(--c-15803d); }
-    .stat-icon.gray  { background: var(--c-rgba110110110014, rgba(110, 110, 110, 0.14)); color: var(--c-555555); }
+    .stat-icon.gray { background: var(--c-rgba110110110014, rgba(110, 110, 110, 0.14)); color: var(--c-555555); }
 
-    .stat-meta {
-        display: grid;
-        gap: 2px;
-    }
+    
 
     .stat-value {
         font-size: 1.55rem;
@@ -4337,9 +4140,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
         box-shadow: var(--sh);
     }
 
-    .chart-card .profile-card-title {
-        border-bottom: 1px dashed var(--bdr, #D7DBE0);
-    }
+    
 
     .chart-wrap {
         position: relative;
@@ -4406,7 +4207,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     }
 
     .activity-table thead th:first-child { border-radius: 0 9px 0 0; }
-    .activity-table thead th:last-child  { border-radius: 9px 0 0 0; }
+    .activity-table thead th:last-child { border-radius: 9px 0 0 0; }
 
     .activity-table tbody td {
         padding: 10px 12px;
@@ -4420,31 +4221,12 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
         background: var(--c-fffaf0, #fffaf0);
     }
 
-    .act-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 3px 10px;
-        border-radius: 999px;
-        font-size: 0.76rem;
-        font-weight: 800;
-        background: var(--c-rgba24419766016);
-        color: var(--c-8a6d0c, #8a6d0c);
-    }
+    
 
-    .act-badge.login  { background: var(--c-rgba2216374013, rgba(22, 163, 74, 0.13)); color: var(--c-15803d); }
-    .act-badge.logout { background: var(--c-rgba2203838012); color: var(--c-b91c1c); }
-    .act-badge.create { background: var(--c-rgba305895012, rgba(30, 58, 95, 0.12)); color: var(--c-1e3a5f, #1E3A5F); }
-
-    .profile-empty {
-        text-align: center;
-        color: var(--t3, #9aa0a8);
-        font-weight: 700;
-        padding: 26px;
-    }
+    
 
     /* UXW-01 ②: أصنافٌ محلَّ الأنماطِ الموضعيةِ التي كانت مبثوثةً في الوسوم */
-    .pf-dot { font-size: .5rem; }
+    
     .pf-qlink { text-decoration: none; }
     .pf-arrow { color: var(--t3); }
     .pf-danger { color: var(--c-b91c1c); }
@@ -4458,24 +4240,6 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     @media (max-width: 900px) {
         .profile-analytics {
             grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .profile-hero {
-            padding: 20px;
-            justify-content: center;
-            text-align: center;
-        }
-
-        .profile-hero-info {
-            text-align: center;
-            justify-items: center;
-        }
-
-        .profile-badges,
-        .profile-hero-actions {
-            justify-content: center;
         }
     }
 
@@ -4551,8 +4315,8 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     .mnt-inspections-main .mnt-line-table tbody td { font-size:.84rem; padding:8px 10px; border-bottom:1px solid var(--c-f0e9da,#f0e9da); vertical-align:middle; }
     .mnt-inspections-main .mnt-line-table tbody tr:hover { background:var(--c-e0ae2e-05, rgba(224,174,46,.05)); }
     .mnt-inspections-main .mnt-sec-row { cursor:pointer; }
-    .mnt-inspections-main .mnt-sec-row td { background:var(--c-eef4fb,#eef4fb) !important; color:var(--c-1f4f7a,#1f4f7a); font-weight:800; font-size:.84rem; display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .mnt-inspections-main .mnt-sec-row:hover td { background:var(--c-e3eefa,#e3eefa) !important; }
+    .mnt-inspections-main .mnt-sec-row td { background:var(--table-group-row-bg,#eef4fb) !important; color:var(--table-group-row-text,#1f4f7a); font-weight:800; font-size:.84rem; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .mnt-inspections-main .mnt-sec-row:hover td { background:var(--table-group-row-hover-bg,#e3eefa) !important; }
     .mnt-inspections-main .mnt-sec-toggle { display:inline-flex; align-items:center; gap:8px; }
     .mnt-inspections-main .mnt-sec-chev { transition:transform .15s; font-size:.72rem; color:var(--c-2f6fa5,#2f6fa5); }
     .mnt-inspections-main .mnt-sec-meta { font-size:.74rem; font-weight:800; color:var(--c-15803d,#15803d); white-space:nowrap; }
@@ -5938,3 +5702,12 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
         .wm-inline-form { display: inline; }
         .wm-state-select { padding: 2px; }
         .wm-empty-cell { text-align: center; color: var(--gray-500); padding: 18px; }
+
+/* ── Projects/project_profile.php ──
+   البطاقةُ على مكوّنِ «بطاقةِ الكِيان»؛ ولم يبقَ من كتلتِها المحليةِ إلا عرضُ
+   جدولِ الموردين. (وسقط معها لونٌ مثبَّتٌ احتياطيٌّ `#ece6d8` كان خارجَ الرموز.) */
+.project-profile-page .pp-suppliers-table { width:100%; }
+
+/* ── main/user_profile.php ──
+   البطاقةُ على المكوّن؛ ولم يبقَ إلا عرضُ جدولِ المشروعِ المكلَّف. */
+.user-profile-page .profile-table { width:100%; }

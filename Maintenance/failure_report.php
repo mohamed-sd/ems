@@ -67,11 +67,17 @@ include '../insidebar.php';
     ?>
 
     <div class="card"><div class="card-body">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" class="mnt-fr-filter">
             <label for="emsf_278_59478">من</label><input type="date" name="from" id="emsf_278_59478" value="<?php echo htmlspecialchars($from); ?>">
             <label for="emsf_279_abf93">إلى</label><input type="date" name="to" id="emsf_279_abf93" value="<?php echo htmlspecialchars($to); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اعرض</button>
         </form>
+            </div>
+        </div>
     </div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list-ol"></i>

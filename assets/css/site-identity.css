@@ -322,10 +322,10 @@ table,
 #minesTable {
   border-collapse: separate !important;
   border-spacing: 0 !important;
-  border: 1px solid var(--site-line) !important;
-  border-radius: 12px !important;
+  border: 1px solid var(--table-border-soft, #eceef1) !important;
+  border-radius: var(--table-radius, 12px) !important;
   overflow: hidden !important;
-  background: var(--c-surface);
+  background: var(--table-surface, #ffffff);
 }
 
 .table thead,
@@ -342,10 +342,13 @@ table.dataTable thead td,
 .dataTables_scrollHead table thead th,
 .dataTables_scrollHead table thead td,
 table thead th {
-  background: linear-gradient(135deg, var(--site-black) 0%, var(--site-black-soft) 100%) !important;
-  color: var(--site-orange) !important;
+  /* وُصِلت بمفاتيحِ ems-tables.css (توحيد 2026-08-17): كانت ترويسةً برتقاليةً
+     على أسودَ بينما المصدرُ الموحَّدُ رماديٌّ بنصٍّ أبيض — تصميمان لجدولٍ واحد. */
+  background: var(--table-header-bg, #6b6b6b) !important;
+  background-image: none !important;
+  color: var(--table-header-text, #ffffff) !important;
   border: 0 !important;
-  border-bottom: 2px solid var(--site-orange-deep) !important;
+  border-bottom: 2px solid var(--table-header-scroll-bg, #3d3d3d) !important;
   font-weight: 700 !important;
   font-size: 13px !important;
   padding: 11px 8px !important;
@@ -359,7 +362,7 @@ table.dataTable thead .sorting_asc::after,
 table.dataTable thead .sorting_desc::after,
 table.dataTable thead .sorting_asc_disabled::after,
 table.dataTable thead .sorting_desc_disabled::after {
-  color: var(--site-orange) !important;
+  color: var(--table-header-text, #ffffff) !important;
   opacity: 0.7 !important;
 }
 
@@ -371,8 +374,8 @@ table.dataTable thead .sorting_desc_disabled::after {
 #driversTable tbody td,
 #minesTable tbody td,
 table tbody td {
-  border-top: 1px solid var(--c-edf1f6) !important;
-  color: var(--site-text) !important;
+  border-top: 1px solid var(--table-border, #cccccc) !important;
+  color: var(--table-text, #161616) !important;
   font-weight: 600;
   padding: 10px 8px !important;
   text-align: center !important;
@@ -386,7 +389,7 @@ table tbody td {
 #driversTable tbody tr:nth-child(even),
 #minesTable tbody tr:nth-child(even),
 table tbody tr:nth-child(even) {
-  background: var(--c-fafbfe) !important;
+  background: var(--table-row-even-bg, #e6e6e6) !important;
 }
 
 .table tbody tr:hover,
@@ -397,7 +400,7 @@ table tbody tr:nth-child(even) {
 #driversTable tbody tr:hover,
 #minesTable tbody tr:hover,
 table tbody tr:hover {
-  background: var(--site-orange-soft) !important;
+  background: var(--table-row-hover-bg, #fcf3d6) !important;
 }
 
 .table td .badge,

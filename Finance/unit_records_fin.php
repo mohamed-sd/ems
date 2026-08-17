@@ -185,6 +185,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     : '<strong>لديك صلاحية العرض فقط</strong> — الاعتماد يحتاج صلاحية التعديل على هذه الشاشة.'; ?>
             </p>
 
+                        <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+            <div class="filter">
+                <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+                <div class="filter-body">
             <form method="get" class="fin-units-filter">
                 <div><label class="fin-units-flabel" for="fin_units_q_project">المشروع</label><br>
                     <select id="fin_units_q_project" name="q_project" onchange="this.form.submit()"><?php echo fin_project_options($conn, $is_super_admin, $company_id, $q_project); ?></select></div>
@@ -194,6 +198,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <a href="unit_records_fin.php" class="btn btn-sm btn-secondary">مسح المرشّحات</a>
                 <?php endif; ?>
             </form>
+                </div>
+            </div>
 
             <?php if (!empty($GLOBALS['fin_queue_error'])): ?>
                 <div class="alert alert-danger fin-units-pad10"><i class="fas fa-triangle-exclamation"></i>

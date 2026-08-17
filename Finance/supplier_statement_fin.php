@@ -108,6 +108,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card"><div class="card-body">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" class="fin-sup-filter">
             <strong><i class="fas fa-truck-field"></i> المورد:</strong>
             <select name="sup" aria-label="المورد المعروض كشفُ حسابه" class="fin-sup-select" onchange="this.form.submit()"><?php
@@ -121,6 +125,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <strong>الفترة:</strong>
             <input type="month" name="period" aria-label="شهرُ كشفِ الحساب" onchange="this.form.submit()" value="<?php echo htmlspecialchars($sel_period); ?>">
         </form>
+            </div>
+        </div>
     </div></div>
 
     <?php if ($sel_sup > 0): ?>

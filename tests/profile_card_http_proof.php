@@ -99,18 +99,54 @@ function pick_sample($base, $jar, $listPath, $linkPat, $cardPath, $limit = 8)
     return $firstOpen;
 }
 
-$targets = array();
-$cid = pick_sample($BASE, $jar, 'Clients/clients.php', '~client_profile\.php\?id=(\d+)~',
-                   'Clients/client_profile.php?id=');
-if ($cid) { $targets['بطاقة العميل'] = "Clients/client_profile.php?id={$cid}"; }
-$eid = pick_sample($BASE, $jar, 'Employees/employees.php', '~employee_profile\.php\?id=(\d+)~',
-                   'Employees/employee_profile.php?id=');
-if ($eid) { $targets['بطاقة الموظف'] = "Employees/employee_profile.php?id={$eid}"; }
+/* ── البطاقاتُ السبعُ وحساباتُها ───────────────────────────────────────────
+   ◆ **حسابٌ لكلِّ بطاقةٍ لا حسابٌ واحدٌ للجميع**: بطاقةُ المورِّدِ لا تُفتح
+     لحساب المبيعات، وبطاقةُ المعدةِ لا تُفتح لحسابِ المورِّدين — والحكمُ على
+     بطاقةٍ بحسابٍ لا يملكها يقيس **تحويلةً** لا تصميمًا. الخريطةُ هنا مرآةُ
+     `tools/uxw_accounts.txt` (كلمةُ المرورِ الموحَّدة 12345678 — دليلُ UAT).
+   ◆ وما تعذّر التقاطُ عيّنتِه **يُعلَن ولا يُسكت عنه**: بطاقةٌ لم تُقَس تُذكر
+     في الحصيلةِ صراحةً، فلا يُقرأ «صفرُ رسوبٍ» على أنه «الكلُّ مقيسٌ سليم». */
+$CARDS = array(
+    'بطاقة العميل'  => array('user' => 'مبيعات', 'list' => 'Clients/clients.php',
+        'pat' => '~client_profile\.php\?id=(\d+)~',       'card' => 'Clients/client_profile.php?id='),
+    'بطاقة الموظف'  => array('user' => 'مبيعات', 'list' => 'Employees/employees.php',
+        'pat' => '~employee_profile\.php\?id=(\d+)~',     'card' => 'Employees/employee_profile.php?id='),
+    'بطاقة المشروع' => array('user' => 'محمد', 'list' => 'Projects/projects.php',
+        'pat' => '~project_profile\.php\?id=(\d+)~',      'card' => 'Projects/project_profile.php?id='),
+    'بطاقة المورِّد' => array('user' => 'مصعب', 'list' => 'Suppliers/suppliers.php',
+        'pat' => '~supplier_profile\.php\?id=(\d+)~',     'card' => 'Suppliers/supplier_profile.php?id='),
+    'بطاقة المعدة'  => array('user' => 'محمد', 'list' => 'Equipments/equipments.php',
+        'pat' => '~equipment_profile\.php\?id=(\d+)~',    'card' => 'Equipments/equipment_profile.php?id='),
+    'بطاقة المستخدم' => array('user' => 'محمد', 'list' => 'main/users.php',
+        'pat' => '~user_profile\.php\?id=(\d+)~',         'card' => 'main/user_profile.php?id='),
+    /* عمليةُ التمويلِ مجالٌ مقيَّدٌ (FIN-01 §1.1): لا تُفتح إلا بمنحِ ownership
+       الفرديِّ أو بدورِ التمويلِ 26 — فحسابُها «تمويل» لا غيرُه. وعيّنتُها
+       تُلتقط من شاشةِ الأقساطِ لأنها الوحيدةُ التي تربط إليها. */
+    'ملف عملية التمويل' => array('user' => 'تمويل', 'list' => 'Financing/installments.php',
+        'pat' => '~operation_profile\.php\?id=(\d+)~',    'card' => 'Financing/operation_profile.php?id='),
+    'الملف الشخصي'  => array('user' => 'محمد', 'fixed' => 'main/profile.php'),
+);
 
-if (!$targets) { exit("\xE2\x9C\x96 لم تُلتقط أيُّ عيّنة — الشاشاتُ الأمُّ محجوبةٌ عن «{$USER}»\n"); }
+$targets = array(); $skipped = array();
+foreach ($CARDS as $label => $c) {
+    $u  = $c['user'];
+    $cj = sys_get_temp_dir() . '/prof_card_' . md5($u) . '.jar';
+    list($lc) = login($BASE, $u, $cj);
+    if ($lc !== 200 && $lc !== 302) { $skipped[] = "{$label}: تعذّر الدخولُ بـ«{$u}»"; continue; }
+    if (isset($c['fixed'])) {
+        $targets[$label] = array('path' => $c['fixed'], 'jar' => $cj, 'user' => $u);
+        continue;
+    }
+    $id = pick_sample($BASE, $cj, $c['list'], $c['pat'], $c['card']);
+    if (!$id) { $skipped[] = "{$label}: لا عيّنةَ — الشاشةُ الأمُّ محجوبةٌ عن «{$u}» أو بلا سجلات"; continue; }
+    $targets[$label] = array('path' => $c['card'] . $id, 'jar' => $cj, 'user' => $u);
+}
 
-foreach ($targets as $label => $path) {
-    echo "\xE2\x94\x80\xE2\x94\x80 {$label}  ({$path})\n";
+if (!$targets) { exit("\xE2\x9C\x96 لم تُلتقط أيُّ عيّنة\n"); }
+
+foreach ($targets as $label => $t) {
+    $path = $t['path']; $jar = $t['jar'];
+    echo "\xE2\x94\x80\xE2\x94\x80 {$label}  ({$path})  بحساب «{$t['user']}»\n";
 
     list($code, $head, $body) = req($BASE . '/' . $path, $jar);
     $loc = preg_match('~^Location:\s*(.+)$~mi', $head, $m) ? trim($m[1]) : '';
@@ -120,7 +156,14 @@ foreach ($targets as $label => $path) {
     /* ① المكوّنُ مُصيَّرٌ أصلًا — وإلا صحَّت الفحوصُ التاليةُ على العدم */
     $hero = substr_count($body, 'ems-profile__hero"');
     ck('لوحُ الهويةِ مُصيَّرٌ مرةً واحدة', $hero === 1, "المقيس={$hero}");
-    ck('شريطُ المؤشراتِ مُصيَّر', strpos($body, 'ems-profile__stat') !== false);
+    /* ◆ شريطُ المؤشراتِ **مكوّنانِ لا واحد**: `ems_profile_stats` للعددِ
+         المجرَّد، و`ems_kpi_card` للمؤشرِ ذي العقدِ السباعيِّ (وحدةٌ · فترةٌ ·
+         مقارنةٌ · حالةٌ · مصدرٌ · رابطُ تعمّق). وبطاقةُ المورِّدِ تستعمل الثاني
+         عمدًا — واستبدالُه بالأولِ يُسقط ستَّ حقائقَ حوكميةٍ من كلِّ مؤشر.
+         فالعقدُ المقيس: **شريطُ مؤشراتٍ مُصيَّرٌ بأحدِ المكوّنَين** لا بواحدٍ
+         بعينِه. (كان الفحصُ يطلب الأولَ وحدَه فرسّب تصميمًا سليمًا.) */
+    ck('شريطُ المؤشراتِ مُصيَّرٌ (stats أو kpi-card)',
+       strpos($body, 'ems-profile__stat') !== false || strpos($body, 'ems-kpi-card') !== false);
 
     /* ◆ كِيانٌ بلا سجلاتٍ **لا يُصيَّر له قسمٌ بالتصميم** — «لا عنوانَ فوقَ
          فراغ». فالعقدُ المقيس: أقسامٌ، أو حالةُ فراغٍ **مُعلَنةٌ** بسببِها
@@ -170,10 +213,19 @@ foreach ($targets as $label => $path) {
     ck('لا مجموعةَ عنوانُها فوقَ فراغ' . ($groups->length ? " ({$groups->length} مجموعة)" : ' (لا مجموعاتٍ)'),
        $empty === 0, "الفارغ={$empty}");
 
-    /* ④ صفرُ بقايا: أصنافُ اللغةِ البصريةِ القديمة */
-    $legacy = array('cp-band', 'cp-group', 'profile-card', 'opp-stage', 'tnd-badge', 'cp-via',
-                    'identity-card', 'section-card', 'stats-grid', 'info-grid', 'driver-badge',
-                    'assignment-status', 'timeline-list');
+    /* ④ صفرُ بقايا: أصنافُ اللغاتِ البصريةِ السبعِ التي حلَّ المكوّنُ محلَّها */
+    $legacy = array(
+        /* بطاقةُ العميل */   'cp-band', 'cp-group', 'opp-stage', 'tnd-badge', 'cp-via',
+        /* بطاقةُ الموظف */   'identity-card', 'section-card', 'stats-grid', 'info-grid',
+                              'driver-badge', 'assignment-status', 'timeline-list',
+        /* المشترَكُ بينها */ 'profile-card', 'profile-hero', 'profile-row', 'profile-pill',
+                              'profile-badge', 'profile-avatar', 'profile-card-title',
+                              'profile-stats', 'stat-meta', 'act-badge',
+        /* بطاقةُ المعدة */   'ep-hero', 'ep-chip', 'ep-pill', 'ep-fact',
+        /* بطاقةُ المورِّد */  'spf-lead-card', 'spf-section-card',
+        /* عمليةُ التمويل */  'fin-op-badge-state', 'fin-op-inst-paid', 'fin-op-inst-due',
+        /* البلاغاتُ المتصلة */ 'related-tickets-tab',
+    );
     $found = array();
     foreach ($legacy as $c) {
         if (preg_match('~class="[^"]*\b' . preg_quote($c, '~') . '\b~', $body)) { $found[] = $c; }
@@ -183,8 +235,33 @@ foreach ($targets as $label => $path) {
     /* ⑤ ورقةُ الأنماطِ موصولةٌ فعلًا — مكوّنٌ بلا أنماطٍ ترميزٌ عارٍ */
     ck('`ems-profile.css` موصولةٌ بالصفحة',
        preg_match('~<link[^>]+ems-profile\.css~', $body) === 1);
+
+    /* ⑥ «البلاغاتُ المتصلة» — حيث تُضمَّن تكون **داخلَ** الغلافِ لا خلفَه.
+         كانت تُضمَّن بعد إغلاقِ `.main` في ثلاثِ بطاقاتٍ فتظهر بجانبِ الشاشة؛
+         والفحصُ يقيس أنّ قسمَها من نسلِ الغلافِ لا شقيقًا له. */
+    $rtPos = mb_strpos($body, 'البلاغاتُ المتصلة');
+    if ($rtPos !== false) {
+        $rtNodes = $xp->query('//*[contains(@class, "ems-profile__section")]'
+                            . '[.//*[contains(text(), "البلاغاتُ المتصلة")]'
+                            . ' or contains(., "البلاغاتُ المتصلة")]');
+        $rtIn = false;
+        foreach ($rtNodes as $n) {
+            $p = $n;
+            while ($p = $p->parentNode) {
+                if ($p->nodeType === XML_ELEMENT_NODE
+                 && preg_match('~(^|\s)ems-profile(\s|$)~', (string) $p->getAttribute('class'))) { $rtIn = true; break 2; }
+            }
+        }
+        ck('«البلاغاتُ المتصلة» داخلَ غلافِ البطاقة', $rtIn, 'مُصيَّرةٌ خارجَ `.ems-profile`');
+    }
 }
 
 echo "\n" . str_repeat("\xE2\x94\x80", 60) . "\n";
+echo '  بطاقاتٌ مقيسة: ' . count($targets) . ' من ' . count($CARDS) . "\n";
+if ($skipped) {
+    /* «ما لم يُقَس يُعلَن»: بطاقةٌ سقطت من الجولةِ ليست بطاقةً ناجحة */
+    echo "  \xE2\x9A\xA0 لم تُقَس (" . count($skipped) . "):\n";
+    foreach ($skipped as $s) { echo "      \xC2\xB7 {$s}\n"; }
+}
 echo "  نجح: {$PASS}   \xC2\xB7   رسب: {$FAIL}\n";
 exit($FAIL > 0 ? 1 : 0);

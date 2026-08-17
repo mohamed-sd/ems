@@ -10,6 +10,7 @@
  *             include __DIR__ . '/../includes/contract_file_tabs.php';
  */
 if (!isset($cf_contract_id)) { return; }
+require_once __DIR__ . '/file_tabs_kit.php';
 $cf_id  = intval($cf_contract_id);
 $cf_act = isset($cf_active) ? $cf_active : 'summary';
 $cf_pre = (strpos($_SERVER['SCRIPT_NAME'] ?? '', '/Contracts/') !== false
@@ -51,25 +52,20 @@ $cf_tabs = array(
 /* أيُّ تبويبٍ علويٍّ نشطٌ؟ — من القسم النشط */
 $cf_top_active = 'summary';
 foreach ($cf_tabs as $tk => $tv) { if (isset($tv[1][$cf_act])) { $cf_top_active = $tk; break; } }
-?>
-<div class="cf-tabs" dir="rtl" style="margin:0 0 12px">
-  <ul class="nav nav-tabs" style="flex-wrap:wrap">
-    <?php foreach ($cf_tabs as $tk => $tv): ?>
-      <li class="nav-item">
-        <a class="nav-link<?= $tk === $cf_top_active ? ' active' : '' ?>"
-           href="<?= $cf_pre . sprintf($tv[1][array_key_first($tv[1])][1], $cf_id) ?>">
-          <?= $tv[0] ?></a>
-      </li>
-    <?php endforeach; ?>
-  </ul>
-  <?php $cf_secs = $cf_tabs[$cf_top_active][1]; if (count($cf_secs) > 1): ?>
-  <div style="padding:6px 4px;background:#f8f9fa;border:1px solid #dee2e6;border-top:0">
-    <?php foreach ($cf_secs as $sk => $sv): ?>
-      <a href="<?= $cf_pre . sprintf($sv[1], $cf_id) ?>"
-         class="badge" style="font-size:.85em;margin:0 2px;<?= $sk === $cf_act
-            ? 'background:#0d6efd;color:#fff' : 'background:#e9ecef;color:#333' ?>">
-        <?= $sv[0] ?></a>
-    <?php endforeach; ?>
-  </div>
-  <?php endif; ?>
-</div>
+$cf_items = array();
+foreach ($cf_tabs as $tk => $tv) {
+    $cf_first = $tv[1][array_key_first($tv[1])][1];
+    $cf_items[] = array('text' => $tv[0], 'href' => $cf_pre . sprintf($cf_first, $cf_id),
+                        'active' => ($tk === $cf_top_active));
+}
+$cf_subItems = array();
+foreach ($cf_tabs[$cf_top_active][1] as $sk => $sv) {
+    $cf_subItems[] = array('text' => $sv[0], 'href' => $cf_pre . sprintf($sv[1], $cf_id),
+                           'active' => ($sk === $cf_act));
+}
+
+ems_file_tabs(array(
+    'label' => 'ملفُّ العقد',
+    'tabs'  => $cf_items,
+    'subs'  => $cf_subItems,
+));

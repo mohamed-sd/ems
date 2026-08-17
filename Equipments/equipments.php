@@ -782,16 +782,10 @@ include __DIR__ . '/../includes/page_header.php';
         </div>
         <div class="card-body">
             <!-- نظام الفلاتر -->
-            <div class="filters-container">
-                <div class="filters-header">
-                    <h6><i class="fas fa-filter"></i> فلترة المعدات</h6>
-                    <button type="button" class="btn-secondary" id="clearFiltersBtn">
-                        <i class="fas fa-times-circle"></i> إلغاء الفلاتر
-                    </button>
-                </div>
-
-                <div class="filters-grid">
-                    <div class="filter-item">
+            <div class="filter">
+                <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+                <div class="filter-body">
+                    <div class="filter-field">
                         <label for="filterSupplier"><i class="fas fa-truck-loading"></i> فلترة بالمورد</label>
                         <select id="filterSupplier" class="filter-select">
                             <option value="">— جميع الموردين —</option>
@@ -809,7 +803,7 @@ include __DIR__ . '/../includes/page_header.php';
                         </select>
                     </div>
 
-                    <div class="filter-item">
+                    <div class="filter-field">
                         <label for="filterType"><i class="fas fa-list-alt"></i> فلترة بالنوع</label>
                         <select id="filterType" class="filter-select">
                             <option value="">— جميع الأنواع —</option>
@@ -827,7 +821,7 @@ include __DIR__ . '/../includes/page_header.php';
                         </select>
                     </div>
 
-                    <div class="filter-item">
+                    <div class="filter-field">
                         <label for="filterStatus"><i class="fas fa-toggle-on"></i> فلترة بالحالة</label>
                         <select id="filterStatus" class="filter-select">
                             <option value="">— جميع الحالات —</option>
@@ -836,7 +830,7 @@ include __DIR__ . '/../includes/page_header.php';
                         </select>
                     </div>
 
-                    <div class="filter-item">
+                    <div class="filter-field">
                         <label for="filterAvailability"><i class="fas fa-traffic-light"></i> فلترة بالتوفر</label>
                         <select id="filterAvailability" class="filter-select">
                             <option value="">— جميع حالات التوفر —</option>
@@ -846,6 +840,7 @@ include __DIR__ . '/../includes/page_header.php';
                             <option value="معطلة مؤقتاً">معطلة مؤقتاً</option>
                         </select>
                     </div>
+                    <div class="filter-actions"><button type="button" class="btn-secondary" id="clearFiltersBtn" title="إلغاء الفلاتر"><i class="fa fa-rotate-right"></i></button></div>
                 </div>
 
                 <div class="filters-summary eq-3" id="filtersSummary">
@@ -1234,10 +1229,12 @@ include __DIR__ . '/../includes/page_header.php';
                 applyFilters();
                 updateFiltersSummary();
 
-                // تأثير بصري
-                $(this).addClass('btn-secondary');
+                /* تأثيرٌ بصريّ: صنفٌ مخصَّصٌ لا `btn-secondary` — ذاك يحمل تصميمَ
+                   الزرِّ نفسَه في `ems-filters.css`، وإزالتُه بعدَ 300ms
+                   كانت تُعرّيه من شكلِه بعدَ أولِ نقرةٍ ولا تُعيدُه. */
+                $(this).addClass('is-flash');
                 setTimeout(function() {
-                    $('#clearFiltersBtn').removeClass('btn-secondary');
+                    $('#clearFiltersBtn').removeClass('is-flash');
                 }, 300);
             });
 

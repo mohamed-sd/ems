@@ -432,7 +432,7 @@ table {
 .table thead {
   background-color: var(--gray-50, var(--c-fafaf9));
   color: var(--gray-900, var(--c-1c1917));
-  border-bottom: 2px solid var(--gray-200, var(--c-line-200));
+  border-bottom: 2px solid var(--table-header-scroll-bg, #3d3d3d);
 }
 
 .table thead tr th {
@@ -443,13 +443,13 @@ table {
   text-align: center;
   color: var(--gray-900, var(--c-1c1917));
   background-color: var(--gray-50, var(--c-fafaf9));
-  border-bottom: 2px solid var(--gray-200, var(--c-line-200));
+  border-bottom: 2px solid var(--table-header-scroll-bg, #3d3d3d);
 }
 
 .table thead tr td {
   background-color: var(--gray-50, var(--c-fafaf9));
   color: var(--gray-900, var(--c-1c1917));
-  border-bottom: 2px solid var(--gray-200, var(--c-line-200));
+  border-bottom: 2px solid var(--table-header-scroll-bg, #3d3d3d);
 }
 
 /* ================== Responsive Sidebar ================== */
@@ -544,8 +544,7 @@ table {
 /* خلفية الجدول */
 #projectsTable,
 .projectsTable {
-  background-color: var(--c-surface);
-  /* أبيض */
+  background-color: var(--table-row-odd-bg, #ffffff);
   border: 2px solid var(--c-0d1b2a);
   /* كحلي غامق */
   border-radius: 8px;
@@ -555,38 +554,33 @@ table {
 /* عناوين الأعمدة */
 #projectsTable thead th,
 .projectsTable thead th {
-  background-color: var(--gray-50, var(--c-fafaf9));
-  /* رمادي فاتح جداً */
-  color: var(--gray-900, var(--c-1c1917));
-  /* نص داكن */
+  /* وُصِلت بمفاتيحِ ems-tables.css (توحيد 2026-08-17) */
+  background-color: var(--table-header-bg, #6b6b6b);
+  color: var(--table-header-text, #ffffff);
   text-align: center;
   font-weight: 600;
   padding: 12px;
-  border-bottom: 2px solid var(--gray-200, var(--c-line-200));
+  border-bottom: 2px solid var(--table-header-scroll-bg, #3d3d3d);
 }
 
 /* الصفوف */
 #projectsTable tbody tr:nth-child(even),
 .projectsTable tbody tr:nth-child(even) {
-  background-color: var(--c-f8f9fa);
-  /* رمادي فاتح */
+  background-color: var(--table-row-even-bg, #e6e6e6);
 }
 
 #projectsTable tbody tr:nth-child(odd),
 .projectsTable tbody tr:nth-child(odd) {
-  background-color: var(--c-surface);
-  /* أبيض */
+  background-color: var(--table-row-odd-bg, #ffffff);
 }
 
 #projectsTable tbody tr:hover {
-  background-color: var(--c-fff3cd);
-  /* أصفر فاتح عند hover */
+  background-color: var(--table-row-hover-bg, #fcf3d6);
 }
 
 /* نصوص الأعمدة */
 #projectsTable tbody td {
-  color: var(--c-0d1b2a);
-  /* كحلي */
+  color: var(--table-text, #161616);
   padding: 10px;
   text-align: center;
 }
@@ -816,19 +810,20 @@ label {
 
 .main .table thead th,
 .main table thead th {
-  background: var(--c-f8fafc);
-  color: var(--c-1f2937);
-  border-bottom: 1px solid var(--ems-border);
+  /* وُصِلت بمفاتيحِ ems-tables.css (توحيد 2026-08-17) */
+  background: var(--table-header-bg, #6b6b6b);
+  color: var(--table-header-text, #ffffff);
+  border-bottom: 1px solid var(--table-header-scroll-bg, #3d3d3d);
 }
 
 .main .table tbody tr:nth-child(even),
 .main table tbody tr:nth-child(even) {
-  background-color: var(--c-fcfcfd);
+  background-color: var(--table-row-even-bg, #e6e6e6);
 }
 
 .main .table tbody tr:hover,
 .main table tbody tr:hover {
-  background-color: var(--c-fff8e8);
+  background-color: var(--table-row-hover-bg, #fcf3d6);
 }
 
 @media (max-width: 767.98px) {

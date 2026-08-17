@@ -370,6 +370,10 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
 
         <!-- شريط الفلاتر السريعة -->
         <div class="card-body fc-filter-body">
+                        <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+            <div class="filter">
+                <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+                <div class="filter-body">
             <form method="GET" action="" class="fc-filter-bar" id="filterBarForm">
                 <input type="hidden" name="f_stat" value="<?= $filter_stat ?>">
                 <div>
@@ -414,6 +418,8 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
                     </div>
                 <?php endif; ?>
             </form>
+                </div>
+            </div>
         </div>
 
         <div class="card-body">

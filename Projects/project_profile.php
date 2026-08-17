@@ -106,24 +106,20 @@ try {
 $page_title = 'إيكوبيشن | بطاقة المشروع';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
+require_once __DIR__ . '/../includes/profile_kit.php';   // عُدّةُ بطاقةِ الكِيان — التأليفُ بديلُ النسخ
 ems_shell_axes(isset($pp) ? $pp : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
-<style>
-.project-profile-page .profile-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:14px; }
-.project-profile-page .profile-card { background:var(--c-surface); border:1px solid var(--c-ece6d8, #ece6d8); border-radius:12px; padding:12px; }
-.project-profile-page .kpi { font-weight:800; font-size:1.4rem; color:var(--c-0f766e); }
-.project-profile-page .label { color:var(--c-ink-500); font-size:.9rem; }
-.project-profile-page .pp-head-card { margin-bottom:12px; }
-.project-profile-page .pp-head-name { margin:0 0 8px 0; }
-.project-profile-page .pp-head-line2 { margin-top:6px; }
-.project-profile-page .pp-suppliers-table { width:100%; }
-</style>
+<?php /* كتلةُ `<style>` المحليةُ سقطت كاملةً: كانت **نسخةً رابعةً** من لغةِ
+        البطاقةِ نفسِها (`.profile-card` · `.kpi` · `.label` · `.profile-grid`)
+        — وفيها لونٌ مثبَّتٌ احتياطيًّا خارجَ الرموز. والبطاقةُ الآن
+        على `assets/css/ems-profile.css` عبر `includes/profile_kit.php`، وعرضُ
+        جدولِها في `ems-screens.css` مع أخواتِه. */ ?>
 
-<div class="main project-profile-page ems-unified-page-shell">
+<div class="main project-profile-page ems-profile ems-unified-page-shell">
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
     $header_title   = 'بطاقة المشروع';
@@ -140,34 +136,48 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('project', 'نظرةٌ عامة'); ?>
 
-    <div class="profile-card pp-head-card">
-        <h2 class="pp-head-name"><?php echo htmlspecialchars($project['name']); ?></h2>
-        <div class="label">
-            العميل: <?php echo htmlspecialchars($project['client_name'] ?: $project['client']); ?> |
-            كود المشروع: <?php echo htmlspecialchars($project['project_code'] ?: '-'); ?> |
-            كود المنجم: <?php echo htmlspecialchars($project['mine_code'] ?: '-'); ?> |
-            الحالة: <?php echo intval($project['status']) === 1 ? 'نشط' : 'غير نشط'; ?>
-        </div>
-        <div class="label pp-head-line2">
-            الموقع: <?php echo htmlspecialchars($project['location'] ?: '-'); ?> |
-            الولاية: <?php echo htmlspecialchars($project['state'] ?: '-'); ?> |
-            المنطقة: <?php echo htmlspecialchars($project['region'] ?: '-'); ?>
-        </div>
-    </div>
+    <?php
+    /* ══ لوحُ الهوية ═══════════════════════════════════════════════════════
+       كان سطرَينِ طويلَينِ تفصلُهما شُرَطٌ رأسية (سبعُ قيمٍ في سطرَين) —
+       والحالةُ نصٌّ بلا لون. صار: الحالةُ شارةً، والأكوادُ رقائقَ، والموقعُ
+       حقائقَ معنونةً. والغائبُ يُعلَن «—» بدلَ شَرْطةٍ تتنكّر في هيئةِ قيمة. */
+    echo ems_profile_hero(array(
+        'name'   => $project['name'],
+        'icon'   => 'fas fa-diagram-project',
+        'status' => array(
+            'text' => intval($project['status']) === 1 ? 'نشط' : 'غير نشط',
+            'tone' => intval($project['status']) === 1 ? 'ok' : 'danger',
+            'icon' => intval($project['status']) === 1 ? 'fas fa-circle-check' : 'fas fa-circle-minus',
+        ),
+        'chips'  => array(
+            array('text' => $project['project_code'], 'icon' => 'fas fa-hashtag', 'mono' => true),
+            array('text' => $project['mine_code'], 'icon' => 'fas fa-mountain', 'mono' => true),
+        ),
+        'facts'  => array(
+            array('label' => 'العميل',   'value' => $project['client_name'] ?: $project['client']),
+            array('label' => 'الموقع',   'value' => $project['location']),
+            array('label' => 'الولاية',  'value' => $project['state']),
+            array('label' => 'المنطقة',  'value' => $project['region']),
+        ),
+    ));
 
-    <div class="profile-grid">
-        <div class="profile-card"><div class="kpi"><?php echo $contracts_count; ?></div><div class="label">إجمالي العقود</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo $active_contracts; ?></div><div class="label">العقود النشطة</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo $suppliers_count; ?></div><div class="label">الموردون</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo $equipments_count; ?></div><div class="label">المعدات</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo $drivers_count; ?></div><div class="label">المشغلون</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo $mines_count; ?></div><div class="label">المناجم</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo number_format($timesheet_hours, 0); ?></div><div class="label">ساعات التشغيل</div></div>
-    </div>
+    /* شريطُ الحصيلة — سبعةُ أعدادٍ كانت سبعَ بطاقاتٍ يدويةً بلغةٍ محلية. */
+    echo ems_profile_stats(array(
+        array('value' => $contracts_count,  'label' => 'إجمالي العقود'),
+        array('value' => $active_contracts, 'label' => 'العقود النشطة', 'tone' => $active_contracts > 0 ? 'ok' : 'muted'),
+        array('value' => $suppliers_count,  'label' => 'الموردون'),
+        array('value' => $equipments_count, 'label' => 'المعدات'),
+        array('value' => $drivers_count,    'label' => 'المشغلون'),
+        array('value' => $mines_count,      'label' => 'المناجم'),
+        array('value' => number_format($timesheet_hours, 0), 'label' => 'ساعات التشغيل', 'unit' => 'ساعة'),
+    ));
 
-    <div class="card">
-        <div class="card-header"><h5><i class="fas fa-truck-loading"></i> الموردون المرتبطون بالمشروع</h5></div>
-        <div class="card-body">
+    echo ems_profile_section_open(array(
+        'title' => 'الموردون المرتبطون بالمشروع',
+        'icon'  => 'fas fa-truck-loading',
+        'meta'  => 'أعلى عشرةٍ بالساعات',
+    ));
+    ?>
             <table id="projectSuppliersTable" class="display pp-suppliers-table">
                 <thead><tr><th>المورد</th><th>عدد المعدات</th><th>الساعات</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -190,8 +200,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php endforeach; endif; ?>
                 </tbody>
             </table>
-        </div>
-    </div>
+    <?php echo ems_profile_section_close(); ?>
+
+    <?php /* NAV-01 §5-④: البلاغاتُ المتصلة — نُقلت داخلَ الغلافِ بعد أن كانت
+             تُضمَّن خلفَ إغلاقِه فتظهر بجانبِ الشاشة. */
+    $rt_kind = 'site'; $rt_ref = $project_id;
+    include __DIR__ . '/../includes/related_tickets_tab.php'; ?>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
@@ -199,7 +213,3 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <?php /* UXW-01 ⑤: التهيئةُ المحليةُ حُذفت — المكوّنُ المركزيُّ في assets/js/ui-unification.js
          يلتقط الجدولَ ويضبط لغةَ ar.json نفسَها. ولا سمةَ سلوكٍ لازمةٌ هنا: التهيئةُ
          المحذوفةُ لم تكن تضبط ترتيبًا ولا طولَ صفحةٍ ولا أعمدةً غيرَ قابلةٍ للفرز. */ ?>
-
-<?php // NAV-01 §5-④ (update0006 B-03): البلاغاتُ المتصلة بالموقع/المشروع
-$rt_kind = 'site'; $rt_ref = $project_id;
-include __DIR__ . '/../includes/related_tickets_tab.php'; ?>

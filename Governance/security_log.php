@@ -453,6 +453,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     </div>
 
     <?php /* ── شريطُ الفلاتر: الرأسُ والعدّادُ وزرُّ التفريغِ من العدّةِ المركزية ── */ ?>
+        <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+    <div class="filter">
+        <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+        <div class="filter-body">
     <form method="get" action="security_log.php" class="ems-card">
         <div class="ems-grid">
             <div class="ems-col-3">
@@ -527,6 +531,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             </div>
         </div>
     </form>
+        </div>
+    </div>
 
     <div class="card"><div class="card-body table-responsive">
         <h6>الأحداث (<?php echo number_format(count($rows)); ?>)

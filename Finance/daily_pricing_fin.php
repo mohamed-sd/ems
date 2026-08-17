@@ -416,4 +416,5 @@ include '../insidebar.php';
         </div>
     </div></div>
 </div>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

@@ -705,11 +705,12 @@ div[style*="flex"][style*="gap"][style*="margin-top"] {
 #projectsTable tbody tr,
 #projectsTable table tbody tr {
     transition: background var(--ease);
-    border-bottom: 1px solid var(--border) !important;
+    /* وُصِلت بمفاتيحِ ems-tables.css (توحيد 2026-08-17) */
+    border-bottom: 1px solid var(--table-border, #cccccc) !important;
 }
 #clientsTable tbody tr:hover,
 #projectsTable tbody tr:hover,
-#projectsTable table tbody tr:hover { background: var(--gold-soft) !important; }
+#projectsTable table tbody tr:hover { background: var(--table-row-hover-bg, #fcf3d6) !important; }
 
 #clientsTable tbody td,
 #projectsTable tbody td,
@@ -718,11 +719,11 @@ div[style*="flex"][style*="gap"][style*="margin-top"] {
     text-align: center !important;
     vertical-align: middle !important;
     font-size: .83rem !important;
-    color: var(--txt) !important;
-    border: none !important;
+    color: var(--table-text, #161616) !important;
+    border: 1px solid var(--table-border, #cccccc) !important;
 }
 
-table.dataTable.no-footer { border: none !important; }
+table.dataTable.no-footer { border: 1px solid var(--table-border-soft, #eceef1) !important; }
 
 /* DataTable search & length */
 .dataTables_wrapper .dataTables_filter input {

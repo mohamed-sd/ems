@@ -428,57 +428,23 @@ $ee = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8');
 $page_title = 'إيكوبيشن | بطاقة المعدة';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
+require_once __DIR__ . '/../includes/profile_kit.php';   // عُدّةُ بطاقةِ الكِيان — التأليفُ بديلُ النسخ
 ems_shell_axes(isset($__pp) ? $__pp : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
+<?php /* ══ كتلةُ الأنماطِ المحليةُ قُلِّمت من 90 سطرًا إلى شريطِ التبويبات وحدَه ══
+        سقط منها **لوحُ هويةٍ كامل** (`ep-hero` بتدرّجِه وشريطِه الجانبيِّ
+        و`ep-hero-ic` و`ep-chips`/`ep-chip` و`ep-pill` و`ep-facts`/`ep-fact`
+        بمفتاحٍ وقيمة) و**شبكةُ مؤشراتٍ** (`profile-grid`/`profile-card`/`kpi`/
+        `label`) و**بطاقاتُ الأقسام** (`card`/`card-header h5`) — كلُّها صارت
+        إلى `assets/css/ems-profile.css` عبر `includes/profile_kit.php`.
+        ولم يبقَ إلا شريطُ التبويباتِ: مكوّنٌ لا نظيرَ له في عُدّةِ البطاقةِ
+        (بطاقةُ المعدةِ وحدَها من بين السبعِ تُقسّم على تبويبات). */ ?>
 <style>
-/* ════════ بطاقة المعدة — إعادة تصميم مواءِمة لهوية الموقع (برتقالي/كهرماني + design-tokens) ════════ */
-.equipment-profile-page{ --ep-accent:var(--brand-orange-bright,#E67E00); }
-
-/* الهيرو */
-.equipment-profile-page .ep-hero{
-  position:relative; overflow:hidden; padding:18px 20px; margin-bottom:14px;
-  border:1px solid var(--gray-200,#E7E5E4); border-radius:var(--radius-xl,16px);
-  background:
-    radial-gradient(120% 150% at 100% 0%, var(--c-rgba24714726010, rgba(247,147,26,.10)) 0%, var(--c-rgba2471472600, rgba(247,147,26,0)) 46%),
-    linear-gradient(180deg,var(--c-surface) 0%, var(--gray-50,#FAFAF9) 100%);
-  box-shadow:var(--shadow-sm,0 1px 2px rgba(0,0,0,.05));
-}
-.equipment-profile-page .ep-hero::before{
-  content:""; position:absolute; inset-inline-start:0; top:0; bottom:0; width:5px;
-  background:linear-gradient(180deg,var(--brand-amber,#F2AA2A),var(--brand-orange-bright,#E67E00));
-}
-.equipment-profile-page .ep-hero-top{ display:flex; flex-wrap:wrap; gap:12px; align-items:flex-start; justify-content:space-between; }
-.equipment-profile-page .ep-hero-name{ display:flex; align-items:center; gap:14px; min-width:0; }
-.equipment-profile-page .ep-hero-ic{
-  width:50px; height:50px; flex:0 0 50px; border-radius:14px; display:grid; place-items:center; color:var(--c-surface); font-size:22px;
-  background:linear-gradient(160deg,var(--brand-amber,#F2AA2A),var(--brand-orange-bright,#E67E00));
-  box-shadow:0 6px 16px var(--c-rgba2301260030, rgba(230,126,0,.30));
-}
-.equipment-profile-page .ep-hero-name h2{ margin:0; font-size:var(--text-h1,24px); font-weight:800; color:var(--gray-900,#1C1917); line-height:1.2; }
-.equipment-profile-page .ep-chips{ display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
-.equipment-profile-page .ep-chip{
-  display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; padding:3px 10px;
-  border-radius:var(--radius-pill,9999px); background:var(--gray-100,#F5F5F4); color:var(--gray-700,#44403C); border:1px solid var(--gray-200,#E7E5E4);
-}
-.equipment-profile-page .ep-chip i{ color:var(--ep-accent); }
-.equipment-profile-page .ep-hero-actions{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
-.equipment-profile-page .ep-pill{ display:inline-flex; align-items:center; gap:6px; padding:5px 12px; border-radius:var(--radius-pill,9999px); font-weight:700; font-size:12.5px; }
-.equipment-profile-page .ep-pill i{ font-size:9px; }
-
-/* شريط الحقائق */
-.equipment-profile-page .ep-facts{
-  display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:1px; margin-top:16px;
-  background:var(--gray-200,#E7E5E4); border:1px solid var(--gray-200,#E7E5E4); border-radius:var(--radius-md,8px); overflow:hidden;
-}
-.equipment-profile-page .ep-fact{ background:var(--c-surface); padding:10px 13px; }
-.equipment-profile-page .ep-fact .k{ font-size:11px; color:var(--gray-500,#78716C); font-weight:600; }
-.equipment-profile-page .ep-fact .v{ font-size:14px; color:var(--gray-900,#1C1917); font-weight:700; margin-top:2px; }
-
-/* التبويبات — بنفس تصميم تابات صفحة الحركة (movement_operations: .ems-tabs-nav/.ems-tab-btn) */
+/* شريطُ تبويباتِ بطاقةِ المعدة — بتصميمِ تابات شاشةِ الحركةِ نفسِه */
 .equipment-profile-page .ep-tabs{
   position:sticky; top:var(--topbar-height,60px); z-index:var(--z-sticky,10);
   display:flex; flex-wrap:wrap; gap:6px; margin-bottom:18px;
@@ -509,24 +475,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 .equipment-profile-page .ep-tab-panel.is-active{ display:block; animation:epFade .25s ease; }
 @keyframes epFade{ from{opacity:0; transform:translateY(5px);} to{opacity:1; transform:none;} }
 
-/* الشبكات والمؤشرات — تملأ العرض بلا فراغات */
-.equipment-profile-page .profile-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(165px,1fr)); gap:12px; margin-bottom:0; grid-auto-flow:dense; }
-.equipment-profile-page .profile-card{
-  background:var(--c-surface); border:1px solid var(--gray-200,#E7E5E4); border-radius:var(--radius-md,8px); padding:12px 14px;
-  transition:border-color var(--transition-fast,150ms ease), box-shadow var(--transition-fast,150ms ease);
-}
-.equipment-profile-page .profile-card:hover{ border-color:var(--gray-300,#D6D3D1); box-shadow:var(--shadow-sm,0 1px 2px rgba(0,0,0,.05)); }
-.equipment-profile-page .kpi{ font-weight:800; font-size:1.55rem; color:var(--gray-900,#1C1917); line-height:1.1; }
-.equipment-profile-page .label{ color:var(--gray-500,#78716C); font-size:.86rem; }
-.equipment-profile-page .profile-card > div:not(.label):not(.kpi){ font-weight:600; color:var(--gray-900,#1C1917); margin-top:2px; }
-
-/* تجميل البطاقات داخل الصفحة */
-.equipment-profile-page .card{ border:1px solid var(--gray-200,#E7E5E4); border-radius:var(--radius-lg,12px); box-shadow:var(--shadow-sm,0 1px 2px rgba(0,0,0,.05)); margin-bottom:14px; }
-.equipment-profile-page .card-header h5{ font-size:var(--text-h3,16px); font-weight:700; color:var(--gray-900,#1C1917); display:flex; align-items:center; gap:8px; }
-.equipment-profile-page .card-header h5 i{ color:var(--ep-accent); }
+/* نموذجُ اعتمادِ الكرتِ أسفلَ لوحِ الهوية */
+.equipment-profile-page .ep-approve-card{ margin:0 0 14px; }
 </style>
 
-<div class="main equipment-profile-page ems-unified-page-shell">
+<div class="main equipment-profile-page ems-profile ems-unified-page-shell">
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
     $header_title   = 'بطاقة المعدة / الشاحنة';
@@ -548,46 +501,50 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $card_is_active = ($card_state === 'active');
     $status_avail   = intval($equipment['status']) === 1;
     ?>
-    <div class="ep-hero">
-        <div class="ep-hero-top">
-            <div class="ep-hero-name">
-                <div class="ep-hero-ic"><i class="fas fa-truck-monster"></i></div>
-                <div>
-                    <h2><?php echo $ee($equipment['name']); ?></h2>
-                    <div class="ep-chips">
-                        <span class="ep-chip"><i class="fas fa-barcode"></i> <?php echo $ee($equipment['code']); ?></span>
-                        <span class="ep-chip"><i class="fas fa-layer-group"></i> <?php echo $ee($equipment['equipment_type_name'] ?: $equipment['type']); ?></span>
-                        <span class="ep-chip"><i class="fas fa-truck"></i> <?php echo $ee($equipment['supplier_name'] ?: '—'); ?></span>
-                    </div>
-                </div>
-            </div>
-            <div class="ep-hero-actions">
-                <span class="ep-pill <?php echo $status_avail ? 'status-active' : 'status-inactive'; ?>">
-                    <i class="fas fa-circle"></i> <?php echo $status_avail ? 'متاحة' : 'مشغولة'; ?>
-                </span>
-                <?php if ($card_is_active): ?>
-                    <span class="ep-pill status-active"><i class="fas fa-id-card"></i> كرت معتمد</span>
-                <?php else: ?>
-                    <span class="ep-pill status-inactive"><i class="fas fa-id-card"></i> كرت مسودة</span>
-                    <?php if (!empty($can_edit)): ?>
-                        <form method="post" action="approve_card.php" class="d-inline" onsubmit="return confirm('اعتماد كرت هذه المعدة؟');">
-        <?= csrf_field() ?>
-                            <input type="hidden" name="equipment_id" value="<?php echo intval($equipment_id); ?>">
-                            <input type="hidden" name="return" value="equipment_profile.php">
-                            <input type="hidden" name="return_id" value="<?php echo intval($equipment_id); ?>">
-                            <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-circle-check"></i> اعتماد الكرت</button>
-                        </form>
-                    <?php endif; ?>
-                <?php endif; ?>
-            </div>
-        </div>
-        <div class="ep-facts">
-            <div class="ep-fact"><div class="k">الموديل</div><div class="v"><?php echo $ee($equipment['model'] ?: '—'); ?></div></div>
-            <div class="ep-fact"><div class="k">سنة الصنع</div><div class="v"><?php echo $ee($equipment['manufacturing_year'] ?: '—'); ?></div></div>
-            <div class="ep-fact"><div class="k">رقم الهيكل</div><div class="v"><?php echo $ee($equipment['chassis_number'] ?: '—'); ?></div></div>
-            <div class="ep-fact"><div class="k">ساعات التشغيل</div><div class="v"><?php echo number_format($hours_sum, 0); ?></div></div>
-        </div>
-    </div>
+    <?php
+    /* ══ لوحُ الهوية ═══════════════════════════════════════════════════════
+       ◆ كان **نسخةً سابعةً** من لوحِ الهويةِ نفسِه — وأقربَها شبهًا بالمكوّن:
+         `ep-hero` · `ep-hero-ic` · `ep-chips`/`ep-chip` · `ep-pill` ·
+         `ep-facts`/`ep-fact` بمفتاحٍ وقيمة. البنيةُ ذاتُها بأسماءٍ أخرى —
+         وهذا بعينِه ما يجعل النسخَ يتكاثر: كلُّ بطاقةٍ تعيد اختراعَ الشيءِ
+         نفسِه لأنّ لا مكوّنَ تنادِيه.
+       ◆ وحالتانِ لا واحدة: **الإتاحةُ** (متاحة/مشغولة) و**كرتُ المعدة**
+         (معتمد/مسودة). فالإتاحةُ شارةُ الحالةِ لأنها وصفُ المعدةِ الآن،
+         وحالُ الكرتِ رقيقةٌ لأنها وصفُ **المستندِ** لا المعدة. */
+    echo ems_profile_hero(array(
+        'name'   => $equipment['name'],
+        'icon'   => 'fas fa-truck-monster',
+        'status' => array(
+            'text' => $status_avail ? 'متاحة' : 'مشغولة',
+            'tone' => $status_avail ? 'ok' : 'warn',
+            'icon' => $status_avail ? 'fas fa-circle-check' : 'fas fa-circle-dot',
+        ),
+        'chips'  => array(
+            array('text' => $equipment['code'], 'icon' => 'fas fa-barcode', 'mono' => true),
+            array('text' => $equipment['equipment_type_name'] ?: $equipment['type'], 'icon' => 'fas fa-layer-group'),
+            array('text' => $equipment['supplier_name'], 'icon' => 'fas fa-truck'),
+            array('text' => $card_is_active ? 'كرت معتمد' : 'كرت مسودة', 'icon' => 'fas fa-id-card'),
+        ),
+        'facts'  => array(
+            array('label' => 'الموديل',        'value' => $equipment['model']),
+            array('label' => 'سنة الصنع',      'value' => $equipment['manufacturing_year']),
+            array('label' => 'رقم الهيكل',     'value' => $equipment['chassis_number']),
+            array('label' => 'ساعات التشغيل',  'value' => number_format($hours_sum, 0)),
+        ),
+    ));
+    ?>
+    <?php if (!$card_is_active && !empty($can_edit)): ?>
+        <?php /* الاعتمادُ فعلٌ كاتبٌ بـPOST — فيبقى نموذجًا بزرِّه المعتمَد،
+                 ولا يُقحَم في شريطِ أفعالِ الرأسِ الذي بنيتُه روابط. */ ?>
+        <?php echo ems_profile_note('كرتُ هذه المعدةِ ما يزال مسودةً — لا يُعتمد عليه حتى يُعتمد.'); ?>
+        <form method="post" action="approve_card.php" class="ep-approve-card" onsubmit="return confirm('اعتماد كرت هذه المعدة؟');">
+            <?= csrf_field() ?>
+            <input type="hidden" name="equipment_id" value="<?php echo intval($equipment_id); ?>">
+            <input type="hidden" name="return" value="equipment_profile.php">
+            <input type="hidden" name="return_id" value="<?php echo intval($equipment_id); ?>">
+            <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-circle-check"></i> اعتماد الكرت</button>
+        </form>
+    <?php endif; ?>
 
     <!-- ════════ شريط التبويبات ════════ -->
     <div class="ep-tabs" role="tablist">
@@ -603,57 +560,61 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="ep-tab-panel is-active" id="tab-overview">
 
     <?php
-    // ── بطاقة: الهوية والمصدر + العدّاد (كرت المعدة) ──
-    $pf = function ($k) use ($equipment) {
-        return isset($equipment[$k]) && $equipment[$k] !== '' && $equipment[$k] !== null
-            ? htmlspecialchars((string) $equipment[$k]) : '—';
+    /* ── قيمُ الهويةِ والمصدرِ والعدّاد ──────────────────────────────────
+       ◆ كانت تُبنى **مهرَّبةً وبـ«—» مخبوزةً فيها** لأن الوسمَ كان يدويًّا.
+         وشبكةُ حقائقِ المكوّنِ تُهرِّب بنفسِها وتُعلن الغيابَ بصنفِه — فتمريرُ
+         نصٍّ مهرَّبٍ إليها يُهرِّبه مرتَين، و«—» يصير **قيمةً حاضرةً** فيضيع
+         تمييزُ الغائب. فالقيمُ هنا خامٌ، والغيابُ فراغٌ يعرفه المكوّن.
+       ◆ والوحدةُ الفارغةُ ليست وحدة: `trim` يمنع «12 » بمسافةٍ معلَّقةٍ حين
+         لا وحدةَ مسجَّلة. */
+    $ep_val = function ($v, $unit = '') use ($equipment) {
+        $v = ($v === null) ? '' : trim((string) $v);
+        if ($v === '') { return ''; }
+        $u = ($unit === null) ? '' : trim((string) $unit);
+        return $u === '' ? $v : ($v . ' ' . $u);
     };
-    $cap = (isset($equipment['capacity']) && $equipment['capacity'] !== '' && $equipment['capacity'] !== null)
-        ? (htmlspecialchars((string) $equipment['capacity']) . ' ' . htmlspecialchars((string) ($equipment['capacity_uom'] ?? ''))) : '—';
-    $acq = (isset($equipment['acquisition_cost']) && $equipment['acquisition_cost'] !== '' && $equipment['acquisition_cost'] !== null)
-        ? (htmlspecialchars((string) $equipment['acquisition_cost']) . ' ' . htmlspecialchars((string) ($equipment['acquisition_currency'] ?? ''))) : '—';
-    $meter = (isset($equipment['opening_meter']) && $equipment['opening_meter'] !== '' && $equipment['opening_meter'] !== null)
-        ? (htmlspecialchars((string) $equipment['opening_meter']) . ' ' . htmlspecialchars((string) ($equipment['meter_uom'] ?? ''))) : '—';
+    $capacity_val = $ep_val($equipment['capacity'] ?? '', $equipment['capacity_uom'] ?? '');
+    $acq_val      = $ep_val($equipment['acquisition_cost'] ?? '', $equipment['acquisition_currency'] ?? '');
+    $meter_val    = $ep_val($equipment['opening_meter'] ?? '', $equipment['meter_uom'] ?? '');
     ?>
-    <div class="card ep-mb14">
-        <div class="card-header"><h5><i class="fas fa-id-badge"></i> الهوية والمصدر والعدّاد</h5></div>
-        <div class="card-body">
-            <div class="profile-grid">
-                <div class="profile-card"><div class="label">الفئة التشغيلية</div><div><?php echo $pf('operating_category'); ?></div></div>
-                <div class="profile-card"><div class="label">بلد الصنع</div><div><?php echo $pf('origin_country'); ?></div></div>
-                <div class="profile-card"><div class="label">رقم الموتور</div><div><?php echo $pf('engine_no'); ?></div></div>
-                <div class="profile-card"><div class="label">رقم اللوحة</div><div><?php echo $pf('plate_no'); ?></div></div>
-                <div class="profile-card"><div class="label">السعة/القدرة</div><div><?php echo $cap; ?></div></div>
-                <div class="profile-card"><div class="label">المقاسات الفنية</div><div><?php echo $pf('dimensions'); ?></div></div>
-                <div class="profile-card"><div class="label">نوع المصدر</div><div><?php echo $pf('source_type'); ?></div></div>
-                <div class="profile-card"><div class="label">تاريخ الدخول</div><div><?php echo $pf('entry_date'); ?></div></div>
-                <div class="profile-card"><div class="label">تكلفة الشراء</div><div><?php echo $acq; ?></div></div>
-                <div class="profile-card"><div class="label">العدّاد الافتتاحي</div><div><?php echo $meter; ?></div></div>
-                <div class="profile-card"><div class="label">مصدر العدّاد</div><div><?php echo $pf('meter_source'); ?></div></div>
-            </div>
-        </div>
-    </div>
+    <?php
+    /* إحدى عشرةَ حقيقةً كانت `profile-card` بـ`label` وقيمةٍ — شبكةُ حقائقَ
+       مبنيةٌ يدويًّا. والغيابُ فيها كان «—» **نصًّا** لا يُميَّز من قيمةٍ
+       حقيقية؛ وشبكةُ المكوّنِ تُعلنه بصنفِ غيابٍ ظاهر. */
+    echo ems_profile_section_open(array('title' => 'الهوية والمصدر والعدّاد', 'icon' => 'fas fa-id-badge'));
+    echo ems_profile_facts(array(
+        array('label' => 'الفئة التشغيلية', 'value' => $equipment['operating_category']),
+        array('label' => 'بلد الصنع',       'value' => $equipment['origin_country']),
+        array('label' => 'رقم الموتور',     'value' => $equipment['engine_no']),
+        array('label' => 'رقم اللوحة',      'value' => $equipment['plate_no']),
+        array('label' => 'السعة/القدرة',    'value' => $capacity_val),
+        array('label' => 'المقاسات الفنية', 'value' => $equipment['dimensions']),
+        array('label' => 'نوع المصدر',      'value' => $equipment['source_type']),
+        array('label' => 'تاريخ الدخول',    'value' => $equipment['entry_date']),
+        array('label' => 'تكلفة الشراء',    'value' => $acq_val),
+        array('label' => 'العدّاد الافتتاحي', 'value' => $meter_val),
+        array('label' => 'مصدر العدّاد',    'value' => $equipment['meter_source']),
+    ), true);
+    echo ems_profile_section_close();
 
-    <div class="card ep-mb14">
-        <div class="card-header"><h5><i class="fas fa-gauge-high"></i> ملخص التشغيل</h5></div>
-        <div class="card-body">
-            <div class="profile-grid">
-                <div class="profile-card"><div class="kpi"><?php echo $operations_count; ?></div><div class="label">إجمالي عمليات التشغيل</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo $active_operations; ?></div><div class="label">عمليات نشطة</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo $projects_count; ?></div><div class="label">المشاريع المرتبطة</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo $drivers_count; ?></div><div class="label">المشغلون النشطون</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo number_format($hours_sum, 0); ?></div><div class="label">ساعات التشغيل</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo number_format($standby_sum, 0); ?></div><div class="label">ساعات الاستعداد</div></div>
-            </div>
-        </div>
-    </div>
+    /* ستةُ مؤشراتٍ كانت `profile-card` بـ`kpi` و`label` — شريطُ مؤشراتٍ
+       مبنيٌّ يدويًّا للمرةِ السابعة. */
+    echo ems_profile_section_open(array('title' => 'ملخص التشغيل', 'icon' => 'fas fa-gauge-high'));
+    echo ems_profile_stats(array(
+        array('value' => $operations_count, 'label' => 'إجمالي عمليات التشغيل'),
+        array('value' => $active_operations, 'label' => 'عمليات نشطة', 'tone' => $active_operations > 0 ? 'ok' : 'muted'),
+        array('value' => $projects_count,   'label' => 'المشاريع المرتبطة'),
+        array('value' => $drivers_count,    'label' => 'المشغلون النشطون'),
+        array('value' => number_format($hours_sum, 0),   'label' => 'ساعات التشغيل',  'unit' => 'ساعة'),
+        array('value' => number_format($standby_sum, 0), 'label' => 'ساعات الاستعداد', 'unit' => 'ساعة'),
+    ));
+    echo ems_profile_section_close();
+    ?>
     </div><!-- /#tab-overview -->
 
     <!-- ════════ لوحة: التشغيل ════════ -->
     <div class="ep-tab-panel" id="tab-operations">
-    <div class="card ep-mb14">
-        <div class="card-header"><h5><i class="fas fa-project-diagram"></i> المشاريع المرتبطة بالمعدة</h5></div>
-        <div class="card-body">
+    <?php echo ems_profile_section_open(array('title' => 'المشاريع المرتبطة بالمعدة', 'icon' => 'fas fa-diagram-project')); ?>
             <table id="equipmentProjectsTable" class="display ep-w100">
                 <thead><tr><th>المشروع</th><th>كود المشروع</th><th>الساعات</th><th>عدد الورديات</th></tr></thead>
                 <tbody>
@@ -667,12 +628,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php endforeach; endif; ?>
                 </tbody>
             </table>
-        </div>
-    </div>
+    <?php echo ems_profile_section_close(); ?>
 
-    <div class="card">
-        <div class="card-header"><h5><i class="fas fa-users"></i> آخر المشغلين المرتبطين</h5></div>
-        <div class="card-body">
+    <?php echo ems_profile_section_open(array('title' => 'آخر المشغلين المرتبطين', 'icon' => 'fas fa-users')); ?>
             <table id="equipmentDriversTable" class="display ep-w100">
                 <thead><tr><th>المشغل</th><th>تاريخ البداية</th><th>تاريخ النهاية</th><th>الحالة</th></tr></thead>
                 <tbody>
@@ -686,28 +644,34 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php endforeach; endif; ?>
                 </tbody>
             </table>
-        </div>
-    </div>
+    <?php echo ems_profile_section_close(); ?>
 
     </div><!-- /#tab-operations -->
 
     <!-- ════════ لوحة: الصيانة والتفتيش ════════ -->
     <div class="ep-tab-panel" id="tab-maintenance">
     <!-- قسم الصيانة (مؤشرات + أوامر) -->
-    <div class="card ep-mb14" id="sec-maintenance">
-        <div class="card-header"><h5><i class="fas fa-wrench"></i> الصيانة — المؤشرات وأوامر الصيانة</h5></div>
-        <div class="card-body">
-            <div class="profile-grid">
-                <div class="profile-card"><div class="kpi"><?php echo intval($mnt_total); ?></div><div class="label">إجمالي أوامر الصيانة</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo intval($mnt_open); ?></div><div class="label">أوامر مفتوحة</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo intval($mnt_failures); ?></div><div class="label">أعطال (من بلاغ)</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo number_format($mnt_downtime, 1); ?></div><div class="label">ساعات التوقّف</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo number_format($mnt_cost, 0); ?></div><div class="label">إجمالي تكلفة الصيانة</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo $mnt_last ? htmlspecialchars((string) $mnt_last) : '—'; ?></div><div class="label">آخر صيانة</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo $mnt_mtbf !== null ? number_format($mnt_mtbf, 1) : '—'; ?></div><div class="label">MTBF (ساعة/عطل)</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo $mnt_mttr !== null ? number_format($mnt_mttr, 1) : '—'; ?></div><div class="label">MTTR (ساعة/أمر)</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo $mnt_avail !== null ? number_format($mnt_avail, 1) . '%' : '—'; ?></div><div class="label">نسبة الجاهزية</div></div>
-            </div>
+    <?php
+    echo ems_profile_section_open(array(
+        'id'    => 'sec-maintenance',
+        'title' => 'الصيانة — المؤشرات وأوامر الصيانة',
+        'icon'  => 'fas fa-wrench',
+    ));
+    /* المقاييسُ الثلاثةُ الأخيرةُ قد تكون **غيرَ محسوبةٍ** (null) لا صفرًا —
+       فتُمرَّر فراغًا ليُعلنها المكوّنُ غيابًا، ولا تُلفَّق صفرًا كاذبًا. */
+    echo ems_profile_stats(array(
+        array('value' => intval($mnt_total),  'label' => 'إجمالي أوامر الصيانة'),
+        array('value' => intval($mnt_open),   'label' => 'أوامر مفتوحة', 'tone' => $mnt_open > 0 ? 'warn' : 'muted'),
+        array('value' => intval($mnt_failures), 'label' => 'أعطال (من بلاغ)', 'tone' => $mnt_failures > 0 ? 'danger' : 'muted'),
+        array('value' => number_format($mnt_downtime, 1), 'label' => 'ساعات التوقّف', 'unit' => 'ساعة'),
+        array('value' => number_format($mnt_cost, 0),     'label' => 'إجمالي تكلفة الصيانة', 'variant' => 'money'),
+        array('value' => $mnt_last !== null && $mnt_last !== '' ? $mnt_last : '', 'label' => 'آخر صيانة', 'variant' => 'date'),
+        array('value' => $mnt_mtbf !== null ? number_format($mnt_mtbf, 1) : '', 'label' => 'MTBF (ساعة/عطل)'),
+        array('value' => $mnt_mttr !== null ? number_format($mnt_mttr, 1) : '', 'label' => 'MTTR (ساعة/أمر)'),
+        array('value' => $mnt_avail !== null ? number_format($mnt_avail, 1) . '%' : '', 'label' => 'نسبة الجاهزية',
+              'tone' => ($mnt_avail !== null && $mnt_avail >= 90) ? 'ok' : (($mnt_avail !== null) ? 'warn' : 'muted')),
+    ));
+    ?>
 
             <div class="table-container ep-mt12">
                 <table class="display ep-w100">
@@ -729,20 +693,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+    <?php echo ems_profile_section_close(); ?>
 
     <!-- ════════════════ قسم التفتيش الفني — مرئي لكل من يفتح الكرت ════════════════ -->
-    <div class="card ep-mb14" id="sec-inspections">
-        <div class="card-header"><h5><i class="fas fa-clipboard-check"></i> التفتيش الفني — المؤشرات والتفتيشات</h5></div>
-        <div class="card-body">
-            <div class="profile-grid">
-                <div class="profile-card"><div class="kpi"><?php echo intval($ins_total); ?></div><div class="label">إجمالي التفتيشات</div></div>
-                <div class="profile-card"><div class="kpi ep-kpi-ok"><?php echo intval($ins_done); ?></div><div class="label">مكتملة</div></div>
-                <div class="profile-card"><div class="kpi ep-kpi-warn"><?php echo intval($ins_open); ?></div><div class="label">مجدولة/مفتوحة</div></div>
-                <div class="profile-card<?php echo $ins_critical > 0 ? ' ep-card-crit' : ''; ?>"><div class="kpi<?php echo $ins_critical > 0 ? ' ep-kpi-crit' : ''; ?>"><?php echo intval($ins_critical); ?></div><div class="label">ملاحظات حرجة</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo $ins_last ? htmlspecialchars((string) $ins_last) : '—'; ?></div><div class="label">آخر تفتيش</div></div>
-            </div>
+    <?php
+    echo ems_profile_section_open(array(
+        'id'    => 'sec-inspections',
+        'title' => 'التفتيش الفني — المؤشرات والتفتيشات',
+        'icon'  => 'fas fa-clipboard-check',
+    ));
+    echo ems_profile_stats(array(
+        array('value' => intval($ins_total), 'label' => 'إجمالي التفتيشات'),
+        array('value' => intval($ins_done),  'label' => 'مكتملة',        'tone' => 'ok'),
+        array('value' => intval($ins_open),  'label' => 'مجدولة/مفتوحة', 'tone' => 'warn'),
+        array('value' => intval($ins_critical), 'label' => 'ملاحظات حرجة',
+              'tone' => $ins_critical > 0 ? 'danger' : 'muted'),
+        array('value' => ($ins_last !== null && $ins_last !== '') ? $ins_last : '',
+              'label' => 'آخر تفتيش', 'variant' => 'date'),
+    ));
+    ?>
 
             <div class="table-container ep-mt12">
                 <table class="display ep-ins-table ep-w100">
@@ -794,21 +763,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+    <?php echo ems_profile_section_close(); ?>
     <script>window.EP_INS_LINES = <?php echo json_encode($ins_lines_map, JSON_UNESCAPED_UNICODE); ?>;</script>
 
     <!-- ════════════════ قسم الصيانة الوقائية — مرئي لكل من يفتح الكرت ════════════════ -->
-    <div class="card ep-mb14" id="sec-preventive">
-        <div class="card-header"><h5><i class="fas fa-calendar-check"></i> الصيانة الوقائية — الخطط المسندة للمعدة</h5></div>
-        <div class="card-body">
-            <div class="profile-grid">
-                <div class="profile-card"><div class="kpi"><?php echo intval($pln_total); ?></div><div class="label">إجمالي الخطط</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo intval($pln_active); ?></div><div class="label">نشطة</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo intval($pln_due); ?></div><div class="label">مستحقة الآن</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo $pln_last ? htmlspecialchars((string) $pln_last) : '—'; ?></div><div class="label">آخر تنفيذ</div></div>
-                <div class="profile-card"><div class="kpi"><?php echo $pln_next ? htmlspecialchars((string) $pln_next) : '—'; ?></div><div class="label">الاستحقاق القادم</div></div>
-            </div>
+    <?php
+    echo ems_profile_section_open(array(
+        'id'    => 'sec-preventive',
+        'title' => 'الصيانة الوقائية — الخطط المسندة للمعدة',
+        'icon'  => 'fas fa-calendar-check',
+    ));
+    echo ems_profile_stats(array(
+        array('value' => intval($pln_total),  'label' => 'إجمالي الخطط'),
+        array('value' => intval($pln_active), 'label' => 'نشطة', 'tone' => $pln_active > 0 ? 'ok' : 'muted'),
+        array('value' => intval($pln_due),    'label' => 'مستحقة الآن', 'tone' => $pln_due > 0 ? 'warn' : 'muted'),
+        array('value' => ($pln_last !== null && $pln_last !== '') ? $pln_last : '', 'label' => 'آخر تنفيذ', 'variant' => 'date'),
+        array('value' => ($pln_next !== null && $pln_next !== '') ? $pln_next : '', 'label' => 'الاستحقاق القادم', 'variant' => 'date'),
+    ));
+    ?>
 
             <div class="table-container ep-mt12">
                 <table class="display ep-w100">
@@ -834,8 +806,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+    <?php echo ems_profile_section_close(); ?>
 
     </div><!-- /#tab-maintenance -->
 
@@ -850,15 +821,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <!-- (1) الوثائق الرسمية -->
-    <div class="card" id="sec-docs">
-        <div class="card-header ep-card-head-row">
-            <h5><i class="fas fa-file-contract"></i> الوثائق الرسمية
-                <?php if ($docs_expired): ?><span class="status-inactive ep-badge-gap">منتهية: <?= (int) $docs_expired; ?></span><?php endif; ?>
-                <?php if ($docs_soon): ?><span class="badge-busy ep-badge-gap">قاربت: <?= (int) $docs_soon; ?></span><?php endif; ?>
-            </h5>
-            <?php if ($can_edit_card): ?><button type="button" class="btn btn-primary btn-sm" onclick="emsToggle('add-docs')"><i class="fas fa-plus"></i> إضافة وثيقة</button><?php endif; ?>
-        </div>
-        <div class="card-body">
+    <?php
+    /* شارتا الانتهاءِ كانتا `status-inactive` و`badge-busy` — صنفانِ من لغةٍ
+       أخرى داخلَ عنوانِ القسم. صارتا شارتَي نغمةٍ في خانةِ `meta`، والزرُّ في
+       خانةِ `actions` التي أُضيفت للمكوّنِ لهذا الغرضِ بعينِه. */
+    $docs_meta = array();
+    if ($docs_expired) { $docs_meta[] = ems_profile_badge('منتهية: ' . (int) $docs_expired, 'danger'); }
+    if ($docs_soon)    { $docs_meta[] = ems_profile_badge('قاربت: ' . (int) $docs_soon, 'warn'); }
+    echo ems_profile_section_open(array(
+        'id'      => 'sec-docs',
+        'title'   => 'الوثائق الرسمية',
+        'icon'    => 'fas fa-file-contract',
+        'actions' => implode(' ', $docs_meta)
+                   . ($can_edit_card ? '<button type="button" class="btn btn-primary btn-sm" onclick="emsToggle(\'add-docs\')"><i class="fas fa-plus"></i> إضافة وثيقة</button>' : ''),
+    ));
+    ?>
             <?php if ($can_edit_card): ?>
             <form id="add-docs" class="child-add-form ems-form ep-mb14 is-hidden" method="post" action="equipment_child_save.php" enctype="multipart/form-data">
         <?= csrf_field() ?>
@@ -896,16 +873,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+    <?php echo ems_profile_section_close(); ?>
 
     <!-- (2) تجهيزات الحماية -->
-    <div class="card" id="sec-protection">
-        <div class="card-header ep-card-head-row">
-            <h5><i class="fas fa-shield-halved"></i> تجهيزات الحماية</h5>
-            <?php if ($can_edit_card): ?><button type="button" class="btn btn-primary btn-sm" onclick="emsToggle('add-prot')"><i class="fas fa-plus"></i> إضافة تجهيز</button><?php endif; ?>
-        </div>
-        <div class="card-body">
+    <?php echo ems_profile_section_open(array(
+        'id'      => 'sec-protection',
+        'title'   => 'تجهيزات الحماية',
+        'icon'    => 'fas fa-shield-halved',
+        'actions' => $can_edit_card ? '<button type="button" class="btn btn-primary btn-sm" onclick="emsToggle(\'add-prot\')"><i class="fas fa-plus"></i> إضافة تجهيز</button>' : '',
+    )); ?>
             <?php if ($can_edit_card): ?>
             <form id="add-prot" class="child-add-form ems-form ep-mb14 is-hidden" method="post" action="equipment_child_save.php" enctype="multipart/form-data">
         <?= csrf_field() ?>
@@ -947,16 +923,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+    <?php echo ems_profile_section_close(); ?>
 
     <!-- (3) المكوّنات الكبرى -->
-    <div class="card" id="sec-components">
-        <div class="card-header ep-card-head-row">
-            <h5><i class="fas fa-gears"></i> المكوّنات الكبرى</h5>
-            <?php if ($can_edit_card): ?><button type="button" class="btn btn-primary btn-sm" onclick="emsToggle('add-comp')"><i class="fas fa-plus"></i> إضافة مكوّن</button><?php endif; ?>
-        </div>
-        <div class="card-body">
+    <?php echo ems_profile_section_open(array(
+        'id'      => 'sec-components',
+        'title'   => 'المكوّنات الكبرى',
+        'icon'    => 'fas fa-gears',
+        'actions' => $can_edit_card ? '<button type="button" class="btn btn-primary btn-sm" onclick="emsToggle(\'add-comp\')"><i class="fas fa-plus"></i> إضافة مكوّن</button>' : '',
+    )); ?>
             <?php if ($can_edit_card): ?>
             <form id="add-comp" class="child-add-form ems-form ep-mb14 is-hidden" method="post" action="equipment_child_save.php">
         <?= csrf_field() ?>
@@ -992,16 +967,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
+    <?php echo ems_profile_section_close(); ?>
 
     <!-- (4) سجل تاريخ المعدة (إدراج فقط) -->
-    <div class="card" id="sec-history">
-        <div class="card-header ep-card-head-row">
-            <h5><i class="fas fa-timeline"></i> سجل تاريخ المعدة</h5>
-            <?php if ($can_edit_card): ?><button type="button" class="btn btn-primary btn-sm" onclick="emsToggle('add-hist')"><i class="fas fa-plus"></i> إضافة حدث يدوي</button><?php endif; ?>
-        </div>
-        <div class="card-body">
+    <?php echo ems_profile_section_open(array(
+        'id'      => 'sec-history',
+        'title'   => 'سجل تاريخ المعدة',
+        'icon'    => 'fas fa-timeline',
+        'actions' => $can_edit_card ? '<button type="button" class="btn btn-primary btn-sm" onclick="emsToggle(\'add-hist\')"><i class="fas fa-plus"></i> إضافة حدث يدوي</button>' : '',
+    )); ?>
             <?php if ($can_edit_card): ?>
             <form id="add-hist" class="child-add-form ems-form ep-mb14 is-hidden" method="post" action="equipment_child_save.php">
         <?= csrf_field() ?>
@@ -1041,15 +1015,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php endforeach; ?>
                 </ul>
             <?php endif; ?>
-        </div>
-    </div>
+    <?php echo ems_profile_section_close(); ?>
     </div><!-- /#tab-records -->
 
     <!-- ════════ لوحة: تحركات الآلية ════════ -->
     <div class="ep-tab-panel" id="tab-movements">
-        <div class="card">
-            <div class="card-header"><h5><i class="fas fa-timeline"></i> تحركات الآلية</h5></div>
-            <div class="card-body">
+        <?php echo ems_profile_section_open(array('title' => 'تحركات الآلية', 'icon' => 'fas fa-timeline')); ?>
                 <?php if (empty($history_rows)): ?>
                     <p class="ep-empty-note">لا توجد تحركات مسجّلة بعد.</p>
                 <?php else: ?>
@@ -1081,10 +1052,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </table>
                     </div>
                 <?php endif; ?>
-            </div>
-        </div>
+        <?php echo ems_profile_section_close(); ?>
     </div><!-- /#tab-movements -->
     </div><!-- /.ep-panels -->
+
+    <?php /* NAV-01 §5-④: البلاغاتُ المتصلة — تاريخُ البلاغاتِ جزءٌ من تاريخِ
+             الكيان. نُقلت داخلَ الغلافِ بعد أن كانت خلفَ إغلاقِه. وهي أسفلَ
+             لوحاتِ التبويبِ لا داخلَ إحداها: تخصُّ المعدةَ كلَّها لا تبويبًا. */
+    $rt_kind = 'equipment'; $rt_ref = $equipment_id;
+    include __DIR__ . '/../includes/related_tickets_tab.php'; ?>
 
 </div>
 
@@ -1281,6 +1257,3 @@ $(function () {
 })();
 </script>
 
-<?php // NAV-01 §5-④ (update0006 B-03): البلاغاتُ المتصلة — تاريخُ البلاغات جزءٌ من تاريخ الكيان
-$rt_kind = 'equipment'; $rt_ref = $equipment_id;
-include __DIR__ . '/../includes/related_tickets_tab.php'; ?>

@@ -141,6 +141,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
 
     <div class="card"><div class="card-body">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" class="mrd-filter">
             <strong>المعدة:</strong>
             <select name="equipment_id" aria-label="اختيارُ المعدةِ المعروضةِ قراءاتُها" onchange="this.form.submit()" class="mrd-eq-select">
@@ -158,6 +162,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php endforeach; ?>
             </select>
         </form>
+            </div>
+        </div>
 
         <div class="mrd-now">
             <strong>العدّادُ الحالي:</strong>

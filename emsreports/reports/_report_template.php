@@ -1471,14 +1471,16 @@ body {
 /* ── Table ──────────────────────────────── */
 #rTable { margin-bottom: 0 !important; width: 100% !important; }
 #rTable thead th {
-    background: linear-gradient(120deg, #120d07, #24180d);
-    color: #f7931a; font-size: .82rem; font-weight: 900;
+    /* وُصِلت بمفاتيحِ ems-tables.css (توحيد 2026-08-17): كانت ترويسةً برتقاليةً
+       على أسود — تصميمٌ ثالثٌ للجدولِ الواحد. */
+    background: var(--table-header-bg, #6b6b6b);
+    color: var(--table-header-text, #ffffff); font-size: .82rem; font-weight: 900;
     border: none; white-space: nowrap; padding: 11px 14px;
     text-align: center !important;
 }
 #rTable tbody td {
-    font-size: .82rem; color: var(--ink);
-    vertical-align: middle; border-color: rgba(12,28,62,.06); padding: 9px 14px;
+    font-size: .82rem; color: var(--table-text, #161616);
+    vertical-align: middle; border-color: var(--table-border, #cccccc); padding: 9px 14px;
     text-align: center !important;
     white-space: nowrap;
 }
@@ -1488,8 +1490,8 @@ body {
 .dataTables_scrollBody table.dataTable tbody td {
     text-align: center !important;
 }
-#rTable tbody tr:nth-child(even) { background: #f8fafd; }
-#rTable tbody tr:hover { background: #fff4e6; }
+#rTable tbody tr:nth-child(even) { background: var(--table-row-even-bg, #e6e6e6); }
+#rTable tbody tr:hover { background: var(--table-row-hover-bg, #fcf3d6); }
 /* ── DataTables toolbars — نفس مواضع شاشة العملاء ──
    أعلى الجدول: عدد المدخلات (يسارًا) + حقل البحث (يمينًا) والأزرار في الوسط.
    أسفل الجدول: معلومات السجلات (يسارًا) + الترقيم (يمينًا).
@@ -1574,6 +1576,8 @@ body {
     .rpt-kpi-val { font-size: 1.22rem; }
 }
 </style>
+<!-- تصميمُ الجداول الموحَّد — قالبُ التقارير يبني رأسَه بنفسه (توحيد 2026-08-17) -->
+<?php require_once dirname(__DIR__, 2) . '/includes/table_design.php'; ?>
 </head>
 <body class="ems-site">
 

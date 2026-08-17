@@ -901,6 +901,10 @@ echo ems_states_bundle('لا سطورَ ساعاتٍ يوميةً مطابقةً
             <h5><i class="fas fa-filter"></i> فلترة النتائج</h5>
         </div>
         <div class="card-body">
+                        <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+            <div class="filter">
+                <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+                <div class="filter-body">
             <form method="GET" class="form-grid" id="timesheetFilterForm">
                 <div class="form-group">
                     <label for="equipment_type_filter"><i class="fas fa-cogs"></i> نوع الآلية</label>
@@ -967,6 +971,8 @@ echo ems_states_bundle('لا سطورَ ساعاتٍ يوميةً مطابقةً
                     </select>
                 </div>
             </form>
+                </div>
+            </div>
             <div class="pu-form-actions">
                 <button type="submit" form="timesheetFilterForm" class="btn-primary">
                     <i class="fas fa-search"></i> تطبيق

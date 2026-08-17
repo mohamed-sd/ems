@@ -125,6 +125,9 @@ $header_icon = 'fa fa-calendar-check';
 $header_title_html = htmlspecialchars('الأقساطُ والسداد' . ($op_filter ? ' — عملية #' . $op_filter : ''), ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
+/* شريطُ تبويباتِ الملفِّ يُصَفُّ قبلَ الرأسِ ليصرفه الرأسُ في موضعِه الواحد */
+if ($op_filter) { $ff_op_id = $op_filter; $ff_active = 'installments';
+    include __DIR__ . '/../includes/financing_file_tabs.php'; }
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑫: شاشةُ دورةِ سدادٍ تنطق بحالةٍ حية (مستحق · متأخر · مسدَّد) — فتُعلن خطوتَها التالية
 echo ems_next_step('سدادُ القسطِ المستحقِّ بمرجعِ سندٍ — وعند بلوغِ الرصيدِ صفرًا تُقفَل العملية');
@@ -133,8 +136,6 @@ echo ems_states_bundle('لا أقساطَ ضمنَ هذا النطاق', 'تُو
 ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('financing', 'الأقساطُ والسداد'); ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
-  <?php if ($op_filter): $ff_op_id = $op_filter; $ff_active = 'installments';
-        include __DIR__ . '/../includes/financing_file_tabs.php'; endif; ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>عملية التمويل</th><th>#</th><th>تاريخ الاستحقاق</th><th>أصل القسط</th><th>ربح القسط</th><th>إجمالي القسط</th><th>الحالة</th><th>تاريخ السداد الفعلي</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->

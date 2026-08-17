@@ -75,24 +75,18 @@ try {
 $page_title = 'إيكوبيشن | بطاقة المستخدم';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
+require_once __DIR__ . '/../includes/profile_kit.php';   // عُدّةُ بطاقةِ الكِيان — التأليفُ بديلُ النسخ
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
-<style>
-.user-profile-page .profile-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:14px; }
-.user-profile-page .profile-card { background:var(--c-surface); border:1px solid var(--c-ece6d8, #ece6d8); border-radius:12px; padding:12px; }
-.user-profile-page .kpi { font-weight:800; font-size:1.4rem; color:var(--c-0f766e); }
-.user-profile-page .label { color:var(--c-6b7280, #6b7280); font-size:.9rem; }
-.user-profile-page .profile-head { margin-bottom:12px; }
-.user-profile-page .profile-head h2 { margin:0 0 8px 0; }
-.user-profile-page .profile-head-meta { margin-top:6px; }
-.user-profile-page .profile-table { width:100%; }
-</style>
+<?php /* كتلةُ `<style>` المحليةُ سقطت: **نسخةٌ خامسةٌ** من لغةِ البطاقةِ نفسِها،
+        وفيها لونانِ مثبَّتانِ احتياطيًّا خارجَ الرموز.
+        البطاقةُ على `assets/css/ems-profile.css` عبر `includes/profile_kit.php`. */ ?>
 
-<div class="main user-profile-page ems-unified-page-shell">
+<div class="main user-profile-page ems-profile ems-unified-page-shell">
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
     $header_title   = 'بطاقة المستخدم';
@@ -104,31 +98,45 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا مشروعَ مكلَّفًا بهذا المستخدم', 'كلِّفه بمشروعٍ من شاشةِ المستخدمين ثم عُدْ إلى بطاقته');
     ?>
 
-    <div class="profile-card profile-head">
-        <h2><?php echo htmlspecialchars($user_data['name']); ?></h2>
-        <div class="label">
-            اسم المستخدم: <?php echo htmlspecialchars($user_data['username']); ?> |
-            الدور: <?php echo htmlspecialchars($user_data['role_name'] ?: $user_data['role']); ?> |
-            الهاتف: <?php echo htmlspecialchars($user_data['phone'] ?: '-'); ?>
-        </div>
-        <div class="label profile-head-meta">
-            الحالة: <?php echo htmlspecialchars($user_data['status']); ?> |
-            آخر دخول: <?php echo htmlspecialchars($last_login); ?> |
-            تاريخ الإنشاء: <?php echo htmlspecialchars($user_data['created_at']); ?>
-        </div>
-    </div>
+    <?php
+    /* ══ لوحُ الهوية ═══════════════════════════════════════════════════════
+       كان سطرَينِ تفصلُهما شُرَطٌ رأسية، والحالةُ نصٌّ بلا لون. */
+    $up_active = (mb_strpos((string) $user_data['status'], 'نشط') !== false
+               && mb_strpos((string) $user_data['status'], 'غير') === false);
+    echo ems_profile_hero(array(
+        'name'   => $user_data['name'],
+        'icon'   => 'fas fa-user-gear',
+        'status' => array(
+            'text' => $user_data['status'],
+            'tone' => $up_active ? 'ok' : 'danger',
+            'icon' => $up_active ? 'fas fa-circle-check' : 'fas fa-circle-minus',
+        ),
+        'chips'  => array(
+            array('text' => $user_data['username'], 'icon' => 'fas fa-at', 'mono' => true),
+            array('text' => $user_data['role_name'] ?: $user_data['role'], 'icon' => 'fas fa-user-shield'),
+        ),
+        'facts'  => array(
+            array('label' => 'الهاتف',         'value' => $user_data['phone']),
+            array('label' => 'آخرُ دخول',      'value' => ($last_login === '-') ? '' : $last_login),
+            array('label' => 'تاريخُ الإنشاء', 'value' => $user_data['created_at']),
+        ),
+    ));
 
-    <div class="profile-grid">
-        <div class="profile-card"><div class="kpi"><?php echo $projects_created; ?></div><div class="label">مشاريع أنشأها</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo $clients_created; ?></div><div class="label">عملاء أضافهم</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo $suppliers_created; ?></div><div class="label">موردون أضافهم</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo !empty($user_data['project_id']) ? 1 : 0; ?></div><div class="label">لديه مشروع مكلّف</div></div>
-        <div class="profile-card"><div class="kpi"><?php echo !empty($user_data['contract_id']) ? 1 : 0; ?></div><div class="label">لديه عقد مكلّف</div></div>
-    </div>
+    /* ◆ «لديه مشروع/عقد مكلّف» كانا مؤشرَين قيمتُهما **0 أو 1** — والرقمُ
+         الثنائيُّ في شريطِ مؤشراتٍ يُقرأ عددًا لا حالة. صارا شارتَي نعم/لا
+         بنغمةٍ، وبقي العدُّ الحقيقيُّ (ثلاثةُ أعدادِ إنشاء) في الشريط. */
+    echo ems_profile_stats(array(
+        array('value' => $projects_created,  'label' => 'مشاريعُ أنشأها'),
+        array('value' => $clients_created,   'label' => 'عملاءُ أضافهم'),
+        array('value' => $suppliers_created, 'label' => 'موردون أضافهم'),
+    ));
 
-    <div class="card">
-        <div class="card-header"><h5><i class="fas fa-project-diagram"></i> المشروع المكلّف به</h5></div>
-        <div class="card-body">
+    echo ems_profile_section_open(array(
+        'title' => 'المشروع المكلّف به',
+        'icon'  => 'fas fa-diagram-project',
+        'meta'  => (!empty($user_data['contract_id']) ? 'وله عقدٌ مكلَّفٌ به' : 'بلا عقدٍ مكلَّف'),
+    ));
+    ?>
             <table id="userProjectTable" class="display profile-table">
                 <thead><tr><th>اسم المشروع</th><th>كود المشروع</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -152,8 +160,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php endif; ?>
                 </tbody>
             </table>
-        </div>
-    </div>
+    <?php echo ems_profile_section_close(); ?>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>

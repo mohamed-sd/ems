@@ -117,6 +117,10 @@ function kpi_card($label, $value, $link, $hint = '')
     .mkpi-hint    { font-size: .85rem; }
     .mkpi-overdue { color: var(--c-b02a37, #b02a37); font-weight: 700; }
     </style>
+        <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+    <div class="filter">
+        <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+        <div class="filter-body">
     <form method="get" class="mkpi-filter">
         <div><label class="mkpi-lbl" for="emsf_377_da0ec">من</label><input type="date" name="from" aria-label="بدايةُ مدى المؤشرات" class="form-control" value="<?php echo htmlspecialchars($from); ?>" id="emsf_377_da0ec"></div>
         <div><label class="mkpi-lbl" for="emsf_378_7cf8e">إلى</label><input type="date" name="to" aria-label="نهايةُ مدى المؤشرات" class="form-control" value="<?php echo htmlspecialchars($to); ?>" id="emsf_378_7cf8e"></div>
@@ -125,6 +129,8 @@ function kpi_card($label, $value, $link, $hint = '')
             <option value="2" <?php echo $depth === 2 ? 'selected' : ''; ?>>مستويان</option></select></div><?php endif; ?>
         <button class="btn btn-primary">تحديث</button>
     </form>
+        </div>
+    </div>
 
     <h6><i class="fas fa-user"></i> مؤشراتي — كل رقمٍ يقود لمصدره</h6>
     <div class="mkpi-cards">

@@ -51,6 +51,10 @@ include '../insidebar.php';
     <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card"><div class="card-body fl-rb-bar">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" class="fl-rb-filter">
             <label for="emsf_276_15f26">المشروع</label><input type="number" name="project_id" min="0" class="fl-rb-w90" id="emsf_276_15f26" placeholder="الكل" aria-label="رقمُ المشروعِ للترشيح"
                 value="<?php echo $prj ?: ''; ?>">
@@ -58,6 +62,8 @@ include '../insidebar.php';
                 value="<?php echo htmlspecialchars($type); ?>">
             <button type="submit" class="btn-primary">رشّح</button>
         </form>
+            </div>
+        </div>
         <div class="fl-rb-pct badge <?php echo ($grid['readiness_pct'] ?? 0) >= 70 ? 'badge-success' : 'badge-danger'; ?>">
             جاهزيةُ الآن: <strong><?php echo $grid['readiness_pct'] !== null
                 ? ($grid['readiness_pct'] . '٪') : '—'; ?></strong>

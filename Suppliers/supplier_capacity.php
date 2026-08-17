@@ -142,6 +142,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'التأهيلُ والقدرة'); ?>
 
     <div class="card"><div class="card-body">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" class="scap-filter">
             <strong>عقد المورد:</strong>
             <select name="contract_id" onchange="this.form.submit()" class="scap-contract-select" aria-label="اختيارُ عقدِ الموردِ المقيس">
@@ -158,6 +162,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <label for="emsf_480_e0019">إلى</label><input type="date" name="to" id="emsf_480_e0019" value="<?php echo htmlspecialchars($mTo); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-magnifying-glass"></i> اقرأ القياس</button>
         </form>
+            </div>
+        </div>
         <p class="scap-penalty-note">
             <i class="fa fa-triangle-exclamation"></i>
             <strong>تحذيرُ الأثر على الجزاءات:</strong> ما يُكتب هنا <strong>يفعّل مالًا</strong> —

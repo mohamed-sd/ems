@@ -74,4 +74,5 @@ echo ems_states_bundle('لا مصطلحاتِ قاموسٍ معروضةً الآ
       </ol></div></div>
   </section>
 </div>
-<?php include __DIR__ . '/../infooter.php'; ?>
+</body>
+</html>

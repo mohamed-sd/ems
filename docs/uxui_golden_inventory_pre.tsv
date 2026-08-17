@@ -1,11 +1,11 @@
 screen	title	state	buttons	columns	filters	inputs	links	tables	forms	row_buttons	row_links	row_inputs	data_rows
-Portal/ceo_board.php	المركزُ التنفيذيُّ للرئيسِ والنواب	pending	4	16	0	15	21	1	1	0	0	0	31
-Portal/my_tasks.php	مركزُ العمل	pending	11	13	0	0	69	1	0	0	0	0	1
-Operations/sites_board.php	لوحةُ إدارةِ التشغيل	pending	1	0	0	0	182	0	0	0	0	0	0
-Contracts/contracts.php	العقود	pending	15	64	11	37	59	1	3	3	3	1	120
-Timesheet/timesheet.php	التايم شيتُ اليوميّ	pending	12	47	7	46	65	2	2	0	0	0	2
-Maintenance/orders.php	أمرُ الصيانة	pending	5	34	7	0	28	1	2	0	4	0	17
-Suppliers/supplier_profile.php	ملفُّ المورد	pending	2	16	0	0	61	2	0	0	1	0	3
-Risk/risk_register.php	المخاطر	pending	10	8	6	3	34	1	3	1	1	0	12
-FinRequests/request_form.php	طلبُ الدفعِ الماليّ	pending	6	0	7	12	62	0	2	0	0	0	0
-Finance/approvals_inbox.php	صندوقُ الاعتمادات	pending	2	116	0	0	62	4	1	1	1	0	63
+Portal/ceo_board.php	المركزُ التنفيذيُّ للرئيسِ والنواب	pending	3	16	0	15	2	1	1	0	0	0	31
+Portal/my_tasks.php	مركزُ العمل	pending	10	13	0	0	11	1	0	0	0	0	1
+Operations/sites_board.php	لوحةُ إدارةِ التشغيل	pending	0	0	0	0	124	0	0	0	0	0	0
+Contracts/contracts.php	العقود	pending	15	64	17	71	7	1	3	6	3	1	120
+Timesheet/timesheet.php	التايم شيتُ اليوميّ	pending	11	52	7	46	7	3	2	0	0	0	1
+Maintenance/orders.php	أمرُ الصيانة	pending	4	34	7	0	8	1	2	3	4	0	17
+Suppliers/supplier_profile.php	ملفُّ المورد	pending	1	16	0	0	15	2	0	0	1	0	3
+Risk/risk_register.php	المخاطر	pending	9	8	6	3	7	1	3	1	1	0	12
+FinRequests/request_form.php	طلبُ الدفعِ الماليّ	pending	5	0	7	12	4	0	2	0	0	0	0
+Finance/approvals_inbox.php	صندوقُ الاعتمادات	pending	1	116	0	0	1	4	1	1	1	0	63

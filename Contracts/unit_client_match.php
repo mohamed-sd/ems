@@ -120,4 +120,5 @@ $canWrite = !empty($PERMS['can_edit']) || !empty($PERMS['can_add']);
     </div></div>
   </section>
 </div>
-<?php include __DIR__ . '/../infooter.php'; ?>
+</body>
+</html>

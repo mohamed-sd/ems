@@ -37,12 +37,13 @@ if ($r) $op = mysqli_fetch_assoc($r);
 $page_title = 'ملف عملية التمويل';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
+require_once __DIR__ . '/../includes/profile_kit.php';   // عُدّةُ بطاقةِ الكِيان — التأليفُ بديلُ النسخ
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main" dir="rtl">
+<div class="main ems-profile" dir="rtl">
   <?php if (!$op): ?>
     <?php
     /* AS-04/AS-05 (UXR-01): فرعُ «غيرُ موجودة» يحمل الرأسَ الموحَّدَ أيضًا —
@@ -60,41 +61,109 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-hand-holding-usd';
-$header_title_html = htmlspecialchars('عملية ' . (htmlspecialchars($op['op_code'], ENT_QUOTES, 'UTF-8')) . ' — ' . (htmlspecialchars($op['financier'] ?: 'ممول #' . $op['financier_entity_id'], ENT_QUOTES, 'UTF-8')), ENT_QUOTES, 'UTF-8');
-ob_start(); ?><span class="badge fin-op-badge-state"><?= htmlspecialchars($op['state'], ENT_QUOTES, 'UTF-8') ?></span><?php
-$header_actions = array(array('raw' => trim((string) ob_get_clean())));
-$header_back = false;
+$header_title_html = htmlspecialchars('ملف عملية التمويل', ENT_QUOTES, 'UTF-8');
+$header_actions = array();
+$header_back = array('href' => 'financing_board.php', 'label' => 'رجوع');
+/* شريطُ تبويباتِ الملفِّ يُصَفُّ **قبل** الرأسِ ليصرفه الرأسُ تحتَ الشريطِ
+   الأصفرِ مباشرةً — كان يُضمَّن بعده فيُطبع أسفلَ لوحِ الهويةِ لا فوقَه. */
+$ff_op_id = $op_id; $ff_active = $tab === 'terms' ? 'terms' : $tab;
+include __DIR__ . '/../includes/financing_file_tabs.php';
 include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
 echo ems_states_bundle('لا بياناتٍ في هذا التبويبِ من ملفِّ العملية', 'انتقلْ إلى تبويبٍ آخرَ أو سجِّلْ أعيانَ العمليةِ وأقساطَها لتظهرَ هنا');
-?>
-  <style>
-    .fin-op-badge-state { background: var(--c-6610f2, #6610f2); }
-    .fin-op-facts { max-width: 720px; }
-    .fin-op-docs { max-width: 640px; }
-    .fin-op-inst-paid { background: var(--c-198754); }
-    .fin-op-inst-overdue { background: var(--c-dc3545); }
-    .fin-op-inst-due { background: var(--c-fd7e14, #fd7e14); }
-    .fin-op-inst-other { background: var(--c-6c757d); }
-  </style>
-  <?php $ff_op_id = $op_id; $ff_active = $tab === 'terms' ? 'terms' : $tab;
-        include __DIR__ . '/../includes/financing_file_tabs.php'; ?>
 
+/* ══ لوحُ الهوية ═══════════════════════════════════════════════════════════
+   ◆ كانت هويةُ العمليةِ محشورةً في **عنوانِ الرأس** («عملية X — الممول Y»)،
+     وحالتُها **زرًّا في شريطِ الأفعال** (`$header_actions` بـ`raw`): شارةٌ
+     تتظاهر بأنها فعلٌ يُضغط. صارت لوحَ هويةٍ كأخواتِها: الاسمُ اسمًا،
+     والحالةُ شارةً بنغمةٍ معلَنة، والمالُ حقائقَ معنونة.
+   ◆ ونغمةُ الحالةِ من معجمِ المكوّنِ الثماني — لا من ألوانٍ مثبَّتةٍ في كتلةِ
+     `<style>` كانت تحمل لونَينِ عاريَينِ خارجَ الرموز (بنفسجيٌّ وبرتقاليٌّ حرفيّان). */
+echo ems_profile_hero(array(
+    'name'   => 'عملية ' . $op['op_code'],
+    'icon'   => 'fas fa-hand-holding-dollar',
+    'status' => array(
+        'text' => $op['state'],
+        /* التسعُ حالاتٍ كما في `financing_operations.state` حرفًا — لا خمسٌ
+           منها ويسقط الباقي إلى `neutral` صامتًا. */
+        'tone' => ems_profile_map($op['state'], array(
+            'draft'       => 'neutral',
+            'negotiation' => 'warn',
+            'approved'    => 'info',
+            'signed'      => 'info',
+            'active'      => 'ok',
+            'paying'      => 'ok',
+            'settled'     => 'info',
+            'closed'      => 'neutral',
+            'defaulted'   => 'danger',
+        )),
+    ),
+    'chips'  => array(
+        array('text' => $op['financier'] ?: 'ممول #' . $op['financier_entity_id'], 'icon' => 'fas fa-building-columns'),
+        array('text' => $op['model_code'], 'icon' => 'fas fa-scale-balanced', 'mono' => true),
+        array('text' => $op['currency'], 'icon' => 'fas fa-coins', 'mono' => true),
+    ),
+    'facts'  => array(
+        array('label' => 'الرصيدُ القائم',    'value' => number_format(floatval($op['outstanding_balance']), 2) . ' ' . $op['currency']),
+        array('label' => 'رأسُ المال',        'value' => number_format(floatval($op['capital']), 2)),
+        array('label' => 'الأقساط',           'value' => intval($op['installments_no']) . ' × ' . number_format(floatval($op['installment_amount']), 2)),
+        array('label' => 'الاستحقاقُ النهائي', 'value' => $op['maturity_date']),
+    ),
+));
+
+/* ══ شريطُ الحصيلة ═════════════════════════════════════════════════════════
+   ◆ كانت هذه البطاقةُ **وحدَها من بين الثماني بلا شريطِ مؤشرات**: أرقامُها
+     كلُّها داخلَ تبويبِ «الشروط» أو مبثوثةٌ في جدولِ الأقساط، فحالُ العمليةِ
+     لا يُعرف إلا بفتحِ تبويبٍ وعدِّ صفوف.
+   ◆ والأعدادُ من `financing_installments` نفسِه الذي يقرؤه تبويبُ الأقساط —
+     استعلامٌ تجميعيٌّ واحدٌ لا حلقةٌ على الصفوف. */
+$fin_paid = $fin_overdue = $fin_due = 0; $fin_remaining = 0.0;
+$agg = mysqli_query($conn, "SELECT
+        SUM(state = 'paid')                          AS paid_n,
+        SUM(state = 'overdue')                       AS overdue_n,
+        SUM(state = 'due')                           AS due_n,
+        SUM(CASE WHEN state <> 'paid' THEN amount_total ELSE 0 END) AS remaining
+      FROM financing_installments WHERE op_id = $op_id");
+if ($agg && ($a = mysqli_fetch_assoc($agg))) {
+    $fin_paid      = (int) $a['paid_n'];
+    $fin_overdue   = (int) $a['overdue_n'];
+    $fin_due       = (int) $a['due_n'];
+    $fin_remaining = (float) $a['remaining'];
+}
+echo ems_profile_stats(array(
+    array('value' => number_format(floatval($op['outstanding_balance']), 2),
+          'label' => 'الرصيدُ القائم', 'unit' => $op['currency'], 'variant' => 'money'),
+    array('value' => number_format($fin_remaining, 2),
+          'label' => 'غيرُ المسدَّد من الأقساط', 'unit' => $op['currency'], 'variant' => 'money'),
+    array('value' => $fin_paid,    'label' => 'أقساطٌ مسدَّدة', 'tone' => $fin_paid > 0 ? 'ok' : 'muted'),
+    array('value' => $fin_due,     'label' => 'مستحقةٌ الآن',  'tone' => $fin_due > 0 ? 'warn' : 'muted'),
+    array('value' => $fin_overdue, 'label' => 'متأخرة',       'tone' => $fin_overdue > 0 ? 'danger' : 'muted'),
+    array('value' => intval($op['installments_no']), 'label' => 'إجمالي الأقساط'),
+));
+?>
   <?php if ($tab === 'terms'): ?>
-    <table class="table table-sm fin-op-facts" data-no-dt>
-      <tr><th>النموذج</th><td><?= htmlspecialchars($op['model_code'], ENT_QUOTES, 'UTF-8') ?></td>
-          <th>العملة</th><td><?= htmlspecialchars($op['currency'], ENT_QUOTES, 'UTF-8') ?></td></tr>
-      <tr><th>رأسُ المال</th><td><?= number_format(floatval($op['capital']), 2) ?></td>
-          <th>قيمةُ الشراء</th><td><?= number_format(floatval($op['purchase_value']), 2) ?></td></tr>
-      <tr><th>الدفعةُ الأولى</th><td><?= number_format(floatval($op['down_payment']), 2) ?></td>
-          <th>هامشُ الربح</th><td><?= number_format(floatval($op['profit_amount']), 2) ?> (<?= floatval($op['profit_rate']) ?>٪)</td></tr>
-      <tr><th>الأقساط</th><td><?= intval($op['installments_no']) ?> × <?= number_format(floatval($op['installment_amount']), 2) ?></td>
-          <th>الرصيدُ القائم</th><td><strong><?= number_format(floatval($op['outstanding_balance']), 2) ?></strong></td></tr>
-      <tr><th>APR</th><td><?= floatval($op['apr']) ?>٪</td>
-          <th>الاستحقاقُ النهائي</th><td><?= htmlspecialchars($op['maturity_date'], ENT_QUOTES, 'UTF-8') ?></td></tr>
-    </table>
+    <?php
+    /* كان جدولًا برأسَينِ وقيمتَينِ في الصفِّ الواحد (`<th><td><th><td>`) —
+       بنيةُ جدولٍ لبياناتٍ ليست جدولًا: عشرُ حقائقَ لكِيانٍ واحد. صارت شبكةَ
+       حقائقِ المكوّنِ نفسِها، فتنساب على الضيّقِ ولا تُقرأ زجزاجًا. */
+    echo ems_profile_section_open(array('title' => 'شروطُ العملية', 'icon' => 'fas fa-file-contract'));
+    echo ems_profile_facts(array(
+        array('label' => 'النموذج',           'value' => $op['model_code']),
+        array('label' => 'العملة',            'value' => $op['currency']),
+        array('label' => 'رأسُ المال',         'value' => number_format(floatval($op['capital']), 2)),
+        array('label' => 'قيمةُ الشراء',       'value' => number_format(floatval($op['purchase_value']), 2)),
+        array('label' => 'الدفعةُ الأولى',     'value' => number_format(floatval($op['down_payment']), 2)),
+        array('label' => 'هامشُ الربح',        'value' => number_format(floatval($op['profit_amount']), 2) . ' (' . floatval($op['profit_rate']) . '٪)'),
+        array('label' => 'الأقساط',            'value' => intval($op['installments_no']) . ' × ' . number_format(floatval($op['installment_amount']), 2)),
+        array('label' => 'الرصيدُ القائم',     'value' => number_format(floatval($op['outstanding_balance']), 2)),
+        array('label' => 'APR',                'value' => floatval($op['apr']) . '٪'),
+        array('label' => 'الاستحقاقُ النهائي', 'value' => $op['maturity_date']),
+    ), true);
+    echo ems_profile_section_close();
+    ?>
 
   <?php elseif ($tab === 'assets'): ?>
+    <?php echo ems_profile_section_open(array('title' => 'أعيانُ العملية', 'icon' => 'fas fa-truck-monster')); ?>
     <table class="table table-striped" data-no-dt>
       <thead><tr><th>الأصل</th><th>النوع</th><th>حصةُ الممول ٪</th><th>من</th><th>إلى</th></tr></thead>
       <tbody>
@@ -111,9 +180,14 @@ echo ems_states_bundle('لا بياناتٍ في هذا التبويبِ من م
       <?php } if (!$any) echo '<tr><td colspan="5" class="text-center text-muted">لا أعيانَ مسجَّلةً لهذه العملية</td></tr>'; ?>
       </tbody>
     </table>
+    <?php echo ems_profile_section_close(); ?>
 
   <?php elseif ($tab === 'shares'): ?>
-    <p class="text-muted">الحصصُ عبر الزمن — Σ لكل أصلٍ في كل لحظةٍ = 100٪ (شاهدُ UAT §11-⑨)</p>
+    <?php echo ems_profile_section_open(array(
+        'title' => 'الحصصُ عبر الزمن',
+        'icon'  => 'fas fa-chart-pie',
+        'note'  => 'Σ لكل أصلٍ في كل لحظةٍ = 100٪ (شاهدُ UAT §11-⑨)',
+    )); ?>
     <table class="table table-striped" data-no-dt>
       <thead><tr><th>الأصل</th><th>الفترة</th><th>المسجَّل ٪</th><th>المصحَّح ٪</th><th>المعتمد ٪</th><th>سببُ التصحيح</th></tr></thead>
       <tbody>
@@ -131,8 +205,10 @@ echo ems_states_bundle('لا بياناتٍ في هذا التبويبِ من م
       <?php } if (!$any) echo '<tr><td colspan="6" class="text-center text-muted">لا حصصَ بعد</td></tr>'; ?>
       </tbody>
     </table>
+    <?php echo ems_profile_section_close(); ?>
 
   <?php elseif ($tab === 'installments'): ?>
+    <?php echo ems_profile_section_open(array('title' => 'جدولُ الأقساط', 'icon' => 'fas fa-calendar-days')); ?>
     <table class="table table-striped" data-no-dt>
       <thead><tr><th>#</th><th>الاستحقاق</th><th>أصل</th><th>ربح</th><th>الإجمالي</th><th>الحالة</th><th>السداد</th><th>مرجعُه</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -150,23 +226,36 @@ echo ems_states_bundle('لا بياناتٍ في هذا التبويبِ من م
                                        FROM financing_installments WHERE op_id = $op_id ORDER BY seq_no");
       $any = false;
       if ($r2) while ($x = mysqli_fetch_assoc($r2)) { $any = true;
-          $clr = array('paid' => 'fin-op-inst-paid', 'overdue' => 'fin-op-inst-overdue', 'due' => 'fin-op-inst-due');
+          /* الخمسُ حالاتٍ كما في `financing_installments.state` حرفًا — بنغماتِ
+             المكوّنِ لا بأصنافِ لونٍ محليةٍ كانت تحمل هكسًا عاريًا. */
+          $instTone = ems_profile_map($x['state'], array(
+              'scheduled'   => 'neutral',
+              'due'         => 'warn',
+              'paid'        => 'ok',
+              'overdue'     => 'danger',
+              'rescheduled' => 'info',
+          ));
       ?>
         <tr><td><?= intval($x['seq_no']) ?></td>
             <td><?= htmlspecialchars($x['due_date'], ENT_QUOTES, 'UTF-8') ?></td>
             <td><?= number_format(floatval($x['amount_principal']), 2) ?></td>
             <td><?= number_format(floatval($x['amount_profit']), 2) ?></td>
             <td><strong><?= number_format(floatval($x['amount_total']), 2) ?></strong> <?= htmlspecialchars($x['currency'], ENT_QUOTES, 'UTF-8') ?></td>
-            <td><span class="badge <?= $clr[$x['state']] ?? 'fin-op-inst-other' ?>"><?= htmlspecialchars($x['state'], ENT_QUOTES, 'UTF-8') ?></span></td>
+            <td><?= ems_profile_badge($x['state'], $instTone) ?></td>
             <td><?= htmlspecialchars($x['paid_date'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
             <td><?= htmlspecialchars($x['payment_ref'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
       <?php } if (!$any) echo '<tr><td colspan="8" class="text-center text-muted">لا أقساطَ بعد</td></tr>'; ?>
       </tbody>
     </table>
     <p><a class="action-btn" href="installments.php?op=<?= $op_id ?>"><i class="fa fa-calendar-check"></i> شاشةُ السداد</a></p>
+    <?php echo ems_profile_section_close(); ?>
 
   <?php elseif ($tab === 'ledger'): ?>
-    <p class="text-muted">حركةُ العملية في دفتر الأحداث — أقساطٌ مستحقةٌ ومسددةٌ وتعديلات</p>
+    <?php echo ems_profile_section_open(array(
+        'title' => 'حركةُ العملية في دفتر الأحداث',
+        'icon'  => 'fas fa-book',
+        'note'  => 'أقساطٌ مستحقةٌ ومسددةٌ وتعديلات — آخرُ خمسين',
+    )); ?>
     <table class="table table-striped" data-no-dt>
       <thead><tr><th>الحدث</th><th>المبلغ</th><th>التاريخ</th><th>المرجع</th></tr></thead>
       <tbody>
@@ -184,14 +273,19 @@ echo ems_states_bundle('لا بياناتٍ في هذا التبويبِ من م
       <?php } if (!$any) echo '<tr><td colspan="4" class="text-center text-muted">لا حركةَ مقيَّدةً بعد</td></tr>'; ?>
       </tbody>
     </table>
+    <?php echo ems_profile_section_close(); ?>
 
   <?php else: /* docs */ ?>
-    <table class="table table-sm fin-op-docs" data-no-dt>
-      <tr><th>مرجعُ العقد</th><td><?= htmlspecialchars($op['contract_ref'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
-      <tr><th>تاريخُ التوقيع</th><td><?= htmlspecialchars($op['signed_date'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
-      <tr><th>أُنشئت</th><td><?= htmlspecialchars($op['created_at'], ENT_QUOTES, 'UTF-8') ?> · بواسطة #<?= intval($op['created_by']) ?></td></tr>
-      <tr><th>آخرُ تحديث</th><td><?= htmlspecialchars($op['updated_at'], ENT_QUOTES, 'UTF-8') ?></td></tr>
-    </table>
+    <?php
+    echo ems_profile_section_open(array('title' => 'مستنداتُ العملية', 'icon' => 'fas fa-folder-open'));
+    echo ems_profile_facts(array(
+        array('label' => 'مرجعُ العقد',   'value' => $op['contract_ref']),
+        array('label' => 'تاريخُ التوقيع', 'value' => $op['signed_date']),
+        array('label' => 'أُنشئت',        'value' => $op['created_at'] . ' · بواسطة #' . intval($op['created_by'])),
+        array('label' => 'آخرُ تحديث',    'value' => $op['updated_at']),
+    ), true);
+    echo ems_profile_section_close();
+    ?>
   <?php endif; ?>
   <?php endif; ?>
 </div>

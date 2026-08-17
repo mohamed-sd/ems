@@ -55,6 +55,10 @@ include '../insidebar.php';
     ?>
 
     <div class="card"><div class="card-body">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" class="rpt-du-filter">
             <label for="emsf_452_2098b">من</label><input type="date" name="from" id="emsf_452_2098b" value="<?php echo htmlspecialchars($from); ?>">
             <label for="emsf_453_8f10a">إلى</label><input type="date" name="to" id="emsf_453_8f10a" value="<?php echo htmlspecialchars($to); ?>">
@@ -62,6 +66,8 @@ include '../insidebar.php';
                 value="<?php echo $prj ?: ''; ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اعرض</button>
         </form>
+            </div>
+        </div>
         <div class="rpt-du-totals">
             <?php foreach ($rep['totals_by_unit'] as $ut => $q): ?>
                 <div class="badge badge-secondary rpt-du-total-badge">

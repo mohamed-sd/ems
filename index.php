@@ -796,6 +796,9 @@ ul{list-style:none}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
+<!-- تصميمُ الجداول الموحَّد — هذه صفحةٌ قائمةٌ بذاتها لا تمرُّ بأيِّ قشرة،
+     فكان جدولُها يُصمَّم بـsite-identity.css وحدَه. (توحيد 2026-08-17) -->
+<?php require_once __DIR__ . '/includes/table_design.php'; ?>
 </head>
 <body class="standalone-brand">
 

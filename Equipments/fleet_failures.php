@@ -178,6 +178,10 @@ $event_types_rows = $ff_gate->scopedQuery(
             </div>
         </div>
         <div class="card-body fc-filter-body">
+                        <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+            <div class="filter">
+                <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+                <div class="filter-body">
             <form method="GET" action="" id="filterForm">
             <div class="row fc-filter-bar">
                     <div class="col-md-3 mb-3">
@@ -265,6 +269,8 @@ $event_types_rows = $ff_gate->scopedQuery(
                     </div>
                 </div>
             </form>
+                </div>
+            </div>
         </div>
     </div>
 

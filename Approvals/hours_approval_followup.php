@@ -420,8 +420,10 @@ include('../inheader.php');
     </div>
   </div>
 
-  <div class="filters-wrap">
-    <div class="fg">
+  <div class="filter">
+    <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+    <div class="filter-body">
+    <div class="filter-field">
       <label for="f-equipment-type">نوع المعدة</label>
       <select id="f-equipment-type">
         <option value="">الكل</option>
@@ -430,7 +432,7 @@ include('../inheader.php');
         <option value="3">خرامات</option>
       </select>
     </div>
-    <div class="fg">
+    <div class="filter-field">
       <label for="f-project">فلتر المشروع (قيد المتابعة)</label>
       <select id="f-project">
         <option value="">الكل</option>
@@ -439,7 +441,7 @@ include('../inheader.php');
         <?php endforeach; ?>
       </select>
     </div>
-    <div class="fg">
+    <div class="filter-field">
       <label for="f-supplier">فلتر المورد</label>
       <select id="f-supplier">
         <option value="">الكل</option>
@@ -448,7 +450,7 @@ include('../inheader.php');
         <?php endforeach; ?>
       </select>
     </div>
-    <div class="fg">
+    <div class="filter-field">
       <label for="f-driver">فلتر السائق / المشغل</label>
       <select id="f-driver">
         <option value="">الكل</option>
@@ -457,7 +459,7 @@ include('../inheader.php');
         <?php endforeach; ?>
       </select>
     </div>
-    <div class="fg">
+    <div class="filter-field">
       <label for="f-equip">فلتر الآلية</label>
       <select id="f-equip">
         <option value="">الكل</option>
@@ -466,17 +468,19 @@ include('../inheader.php');
         <?php endforeach; ?>
       </select>
     </div>
-    <div class="fg">
+    <div class="filter-field">
       <label for="f-date-from">من تاريخ</label>
       <input type="date" id="f-date-from">
     </div>
-    <div class="fg">
+    <div class="filter-field">
       <label for="f-date-to">إلى تاريخ</label>
       <input type="date" id="f-date-to">
     </div>
-    <div class="btns">
+    <div class="filter-actions">
       <button type="button" class="btn btn-primary" onclick="applyFollowupFilters()"><i class="fa fa-filter"></i> تطبيق</button>
-      <button type="button" class="btn btn-secondary" onclick="resetFollowupFilters()"><i class="fa fa-rotate-left"></i> إلغاء</button>
+      <button type="button" class="btn btn-secondary" onclick="resetFollowupFilters()" title="إلغاء الفلاتر"><i class="fa fa-rotate-right"></i></button>
+    </div>
+  
     </div>
   </div>
 
@@ -583,8 +587,10 @@ include('../inheader.php');
   <div class="table-card">
     <h5 class="card-title"><i class="fa fa-check-circle text-success"></i> سجلات مكتملة الاعتماد النهائي</h5>
 
-    <div class="filters-wrap haf-mb12">
-      <div class="fg">
+    <div class="filter haf-mb12">
+      <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+      <div class="filter-body">
+      <div class="filter-field">
         <label for="ff-equipment-type">نوع المعدة</label>
         <select id="ff-equipment-type">
           <option value="">الكل</option>
@@ -593,7 +599,7 @@ include('../inheader.php');
           <option value="3">خرامات</option>
         </select>
       </div>
-      <div class="fg">
+      <div class="filter-field">
         <label for="ff-project">فلتر المشروع (الاعتماد النهائي)</label>
         <select id="ff-project">
           <option value="">الكل</option>
@@ -602,7 +608,7 @@ include('../inheader.php');
           <?php endforeach; ?>
         </select>
       </div>
-      <div class="fg">
+      <div class="filter-field">
         <label for="ff-supplier">فلتر المورد</label>
         <select id="ff-supplier">
           <option value="">الكل</option>
@@ -611,7 +617,7 @@ include('../inheader.php');
           <?php endforeach; ?>
         </select>
       </div>
-      <div class="fg">
+      <div class="filter-field">
         <label for="ff-driver">فلتر السائق / المشغل</label>
         <select id="ff-driver">
           <option value="">الكل</option>
@@ -620,7 +626,7 @@ include('../inheader.php');
           <?php endforeach; ?>
         </select>
       </div>
-      <div class="fg">
+      <div class="filter-field">
         <label for="ff-equip">فلتر الآلية</label>
         <select id="ff-equip">
           <option value="">الكل</option>
@@ -629,17 +635,19 @@ include('../inheader.php');
           <?php endforeach; ?>
         </select>
       </div>
-      <div class="fg">
+      <div class="filter-field">
         <label for="ff-date-from">من تاريخ</label>
         <input type="date" id="ff-date-from">
       </div>
-      <div class="fg">
+      <div class="filter-field">
         <label for="ff-date-to">إلى تاريخ</label>
         <input type="date" id="ff-date-to">
       </div>
-      <div class="btns">
+      <div class="filter-actions">
         <button type="button" class="btn btn-primary" onclick="applyFinalFilters()"><i class="fa fa-filter"></i> تطبيق</button>
-        <button type="button" class="btn btn-secondary" onclick="resetFinalFilters()"><i class="fa fa-rotate-left"></i> إلغاء</button>
+        <button type="button" class="btn btn-secondary" onclick="resetFinalFilters()" title="إلغاء الفلاتر"><i class="fa fa-rotate-right"></i></button>
+      </div>
+    
       </div>
     </div>
 

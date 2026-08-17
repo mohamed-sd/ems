@@ -270,6 +270,10 @@ echo ems_states_bundle('لا حجوزاتِ أسطولٍ في هذه الناف�
   <?php endif; ?>
 
   <div class="card"><div class="card-body">
+        <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+    <div class="filter">
+        <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+        <div class="filter-body">
     <form method="get" class="fc-filter">
       <div><label for="emsf_352_b1438">من</label><input type="date" name="from" id="emsf_352_b1438" class="form-control" value="<?php echo fc_e($from); ?>"></div>
       <div><label for="emsf_353_96e8a">إلى</label><input type="date" name="to" id="emsf_353_96e8a" class="form-control" value="<?php echo fc_e($to); ?>"></div>
@@ -285,6 +289,8 @@ echo ems_states_bundle('لا حجوزاتِ أسطولٍ في هذه الناف�
       <div class="fc-window-note">النافذة <b><?php echo (int) $span_days; ?></b> يومًا ·
         متاحٌ <b class="fc-ok"><?php echo (int) $tot_free; ?></b> من <?php echo (int) $tot_all; ?></div>
     </form>
+        </div>
+    </div>
   </div></div>
 
   <!-- ① سعةُ الفئات -->

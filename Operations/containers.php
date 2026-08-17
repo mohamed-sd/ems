@@ -565,4 +565,5 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
     }
 })();
 </script>
-<?php include '../infooter.php'; ?>
+</body>
+</html>

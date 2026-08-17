@@ -176,6 +176,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
 
     <div class="card"><div class="card-body">
+                <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
         <form method="get" class="dp-filter">
             <strong>المشروع:</strong>
             <select name="project" onchange="this.form.submit()" class="dp-project-select" aria-label="المشروع">
@@ -189,6 +193,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <strong>اليوم:</strong>
             <input type="date" name="date" aria-label="اليوم" value="<?php echo htmlspecialchars($sel_date); ?>" onchange="this.form.submit()">
         </form>
+            </div>
+        </div>
     </div></div>
 
     <?php if ($sel_project > 0): ?>

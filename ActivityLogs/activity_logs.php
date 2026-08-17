@@ -412,6 +412,10 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
 
 
             <!-- Filters Bar -->
+                        <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->
+            <div class="filter">
+                <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+                <div class="filter-body">
             <form class="allforms allforms-visible activity-filters-form" onsubmit="return false;">
                 <div class="card">
                     <div class="card-header">
@@ -470,6 +474,8 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
                     </div>
                 </div>
             </form>
+                </div>
+            </div>
 
             <!-- Table -->
             <div class="card">
