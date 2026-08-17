@@ -189,7 +189,9 @@ if (count($u13Sibs) > 1) {
         ems_audit_change($conn, 'audit', 'route_redirect', 'view_merge', 0, array(),
             array('from' => $U13['file'], 'to' => $u13Sibs[$u13Host]['file'] . '?view=' . $u13Self),
             array('company_id' => $u13Company, 'user_id' => $u13Uid));
-        header('Location: ' . basename($u13Sibs[$u13Host]['file']) . '?view=' . rawurlencode($u13Self));
+        /* الأخواتُ قد تتفرق مجلداتٍ (Audit/ ⇐ Portal/) — فالمسارُ من جذرِ
+           التطبيقِ لا basename الذي يفترض اشتراكَ المجلد */
+        header('Location: ../' . $u13Sibs[$u13Host]['file'] . '?view=' . rawurlencode($u13Self));
         exit();
     }
     /* والمضيفةُ تتلبّس منظرَ أختِها المطلوبة */
