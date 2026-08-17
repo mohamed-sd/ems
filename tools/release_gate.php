@@ -60,7 +60,8 @@ if ($gateFailed === null) {
                    'tools/e05_checks.php --enforce', 'tools/wfm_checks.php --enforce',
                    'tools/se03_ten_checks.php', 'tools/fin01_posting_verify.php',
                    'tools/uxw_visual_baseline.php', 'tools/uxw_gates.php',
-                   'tools/govauth_checks.php', 'tools/govauth_parity_probe.php') as $t) {
+                   'tools/govauth_checks.php', 'tools/govauth_parity_probe.php',
+                   'tools/uxw_a11y_contrast.php') as $t) {
         list($f, $a) = array_pad(explode(' ', $t, 2), 2, '');
         $r = run_step($PHP, $ROOT, $f, $a);
         $say(($r['code'] === 0 ? '  ✔ ' : '  ✘ ') . $f . ' — ' . trim($r['tail']));

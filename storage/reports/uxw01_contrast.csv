@@ -1,0 +1,30 @@
+﻿الملف	المحدد	الخلفية	النص	النسبة	الحكم
+ems-states.css	/** * ems-states.css — حالاتُ الشاشةِ التسعُ والخطوةُ التالية (UXW-01 	var(--gray-50)	var(--gray-700)	9.84	مجتاز
+ems-states.css	/* ④ خطأ — مُسمًّى ومقترنٌ بسببِه (فحصُ الوصولِ ١٢) */ .ems-state-erro	var(--danger-100)	var(--danger-deep)	7.71	مجتاز
+ems-states.css	/* ⑤ لا صلاحية — سببُ المنعِ مكتوبٌ لا بابٌ مغلقٌ صامت */ .ems-state-n	var(--warning-100)	var(--warning-deep)	7.58	مجتاز
+ems-states.css	/* ⑥ قراءةٌ فقط — شريطٌ لاصقٌ أعلى المحتوى لا غطاءٌ عليه */ .ems-state	var(--info-100)	var(--info-deep)	8.44	مجتاز
+ems-states.css	/* ⑦ غيرُ متصل — بيئةُ مواقعِ تعدينٍ بشبكةٍ ضعيفة */ .ems-state-offlin	var(--gray-900)	var(--white)	17.49	مجتاز
+ems-states.css	/* ⑧ مزامنةٌ معلَّقة — العملُ محفوظٌ لم يُرفَع بعد (صندوقُ الخروج) */ 	var(--brand-cream-light)	var(--gray-900)	16.22	مجتاز
+ems-states.css	/* ⑨ بياناتٌ متقادمة — وقتُ آخرِ تحديثٍ ظاهر */ .ems-state-stale	var(--gray-100)	var(--gray-700)	9.42	مجتاز
+ems-states.css	/* الخطوةُ التالية (بوابةُ المنعِ ١٢) — شاشةُ دورةٍ تُري ما بعدَها */ 	var(--white)	var(--gray-900)	17.49	مجتاز
+ems-states.css	/* بطاقةُ السقفِ الموقوف — وقفٌ آمنٌ لا عطل (المكوّنُ الخاصُّ الثالث) 	var(--warning-100)	var(--warning-deep)	7.58	مجتاز
+ems-states.css	.ems-cycle-line .ems-cycle-doc	var(--brand-cream-light)	var(--gray-700)	9.53	مجتاز
+ems-states.css	/* شريطُ جلسةِ النيابةِ الدائم (GOV-AUTH-01 §6-2) — لا يُخفى عن الفاعل	var(--c-brand-navy)	var(--white)	11.5	مجتاز
+ems-buttons.css	/* ① مُنفِّذ — ذهبيُّ العلامةِ بنصٍّ داكنٍ عاليِ التباين */ body .btn-	var(--c-brand-gold)	var(--c-ink-900)	10.13	مجتاز
+ems-buttons.css	/* ② ثانويّ — محايدٌ بحدٍّ ظاهر */ body .btn-secondary, body .btn-seco	var(--c-surface)	var(--c-ink-700)	10.86	مجتاز
+ems-buttons.css	body .btn-secondary:hover, body .btn-secondary:focus-visible	var(--c-line-200)	var(--c-ink-900)	13.13	مجتاز
+ems-buttons.css	/* ③ مُتلِف — أحمرُ صريحٌ لا يلتبس بغيره */ body .btn-danger, body .bt	var(--c-state-danger)	var(--c-surface)	4.83	مجتاز
+ems-buttons.css	body .btn-danger:hover, body .btn-danger:focus-visible	var(--c-ink-900)	var(--c-surface)	16.48	مجتاز
+ems-buttons.css	body .btn-ghost:hover, body .btn-ghost:focus-visible	var(--c-line-200)	var(--c-ink-900)	13.13	مجتاز
+ems-shell.css	.ems-ctx-panel	var(--c-surface)	var(--c-1f2937)	14.68	مجتاز
+ems-shell.css	.ems-account-panel	var(--c-surface)	var(--c-1f2937)	14.68	مجتاز
+ems-shell.css	.ems-filterbar .ems-filter-count	var(--c-1f2937)	var(--c-surface)	14.68	مجتاز
+ems-shell.css	.ems-sync-online	var(--c-ecfdf5)	var(--c-065f46)	7.29	مجتاز
+ems-shell.css	.ems-sync-offline	var(--c-fef3c7)	var(--c-92400e)	6.37	مجتاز
+ems-shell.css	.ems-sync-syncing	var(--c-eff6ff)	var(--c-state-info-deep)	6.16	مجتاز
+ems-shell.css	.ems-sync-failed	var(--c-fef2f2)	var(--c-991b1b)	7.6	مجتاز
+ems-forms.css	/* شارة الرقم (مثل 02) أقصى اليسار — صندوق أبيض بحدّ أسود */ :is(.allf	var(--c-surface)	var(--c-ink-max)	21	مجتاز
+ems-forms.css	:is(.allforms, .ems-form) .checkbox-label	var(--c-surface)	var(--c-41464d)	9.51	مجتاز
+ems-forms.css	:is(.allforms, .ems-form) .checkbox-label:hover	var(--c-fffdf4)	var(--c-ink-900)	16.18	مجتاز
+ems-forms.css	:is(.allforms, .ems-form) .emsf-select-trigger.is-disabled	var(--c-e7e9ed)	var(--c-8b8f96)	2.67	راسب
+ems-forms.css	.emsf-select-search-input	var(--c-surface)	var(--c-1f2227)	15.95	مجتاز
