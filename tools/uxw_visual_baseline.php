@@ -84,6 +84,17 @@ foreach (file(__DIR__ . '/uxw_scope.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPT
     if ($ln !== '' && $ln[0] !== '#') { $scope[] = $ln; }
 }
 
+/* شاشاتٌ ديناميكيةُ البنيةِ بطبيعتِها (نشاطٌ حيٌّ يتغير بكلِّ جلب) — تُلتقط
+   ولا تُقارَن بنيويًّا؛ الإعلانُ في tools/uxw_dynamic.txt بسببِ كلِّ واحدة */
+$DYNAMIC = array();
+if (is_file(__DIR__ . '/uxw_dynamic.txt')) {
+    foreach (file(__DIR__ . '/uxw_dynamic.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $ln) {
+        if (trim($ln) === '' || $ln[0] === '#') continue;
+        $c = explode("\t", $ln);
+        $DYNAMIC[trim($c[0])] = isset($c[1]) ? trim($c[1]) : '';
+    }
+}
+
 $diffs = 0;
 /* معاملاتُ جلبٍ لشاشاتٍ تشترط معاملَ مسارٍ أو تُحوَّل لأختِها الكنسيةِ عمدًا
    (tools/uxw_fetch_params.txt: مسار<TAB>سلسلةُ استعلام[<TAB>اسمُ الوجهةِ المتوقَّعة]) */
@@ -117,6 +128,11 @@ foreach ($scope as $rel) {
         file_put_contents($file, $skel);
         @unlink("$DIR/{$slug}.diff.txt");
         echo "✔ أساس: {$rel} (" . substr_count($skel, "\n") . " عقدة)\n";
+        continue;
+    }
+    if (isset($DYNAMIC[$rel])) {
+        @unlink("$DIR/{$slug}.diff.txt");
+        echo "◇ ديناميكيةٌ معلَنة: {$rel} — تُلتقط ولا تُقارَن ({$DYNAMIC[$rel]})\n";
         continue;
     }
     $base = file_get_contents($file);
