@@ -300,6 +300,15 @@ include $u13Root . '/inheader.php';
 include $u13Root . '/insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 
+/* UXW-01 بوابة ٩: حالاتُ التحميلِ والفراغِ والخطأِ لكلِّ شاشةٍ مولَّدةٍ —
+   في العُدّةِ لا في الملفِّ المولَّدِ فلا تمحوها إعادةُ التوليد */
+if (function_exists('ems_states_bundle')) {
+    echo ems_states_bundle(
+        isset($U13['empty_title']) ? $U13['empty_title'] : 'لا توجد بياناتٌ لهذه الفترة',
+        isset($U13['empty_hint']) ? $U13['empty_hint'] : 'غيّر الفترةَ أو تحقق من توفرِ السجلات'
+    );
+}
+
 $u13Nature = isset($U13['nature']) ? $U13['nature'] : 'read';
 $u13NatureLabel = array('document' => 'مستندٌ يُعتمد', 'register' => 'سجلٌّ أو إعداد', 'read' => 'قارئة');
 ?>

@@ -27,25 +27,32 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                        ORDER BY component_code");
     if ($r) { while ($x = $r->fetch_assoc()) { $rows[] = $x; } }
 ?>
+    <style>
+        .fa-note{font-size:.78rem;opacity:.75;margin-inline-start:10px}
+        .fa-mono{font-family:monospace}
+        .fa-fs72{font-size:.72rem}
+        .fa-table-full{width:100%}
+    </style>
+    <?php echo ems_states_bundle('لا بياناتٍ لهذه الفترةِ المالية', 'غيّر الفترةَ أو تحقق من ترحيلِ القيود'); ?>
     <?php if ($can_write): ?>
     <div class="card"><div class="card-body">
         <button class="ems-btn-primary" onclick="faPost('equity_generate', {}, function(j){ alert('وُلّدت ' + j.eq_code + ' · بنود: ' + j.components + ' — متوازنة ✔'); location.reload(); })">توليد القائمة للفترة</button>
-        <span style="font-size:.78rem;opacity:.75;margin-inline-start:10px">◆ بندٌ لا يتوازن يوقف التوليدَ برمزٍ يسمّيه</span>
+        <span class="fa-note">◆ بندٌ لا يتوازن يوقف التوليدَ برمزٍ يسمّيه</span>
     </div></div>
     <?php endif; ?>
     <div class="card"><div class="card-body table-responsive">
         <?php if (!$rows): ?>
             <?php ems_state_empty('لا قائمةَ حقوقِ ملكيةٍ لهذه الفترة'); ?>
         <?php else: ?>
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap fa-table-full">
             <thead><tr><th>الرقم</th><th>البند</th><th>الاسم</th><th>الرصيد الافتتاحي</th>
                 <th>الإضافات</th><th>الخصومات</th><th>التحويلات</th><th>الرصيد الختامي</th>
-                <th>المحسوب</th><th>متوازن؟</th><th>الفترة</th><th>مرجع التفويض</th></tr></thead>
+                <th>المحسوب</th><th>متوازن؟</th><th>الفترة</th><th>العملة</th><th>مرجع التفويض</th></tr></thead>
             <tbody>
             <?php foreach ($rows as $x): ?>
                 <tr>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars($x['eq_code']); ?></td>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars($x['component_code']); ?></td>
+                    <td class="fa-mono"><?php echo htmlspecialchars($x['eq_code']); ?></td>
+                    <td class="fa-mono"><?php echo htmlspecialchars($x['component_code']); ?></td>
                     <td><?php echo htmlspecialchars($x['component_name']); ?></td>
                     <?php foreach (array('opening_balance','additions','deductions','transfers',
                         'closing_balance','computed_closing') as $f): ?>
@@ -53,7 +60,8 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                     <?php endforeach; ?>
                     <td><span class="badge <?php echo (int)$x['balance_ok']?'badge-success':'badge-danger'; ?>"><?php echo (int)$x['balance_ok']?'✔':'✘'; ?></span></td>
                     <td><?php echo htmlspecialchars($x['period']); ?></td>
-                    <td style="font-size:.72rem"><?php echo htmlspecialchars($x['authority_ref']); ?></td>
+                    <td><?php echo htmlspecialchars($x['currency']); ?></td>
+                    <td class="fa-fs72"><?php echo htmlspecialchars($x['authority_ref']); ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -63,4 +71,5 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 <?php
 }
 
+/* القشرةُ الموحَّدةُ هي التي تُنفِّذ include '../inheader.php' ثم insidebar بعد الحارسِ (البوابة ٤) */
 require __DIR__ . '/../includes/fin_analysis_shell.php';

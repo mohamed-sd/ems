@@ -85,13 +85,15 @@ foreach (file(__DIR__ . '/uxw_scope.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPT
 }
 
 $diffs = 0;
-/* معاملاتُ جلبٍ لشاشاتٍ تشترط معاملَ مسارٍ (tools/uxw_fetch_params.txt: مسار<TAB>سلسلةُ استعلام) */
-$PARAMS = array();
+/* معاملاتُ جلبٍ لشاشاتٍ تشترط معاملَ مسارٍ أو تُحوَّل لأختِها الكنسيةِ عمدًا
+   (tools/uxw_fetch_params.txt: مسار<TAB>سلسلةُ استعلام[<TAB>اسمُ الوجهةِ المتوقَّعة]) */
+$PARAMS = array(); $EXPECT = array();
 if (is_file(__DIR__ . '/uxw_fetch_params.txt')) {
     foreach (file(__DIR__ . '/uxw_fetch_params.txt', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $ln) {
         if (trim($ln) === '' || $ln[0] === '#') continue;
         $c = explode("\t", $ln);
         if (count($c) >= 2) { $PARAMS[trim($c[0])] = trim($c[1]); }
+        if (count($c) >= 3) { $EXPECT[trim($c[0])] = trim($c[2]); }
     }
 }
 foreach ($scope as $rel) {
@@ -100,7 +102,7 @@ foreach ($scope as $rel) {
     login_as($user);
     $qs = isset($PARAMS[$rel]) ? ('?' . $PARAMS[$rel]) : '';
     $html = http_as($user, "$BASE/" . $rel . $qs);
-    $wanted = basename($rel);
+    $wanted = isset($EXPECT[$rel]) ? $EXPECT[$rel] : basename($rel);
     if (strpos($LAST_URL, $wanted) === false) {
         echo "⚠ {$rel}: حُوِّل عنها ({$LAST_URL}) بحساب «{$user}» — لم تُقَس؛ سجِّل حسابًا مخوَّلًا في uxw_accounts.txt\n";
         continue;

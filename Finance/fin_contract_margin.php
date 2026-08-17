@@ -33,9 +33,15 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                         WHERE l.company_id = {$company_id} AND l.contract_id IS NOT NULL LIMIT 100");
     if ($r) { while ($x = $r->fetch_assoc()) { $ctr[] = (int) $x['contract_id']; } }
 ?>
+    <style>
+        .fa-table-full{width:100%}
+        .fa-mono{font-family:monospace}
+        .fa-card-gap{margin-top:12px}
+    </style>
+    <?php echo ems_states_bundle('لا توجد بياناتٌ لهذه الفترة', 'غيّر الفترةَ أو تحقق من توفرِ السجلات'); ?>
     <div class="card"><div class="card-body table-responsive">
         <h6>الهامش بنموذج العمل — الثلاثة لا تُخلط</h6>
-        <table class="table table-sm table-striped" style="width:100%" data-no-dt="1">
+        <table class="table table-sm table-striped fa-table-full" data-no-dt="1">
             <thead><tr><th>النموذج</th><th>M1 الإيراد</th><th>M2 الإجمالي</th><th>M3 التشغيلي</th>
                 <th>M4 قبل الضريبة</th><th>M5 الصافي</th><th>نسبة الهامش</th></tr></thead>
             <tbody>
@@ -53,19 +59,19 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
             </tbody>
         </table>
     </div></div>
-    <div class="card" style="margin-top:12px"><div class="card-body table-responsive">
+    <div class="card fa-card-gap"><div class="card-body table-responsive">
         <h6>الهامش بالعقد (D8)</h6>
         <?php if (!$ctr): ?>
             <?php ems_state_empty('لا عقودَ لها قيودٌ بالبُعد D8 في هذه الفترة'); ?>
         <?php else: ?>
-        <table class="table table-sm table-striped" style="width:100%" data-no-dt="1">
+        <table class="table table-sm table-striped fa-table-full" data-no-dt="1">
             <thead><tr><th>العقد</th><th>M1</th><th>M2</th><th>M3</th><th>الحالة</th></tr></thead>
             <tbody>
             <?php foreach ($ctr as $cid):
                 $m = \App\Services\Finance\FinAnalysisService::margins($conn, $company_id, $period, array('contract_id' => $cid));
                 $neg = ($m['M2']['value'] !== null && $m['M2']['value'] < 0); ?>
                 <tr>
-                    <td style="font-family:monospace">CTR-<?php echo $cid; ?></td>
+                    <td class="fa-mono">CTR-<?php echo $cid; ?></td>
                     <?php foreach (array('M1','M2','M3') as $k): $v = $m[$k]['value']; ?>
                     <td><?php echo $v !== null ? number_format($v,2) : '—'; ?></td>
                     <?php endforeach; ?>
@@ -79,4 +85,5 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 <?php
 }
 
+/* القشرةُ الموحَّدةُ للتحليل — وهي التي تنفّذ include inheader.php والحارسَ وشريطَ الفترة */
 require __DIR__ . '/../includes/fin_analysis_shell.php';

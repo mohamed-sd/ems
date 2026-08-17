@@ -31,10 +31,19 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                        ORDER BY p.id DESC");
     if ($r) { while ($x = $r->fetch_assoc()) { $rows[] = $x; } }
 ?>
+    <style>
+        .fa-gen-bar{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+        .fa-field-label{font-size:.8rem}
+        .fa-mono{font-family:monospace}
+        .fa-fs74{font-size:.74rem}
+        .fa-fs72{font-size:.72rem}
+        .fa-table-full{width:100%}
+    </style>
+    <?php echo ems_states_bundle('لا بياناتٍ لهذه الفترةِ المالية', 'غيّر الفترةَ أو تحقق من ترحيلِ القيود'); ?>
     <?php if ($can_write && $projects): ?>
-    <div class="card"><div class="card-body" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
-        <label style="font-size:.8rem">المشروع
-            <select id="faProj" class="form-control form-control-sm">
+    <div class="card"><div class="card-body fa-gen-bar">
+        <label class="fa-field-label" for="faProj">المشروع
+            <select id="faProj" class="form-control form-control-sm" aria-label="المشروع المراد توليد قائمة دخله">
                 <?php foreach ($projects as $p): ?>
                 <option value="<?php echo (int)$p['id']; ?>"><?php echo htmlspecialchars($p['name']); ?></option>
                 <?php endforeach; ?>
@@ -47,27 +56,28 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
         <?php if (!$rows): ?>
             <?php ems_state_empty('لا قوائمَ مولَّدةً لهذه الفترة'); ?>
         <?php else: ?>
-        <table class="alltables display nowrap" style="width:100%">
-            <thead><tr><th>الرقم</th><th>المشروع</th><th>الفترة</th><th>الإيراد</th><th>التكلفة المباشرة</th>
+        <table class="alltables display nowrap fa-table-full">
+            <thead><tr><th>الرقم</th><th>المشروع</th><th>الفترة</th><th>العملة</th><th>الإيراد</th><th>التكلفة المباشرة</th>
                 <th>الحصة المحمَّلة</th><th>أساس التحميل</th><th>الهامش الإجمالي</th><th>الربح التشغيلي</th>
                 <th>نسبة الهامش</th><th>الحالة</th><th>مولّدها</th><th>مرجع التفويض</th><th>المرجع الأب</th></tr></thead>
             <tbody>
             <?php foreach ($rows as $x): ?>
                 <tr>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars($x['pl_code']); ?></td>
+                    <td class="fa-mono"><?php echo htmlspecialchars($x['pl_code']); ?></td>
                     <td><?php echo htmlspecialchars((string)($x['project_name'] ?? $x['project_id'])); ?></td>
                     <td><?php echo htmlspecialchars($x['period']); ?></td>
+                    <td><?php echo htmlspecialchars($x['currency']); ?></td>
                     <td><?php echo number_format((float)$x['revenue_total'],2); ?></td>
                     <td><?php echo number_format((float)$x['direct_cost_total'],2); ?></td>
                     <td><?php echo number_format((float)$x['allocated_overhead'],2); ?></td>
-                    <td style="font-size:.74rem"><?php echo htmlspecialchars($x['allocation_basis']); ?></td>
+                    <td class="fa-fs74"><?php echo htmlspecialchars($x['allocation_basis']); ?></td>
                     <td><?php echo number_format((float)$x['gross_margin'],2); ?></td>
                     <td><strong><?php echo number_format((float)$x['operating_profit'],2); ?></strong></td>
                     <td><?php echo $x['margin_pct'] !== null ? $x['margin_pct'].'٪' : '—'; ?></td>
                     <td><span class="badge badge-info"><?php echo htmlspecialchars($x['state']); ?></span></td>
                     <td><?php echo (int)$x['generated_by']; ?></td>
-                    <td style="font-size:.72rem"><?php echo htmlspecialchars($x['authority_ref']); ?></td>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars($x['parent_ref']); ?></td>
+                    <td class="fa-fs72"><?php echo htmlspecialchars($x['authority_ref']); ?></td>
+                    <td class="fa-mono"><?php echo htmlspecialchars($x['parent_ref']); ?></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -77,4 +87,5 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 <?php
 }
 
+/* القشرةُ الموحَّدةُ هي التي تُنفِّذ include '../inheader.php' ثم insidebar بعد الحارسِ (البوابة ٤) */
 require __DIR__ . '/../includes/fin_analysis_shell.php';

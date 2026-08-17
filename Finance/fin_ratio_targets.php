@@ -26,8 +26,15 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                         ORDER BY group_code, ratio_code");
     while ($x = $r->fetch_assoc()) { $rows[] = $x; }
 ?>
+    <style>
+        .fa-mono{font-family:monospace}
+        .fa-fs76{font-size:.76rem}
+        .fa-fs72{font-size:.72rem}
+        .fa-table-full{width:100%}
+    </style>
+    <?php echo ems_states_bundle('لا حدودَ نسبٍ معتمدةً بعد', 'تُعتمد الحدودُ من هذه الشاشةِ بصلاحيةِ نائبِ الرئيسِ للشؤونِ الماليةِ والاستثمار'); ?>
     <div class="card"><div class="card-body table-responsive">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap fa-table-full">
             <thead><tr>
                 <th>الرمز</th><th>النسبة</th><th>المجموعة</th><th>الوحدة</th><th>اتجاه الحد</th>
                 <th>حد الإنذار</th><th>الحد الحرج</th><th>الهدف</th><th>نص الحد</th>
@@ -36,7 +43,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
             <tbody>
             <?php foreach ($rows as $x): ?>
                 <tr>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars($x['ratio_code']); ?></td>
+                    <td class="fa-mono"><?php echo htmlspecialchars($x['ratio_code']); ?></td>
                     <td><?php echo htmlspecialchars($x['name_ar']); ?></td>
                     <td><?php echo htmlspecialchars($x['group_code']); ?></td>
                     <td><?php echo htmlspecialchars($x['unit_ar']); ?></td>
@@ -44,12 +51,12 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                     <td><?php echo $x['warn_value'] !== null ? $x['warn_value'] : '—'; ?></td>
                     <td><?php echo $x['critical_value'] !== null ? $x['critical_value'] : '—'; ?></td>
                     <td><?php echo $x['target_value'] !== null ? $x['target_value'] : '—'; ?></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars($x['limit_text']); ?></td>
+                    <td class="fa-fs76"><?php echo htmlspecialchars($x['limit_text']); ?></td>
                     <td><?php echo htmlspecialchars($x['cadence']); ?></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars($x['owner_role']); ?></td>
+                    <td class="fa-fs76"><?php echo htmlspecialchars($x['owner_role']); ?></td>
                     <td>v<?php echo (int) $x['version_no']; ?></td>
                     <td><?php echo $x['approved_by'] ? (int) $x['approved_by'] : '—'; ?></td>
-                    <td style="font-size:.72rem"><?php echo htmlspecialchars($x['authority_ref']); ?></td>
+                    <td class="fa-fs72"><?php echo htmlspecialchars($x['authority_ref']); ?></td>
                     <td><?php if ($can_write): ?>
                         <button class="ems-btn-secondary" onclick="faSetTarget('<?php echo htmlspecialchars($x['ratio_code']); ?>')">اعتماد حد</button>
                     <?php endif; ?></td>
@@ -72,4 +79,5 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 <?php
 }
 
+/* القشرةُ الموحَّدةُ هي التي تُنفِّذ include '../inheader.php' ثم insidebar بعد الحارسِ (البوابة ٤) */
 require __DIR__ . '/../includes/fin_analysis_shell.php';

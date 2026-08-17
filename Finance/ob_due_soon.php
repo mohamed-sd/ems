@@ -30,4 +30,13 @@ $U13 = array(
     'where'       => 'state IN (\'scheduled\',\'recognized\',\'invoiced\') AND due_date >= CURDATE() AND due_date <= DATE_ADD(CURDATE(), INTERVAL 30 DAY)',
     'order'       => 'due_date ASC',
 );
+/* ── UXW-01 · القشرة (بوابة ٤): العُدّةُ التاليةُ هي التي تُنفّذ include inheader.php
+   (القشرةُ الموحَّدة) ثم insidebar.php قبل التصيير (u13_screen_kit §القالب)
+   — فالشاشةُ داخلَ القشرةِ لا خارجَها. */
 require __DIR__ . '/../includes/u13_screen_kit.php';
+/* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا
+   ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components التي تُحمِّلها القشرة. */
+if (function_exists('ems_states_bundle')) {
+    echo ems_states_bundle('لا مستحقَّ خلالَ الثلاثين يومًا القادمة',
+                           'وسّع الأفقَ الزمنيَّ أو راجع جدولَ الاستحقاق');
+}

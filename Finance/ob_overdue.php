@@ -30,4 +30,8 @@ $U13 = array(
     'where'       => '(state = \'moved_to_payables\' OR (due_date < CURDATE() AND settled < l2_recognized AND state <> \'closed\'))',
     'order'       => 'due_date ASC',
 );
+/* القشرةُ الموحَّدة: العُدّةُ أدناه هي التي تنفّذ include inheader.php ثم insidebar.php */
 require __DIR__ . '/../includes/u13_screen_kit.php';
+/* حالاتُ الشاشةِ (UXW-01 ⑨) — عناصرُ مخفيةٌ للفراغِ والخطأِ والتحميلِ تُلحق بذيلِ
+   الصفحة، وحالةُ الفراغِ المرئيةُ يعرضها جدولُ العُدّةِ بنصِّ empty_hint نفسِه */
+echo ems_states_bundle('لا التزامَ متأخرًا — وهذا هو المطلوب', 'غيّر الفترةَ أو تحقق من توفرِ السجلات');

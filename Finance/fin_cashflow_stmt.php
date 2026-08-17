@@ -26,26 +26,33 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                         ORDER BY period DESC, id DESC LIMIT 24");
     if ($r) { while ($x = $r->fetch_assoc()) { $rows[] = $x; } }
 ?>
+    <style>
+        .fa-note{font-size:.78rem;opacity:.75;margin-inline-start:10px}
+        .fa-mono{font-family:monospace}
+        .fa-table-full{width:100%}
+    </style>
+    <?php echo ems_states_bundle('لا بياناتٍ لهذه الفترةِ المالية', 'غيّر الفترةَ أو تحقق من ترحيلِ القيود'); ?>
     <?php if ($can_write): ?>
     <div class="card"><div class="card-body">
         <button class="ems-btn-primary" onclick="faPost('cashflow_generate', {}, function(j){ alert('وُلّدت ' + j.cf_code + ' · التشغيلي ' + j.operating + ' · الفرق ' + j.balance_diff + ' — متوازنة ✔'); location.reload(); })">توليد القائمة للفترة</button>
-        <span style="font-size:.78rem;opacity:.75;margin-inline-start:10px">◆ لا تُحفظ إن لم تتوازن — والرفضُ يبيّن الفرقَ ويقود لتصنيفِ النشاط</span>
+        <span class="fa-note">◆ لا تُحفظ إن لم تتوازن — والرفضُ يبيّن الفرقَ ويقود لتصنيفِ النشاط</span>
     </div></div>
     <?php endif; ?>
     <div class="card"><div class="card-body table-responsive">
         <?php if (!$rows): ?>
             <?php ems_state_empty('لا قوائمَ تدفقاتٍ مولَّدةً بعد'); ?>
         <?php else: ?>
-        <table class="alltables display nowrap" style="width:100%">
-            <thead><tr><th>الرقم</th><th>الفترة</th><th>الربح الصافي</th><th>الإهلاك</th><th>المخصصات</th>
+        <table class="alltables display nowrap fa-table-full">
+            <thead><tr><th>الرقم</th><th>الفترة</th><th>العملة</th><th>الربح الصافي</th><th>الإهلاك</th><th>المخصصات</th>
                 <th>الذمم</th><th>المخزون</th><th>الموردون</th><th>التشغيلي</th><th>الاستثماري</th>
                 <th>التمويلي</th><th>صافي التغير</th><th>نقدية الافتتاح</th><th>نقدية الختام</th>
                 <th>التغير الفعلي</th><th>الفرق</th><th>متوازنة؟</th><th>الحالة</th></tr></thead>
             <tbody>
             <?php foreach ($rows as $x): ?>
                 <tr>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars($x['cf_code']); ?></td>
+                    <td class="fa-mono"><?php echo htmlspecialchars($x['cf_code']); ?></td>
                     <td><?php echo htmlspecialchars($x['period']); ?></td>
+                    <td><?php echo htmlspecialchars($x['currency']); ?></td>
                     <?php foreach (array('net_profit','adj_depreciation','adj_provisions','wc_receivables',
                         'wc_inventory','wc_payables','operating_net','investing_net','financing_net',
                         'net_change','cash_open','cash_close','actual_change','balance_diff') as $f): ?>
@@ -62,4 +69,5 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 <?php
 }
 
+/* القشرةُ الموحَّدةُ هي التي تُنفِّذ include '../inheader.php' ثم insidebar بعد الحارسِ (البوابة ٤) */
 require __DIR__ . '/../includes/fin_analysis_shell.php';

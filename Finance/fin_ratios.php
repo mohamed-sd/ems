@@ -37,11 +37,30 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     $byFlag = array('ok' => 0, 'warn' => 0, 'critical' => 0, 'unmeasured' => 0);
     foreach ($rows as $x) { $f = $x['status_flag'] ?: 'unmeasured'; $byFlag[$f] = ($byFlag[$f] ?? 0) + 1; }
 ?>
-    <div class="card"><div class="card-body" style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
-        <span class="badge badge-success" style="font-size:14px;padding:7px 12px">ضمن الحد: <strong><?php echo $byFlag['ok']; ?></strong></span>
-        <span class="badge badge-warning" style="font-size:14px;padding:7px 12px">إنذار: <strong><?php echo $byFlag['warn']; ?></strong></span>
-        <span class="badge badge-danger" style="font-size:14px;padding:7px 12px">حرج: <strong><?php echo $byFlag['critical']; ?></strong></span>
-        <span class="badge badge-secondary" style="font-size:14px;padding:7px 12px">غير مقيسة: <strong><?php echo $byFlag['unmeasured']; ?></strong></span>
+    <style>
+        .fa-kpi-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+        .fa-kpi-badge{font-size:14px;padding:7px 12px}
+        .fa-table-full{width:100%}
+        .fa-mono{font-family:monospace}
+        .fa-cell-sm{font-size:.76rem}
+    </style>
+    <?php echo ems_states_bundle('لا توجد بياناتٌ لهذه الفترة', 'غيّر الفترةَ أو تحقق من توفرِ السجلات'); ?>
+    <?php if (!$rows): /* حالةُ الفراغِ تُعرض بدل أصفارِ العدّاداتِ والجدولِ الخالي — والأفعالُ تبقى متاحة */ ?>
+    <div class="card"><div class="card-body">
+        <?php echo ems_state('empty', 'لا توجد بياناتٌ لهذه الفترة', 'غيّر الفترةَ أو تحقق من توفرِ السجلات'); ?>
+        <?php if ($can_write): ?>
+        <div class="fa-kpi-row">
+            <button class="ems-btn-primary" onclick="faPost('ratio_compute', {})">احتساب النسب للفترة</button>
+            <button class="ems-btn-secondary" onclick="faPost('signal_raise', {}, function(j){ alert('قواعدُ فُحصت: ' + j.checked + ' · إشاراتٌ رُفعت: ' + j.raised.length); location.reload(); })">تقييم إشارات الإنذار</button>
+        </div>
+        <?php endif; ?>
+    </div></div>
+    <?php else: ?>
+    <div class="card"><div class="card-body fa-kpi-row">
+        <span class="badge badge-success fa-kpi-badge">ضمن الحد: <strong><?php echo $byFlag['ok']; ?></strong></span>
+        <span class="badge badge-warning fa-kpi-badge">إنذار: <strong><?php echo $byFlag['warn']; ?></strong></span>
+        <span class="badge badge-danger fa-kpi-badge">حرج: <strong><?php echo $byFlag['critical']; ?></strong></span>
+        <span class="badge badge-secondary fa-kpi-badge">غير مقيسة: <strong><?php echo $byFlag['unmeasured']; ?></strong></span>
         <?php if ($can_write): ?>
         <button class="ems-btn-primary" onclick="faPost('ratio_compute', {})">احتساب النسب للفترة</button>
         <button class="ems-btn-secondary" onclick="faPost('signal_raise', {}, function(j){ alert('قواعدُ فُحصت: ' + j.checked + ' · إشاراتٌ رُفعت: ' + j.raised.length); location.reload(); })">تقييم إشارات الإنذار</button>
@@ -49,7 +68,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     </div></div>
 
     <div class="card"><div class="card-body table-responsive">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap fa-table-full">
             <thead><tr>
                 <th>الرمز</th><th>المجموعة</th><th>النسبة</th><th>القيمة</th><th>الوحدة</th>
                 <th>الحالة</th><th>الاتجاه</th><th>الحد</th><th>الدورية</th><th>المالك</th>
@@ -63,16 +82,16 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                 $tr = array('up'=>'▲','down'=>'▼','flat'=>'▬','na'=>'—')[$x['trend_direction'] ?: 'na'];
             ?>
                 <tr>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars($x['ratio_code']); ?></td>
+                    <td class="fa-mono"><?php echo htmlspecialchars($x['ratio_code']); ?></td>
                     <td><?php echo htmlspecialchars($x['group_code']); ?></td>
                     <td><?php echo htmlspecialchars($x['name_ar']); ?></td>
                     <td><strong><?php echo $x['result_value'] !== null ? number_format((float)$x['result_value'], 2) : '—'; ?></strong></td>
                     <td><?php echo htmlspecialchars($x['unit_ar']); ?></td>
                     <td><span class="badge <?php echo $cls; ?>"><?php echo $lbl; ?></span></td>
                     <td><?php echo $tr; ?></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars($x['limit_text']); ?></td>
+                    <td class="fa-cell-sm"><?php echo htmlspecialchars($x['limit_text']); ?></td>
                     <td><?php echo htmlspecialchars($x['cadence']); ?></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars($x['owner_role']); ?></td>
+                    <td class="fa-cell-sm"><?php echo htmlspecialchars($x['owner_role']); ?></td>
                     <td><?php echo $x['numerator_value'] !== null ? number_format((float)$x['numerator_value'], 2) : '—'; ?></td>
                     <td><?php echo $x['denominator_value'] !== null ? number_format((float)$x['denominator_value'], 2) : '—'; ?></td>
                     <td><a class="btn-primary" href="fin_ratio_detail.php?ratio=<?php echo urlencode($x['ratio_code']); ?>&period=<?php echo urlencode($period); ?>">تعمّق ▸</a></td>
@@ -83,7 +102,9 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
             </tbody>
         </table>
     </div></div>
+    <?php endif; ?>
 <?php
 }
 
+/* القشرةُ الموحَّدةُ للتحليل — وهي التي تنفّذ include inheader.php والحارسَ وشريطَ الفترة */
 require __DIR__ . '/../includes/fin_analysis_shell.php';

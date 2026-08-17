@@ -35,11 +35,16 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
         $rows[] = array('eq' => $e, 'm' => $m);
     }
 ?>
+    <style>
+        .fa-table-full{width:100%}
+        .fa-mono{font-family:monospace}
+    </style>
+    <?php echo ems_states_bundle('لا توجد بياناتٌ لهذه الفترة', 'غيّر الفترةَ أو تحقق من توفرِ السجلات'); ?>
     <div class="card"><div class="card-body table-responsive">
         <?php if (!$rows): ?>
             <?php ems_state_empty('لا معداتٍ لها قيودٌ في هذه الفترة — الربحيةُ تُقاس بعد أولِ قيدٍ بالبُعد D5'); ?>
         <?php else: ?>
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap fa-table-full">
             <thead><tr><th>المعدة</th><th>الكود</th><th>الإيراد الصافي M1</th><th>الهامش الإجمالي M2</th>
                 <th>الربح التشغيلي M3</th><th>قبل الضريبة M4</th><th>الصافي M5</th>
                 <th>نسبة الهامش</th><th>الحالة</th><th>الفترة</th></tr></thead>
@@ -51,7 +56,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
             ?>
                 <tr>
                     <td><?php echo htmlspecialchars((string)($x['eq']['equipment_name'] ?? '—')); ?></td>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars((string)($x['eq']['equipment_code'] ?? $x['eq']['equipment_id'])); ?></td>
+                    <td class="fa-mono"><?php echo htmlspecialchars((string)($x['eq']['equipment_code'] ?? $x['eq']['equipment_id'])); ?></td>
                     <?php foreach (array('M1','M2','M3','M4','M5') as $k): $v = $x['m'][$k]['value']; ?>
                     <td><?php echo $v !== null ? number_format($v, 2) : '—'; ?></td>
                     <?php endforeach; ?>
@@ -67,4 +72,5 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 <?php
 }
 
+/* القشرةُ الموحَّدةُ للتحليل — وهي التي تنفّذ include inheader.php والحارسَ وشريطَ الفترة */
 require __DIR__ . '/../includes/fin_analysis_shell.php';

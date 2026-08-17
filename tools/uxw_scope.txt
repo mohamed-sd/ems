@@ -17,3 +17,19 @@ Suppliers/supplier_profile.php
 Risk/risk_register.php
 FinRequests/request_form.php
 Finance/approvals_inbox.php
+# موجةُ الإداراتِ ١ — الماليةُ والخزينة (بالشدةِ من الدفتر) — رُحِّلت 2026-08-17
+Finance/fin_cashflow_stmt.php
+Finance/fin_equity_stmt.php
+Finance/fin_project_pl.php
+Finance/fin_ratio_detail.php
+Finance/fin_ratio_targets.php
+Finance/ob_register.php
+Finance/ob_contingent.php
+Finance/ob_commitments.php
+Finance/ob_due_soon.php
+Finance/ob_horizon.php
+Finance/ob_overdue.php
+Finance/fin_ratios.php
+Finance/fin_early_warning.php
+Finance/fin_unit_economics.php
+Finance/fin_contract_margin.php

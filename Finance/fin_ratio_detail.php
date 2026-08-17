@@ -15,12 +15,20 @@ $FA_SCREEN = array(
   0 => 'البسطُ والمقامُ أكوادُ شجرةٍ معلنةٌ لا صيغةٌ خفية',
 ),
     'context' => array(),
-    'filters' => '<label style="font-size:.8rem">النسبة <input type="text" name="ratio" value="" class="form-control form-control-sm" placeholder="FR-01" aria-label="FR-01"></label>',
+    'filters' => '<label class="fa-field-label">النسبة <input type="text" name="ratio" value="" class="form-control form-control-sm" placeholder="FR-01" aria-label="رمز النسبة المالية المطلوب تفصيلها"></label>',
 );
 
 /** جسمُ الشاشةِ — تُستدعى من القشرةِ بعد الحارسِ والغلاف */
 function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 {
+?>
+    <style>
+        .fa-field-label{font-size:.8rem}
+        .fa-mono{font-family:monospace}
+        .fa-table-full{width:100%}
+    </style>
+    <?php echo ems_states_bundle('لا قياسَ لهذه النسبةِ في هذه الفترة', 'غيّر الفترةَ أو تحقق من احتسابِ النسبِ للفترة'); ?>
+<?php
     $code = isset($_GET['ratio']) ? preg_replace('/[^A-Z0-9\-]/', '', strtoupper($_GET['ratio'])) : 'FR-01';
     $st = $conn->prepare("SELECT * FROM fin_ratio_targets WHERE company_id = ? AND ratio_code = ?
                            ORDER BY version_no DESC LIMIT 1");
@@ -50,8 +58,8 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
         <h6><?php echo htmlspecialchars($t['name_ar']); ?> — <?php echo htmlspecialchars($code); ?></h6>
         <table class="table table-sm"><tbody>
             <tr><td>الصيغة</td><td><strong><?php echo htmlspecialchars($t['formula_ar']); ?></strong></td></tr>
-            <tr><td>حسابات البسط</td><td style="font-family:monospace"><?php echo htmlspecialchars($t['numerator_codes']); ?></td></tr>
-            <tr><td>حسابات المقام</td><td style="font-family:monospace"><?php echo htmlspecialchars($t['denominator_codes']); ?></td></tr>
+            <tr><td>حسابات البسط</td><td class="fa-mono"><?php echo htmlspecialchars($t['numerator_codes']); ?></td></tr>
+            <tr><td>حسابات المقام</td><td class="fa-mono"><?php echo htmlspecialchars($t['denominator_codes']); ?></td></tr>
             <tr><td>قيمة البسط</td><td><?php echo $v && $v['numerator_value'] !== null ? number_format((float)$v['numerator_value'],2) : '—'; ?></td></tr>
             <tr><td>قيمة المقام</td><td><?php echo $v && $v['denominator_value'] !== null ? number_format((float)$v['denominator_value'],2) : '—'; ?></td></tr>
             <tr><td>النتيجة</td><td><strong><?php echo $v && $v['result_value'] !== null ? number_format((float)$v['result_value'],4) : '— غير مقيسة'; ?></strong> <?php echo htmlspecialchars($t['unit_ar']); ?></td></tr>
@@ -62,13 +70,13 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     </div></div>
     <div class="card"><div class="card-body table-responsive">
         <h6>الحسابات المكوِّنة — والقيودُ خلفها</h6>
-        <table class="table table-sm table-striped" style="width:100%" data-no-dt="1">
+        <table class="table table-sm table-striped fa-table-full" data-no-dt="1">
             <thead><tr><th>الجهة</th><th>الكود</th><th>الحساب</th><th>القائمة</th><th>نشاط التدفق</th><th>الرصيد</th><th>عدد القيود</th></tr></thead>
             <tbody>
             <?php foreach ($accs as $a): ?>
                 <tr>
                     <td><?php echo $a['side']; ?></td>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars($a['code']); ?></td>
+                    <td class="fa-mono"><?php echo htmlspecialchars($a['code']); ?></td>
                     <td><?php echo htmlspecialchars($a['name']); ?></td>
                     <td><?php echo htmlspecialchars($a['stmt']); ?></td>
                     <td><?php echo htmlspecialchars($a['flow']); ?></td>
@@ -82,4 +90,5 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 <?php
 }
 
+/* القشرةُ الموحَّدةُ هي التي تُنفِّذ include '../inheader.php' ثم insidebar بعد الحارسِ (البوابة ٤) */
 require __DIR__ . '/../includes/fin_analysis_shell.php';
