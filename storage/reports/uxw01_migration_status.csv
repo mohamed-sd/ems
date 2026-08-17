@@ -66,3 +66,10 @@ Risk/risk_control_verify.php,نعم,0,موجود,مُرحَّلة — بوابا
 Risk/risk_acceptance.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
 Risk/risk_reviews.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
 Risk/risk_committee.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Tickets/ticket_kpi.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Tickets/ticket_close.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Workforce/op_codes.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Workforce/op_qual.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Financing/fin_models.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Financing/fin_changes.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Operations/site_gate_person.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس

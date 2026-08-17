@@ -91,42 +91,59 @@ include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main" dir="rtl">
+<div class="main ems-doc-cycle" dir="rtl">
 <?php
 $header_icon = 'fa fa-lock';
 $header_title_html = htmlspecialchars('طابورُ الإغلاق — ما أُنجز وينتظر الإقفال', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+echo ems_next_step('تأكيدُ الحلِّ ثم الإقفالُ — يقعان في شاشةِ البلاغِ نفسِها بزرِّ «فتحُ البلاغ للإقفال»');
+echo ems_states_bundle('لا بلاغَ منجَزًا ينتظر الإقفال', 'الطابورُ يمتلئ حين تبلغ البلاغاتُ مرحلةَ «منجَز» فعلًا');
 ?>
+  <style>
+    .tkc-alert-gap { margin: 10px 0; }
+    .tkc-stat-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
+    .tkc-stat-card { padding: 10px 14px; }
+    .tkc-stat-ready { border-inline-start: 4px solid var(--c-198754); }
+    .tkc-stat-blocked { border-inline-start: 4px solid var(--warning-600); }
+    .tkc-stat-label { font-size: .78rem; opacity: .75; }
+    .tkc-stat-value { font-size: 1.4rem; font-weight: 700; }
+    .tkc-w100 { width: 100%; }
+    .tkc-empty-cell { text-align: center; opacity: .7; }
+    .tkc-badge-ready { background: var(--c-198754); }
+    .tkc-badge-blocked { background: var(--warning-600); }
+    .tkc-blockers { font-size: .78rem; opacity: .85; margin-top: 3px; }
+    .tkc-footnote { font-size: .8rem; margin-top: 8px; }
+  </style>
 
   <?php if ($failed): ?>
-  <div class="alert alert-danger" style="margin:10px 0">
+  <div class="alert alert-danger tkc-alert-gap">
     <strong>تعذّرت قراءةُ الطابور.</strong>
     فرقٌ بين «لا بلاغَ ينتظر» و«تعذّر السؤال» — وهذه الثانية.
   </div>
   <?php else: ?>
 
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin:10px 0">
-    <div class="ems-card" style="padding:10px 14px;border-inline-start:4px solid #198754">
-      <div style="font-size:.78rem;opacity:.75">جاهزٌ للإقفال</div>
-      <div style="font-size:1.4rem;font-weight:700"><?php echo number_format($ready); ?></div>
+  <div class="tkc-stat-row">
+    <div class="ems-card tkc-stat-card tkc-stat-ready">
+      <div class="tkc-stat-label">جاهزٌ للإقفال</div>
+      <div class="tkc-stat-value"><?php echo number_format($ready); ?></div>
     </div>
-    <div class="ems-card" style="padding:10px 14px;border-inline-start:4px solid #b58900">
-      <div style="font-size:.78rem;opacity:.75">منجَزٌ ومحجوب</div>
-      <div style="font-size:1.4rem;font-weight:700"><?php echo number_format($blocked); ?></div>
+    <div class="ems-card tkc-stat-card tkc-stat-blocked">
+      <div class="tkc-stat-label">منجَزٌ ومحجوب</div>
+      <div class="tkc-stat-value"><?php echo number_format($blocked); ?></div>
     </div>
   </div>
 
   <div class="card"><div class="card-body table-responsive">
-    <table class="table table-sm table-striped" style="width:100%">
+    <table class="table table-sm table-striped tkc-w100">
       <thead><tr>
         <th>#</th><th>رقم البلاغ</th><th>العنوان</th><th>المُبلِّغ</th>
         <th>الإدارة المالكة</th><th>الحال</th><th>الإجراء</th>
       </tr></thead>
       <tbody>
       <?php if (!$rows): ?>
-        <tr><td colspan="7" style="text-align:center;opacity:.7">
+        <tr><td colspan="7" class="tkc-empty-cell">
           لا بلاغَ منجَزًا ينتظر الإقفال — والطابورُ يمتلئ حين يُنجَز عملُ بلاغٍ فعلًا.
         </td></tr>
       <?php else: foreach ($rows as $x): ?>
@@ -138,10 +155,10 @@ include __DIR__ . '/../includes/page_header.php';
           <td><?php echo htmlspecialchars((string) $x['owner_role_name'], ENT_QUOTES, 'UTF-8'); ?></td>
           <td>
             <?php if (!$x['blockers']): ?>
-              <span class="badge" style="background:#198754">جاهزٌ للإقفال</span>
+              <span class="badge tkc-badge-ready">جاهزٌ للإقفال</span>
             <?php else: ?>
-              <span class="badge" style="background:#b58900">محجوب</span>
-              <div style="font-size:.78rem;opacity:.85;margin-top:3px">
+              <span class="badge tkc-badge-blocked">محجوب</span>
+              <div class="tkc-blockers">
                 <?php echo htmlspecialchars(implode(' · ', $x['blockers']), ENT_QUOTES, 'UTF-8'); ?>
               </div>
             <?php endif; ?>
@@ -155,7 +172,7 @@ include __DIR__ . '/../includes/page_header.php';
       <?php endforeach; endif; ?>
       </tbody>
     </table>
-    <p class="text-muted" style="font-size:.8rem;margin-top:8px">
+    <p class="text-muted tkc-footnote">
       الإقفالُ يقع في <code>ticket_form.php</code> — مسارٌ واحدٌ يحمل حارسَ «من رفع
       البلاغَ لا يُقفله» ومنعَ الإقفالِ ومسارٌ إلزاميٌّ مفتوح وختمَ وقتِ الإقفال.
       وهذه الشاشةُ تسرد وتشخّص ولا تكتب — فمسارا إقفالٍ يتفرّقان أسوأُ من شاشةٍ ناقصة.

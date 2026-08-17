@@ -8,6 +8,10 @@ Maintenance/	صيانة
 Suppliers/	مصعب
 Risk/	مخاطر
 Audit/	مراجع
+Tickets/	بلاغات
+Workforce/	مدير القوى
+Financing/	تمويل
+Operations/site_gate_person.php	موقع
 Audit/iaf_reports.php	تنفيذ
 FinRequests/	محمد
 FinRequests/accountant_desk.php	مشرف المالية

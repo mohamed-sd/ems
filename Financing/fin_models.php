@@ -175,7 +175,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
+    echo ems_states_bundle('لا نماذجَ تمويلٍ معرَّفةً بعدُ', 'أضف أولَ نموذجٍ بزرِّ «إضافة» — والنموذجُ المعرَّفُ هنا هو ما تُنشأ به عملياتُ التمويل');
     ?>
+    <style>
+        .cmp03-form-actions { margin-top: 12px; display: flex; gap: 10px; }
+    </style>
 
     <?php if ($fm_msg !== ''): ?>
       <div class="alert <?= (mb_strpos($fm_msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">
@@ -230,7 +234,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <option value="0">معطَّل</option>
                     </select></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <div class="cmp03-form-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
                 <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>

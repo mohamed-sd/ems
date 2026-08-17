@@ -73,3 +73,11 @@ Risk/risk_control_verify.php
 Risk/risk_acceptance.php
 Risk/risk_reviews.php
 Risk/risk_committee.php
+# ذيلُ المتوسطاتِ — البلاغاتُ والقوى والتمويلُ والموقع — رُحِّل 2026-08-17
+Tickets/ticket_kpi.php
+Tickets/ticket_close.php
+Workforce/op_codes.php
+Workforce/op_qual.php
+Financing/fin_models.php
+Financing/fin_changes.php
+Operations/site_gate_person.php
