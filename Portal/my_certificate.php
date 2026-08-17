@@ -83,19 +83,31 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ems-ptc-note { color:var(--c-666666); }
+.ems-ptc-filter { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.ems-ptc-issue-row { display:flex; gap:10px; align-items:center; margin-bottom:8px; }
+.ems-ptc-w100 { width:100%; }
+.ems-ptc-cert-body { text-align:center; padding:40px; }
+.ems-ptc-cert-metrics { text-align:right; max-width:560px; margin:16px auto; }
+.ems-ptc-print-row { margin:10px 0; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'شهادة الإنجاز'; $header_icon = 'fa fa-certificate';
     $header_actions = array();
     include('../includes/page_header.php');
+    // حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة
+    echo ems_states_bundle('لا شهادةَ إنجازٍ صادرةً بعدُ', 'شهادتي تُصدَر من تقييمٍ معتمدٍ — أكمل دورةَ التقييمِ ثم أصدرها من هنا');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
     ?>
 
     <div class="card"><div class="card-body">
-        <p style="color:#666"><strong>الشهادةُ تُولَّد من الأرقام المقاسة لا من كتابةٍ حرة</strong> —
+        <p class="ems-ptc-note"><strong>الشهادةُ تُولَّد من الأرقام المقاسة لا من كتابةٍ حرة</strong> —
             ولا تُصدَر لفترةٍ لم تُقفل بلقطةٍ أو لتقييمٍ لم يُعتمد، ولا تُصدَر مرتين،
             ولكلِّ شهادةٍ رقمٌ تسلسليٌّ ورمزُ تحققٍ يمنع التزوير.</p>
-        <form method="get" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="ems-ptc-filter">
             <strong>تحقّق من شهادة:</strong>
             <input type="text" name="verify" placeholder="رمز التحقق" value="<?php echo htmlspecialchars($verify); ?>" aria-label="رمز التحقق">
             <button type="submit" class="btn-primary">تحقّق</button>
@@ -114,7 +126,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-stamp"></i> معتمدٌ بلا شهادة</h5></div>
     <div class="card-body">
         <?php foreach ($approved as $e): ?>
-            <form method="post" style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+            <form method="post" class="ems-ptc-issue-row">
         <?= csrf_field() ?>
                 <input type="hidden" name="ct_action" value="issue">
                 <input type="hidden" name="eval_id" value="<?php echo intval($e['id']); ?>">
@@ -128,7 +140,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> شهاداتي (<?php echo count($certs); ?>)</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <table class="alltables display nowrap ems-ptc-w100" data-no-dt="1">
             <thead><tr><th>رقم الشهادة</th><th>الفترة</th><th>رمز التحقق</th><th>أُصدرت</th><th></th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">الموظف</th>
@@ -168,12 +180,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if ($openCert):
         $m = json_decode((string)$openCert['metrics_json'], true) ?: array();
     ?>
-    <div class="card" id="printable"><div class="card-body" style="text-align:center;padding:40px">
+    <div class="card" id="printable"><div class="card-body ems-ptc-cert-body">
         <h3>شهادةُ إنجاز</h3>
         <p>رقم <strong><?php echo htmlspecialchars((string)$openCert['serial_no']); ?></strong>
             · رمزُ التحقق <code><?php echo htmlspecialchars((string)$openCert['verify_code']); ?></code></p>
         <p>عن الفترة <strong><?php echo htmlspecialchars($openCert['period_from'] . ' → ' . $openCert['period_to']); ?></strong></p>
-        <div style="text-align:right;max-width:560px;margin:16px auto">
+        <div class="ems-ptc-cert-metrics">
             <p><strong>الإنجازُ بالأرقام المقاسة:</strong></p>
             <ul>
                 <li>الطلبات: أُنشئ <?php echo intval($m['requests']['created'] ?? 0); ?> · اكتمل <?php echo intval($m['requests']['completed'] ?? 0); ?></li>
@@ -187,7 +199,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <p><small>أُصدرت في <?php echo htmlspecialchars((string)$openCert['issued_at']); ?> —
             وتُتحقَّق برمزها في هذه الشاشة</small></p>
     </div></div>
-    <div style="margin:10px 0"><button type="button" class="btn-primary" onclick="window.print()">
+    <div class="ems-ptc-print-row"><button type="button" class="btn-primary" onclick="window.print()">
         <i class="fa fa-print"></i> الطباعة الرسمية</button></div>
     <?php endif; ?>
 </div>

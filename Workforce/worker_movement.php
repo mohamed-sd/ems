@@ -115,11 +115,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if(!empty($_GET['msg'])): $ok=strpos($_GET['msg'],'✅')!==false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
-    <form id="mForm" action="" method="post" class="allforms" style="display:none;">
+    <?php require_once __DIR__ . '/../includes/ux_components.php';
+    echo ems_states_bundle('لا أوامرَ تحرّكٍ أو نقلٍ للعاملين مسجَّلةً بعدُ', 'أضف أولَ أمرٍ بزرِّ «أمر تحرّك/نقل» في رأسِ الشاشة'); ?>
+    <style>
+        .wm-form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); padding: 14px; }
+        .wm-span-2 { grid-column: span 2; display: flex; align-items: center; gap: var(--space-2); }
+        .wm-span-2 label { margin: 0; }
+        .wm-span-full { grid-column: 1 / -1; }
+        .wm-form-actions { padding: 0 14px 16px; }
+        .wm-table-wrap { margin-top: 14px; }
+        .wm-table-full { width: 100%; }
+        .wm-actions-cell { gap: var(--space-1); align-items: center; }
+        .wm-inline-form { display: inline; }
+        .wm-state-select { padding: 2px; }
+        .wm-empty-cell { text-align: center; color: var(--gray-500); padding: 18px; }
+    </style>
+    <form id="mForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="save">
         <div class="card-header"><h5><i class="fas fa-plus"></i> أمر تحرّك / نقل</h5></div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
+        <div class="wm-form-grid">
             <!-- صف 1: الأساسيات -->
             <div class="field"><label for="emsf_1867_78531">الموظف</label><select name="worker_id" required id="emsf_1867_78531"><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select></div>
             <div class="field"><label for="emsf_1868_ccba3">نوع الحركة</label><select name="direction" id="emsf_1868_ccba3"><?php foreach($DIRECTIONS as $d): ?><option value="<?= $d ?>"><?= $d ?></option><?php endforeach; ?></select></div>
@@ -147,14 +162,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <!-- صف 5: الجاهزية والاستلام -->
             <div class="field"><label for="emsf_1880_54aa5">تاريخ الجاهزية</label><input type="date" name="ready_date" id="emsf_1880_54aa5"></div>
             <div class="field"><label for="emsf_1881_6cf45">المستلِم (موظف #)</label><input type="number" name="received_by" id="emsf_1881_6cf45"></div>
-            <div class="field" style="grid-column:span 2;display:flex;align-items:center;gap:8px;"><input type="checkbox" name="safety_kit_received" id="skr" value="1"><label for="skr" style="margin:0;">استلام معدات السلامة</label></div>
+            <div class="field wm-span-2"><input type="checkbox" name="safety_kit_received" id="skr" value="1"><label for="skr">استلام معدات السلامة</label></div>
 
             <!-- صف 6: الملاحظات (عرض كامل) -->
-            <div class="field" style="grid-column:1/-1;"><label>ملاحظات</label><input type="text" name="notes"></div>
+            <div class="field wm-span-full"><label for="wm_notes">ملاحظات</label><input type="text" name="notes" id="wm_notes"></div>
         </div>
-        <div style="padding:0 14px 16px;"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button></div>
+        <div class="wm-form-actions"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button></div>
     </form>
-    <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
+    <div class="table-wrap wm-table-wrap"><table class="data-table wm-table-full">
         <thead><tr><th>إجراءات</th><th>#</th><th>كود الموظف</th><th>الحركة</th><th>الوجهة</th><th>الوصول الفعلي</th><th>زمن الرحلة</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم الأمر</th>
@@ -216,11 +231,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 ems_wf_field('الحالة', $r['state'], 'fas fa-flag', ['type' => 'status']),
                 ems_wf_field('ملاحظات', $r['notes'] ?: '-', 'fas fa-align-right', ['size' => 'full']),
             ]); ?>
-            <tr><td><div class="action-btns" style="gap:4px;align-items:center;">
+            <tr><td><div class="action-btns wm-actions-cell">
                 <?= ems_wf_view_button($r['id']) ?>
-                <form action="" method="post" style="display:inline;">
+                <form action="" method="post" class="wm-inline-form">
         <?= csrf_field() ?><input type="hidden" name="action" value="set_state"><input type="hidden" name="id" value="<?= intval($r['id']) ?>">
-                    <select name="new_state" onchange="this.form.submit()" <?= $can_edit?'':'disabled' ?> style="padding:2px;"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= ($r['state']===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select>
+                    <select name="new_state" aria-label="تغيير حالة أمر التحرّك" onchange="this.form.submit()" class="wm-state-select" <?= $can_edit?'':'disabled' ?>><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= ($r['state']===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select>
                 </form>
                 <?php if($can_delete): ?><a href="worker_movement.php?delete=<?= intval($r['id']) ?>" class="action-btn delete" onclick="return confirm('حذف؟')"><i class="fas fa-trash"></i></a><?php endif; ?>
             </div></td>
@@ -229,12 +244,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><?= htmlspecialchars($r['actual_arrival'] ?: '-') ?></td>
             <td><?= ($r['trip_days']!==null && $r['trip_days']!=='') ? (intval($r['trip_days']).' يوم') : '-' ?></td>
             <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="8" style="text-align:center;color:#888;padding:18px;">لا توجد أوامرٌ بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="8" class="wm-empty-cell">لا توجد أوامرٌ بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>
 <script>
-(function(){var b=document.getElementById('toggleForm'),f=document.getElementById('mForm');if(b&&f)b.addEventListener('click',function(){f.style.display=(f.style.display==='none'||!f.style.display)?'block':'none';});})();
+(function(){var b=document.getElementById('toggleForm'),f=document.getElementById('mForm');if(b&&f)b.addEventListener('click',function(){f.classList.toggle('allforms-visible');});})();
 // زمن الرحلة = (الوصول الفعلي − تاريخ التحرك) بالأيام — يُحسب تلقائياً
 function emsCalcTrip(){
   var dep=document.getElementById('dep_date'), act=document.getElementById('act_date'), out=document.getElementById('trip_days');

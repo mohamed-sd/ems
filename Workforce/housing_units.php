@@ -73,20 +73,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if (!empty($_GET['msg'])): $ok=strpos($_GET['msg'],'✅')!==false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
-    <form id="hForm" action="" method="post" class="allforms" style="display:none;">
+    <?php require_once __DIR__ . '/../includes/ux_components.php';
+    echo ems_states_bundle('لا وحداتِ سكنٍ مسجَّلةً بعدُ', 'أضف أولَ وحدةٍ بزرِّ «وحدة سكن» في رأسِ الشاشة'); ?>
+    <style>
+        .hu-form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); padding: 14px; }
+        .hu-span-wide { grid-column: 2 / -1; }
+        .hu-form-actions { padding: 0 14px 16px; }
+        .hu-table-wrap { margin-top: 14px; }
+        .hu-table-full { width: 100%; }
+        .hu-empty-cell { text-align: center; color: var(--gray-500); padding: 18px; }
+    </style>
+    <form id="hForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="0">
         <div class="card-header"><h5><i class="fas fa-plus"></i> وحدة سكن/مخيم</h5></div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:14px;">
+        <div class="hu-form-grid">
             <div class="field"><label for="emsf_1691_9fea7">الاسم</label><input type="text" name="name" required id="emsf_1691_9fea7"></div>
             <div class="field"><label for="emsf_1692_96689">المشروع</label><select name="project_id" id="emsf_1692_96689"><option value="">—</option><?php foreach($projects as $pid=>$pn): ?><option value="<?= intval($pid) ?>"><?= htmlspecialchars($pn) ?></option><?php endforeach; ?></select></div>
             <div class="field"><label for="emsf_1693_c8a14">السعة</label><input type="number" name="capacity" id="emsf_1693_c8a14"></div>
             <div class="field"><label for="emsf_1694_d94c8">الموقع</label><input type="text" name="location" id="emsf_1694_d94c8"></div>
-            <div class="field" style="grid-column:2/-1;"><label for="emsf_1695_9e268">ملاحظات</label><input type="text" name="notes" id="emsf_1695_9e268"></div>
+            <div class="field hu-span-wide"><label for="emsf_1695_9e268">ملاحظات</label><input type="text" name="notes" id="emsf_1695_9e268"></div>
         </div>
-        <div style="padding:0 14px 16px;"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button></div>
+        <div class="hu-form-actions"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button></div>
     </form>
-    <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
+    <div class="table-wrap hu-table-wrap"><table class="data-table hu-table-full">
         <thead><tr><th>إجراءات</th><th>المُنشئ — الاسم والصفة</th><th>المشروع</th><th>السعة</th><th>الموقع</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">كود الوحدة</th>
@@ -139,7 +149,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div></td>
             <td><strong><?= htmlspecialchars($r['name']) ?></strong></td><td><?= htmlspecialchars($r['pname'] ?: '-') ?></td>
             <td><?= htmlspecialchars($r['capacity'] ?: '-') ?></td><td><?= htmlspecialchars($r['location'] ?: '-') ?></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="5" style="text-align:center;color:#888;padding:18px;">لا توجد وحدات سكن بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="5" class="hu-empty-cell">لا توجد وحدات سكن بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>
@@ -148,7 +158,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     function setHeader(t){var h=f.querySelector('.card-header h5');if(h)h.innerHTML='<i class="fas fa-'+(t==='edit'?'edit':'plus')+'"></i> '+(t==='edit'?'تعديل وحدة سكن':'وحدة سكن/مخيم');}
     function resetForm(){if(!f)return;f.reset();f.querySelector('[name="id"]').value='0';setHeader('add');}
     // زر «وحدة سكن» (إضافة): يفتح نموذجاً نظيفاً
-    if(b&&f)b.addEventListener('click',function(){var hidden=(f.style.display==='none'||!f.style.display);if(hidden){resetForm();}f.style.display=hidden?'block':'none';});
+    if(b&&f)b.addEventListener('click',function(){var visible=f.classList.contains('allforms-visible');if(!visible){resetForm();}f.classList.toggle('allforms-visible',!visible);});
     // أزرار التعديل: تملأ النموذج ببيانات الوحدة
     document.querySelectorAll('.hu-edit').forEach(function(btn){
         btn.addEventListener('click',function(){
@@ -159,7 +169,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             f.querySelector('[name="capacity"]').value=(d.capacity&&d.capacity!=='')?d.capacity:'';
             f.querySelector('[name="location"]').value=d.location||'';
             f.querySelector('[name="notes"]').value=d.notes||'';
-            setHeader('edit'); f.style.display='block';
+            setHeader('edit'); f.classList.add('allforms-visible');
             window.scrollTo({top:(f.offsetTop||0)-20,behavior:'smooth'});
         });
     });

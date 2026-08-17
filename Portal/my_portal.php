@@ -72,6 +72,22 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ems-ptp-grid-sm { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; }
+.ems-ptp-grid-lg { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
+.ems-ptp-cardlink { text-decoration:none; color:inherit; }
+.ems-ptp-tile { border:1px solid var(--c-e5e0d5, #e5e0d5); border-radius:10px; padding:12px; background:var(--c-fffdf7); text-align:center; }
+.ems-ptp-tile-num { font-size:1.5rem; font-weight:800; }
+.ems-ptp-tile-lbl { color:var(--gray-500); font-size:.85rem; }
+.ems-ptp-card { border:1px solid var(--c-e5e0d5, #e5e0d5); border-radius:10px; padding:14px; background:var(--c-fffdf7); }
+.ems-ptp-card-title { color:var(--gray-500); font-size:.85rem; }
+.ems-ptp-card-value { font-size:1.15rem; font-weight:800; margin:6px 0; }
+.ems-ptp-card-foot { display:flex; justify-content:space-between; align-items:center; }
+.ems-ptp-period { color:var(--c-aaaaaa); }
+.ems-ptp-hidden-note { color:var(--c-a15c00, #a15c00); margin-top:12px; }
+.ems-ptp-w100 { width:100%; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'بوابتي'; $header_icon = 'fa fa-id-card';
@@ -81,18 +97,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         array('href' => '../user_capacities.php', 'icon' => 'fa fa-people-arrows', 'label' => 'مبدّل المساحة'),
     );
     include('../includes/page_header.php');
+    // حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة
+    echo ems_states_bundle('لا بطاقاتِ بياناتٍ في بوابتي بعدُ', 'بوابتي تتشكّل بالصفةِ النشطةِ ومفاتيحِ الظهور — راجع الصفةَ أو مفاتيحَ العرض');
     ?>
 
     <?php if ($wfmCards): ?>
     <!-- مساحة عملي فوق المحرك (WFM-01) — كل رقمٍ ينقر لشاشته -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-briefcase"></i> مساحة عملي — من المحرك حيًّا</h5></div>
     <div class="card-body">
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px">
+        <div class="ems-ptp-grid-sm">
             <?php foreach ($wfmCards as $wc): ?>
-                <a href="<?php echo htmlspecialchars($wc[2]); ?>" style="text-decoration:none;color:inherit">
-                <div style="border:1px solid #e5e0d5;border-radius:10px;padding:12px;background:#fffdf7;text-align:center">
-                    <div style="font-size:1.5rem;font-weight:800"><?php echo intval($wc[1]); ?></div>
-                    <div style="color:#777;font-size:.85rem"><?php echo htmlspecialchars($wc[0]); ?></div>
+                <a href="<?php echo htmlspecialchars($wc[2]); ?>" class="ems-ptp-cardlink">
+                <div class="ems-ptp-tile">
+                    <div class="ems-ptp-tile-num"><?php echo intval($wc[1]); ?></div>
+                    <div class="ems-ptp-tile-lbl"><?php echo htmlspecialchars($wc[0]); ?></div>
                 </div></a>
             <?php endforeach; ?>
         </div>
@@ -106,14 +124,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php else: ?>
 
     <div class="card"><div class="card-body">
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px">
+        <div class="ems-ptp-grid-lg">
             <?php foreach ($feed['cards'] as $c): ?>
-                <div style="border:1px solid #e5e0d5;border-radius:10px;padding:14px;background:#fffdf7">
-                    <div style="color:#888;font-size:.85rem"><?php echo htmlspecialchars($c['title']); ?></div>
-                    <div style="font-size:1.15rem;font-weight:800;margin:6px 0">
+                <div class="ems-ptp-card">
+                    <div class="ems-ptp-card-title"><?php echo htmlspecialchars($c['title']); ?></div>
+                    <div class="ems-ptp-card-value">
                         <?php echo htmlspecialchars($c['value']); ?></div>
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-                        <small style="color:#aaa"><?php echo htmlspecialchars($c['period']); ?></small>
+                    <div class="ems-ptp-card-foot">
+                        <small class="ems-ptp-period"><?php echo htmlspecialchars($c['period']); ?></small>
                         <?php if ($c['source_link'] !== null): ?>
                             <a href="../<?php echo htmlspecialchars($c['source_link']); ?>">المصدر ▸</a>
                         <?php endif; ?>
@@ -122,7 +140,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <?php endforeach; ?>
         </div>
         <?php if ($feed['hidden_sections']): ?>
-            <p style="color:#a15c00;margin-top:12px"><i class="fa fa-lock"></i>
+            <p class="ems-ptp-hidden-note"><i class="fa fa-lock"></i>
                 أقسامٌ محجوبةٌ بقرارٍ موثَّق: <?php echo count($feed['hidden_sections']); ?>
                 — إدارتُها في لوحة الظهور (ADM-01)</p>
         <?php endif; ?>
@@ -131,7 +149,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-clock-rotate-left"></i>
         سجلُّ نشاطي (لا يُعدَّل ولا يُحذف)</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <table class="alltables display nowrap ems-ptp-w100" data-no-dt="1">
             <thead><tr><th>الوقت</th><th>الفعل</th><th>الهدف</th><th>النتيجة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">الموظف</th>

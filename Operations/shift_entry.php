@@ -50,13 +50,15 @@ enforce_current_page_view_permission($conn, '../main/dashboard.php');
 $PERM = check_page_permissions($conn, 'Operations/shift_entry.php');
 if (empty($PERM['can_view'])) {
     http_response_code(403);
-    echo '<div dir="rtl" style="font-family:Tahoma;padding:24px">'
+    echo '<style>.se-deny{font-family:var(--font-ar, Tahoma);padding:24px}</style>'
+       . '<div dir="rtl" class="se-deny">'
        . 'لا تملك صلاحيةَ فتحِ شاشةِ قيدِ الوردية — راجِعْ مديرَك.</div>';
     exit();
 }
 if (!$is_super_admin && $company_id <= 0) {
     http_response_code(403);
-    echo '<div dir="rtl" style="font-family:Tahoma;padding:24px">'
+    echo '<style>.se-deny{font-family:var(--font-ar, Tahoma);padding:24px}</style>'
+       . '<div dir="rtl" class="se-deny">'
        . 'جلستُك بلا كيانٍ محدَّد — سجّلْ خروجًا ثم دخولًا، فإن تكرّر راجِعْ مديرَك.</div>';
     exit();
 }
@@ -245,10 +247,11 @@ $OPS_AR = [
 ];
 $PARTY_AR = ['company' => 'الشركة', 'client' => 'العميل', 'supplier' => 'المورد',
              'operator' => 'المشغّل', 'planned' => 'مخطَّط', 'force_majeure' => 'قوةٌ قاهرة', 'none' => 'لا طرف'];
-$STATE_AR = ['draft' => ['مسوَّدة', '#6c757d'], 'submitted' => ['بانتظار اعتماد الموقع', '#b8860b'],
-             'site_approved' => ['اعتمدها الموقع', '#0b6b3a'], 'parties_review' => ['مراجعةُ الأطراف', '#b8860b'],
-             'parties_approved' => ['اعتمدها الأطراف', '#0b6b3a'], 'sales_approved' => ['اعتمدتها المبيعات', '#0b6b3a'],
-             'returned' => ['أُعيد للموقع', '#a12622'], 'converted' => ['حُوِّل', '#0b6b3a']];
+/* لونُ الشارةِ صنفُ CSS من كتلةِ الشاشة (UXW-01 بوابة ١) — لا لونَ حرفيًّا في PHP */
+$STATE_AR = ['draft' => ['مسوَّدة', 'se-b-muted'], 'submitted' => ['بانتظار اعتماد الموقع', 'se-b-warn'],
+             'site_approved' => ['اعتمدها الموقع', 'se-b-ok'], 'parties_review' => ['مراجعةُ الأطراف', 'se-b-warn'],
+             'parties_approved' => ['اعتمدها الأطراف', 'se-b-ok'], 'sales_approved' => ['اعتمدتها المبيعات', 'se-b-ok'],
+             'returned' => ['أُعيد للموقع', 'se-b-err'], 'converted' => ['حُوِّل', 'se-b-ok']];
 
 $old = function (string $k, $d = '') use ($formOld) {
     return isset($formOld[$k]) ? htmlspecialchars((string) $formOld[$k], ENT_QUOTES, 'UTF-8') : $d;
@@ -261,35 +264,53 @@ include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — الألوانُ رموزٌ من design-tokens.css
+   (المطابقُ حرفيًّا بالرمزِ القائم، وما لا رمزَ له فبنمطِ var(--c-hex, قيمته)) */
 .se-wrap{max-width:1180px;margin:0 auto;padding:14px}
-.se-card{background:#fff;border:1px solid #e3e6ea;border-radius:10px;padding:16px;margin-bottom:14px}
+.se-card{background:var(--white);border:1px solid var(--c-e3e6ea);border-radius:10px;padding:16px;margin-bottom:14px}
 .se-card h2{font-size:17px;margin:0 0 4px}
-.se-hint{color:#5b6572;font-size:13px;margin:0 0 14px}
+.se-hint{color:var(--c-5b6572, #5b6572);font-size:13px;margin:0 0 14px}
 .se-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
 .se-f label{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
-.se-f input,.se-f select{width:100%;padding:8px 10px;border:1px solid #cfd6dd;border-radius:7px;font-size:14px;font-family:inherit}
-.se-req{color:#a12622;font-weight:700}
-.se-unit{color:#5b6572;font-weight:400;font-size:12px}
+.se-f input,.se-f select{width:100%;padding:8px 10px;border:1px solid var(--c-cfd6dd, #cfd6dd);border-radius:7px;font-size:14px;font-family:inherit}
+.se-req{color:var(--c-a12622, #a12622);font-weight:700}
+.se-unit{color:var(--c-5b6572, #5b6572);font-weight:400;font-size:12px}
 .se-flash{padding:11px 14px;border-radius:8px;margin-bottom:14px;font-size:14px;border:1px solid}
-.se-ok{background:#e8f5ee;border-color:#0b6b3a;color:#0b4a28}
-.se-warn{background:#fdf6e3;border-color:#b8860b;color:#7a5a06}
-.se-err{background:#fdeaea;border-color:#a12622;color:#7a1a17}
-.se-btn{background:#0b6b3a;color:#fff;border:0;border-radius:8px;padding:10px 20px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
-.se-btn[disabled]{background:#adb5bd;cursor:not-allowed}
-.se-btn2{background:#fff;color:#33405a;border:1px solid #cfd6dd;border-radius:8px;padding:10px 18px;font-size:14px;cursor:pointer;font-family:inherit}
+.se-ok{background:var(--c-e8f5ee, #e8f5ee);border-color:var(--c-0b6b3a, #0b6b3a);color:var(--c-0b4a28, #0b4a28)}
+.se-warn{background:var(--c-fdf6e3, #fdf6e3);border-color:var(--c-b8860b, #b8860b);color:var(--c-7a5a06, #7a5a06)}
+.se-err{background:var(--c-fdeaea);border-color:var(--c-a12622, #a12622);color:var(--c-7a1a17, #7a1a17)}
+.se-btn{background:var(--c-0b6b3a, #0b6b3a);color:var(--white);border:0;border-radius:8px;padding:10px 20px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.se-btn[disabled]{background:var(--c-adb5bd);cursor:not-allowed}
+.se-btn2{background:var(--white);color:var(--c-33405a, #33405a);border:1px solid var(--c-cfd6dd, #cfd6dd);border-radius:8px;padding:10px 18px;font-size:14px;cursor:pointer;font-family:inherit}
+.se-btn2-sm{padding:5px 12px}
 .se-tbl{width:100%;border-collapse:collapse;font-size:13px}
-.se-tbl th,.se-tbl td{border:1px solid #e3e6ea;padding:7px 9px;text-align:right}
-.se-tbl th{background:#f5f7f9;font-weight:700}
-.se-badge{display:inline-block;padding:2px 9px;border-radius:11px;font-size:12px;font-weight:700;color:#fff}
+.se-tbl th,.se-tbl td{border:1px solid var(--c-e3e6ea);padding:7px 9px;text-align:right}
+.se-tbl th{background:var(--c-f5f7f9, #f5f7f9);font-weight:700}
+.se-badge{display:inline-block;padding:2px 9px;border-radius:11px;font-size:12px;font-weight:700;color:var(--white)}
+.se-b-muted{background:var(--c-6c757d)}
+.se-b-warn{background:var(--c-b8860b, #b8860b)}
+.se-b-ok{background:var(--c-0b6b3a, #0b6b3a)}
+.se-b-err{background:var(--c-a12622, #a12622)}
 .se-hrow{display:grid;grid-template-columns:1.5fr .7fr 1fr 1.6fr auto;gap:8px;margin-bottom:8px;align-items:end}
-.se-empty{text-align:center;color:#5b6572;padding:26px}
+.se-empty{text-align:center;color:var(--c-5b6572, #5b6572);padding:26px}
+.se-h2b{margin-top:20px;font-size:15px}
+.se-mt12{margin-top:12px}
+.se-mt18{margin-top:18px}
+.se-void-form{display:flex;gap:6px}
+.se-void-input{width:130px;padding:5px 7px;border:1px solid var(--c-cfd6dd, #cfd6dd);border-radius:6px;font-family:inherit}
 @media(max-width:760px){.se-hrow{grid-template-columns:1fr}}
 </style>
 
-<div class="se-wrap" dir="rtl">
+<div class="se-wrap ems-doc-cycle" dir="rtl">
+<?php
+/* حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة */
+echo ems_states_bundle('لم يُسجَّل قيدُ ورديةٍ بعدُ', 'ابدأ بنموذجِ القيدِ أعلى الشاشة');
+?>
 
   <div class="se-card">
     <h2>قيدُ الوردية اليومي</h2>
+    <?php /* بوابة ١٢: قيدُ الورديةِ دورةٌ مستندية — خطوتُها التاليةُ معلَنة */
+    echo ems_next_step('مراجعةُ الموقعِ واعتمادُ القيدِ المُرسَل'); ?>
     <p class="se-hint">
       سجّلْ سطرًا واحدًا لكلِّ آليةٍ في كلِّ ورديةٍ في كلِّ يوم: ساعاتُها ووقودُها وعدّادُها ومشغّلُها.
       الحقولُ الموسومةُ <span class="se-req">*</span> إلزاميةٌ قبلَ الحفظ.
@@ -317,11 +338,11 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
       <div class="se-grid">
         <div class="se-f">
           <label>التاريخ <span class="se-req">*</span></label>
-          <input type="date" name="entry_date" value="<?= $old('entry_date', $today) ?>" required>
+          <input type="date" name="entry_date" aria-label="التاريخ" value="<?= $old('entry_date', $today) ?>" required>
         </div>
         <div class="se-f">
           <label>الآلية <span class="se-req">*</span></label>
-          <select name="equipment_id" required>
+          <select name="equipment_id" aria-label="الآلية" required>
             <option value="">— اختر الآلية —</option>
 <?php foreach ($equipments as $e): ?>
             <option value="<?= (int) $e['id'] ?>" <?= $old('equipment_id') == $e['id'] ? 'selected' : '' ?>>
@@ -332,18 +353,18 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         </div>
         <div class="se-f">
           <label>الوردية <span class="se-req">*</span></label>
-          <select name="shift" required>
+          <select name="shift" aria-label="الوردية" required>
             <option value="day"   <?= $old('shift') === 'day' ? 'selected' : '' ?>>نهار</option>
             <option value="night" <?= $old('shift') === 'night' ? 'selected' : '' ?>>ليل</option>
           </select>
         </div>
         <div class="se-f">
           <label>الكمية المنفَّذة <span class="se-req">*</span></label>
-          <input type="number" step="0.01" min="0" name="qty" value="<?= $old('qty') ?>" required>
+          <input type="number" step="0.01" min="0" name="qty" aria-label="الكمية المنفَّذة" value="<?= $old('qty') ?>" required>
         </div>
         <div class="se-f">
           <label>وحدة القياس <span class="se-req">*</span></label>
-          <select name="unit_type" required>
+          <select name="unit_type" aria-label="وحدة القياس" required>
             <option value="hour"  <?= $old('unit_type', 'hour') === 'hour'  ? 'selected' : '' ?>>ساعة</option>
             <option value="ton"   <?= $old('unit_type') === 'ton'   ? 'selected' : '' ?>>طن</option>
             <option value="meter" <?= $old('unit_type') === 'meter' ? 'selected' : '' ?>>متر</option>
@@ -352,27 +373,27 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         </div>
         <div class="se-f">
           <label>قراءةُ العدّادِ قبل <span class="se-unit">(ساعة عدّاد)</span></label>
-          <input type="number" step="0.01" min="0" name="meter_before" value="<?= $old('meter_before') ?>">
+          <input type="number" step="0.01" min="0" name="meter_before" aria-label="قراءةُ العدّادِ قبل" value="<?= $old('meter_before') ?>">
         </div>
         <div class="se-f">
           <label>قراءةُ العدّادِ بعد <span class="se-unit">(ساعة عدّاد)</span></label>
-          <input type="number" step="0.01" min="0" name="meter_after" value="<?= $old('meter_after') ?>">
+          <input type="number" step="0.01" min="0" name="meter_after" aria-label="قراءةُ العدّادِ بعد" value="<?= $old('meter_after') ?>">
         </div>
         <div class="se-f">
           <label>وقودٌ مستلَم <span class="se-unit">(لتر)</span></label>
-          <input type="number" step="0.01" min="0" name="fuel_received_qty" value="<?= $old('fuel_received_qty', '0') ?>">
+          <input type="number" step="0.01" min="0" name="fuel_received_qty" aria-label="وقودٌ مستلَم باللتر" value="<?= $old('fuel_received_qty', '0') ?>">
         </div>
         <div class="se-f">
           <label>وقودٌ مصروف <span class="se-unit">(لتر)</span></label>
-          <input type="number" step="0.01" min="0" name="fuel_issued_qty" value="<?= $old('fuel_issued_qty', '0') ?>">
+          <input type="number" step="0.01" min="0" name="fuel_issued_qty" aria-label="وقودٌ مصروف باللتر" value="<?= $old('fuel_issued_qty', '0') ?>">
         </div>
         <div class="se-f">
           <label>مفتاحُ الحاوية <span class="se-unit">(اختياري)</span></label>
-          <input type="text" name="container_key" maxlength="32" value="<?= $old('container_key') ?>">
+          <input type="text" name="container_key" aria-label="مفتاحُ الحاوية" maxlength="32" value="<?= $old('container_key') ?>">
         </div>
       </div>
 
-      <h2 style="margin-top:20px;font-size:15px">توزيعُ ساعاتِ الوردية <span class="se-req">*</span></h2>
+      <h2 class="se-h2b">توزيعُ ساعاتِ الوردية <span class="se-req">*</span></h2>
       <p class="se-hint">
         كلُّ سطرٍ حالةٌ واحدةٌ بساعاتِها وطرفِها المسؤول. يمكنك إضافةُ أكثرَ من سببِ توقفٍ في الورديةِ نفسِها.
         ومجموعُ الساعاتِ لا يتجاوز <strong>٢٤ ساعة</strong>.
@@ -381,7 +402,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         <div class="se-hrow">
           <div class="se-f">
             <label>الحالة</label>
-            <select name="h_state[]">
+            <select name="h_state[]" aria-label="حالةُ سطرِ الساعات">
               <option value="">— اختر —</option>
 <?php foreach ($OPS_STATES as $s): ?>
               <option value="<?= htmlspecialchars($s, ENT_QUOTES, 'UTF-8') ?>" <?= $s === 'actual_work' ? 'selected' : '' ?>>
@@ -392,11 +413,11 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
           </div>
           <div class="se-f">
             <label>الساعات <span class="se-unit">(ساعة)</span></label>
-            <input type="number" step="0.25" min="0" max="24" name="h_hours[]">
+            <input type="number" step="0.25" min="0" max="24" name="h_hours[]" aria-label="ساعاتُ السطر">
           </div>
           <div class="se-f">
             <label>الطرفُ المسؤول</label>
-            <select name="h_party[]">
+            <select name="h_party[]" aria-label="الطرفُ المسؤول">
 <?php foreach ($PARTY_AR as $k => $v): ?>
               <option value="<?= $k ?>" <?= $k === 'company' ? 'selected' : '' ?>><?= $v ?></option>
 <?php endforeach; ?>
@@ -404,18 +425,18 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
           </div>
           <div class="se-f">
             <label>سببُ التوقف <span class="se-unit">(عند التوقف)</span></label>
-            <input type="text" name="h_note[]" maxlength="190">
+            <input type="text" name="h_note[]" aria-label="سببُ التوقف" maxlength="190">
           </div>
           <div><button type="button" class="se-btn2" onclick="seAddRow()">+ سطر</button></div>
         </div>
       </div>
 
-      <div class="se-f" style="margin-top:12px">
+      <div class="se-f se-mt12">
         <label>ملاحظاتٌ ميدانية</label>
-        <input type="text" name="note" maxlength="500" value="<?= $old('note') ?>">
+        <input type="text" name="note" aria-label="ملاحظاتٌ ميدانية" maxlength="500" value="<?= $old('note') ?>">
       </div>
 
-      <div style="margin-top:18px">
+      <div class="se-mt18">
         <button type="submit" class="se-btn" <?= $CAN_RECORD ? '' : 'disabled' ?>>احفظ القيدَ وأرسِلْه للمراجعة</button>
       </div>
     </form>
@@ -436,7 +457,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
       <tbody>
 <?php foreach ($todayRows as $r):
         $sk = (string) $r['state'];
-        $sv = $STATE_AR[$sk] ?? [$sk, '#6c757d']; ?>
+        $sv = $STATE_AR[$sk] ?? [$sk, 'se-b-muted']; ?>
         <tr>
           <td><?= htmlspecialchars((string) $r['entry_no'], ENT_QUOTES, 'UTF-8') ?></td>
           <td><?= htmlspecialchars((string) $r['machine'], ENT_QUOTES, 'UTF-8') ?></td>
@@ -448,19 +469,19 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     ? number_format((float) $r['meter_after'] - (float) $r['meter_before'], 2) . ' <span class="se-unit">ساعة عدّاد</span>'
                     : '—' ?></td>
           <td><?= number_format((float) $r['fuel_issued_qty'], 2) ?> <span class="se-unit">لتر</span></td>
-          <td><span class="se-badge" style="background:<?= $sv[1] ?>"><?= htmlspecialchars($sv[0], ENT_QUOTES, 'UTF-8') ?></span></td>
+          <td><span class="se-badge <?= htmlspecialchars($sv[1], ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($sv[0], ENT_QUOTES, 'UTF-8') ?></span></td>
 <?php if ($CAN_VOID): ?>
           <td>
 <?php if (in_array($sk, ['reversed', 'cancelled', 'superseded'], true)): ?>
             <span class="se-unit">—</span>
 <?php else: ?>
-            <form method="post" onsubmit="return seConfirmVoid(this)" style="display:flex;gap:6px">
+            <form method="post" onsubmit="return seConfirmVoid(this)" class="se-void-form">
               <?= csrf_field() ?>
               <input type="hidden" name="action" value="void">
               <input type="hidden" name="entry_id" value="<?= (int) $r['id'] ?>">
               <input type="text" name="void_reason" placeholder="سببُ الإلغاء" required maxlength="190"
-                     style="width:130px;padding:5px 7px;border:1px solid #cfd6dd;border-radius:6px;font-family:inherit">
-              <button type="submit" class="se-btn2" style="padding:5px 12px">ألغِ</button>
+                     class="se-void-input">
+              <button type="submit" class="se-btn2 se-btn2-sm">ألغِ</button>
             </form>
 <?php endif; ?>
           </td>

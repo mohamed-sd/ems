@@ -57,26 +57,35 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ems-pta-filter { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.ems-pta-muted { color:var(--gray-500); }
+.ems-pta-w100 { width:100%; }
+.ems-pta-note { color:var(--c-666666); margin-top:8px; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'إنجازي بين تاريخين'; $header_icon = 'fa fa-chart-simple';
     $header_actions = array(array('href' => 'my_certificate.php', 'icon' => 'fa fa-certificate', 'label' => 'شهادة الإنجاز'));
     include('../includes/page_header.php');
+    // حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة
+    echo ems_states_bundle('لا قياساتِ إنجازٍ لهذه الفترة', 'غيّر الفترةَ أو الصفةَ ثم اضغط «قِس» لقياسِ إنجازي من مصادرِه');
     ?>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="ems-pta-filter">
             <strong>الصفة:</strong>
-            <select name="capacity_id">
+            <select name="capacity_id" aria-label="الصفة">
                 <?php foreach ($myCaps as $c): ?>
                     <option value="<?php echo intval($c['id']); ?>" <?php echo intval($c['id']) === $capId ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars(CAP::CAPACITY_AR[$c['capacity_type']] ?? $c['capacity_type']); ?></option>
                 <?php endforeach; ?>
             </select>
-            <label for="emsf_370_07324">من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>" id="emsf_370_07324">
-            <label for="emsf_371_48875">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>" id="emsf_371_48875">
+            <label for="emsf_370_07324">من</label><input type="date" name="from" id="emsf_370_07324" value="<?php echo htmlspecialchars($from); ?>">
+            <label for="emsf_371_48875">إلى</label><input type="date" name="to" id="emsf_371_48875" value="<?php echo htmlspecialchars($to); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-calculator"></i> قِس</button>
-            <small style="color:#888">اختصارات:
+            <small class="ems-pta-muted">اختصارات:
                 <a href="?capacity_id=<?php echo $capId; ?>&from=<?php echo date('Y-m-d'); ?>&to=<?php echo date('Y-m-d'); ?>">يوم</a> ·
                 <a href="?capacity_id=<?php echo $capId; ?>&from=<?php echo date('Y-m-d', strtotime('-7 days')); ?>&to=<?php echo date('Y-m-d'); ?>">أسبوع</a> ·
                 <a href="?capacity_id=<?php echo $capId; ?>&from=<?php echo date('Y-m-01'); ?>&to=<?php echo date('Y-m-d'); ?>">شهر</a> ·
@@ -89,9 +98,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php elseif ($res !== null): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-gauge-high"></i>
         المؤشراتُ السبعة — <?php echo htmlspecialchars($from . ' → ' . $to); ?>
-        <small style="color:#888">(لُقطت ببصمتها #<?php echo intval($res['snap_id']); ?>)</small></h5></div>
+        <small class="ems-pta-muted">(لُقطت ببصمتها #<?php echo intval($res['snap_id']); ?>)</small></h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <table class="alltables display nowrap ems-pta-w100" data-no-dt="1">
             <thead><tr><th>المؤشر</th><th>الفترة</th><th>الفترة السابقة (بالطول نفسه)</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">الموظف</th>
@@ -134,7 +143,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tbody>
         </table>
     </div>
-    <p style="color:#666;margin-top:8px">«المؤشرُ الذي لا يخصّ فئةً لا يُعرض لها صفرًا مضلِّلًا
+    <p class="ems-pta-note">«المؤشرُ الذي لا يخصّ فئةً لا يُعرض لها صفرًا مضلِّلًا
         بل يُخفى بنصِّ <strong>لا ينطبق</strong> — فالمقارنةُ تبقى عادلة» (USR-01 §6).</p>
     </div></div>
     <?php endif; ?>

@@ -178,39 +178,57 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if(!empty($_GET['msg'])): $ok=strpos($_GET['msg'],'✅')!==false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
-    <form id="eForm" action="" method="post" class="allforms" style="<?= $edit?'display:block;':'display:none;' ?>
-        <?= csrf_field() ?>">
+    <?php require_once __DIR__ . '/../includes/ux_components.php';
+    echo ems_states_bundle('لا تقييماتِ عاملين مسجَّلةً بعدُ', 'أضف أولَ تقييمٍ بزرِّ «تقييم جديد» في رأسِ الشاشة'); ?>
+    <style>
+        .ev-form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); padding: 14px; }
+        .ev-span-3end { grid-column: 3 / -1; }
+        .ev-span-full { grid-column: 1 / -1; }
+        .ev-form-actions { padding: 0 14px 16px; display: flex; gap: 10px; }
+        .ev-btn-muted { background: var(--gray-500); }
+        .ev-weight-note { font-weight: var(--weight-regular); color: var(--gray-500); }
+        .ev-kpi-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 2fr auto; gap: var(--space-3); padding: 14px; align-items: flex-end; }
+        .ev-table-wrap { margin-top: 14px; }
+        .ev-table-full { width: 100%; }
+        .ev-actions-cell { gap: var(--space-1); align-items: center; }
+        .ev-inline-form { display: inline; }
+        .ev-state-select { padding: 2px; }
+        .ev-empty-cell { text-align: center; color: var(--gray-500); padding: 18px; }
+        .ev-empty-cell-sm { text-align: center; color: var(--gray-500); }
+    </style>
+    <form id="eForm" action="" method="post" class="allforms<?= $edit?' allforms-visible':'' ?>">
+        <?= csrf_field() ?>
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= $edit?intval($edit['id']):0 ?>">
         <div class="card-header"><h5><i class="fas <?= $edit?'fa-edit':'fa-plus' ?>"></i> <?= $edit?'تعديل تقييم':'تقييم عامل' ?></h5></div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
-            <div class="field"><label>الموظف</label><?php if($edit): ?><input type="text" value="<?= htmlspecialchars($edit['wname'] ?: ('#'.$edit['employee_id'])) ?>" disabled><?php else: ?><select name="worker_id" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?></div>
-            <div class="field"><label>الفترة</label><input type="date" name="period" value="<?= htmlspecialchars($edit['period'] ?? '') ?>"></div>
-            <div class="field"><label for="emsf_592_91c89">الدرجة <?= !empty($kpis)?'(محسوبةٌ من البنود)':'' ?></label><input type="number" step="0.01" name="score" value="<?= htmlspecialchars($edit['score'] ?? '') ?>" <?= !empty($kpis)?'readonly title="تُحتسَب آلياً من بنود المؤشّرات"':'' ?> id="emsf_592_91c89"></div>
+        <div class="ev-form-grid">
+            <div class="field"><label>الموظف</label><?php if($edit): ?><input type="text" aria-label="الموظف" value="<?= htmlspecialchars($edit['wname'] ?: ('#'.$edit['employee_id'])) ?>" disabled><?php else: ?><select name="worker_id" aria-label="الموظف" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?></div>
+            <div class="field"><label>الفترة</label><input type="date" name="period" aria-label="فترة التقييم" value="<?= htmlspecialchars($edit['period'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_592_91c89">الدرجة <?= !empty($kpis)?'(محسوبةٌ من البنود)':'' ?></label><input type="number" step="0.01" name="score" aria-label="الدرجة الإجمالية" value="<?= htmlspecialchars($edit['score'] ?? '') ?>" <?= !empty($kpis)?'readonly title="تُحتسَب آلياً من بنود المؤشّرات"':'' ?> id="emsf_592_91c89"></div>
             <div class="field"><label for="emsf_593_670b4">الحالة</label><select name="state" id="emsf_593_670b4"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= (($edit['state']??'مسودة')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
             <div class="field"><label for="emsf_594_b3e3a">النوع</label><select name="incentive_penalty_type" id="emsf_594_b3e3a"><?php foreach(['بلا','حافز','جزاء'] as $t): ?><option value="<?= $t ?>" <?= (($edit['incentive_penalty_type']??'بلا')===$t)?'selected':'' ?>><?= $t ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label for="emsf_595_7abb8">المبلغ (مالي — يدوي)</label><input type="number" step="0.01" name="amount" value="<?= htmlspecialchars($edit['amount'] ?? '') ?>" id="emsf_595_7abb8"></div>
-            <div class="field" style="grid-column:3/-1;"><label for="emsf_596_c617b">تعليق مالي (للمالية لاحقاً)</label><input type="text" name="amount_finance_note" value="<?= htmlspecialchars($edit['amount_finance_note'] ?? '') ?>" id="emsf_596_c617b"></div>
-            <div class="field"><label for="emsf_597_5d4f1">ساعات التشغيل</label><input type="number" step="0.01" name="operating_hours" value="<?= htmlspecialchars($edit['operating_hours'] ?? '') ?>" id="emsf_597_5d4f1"></div>
-            <div class="field"><label for="emsf_598_354bd">الالتزام بالحضور %</label><input type="number" step="0.01" name="attendance_rate" value="<?= htmlspecialchars($edit['attendance_rate'] ?? '') ?>" id="emsf_598_354bd"></div>
-            <div class="field"><label for="emsf_599_c13e5">الإنتاجية</label><input type="number" step="0.01" name="productivity" value="<?= htmlspecialchars($edit['productivity'] ?? '') ?>" id="emsf_599_c13e5"></div>
-            <div class="field"><label for="emsf_600_932f7">أعطال سوء التشغيل</label><input type="number" name="misuse_faults" value="<?= htmlspecialchars($edit['misuse_faults'] ?? '') ?>" id="emsf_600_932f7"></div>
-            <div class="field"><label for="emsf_601_4efa8">استهلاك الوقود</label><input type="number" step="0.01" name="fuel_consumption" value="<?= htmlspecialchars($edit['fuel_consumption'] ?? '') ?>" id="emsf_601_4efa8"></div>
-            <div class="field"><label for="emsf_602_13d3d">التزام السلامة</label><input type="number" step="0.01" name="safety_score" value="<?= htmlspecialchars($edit['safety_score'] ?? '') ?>" id="emsf_602_13d3d"></div>
-            <div class="field" style="grid-column:1/-1;"><label for="emsf_603_2af5b">ملاحظات</label><input type="text" name="notes" value="<?= htmlspecialchars($edit['notes'] ?? '') ?>" id="emsf_603_2af5b"></div>
+            <div class="field"><label for="emsf_595_7abb8">المبلغ (مالي — يدوي)</label><input type="number" step="0.01" name="amount" aria-label="المبلغ" value="<?= htmlspecialchars($edit['amount'] ?? '') ?>" id="emsf_595_7abb8"></div>
+            <div class="field ev-span-3end"><label for="emsf_596_c617b">تعليق مالي (للمالية لاحقاً)</label><input type="text" name="amount_finance_note" aria-label="تعليق مالي" value="<?= htmlspecialchars($edit['amount_finance_note'] ?? '') ?>" id="emsf_596_c617b"></div>
+            <div class="field"><label for="emsf_597_5d4f1">ساعات التشغيل</label><input type="number" step="0.01" name="operating_hours" aria-label="ساعات التشغيل" value="<?= htmlspecialchars($edit['operating_hours'] ?? '') ?>" id="emsf_597_5d4f1"></div>
+            <div class="field"><label for="emsf_598_354bd">الالتزام بالحضور %</label><input type="number" step="0.01" name="attendance_rate" aria-label="الالتزام بالحضور" value="<?= htmlspecialchars($edit['attendance_rate'] ?? '') ?>" id="emsf_598_354bd"></div>
+            <div class="field"><label for="emsf_599_c13e5">الإنتاجية</label><input type="number" step="0.01" name="productivity" aria-label="الإنتاجية" value="<?= htmlspecialchars($edit['productivity'] ?? '') ?>" id="emsf_599_c13e5"></div>
+            <div class="field"><label for="emsf_600_932f7">أعطال سوء التشغيل</label><input type="number" name="misuse_faults" aria-label="أعطال سوء التشغيل" value="<?= htmlspecialchars($edit['misuse_faults'] ?? '') ?>" id="emsf_600_932f7"></div>
+            <div class="field"><label for="emsf_601_4efa8">استهلاك الوقود</label><input type="number" step="0.01" name="fuel_consumption" aria-label="استهلاك الوقود" value="<?= htmlspecialchars($edit['fuel_consumption'] ?? '') ?>" id="emsf_601_4efa8"></div>
+            <div class="field"><label for="emsf_602_13d3d">التزام السلامة</label><input type="number" step="0.01" name="safety_score" aria-label="التزام السلامة" value="<?= htmlspecialchars($edit['safety_score'] ?? '') ?>" id="emsf_602_13d3d"></div>
+            <div class="field ev-span-full"><label for="emsf_603_2af5b">ملاحظات</label><input type="text" name="notes" aria-label="ملاحظات" value="<?= htmlspecialchars($edit['notes'] ?? '') ?>" id="emsf_603_2af5b"></div>
         </div>
-        <div style="padding:0 14px 16px;display:flex;gap:10px;"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button><?php if($edit): ?><a href="worker_evaluation.php" class="add-btn" style="background:#6b7280;"><i class="fas fa-times"></i> إلغاء</a><?php endif; ?></div>
+        <div class="ev-form-actions"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button><?php if($edit): ?><a href="worker_evaluation.php" class="add-btn ev-btn-muted"><i class="fas fa-times"></i> إلغاء</a><?php endif; ?></div>
     </form>
 
     <?php if ($edit):
         $computed = ems_eval_weighted_score($ev_gate, intval($edit['id']));
         $sumW=0; foreach($kpis as $k){ $sumW += floatval($k['weight']); } ?>
-    <div class="allforms" style="display:block;">
+    <div class="allforms allforms-visible">
         <div class="card-header"><h5><i class="fas fa-list-check"></i> بنود مؤشّرات الأداء (KPI) — الدرجة الموزونة المحسوبة:
             <strong><?= $computed!==null ? number_format($computed,2) : '—' ?></strong>
-            <?php if($sumW>0): ?><span style="font-weight:400;color:#888;">(مجموع الأوزان: <?= number_format($sumW,2) ?>)</span><?php endif; ?>
+            <?php if($sumW>0): ?><span class="ev-weight-note">(مجموع الأوزان: <?= number_format($sumW,2) ?>)</span><?php endif; ?>
         </h5></div>
         <?php if($can_edit): ?>
-        <form action="" method="post" style="display:grid;grid-template-columns:2fr 1fr 1fr 2fr auto;gap:12px;padding:14px;align-items:flex-end;">
+        <form action="" method="post" class="ev-kpi-grid">
         <?= csrf_field() ?>
             <input type="hidden" name="action" value="add_kpi"><input type="hidden" name="evaluation_id" value="<?= intval($edit['id']) ?>">
             <div class="field"><label for="emsf_604_ddef9">اسم المؤشّر</label><input type="text" name="kpi_name" required id="emsf_604_ddef9"></div>
@@ -220,8 +238,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="field"><button type="submit" class="add-btn"><i class="fas fa-plus"></i> إضافة بند</button></div>
         </form>
         <?php endif; ?>
-        <table class="data-table" style="width:100%;"><thead><tr><th>المؤشّر</th><th>الوزن</th><th>الدرجة</th><th>ملاحظة</th><th></th></tr></thead><tbody>
-        <?php if(empty($kpis)): ?><tr><td colspan="5" style="text-align:center;color:#888;">لا بنود — الدرجة تبقى المُدخَلة يدوياً.</td></tr>
+        <table class="data-table ev-table-full"><thead><tr><th>المؤشّر</th><th>الوزن</th><th>الدرجة</th><th>ملاحظة</th><th></th></tr></thead><tbody>
+        <?php if(empty($kpis)): ?><tr><td colspan="5" class="ev-empty-cell-sm">لا بنود — الدرجة تبقى المُدخَلة يدوياً.</td></tr>
         <?php else: foreach($kpis as $k): ?>
             <tr><td><strong><?= htmlspecialchars($k['kpi_name']) ?></strong></td><td><?= htmlspecialchars($k['weight'] ?? '-') ?></td><td><?= htmlspecialchars($k['score'] ?? '-') ?></td><td><?= htmlspecialchars($k['notes'] ?: '-') ?></td>
             <td><?php if($can_delete): ?><a href="worker_evaluation.php?edit=<?= intval($edit['id']) ?>&del_kpi=<?= intval($k['id']) ?>" class="action-btn delete" onclick="return confirm('حذف البند؟')"><i class="fas fa-trash"></i></a><?php endif; ?></td></tr>
@@ -230,7 +248,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
     <?php endif; ?>
 
-    <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
+    <div class="table-wrap ev-table-wrap"><table class="data-table ev-table-full">
         <thead><tr><th>إجراءات</th><th>#</th><th>كود الموظف</th><th>الفترة</th><th>الدرجة</th><th>نوع التقييم</th><th>المبلغ</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم التقييم</th>
@@ -274,12 +292,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 ems_wf_field('الحالة', $r['state'], 'fas fa-flag', ['type' => 'status']),
                 ems_wf_field('ملاحظات', $r['notes'] ?: '-', 'fas fa-align-right', ['size' => 'full']),
             ]); ?>
-            <tr><td><div class="action-btns" style="gap:4px;align-items:center;">
+            <tr><td><div class="action-btns ev-actions-cell">
                 <?= ems_wf_view_button($r['id']) ?>
                 <?php if($can_edit): ?><a href="worker_evaluation.php?edit=<?= intval($r['id']) ?>" class="action-btn edit" title="تعديل + بنود المؤشّرات"><i class="fas fa-edit"></i></a><?php endif; ?>
-                <form action="" method="post" style="display:inline;">
+                <form action="" method="post" class="ev-inline-form">
         <?= csrf_field() ?><input type="hidden" name="action" value="set_state"><input type="hidden" name="id" value="<?= intval($r['id']) ?>">
-                    <select name="new_state" onchange="this.form.submit()" <?= $can_edit?'':'disabled' ?> style="padding:2px;"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= ($r['state']===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select>
+                    <select name="new_state" aria-label="تغيير حالة التقييم" onchange="this.form.submit()" class="ev-state-select" <?= $can_edit?'':'disabled' ?>><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= ($r['state']===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select>
                 </form>
                 <?php if($can_delete): ?><a href="worker_evaluation.php?delete=<?= intval($r['id']) ?>" class="action-btn delete" onclick="return confirm('حذف؟')"><i class="fas fa-trash"></i></a><?php endif; ?>
             </div></td>
@@ -288,9 +306,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><span class="badge badge-info"><?= htmlspecialchars($r['incentive_penalty_type']) ?></span></td>
             <td><?= htmlspecialchars($r['amount'] ?: '-') ?></td>
             <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="8" style="text-align:center;color:#888;padding:18px;">لا توجد تقييماتٌ بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="8" class="ev-empty-cell">لا توجد تقييماتٌ بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>
-<script>(function(){var b=document.getElementById('toggleForm'),f=document.getElementById('eForm');if(b&&f)b.addEventListener('click',function(){f.style.display=(f.style.display==='none'||!f.style.display)?'block':'none';});})();</script>
+<script>(function(){var b=document.getElementById('toggleForm'),f=document.getElementById('eForm');if(b&&f)b.addEventListener('click',function(){f.classList.toggle('allforms-visible');});})();</script>
 </body></html>

@@ -12,6 +12,8 @@ error_reporting(E_ALL & ~E_DEPRECATED);
 mb_internal_encoding('UTF-8');
 $ROOT = dirname(__DIR__);
 require_once $ROOT . '/config.php';
+require_once $ROOT . '/includes/manual_run_guard.php';
+ems_manual_run_retired('capacity_rollup', 'Operations/cron_capacity_rollup.php');
 require_once $ROOT . '/app/Services/Capacity/CapacityRollupService.php';
 use App\Services\Capacity\CapacityRollupService as CR;
 

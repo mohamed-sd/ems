@@ -21,3 +21,20 @@ FinRequests/effect_map.php	مشرف المالية
 FinRequests/routing_admin.php	مشرف المالية
 Finance/	مشرف المالية
 Operations/	محمد
+Operations/attendance.php	موقع
+Operations/gov_dept_sit.php	موقع
+Operations/shift_entry.php	موقع
+Operations/shift_log.php	موقع
+Operations/site_gate_equip.php	موقع
+Operations/site_shift_plan.php	موقع
+Operations/site_work_calendar.php	موقع
+Portal/	تنفيذ
+Portal/my_achievement.php	محمد
+Portal/my_certificate.php	محمد
+Portal/my_evaluation.php	محمد
+Portal/my_portal.php	محمد
+Portal/my_tasks.php	محمد
+Workforce/contract_registry.php	اروينا
+Workforce/final_settlement.php	اروينا
+Workforce/gov_dept_hrm.php	اروينا
+Workforce/worker_evaluation.php	اروينا

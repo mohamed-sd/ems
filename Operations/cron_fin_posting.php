@@ -17,6 +17,8 @@ error_reporting(E_ALL & ~E_DEPRECATED);
 mb_internal_encoding('UTF-8');
 $ROOT = dirname(__DIR__);
 require_once $ROOT . '/config.php';
+require_once $ROOT . '/includes/manual_run_guard.php';
+ems_manual_run_retired('fin_posting', 'Operations/cron_fin_posting.php');
 require_once $ROOT . '/app/Services/Finance/PostingService.php';
 use App\Services\Finance\PostingService as PS;
 

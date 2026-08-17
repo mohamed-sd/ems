@@ -109,6 +109,14 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ems-dach-filter { display:flex; gap:8px; align-items:flex-end; margin-bottom:14px; }
+.ems-dach-cards { display:flex; flex-wrap:wrap; gap:12px; }
+.ems-dach-card { min-width:200px; padding:14px; border:1px solid var(--c-dee2e6); border-radius:8px; background:var(--c-f8f9fa); }
+.ems-dach-num { font-size:1.6em; font-weight:bold; }
+.ems-dach-note { font-size:.85em; margin-top:12px; }
+</style>
 <div class="main" dir="rtl">
   <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
@@ -118,23 +126,24 @@ $header_title_html = htmlspecialchars('إنجازُ الإدارة', ENT_QUOTES,
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+echo ems_states_bundle('لا نشاطَ معتمدًا للإدارةِ في هذه المدة', 'وسّع «من/إلى» أعلاه أو تحقق من توفرِ السجلات');
 ?>
-  <form method="get" class="ems-form" style="display:flex;gap:8px;align-items:end;margin-bottom:14px">
-    <div><label for="emsf_368_d3c6f">من</label><input type="date" name="from" class="form-control" value="<?= htmlspecialchars($from) ?>" id="emsf_368_d3c6f"></div>
-    <div><label for="emsf_369_142f6">إلى</label><input type="date" name="to" class="form-control" value="<?= htmlspecialchars($to) ?>" id="emsf_369_142f6"></div>
+  <form method="get" class="ems-form ems-dach-filter">
+    <div><label for="emsf_368_d3c6f">من</label><input type="date" name="from" class="form-control" id="emsf_368_d3c6f" aria-label="من — بداية المدة" value="<?= htmlspecialchars($from) ?>"></div>
+    <div><label for="emsf_369_142f6">إلى</label><input type="date" name="to" class="form-control" id="emsf_369_142f6" aria-label="إلى — نهاية المدة" value="<?= htmlspecialchars($to) ?>"></div>
     <button class="btn btn-primary">عرض</button>
   </form>
   <?php $allZero = true; foreach ($metrics as $m2) if ($m2[1] > 0) { $allZero = false; break; }
   if ($allZero): ?>
     <div class="alert alert-warning">لا نشاطَ معتمدًا في هذه المدة — وسّع «من/إلى» أعلاه.</div>
   <?php endif; ?>
-  <div style="display:flex;flex-wrap:wrap;gap:12px">
+  <div class="ems-dach-cards">
     <?php foreach ($metrics as $m2): ?>
-    <div style="min-width:200px;padding:14px;border:1px solid #dee2e6;border-radius:8px;background:#f8f9fa">
-      <div style="font-size:1.6em;font-weight:bold"><?= number_format($m2[1], is_float($m2[1]) && $m2[1] != intval($m2[1]) ? 1 : 0) ?></div>
+    <div class="ems-dach-card">
+      <div class="ems-dach-num"><?= number_format($m2[1], is_float($m2[1]) && $m2[1] != intval($m2[1]) ? 1 : 0) ?></div>
       <div class="text-muted"><?= $m2[0] ?></div>
     </div>
     <?php endforeach; ?>
   </div>
-  <p class="text-muted" style="font-size:.85em;margin-top:12px">إنجازُ الفرد في «إنجازي» بمساحة عملي — وهذا إنجازُ الإدارة (NAV-01 §7-④).</p>
+  <p class="text-muted ems-dach-note">إنجازُ الفرد في «إنجازي» بمساحة عملي — وهذا إنجازُ الإدارة (NAV-01 §7-④).</p>
 </div>

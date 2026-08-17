@@ -122,12 +122,27 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
+    require_once __DIR__ . '/../includes/ux_components.php';
+    echo ems_states_bundle('لا تصفياتِ إنهاءِ خدمةٍ ضمن هذا النطاق', 'التصفيةُ يفتحها إنهاءُ العقد — راجع سجلَّ عقودِ الموظفين');
     ?>
+    <style>
+        .fs-note-muted { color: var(--gray-500); }
+        .fs-table-full { width: 100%; }
+        .fs-preview-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
+        .fs-src-cell { white-space: normal; }
+        .fs-open-form { margin-top: 14px; }
+        .fs-card-item { margin-bottom: 14px; }
+        .fs-meta-row { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 10px; }
+        .fs-approve-form { margin-top: 12px; }
+        .fs-cancel-form { margin-top: 8px; }
+        .fs-required { color: var(--danger-600); }
+        .fs-alert-gap { margin-top: 10px; }
+    </style>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list-check"></i>
         عقودٌ منتهيةٌ تنتظر التصفية</h5></div>
     <div class="card-body">
-        <p style="color:#666">
+        <p class="fs-note-muted">
             <strong>التصفيةُ يفتحها الإنهاء</strong> (ENT-01 §5) — ولكل عقدٍ تصفيةٌ واحدةٌ لا تتكرر.
             والبنودُ <strong>محسوبةٌ من اللقطة</strong>: ما لا قاعدةَ مكتوبةً له يظهر
             <strong>معلَنًا بسببه</strong> ولا يُقدَّر بصفرٍ صامت.
@@ -136,7 +151,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
             <div class="alert alert-warning">لا عقدَ في «منتهٍ · منهًى · مقفل» — فلا تصفيةَ ممكنة.</div>
         <?php else: ?>
         <div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap fs-table-full">
             <thead><tr><th>العقد</th><th>كود الموظف</th><th>الحالة</th><th>المُنشئ — الاسم والصفة</th><th>إجمالي المستحقات</th>
                 <th>مكافأة نهاية الخدمة</th><th>قاعدةُ الإجازة</th><th>التصفية</th><th></th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -211,10 +226,10 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
     <div class="card"><div class="card-header"><h5><i class="fa fa-calculator"></i>
         معاينةُ تصفية العقد #<?php echo $previewFor; ?></h5></div>
     <div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+        <form method="get" class="fs-preview-form">
             <input type="hidden" name="preview" value="<?php echo $previewFor; ?>">
             <label for="emsf_569_22ab0">تاريخُ الأثر:</label>
-            <input type="date" name="as_of" value="<?php echo htmlspecialchars($previewOn); ?>" id="emsf_569_22ab0">
+            <input type="date" name="as_of" aria-label="تاريخ الأثر" value="<?php echo htmlspecialchars($previewOn); ?>" id="emsf_569_22ab0">
             <button type="submit" class="btn-primary"><i class="fa fa-rotate"></i> أعِد الاحتساب</button>
         </form>
 
@@ -223,7 +238,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                 <?php echo intval($preview['code']); ?> — <?php echo htmlspecialchars((string)$preview['reason']); ?>
             </div>
         <?php else: ?>
-            <p style="color:#666">
+            <p class="fs-note-muted">
                 اللقطةُ <strong>#<?php echo intval($preview['snapshot_id']); ?></strong>
                 ببصمة <code><?php echo htmlspecialchars(substr((string)$preview['fingerprint'], 0, 12)); ?>…</code>
                 · سنواتُ الخدمة <strong><?php echo htmlspecialchars((string)$preview['basis']['service_years']); ?></strong>
@@ -243,7 +258,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
             <?php endif; ?>
 
             <div class="table-container">
-            <table class="alltables display nowrap" style="width:100%">
+            <table class="alltables display nowrap fs-table-full">
                 <thead><tr><th>البند</th><th>الكمية</th><th>المعدل</th><th>المبلغ</th><th>المصدر</th></tr></thead>
                 <tbody>
                 <?php foreach ($preview['lines'] as $l): ?>
@@ -255,7 +270,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                         <td><?php echo $l['qty'] !== null ? htmlspecialchars((string)$l['qty']) : '—'; ?></td>
                         <td><?php echo $l['rate'] !== null ? htmlspecialchars((string)$l['rate']) : '—'; ?></td>
                         <td><strong><?php echo htmlspecialchars((string)$l['amount']); ?></strong></td>
-                        <td style="white-space:normal"><small><?php echo htmlspecialchars((string)$l['source_note']); ?></small></td>
+                        <td class="fs-src-cell"><small><?php echo htmlspecialchars((string)$l['source_note']); ?></small></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -270,7 +285,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
             </div>
 
             <?php if ($can_add): ?>
-            <form method="post" class="ems-form" style="margin-top:14px">
+            <form method="post" class="ems-form fs-open-form">
         <?= csrf_field() ?>
                 <input type="hidden" name="fs_action" value="open">
                 <input type="hidden" name="contract_id" value="<?php echo $previewFor; ?>">
@@ -289,16 +304,22 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
         <?php if (!$settlements): ?>
             <div class="alert alert-info">لا تصفيةَ بعد.</div>
         <?php else: foreach ($settlements as $s): $lines = FS::linesOf($gate, intval($s['id'])); ?>
-            <div class="card" style="margin-bottom:14px">
+            <div class="card fs-card-item ems-doc-cycle">
             <div class="card-header"><h5>
                 #<?php echo intval($s['id']); ?> —
                 <?php echo htmlspecialchars((string)($s['employee_name'] ?? ('موظف ' . intval($s['employee_id'])))); ?>
                 <span class="badge <?php echo (string)$s['state'] === 'approved' ? 'badge-success'
                     : ((string)$s['state'] === 'cancelled' ? 'badge-danger' : 'badge-secondary'); ?>">
                     <?php echo htmlspecialchars($ST_LABEL[(string)$s['state']] ?? (string)$s['state']); ?></span>
+                <?php /* بوابة ١٢: الخطوةُ التاليةُ من حالِ المستندِ الحي — يدُ الإعدادِ غيرُ يدِ الاعتماد */
+                if ((string)$s['state'] === 'draft') {
+                    echo ems_next_step('اعتمادُ التصفيةِ بيدِ الإجازةِ الماليةِ — بمرفقِ الإخلاء');
+                } elseif ((string)$s['state'] === 'approved') {
+                    echo ems_next_step('صرفُ الذمّةِ الصافيةِ عبر دورةِ المدفوعات');
+                } ?>
             </h5></div>
             <div class="card-body">
-                <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:10px">
+                <div class="fs-meta-row">
                     <div>تاريخُ الأثر: <strong><?php echo htmlspecialchars((string)$s['effective_date']); ?></strong></div>
                     <div>سنواتُ الخدمة: <strong><?php echo htmlspecialchars((string)$s['service_years']); ?></strong></div>
                     <div>الصافي: <strong><?php echo htmlspecialchars((string)$s['net_amount']); ?>
@@ -314,7 +335,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                     <?php endif; ?>
                 </div>
                 <div class="table-container">
-                <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+                <table class="alltables display nowrap no-datatable fs-table-full" data-no-dt="1">
                     <thead><tr><th>البند</th><th>الكمية</th><th>المعدل</th><th>المبلغ</th><th>المصدر</th></tr></thead>
                     <tbody>
                     <?php foreach ($lines as $l): ?>
@@ -326,7 +347,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
                             <td><?php echo $l['qty'] !== null ? htmlspecialchars((string)$l['qty']) : '—'; ?></td>
                             <td><?php echo $l['rate'] !== null ? htmlspecialchars((string)$l['rate']) : '—'; ?></td>
                             <td><strong><?php echo htmlspecialchars((string)$l['amount']); ?></strong></td>
-                            <td style="white-space:normal"><small><?php echo htmlspecialchars((string)$l['source_note']); ?></small></td>
+                            <td class="fs-src-cell"><small><?php echo htmlspecialchars((string)$l['source_note']); ?></small></td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>
@@ -335,41 +356,41 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
 
                 <?php if ((string)$s['state'] === 'draft'): ?>
                     <?php if ($can_edit): ?>
-                    <form method="post" class="ems-form" style="margin-top:12px">
+                    <form method="post" class="ems-form fs-approve-form">
         <?= csrf_field() ?>
                         <input type="hidden" name="fs_action" value="approve">
                         <input type="hidden" name="settlement_id" value="<?php echo intval($s['id']); ?>">
                         <div class="form-grid">
-                            <div class="form-group"><label for="emsf_570_4f3bf">مرفقُ الإخلاء <span style="color:#c00">*</span></label>
+                            <div class="form-group"><label for="emsf_570_4f3bf">مرفقُ الإخلاء <span class="fs-required">*</span></label>
                                 <input type="text" name="clearance_doc" maxlength="120" required
                                        placeholder="مرجعُ محضر الإخلاء" id="emsf_570_4f3bf"></div>
                         </div>
                         <button type="submit" class="btn-primary"><i class="fa fa-check"></i>
                             اعتمد التصفية</button>
-                        <small style="color:#666">— والاعتمادُ يولّد <strong>الحدثَ الماليَّ الواحد</strong>
+                        <small class="fs-note-muted">— والاعتمادُ يولّد <strong>الحدثَ الماليَّ الواحد</strong>
                             ويسترد السلفَ فعليًّا.</small>
                     </form>
                     <?php endif; ?>
                     <?php if ($can_add): ?>
-                    <form method="post" class="ems-form" style="margin-top:8px">
+                    <form method="post" class="ems-form fs-cancel-form">
         <?= csrf_field() ?>
                         <input type="hidden" name="fs_action" value="cancel">
                         <input type="hidden" name="settlement_id" value="<?php echo intval($s['id']); ?>">
                         <div class="form-grid">
-                            <div class="form-group"><label for="emsf_571_348a7">سببُ الإلغاء <span style="color:#c00">*</span></label>
+                            <div class="form-group"><label for="emsf_571_348a7">سببُ الإلغاء <span class="fs-required">*</span></label>
                                 <input type="text" name="cancel_reason" maxlength="255" required id="emsf_571_348a7"></div>
                         </div>
                         <button type="submit" class="btn-secondary"><i class="fa fa-ban"></i> ألغِ المسودة</button>
                     </form>
                     <?php endif; ?>
                 <?php elseif ((string)$s['state'] === 'approved'): ?>
-                    <div class="alert alert-success" style="margin-top:10px">
+                    <div class="alert alert-success fs-alert-gap">
                         اعتُمدت بمرفق الإخلاء
                         <strong><?php echo htmlspecialchars((string)$s['clearance_doc']); ?></strong>
                         — والتصحيحُ بعدها <strong>بحركةٍ عاكسةٍ لا بمحو</strong>.
                     </div>
                 <?php elseif ((string)$s['state'] === 'cancelled'): ?>
-                    <div class="alert alert-warning" style="margin-top:10px">
+                    <div class="alert alert-warning fs-alert-gap">
                         أُلغيت: <?php echo htmlspecialchars((string)$s['cancel_reason']); ?>
                     </div>
                 <?php endif; ?>

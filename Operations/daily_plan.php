@@ -160,6 +160,16 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا */
+.dp-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.dp-project-select { min-width: 220px; }
+.dp-inline { display: inline; }
+.dp-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+.dp-inline-flex { display: inline-flex; gap: 4px; }
+.dp-reason { width: 160px; }
+.dp-table-full { width: 100%; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'خطة عمل الغد — مساحة التوزيع'; $header_icon = 'fa fa-calendar-day';
@@ -169,12 +179,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
+    echo ems_states_bundle('لا خطةَ لهذا اليومِ بعدُ', 'اختر المشروعَ واليومَ ثم ولّدِ الاحتياجَ من الحاويات');
     ?>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="dp-filter">
             <strong>المشروع:</strong>
-            <select name="project" onchange="this.form.submit()" style="min-width:220px">
+            <select name="project" onchange="this.form.submit()" class="dp-project-select" aria-label="المشروع">
                 <option value="0">— اختر —</option>
                 <?php foreach ($projects_options as $p): ?>
                     <option value="<?php echo intval($p['id']); ?>" <?php echo $sel_project === intval($p['id']) ? 'selected' : ''; ?>>
@@ -183,7 +194,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php endforeach; ?>
             </select>
             <strong>اليوم:</strong>
-            <input type="date" name="date" value="<?php echo htmlspecialchars($sel_date); ?>" onchange="this.form.submit()">
+            <input type="date" name="date" aria-label="اليوم" value="<?php echo htmlspecialchars($sel_date); ?>" onchange="this.form.submit()">
         </form>
     </div></div>
 
@@ -192,7 +203,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php if (!$plan): ?>
             <p>لا خطةَ لهذا اليوم بعد — الاحتياجُ يُولَّد من حاويات المعدات النشطة (لا من اليد).</p>
             <?php if ($can_add): ?>
-            <form method="post" style="display:inline">
+            <form method="post" class="dp-inline">
         <?= csrf_field() ?>
                 <input type="hidden" name="dp_action" value="generate">
                 <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
@@ -211,16 +222,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <small title="سبب آخر إرجاع">↩ <?php echo htmlspecialchars($plan['reopen_reason']); ?></small>
                 <?php endif; ?>
             </h5>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0">
+            <div class="dp-actions">
                 <?php if ($editable): ?>
-                <form method="post" style="display:inline">
+                <form method="post" class="dp-inline">
         <?= csrf_field() ?>
                     <input type="hidden" name="dp_action" value="generate">
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                     <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
                     <button type="submit" class="btn btn-sm btn-secondary">حدّث الاحتياج</button>
                 </form>
-                <form method="post" style="display:inline">
+                <form method="post" class="dp-inline">
         <?= csrf_field() ?>
                     <input type="hidden" name="dp_action" value="approve">
                     <input type="hidden" name="plan_id" value="<?php echo intval($plan['id']); ?>">
@@ -229,7 +240,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <button type="submit" class="btn btn-sm btn-secondary" title="لا اعتمادَ لمن أنشأ">اعتمادُ الحركة</button>
                 </form>
                 <?php elseif ($plan['state'] === 'approved' && $can_edit): ?>
-                <form method="post" style="display:inline">
+                <form method="post" class="dp-inline">
         <?= csrf_field() ?>
                     <input type="hidden" name="dp_action" value="open">
                     <input type="hidden" name="plan_id" value="<?php echo intval($plan['id']); ?>">
@@ -239,20 +250,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </form>
                 <?php endif; ?>
                 <?php if (in_array(strval($plan['state']), array('approved', 'opened'), true) && $can_edit): ?>
-                <form method="post" style="display:inline-flex;gap:4px">
+                <form method="post" class="dp-inline-flex">
         <?= csrf_field() ?>
                     <input type="hidden" name="dp_action" value="reopen">
                     <input type="hidden" name="plan_id" value="<?php echo intval($plan['id']); ?>">
                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                     <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
-                    <input type="text" name="reason" placeholder="سبب الإرجاع (إلزامي)" style="width:160px" aria-label="سبب الإرجاع (إلزامي)">
+                    <input type="text" name="reason" placeholder="سبب الإرجاع (إلزامي)" class="dp-reason" aria-label="سبب الإرجاع (إلزامي)">
                     <button type="submit" class="btn btn-sm btn-secondary">أرجِع للمسودة</button>
                 </form>
                 <?php endif; ?>
             </div>
 
             <div class="table-container">
-                <table class="alltables display no-datatable" style="width:100%">
+                <table class="alltables display no-datatable dp-table-full">
                     <thead><tr>
                         <th>نوع المعدة</th><th>الوردية</th><th>المشغّل الموزَّع</th>
                         <?php if ($editable): ?><th>التوزيع (من سلسلة حاويتها حصرًا)</th><?php endif; ?>
@@ -294,13 +305,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </td>
                             <?php if ($editable): ?>
                             <td>
-                                <form method="post" style="display:inline-flex;gap:4px">
+                                <form method="post" class="dp-inline-flex">
         <?= csrf_field() ?>
                                     <input type="hidden" name="dp_action" value="assign">
                                     <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                                     <input type="hidden" name="project_id" value="<?php echo $sel_project; ?>">
                                     <input type="hidden" name="plan_date" value="<?php echo htmlspecialchars($sel_date); ?>">
-                                    <select name="operator_employee_id">
+                                    <select name="operator_employee_id" aria-label="المشغّل الموزَّع">
                                         <option value="0">— أزل التخصيص —</option>
                                         <?php foreach (($chains[$ecId] ?? array()) as $c): ?>
                                             <option value="<?php echo intval($c['operator_employee_id']); ?>">

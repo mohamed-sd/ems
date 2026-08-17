@@ -381,7 +381,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
+    echo ems_states_bundle('لا قراراتِ خصوماتٍ أو جزاءاتٍ مسجَّلةً بعدُ', 'أضف أولَ قرارٍ بزرِّ «إضافة» في رأسِ الشاشة');
     ?>
+    <style>
+        .cmp03-form-actions { margin-top: 12px; display: flex; gap: 10px; }
+        .ded-hint-thin { font-weight: var(--weight-regular); }
+        .ded-spine-cell { font-size: .88em; }
+        .ded-step-line { opacity: .8; }
+        .ded-inline-flex { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+        .ded-proposal-select { max-width: 340px; }
+    </style>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
     <form method="post" action="" class="allforms" id="cmp03AddForm">
@@ -447,7 +456,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_1674_7fb2a">نسخة القاعدة المستعملة</label>
                     <input type="text" name="f24" maxlength="190" id="emsf_1674_7fb2a"></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <div class="cmp03-form-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
                 <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>
@@ -512,9 +521,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
          الطبيعيّ: من ينتظر يدًا، وأيَّ يدٍ ينتظر.
        ◆ ولا يُخفى زرٌّ اكتفاءً بالإخفاء: الخادمُ هو من يفصل (الحارسُ + قاعدةُ
          «لا يدَ تمشي خطوتين» + قيدُ القاعدة) — والإخفاءُ زينةٌ فوق منعٍ قائم. */ ?>
-    <div class="card"><div class="card-header">
+    <div class="card ems-doc-cycle"><div class="card-header">
         <h5><i class="fa fa-list-check"></i> سلّمُ اعتمادِ قراراتِ الخصم
-            <small class="text-muted" style="font-weight:400">— ثلاثُ خطواتٍ بثلاثِ أيدٍ: مراجعةُ الموارد ← اعتمادُ الإدارة ← الاعتمادُ المالي</small></h5>
+            <small class="text-muted ded-hint-thin">— ثلاثُ خطواتٍ بثلاثِ أيدٍ: مراجعةُ الموارد ← اعتمادُ الإدارة ← الاعتمادُ المالي</small></h5>
     </div><div class="card-body">
         <?php
         $pending = array();
@@ -537,7 +546,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <td><?php echo $rid; ?></td>
                 <td><?php echo htmlspecialchars((string) ($r['payload']['رقم القرار'] ?? '—'), ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo htmlspecialchars((string) $r['status'], ENT_QUOTES, 'UTF-8'); ?></td>
-                <td style="font-size:.88em">
+                <td class="ded-spine-cell">
                     <?php if ($sp && $sp['proposal_ref']): ?>
                         مقترحٌ #<?php echo (int) $sp['proposal_ref']; ?>
                     <?php elseif ($ch && !empty($ch['payload_proposal'])): ?>
@@ -549,17 +558,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php if ($ch): ?>
                         · طلبٌ #<?php echo (int) $ch['id']; ?> (<?php echo htmlspecialchars($ch['status'], ENT_QUOTES, 'UTF-8'); ?>)
                         <?php foreach ($ch['steps'] as $so => $s): ?>
-                            <br><span style="opacity:.8">خطوة <?php echo (int) $so; ?>: <?php echo htmlspecialchars(inj0219_signer($ch, (int) $so), ENT_QUOTES, 'UTF-8'); ?></span>
+                            <br><span class="ded-step-line">خطوة <?php echo (int) $so; ?>: <?php echo htmlspecialchars(inj0219_signer($ch, (int) $so), ENT_QUOTES, 'UTF-8'); ?></span>
                         <?php endforeach; ?>
                     <?php endif; ?>
+                    <?php /* بوابة ١٢: الخطوةُ التاليةُ من حالِ السلّمِ الحيِّ — لا نصٌّ ثابت */
+                    if ($ch && $ch['status'] === 'pending') {
+                        $inj_nx = inj0219_pending_step($ch);
+                        if ($inj_nx) { echo '<br>' . ems_next_step('الخطوةُ ' . (int) $inj_nx['order'] . ' بيدِ الدورِ ' . $inj_nx['role']); }
+                    } elseif (!$ch || $ch['status'] === 'rejected') {
+                        echo '<br>' . ems_next_step('فتحُ سلّمِ الاعتمادِ بربطِ مقترحِ الخصم');
+                    } ?>
                 </td>
                 <td>
                 <?php if (!$ch || $ch['status'] === 'rejected'): ?>
-                    <form method="post" action="" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                    <form method="post" action="" class="ded-inline-flex">
         <?= csrf_field() ?>
                         <input type="hidden" name="cmp03_action" value="request_approval">
                         <input type="hidden" name="row_id" value="<?php echo $rid; ?>">
-                        <select name="proposal_ref" required style="max-width:340px">
+                        <select name="proposal_ref" aria-label="مقترح الخصم المرتبط بالقرار" required class="ded-proposal-select">
                             <option value="">— اختر مقترحَ الخصم (إلزامي) —</option>
                             <?php foreach ($OPEN_PROPOSALS as $p): ?>
                             <option value="<?php echo (int) $p['ded_id']; ?>">#<?php echo (int) $p['ded_id']; ?>
@@ -593,7 +609,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             تنتظر الدورَ <?php echo $ps ? htmlspecialchars($ps['role'], ENT_QUOTES, 'UTF-8') : '؟'; ?>
                             — لا يدَك</span>
                     <?php else: ?>
-                    <form method="post" action="" style="display:flex;gap:6px;align-items:center">
+                    <form method="post" action="" class="ded-inline-flex">
         <?= csrf_field() ?>
                         <input type="hidden" name="cmp03_action" value="approve_step">
                         <input type="hidden" name="row_id" value="<?php echo $rid; ?>">

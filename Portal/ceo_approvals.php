@@ -282,7 +282,12 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main ems-unified-page-shell" dir="rtl">
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ems-exap-form-actions { margin-top:12px; display:flex; gap:10px; }
+.form-group.is-hidden { display:none; }
+</style>
+<div class="main ems-unified-page-shell ems-doc-cycle" dir="rtl">
     <?php
     $header_title = 'اعتمادات المدير التنفيذي';
     $header_icon = 'fa fa-stamp';
@@ -292,6 +297,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = false;
     include '../includes/page_header.php';
+    echo ems_states_bundle('لا اعتماداتٍ معروضةً على الإدارةِ التنفيذيةِ بعدُ', 'أضف صفًّا بزر «إضافة» — أو يصل الرفعُ الآليُّ من بوابةِ الطلبِ المالي عند تجاوزِ السقف');
+    echo ems_next_step('قرارُ الإدارةِ التنفيذية على المعروض: اعتمادٌ أو اعتمادٌ بشرطٍ أو ردٌّ أو تأجيل — والمقرَّرُ لا يُقرَّرُ ثانية');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
@@ -342,7 +349,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_1087_f3217">الحالة</label>
                     <select name="f17" id="emsf_1087_f3217"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <div class="ems-exap-form-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
                 <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>
@@ -383,10 +390,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </select></div>
                 <div class="form-group" id="cmp03ReasonWrap"><label id="cmp03ReasonLbl" for="emsf_1089_ef825">سبب القرار (إلزامي للمشروط والرد)</label>
                     <input type="text" name="reason" maxlength="300" placeholder="الشرط أو السبب" id="emsf_1089_ef825"></div>
-                <div class="form-group" id="cmp03UntilWrap" style="display:none"><label for="emsf_1090_e4372">مؤجل إلى (إلزامي للتأجيل)</label>
+                <div class="form-group is-hidden" id="cmp03UntilWrap"><label for="emsf_1090_e4372">مؤجل إلى (إلزامي للتأجيل)</label>
                     <input type="date" name="until" id="emsf_1090_e4372"></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <div class="ems-exap-form-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-stamp"></i> قيد القرار</button>
             </div>
         </div></div>
@@ -462,8 +469,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (sel && rw && uw) {
         var sync = function () {
             var v = sel.value;
-            uw.style.display = (v === 'تأجيل') ? '' : 'none';
-            rw.style.display = '';
+            uw.classList.toggle('is-hidden', v !== 'تأجيل');
+            rw.classList.remove('is-hidden');
             if (rl) {
                 rl.textContent = (v === 'اعتماد بشرط') ? 'نص الشرط (إلزامي)'
                     : (v === 'رد') ? 'سبب الرد (إلزامي)'

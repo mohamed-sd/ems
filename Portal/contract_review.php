@@ -127,7 +127,11 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main ems-unified-page-shell" dir="rtl">
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ems-crev-form-actions { margin-top:12px; display:flex; gap:10px; }
+</style>
+<div class="main ems-unified-page-shell ems-doc-cycle" dir="rtl">
     <?php
     $header_title = 'مراجعة العقود وملاحظاتها';
     $header_icon = 'fa fa-file-circle-question';
@@ -137,6 +141,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = false;
     include '../includes/page_header.php';
+    echo ems_states_bundle('لا ملاحظاتِ مراجعةٍ مسجَّلةً على العقودِ بعدُ', 'أضف ملاحظةً بزر «إضافة» أو تحقق من توفرِ السجلات');
+    echo ems_next_step('معالجةُ الملاحظةِ بمستندِ معالجةٍ ثم إقفالُها — والحاجبةُ المفتوحةُ تمنع توقيعَ عقدِها');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
@@ -191,7 +197,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_1167_b9b60">الحالة</label>
                     <select name="f19" id="emsf_1167_b9b60"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <div class="ems-crev-form-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
                 <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>

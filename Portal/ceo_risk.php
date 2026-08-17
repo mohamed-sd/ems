@@ -251,6 +251,10 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ems-exdc-form-actions { margin-top:12px; display:flex; gap:10px; }
+</style>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
     $header_title = 'المخاطر والقرارات العليا';
@@ -261,6 +265,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = false;
     include '../includes/page_header.php';
+    echo ems_states_bundle('لا قراراتٍ عليا مسجَّلةً بعدُ لهذا الكيان', 'أضف قرارًا بزر «إضافة» أو تحقق من توفرِ السجلات');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
@@ -311,7 +316,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_1147_44369">الحالة</label>
                     <select name="f15" id="emsf_1147_44369"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="قيد الحسم">قيد الحسم</option><option value="محسوم">محسوم</option><option value="قيد المتابعة">قيد المتابعة</option><option value="مغلق بعد المعالجة">مغلق بعد المعالجة</option><option value="مؤجل">مؤجل</option></select></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <div class="ems-exdc-form-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
                 <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>

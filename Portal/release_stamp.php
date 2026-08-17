@@ -159,6 +159,12 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ems-pts-note { font-size:.9em; }
+.ems-pts-th-key { width:220px; }
+.ems-pts-stamp { font-family:var(--font-mono); font-size:1.15em; }
+</style>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
     $header_title = 'بصمة الإصدار وتقرير النشر';
@@ -169,6 +175,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = false;
     include '../includes/page_header.php';
+    // حزمةُ الحالاتِ الدنيا (بوابة ٩) — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشة
+    echo ems_states_bundle('لا سجلاتِ نشرٍ مدوَّنةً بعدُ', 'ختمُ الإصدارِ يُحسب حيًّا في اللوحةِ أعلاه — وسجلُّ النشرِ يُضاف بزرِّ «إضافة»');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
@@ -184,15 +192,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header">
         <h5><i class="fa fa-fingerprint"></i> بصمةُ الإصدارِ الحالية — مولَّدةٌ من النسخةِ المنشورة</h5>
     </div><div class="card-body">
-        <p class="text-muted" style="font-size:.9em">
+        <p class="text-muted ems-pts-note">
             هذه البصمةُ <strong>تُحسب ولا تُكتب</strong>: تُشتقُّ من مخطَّطِ القاعدةِ
             المُصدَّرِ للمثبِّت وعددِ الهجراتِ المطبَّقةِ والشاشاتِ الحيّةِ وجداولِ
             القاعدة. فبصمةٌ تُدخَل يدويًّا تُطابق ما يريده كاتبُها لا ما يعمل على الخادم.
         </p>
         <table class="table table-striped" data-no-dt>
             <tbody>
-                <tr><th style="width:220px">البصمة</th>
-                    <td><strong style="font-family:monospace;font-size:1.15em"><?php
+                <tr><th class="ems-pts-th-key">البصمة</th>
+                    <td><strong class="ems-pts-stamp"><?php
                         echo htmlspecialchars((string) $RELEASE['stamp'], ENT_QUOTES, 'UTF-8'); ?></strong></td></tr>
                 <tr><th>بصمةُ بيانِ المخطَّط</th>
                     <td><?php echo htmlspecialchars((string) $RELEASE['schema_manifest'], ENT_QUOTES, 'UTF-8'); ?></td></tr>
