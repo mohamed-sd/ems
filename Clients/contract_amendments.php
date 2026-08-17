@@ -413,6 +413,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         </div>
     <?php endif; ?>
 
+    <?php echo ems_states_bundle('لا ملاحقَ مسجَّلةً ضمن هذا الترشيح', 'الملاحقُ تُغذَّى تلقائيًّا من إجراءات العقد — أو غيّر المرشِّحات'); ?>
+
     <div class="stats-section amd-hidden" id="amdStatsSection">
         <div class="stats-grid">
             <div class="stats-card">
@@ -547,7 +549,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card">
         <div class="card-body">
             <div class="table-container">
-                <table id="amdTable" class="display amd-table-nowrap no-datatable">
+                <table id="amdTable" class="display amd-table-nowrap no-datatable" data-state-save="false">
                     <thead>
                         <tr>
                             <th>إجراءات</th>
@@ -636,11 +638,10 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
 <script>
     $(document).ready(function () {
-        const amdTable = $('#amdTable').DataTable({
-            autoWidth: false,
-            stateSave: false,
-            language: { url: '/ems/assets/i18n/datatables/ar.json' }
-        });
+        // تهيئةُ الجدول انتقلت إلى المكوّنِ المركزي (ui-unification.js) —
+        // وتعطيلُ حفظِ الحالة بقي بسمةِ data-state-save="false" على وسمِ الجدول.
+        function bindAmdFilters() {
+        const amdTable = $('#amdTable').DataTable();
 
         function fillFilterOptions(columnIndex, selectId) {
             const select = $(selectId);
@@ -660,6 +661,14 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
             amdTable.column(3).search(value ? '^' + value + '$' : '', true, false).draw();
         });
+        }
+
+        // الربطُ بعد تهيئةِ المكوّنِ المركزي للجدول (أو فورًا إن سبقنا)
+        if ($.fn.dataTable && $.fn.dataTable.isDataTable('#amdTable')) {
+            bindAmdFilters();
+        } else {
+            $('#amdTable').one('init.dt', bindAmdFilters);
+        }
     });
 
     // ── إظهار/إخفاء الفورم والإحصائيات ──
@@ -791,13 +800,13 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     .amd-main .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: 12px; }
     .amd-main .stats-section {
         border: 1px solid var(--bdr); border-radius: var(--rl);
-        background: linear-gradient(180deg, rgba(255,255,255,.95) 0%, var(--s2) 100%);
+        background: linear-gradient(180deg, var(--c-rgba255255255095, rgba(255,255,255,.95)) 0%, var(--s2) 100%);
         box-shadow: var(--sh); padding: 14px; margin-bottom: 14px;
     }
-    .amd-main .stats-card { background: #eee; border: 1px solid #aaa; border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px rgba(26,18,8,.07); position: relative; overflow: hidden; }
-    .amd-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid #999; background:#fff; color:#000; }
-    .amd-main .stats-card .stats-title { color: #555; font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
-    .amd-main .stats-card .stats-value { color: #222; line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
+    .amd-main .stats-card { background: var(--c-eeeeee, #eee); border: 1px solid var(--c-aaaaaa, #aaa); border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px var(--c-rgba26188007, rgba(26,18,8,.07)); position: relative; overflow: hidden; }
+    .amd-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-surface); color:var(--c-ink-max); }
+    .amd-main .stats-card .stats-title { color: var(--c-555555, #555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
+    .amd-main .stats-card .stats-value { color: var(--c-222222, #222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
     @media (max-width: 900px) { .amd-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
     @media (max-width: 560px) { .amd-main .stats-grid { grid-template-columns: 1fr; } }
 
@@ -807,7 +816,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     #amdTable.amd-table-nowrap, #amdTable.amd-table-nowrap th, #amdTable.amd-table-nowrap td { white-space: nowrap; }
     #amdTable .action-btns { flex-wrap: nowrap; white-space: nowrap; }
     .amd-main .amd-num { font-variant-numeric: tabular-nums; font-weight: 700; }
-    .amd-main .amd-muted { color: #999; }
+    .amd-main .amd-muted { color: var(--c-ink-400); }
 </style>
 
 </body>

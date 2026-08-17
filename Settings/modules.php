@@ -215,13 +215,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         padding: 11px 14px;
         font-family: 'Cairo', sans-serif;
         font-size: .92rem;
-        background: #fff;
+        background: var(--c-s-fff);
     }
 
     .icon-picker-search:focus {
         outline: none;
-        border-color: rgba(37,99,235,.35);
-        box-shadow: 0 0 0 4px rgba(37,99,235,.08);
+        border-color: var(--c-rgba3799235035, rgba(37,99,235,.35));
+        box-shadow: 0 0 0 4px var(--c-rgba3799235008, rgba(37,99,235,.08));
     }
 
     .icon-suggest-btn {
@@ -233,8 +233,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         align-items: center;
         gap: 12px;
         padding: 14px 16px;
-        background: linear-gradient(135deg, rgba(232,184,0,.12), rgba(37,99,235,.08));
-        border: 1.5px dashed rgba(232,184,0,.35);
+        background: linear-gradient(135deg, var(--c-rgba2321840012, rgba(232,184,0,.12)), var(--c-rgba3799235008, rgba(37,99,235,.08)));
+        border: 1.5px dashed var(--c-rgba2321840035);
         border-radius: var(--radius-lg);
     }
 
@@ -245,8 +245,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: #fff;
-        border: 1.5px solid rgba(232,184,0,.28);
+        background: var(--c-s-fff);
+        border: 1.5px solid var(--c-rgba2321840028);
         color: var(--navy);
         font-size: 1.25rem;
         flex-shrink: 0;
@@ -277,7 +277,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     .icon-option {
         border: 1.5px solid var(--border);
         border-radius: 14px;
-        background: #fff;
+        background: var(--c-s-fff);
         padding: 12px 10px;
         display: grid;
         justify-items: center;
@@ -302,20 +302,89 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     .icon-option:hover {
         transform: translateY(-2px);
-        border-color: rgba(37,99,235,.28);
+        border-color: var(--c-rgba3799235028, rgba(37,99,235,.28));
         box-shadow: var(--shadow-sm);
     }
 
     .icon-option.is-selected {
-        background: linear-gradient(180deg, rgba(37,99,235,.08), rgba(232,184,0,.10));
-        border-color: rgba(232,184,0,.58);
-        box-shadow: 0 10px 20px rgba(15,23,42,.08);
+        background: linear-gradient(180deg, var(--c-rgba3799235008, rgba(37,99,235,.08)), var(--c-rgba232184001, rgba(232,184,0,.10)));
+        border-color: var(--c-rgba2321840058, rgba(232,184,0,.58));
+        box-shadow: 0 10px 20px var(--c-rgba152342008);
     }
 
     .icon-picker-note {
         color: var(--sub);
         font-size: .78rem;
         font-weight: 700;
+    }
+
+    /* UXW-01 ②: أصنافٌ محلَّ الأنماطِ الموضعيةِ التي كانت مبثوثةً في الوسوم */
+    .smod-span-all { grid-column: 1 / -1; }
+    .smod-check-row { display: flex; align-items: center; }
+    .smod-check-label { margin: 0; margin-right: 8px; cursor: pointer; }
+    .smod-submit { grid-column: 1 / -1; justify-self: center; }
+    .smod-header-flex { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .smod-m0 { margin: 0; }
+    .smod-filter-row { display: flex; align-items: center; gap: 10px; }
+    .smod-filter-label { font-weight: 700; margin: 0; }
+    .smod-role-select {
+        padding: 7px 14px;
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius);
+        font-family: 'Cairo', sans-serif;
+        font-size: .88rem;
+        min-width: 180px;
+    }
+    .smod-icon-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        background: var(--gold-soft);
+        color: var(--navy);
+        border: 1.5px solid var(--c-rgba2321840025, rgba(232,184,0,.25));
+    }
+    .smod-code {
+        background: var(--gold-soft);
+        color: var(--navy);
+        padding: 4px 8px;
+        border-radius: 6px;
+        font-weight: 600;
+    }
+    .smod-role-link {
+        color: var(--blue);
+        text-decoration: none;
+        font-weight: 600;
+        transition: all var(--ease);
+    }
+    .smod-role-link:hover { color: var(--navy); text-decoration: underline; }
+    .smod-yes {
+        display: inline-block;
+        background: var(--green-soft);
+        color: var(--green);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+    .smod-no {
+        display: inline-block;
+        background: var(--gray-soft);
+        color: var(--gray);
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+    .smod-edit-btn {
+        background: var(--blue-soft);
+        color: var(--blue);
+        border: 1.5px solid var(--c-rgba3799235018, rgba(37,99,235,.18));
+    }
+    .smod-del-btn {
+        background: var(--red-soft);
+        color: var(--red);
+        border: 1.5px solid var(--c-rgba2203838018, rgba(220,38,38,.18));
     }
 
     @media (max-width: 768px) {
@@ -363,9 +432,16 @@ include __DIR__ . '/../includes/page_header.php';
         </div>
     <?php endif; ?>
 
-    <!-- فورم إضافة / تعديل -->
-    <form id="moduleForm" action="" method="post" class="ems-form" style="display:<?= !empty($editData) ? 'block' : 'none'; ?>
-        <?= csrf_field() ?>">
+    <?php
+    /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
+    echo ems_states_bundle('لا شاشاتِ نظامٍ مسجَّلةً بعدُ',
+        'أضف شاشةً جديدةً من زرِّ «إضافة صفحة جديدة» — والكودُ مفتاحُ حلِّ الصلاحية');
+    ?>
+
+    <!-- فورم إضافة / تعديل — الإظهارُ بصنفِ is-hidden لا بنمطٍ موضعيّ (UXW-01 ②)،
+         وحقلُ CSRF داخلَ جسمِ النموذجِ لا داخلَ سمةِ style -->
+    <form id="moduleForm" action="" method="post" class="ems-form<?= !empty($editData) ? '' : ' is-hidden'; ?>">
+        <?= csrf_field() ?>
         <div class="card">
             <div class="card-header">
                 <h5><i class="fas fa-edit"></i> <?= !empty($editData) ? 'تعديل الصفحة' : 'إضافة صفحة جديدة'; ?></h5>
@@ -385,7 +461,7 @@ include __DIR__ . '/../includes/page_header.php';
                         <input type="text" name="code" id="code" placeholder="مثال: clients" required />
                     </div>
 
-                    <div style="grid-column: 1 / -1;">
+                    <div class="smod-span-all">
                         <label for="owner_role_id"><i class="fas fa-icons"></i> أيقونة القائمة</label>
                         <div class="icon-picker-shell">
                             <input type="hidden" name="icon" id="icon" value="<?= htmlspecialchars($default_module_icon, ENT_QUOTES, 'UTF-8'); ?>" />
@@ -488,14 +564,14 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
 
                     <!-- رابط -->
-                    <div style="display: flex; align-items: center;">
+                    <div class="smod-check-row">
                         <input type="checkbox" name="is_link" id="is_link" value="1" />
-                        <label for="is_link" style="margin: 0; margin-right: 8px; cursor: pointer;">
+                        <label for="is_link" class="smod-check-label">
                             <i class="fas fa-link"></i> رابط
                         </label>
                     </div>
 
-                    <button type="submit" style="grid-column: 1 / -1; justify-self: center;">
+                    <button type="submit" class="smod-submit">
                         <i class="fas fa-save"></i> حفظ الصفحة
                     </button>
                 </div>
@@ -505,11 +581,11 @@ include __DIR__ . '/../includes/page_header.php';
 
     <!-- جدول الصفحات -->
     <div class="card">
-        <div class="card-header" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
-            <h5 style="margin:0;"><i class="fas fa-list"></i> جميع الصفحات والموديولات</h5>
-            <div style="display:flex; align-items:center; gap:10px;">
-                <label style="font-weight:700; margin:0;"><i class="fas fa-user-tie"></i> فلترة حسب الدور:</label>
-                <select id="roleFilterSelect" style="padding:7px 14px; border:1.5px solid var(--border); border-radius:var(--radius); font-family:'Cairo',sans-serif; font-size:.88rem; min-width:180px;">
+        <div class="card-header smod-header-flex">
+            <h5 class="smod-m0"><i class="fas fa-list"></i> جميع الصفحات والموديولات</h5>
+            <div class="smod-filter-row">
+                <label class="smod-filter-label"><i class="fas fa-user-tie"></i> فلترة حسب الدور:</label>
+                <select id="roleFilterSelect" class="smod-role-select" aria-label="فلترة حسب الدور المسؤول">
                     <option value="">-- جميع الأدوار --</option>
                     <?php foreach ($roles as $role): ?>
                         <option value="<?= htmlspecialchars($role['name'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -517,7 +593,7 @@ include __DIR__ . '/../includes/page_header.php';
                         </option>
                     <?php endforeach; ?>
                 </select>
-                <button id="clearRoleFilter" class="back-btn" style="display:none;" title="مسح الفلتر">
+                <button id="clearRoleFilter" class="back-btn is-hidden" title="مسح الفلتر">
                     <i class="fas fa-times"></i> مسح
                 </button>
             </div>
@@ -592,46 +668,44 @@ include __DIR__ . '/../includes/page_header.php';
                                         <strong><?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?></strong>
                                     </td>
                                     <td class="text-center">
-                                        <span style="display:inline-flex; align-items:center; justify-content:center; width:42px; height:42px; border-radius:12px; background:var(--gold-soft); color:var(--navy); border:1.5px solid rgba(232,184,0,.25);">
+                                        <span class="smod-icon-badge">
                                             <i class="<?= htmlspecialchars($row['icon'], ENT_QUOTES, 'UTF-8'); ?>"></i>
                                         </span>
                                     </td>
                                     <td>
-                                        <code style="background: var(--gold-soft); color: var(--navy); padding: 4px 8px; border-radius: 6px; font-weight: 600;">
+                                        <code class="smod-code">
                                             <?= htmlspecialchars($row['code'], ENT_QUOTES, 'UTF-8'); ?>
                                         </code>
                                     </td>
                                     <td data-search="<?= htmlspecialchars($row['role_name'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
-                                        <a href="role_permissions.php?role_id=<?= $row['owner_role_id']; ?>" 
-                                           style="color: var(--blue); text-decoration: none; font-weight: 600; transition: all var(--ease);"
-                                           onmouseover="this.style.color='var(--navy)'; this.style.textDecoration='underline';"
-                                           onmouseout="this.style.color='var(--blue)'; this.style.textDecoration='none';"
+                                        <a href="role_permissions.php?role_id=<?= $row['owner_role_id']; ?>"
+                                           class="smod-role-link"
                                            title="الانتقال إلى صلاحيات هذا الدور">
-                                            <i class="fas fa-user-shield"></i> 
+                                            <i class="fas fa-user-shield"></i>
                                             <?= htmlspecialchars($row['role_name'], ENT_QUOTES, 'UTF-8'); ?>
                                         </a>
                                     </td>
                                     <td class="text-center">
                                         <?php if ($row['is_link'] == 1): ?>
-                                            <span style="display: inline-block; background: var(--green-soft); color: var(--green); padding: 4px 8px; border-radius: 4px; font-weight: 600;">
+                                            <span class="smod-yes">
                                                 <i class="fas fa-check-circle"></i> نعم
                                             </span>
                                         <?php else: ?>
-                                            <span style="display: inline-block; background: var(--gray-soft); color: var(--gray); padding: 4px 8px; border-radius: 4px; font-weight: 600;">
+                                            <span class="smod-no">
                                                 <i class="fas fa-times-circle"></i> لا
                                             </span>
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-center">
-                                        <a href="javascript:void(0);" 
+                                        <a href="javascript:void(0);"
                                            onclick="editModule(<?= htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8'); ?>)"
-                                           class="btn btn-sm btn-primary" title="تعديل" style="background: var(--blue-soft); color: var(--blue); border: 1.5px solid rgba(37,99,235,.18);">
-                                            <i class="fas fa-edit"></i> 
+                                           class="btn btn-sm btn-primary smod-edit-btn" title="تعديل">
+                                            <i class="fas fa-edit"></i>
                                         </a>
-                                        <a href="javascript:void(0);" 
+                                        <a href="javascript:void(0);"
                                            onclick="confirmDelete(<?= $row['id']; ?>, '<?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>')"
-                                           class="btn btn-sm btn-danger" title="حذف" style="background: var(--red-soft); color: var(--red); border: 1.5px solid rgba(220,38,38,.18);">
-                                            <i class="fas fa-trash"></i> 
+                                           class="btn btn-sm btn-danger smod-del-btn" title="حذف">
+                                            <i class="fas fa-trash"></i>
                                         </a>
                                     </td>
                                 </tr>
@@ -653,27 +727,26 @@ include __DIR__ . '/../includes/page_header.php';
 
 <script>
 $(document).ready(function () {
-    // تهيئة DataTable
-    var modulesTable = $('#modulesTable').DataTable({
-        language: {
-            url: "/ems/assets/i18n/datatables/ar.json"
-        },
-        columnDefs: [
-            { "orderable": false, "targets": [6] }
-        ]
-    });
+    // UXW-01 ⑤: لا تهيئةَ DataTable محليةً — التهيئةُ للمكوّنِ المركزيِّ وحدَه
+    // (assets/js/ui-unification.js)؛ ونصل واجهتَه كسولًا لأن تهيئتَه قد تتأخر.
+    function modulesApi() {
+        return ($.fn.dataTable && $.fn.dataTable.isDataTable('#modulesTable'))
+            ? $('#modulesTable').DataTable() : null;
+    }
 
     // فلترة حسب الدور المسؤول (العمود index 4)
     $('#roleFilterSelect').on('change', function () {
         var val = $.trim($(this).val());
         // بحث نصي عادي بدون regex لضمان عمله مع النص العربي
-        modulesTable.column(4).search(val, false, false).draw();
+        var api = modulesApi();
+        if (api) { api.column(4).search(val, false, false).draw(); }
         $('#clearRoleFilter').toggle(val !== '');
     });
 
     $('#clearRoleFilter').on('click', function () {
         $('#roleFilterSelect').val('');
-        modulesTable.column(4).search('', false, false).draw();
+        var api = modulesApi();
+        if (api) { api.column(4).search('', false, false).draw(); }
         $(this).hide();
     });
 
@@ -694,7 +767,14 @@ $(document).ready(function () {
     ?>
     var autoRoleName = <?= json_encode($selected_role_name); ?>;
     if (autoRoleName) {
-        $('#roleFilterSelect').val(autoRoleName).trigger('change');
+        // ينتظر تهيئةَ المكوّنِ المركزيِّ للجدول ثم يطبّق الفلتر
+        (function smodAutoFilter(tries) {
+            if (modulesApi()) {
+                $('#roleFilterSelect').val(autoRoleName).trigger('change');
+            } else if (tries > 0) {
+                setTimeout(function () { smodAutoFilter(tries - 1); }, 150);
+            }
+        })(40);
     }
     <?php endif; ?>
 

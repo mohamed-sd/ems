@@ -134,6 +134,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
+    /* UXW-01 بوابة ٩: حزمةُ الحالاتِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ
+       افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components
+       التي تُحمِّلها القشرة. */
+    echo ems_states_bundle('لا روابطَ في جسرِ ترقيمِ المعداتِ بعدُ',
+                           'أضف أولَ ربطِ ترقيمٍ بزرِّ «إضافة» أو تحقق من توفرِ السجلات');
     ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
@@ -179,7 +184,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_164_71d36">الحالة</label>
                     <select name="f16" id="emsf_164_71d36"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <!-- UXW-01 بوابة ٢: صفُّ الأزرارِ بصنفِ المكوّنِ الموحَّد بدل style= -->
+            <div class="form-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
                 <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>

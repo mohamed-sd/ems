@@ -69,15 +69,31 @@ include '../insidebar.php';
 function ems_org_unit_card($u)
 {
     $head = $u['head_name'] ? htmlspecialchars($u['head_name'])
-        : ($u['head_person_id'] ? '#' . intval($u['head_person_id']) : '<span style="color:#c0392b">بلا تكليف نافذ</span>');
-    echo '<div style="border:1px solid #ddd;border-radius:8px;padding:10px 14px;min-width:220px">'
+        : ($u['head_person_id'] ? '#' . intval($u['head_person_id']) : '<span class="orgst-alert">بلا تكليف نافذ</span>');
+    echo '<div class="orgst-card">'
         . '<strong>' . htmlspecialchars($u['name_ar']) . '</strong>'
-        . ' <small style="color:#888">(' . htmlspecialchars($u['unit_code']) . ')</small><br>'
+        . ' <small class="orgst-code">(' . htmlspecialchars($u['unit_code']) . ')</small><br>'
         . '<small>الرأس (مشتق): ' . $head . '</small><br>'
         . '<small>تكليفات نافذة: ' . intval($u['active_asg']) . '</small>'
         . '</div>';
 }
 ?>
+<style>
+    /* UXW-01 ①+②: بطاقاتُ المخططِ التفاعليِّ بأصنافٍ ورموزِ لوحةٍ — لا أنماطَ موضعية */
+    .orgst-card { border: 1px solid var(--c-s-ddd); border-radius: 8px; padding: 10px 14px; min-width: 220px; }
+    .orgst-alert { color: var(--c-c0392b); }
+    .orgst-code { color: var(--c-s-888); }
+    .orgst-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .orgst-children {
+        margin-top: 8px;
+        margin-inline-start: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        border-inline-start: 2px solid var(--c-f0c419, #f0c419);
+        padding-inline-start: 12px;
+    }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'الهيكل التنظيمي — الطبقتان والمجالان'; $header_icon = 'fa fa-sitemap';
@@ -91,17 +107,21 @@ function ems_org_unit_card($u)
         . 'رأس كل وحدة يُشتق من التكليف النافذ ولا يُكتب.',
         array('الرأس «بلا تكليف نافذ» يعني وحدة بلا مكلَّف حي — أنشئ تكليفًا من شاشة التكليفات',
               'الموارد البشرية: لا يعتمد مدير التشغيل تعيينًا ولا أجرًا ولا جزاءً (DEC-ORG-A)'));
+
+    /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
+    echo ems_states_bundle('لا وحداتِ هيكلٍ نشطةً لهذه الشركة',
+        'وحداتُ الهيكلِ تُبذر من مصفوفةِ ORG-01 §1.1 — راجع مديرَ الصلاحيات');
     ?>
 
     <?php foreach ($layerTitles as $layer => $title): ?>
     <div class="card"><div class="card-header"><h5><?php echo htmlspecialchars($title); ?></h5></div>
     <div class="card-body">
-        <div style="display:flex;gap:12px;flex-wrap:wrap">
+        <div class="orgst-row">
             <?php foreach ($byLayer[$layer] as $u): ?>
                 <div>
                     <?php ems_org_unit_card($u); ?>
                     <?php if (!empty($children[intval($u['unit_id'])])): ?>
-                        <div style="margin-top:8px;margin-inline-start:22px;display:flex;flex-direction:column;gap:8px;border-inline-start:2px solid #f0c419;padding-inline-start:12px">
+                        <div class="orgst-children">
                             <?php foreach ($children[intval($u['unit_id'])] as $c) { ems_org_unit_card($c); } ?>
                         </div>
                     <?php endif; ?>

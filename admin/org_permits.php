@@ -124,13 +124,17 @@ include '../insidebar.php';
               'الإذن الساري يُستهلك مرة واحدة، والمنتهي يُطلب تجديده (423)'));
 
     if ($msg !== '') { echo '<div class="alert alert-info">' . htmlspecialchars($msg) . '</div>'; }
+
+    /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
+    echo ems_states_bundle('لا طلباتِ أذوناتٍ مسجَّلةً بعدُ',
+        'اطلب إذنًا جديدًا من زرِّ «طلب إذن» — والإذنُ يسبق الفعلَ دائمًا');
     ?>
 
     <?php if ($can_add): ?>
     <form method="post" action="org_permits.php" class="allforms" id="permitForm">
         <input type="hidden" name="permit_action" value="request">
         <h5>طلب إذن جديد</h5>
-        <div class="form-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <div class="form-row orgprm-grid4">
             <div class="form-group"><label for="emsf_1977_c41c7">نوع الإذن *</label>
                 <select name="permit_type_code" required id="emsf_1977_c41c7"><option value="">— اختر —</option>
                     <?php foreach ($ptypes as $t) { echo '<option value="' . htmlspecialchars($t['permit_type_code']) . '">' . htmlspecialchars($t['name_ar']) . '</option>'; } ?>
@@ -155,7 +159,7 @@ include '../insidebar.php';
         <?php if ($detail['valid_until']): ?> · ساري حتى <?php echo htmlspecialchars($detail['valid_until']); ?><?php endif; ?>
     </h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <table class="alltables display nowrap orgprm-w100" data-no-dt="1">
             <thead><tr><th>الخطوة</th><th>الدور الموافق</th><th>إلزامية</th><th>القرار</th><th>بواسطة</th><th>متى</th><th></th></tr></thead>
             <tbody>
             <?php $nextOpen = true; foreach ($steps as $s): ?>
@@ -168,18 +172,18 @@ include '../insidebar.php';
                     <td><?php echo htmlspecialchars($s['at'] ?: '—'); ?></td>
                     <td>
                     <?php if ($can_edit && $detail['state'] === 'pending' && $s['decision'] === null && $nextOpen): $nextOpen = false; ?>
-                        <form method="post" style="display:inline">
+                        <form method="post" class="orgprm-inline">
                             <input type="hidden" name="permit_action" value="approve">
                             <input type="hidden" name="req_id" value="<?php echo intval($detail['req_id']); ?>">
                             <button type="submit" class="btn-primary">أوافق (بدوري)</button>
                         </form>
-                        <form method="post" style="display:inline">
+                        <form method="post" class="orgprm-inline">
                             <input type="hidden" name="permit_action" value="reject">
                             <input type="hidden" name="req_id" value="<?php echo intval($detail['req_id']); ?>">
                             <input type="hidden" name="reason" value="رفض من الشاشة">
                             <button type="submit" class="action-btn delete">أرفض</button>
                         </form>
-                    <?php elseif ($s['decision'] === null && !$nextOpen): echo '<small style="color:#888">بانتظار ما قبلها</small>'; endif; ?>
+                    <?php elseif ($s['decision'] === null && !$nextOpen): echo '<small class="orgprm-muted">بانتظار ما قبلها</small>'; endif; ?>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -189,7 +193,7 @@ include '../insidebar.php';
     <?php endif; ?>
 
     <div class="card"><div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap orgprm-w100">
             <thead><tr><th>#</th><th>نوع الإذن</th><th>الموضوع</th><th>الموقع</th><th>الطالب</th>
                 <th>الحالة</th><th>ساري حتى</th><th>أُنشئ</th><th></th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -233,6 +237,13 @@ include '../insidebar.php';
     </div></div></div>
 </div>
 
+<style>
+    /* UXW-01 ①+②: أصنافٌ محلَّ الأنماطِ الموضعية — والألوانُ برموزِ اللوحة */
+    .orgprm-grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .orgprm-w100 { width: 100%; }
+    .orgprm-inline { display: inline; }
+    .orgprm-muted { color: var(--c-s-888); }
+</style>
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script>
 document.getElementById('toggleForm')?.addEventListener('click', function () {

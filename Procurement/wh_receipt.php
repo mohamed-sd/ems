@@ -73,7 +73,7 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
-<div class="main proc-whrc-main ems-unified-page-shell">
+<div class="main proc-whrc-main ems-unified-page-shell ems-doc-cycle">
     <?php
     $header_title = 'الاستلام المؤقت قبل الإدخال';
     $header_icon  = 'fa fa-hourglass-half';
@@ -81,16 +81,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                   'icon' => 'fas fa-truck-ramp-box', 'label' => 'شاشة العهدة (الفعل هناك)'));
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    /* الدورةُ المستندية (بوابة ١٢): الاستلامُ المؤقتُ خطوتُه التاليةُ التسليمُ للوجهة */
+    echo ems_next_step('تسليمُ العهدةِ للوجهة — يُسجَّل من شاشةِ العهدة', 'receipt_custody_proc.php');
+    /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */
+    echo ems_states_bundle('لا عُهَدَ استلامٍ مؤقتٍ بانتظارِ الوجهة',
+        'كلُّ استلامٍ لم يبلغ وجهتَه يظهر هنا بعمرِه — والتسليمُ يُسجَّل من شاشةِ العهدة فيغادر الصفُّ القائمة');
     ?>
+    <style>
+        .whr-note { color: var(--c-4b5563); margin: 0 0 10px; }
+        .whr-w100 { width: 100%; }
+        .whr-overdue > td { background: var(--c-fff7ed); }
+        .whr-act-btn { padding: 4px 10px; }
+    </style>
 
     <?php proc_msg_banner(); ?>
 
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;margin:0 0 10px"><i class="fas fa-circle-info"></i>
+        <p class="whr-note"><i class="fas fa-circle-info"></i>
             قائمةُ عمل: العهدُ التي **لم تبلغ وجهتَها بعد** (مستلَمة · قيد الترحيل) بعمرها منذ الاستلام —
             التسليمُ للوجهة يُسجَّل من شاشة العهدة، فيغادر الصفُّ هذه القائمة.</p>
         <div class="table-container">
-            <table id="procTable" class="display nowrap alltables" style="width:100%;">
+            <table id="procTable" class="display nowrap alltables whr-w100">
                 <thead><tr>
                     <th>الإجراءات</th>
                     <th>رقم العهدة</th>
@@ -126,8 +137,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     }
                     $overdue = is_int($age) && $age > 7;   // فوق أسبوعٍ بلا وجهة = متأخرة
                 ?>
-                    <tr<?php echo $overdue ? ' style="background:#fff7ed"' : ''; ?>>
-                        <td><a href="receipt_custody_proc.php?edit_id=<?php echo $rid; ?>" class="add-btn" style="padding:4px 10px"
+                    <tr<?php echo $overdue ? ' class="whr-overdue"' : ''; ?>>
+                        <td><a href="receipt_custody_proc.php?edit_id=<?php echo $rid; ?>" class="add-btn whr-act-btn"
                                title="أكمل التسليم من شاشة العهدة"><i class="fas fa-pen"></i> افتح العهدة</a></td>
                         <td><?php echo htmlspecialchars((string) $rc['code']); ?></td>
                         <td><?php echo htmlspecialchars((string) ($rc['receipt_date'] ?? '—')); ?></td>

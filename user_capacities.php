@@ -93,7 +93,8 @@ $activeCapId = isset($_SESSION['active_capacity']['id']) ? intval($_SESSION['act
 
 $page_title = 'إيكوبيشن | صفاتي ومبدّل المساحة';
 // CM-00 (DEC-E · U10): بذرُ محاورِ الغلافِ من الخادم — AX-2/3 من محرك الصلاحيات
-require_once __DIR__ . '/../includes/screen_contract.php';
+// (الملفُّ في جذرِ ems — فمسارُ includes مباشرٌ لا بـ../ التي كانت تشير خارجَ الجذر)
+require_once __DIR__ . '/includes/screen_contract.php';
 ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : null));
 include 'inheader.php';
 include 'insidebar.php';
@@ -107,10 +108,14 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
+
+    /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
+    echo ems_states_bundle('لا صفاتٍ مشتقةً لحسابك بعدُ',
+        'الاشتقاقُ بيد مديرِ الصلاحيات — الصفةُ تُشتقّ من عقدِك أو ربطِك لا تُمنح يدويًّا');
     ?>
 
     <div class="card"><div class="card-body">
-        <p style="color:#666">
+        <p class="uc-note">
             <strong>الشخصُ واحدٌ والصفاتُ متعددةٌ ومتزامنة</strong> (USR-01 §2) — كلُّ صفةٍ
             بنطاقها ودورِها منفصلةً <strong>ولا تتسرّب بينهما بيانات</strong>. الصلاحياتُ
             مرتبطةٌ <strong>بالصفة لا بالشخص</strong>: انتهاءُ العقد أو التفويض
@@ -120,16 +125,16 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-people-arrows"></i> صفاتي</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <table class="alltables display nowrap uc-w100" data-no-dt="1">
             <thead><tr><th>الصفة</th><th>الدور</th><th>النطاق</th><th>المصدر</th>
                 <th>السريان</th><th>الحالة</th><th></th></tr></thead>
             <tbody>
             <?php if (!$myCaps): ?>
-                <tr><td colspan="7" style="text-align:center;color:#888">
+                <tr><td colspan="7" class="uc-empty-cell">
                     لا صفاتَ مشتقةً لحسابك بعدُ — الاشتقاقُ بيد مدير الصلاحيات</td></tr>
             <?php endif; ?>
             <?php foreach ($myCaps as $c): ?>
-                <tr<?php echo (string)$c['state'] !== 'active' ? ' style="opacity:.55"' : ''; ?>>
+                <tr<?php echo (string)$c['state'] !== 'active' ? ' class="uc-frozen"' : ''; ?>>
                     <td><strong><?php echo htmlspecialchars(CAP::CAPACITY_AR[$c['capacity_type']] ?? $c['capacity_type']); ?></strong>
                         <?php if (intval($c['id']) === $activeCapId): ?>
                             <span class="badge badge-success">الفعّالة الآن</span>
@@ -140,7 +145,7 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
                     <td><?php echo htmlspecialchars((string)$c['source_type']); ?>
                         <?php if ($c['source_id'] !== null): ?>#<?php echo intval($c['source_id']); ?><?php endif; ?>
                         <?php if ((string)$c['source_note'] !== ''): ?>
-                            <small style="color:#a15c00" title="<?php echo htmlspecialchars((string)$c['source_note']); ?>">⚠ معلَن</small>
+                            <small class="uc-declared" title="<?php echo htmlspecialchars((string)$c['source_note']); ?>">⚠ معلَن</small>
                         <?php endif; ?></td>
                     <td><?php echo htmlspecialchars((string)$c['valid_from']); ?>
                         → <?php echo $c['valid_to'] !== null ? htmlspecialchars((string)$c['valid_to']) : 'مفتوح'; ?></td>
@@ -151,7 +156,7 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
                                 مجمَّدة — للقراءة</span>
                         <?php endif; ?></td>
                     <td><?php if ((string)$c['state'] === 'active' && intval($c['id']) !== $activeCapId): ?>
-                        <form method="post" style="display:inline">
+                        <form method="post" class="uc-inline">
                             <input type="hidden" name="cap_action" value="switch">
                             <input type="hidden" name="capacity_id" value="<?php echo intval($c['id']); ?>">
                             <button type="submit" class="btn-primary">البس هذه الصفة</button>
@@ -167,10 +172,10 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
     <div class="card"><div class="card-header"><h5><i class="fa fa-wand-magic-sparkles"></i>
         الاشتقاق من القائم (لمدير الصلاحيات)</h5></div>
     <div class="card-body">
-        <p style="color:#666">يشتقّ صفةً لكل حسابٍ نشطٍ من <strong>عقده النشط في السجل الموحّد</strong>
+        <p class="uc-note">يشتقّ صفةً لكل حسابٍ نشطٍ من <strong>عقده النشط في السجل الموحّد</strong>
             (H-08) أو من <strong>ربط المورد</strong> — وما لا مصدرَ له يُعلَن
             <strong>«تفويضًا موروثًا»</strong> ولا يُلفَّق. <strong>الإعادةُ لا تكرّر صفًّا.</strong></p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div class="uc-actions-row">
             <form method="post"><input type="hidden" name="cap_action" value="derive_dry">
                 <button type="submit" class="btn-primary"><i class="fa fa-flask"></i> جرّب (بلا كتابة)</button></form>
             <form method="post"><input type="hidden" name="cap_action" value="derive_apply">
@@ -180,7 +185,7 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> كل الصفات (<?php echo count($allCaps); ?>)</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap uc-w100">
             <thead><tr><th>#</th><th>كود الحساب</th><th>الشخص</th><th>الصفة</th><th>الدور</th>
                 <th>النطاق</th><th>المصدر</th><th>الحال</th><th>تجميد</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -217,10 +222,10 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
                         ? "<span class='badge badge-success'>نشطة</span>"
                         : "<span class='badge badge-secondary' title='" . htmlspecialchars((string)$c['state_reason']) . "'>" . htmlspecialchars((string)$c['state']) . "</span>"; ?></td>
                     <td><?php if ((string)$c['state'] === 'active'): ?>
-                        <form method="post" style="display:flex;gap:4px">
+                        <form method="post" class="uc-freeze-form">
                             <input type="hidden" name="cap_action" value="freeze">
                             <input type="hidden" name="capacity_id" value="<?php echo intval($c['id']); ?>">
-                            <input type="text" name="reason" placeholder="السبب *" required style="width:120px" aria-label="السبب">
+                            <input type="text" name="reason" placeholder="السبب *" required class="uc-reason-input" aria-label="سبب التجميد">
                             <button type="submit" class="btn-primary">جمّد</button>
                         </form>
                     <?php endif; ?></td>
@@ -232,6 +237,19 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
     <?php endif; ?>
 </div>
 
+<style>
+    /* UXW-01 ①+②: أصنافٌ محلَّ الأنماطِ الموضعية — والألوانُ برموزِ اللوحة
+       (المساحةُ الشخصيةُ بنيتُها قياسيةٌ فرُحِّلت كاملةً بلا استثناء) */
+    .uc-note { color: var(--c-s-666); }
+    .uc-w100 { width: 100%; }
+    .uc-empty-cell { text-align: center; color: var(--c-s-888); }
+    .uc-frozen { opacity: .55; }
+    .uc-declared { color: var(--c-a15c00, #a15c00); }
+    .uc-inline { display: inline; }
+    .uc-actions-row { display: flex; gap: 10px; flex-wrap: wrap; }
+    .uc-freeze-form { display: flex; gap: 4px; }
+    .uc-reason-input { width: 120px; }
+</style>
 <script src="includes/js/jquery-3.7.1.main.js"></script>
 </body>
 </html>

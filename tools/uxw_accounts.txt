@@ -38,3 +38,26 @@ Workforce/contract_registry.php	اروينا
 Workforce/final_settlement.php	اروينا
 Workforce/gov_dept_hrm.php	اروينا
 Workforce/worker_evaluation.php	اروينا
+Clients/	مبيعات
+Equipments/	مشرف الأسطول
+Procurement/	مشتريات
+Maintenance/	صيانة
+Transport/	transport_mgr
+Opportunities/	مبيعات
+Projects/	محمد
+Employees/	اروينا
+admin/	مشرف الصلاحيات
+Settings/	مشرف الصلاحيات
+main/	محمد
+Contracts/claims.php	مشرف المالية
+Contracts/tax_invoices.php	مشرف المالية
+user_capacities.php	محمد
+Procurement/	مشرف المشتريات
+Finance/asset_hours_link.php	تنفيذ
+Finance/depr_run.php	تنفيذ
+Transport/	مشرف النقل
+Procurement/wh_count.php	أمين المستودع
+Procurement/wh_transfer.php	أمين المستودع
+Procurement/gov_dept_inv.php	أمين المستودع
+Procurement/consumption_rate.php	أمين المستودع
+admin/org_permits.php	محمد

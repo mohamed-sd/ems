@@ -77,7 +77,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main ems-unified-page-shell">
+<div class="main ems-unified-page-shell ems-doc-cycle">
     <?php
     $header_title = 'الفاتورة الضريبية'; $header_icon = 'fa fa-file-invoice-dollar';
     $header_actions = array();
@@ -87,10 +87,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
+    // UXW-01 ⑫: شاشةُ دورةٍ اعتماديةٍ تنطق بحالتِها الحية (صادرة · ملغاة) — فتُعلن خطوتَها التالية
+    echo ems_next_step('الفاتورةُ الصادرةُ تُحصَّل في ذمّةِ العميل — وتصحيحُها بإشعارٍ دائن/مدينٍ لا بتعديلها');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا فواتيرَ ضريبيةً صادرةً بعدُ', 'الفاتورةُ تصدر آليًّا عند إجازةِ مستخلصٍ من شاشةِ المستخلصات');
     ?>
 
     <div class="card"><div class="card-body">
-        <p style="color:#666">
+        <p class="ti-note">
             الفاتورةُ تُصدَر <strong>من المستخلص المعتمد وحدَه</strong> برقمٍ
             <strong>تسلسليٍّ نظاميٍّ لكل (شركة × سنة)</strong>، و<strong>لا تعديلَ بعد الإصدار</strong>:
             التصحيحُ <strong>بإشعارٍ دائن/مدين</strong>، والإلغاءُ الضريبيُّ يلزمه سببٌ مكتوب
@@ -100,7 +104,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> الفواتير الصادرة</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap ti-w100">
             <thead><tr><th>الرقم التسلسلي</th><th>مرجع المستخلص</th><th>العميل</th><th>فترة الإقرار</th>
                 <!-- CMP-03 مراجعة عكسية: تاريخ الإصدار والضريبتان أعمدة قائمة بقيمها الحقيقية
                      (كانت قيمة الضريبة تعرض تحت رأس «الإجمالي قبل الضريبة» ملتبسة) -->
@@ -176,7 +180,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         فاتورة ضريبية <?php echo htmlspecialchars((string)$openInv['serial_no']); ?></h5></div>
     <div class="card-body">
         <div class="table-container">
-        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <table class="alltables display nowrap ti-w100" data-no-dt="1">
             <tbody>
             <tr><th>البائع</th><td><?php echo htmlspecialchars((string)($fields['seller_name'] ?? '—')); ?>
                 — رقمٌ ضريبيٌّ: <?php echo htmlspecialchars((string)($fields['seller_tax_no'] ?? '—')); ?></td></tr>
@@ -201,10 +205,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
 
         <?php if ($invLines): ?>
-        <h6 style="margin-top:14px"><i class="fa fa-list-ol"></i> أسطرُ المستخلص ببند بيعها
-            <small style="color:#666">(تُقرأ من مصدرها الحي — والفاتورةُ لا تخزّن أسطرًا)</small></h6>
+        <h6 class="ti-mt14"><i class="fa fa-list-ol"></i> أسطرُ المستخلص ببند بيعها
+            <small class="ti-muted">(تُقرأ من مصدرها الحي — والفاتورةُ لا تخزّن أسطرًا)</small></h6>
         <div class="table-container">
-        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <table class="alltables display nowrap ti-w100" data-no-dt="1">
             <thead><tr><th>بند البيع</th><th>تاريخ الاستحقاق</th><th>المعدة</th><th>وحدة القياس</th>
                 <th>الكمية المفوترة</th><th>سعر الوحدة</th><th>القيمة</th></tr></thead>
             <tbody>
@@ -230,22 +234,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </table>
         </div>
         <?php endif; ?>
-        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap">
+        <div class="ti-actions">
             <button type="button" class="btn-primary" onclick="window.print()"><i class="fa fa-print"></i> الطباعة الرسمية</button>
             <a class="btn-primary" href="notes.php?invoice_no=<?php echo rawurlencode((string)$openInv['serial_no']); ?>">
                 <i class="fa fa-file-circle-plus"></i> إشعار دائن/مدين (التصحيح)</a>
         </div>
 
         <?php if ($can_edit && (string)$openInv['state'] === 'issued'): ?>
-        <form method="post" class="ems-form" style="margin-top:14px">
+        <form method="post" class="ems-form ti-mt14">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="ti_action" value="cancel">
             <input type="hidden" name="invoice_id" value="<?php echo intval($openInv['id']); ?>">
             <div class="form-grid">
-                <div class="form-group"><label for="emsf_122_ab841">سبب الإلغاء الضريبي <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_122_ab841">سبب الإلغاء الضريبي <span class="ti-req">*</span></label>
                     <input type="text" name="cancel_reason" maxlength="255" required id="emsf_122_ab841"></div>
             </div>
-            <p style="color:#a15c00">الإلغاءُ لا يمحو صفًّا و<strong>لا يُعيد استعمال رقمه</strong> —
+            <p class="ti-warn">الإلغاءُ لا يمحو صفًّا و<strong>لا يُعيد استعمال رقمه</strong> —
                 والتصحيحُ العاديُّ <strong>بإشعار</strong> لا بإلغاء.</p>
             <div><button type="submit" class="btn-primary"><i class="fa fa-ban"></i> ألغِ ضريبيًّا</button></div>
         </form>
@@ -255,5 +259,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 </div>
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
+<style>
+    /* UXW-01 ①+②: الأنماطُ الموضعيةُ صارت أصنافًا والألوانُ من الرموز — القيمُ ذاتُها بلا style= */
+    .ti-note { color:var(--c-666, #666); }
+    .ti-muted { color:var(--c-666, #666); }
+    .ti-w100 { width:100%; }
+    .ti-mt14 { margin-top:14px; }
+    .ti-actions { margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; }
+    .ti-req { color:var(--c-c00, #c00); }
+    .ti-warn { color:var(--c-a15c00, #a15c00); }
+</style>
 </body>
 </html>

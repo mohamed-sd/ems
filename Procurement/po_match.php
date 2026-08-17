@@ -9,7 +9,7 @@
  *   · «تسجيل فاتورة ومطابقة» يستدعي proc_match_invoice (الأمر × الاستلام
  *     × الفاتورة): ضمن السماح → matched + دَينُ المورد؛ فوقه → var_pending
  *     بلا دَينٍ حتى قرار (UX-09 §8.2 «لا استحقاقَ بلا مطابقة»)
- *   · الشاشة مسجَّلة في modules (#255) — الحارس خادميٌّ لا واجهة (M-14)
+ *   · الشاشة مسجَّلة في modules (السجل رقم 255) — الحارس خادميٌّ لا واجهة (M-14)
  * الإجراء نفسُه متاح من شاشة الأمر (orders_proc?edit_id) — محرّكٌ واحدٌ للقناتين.
  */
 require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
@@ -220,10 +220,10 @@ if (isset($_GET['match_id']) && $can_edit) {
 
 $badge = function ($state) {
     switch ($state) {
-        case 'matched':     return '<span style="color:#1a7f37;font-weight:700">مطابَق ✔</span>';
-        case 'var_pending': return '<span style="color:#b35900;font-weight:700">فرقٌ معلَّق ⚠</span>';
-        case 'rejected':    return '<span style="color:#b3261e;font-weight:700">فاتورةٌ مرفوضة ✖</span>';
-        default:            return '<span style="color:#888">لم تُسجَّل فاتورة</span>';
+        case 'matched':     return '<span class="pom-badge-ok">مطابَق ✔</span>';
+        case 'var_pending': return '<span class="pom-badge-warn">فرقٌ معلَّق ⚠</span>';
+        case 'rejected':    return '<span class="pom-badge-danger">فاتورةٌ مرفوضة ✖</span>';
+        default:            return '<span class="pom-badge-muted">لم تُسجَّل فاتورة</span>';
     }
 };
 
@@ -243,14 +243,32 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
-<div class="main proc-match-main ems-unified-page-shell">
+<div class="main proc-match-main ems-unified-page-shell ems-doc-cycle">
     <?php
     $header_title = 'مطابقة الفاتورة بالأمر والاستلام';
     $header_icon  = 'fa fa-scale-balanced';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    /* الدورةُ المستندية (بوابة ١٢): الخطوةُ التاليةُ بعد الاستلام — المطابقةُ ثم حسمُ الفرقِ إن ظهر */
+    echo ems_next_step('تسجيلُ فاتورةِ الموردِ ومطابقتُها — وحسمُ الفرقِ إن ظهر');
+    /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */
+    echo ems_states_bundle('لا أوامرَ شراءٍ بلغت طورَ المطابقة',
+        'يظهر الأمرُ هنا بعد تسجيلِ الاستلام — سجِّلِ الاستلامَ ثم طابِقْ فاتورةَ المورد');
     ?>
+    <style>
+        .pom-badge-ok { color: var(--c-state-ok-deep); font-weight: 700; }
+        .pom-badge-warn { color: var(--c-badge-warning-b); font-weight: 700; }
+        .pom-badge-danger { color: var(--c-state-danger-deep); font-weight: 700; }
+        .pom-badge-muted { color: var(--c-s-888); }
+        .pom-meta { margin: 0 0 10px; }
+        .pom-var-amount { color: var(--c-badge-warning-b); }
+        .pom-span-full { grid-column: 1 / -1; }
+        .pom-w100 { width: 100%; }
+        .pom-act-btn { padding: 4px 10px; }
+        .pom-act-btn-warn { background: var(--c-badge-warning-b); }
+        .pom-act-gap { margin-inline-start: 4px; }
+    </style>
 
     <?php proc_msg_banner(); ?>
 
@@ -269,7 +287,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="action" value="match_invoice">
             <input type="hidden" name="order_id" value="<?php echo $oid; ?>">
             <div class="form-section">
-                <p style="margin:0 0 10px">
+                <p class="pom-meta">
                     المورد: <strong><?php echo htmlspecialchars(isset($sup_map[intval($match_order['supplier_id'])]) ? $sup_map[intval($match_order['supplier_id'])] : '—'); ?></strong>
                     · الكمية بالأمر <strong><?php echo number_format($oQty, 2); ?></strong>
                     · المستلَمة <strong><?php echo number_format($rQty, 2); ?></strong>
@@ -280,23 +298,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="emsf_419_9d561">رقم فاتورة المورد <span class="required">*</span></label>
-                        <input type="text" name="invoice_no" required
-                               value="<?php echo htmlspecialchars((string) ($match_order['invoice_no'] ?? '')); ?>" id="emsf_419_9d561">
+                        <input type="text" name="invoice_no" required id="emsf_419_9d561"
+                               value="<?php echo htmlspecialchars((string) ($match_order['invoice_no'] ?? '')); ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_420_dfa98">تاريخ الفاتورة</label>
-                        <input type="date" name="invoice_date"
-                               value="<?php echo htmlspecialchars((string) ($match_order['invoice_date'] ?? '')); ?>" id="emsf_420_dfa98">
+                        <input type="date" name="invoice_date" id="emsf_420_dfa98"
+                               value="<?php echo htmlspecialchars((string) ($match_order['invoice_date'] ?? '')); ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_421_08b7b">قيمة الفاتورة (إجمالي) <span class="required">*</span></label>
-                        <input type="number" step="0.01" min="0.01" name="invoice_amount" required
-                               value="<?php echo htmlspecialchars((string) ($match_order['invoice_amount'] ?? '')); ?>" id="emsf_421_08b7b">
+                        <input type="number" step="0.01" min="0.01" name="invoice_amount" required id="emsf_421_08b7b"
+                               value="<?php echo htmlspecialchars((string) ($match_order['invoice_amount'] ?? '')); ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_422_1bb58">الضريبة ضمن القيمة <small>(تُفصل — المطابقة على الصافي)</small></label>
-                        <input type="number" step="0.01" min="0" name="invoice_tax"
-                               value="<?php echo htmlspecialchars((string) ($match_order['tax_amount'] ?? '0')); ?>" id="emsf_422_1bb58">
+                        <input type="number" step="0.01" min="0" name="invoice_tax" id="emsf_422_1bb58"
+                               value="<?php echo htmlspecialchars((string) ($match_order['tax_amount'] ?? '0')); ?>">
                     </div>
                 </div>
             </div>
@@ -321,11 +339,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="action" value="resolve_variance">
             <input type="hidden" name="order_id" value="<?php echo $rid; ?>">
             <div class="form-section">
-                <p style="margin:0 0 10px">
+                <p class="pom-meta">
                     فاتورة <strong><?php echo htmlspecialchars((string) $resolve_order['invoice_no']); ?></strong>
                     بقيمة <strong><?php echo number_format($rInv, 2); ?></strong>
                     مقابل أمرٍ بقيمة <strong><?php echo number_format($rAmt, 2); ?></strong>
-                    — الفرق <strong style="color:#b35900"><?php echo number_format($rInv - $rAmt, 2); ?></strong>
+                    — الفرق <strong class="pom-var-amount"><?php echo number_format($rInv - $rAmt, 2); ?></strong>
                 </p>
                 <div class="form-grid">
                     <div class="form-group">
@@ -336,7 +354,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <option value="رفض الفاتورة">رفض الفاتورة — لا ذمّة، وتسجيل فاتورة بديلة متاح</option>
                         </select>
                     </div>
-                    <div class="form-group" style="grid-column:1/-1">
+                    <div class="form-group pom-span-full">
                         <label for="emsf_424_beb57">تفسير القرار <span class="required">*</span> <small>(لا حسمَ بلا تفسير — يُختم باسمك ولحظته)</small></label>
                         <input type="text" name="reason" required maxlength="255" id="emsf_424_beb57">
                     </div>
@@ -352,7 +370,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="procTable" class="display nowrap alltables" style="width:100%;">
+            <table id="procTable" class="display nowrap alltables pom-w100">
                 <thead><tr>
                     <th>الإجراءات</th>
                     <th>أمر الشراء</th>
@@ -399,12 +417,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <tr>
                         <td>
                             <?php if ($can_edit && (string) $po['match_state'] === 'var_pending'): ?>
-                                <a href="po_match.php?resolve_id=<?php echo $oid; ?>" class="add-btn" style="padding:4px 10px;background:#b35900"
+                                <a href="po_match.php?resolve_id=<?php echo $oid; ?>" class="add-btn pom-act-btn pom-act-btn-warn"
                                    title="حسم الفرق بقرار موثق"><i class="fas fa-gavel"></i> حسم الفرق</a>
-                                <a href="po_match.php?match_id=<?php echo $oid; ?>" style="margin-inline-start:4px"
+                                <a href="po_match.php?match_id=<?php echo $oid; ?>" class="pom-act-gap"
                                    title="إعادة المطابقة بفاتورة معدلة">إعادة المطابقة</a>
                             <?php elseif ($can_edit && $matchable): ?>
-                                <a href="po_match.php?match_id=<?php echo $oid; ?>" class="add-btn" style="padding:4px 10px"
+                                <a href="po_match.php?match_id=<?php echo $oid; ?>" class="add-btn pom-act-btn"
                                    title="تسجيل فاتورة ومطابقة"><i class="fas fa-file-invoice"></i> تسجيل فاتورة</a>
                             <?php else: ?>—<?php endif; ?>
                         </td>

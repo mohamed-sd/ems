@@ -55,19 +55,31 @@ $header_title_html = htmlspecialchars('المخازنُ وأنواعُها', ENT
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+/* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */
+echo ems_states_bundle('لا مستودعاتٍ مسجَّلةً بعد',
+    'تُعرَّف المستودعاتُ وأنواعُها من بياناتِ المشترياتِ المرجعية — فتظهر هنا فورَ تسجيلِها');
 ?>
+  <style>
+    .whx-alert-gap { margin: 10px 0; }
+    .whx-kpi { padding: 10px 14px; margin: 10px 0; border-inline-start: 4px solid var(--c-0d6efd); display: inline-block; }
+    .whx-kpi-label { font-size: .78rem; opacity: .75; }
+    .whx-kpi-value { font-size: 1.4rem; font-weight: 700; }
+    .whx-w100 { width: 100%; }
+    .whx-empty-cell { text-align: center; opacity: .7; }
+    .whx-foot-note { font-size: .8rem; margin-top: 8px; }
+  </style>
   <?php if ($failed): ?>
-  <div class="alert alert-danger" style="margin:10px 0">
+  <div class="alert alert-danger whx-alert-gap">
     <strong>تعذّرت قراءةُ البيانات.</strong>
     فرقٌ بين «لا صفَّ» و«تعذّر السؤال» — وهذه الثانية.
   </div>
   <?php else: ?>
-  <div class="ems-card" style="padding:10px 14px;margin:10px 0;border-inline-start:4px solid #0d6efd;display:inline-block">
-    <div style="font-size:.78rem;opacity:.75">صفوفٌ معروضة</div>
-    <div style="font-size:1.4rem;font-weight:700"><?php echo number_format(count($rows)); ?></div>
+  <div class="ems-card whx-kpi">
+    <div class="whx-kpi-label">صفوفٌ معروضة</div>
+    <div class="whx-kpi-value"><?php echo number_format(count($rows)); ?></div>
   </div>
   <div class="card"><div class="card-body table-responsive">
-    <table class="table table-sm table-striped" style="width:100%">
+    <table class="table table-sm table-striped whx-w100">
       <thead><tr>
         <th>الرمز</th>
         <th>المخزن</th>
@@ -79,7 +91,7 @@ include __DIR__ . '/../includes/page_header.php';
       </tr></thead>
       <tbody>
       <?php if (!$rows): ?>
-        <tr><td colspan="99" style="text-align:center;opacity:.7">لا صفَّ مسجَّلٌ بعد.</td></tr>
+        <tr><td colspan="99" class="whx-empty-cell">لا صفَّ مسجَّلٌ بعد.</td></tr>
       <?php else: foreach ($rows as $x): ?>
         <tr>
           <td><?php echo htmlspecialchars((string) $x['code'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -93,7 +105,7 @@ include __DIR__ . '/../includes/page_header.php';
       <?php endforeach; endif; ?>
       </tbody>
     </table>
-    <p class="text-muted" style="font-size:.8rem;margin-top:8px">
+    <p class="text-muted whx-foot-note">
       قراءةٌ محضة — سجلُّ المخازنِ المرجعيّ — والإضافةُ والتعديلُ من بياناتِ المشترياتِ المرجعية، فمسارا تعريفٍ يتفرّقان أسوأُ من شاشةٍ ناقصة. وأحدثُ 500 صفٍّ.
     </p>
   </div></div>

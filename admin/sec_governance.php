@@ -174,28 +174,33 @@ include '../insidebar.php';
               'الحراس السبعة عشر تُقرأ سياساتهم ولا تُستثنى'));
 
     if ($msg !== '') { echo '<div class="alert alert-info">' . htmlspecialchars($msg) . '</div>'; }
+
+    /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
+    echo ems_states_bundle('لا بياناتِ حوكمةِ صلاحياتٍ ضمن نطاقك بعدُ',
+        'اللوحةُ تُقاس من سجلاتِ الاستثناءاتِ والتكليفاتِ والحراسِ الحيّة');
     ?>
 
     <div class="card"><div class="card-header"><h5>① لوحة الحوكمة</h5></div>
-    <div class="card-body" style="display:flex;gap:14px;flex-wrap:wrap">
-        <div class="badge badge-warning" style="font-size:14px;padding:8px 14px">استثناءات منتهية: <strong><?php echo intval($board['expired_ex']); ?></strong></div>
-        <div class="badge badge-secondary" style="font-size:14px;padding:8px 14px">تكليفات منقضية: <strong><?php echo intval($board['ended_asg']); ?></strong></div>
-        <div class="badge badge-danger" style="font-size:14px;padding:8px 14px">محاولات مرفوضة (7 أيام): <strong><?php echo intval($board['denials']); ?></strong></div>
-        <div class="badge badge-danger" style="font-size:14px;padding:8px 14px">كسر زجاج نشط: <strong><?php echo intval($board['bg_active']); ?></strong></div>
+    <div class="card-body secg-flexwrap">
+        <div class="badge badge-warning secg-kpi">استثناءات منتهية: <strong><?php echo intval($board['expired_ex']); ?></strong></div>
+        <div class="badge badge-secondary secg-kpi">تكليفات منقضية: <strong><?php echo intval($board['ended_asg']); ?></strong></div>
+        <div class="badge badge-danger secg-kpi">محاولات مرفوضة (7 أيام): <strong><?php echo intval($board['denials']); ?></strong></div>
+        <div class="badge badge-danger secg-kpi">كسر زجاج نشط: <strong><?php echo intval($board['bg_active']); ?></strong></div>
     </div></div>
 
     <div class="card"><div class="card-header"><h5>⑦ التقارير — لماذا يملك فلان هذه الصلاحية؟</h5></div>
     <div class="card-body">
-        <form method="post" class="allforms allforms-visible" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+        <form method="post" class="allforms allforms-visible secg-form-inline">
             <input type="hidden" name="gov_action" value="explain">
             <div class="form-group"><label for="emsf_696_6318c">الشخص</label>
                 <select name="person_id" id="emsf_696_6318c"><?php foreach ($usersList as $u) { echo '<option value="' . intval($u['id']) . '"' . (isset($_POST['person_id']) && intval($_POST['person_id']) === intval($u['id']) ? ' selected' : '') . '>' . htmlspecialchars($u['name']) . '</option>'; } ?></select></div>
-            <div class="form-group"><label for="emsf_697_c288a">الصلاحية</label><input type="text" name="permission_code" value="<?php echo htmlspecialchars($_POST['permission_code'] ?? ''); ?>" placeholder="unit.approve" required id="emsf_697_c288a"></div>
-            <div class="form-group"><label for="emsf_698_d6fe5">النطاق</label><input type="text" name="scope" value="<?php echo htmlspecialchars($_POST['scope'] ?? ''); ?>" placeholder="site:18" required id="emsf_698_d6fe5"></div>
+            <!-- UXW-01 ⑥: السماتُ الثابتةُ (id·placeholder) قبل value المضمَّنةِ بـPHP — فخُّ ?> يبتر الوسم -->
+            <div class="form-group"><label for="emsf_697_c288a">الصلاحية</label><input type="text" name="permission_code" id="emsf_697_c288a" placeholder="unit.approve" required value="<?php echo htmlspecialchars($_POST['permission_code'] ?? ''); ?>"></div>
+            <div class="form-group"><label for="emsf_698_d6fe5">النطاق</label><input type="text" name="scope" id="emsf_698_d6fe5" placeholder="site:18" required value="<?php echo htmlspecialchars($_POST['scope'] ?? ''); ?>"></div>
             <button type="submit" class="btn-primary">فسّر</button>
         </form>
         <?php if ($explainResult !== null): ?>
-        <pre style="direction:ltr;text-align:left;background:#f7f7f7;padding:12px;border-radius:8px;max-height:320px;overflow:auto"><?php
+        <pre class="secg-json"><?php
             echo htmlspecialchars(json_encode($explainResult, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT)); ?></pre>
         <?php endif; ?>
     </div></div>
@@ -203,7 +208,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-header"><h5>④ الاعتماد — طلبات تغيير الصلاحيات</h5></div>
     <div class="card-body">
         <?php if (!$pcrs) { ems_state_empty('لا طلبات تنتظر — نظيف ✨'); } else { ?>
-        <div class="table-container"><table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <div class="table-container"><table class="alltables display nowrap secg-w100" data-no-dt="1">
             <thead><tr><th>#</th><th>الشخص</th><th>نوع الفحص</th><th>المخاطرة</th><th>السبب</th><th>الباقي</th><th>الحالة</th><th></th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم المراجعة</th>
@@ -231,12 +236,12 @@ include '../insidebar.php';
                     <td><?php echo htmlspecialchars($x['state']); ?></td>
                     <td>
                     <?php if ($can_edit && $x['state'] === 'pending'): ?>
-                        <form method="post" style="display:inline"><input type="hidden" name="gov_action" value="decide_pcr">
+                        <form method="post" class="secg-inline"><input type="hidden" name="gov_action" value="decide_pcr">
                             <input type="hidden" name="req_id" value="<?php echo intval($x['req_id']); ?>">
                             <input type="hidden" name="decision" value="approve">
                             <button class="btn-primary" type="submit">أوافق (بدوري)</button></form>
                     <?php elseif ($can_edit && $x['state'] === 'approved'): ?>
-                        <form method="post" style="display:inline"><input type="hidden" name="gov_action" value="apply_pcr">
+                        <form method="post" class="secg-inline"><input type="hidden" name="gov_action" value="apply_pcr">
                             <input type="hidden" name="req_id" value="<?php echo intval($x['req_id']); ?>">
                             <button class="btn-primary" type="submit">طبّق</button></form>
                     <?php endif; ?>
@@ -247,19 +252,19 @@ include '../insidebar.php';
     </div></div>
 
     <div class="card"><div class="card-header"><h5>⑤ المتابعة — الخامل والمنتهي وبلا مصدر</h5></div>
-    <div class="card-body" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
-        <div><strong>خامل 90 يومًا (<?php echo count($dormant); ?>)</strong><ul style="max-height:160px;overflow:auto">
-            <?php foreach ($dormant as $d) { echo '<li>' . htmlspecialchars($d['name']) . '</li>'; } if (!$dormant) { echo '<li style="color:#888">لا خامل</li>'; } ?></ul></div>
-        <div><strong>ينتهي خلال 30 يومًا (<?php echo count($expiring); ?>)</strong><ul style="max-height:160px;overflow:auto">
-            <?php foreach ($expiring as $e) { echo '<li>' . htmlspecialchars($e['kind'] . ' #' . $e['id'] . ' — ' . $e['code'] . ' · ' . $e['ts']) . '</li>'; } if (!$expiring) { echo '<li style="color:#888">لا شيء</li>'; } ?></ul></div>
-        <div><strong>صلاحيات بلا مصدر (<?php echo count($orphans); ?>)</strong><ul style="max-height:160px;overflow:auto">
-            <?php foreach ($orphans as $o) { echo '<li>دور ' . intval($o['role_id']) . ' → موديول محذوف</li>'; } if (!$orphans) { echo '<li style="color:#888">صفر — كل صلاحية لها مصدر</li>'; } ?></ul></div>
+    <div class="card-body secg-grid3">
+        <div><strong>خامل 90 يومًا (<?php echo count($dormant); ?>)</strong><ul class="secg-scroll-list">
+            <?php foreach ($dormant as $d) { echo '<li>' . htmlspecialchars($d['name']) . '</li>'; } if (!$dormant) { echo '<li class="secg-muted">لا خامل</li>'; } ?></ul></div>
+        <div><strong>ينتهي خلال 30 يومًا (<?php echo count($expiring); ?>)</strong><ul class="secg-scroll-list">
+            <?php foreach ($expiring as $e) { echo '<li>' . htmlspecialchars($e['kind'] . ' #' . $e['id'] . ' — ' . $e['code'] . ' · ' . $e['ts']) . '</li>'; } if (!$expiring) { echo '<li class="secg-muted">لا شيء</li>'; } ?></ul></div>
+        <div><strong>صلاحيات بلا مصدر (<?php echo count($orphans); ?>)</strong><ul class="secg-scroll-list">
+            <?php foreach ($orphans as $o) { echo '<li>دور ' . intval($o['role_id']) . ' → موديول محذوف</li>'; } if (!$orphans) { echo '<li class="secg-muted">صفر — كل صلاحية لها مصدر</li>'; } ?></ul></div>
     </div></div>
 
     <div class="card"><div class="card-header"><h5>⑥ الإغلاق — المراجعة الدورية ووضع التأسيس</h5></div>
     <div class="card-body">
         <?php if ($can_edit): ?>
-        <form method="post" class="allforms allforms-visible" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+        <form method="post" class="allforms allforms-visible secg-form-inline">
             <input type="hidden" name="gov_action" value="open_cycle">
             <div class="form-group"><label for="emsf_699_5d543">الوحدة</label>
                 <select name="org_unit_id" id="emsf_699_5d543"><?php foreach ($units as $u) { echo '<option value="' . intval($u['unit_id']) . '">' . htmlspecialchars($u['name_ar']) . '</option>'; } ?></select></div>
@@ -269,34 +274,34 @@ include '../insidebar.php';
             <button type="submit" class="btn-primary">افتح مراجعة نصف سنوية</button>
         </form>
         <?php endif; ?>
-        <div class="table-container"><table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <div class="table-container"><table class="alltables display nowrap secg-w100" data-no-dt="1">
             <thead><tr><th>الدورة</th><th>الوحدة</th><th>الفترة</th><th>المهلة</th><th>بنود بلا قرار</th><th>الحالة</th></tr></thead>
             <tbody><?php foreach ($cycles as $c) {
                 echo '<tr><td>' . intval($c['cycle_id']) . '</td><td>' . htmlspecialchars($c['unit_name'])
                     . '</td><td>' . htmlspecialchars($c['period']) . '</td><td>' . htmlspecialchars($c['due_at'])
                     . '</td><td>' . intval($c['open_lines']) . '</td><td>' . htmlspecialchars($c['state']) . '</td></tr>';
             } ?></tbody></table></div>
-        <div style="margin-top:10px">
+        <div class="secg-mt10">
             <?php foreach ($founding as $f) {
-                echo '<span class="badge ' . (intval($f['enabled']) ? 'badge-danger' : 'badge-secondary') . '" style="font-size:13px;padding:6px 12px;margin-inline-end:8px">وضع '
+                echo '<span class="badge ' . (intval($f['enabled']) ? 'badge-danger' : 'badge-secondary') . ' secg-founding">وضع '
                     . htmlspecialchars($f['mode']) . ': ' . (intval($f['enabled']) ? ('مفعَّل حتى ' . $f['ends_at']) : 'مطفأ') . '</span>';
             } ?>
         </div>
     </div></div>
 
     <div class="card"><div class="card-header"><h5>⑧ الإعدادات — القوالب والحراس</h5></div>
-    <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div class="card-body secg-grid2">
         <div><strong>القوالب بأصنافها</strong>
-            <div class="table-container"><table class="alltables" style="width:100%" data-no-dt="1">
+            <div class="table-container"><table class="alltables secg-w100" data-no-dt="1">
             <thead><tr><th>الصنف</th><th>عدد الحسابات المتأثرة</th><th>منشور</th></tr></thead>
             <tbody><?php foreach ($tplStats as $t) {
                 echo '<tr><td>' . htmlspecialchars($t['tpl_kind']) . '</td><td>' . intval($t['total']) . '</td><td>' . intval($t['published']) . '</td></tr>';
             } ?></tbody></table></div></div>
         <div><strong>الحراس السبعة عشر — الاسم يصف السياسة</strong>
-            <ul style="max-height:220px;overflow:auto">
+            <ul class="secg-scroll-list secg-scroll-list-lg">
             <?php foreach ($guards as $g) {
-                $c = $g['overridable'] === 'never' ? '#c0392b' : ($g['overridable'] === 'break_glass_only' ? '#e67e22' : '#2980b9');
-                echo '<li><span style="color:' . $c . '">●</span> ' . htmlspecialchars($g['name_ar']) . ' <small>(' . htmlspecialchars($g['overridable']) . ')</small></li>';
+                $c = $g['overridable'] === 'never' ? 'secg-dot-never' : ($g['overridable'] === 'break_glass_only' ? 'secg-dot-bg' : 'secg-dot-comp');
+                echo '<li><span class="' . $c . '">●</span> ' . htmlspecialchars($g['name_ar']) . ' <small>(' . htmlspecialchars($g['overridable']) . ')</small></li>';
             } ?></ul></div>
     </div></div>
 
@@ -309,6 +314,34 @@ include '../insidebar.php';
     </div></div>
 </div>
 
+<style>
+    /* UXW-01 ①+②: أصنافٌ محلَّ الأنماطِ الموضعية — والألوانُ برموزِ اللوحة
+       (ما لا رمزَ حرفيًّا له يُعلَن باسمِ قيمتِه مع قيمتِه الاحتياطيةِ حرفًا بحرف) */
+    .secg-flexwrap { display: flex; gap: 14px; flex-wrap: wrap; }
+    .secg-kpi { font-size: 14px; padding: 8px 14px; }
+    .secg-form-inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+    .secg-json {
+        direction: ltr;
+        text-align: left;
+        background: var(--c-f7f7f7);
+        padding: 12px;
+        border-radius: 8px;
+        max-height: 320px;
+        overflow: auto;
+    }
+    .secg-w100 { width: 100%; }
+    .secg-inline { display: inline; }
+    .secg-grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .secg-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .secg-scroll-list { max-height: 160px; overflow: auto; }
+    .secg-scroll-list-lg { max-height: 220px; }
+    .secg-muted { color: var(--c-s-888); }
+    .secg-mt10 { margin-top: 10px; }
+    .secg-founding { font-size: 13px; padding: 6px 12px; margin-inline-end: 8px; }
+    .secg-dot-never { color: var(--c-c0392b); }
+    .secg-dot-bg { color: var(--c-e67e22, #e67e22); }
+    .secg-dot-comp { color: var(--c-s-2980b9); }
+</style>
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 </body>
 </html>

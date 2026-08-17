@@ -505,9 +505,12 @@ function mnt_seg_kind($c) {
 ?>
 <div class="main mnt-inspections-main ems-unified-page-shell">
 
+    <?php // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
+    echo ems_states_bundle('لا فحوصَ دوريةً مسجَّلةً في نطاقك', 'أنشئ تفتيشًا جديدًا أو عدِّل تصفيةَ الحالة'); ?>
+
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
-        <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>" style="margin-bottom:12px;">
+        <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?> mnt-mb12">
             <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
             <?php echo htmlspecialchars($_GET['msg']); ?>
         </div>
@@ -553,14 +556,14 @@ function mnt_seg_kind($c) {
     $can_show_gen = ($can_gen_order && $locked && $ins_has_equipment && $cnt_crit > 0 && !$ins_order_active);
 ?>
     <?php
-    $header_title_html = 'تفتيش: <strong>' . htmlspecialchars((string) $ins['code']) . '</strong> <span class="action-btn">' . htmlspecialchars($st) . '</span>' . ($tpl ? ' <span class="action-btn" style="background:#eef4fb;color:#1f4f7a;">' . htmlspecialchars((string) $tpl['name']) . '</span>' : '');
+    $header_title_html = 'تفتيش: <strong>' . htmlspecialchars((string) $ins['code']) . '</strong> <span class="action-btn">' . htmlspecialchars($st) . '</span>' . ($tpl ? ' <span class="action-btn mnt-tpl-badge">' . htmlspecialchars((string) $tpl['name']) . '</span>' : '');
     $header_icon = 'fa fa-clipboard-check';
     $header_actions = array();
     $header_actions[] = array('id' => 'toggleInspForm', 'class' => 'add-btn', 'icon' => 'fas fa-pen-to-square', 'label' => 'أعلى الصفحة');
     if ($can_show_gen) {
         // فورمٌ مصغَّرٌ داخل رأس الصفحة (رمزُ CSRF يُحقن مركزيًّا — لا يُضاف يدويًّا).
         $header_actions[] = array('raw' =>
-            '<form method="post" action="" style="display:inline" '
+            '<form method="post" action="" class="mnt-inline-form" '
             . 'onsubmit="return confirm(\'توليد أمر صيانة من هذا التفتيش (' . $cnt_crit . ' بندًا حرجًا)؟\');">
         <?= csrf_field() ?>'
             . '<input type="hidden" name="action" value="generate_order">'
@@ -588,7 +591,7 @@ function mnt_seg_kind($c) {
         <div class="card"><div class="card-body">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="emsf_280_3cbf1">نوع التفتيش</label>
-                    <input type="text" value="<?php echo htmlspecialchars((string) $ins['inspection_type']); ?>" readonly id="emsf_280_3cbf1">
+                    <input type="text" id="emsf_280_3cbf1" readonly value="<?php echo htmlspecialchars((string) $ins['inspection_type']); ?>">
                     <input type="hidden" name="inspection_type" value="<?php echo htmlspecialchars((string) $ins['inspection_type'], ENT_QUOTES); ?>">
                 </div>
 
@@ -599,7 +602,7 @@ function mnt_seg_kind($c) {
                     </select>
                 </div>
                 <div class="form-group"><label for="emsf_282_33223">المعدة</label>
-                    <select name="equipment_id" class="mnt-eq" data-selected="<?php echo intval($ins['equipment_id']); ?>" id="emsf_282_33223"><option value="">— اختر المشروع أولاً —</option>
+                    <select name="equipment_id" class="mnt-eq" id="emsf_282_33223" data-selected="<?php echo intval($ins['equipment_id']); ?>"><option value="">— اختر المشروع أولاً —</option>
                         <?php foreach ($equipments as $e) echo mnt_opt($e['id'], $e['name'] . (!empty($e['code']) ? ' (' . $e['code'] . ')' : ''), intval($ins['equipment_id']) === intval($e['id'])); ?>
                     </select>
                 </div>
@@ -611,7 +614,7 @@ function mnt_seg_kind($c) {
                 </div>
                 <?php else: // external ?>
                 <div class="form-group"><label for="emsf_284_725c7">المعدة المعروضة (وصف)</label>
-                    <input type="text" name="external_equipment" value="<?php echo htmlspecialchars((string) ($ins['external_equipment'] ?? '')); ?>" placeholder="النوع/الماركة/الموديل" id="emsf_284_725c7">
+                    <input type="text" name="external_equipment" id="emsf_284_725c7" placeholder="النوع/الماركة/الموديل" value="<?php echo htmlspecialchars((string) ($ins['external_equipment'] ?? '')); ?>">
                 </div>
                 <div class="form-group"><label for="emsf_285_d0a7b">المالك / البائع</label>
                     <select name="supplier_id" id="emsf_285_d0a7b"><option value="">— اختر —</option>
@@ -626,7 +629,7 @@ function mnt_seg_kind($c) {
                     </select>
                 </div>
                 <div class="form-group"><label for="emsf_287_047a0">تاريخ التفتيش</label>
-                    <input type="date" name="scheduled_date" value="<?php echo htmlspecialchars((string) $ins['scheduled_date']); ?>" id="emsf_287_047a0">
+                    <input type="date" name="scheduled_date" id="emsf_287_047a0" value="<?php echo htmlspecialchars((string) $ins['scheduled_date']); ?>">
                 </div>
                 <div class="form-group"><label for="scoreReadout">الدرجة (تُحسب تلقائيًا)</label>
                     <input type="text" id="scoreReadout" value="<?php echo $cnt_app > 0 ? $cnt_score . '%' : '—'; ?>" readonly>
@@ -637,7 +640,7 @@ function mnt_seg_kind($c) {
                     </select>
                 </div>
                 <div class="form-group"><label for="emsf_289_f702c">النتيجة العامة</label>
-                    <input type="text" name="overall_result" value="<?php echo htmlspecialchars((string) $ins['overall_result']); ?>" id="emsf_289_f702c">
+                    <input type="text" name="overall_result" id="emsf_289_f702c" value="<?php echo htmlspecialchars((string) $ins['overall_result']); ?>">
                 </div>
                 <div class="form-group"><label for="emsf_290_56253">حالة المعدة (تُكتب للكرت عند الإكمال)</label>
                     <select name="equipment_condition" id="emsf_290_56253"><option value="">-- اختر --</option>
@@ -675,7 +678,7 @@ function mnt_seg_kind($c) {
             </div>
             <div class="card-body">
                 <?php if (!$locked && $can_edit): ?>
-                <div class="mnt-line-form" id="lineForm" style="display:none;">
+                <div class="mnt-line-form mnt-hidden" id="lineForm">
                     <div class="mnt-line-grid">
                         <div class="form-group"><label for="xl_component">البند</label><input type="text" id="xl_component" placeholder="بند خارج القالب"></div>
                         <div class="form-group"><label for="xl_condition">الحالة</label><select id="xl_condition"><?php foreach ($scale_opts as $lc) echo mnt_opt($lc, $lc, false); ?></select></div>
@@ -710,9 +713,9 @@ function mnt_seg_kind($c) {
                 </div>
                 <?php endif; ?>
 
-                <div class="table-container"><table class="alltables no-datatable mnt-line-table" id="lineTable" data-kind="<?php echo htmlspecialchars($kind, ENT_QUOTES); ?>" style="width:100%">
+                <div class="table-container"><table class="alltables no-datatable mnt-line-table mnt-w100" id="lineTable" data-no-dt="hard" data-kind="<?php echo htmlspecialchars($kind, ENT_QUOTES); ?>">
                     <thead><tr>
-                        <th>البند</th><th style="min-width:150px">الحالة</th><th>التفاصيل والتوصية</th>
+                        <th>البند</th><th class="mnt-th-state">الحالة</th><th>التفاصيل والتوصية</th>
                         <?php if (!$locked && $can_edit) echo '<th></th>'; ?>
                     </tr></thead>
                     <tbody>
@@ -744,17 +747,17 @@ function mnt_seg_kind($c) {
                             <td class="mnt-detail-cell">
                                 <?php if (!$locked && $can_edit): ?>
                                     <div class="mnt-detail">
-                                        <input type="text" class="mnt-d-measured" name="line[<?php echo intval($l['id']); ?>][measured_value]" value="<?php echo htmlspecialchars((string) ($l['measured_value'] ?? '')); ?>" placeholder="<?php echo $ref !== '' ? 'القيمة المقاسة (الحد: ' . htmlspecialchars($ref, ENT_QUOTES) . ')' : 'القيمة المقاسة'; ?>">
-                                        <input type="text" name="line[<?php echo intval($l['id']); ?>][note]" value="<?php echo htmlspecialchars((string) ($l['note'] ?? '')); ?>" placeholder="ملاحظة" aria-label="ملاحظة">
-                                        <input type="text" name="line[<?php echo intval($l['id']); ?>][recommendation]" value="<?php echo htmlspecialchars((string) ($l['recommendation'] ?? '')); ?>" placeholder="توصية" aria-label="توصية">
-                                        <input type="text" name="line[<?php echo intval($l['id']); ?>][photo_ref]" value="<?php echo htmlspecialchars((string) ($l['photo_ref'] ?? '')); ?>" placeholder="مرجع الصورة (M-34)" aria-label="مرجع الصورة (M-34)">
+                                        <input type="text" class="mnt-d-measured" aria-label="القيمة المقاسة" name="line[<?php echo intval($l['id']); ?>][measured_value]" value="<?php echo htmlspecialchars((string) ($l['measured_value'] ?? '')); ?>" placeholder="<?php echo $ref !== '' ? 'القيمة المقاسة (الحد: ' . htmlspecialchars($ref, ENT_QUOTES) . ')' : 'القيمة المقاسة'; ?>">
+                                        <input type="text" aria-label="ملاحظة" name="line[<?php echo intval($l['id']); ?>][note]" value="<?php echo htmlspecialchars((string) ($l['note'] ?? '')); ?>" placeholder="ملاحظة">
+                                        <input type="text" aria-label="توصية" name="line[<?php echo intval($l['id']); ?>][recommendation]" value="<?php echo htmlspecialchars((string) ($l['recommendation'] ?? '')); ?>" placeholder="توصية">
+                                        <input type="text" aria-label="مرجع الصورة (M-34)" name="line[<?php echo intval($l['id']); ?>][photo_ref]" value="<?php echo htmlspecialchars((string) ($l['photo_ref'] ?? '')); ?>" placeholder="مرجع الصورة (M-34)">
                                     </div>
                                     <?php // M-34: تحويلُ الملاحظة بلاغًا بنقرة — والمحوَّلُ يعرض بلاغَه (الخيطُ بالاتجاهين)
                                     if (!empty($l['converted_ticket_id'])): ?>
                                         <a class="badge badge-success" href="../Tickets/ticket_form.php?id=<?php echo intval($l['converted_ticket_id']); ?>"
                                            title="بلاغُ هذه الملاحظة"><i class="fas fa-tower-observation"></i> بلاغ #<?php echo intval($l['converted_ticket_id']); ?></a>
                                     <?php elseif (trim((string)($l['note'] ?? '')) !== '' || trim((string)($l['recommendation'] ?? '')) !== ''): ?>
-                                        <form method="post" style="display:inline" onsubmit="return confirm('تحويلُ هذه الملاحظة بلاغًا؟')">
+                                        <form method="post" class="mnt-inline-form" onsubmit="return confirm('تحويلُ هذه الملاحظة بلاغًا؟')">
         <?= csrf_field() ?>
                                             <input type="hidden" name="action" value="convert_note_ticket">
                                             <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
@@ -773,7 +776,7 @@ function mnt_seg_kind($c) {
                     <?php endforeach; ?>
                     </tbody>
                 </table></div>
-                <div class="mnt-empty-line" id="lineEmpty" style="<?php echo empty($lines) ? '' : 'display:none'; ?>"><i class="fas fa-list-check"></i><span>لا توجد بنود — اختر نوع تفتيش له قالب</span></div>
+                <div class="mnt-empty-line<?php echo empty($lines) ? '' : ' mnt-hidden'; ?>" id="lineEmpty"><i class="fas fa-list-check"></i><span>لا توجد بنود — اختر نوع تفتيش له قالب</span></div>
 
                 <?php if (count($section_list) > 1): ?>
                 <div class="mnt-tabnav">
@@ -793,7 +796,7 @@ function mnt_seg_kind($c) {
         </div>
 
         <?php if (!$locked && $can_edit): ?>
-        <div class="form-actions" style="margin-top:14px;">
+        <div class="form-actions mnt-mt14">
             <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ التفتيش والبنود</button>
         </div>
         <?php endif; ?>
@@ -832,12 +835,12 @@ function mnt_seg_kind($c) {
                 <div class="form-group hdr-equipment"><label for="emsf_295_6fbe0">المعدة</label>
                     <select name="equipment_id" class="mnt-eq" data-selected="" id="emsf_295_6fbe0"><option value="">— اختر المشروع أولاً —</option></select>
                 </div>
-                <div class="form-group hdr-supplier hdr-external" style="display:none"><label for="emsf_296_3b5ac">المورّد / البائع</label>
+                <div class="form-group hdr-supplier hdr-external mnt-hidden"><label for="emsf_296_3b5ac">المورّد / البائع</label>
                     <select name="supplier_id" id="emsf_296_3b5ac"><option value="">— اختر المورّد —</option>
                         <?php foreach ($suppliers as $sp) echo mnt_opt($sp['id'], $sp['name'], false); ?>
                     </select>
                 </div>
-                <div class="form-group hdr-external" style="display:none"><label for="emsf_297_c9854">المعدة المعروضة (وصف)</label>
+                <div class="form-group hdr-external mnt-hidden"><label for="emsf_297_c9854">المعدة المعروضة (وصف)</label>
                     <input type="text" name="external_equipment" placeholder="النوع/الماركة/الموديل" id="emsf_297_c9854">
                 </div>
                 <div class="form-group"><label for="emsf_298_d4165">الفاحص</label>
@@ -865,7 +868,7 @@ function mnt_seg_kind($c) {
             </div>
         </div>
         <div class="table-container">
-            <table id="mntTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="mntTable" class="display nowrap alltables no-datatable mnt-w100" data-order='[[1, "desc"]]'>
                 <thead><tr><th>الإجراءات</th><th>مرجع التفويض</th><th>نوع الاستمارة</th><th>المعدة/الجهة</th><th>الفاحص</th><th>التاريخ</th><th>درجة الخطورة</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم التفتيش</th>
@@ -988,15 +991,12 @@ function mnt_seg_kind($c) {
 
     $(document).ready(function () {
         if ($('#mntTable').length && $('#filterState').length) {
-            var table = $('#mntTable').DataTable({
-                scrollX: true, autoWidth: false, stateSave: false, order: [[1, 'desc']],
-                dom: 'Bfrtip',
-                buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-                "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-            });
+            // UXW-01 ⑤: تهيئةُ الجدولِ للمكوّنِ المركزيِّ وحدَه (ui-unification.js) —
+            // والترتيبُ الافتراضيُّ معلَنٌ سمةَ data-order على وسمِ الجدول.
             $('#filterState').on('change', function () {
+                if (!$.fn.dataTable || !$.fn.dataTable.isDataTable('#mntTable')) { return; }
                 var v = this.value ? '^' + $.fn.dataTable.util.escapeRegex(this.value) + '$' : '';
-                table.column(7).search(v, true, false).draw();
+                $('#mntTable').DataTable().column(7).search(v, true, false).draw();
             });
         }
 
@@ -1103,13 +1103,13 @@ function mnt_seg_kind($c) {
     // تلوين مباشر (inline + important) يتجاوز أي تعارض في تنسيقات النظام
     function paintBtn(el, active){
         if (active){
-            el.style.setProperty('background', '#C9920E', 'important');
-            el.style.setProperty('color', '#ffffff', 'important');
-            el.style.setProperty('border-color', '#A6790B', 'important');
+            el.style.setProperty('background', 'var(--c-c9920e, #C9920E)', 'important');
+            el.style.setProperty('color', 'var(--white, #ffffff)', 'important');
+            el.style.setProperty('border-color', 'var(--c-a6790b, #A6790B)', 'important');
         } else {
-            el.style.setProperty('background', '#fafafa', 'important');
-            el.style.setProperty('color', '#6b7280', 'important');
-            el.style.setProperty('border-color', '#d9d6cc', 'important');
+            el.style.setProperty('background', 'var(--c-fafafa, #fafafa)', 'important');
+            el.style.setProperty('color', 'var(--c-6b7280, #6b7280)', 'important');
+            el.style.setProperty('border-color', 'var(--c-d9d6cc, #d9d6cc)', 'important');
         }
     }
     function paintSeg($seg){
@@ -1221,50 +1221,58 @@ function mnt_seg_kind($c) {
 })();
 </script>
 <style>
+    /* UXW-01 ①: الألوانُ من الرموزِ حصرًا — الرمزُ الدلاليُّ إن طابق وإلا var(--c-<hex>, <hex>) بردمِ القيمةِ الأصلية */
+    .mnt-inspections-main .mnt-hidden { display:none; }
+    .mnt-inspections-main .mnt-inline-form { display:inline; }
+    .mnt-inspections-main .mnt-mb12 { margin-bottom:12px; }
+    .mnt-inspections-main .mnt-mt14 { margin-top:14px; }
+    .mnt-inspections-main .mnt-w100 { width:100%; }
+    .mnt-inspections-main .mnt-th-state { min-width:150px; }
+    .mnt-inspections-main .mnt-tpl-badge { background:var(--c-eef4fb,#eef4fb); color:var(--c-1f4f7a,#1f4f7a); }
     .mnt-inspections-main .mnt-lines-card { overflow:hidden; }
     .mnt-inspections-main .mnt-lines-card > .card-header.mnt-lines-head {
         display:flex; align-items:center; justify-content:space-between; gap:10px;
-        background:linear-gradient(135deg,#1f4f7a,#2f6fa5); color:#fff; padding:13px 16px; border:none;
+        background:linear-gradient(135deg,var(--c-1f4f7a,#1f4f7a),var(--c-2f6fa5,#2f6fa5)); color:var(--white,#fff); padding:13px 16px; border:none;
     }
-    .mnt-inspections-main .mnt-lines-head h5 { display:flex; align-items:center; gap:8px; margin:0; color:#fff; font-weight:800; font-size:1rem; }
-    .mnt-inspections-main .mnt-lines-head h5 i { color:#ffd98a; }
-    .mnt-inspections-main .mnt-count { display:inline-flex; align-items:center; justify-content:center; min-width:24px; height:24px; padding:0 8px; border-radius:999px; background:rgba(255,255,255,.22); color:#fff; font-size:.76rem; font-weight:800; }
+    .mnt-inspections-main .mnt-lines-head h5 { display:flex; align-items:center; gap:8px; margin:0; color:var(--white,#fff); font-weight:800; font-size:1rem; }
+    .mnt-inspections-main .mnt-lines-head h5 i { color:var(--c-ffd98a,#ffd98a); }
+    .mnt-inspections-main .mnt-count { display:inline-flex; align-items:center; justify-content:center; min-width:24px; height:24px; padding:0 8px; border-radius:999px; background:var(--c-white-22, rgba(255,255,255,.22)); color:var(--white,#fff); font-size:.76rem; font-weight:800; }
     .mnt-inspections-main .mnt-add-toggle {
         display:inline-flex; align-items:center; gap:6px; border:none; cursor:pointer;
-        padding:7px 15px; border-radius:999px; font-weight:800; font-size:.82rem; color:#1a1208;
-        background:linear-gradient(135deg,#E0AE2E,#f5d27e); box-shadow:0 2px 8px rgba(224,174,46,.4); transition:transform .15s, box-shadow .15s;
+        padding:7px 15px; border-radius:999px; font-weight:800; font-size:.82rem; color:var(--c-1a1208,#1a1208);
+        background:linear-gradient(135deg,var(--c-e0ae2e,#E0AE2E),var(--c-f5d27e,#f5d27e)); box-shadow:0 2px 8px var(--c-e0ae2e-40, rgba(224,174,46,.4)); transition:transform .15s, box-shadow .15s;
     }
-    .mnt-inspections-main .mnt-add-toggle:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(224,174,46,.5); }
-    .mnt-inspections-main .mnt-line-form { background:linear-gradient(180deg,#fffdf7,#fbf6ea); border:1px solid var(--bdr,#e7dcc4); border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:inset 0 1px 0 #fff, 0 2px 8px rgba(26,18,8,.05); }
+    .mnt-inspections-main .mnt-add-toggle:hover { transform:translateY(-1px); box-shadow:0 6px 16px var(--c-e0ae2e-50, rgba(224,174,46,.5)); }
+    .mnt-inspections-main .mnt-line-form { background:linear-gradient(180deg,var(--c-fffdf7,#fffdf7),var(--c-fbf6ea,#fbf6ea)); border:1px solid var(--bdr,#e7dcc4); border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:inset 0 1px 0 var(--white,#fff), 0 2px 8px var(--c-1a1208-05, rgba(26,18,8,.05)); }
     .mnt-inspections-main .mnt-line-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; align-items:end; }
     .mnt-inspections-main .mnt-line-grid .form-group { margin:0; }
     .mnt-inspections-main .mnt-line-actions { display:flex; align-items:center; gap:10px; margin-top:14px; flex-wrap:wrap; padding-top:12px; border-top:1px dashed var(--bdr,#e7dcc4); }
     .mnt-inspections-main .mnt-line-cancel { display:inline-flex; align-items:center; gap:6px; cursor:pointer; }
 
     .mnt-inspections-main .mnt-summary { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:14px 0; }
-    .mnt-inspections-main .mnt-stat { display:flex; flex-direction:column; gap:4px; padding:12px 14px; border-radius:14px; background:#f5f6f8; }
-    .mnt-inspections-main .mnt-stat-label { font-size:.78rem; color:#6b7280; font-weight:700; }
+    .mnt-inspections-main .mnt-stat { display:flex; flex-direction:column; gap:4px; padding:12px 14px; border-radius:14px; background:var(--c-f5f6f8,#f5f6f8); }
+    .mnt-inspections-main .mnt-stat-label { font-size:.78rem; color:var(--c-6b7280,#6b7280); font-weight:700; }
     .mnt-inspections-main .mnt-stat-num { font-size:1.5rem; font-weight:800; }
-    .mnt-inspections-main .mnt-stat--ok .mnt-stat-num { color:#15803d; }
-    .mnt-inspections-main .mnt-stat--note .mnt-stat-num { color:#b45309; }
-    .mnt-inspections-main .mnt-stat--crit .mnt-stat-num { color:#b91c1c; }
-    .mnt-inspections-main .mnt-stat--na .mnt-stat-num { color:#6b7280; }
-    .mnt-inspections-main .mnt-stat--score { background:#eef4fb; }
-    .mnt-inspections-main .mnt-stat--score .mnt-stat-num { color:#1f4f7a; }
+    .mnt-inspections-main .mnt-stat--ok .mnt-stat-num { color:var(--c-15803d,#15803d); }
+    .mnt-inspections-main .mnt-stat--note .mnt-stat-num { color:var(--c-b45309,#b45309); }
+    .mnt-inspections-main .mnt-stat--crit .mnt-stat-num { color:var(--c-b91c1c,#b91c1c); }
+    .mnt-inspections-main .mnt-stat--na .mnt-stat-num { color:var(--c-6b7280,#6b7280); }
+    .mnt-inspections-main .mnt-stat--score { background:var(--c-eef4fb,#eef4fb); }
+    .mnt-inspections-main .mnt-stat--score .mnt-stat-num { color:var(--c-1f4f7a,#1f4f7a); }
 
     .mnt-inspections-main .mnt-line-table { width:100%; border-collapse:separate; border-spacing:0; }
-    .mnt-inspections-main .mnt-line-table thead th { background:#f3ede0; color:#6b5d3e; font-weight:800; font-size:.8rem; padding:9px 10px; border-bottom:2px solid #e7dcc4; }
-    .mnt-inspections-main .mnt-line-table tbody td { font-size:.84rem; padding:8px 10px; border-bottom:1px solid #f0e9da; vertical-align:middle; }
-    .mnt-inspections-main .mnt-line-table tbody tr:hover { background:rgba(224,174,46,.05); }
+    .mnt-inspections-main .mnt-line-table thead th { background:var(--c-f3ede0,#f3ede0); color:var(--c-6b5d3e,#6b5d3e); font-weight:800; font-size:.8rem; padding:9px 10px; border-bottom:2px solid var(--c-e7dcc4,#e7dcc4); }
+    .mnt-inspections-main .mnt-line-table tbody td { font-size:.84rem; padding:8px 10px; border-bottom:1px solid var(--c-f0e9da,#f0e9da); vertical-align:middle; }
+    .mnt-inspections-main .mnt-line-table tbody tr:hover { background:var(--c-e0ae2e-05, rgba(224,174,46,.05)); }
     .mnt-inspections-main .mnt-sec-row { cursor:pointer; }
-    .mnt-inspections-main .mnt-sec-row td { background:#eef4fb !important; color:#1f4f7a; font-weight:800; font-size:.84rem; display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .mnt-inspections-main .mnt-sec-row:hover td { background:#e3eefa !important; }
+    .mnt-inspections-main .mnt-sec-row td { background:var(--c-eef4fb,#eef4fb) !important; color:var(--c-1f4f7a,#1f4f7a); font-weight:800; font-size:.84rem; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+    .mnt-inspections-main .mnt-sec-row:hover td { background:var(--c-e3eefa,#e3eefa) !important; }
     .mnt-inspections-main .mnt-sec-toggle { display:inline-flex; align-items:center; gap:8px; }
-    .mnt-inspections-main .mnt-sec-chev { transition:transform .15s; font-size:.72rem; color:#2f6fa5; }
-    .mnt-inspections-main .mnt-sec-meta { font-size:.74rem; font-weight:800; color:#15803d; white-space:nowrap; }
-    .mnt-inspections-main .mnt-sec-meta.has-prob { color:#b45309; }
+    .mnt-inspections-main .mnt-sec-chev { transition:transform .15s; font-size:.72rem; color:var(--c-2f6fa5,#2f6fa5); }
+    .mnt-inspections-main .mnt-sec-meta { font-size:.74rem; font-weight:800; color:var(--c-15803d,#15803d); white-space:nowrap; }
+    .mnt-inspections-main .mnt-sec-meta.has-prob { color:var(--c-b45309,#b45309); }
     .mnt-inspections-main .mnt-item { font-weight:600; min-width:200px; }
-    .mnt-inspections-main .mnt-hint { font-size:.72rem; color:#9a8f78; margin-top:4px; font-weight:600; }
+    .mnt-inspections-main .mnt-hint { font-size:.72rem; color:var(--c-9a8f78,#9a8f78); margin-top:4px; font-weight:600; }
     .mnt-inspections-main .mnt-detail { display:none; flex-direction:column; gap:6px; }
     .mnt-inspections-main .mnt-item-row.mnt-show-detail .mnt-detail { display:flex; }
     .mnt-inspections-main .mnt-act { text-align:center; width:44px; }
@@ -1272,49 +1280,49 @@ function mnt_seg_kind($c) {
     /* تبويبات المنظومات */
     .mnt-inspections-main .mnt-tabs { display:flex; gap:6px; overflow-x:auto; padding:4px 2px 10px; margin-bottom:6px; -webkit-overflow-scrolling:touch; }
     .mnt-inspections-main .mnt-tab {
-        flex:0 0 auto; cursor:pointer; border:1px solid #e2e0d7; background:#fafafa; color:#5f5e5a;
+        flex:0 0 auto; cursor:pointer; border:1px solid var(--c-e2e0d7,#e2e0d7); background:var(--c-fafafa,#fafafa); color:var(--c-5f5e5a,#5f5e5a);
         padding:8px 14px; border-radius:999px; font-size:.82rem; font-weight:800; white-space:nowrap;
         display:inline-flex; align-items:center; gap:7px; transition:background .12s, border-color .12s, color .12s;
     }
-    .mnt-inspections-main .mnt-tab:hover { border-color:#c9b98f; }
-    .mnt-inspections-main .mnt-tab.is-active { background:#1f4f7a; color:#fff; border-color:#1f4f7a; }
-    .mnt-inspections-main .mnt-tab-badge { font-size:.7rem; font-weight:800; padding:1px 7px; border-radius:999px; background:rgba(0,0,0,.08); color:inherit; }
-    .mnt-inspections-main .mnt-tab.tab-ok   .mnt-tab-badge { background:rgba(22,163,74,.18);  color:#15803d; }
-    .mnt-inspections-main .mnt-tab.tab-prob .mnt-tab-badge { background:rgba(220,38,38,.18);  color:#b91c1c; }
-    .mnt-inspections-main .mnt-tab.tab-todo .mnt-tab-badge { background:rgba(217,119,6,.18);  color:#b45309; }
-    .mnt-inspections-main .mnt-tab.is-active .mnt-tab-badge { background:#fff; color:#C9920E !important; }
+    .mnt-inspections-main .mnt-tab:hover { border-color:var(--c-c9b98f,#c9b98f); }
+    .mnt-inspections-main .mnt-tab.is-active { background:var(--c-1f4f7a,#1f4f7a); color:var(--white,#fff); border-color:var(--c-1f4f7a,#1f4f7a); }
+    .mnt-inspections-main .mnt-tab-badge { font-size:.7rem; font-weight:800; padding:1px 7px; border-radius:999px; background:var(--c-black-08, rgba(0,0,0,.08)); color:inherit; }
+    .mnt-inspections-main .mnt-tab.tab-ok   .mnt-tab-badge { background:var(--c-16a34a-18, rgba(22,163,74,.18));  color:var(--c-15803d,#15803d); }
+    .mnt-inspections-main .mnt-tab.tab-prob .mnt-tab-badge { background:var(--c-dc2626-18, rgba(220,38,38,.18));  color:var(--c-b91c1c,#b91c1c); }
+    .mnt-inspections-main .mnt-tab.tab-todo .mnt-tab-badge { background:var(--c-d97706-18, rgba(217,119,6,.18));  color:var(--c-b45309,#b45309); }
+    .mnt-inspections-main .mnt-tab.is-active .mnt-tab-badge { background:var(--white,#fff); color:var(--c-c9920e,#C9920E) !important; }
     .mnt-inspections-main .mnt-tabnav { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; }
-    .mnt-inspections-main .mnt-tabnav-pos { font-size:.8rem; font-weight:700; color:#6b7280; }
+    .mnt-inspections-main .mnt-tabnav-pos { font-size:.8rem; font-weight:700; color:var(--c-6b7280,#6b7280); }
     .mnt-inspections-main .mnt-nav-btn {
-        cursor:pointer; border:1px solid #d9d6cc; background:#fff; color:#1f4f7a;
+        cursor:pointer; border:1px solid var(--c-d9d6cc,#d9d6cc); background:var(--white,#fff); color:var(--c-1f4f7a,#1f4f7a);
         padding:8px 18px; border-radius:10px; font-weight:800; font-size:.84rem;
         display:inline-flex; align-items:center; gap:7px;
     }
-    .mnt-inspections-main .mnt-nav-btn.mnt-nav-next { background:#1f4f7a; color:#fff; border-color:#1f4f7a; }
+    .mnt-inspections-main .mnt-nav-btn.mnt-nav-next { background:var(--c-1f4f7a,#1f4f7a); color:var(--white,#fff); border-color:var(--c-1f4f7a,#1f4f7a); }
     .mnt-inspections-main .mnt-nav-btn:disabled { opacity:.4; cursor:default; }
-    .mnt-inspections-main .mnt-line-table input[type=text] { width:100%; min-width:90px; padding:5px 8px; border:1px solid #e2e0d7; border-radius:8px; font-size:.82rem; }
+    .mnt-inspections-main .mnt-line-table input[type=text] { width:100%; min-width:90px; padding:5px 8px; border:1px solid var(--c-e2e0d7,#e2e0d7); border-radius:8px; font-size:.82rem; }
     /* مربّعات اختيار الحالة (بدل القائمة المنسدلة) */
     .mnt-inspections-main .mnt-cond-seg { display:flex; flex-wrap:wrap; gap:5px; min-width:150px; }
     .mnt-inspections-main .mnt-line-table .mnt-seg-btn {
-        cursor:pointer; border:1px solid #d9d6cc !important; background:#fafafa !important; color:#6b7280 !important;
+        cursor:pointer; border:1px solid var(--c-d9d6cc,#d9d6cc) !important; background:var(--c-fafafa,#fafafa) !important; color:var(--c-6b7280,#6b7280) !important;
         padding:5px 11px !important; border-radius:8px !important; font-size:.78rem !important; font-weight:700 !important; line-height:1.2 !important;
         box-shadow:none !important; transition:background .12s, border-color .12s, color .12s;
     }
-    .mnt-inspections-main .mnt-line-table .mnt-seg-btn:hover { border-color:#bdb9ad !important; }
-    .mnt-inspections-main .mnt-line-table .mnt-seg-btn.is-active { background:#C9920E !important; color:#fff !important; border-color:#A6790B !important; }
-    .mnt-inspections-main .mnt-lock { color:#c7bfa8; }
+    .mnt-inspections-main .mnt-line-table .mnt-seg-btn:hover { border-color:var(--c-bdb9ad,#bdb9ad) !important; }
+    .mnt-inspections-main .mnt-line-table .mnt-seg-btn.is-active { background:var(--c-c9920e,#C9920E) !important; color:var(--white,#fff) !important; border-color:var(--c-a6790b,#A6790B) !important; }
+    .mnt-inspections-main .mnt-lock { color:var(--c-c7bfa8,#c7bfa8); }
 
     .mnt-cond { display:inline-flex; align-items:center; gap:5px; padding:4px 12px; border-radius:999px; font-size:.78rem; font-weight:800; }
-    .mnt-cond--ok   { background:rgba(22,163,74,.14);  color:#15803d; }
-    .mnt-cond--note { background:rgba(217,119,6,.16);  color:#b45309; }
-    .mnt-cond--crit { background:rgba(220,38,38,.14);  color:#b91c1c; }
-    .mnt-cond--na   { background:#f1efe8; color:#6b7280; }
+    .mnt-cond--ok   { background:var(--c-16a34a-14, rgba(22,163,74,.14));  color:var(--c-15803d,#15803d); }
+    .mnt-cond--note { background:var(--c-d97706-16, rgba(217,119,6,.16));  color:var(--c-b45309,#b45309); }
+    .mnt-cond--crit { background:var(--c-dc2626-14, rgba(220,38,38,.14));  color:var(--c-b91c1c,#b91c1c); }
+    .mnt-cond--na   { background:var(--c-f1efe8,#f1efe8); color:var(--c-6b7280,#6b7280); }
 
-    .mnt-cond-legend { display:flex; gap:16px; flex-wrap:wrap; margin-top:12px; font-size:.76rem; color:#6b7280; }
+    .mnt-cond-legend { display:flex; gap:16px; flex-wrap:wrap; margin-top:12px; font-size:.76rem; color:var(--c-6b7280,#6b7280); }
     .mnt-cond-legend .mnt-dot { display:inline-block; width:10px; height:10px; border-radius:50%; vertical-align:middle; margin-left:4px; }
-    .mnt-dot--ok{background:#16a34a}.mnt-dot--note{background:#d97706}.mnt-dot--crit{background:#dc2626}.mnt-dot--na{background:#b4b2a9}
+    .mnt-dot--ok{background:var(--c-16a34a,#16a34a)}.mnt-dot--note{background:var(--c-d97706,#d97706)}.mnt-dot--crit{background:var(--c-dc2626,#dc2626)}.mnt-dot--na{background:var(--c-b4b2a9,#b4b2a9)}
 
-    .mnt-inspections-main .mnt-empty-line { display:flex; flex-direction:column; align-items:center; gap:8px; color:#b0a489; padding:24px 10px; }
+    .mnt-inspections-main .mnt-empty-line { display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--c-b0a489,#b0a489); padding:24px 10px; }
     .mnt-inspections-main .mnt-empty-line i { font-size:1.9rem; opacity:.5; }
     @media(max-width:780px){ .mnt-inspections-main .mnt-summary{grid-template-columns:repeat(2,1fr)} }
 </style>

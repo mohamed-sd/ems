@@ -445,6 +445,8 @@ function risk_entity_label($type, $map)
         </div>
     <?php endif; ?>
 
+    <?php echo ems_states_bundle('لا مخاطرَ تجاريةً مسجَّلةً ضمن هذا الترشيح', 'أبلغ عن خطرٍ جديدٍ أو غيّر المرشِّحات'); ?>
+
     <div class="stats-section risk-hidden" id="riskStatsSection">
         <div class="stats-grid">
             <div class="stats-card">
@@ -592,7 +594,7 @@ function risk_entity_label($type, $map)
     <div class="card">
         <div class="card-body">
             <div class="table-container">
-                <table id="riskTable" class="display risk-table-nowrap no-datatable">
+                <table id="riskTable" class="display risk-table-nowrap no-datatable" data-state-save="false">
                     <thead>
                         <tr>
                             <th>إجراءات</th>
@@ -713,11 +715,10 @@ function risk_entity_label($type, $map)
     }
 
     $(document).ready(function () {
-        const riskTable = $('#riskTable').DataTable({
-            autoWidth: false,
-            stateSave: false,
-            language: { url: '/ems/assets/i18n/datatables/ar.json' }
-        });
+        // تهيئةُ الجدول انتقلت إلى المكوّنِ المركزي (ui-unification.js) —
+        // وتعطيلُ حفظِ الحالة بقي بسمةِ data-state-save="false" على وسمِ الجدول.
+        function bindRiskFilters() {
+        const riskTable = $('#riskTable').DataTable();
 
         function fillFilterOptions(columnIndex, selectId) {
             const select = $(selectId);
@@ -747,6 +748,14 @@ function risk_entity_label($type, $map)
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
             riskTable.column(5).search(value ? '^' + value + '$' : '', true, false).draw();
         });
+        }
+
+        // الربطُ بعد تهيئةِ المكوّنِ المركزي للجدول (أو فورًا إن سبقنا)
+        if ($.fn.dataTable && $.fn.dataTable.isDataTable('#riskTable')) {
+            bindRiskFilters();
+        } else {
+            $('#riskTable').one('init.dt', bindRiskFilters);
+        }
 
         $('#entity_type').on('change', function () { riskFillEntityOptions($(this).val(), ''); });
         riskFillEntityOptions($('#entity_type').val() || 'opportunity', '');
@@ -877,13 +886,13 @@ function risk_entity_label($type, $map)
     .risk-main .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: 12px; }
     .risk-main .stats-section {
         border: 1px solid var(--bdr); border-radius: var(--rl);
-        background: linear-gradient(180deg, rgba(255,255,255,.95) 0%, var(--s2) 100%);
+        background: linear-gradient(180deg, var(--c-rgba255255255095, rgba(255,255,255,.95)) 0%, var(--s2) 100%);
         box-shadow: var(--sh); padding: 14px; margin-bottom: 14px;
     }
-    .risk-main .stats-card { background: #eee; border: 1px solid #aaa; border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px rgba(26,18,8,.07); position: relative; overflow: hidden; }
-    .risk-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid #999; background:#fff; color:#000; }
-    .risk-main .stats-card .stats-title { color: #555; font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
-    .risk-main .stats-card .stats-value { color: #222; line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
+    .risk-main .stats-card { background: var(--c-eeeeee, #eee); border: 1px solid var(--c-aaaaaa, #aaa); border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px var(--c-rgba26188007, rgba(26,18,8,.07)); position: relative; overflow: hidden; }
+    .risk-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-surface); color:var(--c-ink-max); }
+    .risk-main .stats-card .stats-title { color: var(--c-555555, #555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
+    .risk-main .stats-card .stats-value { color: var(--c-222222, #222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
     @media (max-width: 900px) { .risk-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
     @media (max-width: 560px) { .risk-main .stats-grid { grid-template-columns: 1fr; } }
 
@@ -892,11 +901,11 @@ function risk_entity_label($type, $map)
     .risk-main .table-container { overflow-x: auto; }
     #riskTable.risk-table-nowrap, #riskTable.risk-table-nowrap th, #riskTable.risk-table-nowrap td { white-space: nowrap; }
     #riskTable .action-btns { flex-wrap: nowrap; white-space: nowrap; }
-    .risk-main .risk-muted { color: #999; }
+    .risk-main .risk-muted { color: var(--c-ink-400); }
     .risk-main .risk-sev-badge { display:inline-block; padding:2px 12px; border-radius:999px; font-size:.78rem; font-weight:800; border:1px solid transparent; }
-    .risk-main .risk-sev-high { background:rgba(220,38,38,.14); color:#b91c1c; border-color:rgba(220,38,38,.35); }
-    .risk-main .risk-sev-mid { background:rgba(245,158,11,.16); color:#b45309; border-color:rgba(245,158,11,.35); }
-    .risk-main .risk-sev-low { background:rgba(22,163,74,.14); color:#15803d; border-color:rgba(22,163,74,.35); }
+    .risk-main .risk-sev-high { background:var(--c-rgba2203838014, rgba(220,38,38,.14)); color:var(--c-b91c1c); border-color:var(--c-rgba2203838035, rgba(220,38,38,.35)); }
+    .risk-main .risk-sev-mid { background:var(--c-rgba24515811016, rgba(245,158,11,.16)); color:var(--c-b45309); border-color:var(--c-rgba24515811035, rgba(245,158,11,.35)); }
+    .risk-main .risk-sev-low { background:var(--c-rgba2216374014, rgba(22,163,74,.14)); color:var(--c-state-ok-deep); border-color:var(--c-rgba2216374035, rgba(22,163,74,.35)); }
 </style>
 
 </body>

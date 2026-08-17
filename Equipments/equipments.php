@@ -143,6 +143,30 @@ if (isset($_GET['msg'])) {
 <!-- Font Awesome من CDN لضمان ظهور الأيقونات بشكل صحيح -->
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+<style>
+/* UXW-01 بوابتا ١·٢: أنماطُ زرَّي إكسل في الرأس — أصنافٌ بدل style=،
+   والألوانُ برموزٍ ذاتِ ردمٍ حرفيٍّ يحفظ المظهرَ كما كان (var(--c-<hex>, #<hex>)) */
+.eq-xl-tpl,
+.eq-xl-exp {
+    color: var(--white);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+.eq-xl-tpl {
+    background: linear-gradient(135deg, var(--c-16a34a, #16a34a) 0%, var(--c-059669, #059669) 100%);
+    box-shadow: 0 2px 8px var(--c-16a34a-sh, rgba(22, 163, 74, 0.25));
+}
+.eq-xl-exp {
+    background: linear-gradient(135deg, var(--c-2563eb, #2563eb) 0%, var(--c-1d4ed8, #1d4ed8) 100%);
+    box-shadow: 0 2px 8px var(--c-2563eb-sh, rgba(37, 99, 235, 0.25));
+}
+</style>
 
 <?php
 
@@ -289,17 +313,17 @@ if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] == "10" && iss
    مصدرٌ واحدٌ للبنيةِ، والأفعالُ وزرُّ العودةِ منقولانِ كما هما. */
 $header_icon = 'fas fa-cogs';
 $header_title_html = htmlspecialchars('إدارة المعدات', ENT_QUOTES, 'UTF-8');
-ob_start(); ?>>
+ob_start(); ?>
             <?php if ($_SESSION['user']['role'] != "10") { ?>
             <!-- ── نظام Excel الموحّد (Unified Excel Framework) ── -->
             <?php
             require_once __DIR__ . '/../includes/excel_ui.php';
             $__xlBase = ems_excel_endpoint_url();
             ?>
-            <a href="<?php echo htmlspecialchars($__xlBase . '?entity=equipments&action=template', ENT_QUOTES, 'UTF-8'); ?>" class="btn" style="background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25); transition: all 0.3s ease;">
+            <a href="<?php echo htmlspecialchars($__xlBase . '?entity=equipments&action=template', ENT_QUOTES, 'UTF-8'); ?>" class="btn eq-xl-tpl">
                 <i class="fas fa-file-excel"></i> تحميل النموذج
             </a>
-            <a href="<?php echo htmlspecialchars($__xlBase . '?entity=equipments&action=export', ENT_QUOTES, 'UTF-8'); ?>" class="btn" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25); transition: all 0.3s ease;">
+            <a href="<?php echo htmlspecialchars($__xlBase . '?entity=equipments&action=export', ENT_QUOTES, 'UTF-8'); ?>" class="btn eq-xl-exp">
                 <i class="fas fa-file-export"></i> تصدير Excel
             </a>
             <button type="button" class="btn eq-1" data-ems-excel-import="equipments" data-ems-excel-title="المعدات">
@@ -326,10 +350,21 @@ include __DIR__ . '/../includes/page_header.php';
         </div>
     <?php endif; ?>
 
+    <?php
+    /* UXW-01 بوابة ٩: حزمةُ الحالاتِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ
+       افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components
+       التي تُحمِّلها القشرة. */
+    if (function_exists('ems_states_bundle')) {
+        echo ems_states_bundle('لا معداتٍ مسجلةً في سجلِّ المعداتِ بعدُ',
+                               'أضف معدةً جديدةً بزرِّ «إضافة معدة جديدة» أو راجع فلاترَ العرض');
+    }
+    ?>
+
     <?php if ($_SESSION['user']['role'] != "10") { ?>
     <!-- فورم إضافة / تعديل معدة -->
-    <form id="projectForm" action="" method="post" class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>
-        <?= csrf_field() ?>">
+    <!-- UXW-01: حقلُ رمزِ الحماية كان محشورًا داخل سمةِ class فلا يُرسَل — نُقل إلى جسمِ الفورم -->
+    <form id="projectForm" action="" method="post" class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>">
+        <?= csrf_field() ?>
         <div class="card">
             <div class="card-header">
                 <h5>
@@ -841,24 +876,24 @@ include __DIR__ . '/../includes/page_header.php';
                 </div>
             </div>
 
-            <!-- أزرار إظهار/إخفاء المجموعات -->
+            <!-- أزرار إظهار/إخفاء المجموعات — UXW-01 بوابة ٣: العائلةُ المؤسسية ems-btn -->
             <div class="column-groups-toggle">
-                <button type="button" class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
+                <button type="button" class="ems-btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
                     <i class="fas fa-info-circle"></i> أساسية
                 </button>
-                <button type="button" class="btn-group-toggle active" data-group="identification" title="بيانات التعريف">
+                <button type="button" class="ems-btn-group-toggle active" data-group="identification" title="بيانات التعريف">
                     <i class="fas fa-id-card"></i> التعريف
                 </button>
-                <button type="button" class="btn-group-toggle" data-group="manufacturing" title="بيانات الصنع">
+                <button type="button" class="ems-btn-group-toggle" data-group="manufacturing" title="بيانات الصنع">
                     <i class="fas fa-industry"></i> الصنع
                 </button>
-                <button type="button" class="btn-group-toggle" data-group="technical" title="الحالة الفنية">
+                <button type="button" class="ems-btn-group-toggle" data-group="technical" title="الحالة الفنية">
                     <i class="fas fa-wrench"></i> فنية
                 </button>
-                <button type="button" class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
+                <button type="button" class="ems-btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
                     <i class="fas fa-toggle-on"></i> الحالة
                 </button>
-                <button type="button" class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
+                <button type="button" class="ems-btn-group-toggle-all" title="إظهار/إخفاء الكل">
                     <i class="fas fa-eye"></i> الكل
                 </button>
             </div>
@@ -1062,8 +1097,9 @@ include __DIR__ . '/../includes/page_header.php';
                                                 } else {
                                                     echo "<span class='badge-busy' title='كرت مسودة' data-ems-c='eq-4'><i class='fas fa-id-card'></i> مسودة</span>";
                                                     if ($can_edit) {
-                                                        echo "<form method='post' action='approve_card.php' class='d-inline' onsubmit=\"return confirm('اعتماد كرت هذه المعدة؟');\">
-        <?= csrf_field() ?>"
+                                                        // UXW-01: كان رمزُ الحماية وسمَ قالبٍ حرفيًّا داخلَ سلسلةٍ مطبوعةٍ فلا يُنفَّذ — صار نداءً حقيقيًّا
+                                                        echo "<form method='post' action='approve_card.php' class='d-inline' onsubmit=\"return confirm('اعتماد كرت هذه المعدة؟');\">"
+                                                            . csrf_field()
                                                             . "<input type='hidden' name='equipment_id' value='" . intval($row['id']) . "'>"
                                                             . "<input type='hidden' name='return' value='equipments.php'>"
                                                             . "<button type='submit' class='action-btn' data-ems-c='eq-5' title='اعتماد الكرت'><i class='fas fa-circle-check'></i></button>"
@@ -1096,19 +1132,13 @@ include __DIR__ . '/../includes/page_header.php';
 <script>
     (function () {
         $(document).ready(function () {
-            var table = $('#projectsTable').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    { extend: 'copy', text: 'نسخ' },
-                    { extend: 'excel', text: 'تصدير Excel' },
-                    { extend: 'csv', text: 'تصدير CSV' },
-                    { extend: 'pdf', text: 'تصدير PDF' },
-                    { extend: 'print', text: 'طباعة' }
-                ],
-                "language": {
-                    "url": "https:/ems/assets/i18n/datatables/ar.json"
-                }
-            });
+            /* UXW-01 بوابة ٥: تهيئةُ جدولِ المعدات انتقلت إلى المكوّنِ المركزي
+               (assets/js/ui-unification.js — initializeMissingDataTables):
+               لغةٌ عربيةٌ وضبطُ أعمدةٍ وزرُّ إكسل موحَّد. هنا يُربَط ما يخصُّ
+               الشاشةَ (الفلاتر ومجموعاتُ الأعمدة) بعد التهيئةِ المركزية —
+               فإن سبقت التهيئةُ رُبط فورًا، وإلا انتظرنا حدثَ init.dt. */
+            function bindEquipmentsTable() {
+            var table = $('#projectsTable').DataTable();
 
             // نظام إظهار/إخفاء المجموعات — خريطة الفهارس تُمرّر للوحدة الموحّدة.
             // الحالة الافتراضية تؤخذ من كلاس active على الأزرار (الصنع/الفنية مخفيتان).
@@ -1234,19 +1264,24 @@ include __DIR__ . '/../includes/page_header.php';
             });
 
             // إظهار/إخفاء المجموعات — موحّد عبر assets/js/column-groups.js
-            (function () {
-                function go() {
-                    if (window.EmsColumnGroups) {
-                        EmsColumnGroups.init({
-                            storageKey: 'equipmentsGroupStates',
-                            mode: 'datatable',
-                            table: table,
-                            columnMap: columnGroups
-                        });
-                    }
-                }
-                if (window.EmsColumnGroups) { go(); } else { window.addEventListener('DOMContentLoaded', go); }
-            })();
+            // (الأصنافُ اعتُمدت باسمِ العائلةِ المؤسسية ems-btn — المحدِّدان يمرَّران صراحةً)
+            if (window.EmsColumnGroups) {
+                EmsColumnGroups.init({
+                    storageKey: 'equipmentsGroupStates',
+                    mode: 'datatable',
+                    table: table,
+                    columnMap: columnGroups,
+                    buttons: '.ems-btn-group-toggle[data-group]',
+                    allButton: '.ems-btn-group-toggle-all'
+                });
+            }
+            }
+
+            if ($.fn.dataTable && $.fn.dataTable.isDataTable('#projectsTable')) {
+                bindEquipmentsTable();
+            } else {
+                $('#projectsTable').one('init.dt', bindEquipmentsTable);
+            }
         });
 
         const toggleFormBtn = document.getElementById('toggleForm');

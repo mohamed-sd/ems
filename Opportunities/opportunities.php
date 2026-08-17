@@ -540,6 +540,8 @@ function opp_stage_tone($stage)
         </div>
     <?php endif; ?>
 
+    <?php echo ems_states_bundle('لا فرصًا بيعيةً مسجَّلةً ضمن هذا الترشيح', 'أضف فرصةً جديدةً أو غيّر المرشِّحات'); ?>
+
     <div class="stats-section opp-hidden" id="oppStatsSection">
         <div class="stats-grid">
             <div class="stats-card">
@@ -853,7 +855,7 @@ function opp_stage_tone($stage)
     <div class="card">
         <div class="card-body">
             <div class="table-container">
-                <table id="oppTable" class="display opp-table-nowrap no-datatable">
+                <table id="oppTable" class="display opp-table-nowrap no-datatable" data-state-save="false">
                     <thead>
                         <tr>
                             <th>إجراءات</th>
@@ -979,11 +981,10 @@ function opp_stage_tone($stage)
 
 <script>
     $(document).ready(function () {
-        const oppTable = $('#oppTable').DataTable({
-            autoWidth: false,
-            stateSave: false,
-            language: { url: '/ems/assets/i18n/datatables/ar.json' }
-        });
+        // تهيئةُ الجدول انتقلت إلى المكوّنِ المركزي (ui-unification.js) —
+        // وتعطيلُ حفظِ الحالة بقي بسمةِ data-state-save="false" على وسمِ الجدول.
+        function bindOppFilters() {
+        const oppTable = $('#oppTable').DataTable();
 
         function fillFilterOptions(columnIndex, selectId) {
             const select = $(selectId);
@@ -1008,6 +1009,14 @@ function opp_stage_tone($stage)
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
             oppTable.column(4).search(value ? '^' + value + '$' : '', true, false).draw();
         });
+        }
+
+        // الربطُ بعد تهيئةِ المكوّنِ المركزي للجدول (أو فورًا إن سبقنا)
+        if ($.fn.dataTable && $.fn.dataTable.isDataTable('#oppTable')) {
+            bindOppFilters();
+        } else {
+            $('#oppTable').one('init.dt', bindOppFilters);
+        }
     });
 
     // ── إظهار/إخفاء الفورم والإحصائيات ──
@@ -1059,8 +1068,8 @@ function opp_stage_tone($stage)
     function oppAddEquipRow(typeId, qty) {
         var q = parseInt(qty, 10); if (!(q > 0)) q = 1;
         var $row = $('<div class="opp-req-row"></div>').html(
-            '<select name="req_equip_type[]" class="opp-req-type">' + oppEquipOptionsHtml(typeId) + '</select>' +
-            '<input type="number" name="req_equip_qty[]" class="opp-req-qty" min="1" step="1" value="' + q + '" />' +
+            '<select name="req_equip_type[]" class="opp-req-type" aria-label="نوع المعدة المطلوبة">' + oppEquipOptionsHtml(typeId) + '</select>' +
+            '<input type="number" name="req_equip_qty[]" class="opp-req-qty" min="1" step="1" value="' + q + '" aria-label="عدد المعدات من هذا النوع" />' +
             '<button type="button" class="opp-req-del" aria-label="حذف نوع المعدة"><i class="fas fa-trash-alt"></i></button>'
         );
         $('#reqEquipRows').append($row);
@@ -1271,13 +1280,13 @@ function opp_stage_tone($stage)
     .opp-main .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: 12px; }
     .opp-main .stats-section {
         border: 1px solid var(--bdr); border-radius: var(--rl);
-        background: linear-gradient(180deg, rgba(255,255,255,.95) 0%, var(--s2) 100%);
+        background: linear-gradient(180deg, var(--c-rgba255255255095, rgba(255,255,255,.95)) 0%, var(--s2) 100%);
         box-shadow: var(--sh); padding: 14px; margin-bottom: 14px;
     }
-    .opp-main .stats-card { background: #eee; border: 1px solid #aaa; border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px rgba(26,18,8,.07); position: relative; overflow: hidden; }
-    .opp-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid #999; background:#fff; color:#000; }
-    .opp-main .stats-card .stats-title { color: #555; font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
-    .opp-main .stats-card .stats-value { color: #222; line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
+    .opp-main .stats-card { background: var(--c-eeeeee, #eee); border: 1px solid var(--c-aaaaaa, #aaa); border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px var(--c-rgba26188007, rgba(26,18,8,.07)); position: relative; overflow: hidden; }
+    .opp-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-surface); color:var(--c-ink-max); }
+    .opp-main .stats-card .stats-title { color: var(--c-555555, #555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
+    .opp-main .stats-card .stats-value { color: var(--c-222222, #222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
     @media (max-width: 900px) { .opp-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
     @media (max-width: 560px) { .opp-main .stats-grid { grid-template-columns: 1fr; } }
 
@@ -1289,62 +1298,62 @@ function opp_stage_tone($stage)
     #oppTable.opp-table-nowrap, #oppTable.opp-table-nowrap th, #oppTable.opp-table-nowrap td { white-space: nowrap; }
     #oppTable .action-btns { flex-wrap: nowrap; white-space: nowrap; }
     .opp-main .opp-num { font-variant-numeric: tabular-nums; font-weight: 700; }
-    .opp-main .opp-muted { color: #999; }
+    .opp-main .opp-muted { color: var(--c-ink-400); }
 
     /* شارات المراحل */
     .opp-stage { display: inline-block; padding: 3px 12px; border-radius: 999px; font-size: .82rem; font-weight: 800; border: 1px solid transparent; }
-    .opp-stage-new { background: rgba(59,130,246,.12); color: #1d4ed8; border-color: rgba(59,130,246,.28); }
-    .opp-stage-study { background: rgba(139,92,246,.12); color: #6d28d9; border-color: rgba(139,92,246,.28); }
-    .opp-stage-qualified { background: rgba(14,165,233,.12); color: #0369a1; border-color: rgba(14,165,233,.28); }
-    .opp-stage-quoted { background: rgba(234,179,8,.15); color: #a16207; border-color: rgba(234,179,8,.30); }
-    .opp-stage-negotiation { background: rgba(249,115,22,.14); color: #c2410c; border-color: rgba(249,115,22,.30); }
-    .opp-stage-won { background: rgba(34,197,94,.15); color: #15803d; border-color: rgba(34,197,94,.30); }
-    .opp-stage-lost { background: rgba(220,38,38,.12); color: #b91c1c; border-color: rgba(220,38,38,.28); }
-    .opp-stage-excluded { background: rgba(107,114,128,.14); color: #4b5563; border-color: rgba(107,114,128,.30); }
+    .opp-stage-new { background: var(--c-rgba5913024612, rgba(59,130,246,.12)); color: var(--c-state-info-deep); border-color: var(--c-rgba5913024628, rgba(59,130,246,.28)); }
+    .opp-stage-study { background: var(--c-rgba1399224612, rgba(139,92,246,.12)); color: var(--c-6d28d9); border-color: var(--c-rgba1399224628, rgba(139,92,246,.28)); }
+    .opp-stage-qualified { background: var(--c-rgba1416523312, rgba(14,165,233,.12)); color: var(--c-0369a1, #0369a1); border-color: var(--c-rgba1416523328, rgba(14,165,233,.28)); }
+    .opp-stage-quoted { background: var(--c-rgba234179815, rgba(234,179,8,.15)); color: var(--c-a16207, #a16207); border-color: var(--c-rgba23417983, rgba(234,179,8,.30)); }
+    .opp-stage-negotiation { background: var(--c-rgba2491152214, rgba(249,115,22,.14)); color: var(--c-c2410c, #c2410c); border-color: var(--c-rgba249115223, rgba(249,115,22,.30)); }
+    .opp-stage-won { background: var(--c-rgba341979415, rgba(34,197,94,.15)); color: var(--c-state-ok-deep); border-color: var(--c-rgba34197943, rgba(34,197,94,.30)); }
+    .opp-stage-lost { background: var(--c-rgba2203838012); color: var(--c-b91c1c); border-color: var(--c-rgba2203838028, rgba(220,38,38,.28)); }
+    .opp-stage-excluded { background: var(--c-rgba10711412814, rgba(107,114,128,.14)); color: var(--c-ink-600); border-color: var(--c-rgba1071141283, rgba(107,114,128,.30)); }
 
     /* ── المتطلبات المبدئية المُهيكلة (بناء) ── */
     .opp-main .opp-req-title { display: block; margin-bottom: 8px; }
-    .opp-main .opp-req-hint { font-weight: 400; font-size: .8rem; color: #8a8f98; }
+    .opp-main .opp-req-hint { font-weight: 400; font-size: .8rem; color: var(--c-8a8f98, #8a8f98); }
     .opp-main .opp-req-panel { border: 1px solid var(--bdr, #D7DBE0); border-radius: var(--rl, 12px); background: var(--s2, #F2F3F5); padding: 14px; }
     .opp-main .opp-req-summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
-    .opp-main .opp-req-sumcard { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 12px; background: #fff; border: 1px solid var(--bdr, #D7DBE0); border-radius: 12px; padding: 14px 12px; }
-    .opp-main .opp-req-sumcard .opp-req-sumicon { width: 40px; height: 40px; flex: 0 0 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; background: #FCF3D6; color: #C88A00; font-size: 1.1rem; }
-    .opp-main .opp-req-sumnum { font-size: 30px; font-weight: 900; line-height: 1; color: #1a1f28; font-variant-numeric: tabular-nums; min-width: 34px; text-align: center; }
-    .opp-main .opp-req-sumlbl { font-size: .9rem; font-weight: 700; color: #5f5e5a; }
-    .opp-main .opp-req-seclbl { font-size: .85rem; font-weight: 700; color: #444; margin-bottom: 8px; }
-    .opp-main .opp-req-seclbl i { color: #E0AE2E; }
+    .opp-main .opp-req-sumcard { display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 12px; background: var(--c-surface); border: 1px solid var(--bdr, #D7DBE0); border-radius: 12px; padding: 14px 12px; }
+    .opp-main .opp-req-sumcard .opp-req-sumicon { width: 40px; height: 40px; flex: 0 0 40px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; background: var(--c-fcf3d6, #FCF3D6); color: var(--c-c88a00, #C88A00); font-size: 1.1rem; }
+    .opp-main .opp-req-sumnum { font-size: 30px; font-weight: 900; line-height: 1; color: var(--c-1a1f28); font-variant-numeric: tabular-nums; min-width: 34px; text-align: center; }
+    .opp-main .opp-req-sumlbl { font-size: .9rem; font-weight: 700; color: var(--c-5f5e5a, #5f5e5a); }
+    .opp-main .opp-req-seclbl { font-size: .85rem; font-weight: 700; color: var(--c-444444, #444); margin-bottom: 8px; }
+    .opp-main .opp-req-seclbl i { color: var(--c-e0ae2e); }
     .opp-main .opp-req-rows { display: flex; flex-direction: column; gap: 8px; }
     .opp-main .opp-req-row { display: flex; gap: 8px; align-items: center; max-width: 480px; }
     .opp-main .opp-req-row .opp-req-type, .opp-main .opp-req-row .emsf-select-wrap { flex: 1 1 auto; min-width: 0; margin: 0; }
     .opp-main .opp-req-row .opp-req-qty { flex: 0 0 90px; width: 90px; margin: 0; text-align: center; }
-    .opp-main .opp-req-del { flex: 0 0 auto; width: 38px; height: 38px; border: 1px solid #e6b8b8; background: #fff; color: #c0392b; border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-    .opp-main .opp-req-del:hover { background: #fdecea; }
-    .opp-main .opp-req-add { margin-top: 10px; background: #fff; border: 1px dashed #E0AE2E; color: #946A00; border-radius: 10px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-size: .85rem; }
-    .opp-main .opp-req-add:hover { background: #FCF3D6; }
-    .opp-main .opp-req-empty { font-size: .82rem; color: #8a8f98; padding: 6px 2px; }
+    .opp-main .opp-req-del { flex: 0 0 auto; width: 38px; height: 38px; border: 1px solid var(--c-e6b8b8, #e6b8b8); background: var(--c-surface); color: var(--c-c0392b, #c0392b); border-radius: 10px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+    .opp-main .opp-req-del:hover { background: var(--c-fdecea, #fdecea); }
+    .opp-main .opp-req-add { margin-top: 10px; background: var(--c-surface); border: 1px dashed var(--c-e0ae2e); color: var(--c-946a00, #946A00); border-radius: 10px; padding: 8px 14px; font-weight: 700; cursor: pointer; font-size: .85rem; }
+    .opp-main .opp-req-add:hover { background: var(--c-fcf3d6, #FCF3D6); }
+    .opp-main .opp-req-empty { font-size: .82rem; color: var(--c-8a8f98, #8a8f98); padding: 6px 2px; }
     .opp-main .opp-req-hidden { display: none !important; }
     /* المنطقة الرئيسة: عمودان (المعدات | الطاقم والموردون) لاستغلال العرض بتوازن */
     .opp-main .opp-req-main { display: flex; gap: 20px; align-items: stretch; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--bdr, #D7DBE0); }
     .opp-main .opp-req-eqsec { flex: 1.35 1 0; min-width: 0; }
     .opp-main .opp-req-counts { flex: 1 1 0; min-width: 0; border-inline-start: 1px dashed var(--bdr, #D7DBE0); padding-inline-start: 20px; }
     .opp-main .opp-req-countgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .opp-main .opp-req-countfield label { display: inline-flex; align-items: center; gap: 5px; font-size: .8rem; font-weight: 700; color: #5f5e5a; margin-bottom: 5px; }
-    .opp-main .opp-req-countfield label i { color: #E0AE2E; }
+    .opp-main .opp-req-countfield label { display: inline-flex; align-items: center; gap: 5px; font-size: .8rem; font-weight: 700; color: var(--c-5f5e5a, #5f5e5a); margin-bottom: 5px; }
+    .opp-main .opp-req-countfield label i { color: var(--c-e0ae2e); }
     .opp-main .opp-req-countfield input { width: 100%; text-align: center; }
-    .opp-main .opp-req-fieldhint { font-size: .72rem; color: #8a8f98; margin-top: 4px; }
+    .opp-main .opp-req-fieldhint { font-size: .72rem; color: var(--c-8a8f98, #8a8f98); margin-top: 4px; }
     @media (max-width: 900px) { .opp-main .opp-req-main { flex-direction: column; gap: 14px; } .opp-main .opp-req-counts { border-inline-start: 0; padding-inline-start: 0; border-top: 1px dashed var(--bdr, #D7DBE0); padding-top: 12px; } }
-    .opp-main .opp-req-legacy { background: #FDF6E3; border: 1px dashed #E0AE2E; border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; font-size: .84rem; color: #6b5200; font-weight: 700; }
-    .opp-main .opp-req-legacy .opp-req-legacy-hint { font-weight: 400; font-size: .74rem; color: #8a7a3a; margin-top: 3px; }
+    .opp-main .opp-req-legacy { background: var(--c-fdf6e3, #FDF6E3); border: 1px dashed var(--c-e0ae2e); border-radius: 10px; padding: 8px 12px; margin-bottom: 12px; font-size: .84rem; color: var(--c-brand-gold-ink-deep); font-weight: 700; }
+    .opp-main .opp-req-legacy .opp-req-legacy-hint { font-weight: 400; font-size: .74rem; color: var(--c-8a7a3a, #8a7a3a); margin-top: 3px; }
     @media (max-width: 560px) { .opp-main .opp-req-summary { grid-template-columns: 1fr 1fr; } .opp-main .opp-req-counts { grid-template-columns: 1fr; } }
 
     /* ── عرض المتطلبات داخل مودال التفاصيل (خارج .opp-main — المودال في body) ── */
     .opp-reqv-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
-    .opp-reqv-chip { display: inline-flex; align-items: center; gap: 5px; background: #FCF3D6; border: 1px solid #E9D08A; color: #6b5200; border-radius: 999px; padding: 4px 12px; font-size: .82rem; font-weight: 700; }
+    .opp-reqv-chip { display: inline-flex; align-items: center; gap: 5px; background: var(--c-fcf3d6, #FCF3D6); border: 1px solid var(--c-e9d08a, #E9D08A); color: var(--c-brand-gold-ink-deep); border-radius: 999px; padding: 4px 12px; font-size: .82rem; font-weight: 700; }
     .opp-reqv-chip b { font-weight: 900; }
     .opp-reqv-table { width: 100%; border-collapse: collapse; font-size: .85rem; }
-    .opp-reqv-table th, .opp-reqv-table td { border: 1px solid #e3e6ea; padding: 6px 10px; text-align: right; }
-    .opp-reqv-table thead th { background: #f7f4ec; font-weight: 800; color: #5f5e5a; }
-    .opp-reqv-legacy { color: #6b5200; font-style: italic; }
+    .opp-reqv-table th, .opp-reqv-table td { border: 1px solid var(--c-e3e6ea); padding: 6px 10px; text-align: right; }
+    .opp-reqv-table thead th { background: var(--c-f7f4ec, #f7f4ec); font-weight: 800; color: var(--c-5f5e5a, #5f5e5a); }
+    .opp-reqv-legacy { color: var(--c-brand-gold-ink-deep); font-style: italic; }
 </style>
 
 </body>

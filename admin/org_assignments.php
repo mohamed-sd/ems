@@ -154,13 +154,17 @@ include '../insidebar.php';
               'الإنهاء قرار موثَّق يسقط بصلاحيته فورًا — والسجل لا يُمحى'));
 
     if ($msg !== '') { echo '<div class="alert alert-info">' . htmlspecialchars($msg) . '</div>'; }
+
+    /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
+    echo ems_states_bundle('لا تكليفاتٍ تنظيميةً مسجَّلةً بعدُ',
+        'أنشئ تكليفًا بمدةٍ ونطاقٍ إلزاميَّين من زرِّ «تكليف جديد»');
     ?>
 
     <?php if ($can_edit): ?>
     <form method="post" action="org_assignments.php" class="allforms" id="asgForm">
         <input type="hidden" name="org_action" value="create">
         <h5>تكليف جديد — المدة والنطاق إلزاميان (ORG-01 §2)</h5>
-        <div class="form-row" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <div class="form-row orgasg-grid4">
             <div class="form-group"><label for="emsf_1967_68680">الشخص *</label>
                 <select name="person_id" required id="emsf_1967_68680"><option value="">— اختر —</option>
                     <?php foreach ($usersList as $u) { echo '<option value="' . intval($u['id']) . '">' . htmlspecialchars($u['name']) . '</option>'; } ?>
@@ -205,7 +209,7 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap orgasg-w100">
             <thead><tr><th>#</th><th>الشخص</th><th>نوع التكليف</th><th>الوحدة المكلَّف بها</th><th>النطاق</th>
                 <th>من تاريخ</th><th>إلى تاريخ</th><th>النائب</th><th>الحالة</th><th>إجراءات</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -242,7 +246,7 @@ include '../insidebar.php';
                     <td>
                         <a class="action-btn" href="?audit=<?php echo intval($x['asg_id']); ?>" title="السجل"><i class="fas fa-history"></i></a>
                         <?php if ($can_edit && $x['state'] !== 'ended'): ?>
-                        <form method="post" style="display:inline" onsubmit="return confirm('إنهاء التكليف؟ قرار موثَّق يسقط بالصلاحية فورًا');">
+                        <form method="post" class="orgasg-inline" onsubmit="return confirm('إنهاء التكليف؟ قرار موثَّق يسقط بالصلاحية فورًا');">
                             <input type="hidden" name="org_action" value="end">
                             <input type="hidden" name="asg_id" value="<?php echo intval($x['asg_id']); ?>">
                             <input type="hidden" name="reason" value="إنهاء من الشاشة">
@@ -260,7 +264,7 @@ include '../insidebar.php';
     <?php if ($auditFor > 0): ?>
     <div class="card"><div class="card-header"><h5><i class="fas fa-history"></i> سجل التكليف #<?php echo $auditFor; ?> — Insert-only</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <table class="alltables display nowrap orgasg-w100" data-no-dt="1">
             <thead><tr><th>الوقت</th><th>الفعل</th><th>سبب التكليف</th><th>قبل</th><th>بعد</th><th>بواسطة</th></tr></thead>
             <tbody>
             <?php foreach ($auditRows as $g): ?>
@@ -277,6 +281,12 @@ include '../insidebar.php';
     <?php endif; ?>
 </div>
 
+<style>
+    /* UXW-01 ②: أصنافٌ محلَّ الأنماطِ الموضعيةِ التي كانت مبثوثةً في الوسوم */
+    .orgasg-grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+    .orgasg-w100 { width: 100%; }
+    .orgasg-inline { display: inline; }
+</style>
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script>
 document.getElementById('toggleForm')?.addEventListener('click', function () {

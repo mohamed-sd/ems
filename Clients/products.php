@@ -356,6 +356,8 @@ function prod_revenue_label($model, $map)
         </div>
     <?php endif; ?>
 
+    <?php echo ems_states_bundle('لا منتجاتٍ ولا خدماتٍ مسجَّلةً ضمن هذا الترشيح', 'أضف منتجًا أو خدمةً جديدةً أو غيّر المرشِّحات'); ?>
+
     <div class="stats-section prod-hidden" id="prodStatsSection">
         <div class="stats-grid">
             <div class="stats-card">
@@ -479,7 +481,7 @@ function prod_revenue_label($model, $map)
     <div class="card">
         <div class="card-body">
             <div class="table-container">
-                <table id="prodTable" class="display prod-table-nowrap no-datatable">
+                <table id="prodTable" class="display prod-table-nowrap no-datatable" data-state-save="false">
                     <thead>
                         <tr>
                             <th>إجراءات</th>
@@ -568,11 +570,10 @@ function prod_revenue_label($model, $map)
 
 <script>
     $(document).ready(function () {
-        const prodTable = $('#prodTable').DataTable({
-            autoWidth: false,
-            stateSave: false,
-            language: { url: '/ems/assets/i18n/datatables/ar.json' }
-        });
+        // تهيئةُ الجدول انتقلت إلى المكوّنِ المركزي (ui-unification.js) —
+        // وتعطيلُ حفظِ الحالة بقي بسمةِ data-state-save="false" على وسمِ الجدول.
+        function bindProdFilters() {
+        const prodTable = $('#prodTable').DataTable();
 
         function fillFilterOptions(columnIndex, selectId) {
             const select = $(selectId);
@@ -597,6 +598,14 @@ function prod_revenue_label($model, $map)
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
             prodTable.column(4).search(value ? '^' + value + '$' : '', true, false).draw();
         });
+        }
+
+        // الربطُ بعد تهيئةِ المكوّنِ المركزي للجدول (أو فورًا إن سبقنا)
+        if ($.fn.dataTable && $.fn.dataTable.isDataTable('#prodTable')) {
+            bindProdFilters();
+        } else {
+            $('#prodTable').one('init.dt', bindProdFilters);
+        }
     });
 
     // ── إظهار/إخفاء الفورم والإحصائيات ──
@@ -721,13 +730,13 @@ function prod_revenue_label($model, $map)
     .prod-main .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: 12px; }
     .prod-main .stats-section {
         border: 1px solid var(--bdr); border-radius: var(--rl);
-        background: linear-gradient(180deg, rgba(255,255,255,.95) 0%, var(--s2) 100%);
+        background: linear-gradient(180deg, var(--c-rgba255255255095, rgba(255,255,255,.95)) 0%, var(--s2) 100%);
         box-shadow: var(--sh); padding: 14px; margin-bottom: 14px;
     }
-    .prod-main .stats-card { background: #eee; border: 1px solid #aaa; border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px rgba(26,18,8,.07); position: relative; overflow: hidden; }
-    .prod-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid #999; background:#fff; color:#000; }
-    .prod-main .stats-card .stats-title { color: #555; font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
-    .prod-main .stats-card .stats-value { color: #222; line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
+    .prod-main .stats-card { background: var(--c-eeeeee, #eee); border: 1px solid var(--c-aaaaaa, #aaa); border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px var(--c-rgba26188007, rgba(26,18,8,.07)); position: relative; overflow: hidden; }
+    .prod-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-surface); color:var(--c-ink-max); }
+    .prod-main .stats-card .stats-title { color: var(--c-555555, #555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
+    .prod-main .stats-card .stats-value { color: var(--c-222222, #222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
     @media (max-width: 900px) { .prod-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
     @media (max-width: 560px) { .prod-main .stats-grid { grid-template-columns: 1fr; } }
 
@@ -737,7 +746,7 @@ function prod_revenue_label($model, $map)
     #prodTable.prod-table-nowrap, #prodTable.prod-table-nowrap th, #prodTable.prod-table-nowrap td { white-space: nowrap; }
     #prodTable .action-btns { flex-wrap: nowrap; white-space: nowrap; }
     .prod-main .prod-num { font-variant-numeric: tabular-nums; font-weight: 700; }
-    .prod-main .prod-muted { color: #999; }
+    .prod-main .prod-muted { color: var(--c-ink-400); }
 </style>
 
 </body>

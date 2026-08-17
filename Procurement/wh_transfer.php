@@ -80,9 +80,16 @@ $header_title_html = htmlspecialchars('التحويلُ بين المخازن', 
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+/* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */
+echo ems_states_bundle('لا تحويلاتٍ بين المخازن بعد',
+    'سجِّلِ التحويلَ من النموذج أعلاه — حركتان ذريّتان بمرجعٍ واحدٍ فلا يظهر الصنفُ في مخزنين');
 ?>
+  <style>
+    .wht-form { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; margin-bottom: 16px; }
+    .wht-qty-input { max-width: 110px; }
+  </style>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
-  <form method="post" class="ems-form" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:16px">
+  <form method="post" class="ems-form wht-form">
         <?= csrf_field() ?>
     <div><label for="emsf_1350_8dfe1">الصنف</label><select name="item_id" class="form-control" required id="emsf_1350_8dfe1"><option value="">—</option>
       <?php foreach ($items as $i): ?><option value="<?= intval($i['id']) ?>"><?= htmlspecialchars($i['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
@@ -90,7 +97,7 @@ include __DIR__ . '/../includes/page_header.php';
       <?php foreach ($whs as $w): ?><option value="<?= intval($w['id']) ?>"><?= htmlspecialchars($w['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
     <div><label for="emsf_1352_887b9">إلى مخزن</label><select name="to_wh" class="form-control" required id="emsf_1352_887b9"><option value="">—</option>
       <?php foreach ($whs as $w): ?><option value="<?= intval($w['id']) ?>"><?= htmlspecialchars($w['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
-    <div><label for="emsf_1353_4bc3c">الكمية</label><input type="number" step="0.01" name="qty" class="form-control" required style="max-width:110px" id="emsf_1353_4bc3c"></div>
+    <div><label for="emsf_1353_4bc3c">الكمية</label><input type="number" step="0.01" name="qty" class="form-control wht-qty-input" required id="emsf_1353_4bc3c"></div>
     <button class="btn btn-primary">حوّل</button>
   </form>
   <h6>آخرُ التحويلات</h6>

@@ -147,6 +147,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا علاقاتِ ملكيةٍ مسجَّلةً بعدُ', 'أضف أولَ علاقةِ ملكيةٍ بزرِّ «إضافة» في رأسِ الشاشة');
     ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
@@ -204,7 +206,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_506_b7f82">المرفق</label>
                     <input type="text" name="f22" maxlength="190" id="emsf_506_b7f82"></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <div class="cmp03-form-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
                 <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>
@@ -258,6 +260,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div></div>
 </div>
 
+<style>
+    /* UXW-01 ②: النمطُ الموضعيُّ صار صنفًا — القيمُ ذاتُها بلا style= */
+    .cmp03-form-actions { margin-top:12px; display:flex; gap:10px; }
+</style>
 <script>
 (function () {
     var btn = document.getElementById('cmp03AddBtn');

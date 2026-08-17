@@ -101,7 +101,13 @@ $header_title_html = htmlspecialchars('الجردُ والتسويات', ENT_QUO
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+/* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */
+echo ems_states_bundle('لا أصنافَ للجردِ في هذا الاختيار',
+    'اخترِ المخزنَ وفترةَ الحركات — فيُعرضُ الرصيدُ الدفتريُّ المحسوبُ من الحركاتِ ويُجرى الجردُ عليه');
 ?>
+  <style>
+    .whc-qty-input { max-width: 110px; }
+  </style>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <?php /* INJ-0561: كان الترشيحُ بالمخزنِ وحدَه — بلا فترةٍ رغم أن كلَّ حركةٍ
            تحمل `moved_at`. فأُضيف مدى تاريخٍ يُطبَّق في وصلِ الحركاتِ نفسِه،
@@ -165,7 +171,7 @@ include __DIR__ . '/../includes/page_header.php';
         <?= csrf_field() ?>
           <input type="hidden" name="adjust_item" value="<?= intval($it['id']) ?>">
           <input type="hidden" name="book_qty" value="<?= floatval($it['book']) ?>">
-          <td><input type="number" step="0.01" name="actual_qty" class="form-control form-control-sm" value="<?= floatval($it['book']) ?>" style="max-width:110px"></td>
+          <td><input type="number" step="0.01" name="actual_qty" class="form-control form-control-sm whc-qty-input" aria-label="الفعليُّ المجرود" value="<?= floatval($it['book']) ?>"></td>
           <td><input type="text" name="reason" class="form-control form-control-sm" placeholder="سببُ الفرق" aria-label="سببُ الفرق"></td>
           <td><button class="action-btn" type="submit">سوِّ</button></td>
         </form>

@@ -193,7 +193,7 @@ include __DIR__ . '/../inheader.php';
             font-family: 'Cairo', sans-serif;
             cursor: pointer;
             transition: all var(--ease);
-            box-shadow: 0 4px 14px rgba(12, 28, 62, 0.25);
+            box-shadow: 0 4px 14px var(--c-rgba122862025, rgba(12, 28, 62, 0.25));
             position: relative;
             overflow: hidden;
         }
@@ -206,7 +206,7 @@ include __DIR__ . '/../inheader.php';
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(232, 184, 0, 0.15), transparent);
+            background: linear-gradient(90deg, transparent, var(--c-rgba2321840015, rgba(232, 184, 0, 0.15)), transparent);
             transition: left 0.5s ease;
         }
 
@@ -214,14 +214,14 @@ include __DIR__ . '/../inheader.php';
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(12, 28, 62, 0.35);
+            box-shadow: 0 6px 20px var(--c-rgba122862035, rgba(12, 28, 62, 0.35));
             background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
             color: var(--navy);
         }
 
         .btn-primary:active {
             transform: translateY(0);
-            box-shadow: 0 2px 8px rgba(12, 28, 62, 0.2);
+            box-shadow: 0 2px 8px var(--c-rgba12286202, rgba(12, 28, 62, 0.2));
         }
 
         .btn-primary i { font-size: 1.05rem; transition: transform var(--ease); }
@@ -242,7 +242,7 @@ include __DIR__ . '/../inheader.php';
             font-family: 'Cairo', sans-serif;
             cursor: pointer;
             transition: all var(--ease);
-            box-shadow: 0 2px 8px rgba(12, 28, 62, 0.08);
+            box-shadow: 0 2px 8px var(--c-rgba122862008);
         }
 
         .btn-secondary:hover {
@@ -250,12 +250,12 @@ include __DIR__ . '/../inheader.php';
             border-color: var(--red);
             color: var(--red);
             transform: translateY(-2px);
-            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.2);
+            box-shadow: 0 4px 14px var(--c-rgba220383802);
         }
 
         .btn-secondary:active {
             transform: translateY(0);
-            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.15);
+            box-shadow: 0 2px 6px var(--c-rgba2203838015, rgba(220, 38, 38, 0.15));
         }
 
         .btn-secondary i { font-size: 1rem; transition: transform var(--ease); }
@@ -280,6 +280,11 @@ include __DIR__ . '/../inheader.php';
             to   { transform: rotate(360deg); }
         }
 
+        /* UXW-01 ②: أصنافٌ محلَّ الأنماطِ الموضعيةِ التي كانت مبثوثةً في الوسوم */
+        .cp-header-title-row { display: flex; align-items: center; gap: 12px; }
+        .cp-header-actions { display: flex; gap: 10px; }
+        .cp-match-msg { font-size: 0.82rem; margin-top: 6px; font-weight: 600; }
+
         /* ── استجابة الشاشات الصغيرة ── */
         @media (max-width: 600px) {
             .form-actions { flex-direction: column; }
@@ -302,9 +307,15 @@ include('../insidebar.php'); ?>
 
     <div class="main">
 
+        <?php
+        /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
+        echo ems_states_bundle('لا محتوى بياناتٍ لهذه الشاشة — هي نموذجُ تغييرِ كلمةِ السر',
+            'أدخل كلمةَ السرِّ الحاليةَ ثم الجديدةَ وتأكيدَها واحفظ');
+        ?>
+
         <!-- رأس الصفحة -->
         <div class="header">
-            <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="cp-header-title-row">
                 <div class="title-icon"><i class="fas fa-key"></i></div>
                 <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ العنوانِ اليدويّ. */
@@ -315,7 +326,7 @@ $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 ?>
             </div>
-            <div style="display: flex; gap: 10px;">
+            <div class="cp-header-actions">
                 <a href="settings.php" class="back-btn">
                     <i class="fas fa-arrow-right"></i> العودة للإعدادات
                 </a>
@@ -405,7 +416,7 @@ include __DIR__ . '/../includes/page_header.php';
                                        required placeholder="أعد إدخال كلمة السر الجديدة" aria-label="أعد إدخال كلمة السر الجديدة">
                                 <i class="fas fa-eye toggle-password" data-target="confirm_password"></i>
                             </div>
-                            <div id="match-message" style="font-size: 0.82rem; margin-top: 6px; font-weight: 600;"></div>
+                            <div id="match-message" class="cp-match-msg"></div>
                         </div>
 
                     </div>

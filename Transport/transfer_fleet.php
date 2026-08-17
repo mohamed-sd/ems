@@ -142,7 +142,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
+    /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */
+    echo ems_states_bundle('لا ناقلاتٍ مسجَّلةً في أسطولِ النقل بعد',
+        'أضفِ الناقلَ بزر «إضافة» — بكودِه ولوحتِه ورخصتِه وتأمينِه فيظهر في سجلِّ الأسطول');
     ?>
+    <style>
+        .tf-actions { margin-top: 12px; display: flex; gap: 10px; }
+    </style>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
     <form method="post" action="" class="allforms" id="cmp03AddForm">
@@ -193,7 +199,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_1536_fa3e9">المرفق</label>
                     <input type="text" name="f19" maxlength="190" id="emsf_1536_fa3e9"></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <div class="tf-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
                 <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>

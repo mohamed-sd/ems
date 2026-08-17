@@ -139,7 +139,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
+    /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا */
+    echo ems_states_bundle('لا تصاريحَ نقلٍ مسجَّلةً بعد',
+        'أضفِ التصريحَ بزر «إضافة» — برقمِه ومسارِه المصرَّحِ وحمولتِه ومدةِ سريانِه');
     ?>
+    <style>
+        .tp-actions { margin-top: 12px; display: flex; gap: 10px; }
+    </style>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
     <form method="post" action="" class="allforms" id="cmp03AddForm">
@@ -188,7 +194,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_1595_e25e9">سعر الصرف ومصدره</label>
                     <input type="text" inputmode="decimal" name="f18" placeholder="0" id="emsf_1595_e25e9"></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <div class="tp-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
                 <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>

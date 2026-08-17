@@ -654,6 +654,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     <?php endif; ?>
 
+    <?php echo ems_states_bundle('لا عملاءَ مسجَّلين ضمن هذا الترشيح', 'أضف عميلًا جديدًا أو غيّر المرشِّحات'); ?>
+
     <div class="stats-section clients-hidden" id="clientsStatsSection">
         <div class="stats-grid">
             <div class="stats-card stats-primary">
@@ -879,7 +881,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
             <?php endif; ?>
             <div class="table-container">
-                <table id="clientsTable" class="display clients-table-nowrap no-datatable">
+                <table id="clientsTable" class="display clients-table-nowrap no-datatable" data-state-save="false">
                     <thead>
                         <tr>
                             <th> إجراءات</th>
@@ -1019,18 +1021,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <script>
     $(document).ready(function () {
-        // تهيئة جدول العملاء بالعربية
-        const clientsTable = $('#clientsTable').DataTable({
-            autoWidth: false,
-            // تعطيل حفظ الحالة: الفلاتر هنا تُدار عبر قوائم منفصلة (fillFilterOptions)
-            // تملأ بحث الأعمدة، وحالة الـ <select> ليست جزءاً من حالة DataTables.
-            // مع stateSave العام (performance-boost.js) كان بحث عمود محفوظ يُستعاد
-            // فيُخفي كل الصفوف («مرشّحة من 4 ← 0») والقوائم تبدو فارغة. (ظهر في Edge)
-            stateSave: false,
-            language: {
-                url: '/ems/assets/i18n/datatables/ar.json'
-            }
-        });
+        // تهيئةُ جدولِ العملاء انتقلت إلى المكوّنِ المركزي
+        // (assets/js/ui-unification.js — initializeMissingDataTables):
+        // لغةٌ عربية وتمريرٌ أفقيٌّ وزرُّ إكسل موحَّد.
+        // تعطيلُ حفظِ الحالة بقي كما كان لكن بسمةِ data-state-save="false" على
+        // وسمِ الجدول (يقرؤها DataTables بنفسه): الفلاتر هنا تُدار عبر قوائم
+        // اختيارٍ منفصلة (fillFilterOptions) تملأ بحثَ الأعمدة، وحالةُ قوائمِ
+        // الاختيار ليست جزءاً من حالة DataTables. مع stateSave العام
+        // (performance-boost.js) كان بحثُ عمودٍ محفوظٌ يُستعاد فيُخفي كل الصفوف
+        // («مرشّحة من 4 ← 0») والقوائم تبدو فارغة. (ظهر في Edge)
+        function bindClientsFilters() {
+        const clientsTable = $('#clientsTable').DataTable();
 
         function fillFilterOptions(columnIndex, selectId) {
             const select = $(selectId);
@@ -1066,6 +1067,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
             clientsTable.column(4).search(value ? '^' + value + '$' : '', true, false).draw();
         });
+        }
+
+        // الربطُ بعد تهيئةِ المكوّنِ المركزي: إن كان الجدولُ مهيَّأً ربطنا فورًا،
+        // وإلا انتظرنا حدثَ init.dt الذي يطلقه DataTables عند التهيئة.
+        if ($.fn.dataTable && $.fn.dataTable.isDataTable('#clientsTable')) {
+            bindClientsFilters();
+        } else {
+            $('#clientsTable').one('init.dt', bindClientsFilters);
+        }
     });
 
     // إظهار / إخفاء فورم الإضافة + إظهار / إخفاء الإحصائيات

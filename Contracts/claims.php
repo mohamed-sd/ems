@@ -305,7 +305,7 @@ include('../inheader.php');
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main ems-unified-page-shell">
+<div class="main ems-unified-page-shell ems-doc-cycle">
     <?php
     $header_title = 'المستخلصات';
     $header_icon  = 'fa fa-file-invoice-dollar';
@@ -318,9 +318,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // TKT-15 · زر الإبلاغ السياقي — المستخلص والفاتورة (§2-⑦)
     require_once __DIR__ . '/../includes/report_button.php';
     ems_report_button(array('screen' => 'claims', 'contract_id' => $contract_id ?? null));
+    // UXW-01 ⑫: شاشةُ دورةٍ اعتماديةٍ تنطق بحالتِها الحية (مسودة · مراجعة · مفوتر) — فتُعلن خطوتَها التالية
+    echo ems_next_step('توليدُ المستخلص ثم رفعُه للمالية فإجازتُه — فتصدر الفاتورةُ الضريبيةُ وتُفتح ذمّةُ العميل');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مستخلصاتٍ ضمن هذا الترشيح', 'ولّد مستخلصَ فترةٍ لعقدٍ من زرِّ الرأس أو غيّر مرشِّحَ الحالة');
     ?>
 
-    <p class="text-muted" style="margin:4px 2px 12px">
+    <p class="text-muted clm-m4-12">
         <i class="fa fa-route"></i>
         أيامٌ <strong>حوّلتها المالية</strong> ← <strong>مستخلص</strong> ← رفعٌ للمالية ← فاتورةٌ ضريبية ← ذمّةُ العميل.
         اختر العقدَ والفترةَ فقط — الكمياتُ والأسعارُ والعميلُ تُشتق كلُّها.
@@ -330,7 +334,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </p>
 
     <?php if (isset($_GET['msg']) && trim($_GET['msg']) !== ''): ?>
-        <div class="alert alert-info" style="margin-bottom:14px;font-weight:700">
+        <div class="alert alert-info clm-alert">
             <?php echo clm_e($_GET['msg']); ?></div>
     <?php endif; ?>
 
@@ -358,7 +362,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_23_cac2e">إلى تاريخ</label>
                     <input type="date" name="period_to" required id="emsf_23_cac2e"></div>
             </div>
-            <div style="margin-top:10px">
+            <div class="clm-mt10">
                 <button type="submit" class="btn-primary"><i class="fas fa-bolt"></i> ولّد المستخلص</button>
             </div>
         </div></div>
@@ -366,25 +370,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <?php if ($show_unbilled): ?>
-    <div class="card" style="margin-bottom:14px">
+    <div class="card clm-mb14">
         <div class="card-header"><h5><i class="fas fa-hourglass-half"></i>
             جاهزٌ للفوترة ولم يُفوتر — <?php echo intval($unbilled_days); ?> يومَ عملٍ
             في <?php echo count($unbilled_contracts); ?> عقد</h5></div>
         <div class="card-body table-container">
             <?php if (empty($unbilled_rows)): ?>
-                <p class="text-muted" style="margin:6px 2px">
+                <p class="text-muted clm-m6-2">
                     <i class="fa fa-circle-check"></i>
                     لا يومَ عملٍ جاهزًا للفوترة خارجَ المستخلصات — كلُّ ما حوّلته الماليةُ مُطالَبٌ به.
                 </p>
             <?php else: ?>
-            <p class="text-muted" style="margin:2px 2px 10px">
+            <p class="text-muted clm-m2-10">
                 <i class="fa fa-shield-halved"></i>
                 أيامٌ <strong>حوّلتها المالية</strong> ولم يشملها مستخلصٌ قائم. اختر العقدَ لتُولّد مستخلصَ مداه.
                 <br><i class="fa fa-coins"></i>
                 <strong>صفٌّ لكل عملة</strong>: العقدُ الواحد قد تكون أيامُه بعملتين، ولا تُجمعان في رقمٍ
                 واحدٍ ما لم يُدخَل سعرُ صرفهما.
             </p>
-            <table class="display" style="width:100%">
+            <table class="display clm-w100">
                 <thead><tr><th>العقد</th><th>المشروع</th><th>العميل</th><th>العملة</th><th>الأيام</th>
                     <th>المدى</th><th>القيمة</th><th></th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -436,18 +440,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tbody>
             </table>
             <?php endif; ?>
-            <a href="claims.php" class="btn btn-sm" style="margin-top:10px">إغلاق</a>
+            <a href="claims.php" class="btn btn-sm clm-mt10">إغلاق</a>
         </div>
     </div>
     <?php endif; ?>
 
     <?php if ($open_claim): ?>
-    <div class="card" style="margin-bottom:14px">
+    <div class="card clm-mb14">
         <div class="card-header"><h5><i class="fas fa-list-ol"></i>
             بنود المستخلص <?php echo clm_e($open_claim['claim_no']); ?>
             — <?php echo clm_e($open_claim['period_from']); ?> إلى <?php echo clm_e($open_claim['period_to']); ?></h5></div>
         <div class="card-body table-container">
-            <table class="display" style="width:100%">
+            <table class="display clm-w100">
                 <thead><tr><th>تاريخ الإصدار</th><th>المعدة</th><th>الوحدة</th><th>الكمية المعتمدة</th>
                     <th>سعر الوحدة</th><th>القيمة</th><th>الأصل</th><th>بند البيع</th>
                     <th>النزاع (§3-⑤)</th></tr></thead>
@@ -455,7 +459,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php foreach ($open_lines as $l):
                     $dstate = isset($l['dispute_state']) ? (string) $l['dispute_state'] : 'none';
                 ?>
-                    <tr<?php echo intval($l['dispute_flag']) === 1 ? ' style="opacity:.6"' : ''; ?>>
+                    <tr<?php echo intval($l['dispute_flag']) === 1 ? ' class="clm-dim60"' : ''; ?>>
                         <td><?php echo clm_e($l['work_date']); ?></td>
                         <td><?php echo clm_e($l['equipment_ref']); ?></td>
                         <td><?php echo clm_e($l['unit_type']); ?></td>
@@ -475,12 +479,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <small><?php echo clm_e($l['dispute_reason']); ?>
                                 · مستند <?php echo clm_e($l['dispute_doc_ref']); ?></small>
                             <?php if ($can_approve): ?>
-                            <form method="post" style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+                            <form method="post" class="clm-flexform clm-mt6">
         <?php echo csrf_field(); ?>
                                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
                                 <input type="hidden" name="action" value="dispute_resolve">
                                 <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
-                                <select name="resolution">
+                                <select name="resolution" aria-label="قرارُ حسمِ النزاع">
                                     <option value="rejected">رُدَّ الاعتراض (البند يعود)</option>
                                     <option value="upheld">أُقرَّ الاعتراض (البند يسقط)</option>
                                 </select>
@@ -495,7 +499,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     ? 'أُقرَّ — البندُ ساقط' : 'رُدَّ — البندُ محتسَب'; ?></span>
                             <small><?php echo clm_e($l['resolution_note']); ?></small>
                         <?php elseif ($can_add): ?>
-                            <form method="post" style="display:flex;gap:6px;flex-wrap:wrap">
+                            <form method="post" class="clm-flexform">
         <?php echo csrf_field(); ?>
                                 <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
                                 <input type="hidden" name="action" value="dispute_raise">
@@ -512,7 +516,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php endforeach; ?>
                 </tbody>
             </table>
-            <p style="margin-top:10px"><strong>الإجمالي:</strong>
+            <p class="clm-mt10"><strong>الإجمالي:</strong>
                 <?php echo clm_num($open_claim['gross_amount']); ?>
                 <?php echo clm_e($open_claim['currency']); ?>
                 · <strong>الصافي:</strong> <?php echo clm_num($open_claim['net_amount']); ?>
@@ -539,15 +543,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     } catch (\Throwable $t) { /* النسبةُ زينةُ عرض */ }
     ?>
     <?php if ($adv_pct > 0 || $adv['received'] > 0 || $adv['recovered'] > 0): ?>
-    <div class="card" style="margin-bottom:14px">
+    <div class="card clm-mb14">
         <div class="card-header"><h5><i class="fas fa-hand-holding-dollar"></i>
             الدفعةُ المقدَّمة — عقد #<?php echo $adv_cid; ?></h5></div>
         <div class="card-body">
-            <p class="text-muted" style="margin:0 0 8px;line-height:1.9">
+            <p class="text-muted clm-adv-note">
                 <strong>المقبوض:</strong> <?php echo clm_num($adv['received']); ?>
                 · <strong>المستهلَك:</strong> <?php echo clm_num($adv['recovered']); ?>
                 · <strong>المتبقي:</strong>
-                <strong style="color:<?php echo ($adv['balance'] < 0) ? '#b91c1c' : '#15803d'; ?>">
+                <strong class="<?php echo ($adv['balance'] < 0) ? 'clm-neg' : 'clm-pos'; ?>">
                     <?php echo clm_num($adv['balance']); ?></strong>
                 <?php if ($adv_pct > 0): ?> · نسبةُ الاسترداد <?php echo clm_num($adv_pct); ?>٪<?php endif; ?>
                 <br>
@@ -564,8 +568,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php endif; ?>
             </p>
             <?php if ($can_approve): ?>
-            <form action="claims.php" method="post" class="allforms allforms-visible"
-                  style="box-shadow:none;padding:0;margin-top:8px">
+            <form action="claims.php" method="post" class="allforms allforms-visible clm-subform clm-mt8">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="action" value="advance_record">
                 <input type="hidden" name="contract_id" value="<?php echo $adv_cid; ?>">
@@ -581,7 +584,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-group"><label for="emsf_27_e5f9e">ملاحظة</label>
                         <input type="text" name="note" maxlength="255" id="emsf_27_e5f9e"></div>
                 </div></div>
-                <div style="margin-top:10px">
+                <div class="clm-mt10">
                     <button type="submit" class="btn-primary"><i class="fas fa-receipt"></i> سجّل قبضَ الدفعة</button>
                 </div>
             </form>
@@ -600,11 +603,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $note_kinds  = cdnote_kinds();
     $invoiced_states = array('invoiced', 'collected');
     ?>
-    <div class="card" style="margin-bottom:14px">
+    <div class="card clm-mb14">
         <div class="card-header"><h5><i class="fas fa-file-circle-exclamation"></i>
             الإشعاراتُ الدائنة/المدينة على <?php echo clm_e($open_claim['claim_no']); ?></h5></div>
         <div class="card-body table-container">
-            <p class="text-muted" style="margin:2px 2px 10px">
+            <p class="text-muted clm-m2-10">
                 <i class="fa fa-shield-halved"></i>
                 <strong>الفاتورةُ الصادرة لا تُعدَّل</strong> — تُصحَّح بإشعارٍ يشير إليها
                 ويحرّك ذمّةَ العميل بمقداره. والأصلُ يبقى كما صدر.
@@ -618,12 +621,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </p>
 
             <?php if ($open_notes): ?>
-            <table class="display" style="width:100%">
+            <table class="display clm-w100">
                 <thead><tr><th>رقم المستخلص</th><th>الاتجاه</th><th>المبلغ</th><th>السبب</th>
                     <th>المستند</th><th>السطر</th><th>الحالة</th><th></th></tr></thead>
                 <tbody>
                 <?php foreach ($open_notes as $n): ?>
-                    <tr<?php echo ((string) $n['state'] === 'cancelled') ? ' style="opacity:.55"' : ''; ?>>
+                    <tr<?php echo ((string) $n['state'] === 'cancelled') ? ' class="clm-dim55"' : ''; ?>>
                         <td><code><?php echo clm_e($n['note_no']); ?></code></td>
                         <td><?php echo ((string) $n['note_kind'] === 'credit')
                                 ? '<span class="badge badge-success">دائن −</span>'
@@ -635,9 +638,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <td><?php echo $n['claim_line_id'] !== null
                                 ? ('#' . intval($n['claim_line_id'])) : 'المستخلص كلُّه'; ?></td>
                         <td><?php echo clm_e($note_states[$n['state']] ?? $n['state']); ?></td>
-                        <td style="white-space:nowrap">
+                        <td class="clm-nowrap">
                             <?php if ($can_add && (string) $n['state'] === 'draft'): ?>
-                            <form action="claims.php" method="post" style="display:inline">
+                            <form action="claims.php" method="post" class="clm-inline">
         <?php echo csrf_field(); ?>
                                 <input type="hidden" name="action" value="note_submit">
                                 <input type="hidden" name="note_id" value="<?php echo intval($n['id']); ?>">
@@ -647,7 +650,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </form>
                             <?php endif; ?>
                             <?php if ($can_approve && (string) $n['state'] === 'review'): ?>
-                            <form action="claims.php" method="post" style="display:inline"
+                            <form action="claims.php" method="post" class="clm-inline"
                                   onsubmit="return confirm('إجازةُ الإشعار تحرّك ذمّةَ العميل بمقداره. متابعة؟');">
         <?php echo csrf_field(); ?>
                                 <input type="hidden" name="action" value="note_approve">
@@ -658,7 +661,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </form>
                             <?php endif; ?>
                             <?php if ($can_add && in_array((string) $n['state'], array('draft', 'review'), true)): ?>
-                            <form action="claims.php" method="post" style="display:inline">
+                            <form action="claims.php" method="post" class="clm-inline">
         <?php echo csrf_field(); ?>
                                 <input type="hidden" name="action" value="note_cancel">
                                 <input type="hidden" name="note_id" value="<?php echo intval($n['id']); ?>">
@@ -673,12 +676,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tbody>
             </table>
             <?php else: ?>
-                <p class="text-muted" style="margin:6px 2px">لا إشعاراتٍ على هذا المستخلص.</p>
+                <p class="text-muted clm-m6-2">لا إشعاراتٍ على هذا المستخلص.</p>
             <?php endif; ?>
 
             <?php if ($can_add && in_array((string) $open_claim['state'], $invoiced_states, true)): ?>
-            <form action="claims.php" method="post" class="allforms allforms-visible"
-                  style="box-shadow:none;padding:0;margin-top:12px">
+            <form action="claims.php" method="post" class="allforms allforms-visible clm-subform clm-mt12">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="action" value="note_create">
                 <input type="hidden" name="claim_id" value="<?php echo $open_id; ?>">
@@ -709,12 +711,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="text" name="doc_ref" maxlength="120" required
                                placeholder="رقمُ المستند المؤيِّد" id="emsf_32_0b3ca"></div>
                 </div></div>
-                <div style="margin-top:10px">
+                <div class="clm-mt10">
                     <button type="submit" class="btn-primary"><i class="fas fa-file-circle-plus"></i> أنشئ الإشعار</button>
                 </div>
             </form>
             <?php elseif ($can_add): ?>
-                <p class="text-muted" style="margin:10px 2px">
+                <p class="text-muted clm-m10-2">
                     <i class="fa fa-circle-info"></i>
                     لا إشعارَ إلا على مستخلصٍ صدرت فاتورتُه — وما لم يُفوتر بعدُ يُصحَّح في موضعه.
                 </p>
@@ -726,7 +728,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card">
         <div class="card-header"><h5><i class="fas fa-table"></i> المستخلصات</h5></div>
         <div class="card-body table-container">
-            <div style="margin-bottom:10px">
+            <div class="clm-mb10">
                 <a href="claims.php" class="action-btn<?php echo ($filter_state === '' && !$filter_pending) ? ' active' : ''; ?>">الكل</a>
                 <a href="claims.php?pending=1"
                    class="action-btn<?php echo $filter_pending ? ' active' : ''; ?>"
@@ -736,7 +738,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                        class="action-btn<?php echo (!$filter_pending && $filter_state === $k) ? ' active' : ''; ?>"><?php echo clm_e($lbl); ?></a>
                 <?php endforeach; ?>
             </div>
-            <table class="display" style="width:100%">
+            <table class="display clm-w100">
                 <thead><tr>
                     <th>رقم البند</th><th>العميل</th><th>المشروع</th><th>الفترة</th>
                     <th>الإجمالي</th><th>صافي المستحق</th><th>الضريبة</th><th>الفاتورة</th><th>الحالة</th><th></th>
@@ -755,11 +757,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <td><?php echo $c['invoice_no'] ? clm_e($c['invoice_no']) : '—'; ?></td>
                         <td><?php echo clm_e($states[$c['state']] ?? $c['state']); ?></td>
                         <td>
-                            <div class="action-btns" style="display:flex;gap:6px;flex-wrap:wrap">
+                            <div class="action-btns clm-flexform">
                                 <a href="claims.php?open=<?php echo intval($c['id']); ?>" class="action-btn view" title="البنود">
                                     <i class="fa fa-eye"></i></a>
                                 <?php if ($can_add && (string)$c['state'] === 'draft'): ?>
-                                    <form action="claims.php" method="post" style="display:inline"
+                                    <form action="claims.php" method="post" class="clm-inline"
                                           onsubmit="return confirm('رفعُ المستخلص للمالية يقفل تعديلَه عندك. متابعة؟');">
         <?php echo csrf_field(); ?>
                                         <input type="hidden" name="action" value="submit">
@@ -770,14 +772,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     </form>
                                 <?php endif; ?>
                                 <?php if ($can_approve && (string)$c['state'] === 'review'): ?>
-                                    <form action="claims.php" method="post" style="display:inline"
+                                    <form action="claims.php" method="post" class="clm-inline"
                                           onsubmit="return confirm('إجازةُ المستخلص تولّد فاتورةً ضريبيةً وتفتح ذمّةً على العميل. متابعة؟');">
         <?php echo csrf_field(); ?>
                                         <input type="hidden" name="action" value="approve">
                                         <input type="hidden" name="id" value="<?php echo intval($c['id']); ?>">
                                         <input type="hidden" name="clm_csrf" value="<?php echo clm_e($clm_csrf); ?>">
                                         <?php if ($tax_rows): ?>
-                                        <select name="tax_code" style="width:auto;display:inline-block">
+                                        <select name="tax_code" aria-label="رمزُ الضريبة" class="clm-tax-select">
                                             <option value="">بلا ضريبة</option>
                                             <?php foreach ($tax_rows as $t): ?>
                                                 <option value="<?php echo clm_e($t['code']); ?>"><?php echo clm_e($t['code']); ?></option>
@@ -788,7 +790,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     </form>
                                 <?php endif; ?>
                                 <?php if ($can_add && in_array((string)$c['state'], array('draft', 'review'), true)): ?>
-                                    <form action="claims.php" method="post" style="display:inline"
+                                    <form action="claims.php" method="post" class="clm-inline"
                                           onsubmit="return confirm('إلغاءُ المستخلص يردّ وقائعَه للاستخلاص. متابعة؟');">
         <?php echo csrf_field(); ?>
                                         <input type="hidden" name="action" value="cancel">
@@ -804,7 +806,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tbody>
             </table>
             <?php if (!$claims): ?>
-                <p class="text-muted" style="margin-top:12px">
+                <p class="text-muted clm-mt12">
                     لا مستخلصاتٍ بعد — ابدأ بتوليد مستخلصِ فترةٍ لعقدٍ من الزرّ أعلاه.
                 </p>
             <?php endif; ?>
@@ -848,5 +850,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 })();
 </script>
+<style>
+    /* UXW-01 ①+②: الأنماطُ الموضعيةُ صارت أصنافًا والألوانُ من الرموز — القيمُ ذاتُها بلا style= */
+    .clm-m4-12 { margin:4px 2px 12px; }
+    .clm-alert { margin-bottom:14px; font-weight:700; }
+    .clm-mt6 { margin-top:6px; }
+    .clm-mt8 { margin-top:8px; }
+    .clm-mt10 { margin-top:10px; }
+    .clm-mt12 { margin-top:12px; }
+    .clm-mb10 { margin-bottom:10px; }
+    .clm-mb14 { margin-bottom:14px; }
+    .clm-m6-2 { margin:6px 2px; }
+    .clm-m2-10 { margin:2px 2px 10px; }
+    .clm-m10-2 { margin:10px 2px; }
+    .clm-w100 { width:100%; }
+    .clm-dim60 { opacity:.6; }
+    .clm-dim55 { opacity:.55; }
+    .clm-nowrap { white-space:nowrap; }
+    .clm-inline { display:inline; }
+    .clm-flexform { display:flex; gap:6px; flex-wrap:wrap; }
+    .clm-subform { box-shadow:none; padding:0; }
+    .clm-adv-note { margin:0 0 8px; line-height:1.9; }
+    .clm-neg { color:var(--c-b91c1c, #b91c1c); }
+    .clm-pos { color:var(--c-15803d, #15803d); }
+    .clm-tax-select { width:auto; display:inline-block; }
+</style>
 </body>
 </html>

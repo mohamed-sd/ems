@@ -263,9 +263,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 ?>
 
 <style>
+    /* UXW-01 ①: الألوانُ كلُّها برموزِ اللوحة — وما لا رمزَ حرفيًّا له يُعلَن
+       باسمِ قيمتِه مع قيمتِه الاحتياطيةِ حرفًا بحرفٍ فلا يتغيّر بكسلٌ واحد. */
     .profile-shell {
         display: grid;
         gap: 18px;
+        /* رموزُ الرسومِ البيانية — تقرؤها Chart.js من هنا بدل ثوابتَ في JS */
+        --pf-chart-1: var(--c-d9ab32, #D9AB32);
+        --pf-chart-2: var(--c-f4c542, #F4C542);
+        --pf-chart-3: var(--c-1e3a5f, #1E3A5F);
+        --pf-chart-4: var(--c-6e6e6e, #6e6e6e);
+        --pf-chart-5: var(--c-15803d, #15803d);
+        --pf-chart-6: var(--c-s-b8860b, #b8860b);
+        --pf-chart-7: var(--c-c2941c, #C2941C);
+        --pf-chart-8: var(--c-9aa0a8, #9aa0a8);
+        --pf-chart-9: var(--c-b91c1c, #b91c1c);
+        --pf-chart-10: var(--c-3b82f6, #3b82f6);
+        --pf-chart-bar: var(--c-rgba21717150075, rgba(217, 171, 50, 0.75));
+        --pf-chart-grid: var(--c-eef0f3, #eef0f3);
+        --pf-chart-border: var(--c-s-fff, #fff);
     }
 
     /* ── بطاقة الترويسة (Hero) ── */
@@ -275,11 +291,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         align-items: center;
         gap: 22px;
         flex-wrap: wrap;
-        background:#ccc;
-        border: 1px solid rgba(244, 197, 66, 0.32);
+        background: var(--c-s-ccc);
+        border: 1px solid var(--c-rgba24419766032);
         border-radius: var(--rl, 14px);
         padding: 26px;
-        color: #fff;
+        color: var(--c-s-fff);
         box-shadow: var(--sh2);
         overflow: hidden;
     }
@@ -288,7 +304,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         content: "";
         position: absolute;
         inset: 0;
-        background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        background-image: radial-gradient(var(--c-rgba255255255005) 1px, transparent 1px);
         background-size: 18px 18px;
         pointer-events: none;
     }
@@ -301,7 +317,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         width: 220px;
         height: 220px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(244, 197, 66, 0.35) 0%, transparent 70%);
+        background: radial-gradient(circle, var(--c-rgba24419766035) 0%, transparent 70%);
         pointer-events: none;
     }
 
@@ -316,10 +332,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         justify-content: center;
         font-size: 2.2rem;
         font-weight: 900;
-        color: #2a2010;
-        background: linear-gradient(135deg, var(--primary-yellow, #F4C542), #D9AB32);
-        border: 3px solid rgba(255, 255, 255, 0.25);
-        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+        color: var(--c-2a2010);
+        background: linear-gradient(135deg, var(--primary-yellow, #F4C542), var(--c-d9ab32));
+        border: 3px solid var(--c-rgba255255255025, rgba(255, 255, 255, 0.25));
+        box-shadow: 0 8px 22px var(--c-rgba000025);
         flex-shrink: 0;
     }
 
@@ -336,7 +352,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         margin: 0;
         font-size: 1.6rem;
         font-weight: 900;
-        color: #fff;
+        color: var(--c-s-fff);
     }
 
     .profile-badges {
@@ -357,27 +373,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .profile-badge.role {
-        background: rgba(244, 197, 66, 0.18);
-        border: 1px solid rgba(244, 197, 66, 0.4);
-        color: #ffe7b5;
+        background: var(--c-rgba24419766018);
+        border: 1px solid var(--c-rgba2441976604);
+        color: var(--c-ffe7b5, #ffe7b5);
     }
 
     .profile-badge.user {
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        color: #f3f4f6;
+        background: var(--c-rgba25525525501);
+        border: 1px solid var(--c-rgba255255255018);
+        color: var(--c-f3f4f6);
     }
 
     .profile-badge.status-on {
-        background: rgba(22, 163, 74, 0.18);
-        border: 1px solid rgba(22, 163, 74, 0.45);
-        color: #bbf7d0;
+        background: var(--c-rgba2216374018, rgba(22, 163, 74, 0.18));
+        border: 1px solid var(--c-rgba2216374045, rgba(22, 163, 74, 0.45));
+        color: var(--c-bbf7d0);
     }
 
     .profile-badge.status-off {
-        background: rgba(220, 38, 38, 0.18);
-        border: 1px solid rgba(220, 38, 38, 0.45);
-        color: #fecaca;
+        background: var(--c-rgba2203838018, rgba(220, 38, 38, 0.18));
+        border: 1px solid var(--c-rgba2203838045, rgba(220, 38, 38, 0.45));
+        color: var(--c-fecaca);
     }
 
     .profile-hero-actions {
@@ -403,19 +419,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .profile-hero-btn.primary {
-        background: linear-gradient(135deg, var(--primary-yellow, #F4C542), #D9AB32);
-        color: #2a2010;
+        background: linear-gradient(135deg, var(--primary-yellow, #F4C542), var(--c-d9ab32));
+        color: var(--c-2a2010);
     }
 
     .profile-hero-btn.ghost {
-        background: #999;
-        border-color: rgba(255, 255, 255, 0.22);
-        color: #000;
+        background: var(--c-999999);
+        border-color: var(--c-rgba255255255022);
+        color: var(--c-s-000, #000);
     }
 
     .profile-hero-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+        box-shadow: 0 8px 18px var(--c-rgba000025);
     }
 
     /* ── شبكة الأقسام ── */
@@ -455,8 +471,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: rgba(244, 197, 66, 0.16);
-        color: #b8860b;
+        background: var(--c-rgba24419766016);
+        color: var(--c-s-b8860b);
         font-size: .9rem;
     }
 
@@ -512,13 +528,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .profile-pill.on {
-        background: rgba(22, 163, 74, 0.12);
-        color: #15803d;
+        background: var(--c-rgba2216374012);
+        color: var(--c-15803d);
     }
 
     .profile-pill.off {
-        background: rgba(220, 38, 38, 0.12);
-        color: #b91c1c;
+        background: var(--c-rgba2203838012);
+        color: var(--c-b91c1c);
     }
 
     /* ── بطاقات الإحصائيات ── */
@@ -548,7 +564,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         top: 0;
         bottom: 0;
         width: 4px;
-        background: linear-gradient(180deg, var(--primary-yellow, #F4C542), #D9AB32);
+        background: linear-gradient(180deg, var(--primary-yellow, #F4C542), var(--c-d9ab32));
     }
 
     .stat-icon {
@@ -560,13 +576,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         justify-content: center;
         font-size: 1.15rem;
         flex-shrink: 0;
-        background: rgba(244, 197, 66, 0.16);
-        color: #b8860b;
+        background: var(--c-rgba24419766016);
+        color: var(--c-s-b8860b);
     }
 
-    .stat-icon.blue { background: rgba(30, 58, 95, 0.12); color: #1E3A5F; }
-    .stat-icon.green { background: rgba(22, 163, 74, 0.13); color: #15803d; }
-    .stat-icon.gray  { background: rgba(110, 110, 110, 0.14); color: #555; }
+    .stat-icon.blue { background: var(--c-rgba305895012, rgba(30, 58, 95, 0.12)); color: var(--c-1e3a5f, #1E3A5F); }
+    .stat-icon.green { background: var(--c-rgba2216374013, rgba(22, 163, 74, 0.13)); color: var(--c-15803d); }
+    .stat-icon.gray  { background: var(--c-rgba110110110014, rgba(110, 110, 110, 0.14)); color: var(--c-555555); }
 
     .stat-meta {
         display: grid;
@@ -646,7 +662,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         display: block;
         height: 100%;
         border-radius: 99px;
-        background: linear-gradient(90deg, var(--primary-yellow, #F4C542), #D9AB32);
+        background: linear-gradient(90deg, var(--primary-yellow, #F4C542), var(--c-d9ab32));
     }
 
     /* ── جدول آخر الأنشطة ── */
@@ -661,8 +677,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .activity-table thead th {
-        background: #666;
-        color: #F4C542;
+        background: var(--c-s-666);
+        color: var(--c-f4c542, #F4C542);
         padding: 10px 12px;
         text-align: right;
         font-weight: 800;
@@ -681,7 +697,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .activity-table tbody tr:hover td {
-        background: #fffaf0;
+        background: var(--c-fffaf0, #fffaf0);
     }
 
     .act-badge {
@@ -692,19 +708,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         border-radius: 999px;
         font-size: 0.76rem;
         font-weight: 800;
-        background: rgba(244, 197, 66, 0.16);
-        color: #8a6d0c;
+        background: var(--c-rgba24419766016);
+        color: var(--c-8a6d0c, #8a6d0c);
     }
 
-    .act-badge.login  { background: rgba(22, 163, 74, 0.13); color: #15803d; }
-    .act-badge.logout { background: rgba(220, 38, 38, 0.12); color: #b91c1c; }
-    .act-badge.create { background: rgba(30, 58, 95, 0.12); color: #1E3A5F; }
+    .act-badge.login  { background: var(--c-rgba2216374013, rgba(22, 163, 74, 0.13)); color: var(--c-15803d); }
+    .act-badge.logout { background: var(--c-rgba2203838012); color: var(--c-b91c1c); }
+    .act-badge.create { background: var(--c-rgba305895012, rgba(30, 58, 95, 0.12)); color: var(--c-1e3a5f, #1E3A5F); }
 
     .profile-empty {
         text-align: center;
         color: var(--t3, #9aa0a8);
         font-weight: 700;
         padding: 26px;
+    }
+
+    /* UXW-01 ②: أصنافٌ محلَّ الأنماطِ الموضعيةِ التي كانت مبثوثةً في الوسوم */
+    .pf-dot { font-size: .5rem; }
+    .pf-qlink { text-decoration: none; }
+    .pf-arrow { color: var(--t3); }
+    .pf-danger { color: var(--c-b91c1c); }
+    .pf-chart-empty {
+        padding: 24px;
+        text-align: center;
+        opacity: .75;
+        font-size: .85rem;
     }
 
     @media (max-width: 900px) {
@@ -740,6 +768,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back    = array('href' => 'dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+
+    /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
+    echo ems_states_bundle('لا سجلَّ نشاطٍ لحسابك بعدُ',
+        'الإحصاءاتُ والرسومُ تُبنى من نشاطِك المسجَّلِ على الشاشات');
     ?>
 
     <div class="profile-shell">
@@ -755,7 +787,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <span class="profile-badge user"><i class="fas fa-at"></i> <?php echo htmlspecialchars($user['username'], ENT_QUOTES, 'UTF-8'); ?></span>
                     <?php endif; ?>
                     <span class="profile-badge <?php echo $is_active ? 'status-on' : 'status-off'; ?>">
-                        <i class="fas fa-circle" style="font-size:.5rem;"></i> <?php echo $is_active ? 'حساب نشط' : 'حساب موقوف'; ?>
+                        <i class="fas fa-circle pf-dot"></i> <?php echo $is_active ? 'حساب نشط' : 'حساب موقوف'; ?>
                     </span>
                 </div>
             </div>
@@ -799,7 +831,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <span class="profile-row-label"><i class="fas fa-toggle-on"></i> حالة الحساب</span>
                     <span class="profile-row-value">
                         <span class="profile-pill <?php echo $is_active ? 'on' : 'off'; ?>">
-                            <i class="fas fa-circle" style="font-size:.5rem;"></i> <?php echo $is_active ? 'نشط' : 'موقوف'; ?>
+                            <i class="fas fa-circle pf-dot"></i> <?php echo $is_active ? 'نشط' : 'موقوف'; ?>
                         </span>
                     </span>
                 </div>
@@ -859,21 +891,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="profile-card">
                 <h3 class="profile-card-title"><i class="fas fa-bolt"></i> إجراءات سريعة</h3>
 
-                <a href="<?php echo htmlspecialchars($change_password_url, ENT_QUOTES, 'UTF-8'); ?>" class="profile-row" style="text-decoration:none;">
+                <a href="<?php echo htmlspecialchars($change_password_url, ENT_QUOTES, 'UTF-8'); ?>" class="profile-row pf-qlink">
                     <span class="profile-row-label"><i class="fas fa-key"></i> تغيير كلمة المرور</span>
-                    <span class="profile-row-value"><i class="fas fa-arrow-left" style="color:var(--t3);"></i></span>
+                    <span class="profile-row-value"><i class="fas fa-arrow-left pf-arrow"></i></span>
                 </a>
-                <a href="<?php echo htmlspecialchars($settings_url, ENT_QUOTES, 'UTF-8'); ?>" class="profile-row" style="text-decoration:none;">
+                <a href="<?php echo htmlspecialchars($settings_url, ENT_QUOTES, 'UTF-8'); ?>" class="profile-row pf-qlink">
                     <span class="profile-row-label"><i class="fas fa-gear"></i> إعدادات النظام</span>
-                    <span class="profile-row-value"><i class="fas fa-arrow-left" style="color:var(--t3);"></i></span>
+                    <span class="profile-row-value"><i class="fas fa-arrow-left pf-arrow"></i></span>
                 </a>
-                <a href="dashboard.php" class="profile-row" style="text-decoration:none;">
+                <a href="dashboard.php" class="profile-row pf-qlink">
                     <span class="profile-row-label"><i class="fas fa-house"></i> لوحة التحكم</span>
-                    <span class="profile-row-value"><i class="fas fa-arrow-left" style="color:var(--t3);"></i></span>
+                    <span class="profile-row-value"><i class="fas fa-arrow-left pf-arrow"></i></span>
                 </a>
-                <a href="<?php echo htmlspecialchars($logout_url, ENT_QUOTES, 'UTF-8'); ?>" class="profile-row" style="text-decoration:none;">
-                    <span class="profile-row-label" style="color:#b91c1c;"><i class="fas fa-power-off" style="color:#b91c1c;"></i> تسجيل الخروج</span>
-                    <span class="profile-row-value"><i class="fas fa-arrow-left" style="color:#b91c1c;"></i></span>
+                <a href="<?php echo htmlspecialchars($logout_url, ENT_QUOTES, 'UTF-8'); ?>" class="profile-row pf-qlink">
+                    <span class="profile-row-label pf-danger"><i class="fas fa-power-off pf-danger"></i> تسجيل الخروج</span>
+                    <span class="profile-row-value"><i class="fas fa-arrow-left pf-danger"></i></span>
                 </a>
             </div>
 
@@ -992,7 +1024,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <span><?php echo htmlspecialchars($screen['name'], ENT_QUOTES, 'UTF-8'); ?></span>
                                 <span class="cnt rtl-number"><?php echo number_format($screen['count']); ?></span>
                             </div>
-                            <div class="top-screen-bar"><span style="width: <?php echo $pct; ?>%;"></span></div>
+                            <!-- UXW-01 ②: عرضُ الشريطِ محسوبٌ لحظيًّا من البيانات — تصريحُ data-allow-style -->
+                            <div class="top-screen-bar"><span data-allow-style style="width: <?php echo $pct; ?>%;"></span></div>
                         </div>
                     <?php endforeach; ?>
                 <?php else: ?>
@@ -1016,7 +1049,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     (function () {
         if (typeof Chart === 'undefined') { return; }
 
-        var goldPalette = ['#D9AB32', '#F4C542', '#1E3A5F', '#6e6e6e', '#15803d', '#b8860b', '#C2941C', '#9aa0a8', '#b91c1c', '#3b82f6'];
+        /* UXW-01 ①: ألوانُ الرسومِ تُقرأ من رموزِ اللوحةِ المعرَّفةِ على .profile-shell
+           (--pf-chart-*) لا من ثوابتَ مدفونةٍ في JS */
+        var pfShell = document.querySelector('.profile-shell');
+        var pfCss = pfShell ? getComputedStyle(pfShell) : null;
+        function pfTok(name) { return pfCss ? pfCss.getPropertyValue(name).trim() : ''; }
+        var goldPalette = ['--pf-chart-1', '--pf-chart-2', '--pf-chart-3', '--pf-chart-4', '--pf-chart-5',
+            '--pf-chart-6', '--pf-chart-7', '--pf-chart-8', '--pf-chart-9', '--pf-chart-10'].map(pfTok);
 
         /* UI-DEF-07 (L4): الكتلةُ محكومةٌ خادميًّا بـact_total>0 — والحارسُ
            النصيُّ يوحّد العقدَ: لا رسمَ بلا بياناتٍ بمحاورَ افتراضية. */
@@ -1026,7 +1065,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             if (t > 0) { return renderFn(); }
             var host = c && c.parentNode ? c.parentNode : null;
             if (host) {
-                host.innerHTML = '<div style="padding:24px;text-align:center;opacity:.75;font-size:.85rem">'
+                host.innerHTML = '<div class="pf-chart-empty">'
                     + 'لا بيانات في الفترة المعروضة — الرسم لا يُعرض بمحاور افتراضية</div>';
             }
             return null;
@@ -1043,8 +1082,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     datasets: [{
                         label: 'عدد الأنشطة',
                         data: <?php echo json_encode($act_days_values); ?>,
-                        backgroundColor: 'rgba(217, 171, 50, 0.75)',
-                        hoverBackgroundColor: '#C2941C',
+                        backgroundColor: pfTok('--pf-chart-bar'),
+                        hoverBackgroundColor: pfTok('--pf-chart-7'),
                         borderRadius: 6,
                         maxBarThickness: 26
                     }]
@@ -1054,7 +1093,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#eef0f3' } },
+                        y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: pfTok('--pf-chart-grid') } },
                         x: { grid: { display: false } }
                     }
                 }
@@ -1074,7 +1113,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         data: <?php echo json_encode(array_values($act_by_type)); ?>,
                         backgroundColor: goldPalette,
                         borderWidth: 2,
-                        borderColor: '#fff'
+                        borderColor: pfTok('--pf-chart-border')
                     }]
                 },
                 options: {

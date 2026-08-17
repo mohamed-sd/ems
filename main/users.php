@@ -435,6 +435,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
     );
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+
+    /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
+    echo ems_states_bundle('لا مستخدمين مسجَّلين ضمن نطاقك بعدُ',
+        'أضف مستخدمًا جديدًا من زرِّ «إضافة مستخدم جديد» — ولا حسابَ يعمل بلا موظفٍ مُسنَد');
     ?>
 
     <?php
@@ -604,7 +608,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                 <div class="users-table-note">عرض وإدارة المستخدمين مع التصدير السريع من الشريط العلوي</div>
             </div>
             <div class="table-container">
-                <table id="projectsTable" class="display nowrap pu-table users-table-nowrap" style="width:100%;">
+                <table id="projectsTable" class="display nowrap pu-table users-table-nowrap pu-w100">
                     <thead>
                         <tr>
                             <th>إجراءات</th>
@@ -724,7 +728,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
                             if ($linked_emp_id > 0 && isset($emp_name_by_id[$linked_emp_id])) {
                                 echo "<td><a class='client-name-link' href='../Employees/employee_profile.php?id=" . $linked_emp_id . "'><i class='fas fa-id-card-alt'></i> " . htmlspecialchars($emp_name_by_id[$linked_emp_id], ENT_QUOTES, 'UTF-8') . "</a></td>";
                             } else {
-                                echo "<td><span style='color:#999;'>— غير مرتبط —</span></td>";
+                                echo "<td><span class='pu-unlinked'>— غير مرتبط —</span></td>";
                             }
                             echo "<td><i class='fas fa-phone'></i>" . htmlspecialchars($row['phone'], ENT_QUOTES, 'UTF-8') . "</td>";
                                                         echo "<td>" . $status_badge . "</td>";
@@ -762,6 +766,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         flex-wrap: nowrap;
         white-space: nowrap;
     }
+
+    /* UXW-01 ①+②: أصنافٌ محلَّ الأنماطِ الموضعية — والألوانُ برموزِ اللوحة */
+    .pu-w100 { width: 100%; }
+    .pu-unlinked { color: var(--c-999999); }
 </style>
 
 <!-- jQuery + DataTables -->
@@ -925,26 +933,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
         /* =============================
            DataTable
+           UXW-01 ⑤: لا تهيئةَ محليةً — التهيئةُ للمكوّنِ المركزيِّ وحدَه
+           (assets/js/ui-unification.js — ومعه زرُّ التصدير الموحَّد)؛
+           وكلُّ ما يعتمد واجهةَ الجدولِ ينتظرها هنا.
         ============================== */
-        const usersTable = $('#projectsTable').DataTable({
-            dom: 'Bfrtip',
-            scrollX: true,
-            autoWidth: false,
-            // الفلاتر الخارجية تُدار يدوياً؛ نُعطّل حفظ الحالة لتفادي استعادة بحثٍ محفوظ يُخفي الصفوف
-            stateSave: false,
-            buttons: [
-                { extend: 'copy', text: '<i class="fas fa-copy"></i> نسخ', className: 'users-table-action' },
-                { extend: 'excel', text: '<i class="fas fa-file-excel"></i> Excel', className: 'users-table-action' },
-                { extend: 'csv', text: '<i class="fas fa-file-csv"></i> CSV', className: 'users-table-action' },
-                { extend: 'pdf', text: '<i class="fas fa-file-pdf"></i> PDF', className: 'users-table-action' },
-                { extend: 'print', text: '<i class="fas fa-print"></i> طباعة', className: 'users-table-action' }
-            ],
-            language: {
-                url: "/ems/assets/i18n/datatables/ar.json"
+        function whenUsersTable(cb, tries) {
+            if (window.jQuery && $.fn.dataTable && $.fn.dataTable.isDataTable('#projectsTable')) {
+                cb($('#projectsTable').DataTable());
+                return;
             }
-        });
+            tries = (tries === undefined) ? 60 : tries;
+            if (tries > 0) { setTimeout(function () { whenUsersTable(cb, tries - 1); }, 150); }
+        }
 
-        usersTable.buttons().container().appendTo('#usersExportButtons');
+        whenUsersTable(function (usersTable) {
 
         /* =============================
            فلاتر المستخدمين — نفس هوية/تصميم فلاتر شاشة العملاء
@@ -987,6 +989,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
         $('#usersFilterReset').on('click', function () {
             $('#filterRole, #filterStatus, #filterLinked').val('');
             usersTable.search('').draw();
+        });
+
         });
 
         /* =============================

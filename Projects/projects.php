@@ -448,6 +448,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     <?php endif; ?>
 
+    <?php echo ems_states_bundle('لا مشاريعَ مسجَّلةً ضمن هذا الترشيح', 'أضف مشروعًا جديدًا أو غيّر المرشِّحات'); ?>
+
     <div class="stats-section projects-hidden" id="projectsStatsSection">
         <div class="stats-grid">
             <div class="stats-card stats-primary">
@@ -596,7 +598,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card">
         <div class="card-body">
             <div class="table-container">
-                <table id="projectsTable" class="display projects-table-nowrap" style="width:100%;">
+                <table id="projectsTable" class="display projects-table-nowrap projects-w100">
                     <thead>
                         <tr>
                             <th> إجراءات</th>
@@ -741,7 +743,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 echo "<a href='../Contracts/contracts.php?filter_project_id=" . intval($row['id']) . "'
                                                 class='action-btn view projectContractsBtn'
                                                 title='عقودات المشروع'>
-                                                <i class='fas fa-file-contract'></i><span style='font-size:11px;font-weight:700;margin-inline-start:3px;'>" . intval($row['contracts']) . "</span>
+                                                <i class='fas fa-file-contract'></i><span class='projects-contract-count'>" . intval($row['contracts']) . "</span>
                                             </a>";
 
                                 echo "</div>
@@ -791,24 +793,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     (function () {
-        // تشغيل DataTable
-        $(document).ready(function () {
-            $('#projectsTable').DataTable({
-                dom: 'Bfrtip',
-                scrollX: true,
-                autoWidth: false,
-                buttons: [
-                    { extend: 'copy', text: 'نسخ (Copy)' },
-                    { extend: 'excel', text: 'تصدير Excel' },
-                    { extend: 'csv', text: 'تصدير CSV' },
-                    { extend: 'pdf', text: 'تصدير PDF' },
-                    { extend: 'print', text: 'طباعة (Print)' }
-                ],
-                "language": {
-                    "url": "/ems/assets/i18n/datatables/ar.json"
-                }
-            });
-        });
+        // تهيئةُ جدولِ المشاريع انتقلت إلى المكوّنِ المركزي
+        // (assets/js/ui-unification.js — initializeMissingDataTables):
+        // لغةٌ عربية وتمريرٌ أفقيٌّ وزرُّ إكسل موحَّد — لا تهيئةَ محليةً هنا.
 
         // اظهار/اخفاء الفورم
         const toggleProjectFormBtn = document.getElementById('toggleForm');
@@ -1071,7 +1058,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     .projects-main .stats-section {
         border: 1px solid var(--bdr);
         border-radius: var(--rl);
-        background: linear-gradient(180deg, rgba(255, 255, 255, .95) 0%, var(--s2) 100%);
+        background: linear-gradient(180deg, var(--c-rgba255255255095, rgba(255, 255, 255, .95)) 0%, var(--s2) 100%);
         box-shadow: var(--sh);
         padding: 14px;
         margin-bottom: 14px;
@@ -1084,11 +1071,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .projects-main .stats-card {
-        background: #eee;
-        border: 1px solid #aaa;
+        background: var(--c-eeeeee, #eee);
+        border: 1px solid var(--c-aaaaaa, #aaa);
         border-radius: 35px;
         padding: 18px;
-        box-shadow: 0 2px 8px rgba(26, 18, 8, .07);
+        box-shadow: 0 2px 8px var(--c-rgba26188007, rgba(26, 18, 8, .07));
         position: relative;
         overflow: hidden;
     }
@@ -1115,12 +1102,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         float: left;
         vertical-align: middle;
         margin-top: 15px;
-        border: 1px solid #999;
-        background-color: #fff;
+        border: 1px solid var(--c-ink-400);
+        background-color: var(--c-surface);
     }
 
     .projects-main .stats-card .stats-title {
-        color: #555;
+        color: var(--c-555555, #555);
         font-size: 0.92rem;
         font-weight: 700;
         margin-top: 5px;
@@ -1128,7 +1115,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .projects-main .stats-card .stats-value {
-        color: #222;
+        color: var(--c-222222, #222);
         font-size: 1.8rem;
         line-height: 1;
         font-weight: 900;
@@ -1139,28 +1126,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     .projects-main .stats-primary .stats-icon {
         background: fff;
-        color: #000;
+        color: var(--c-ink-max);
     }
 
     .projects-main .stats-success .stats-icon {
        background: fff;
-        color: #000;
+        color: var(--c-ink-max);
     }
 
     .projects-main .stats-danger .stats-icon {
          background: fff;
-        color: #000;
+        color: var(--c-ink-max);
     }
 
     .projects-main .stats-purple .stats-icon {
           background: fff;
-        color: #000;
+        color: var(--c-ink-max);
     }
 
     .projects-main .stats-cyan .stats-icon {
          background: fff;
-        color: #000;
+        color: var(--c-ink-max);
     }
+
+    #projectsTable.projects-w100 { width: 100%; }
+    #projectsTable .projects-contract-count { font-size: 11px; font-weight: 700; margin-inline-start: 3px; }
 
     .table-container {
         overflow-x: auto;

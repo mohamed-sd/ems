@@ -249,6 +249,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+
+    /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
+    echo ems_states_bundle('لا موظفين مسجَّلين ضمن نطاقك بعدُ',
+        'أضف موظفًا جديدًا من زرِّ «إضافة موظف جديد» أو استوردهم من معالجِ Excel الموحَّد');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -946,17 +950,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                         // شارة تصنيف مسار التوظيف — ألوانها تتبع دلالة المرحلة:
                         // قيد المسار (رمادي/أزرق) · معتمد (أخضر) · منتهٍ (أحمر).
+                        // UXW-01 ①+②: اللونُ بصنفٍ من رموزِ اللوحةِ لا بنمطٍ موضعيٍّ بقيمٍ صلبة.
                         $cls_value = (string) ($row['employment_classification'] ?? '');
                         $cls_map = array(
-                            'مرشح'   => array('#eef2ff', '#3730a3', '📝'),
-                            'متدرب'  => array('#fff7ed', '#9a3412', '🎓'),
-                            'مقبول'  => array('#ecfdf5', '#065f46', '✅'),
-                            'مستقيل' => array('#f3f4f6', '#4b5563', '🚪'),
-                            'مفصول'  => array('#fef2f2', '#991b1b', '⛔'),
+                            'مرشح'   => array('emp-class-candidate', '📝'),
+                            'متدرب'  => array('emp-class-trainee', '🎓'),
+                            'مقبول'  => array('emp-class-accepted', '✅'),
+                            'مستقيل' => array('emp-class-resigned', '🚪'),
+                            'مفصول'  => array('emp-class-dismissed', '⛔'),
                         );
                         if ($cls_value !== '' && isset($cls_map[$cls_value])) {
-                            list($cls_bg, $cls_fg, $cls_icon) = $cls_map[$cls_value];
-                            $classificationBadge = "<span class='emp-class-pill' style='background:$cls_bg;color:$cls_fg;'>"
+                            list($cls_class, $cls_icon) = $cls_map[$cls_value];
+                            $classificationBadge = "<span class='emp-class-pill $cls_class'>"
                                 . $cls_icon . ' ' . htmlspecialchars($cls_value) . '</span>';
                         } else {
                             $classificationBadge = "<span class='emp-class-pill emp-class-none'>— غير مصنّف</span>";
@@ -998,6 +1003,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 </div>
 
+<style>
+    /* UXW-01 ①: شاراتُ تصنيفِ مسارِ التوظيف — الألوانُ نفسُها برموزِ اللوحة */
+    .emp-class-candidate { background: var(--c-eef2ff, #eef2ff); color: var(--c-3730a3); }
+    .emp-class-trainee { background: var(--c-fff7ed); color: var(--c-9a3412); }
+    .emp-class-accepted { background: var(--c-ecfdf5); color: var(--c-065f46); }
+    .emp-class-resigned { background: var(--c-f3f4f6); color: var(--c-4b5563); }
+    .emp-class-dismissed { background: var(--c-fef2f2); color: var(--c-991b1b); }
+</style>
 <!-- jQuery (Required first) -->
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <!-- Bootstrap Bundle -->
@@ -1048,23 +1061,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     document.addEventListener('DOMContentLoaded', emsToggleEmpType);
 
     (function () {
-        // تشغيل DataTable بالعربية
+        // UXW-01 ⑤: لا تهيئةَ DataTable محليةً — التهيئةُ للمكوّنِ المركزيِّ وحدَه
+        // (assets/js/ui-unification.js — ومعه زرُّ التصدير الموحَّد)؛ وكلُّ ما
+        // يعتمد واجهةَ الجدولِ ينتظر تهيئتَه هنا.
+        function empWhenTable(cb, tries) {
+            if (window.jQuery && $.fn.dataTable && $.fn.dataTable.isDataTable('#driversTable')) {
+                cb($('#driversTable').DataTable());
+                return;
+            }
+            tries = (tries === undefined) ? 60 : tries;
+            if (tries > 0) { setTimeout(function () { empWhenTable(cb, tries - 1); }, 150); }
+        }
+
         $(document).ready(function () {
-            var empTable = $('#driversTable').DataTable({
-                dom: 'Bfrtip',
-                scrollX: true,
-                scrollCollapse: true,
-                buttons: [
-                    { extend: 'copy', text: 'نسخ' },
-                    { extend: 'excel', text: 'تصدير Excel' },
-                    { extend: 'csv', text: 'تصدير CSV' },
-                    { extend: 'pdf', text: 'تصدير PDF' },
-                    { extend: 'print', text: 'طباعة' }
-                ],
-                "language": {
-                    "url": "/ems/assets/i18n/datatables/ar.json"
-                }
-            });
+            empWhenTable(function (empTable) {
 
             // ── لوحة الفلاتر الموحّدة: تُملأ خياراتها من بيانات الصفوف ثم تُصفّي عبر بحث مخصّص ──
             var EMP_FILTERS = [
@@ -1113,6 +1123,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             $('#empFilterReset').on('click', function () {
                 EMP_FILTERS.forEach(function (f) { $(f.sel).val(''); });
                 empTable.draw();
+            });
+
             });
         });
 

@@ -241,6 +241,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا احتساباتِ جزاءاتٍ أو حوافزَ في هذه الفترة', 'اختر عقدًا وفترةً ثم اضغط «احتسِب الفترة» — ولا احتسابَ بلا قواعدَ مسجَّلةٍ على العقد');
     ?>
 
     <?php if (!empty($_GET['msg'])): $isS = strpos($_GET['msg'], '✅') !== false; ?>
@@ -275,9 +277,9 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     </select>
                 </div>
                 <div class="filter-field"><label for="emsf_78_9c216"><i class="fa fa-calendar"></i> من</label>
-                    <input type="date" name="from" value="<?php echo pen_e($from); ?>" class="form-control" id="emsf_78_9c216"></div>
+                    <input type="date" name="from" class="form-control" id="emsf_78_9c216" value="<?php echo pen_e($from); ?>"></div>
                 <div class="filter-field"><label for="emsf_79_cd642"><i class="fa fa-calendar"></i> إلى</label>
-                    <input type="date" name="to" value="<?php echo pen_e($to); ?>" class="form-control" id="emsf_79_cd642"></div>
+                    <input type="date" name="to" class="form-control" id="emsf_79_cd642" value="<?php echo pen_e($to); ?>"></div>
                 <div class="filter-actions"><button type="submit" class="btn-primary"><i class="fa fa-search"></i> عرض</button></div>
             </form>
         </div>
@@ -472,44 +474,45 @@ $(function () {
 </script>
 
 <style>
-    .pen-main .pen-rule { display:flex; gap:12px; align-items:flex-start; border:1px solid #ce93d8;
-        border-right:5px solid #7b1fa2; border-radius:10px; background:#faf5fc; padding:12px 14px; margin-bottom:14px; line-height:1.75; }
-    .pen-main .pen-rule i { color:#7b1fa2; font-size:1.25rem; margin-top:3px; }
-    .pen-main .pen-summary { display:flex; gap:18px; align-items:center; flex-wrap:wrap; background:#fff;
+    /* UXW-01 ①: الألوانُ من الرموزِ حصرًا — var(--c-<hex>, <hex>) بردمِ القيمةِ الأصلية */
+    .pen-main .pen-rule { display:flex; gap:12px; align-items:flex-start; border:1px solid var(--c-ce93d8,#ce93d8);
+        border-right:5px solid var(--c-7b1fa2,#7b1fa2); border-radius:10px; background:var(--c-faf5fc,#faf5fc); padding:12px 14px; margin-bottom:14px; line-height:1.75; }
+    .pen-main .pen-rule i { color:var(--c-7b1fa2,#7b1fa2); font-size:1.25rem; margin-top:3px; }
+    .pen-main .pen-summary { display:flex; gap:18px; align-items:center; flex-wrap:wrap; background:var(--white,#fff);
         border:1px solid var(--bdr); border-radius:12px; padding:12px 14px; margin-bottom:14px; }
-    .pen-main .pen-note { border:1px solid #ffe082; background:#fffbe9; border-radius:10px; padding:11px 13px; margin-bottom:12px; }
-    .pen-main .pen-ret-note { font-size:.8rem; color:#a06b00; margin-inline-start:6px; }
-    .pen-main .pen-ret-note.is-done { color:#2e7d32; font-weight:700; }
-    .pen-main .pen-release { background:#e8f5e9; border-color:#a5d6a7; }
+    .pen-main .pen-note { border:1px solid var(--c-ffe082,#ffe082); background:var(--c-fffbe9,#fffbe9); border-radius:10px; padding:11px 13px; margin-bottom:12px; }
+    .pen-main .pen-ret-note { font-size:.8rem; color:var(--c-a06b00,#a06b00); margin-inline-start:6px; }
+    .pen-main .pen-ret-note.is-done { color:var(--c-2e7d32,#2e7d32); font-weight:700; }
+    .pen-main .pen-release { background:var(--c-e8f5e9,#e8f5e9); border-color:var(--c-a5d6a7,#a5d6a7); }
     /* مظهرُ الشارات يخرج مع مكوِّنها (includes/contract_badges.php) — فلا يفترق بين شاشتين */
     .pen-main .pen-inline { display:inline; margin:0; }
     .pen-main .pen-kind { padding:3px 10px; border-radius:20px; font-size:.83rem; font-weight:700; white-space:nowrap; }
-    .pen-main .pen-kind-penalty { background:#ffebee; color:#c62828; border:1px solid #ef9a9a; }
-    .pen-main .pen-kind-incentive { background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7; }
-    .pen-main .pen-kind-min_guarantee { background:#e3f2fd; color:#1565c0; border:1px solid #90caf9; }
+    .pen-main .pen-kind-penalty { background:var(--c-ffebee,#ffebee); color:var(--c-c62828,#c62828); border:1px solid var(--c-ef9a9a,#ef9a9a); }
+    .pen-main .pen-kind-incentive { background:var(--c-e8f5e9,#e8f5e9); color:var(--c-2e7d32,#2e7d32); border:1px solid var(--c-a5d6a7,#a5d6a7); }
+    .pen-main .pen-kind-min_guarantee { background:var(--c-e3f2fd,#e3f2fd); color:var(--c-1565c0,#1565c0); border:1px solid var(--c-90caf9,#90caf9); }
     .pen-main .pen-state { padding:2px 8px; border-radius:12px; font-size:.8rem; font-weight:700; }
-    .pen-main .pen-state-computed { background:#eceff1; color:#546e7a; }
-    .pen-main .pen-state-reviewed { background:#fff8e1; color:#a06b00; }
-    .pen-main .pen-state-posted { background:#e8f5e9; color:#2e7d32; }
-    .pen-main .pen-state-waived { background:#f3e5f5; color:#6a1b9a; }
+    .pen-main .pen-state-computed { background:var(--c-eceff1,#eceff1); color:var(--c-546e7a,#546e7a); }
+    .pen-main .pen-state-reviewed { background:var(--c-fff8e1,#fff8e1); color:var(--c-a06b00,#a06b00); }
+    .pen-main .pen-state-posted { background:var(--c-e8f5e9,#e8f5e9); color:var(--c-2e7d32,#2e7d32); }
+    .pen-main .pen-state-waived { background:var(--c-f3e5f5,#f3e5f5); color:var(--c-6a1b9a,#6a1b9a); }
     .pen-main .pen-row-waived { opacity:.62; }
     .pen-main .pen-num { font-variant-numeric:tabular-nums; text-align:left; }
     .pen-main .pen-amount { font-weight:900; }
-    .pen-main .pen-amount.is-neg { color:#c62828; }
-    .pen-main .pen-amount.is-pos { color:#2e7d32; }
-    .pen-main .pen-capped { color:#a06b00; font-size:.78rem; font-weight:700; }
+    .pen-main .pen-amount.is-neg { color:var(--c-c62828,#c62828); }
+    .pen-main .pen-amount.is-pos { color:var(--c-2e7d32,#2e7d32); }
+    .pen-main .pen-capped { color:var(--c-a06b00,#a06b00); font-size:.78rem; font-weight:700; }
     .pen-main .pen-small { font-size:.84rem; }
     .pen-main .pen-nowrap { white-space:nowrap; }
-    .pen-main .pen-muted { color:#999; font-size:.82rem; }
-    .pen-main .pen-empty { text-align:center; color:#888; padding:22px; }
-    .pen-main .pen-btn { background:#f5f5f5; border:1px solid #ccc; border-radius:8px; padding:3px 9px;
+    .pen-main .pen-muted { color:var(--c-999,#999); font-size:.82rem; }
+    .pen-main .pen-empty { text-align:center; color:var(--c-888,#888); padding:22px; }
+    .pen-main .pen-btn { background:var(--c-f5f5f5,#f5f5f5); border:1px solid var(--c-ccc,#ccc); border-radius:8px; padding:3px 9px;
         cursor:pointer; font-size:.82rem; margin:1px; white-space:nowrap; }
-    .pen-main .pen-btn.is-ok { background:#e8f5e9; border-color:#a5d6a7; }
-    .pen-main .pen-btn.is-warn { background:#f3e5f5; border-color:#ce93d8; }
+    .pen-main .pen-btn.is-ok { background:var(--c-e8f5e9,#e8f5e9); border-color:var(--c-a5d6a7,#a5d6a7); }
+    .pen-main .pen-btn.is-warn { background:var(--c-f3e5f5,#f3e5f5); border-color:var(--c-ce93d8,#ce93d8); }
     .pen-main .table-container { overflow-x:auto; }
-    .pen-modal { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center; justify-content:center; z-index:9999; }
+    .pen-modal { position:fixed; inset:0; background:var(--c-black-45, rgba(0,0,0,.45)); display:flex; align-items:center; justify-content:center; z-index:9999; }
     .pen-modal[hidden] { display:none; }
-    .pen-modal-card { background:#fff; border-radius:14px; padding:20px; width:min(520px,92vw); box-shadow:0 10px 40px rgba(0,0,0,.3); }
+    .pen-modal-card { background:var(--white,#fff); border-radius:14px; padding:20px; width:min(520px,92vw); box-shadow:0 10px 40px var(--c-black-30, rgba(0,0,0,.3)); }
     .pen-modal-card label { display:block; margin:10px 0 4px; font-weight:700; }
     .pen-modal-card textarea { width:100%; }
     .pen-modal-actions { display:flex; gap:10px; margin-top:16px; }

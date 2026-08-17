@@ -80,23 +80,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => 'claims.php', 'class' => '',
                          'icon' => 'fas fa-arrow-right', 'label' => 'المستخلصات');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا حركاتٍ في كشفِ هذا العميلِ للفترة', 'وسّع الفترةَ أو اختر عميلًا آخر — والكشفُ يقرأ الفواتيرَ والتحصيلاتِ الحية');
     ?>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="cst-filter">
             <strong>العميل:</strong>
-            <select name="client_id" onchange="this.form.submit()" style="min-width:320px">
+            <select name="client_id" aria-label="العميل" class="cst-client-select" onchange="this.form.submit()">
                 <?php foreach ($clients as $c): ?>
                     <option value="<?php echo intval($c['id']); ?>" <?php echo $selected === intval($c['id']) ? 'selected' : ''; ?>>
                         #<?php echo intval($c['id']); ?> — <?php echo htmlspecialchars((string)$c['client_name']); ?>
                     </option>
                 <?php endforeach; ?>
             </select>
-            <label for="emsf_21_8b3c3">من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>" id="emsf_21_8b3c3">
-            <label for="emsf_22_eabe1">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>" id="emsf_22_eabe1">
+            <label for="emsf_21_8b3c3">من</label><input type="date" name="from" id="emsf_21_8b3c3" value="<?php echo htmlspecialchars($from); ?>">
+            <label for="emsf_22_eabe1">إلى</label><input type="date" name="to" id="emsf_22_eabe1" value="<?php echo htmlspecialchars($to); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اقرأ الكشف</button>
         </form>
-        <p style="color:#666;margin-top:10px">
+        <p class="cst-note">
             <strong>كلُّ رقمٍ برابط مصدره</strong> — ومن لا مصدرَ له <strong>يُعلَن</strong> ولا يُخفى.
             و<strong>المحتجزُ والمقدمةُ كلٌّ في طبقته</strong> لا يُخلطان بالذمة الجارية (§4)،
             و<strong>الرصيدُ من الفواتير</strong> لا من المستخلصات — فالمستخلصُ اعترافٌ سابقٌ على المطالبة،
@@ -106,20 +108,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($stmt !== null): ?>
     <div class="card"><div class="card-body">
-        <div style="display:flex;gap:14px;flex-wrap:wrap">
+        <div class="cst-badges">
             <?php foreach (CSS::LAYER_LABELS as $k => $lbl): ?>
-                <div class="badge badge-secondary" style="font-size:15px;padding:8px 14px">
+                <div class="badge badge-secondary cst-badge">
                     <?php echo htmlspecialchars($lbl); ?>:
                     <strong><?php echo htmlspecialchars((string)$stmt['totals'][$k]); ?></strong>
                 </div>
             <?php endforeach; ?>
-            <div class="badge <?php echo $stmt['totals']['balance'] > 0 ? 'badge-danger' : 'badge-success'; ?>"
-                 style="font-size:16px;padding:8px 14px">
+            <div class="badge cst-badge-balance <?php echo $stmt['totals']['balance'] > 0 ? 'badge-danger' : 'badge-success'; ?>">
                 الرصيدُ الجاري: <strong><?php echo htmlspecialchars((string)$stmt['totals']['balance']); ?></strong>
             </div>
         </div>
         <?php foreach ($stmt['notes'] as $n): ?>
-            <div class="alert alert-info" style="margin:8px 0"><?php echo htmlspecialchars($n); ?></div>
+            <div class="alert alert-info cst-alert"><?php echo htmlspecialchars($n); ?></div>
         <?php endforeach; ?>
     </div></div>
 
@@ -129,7 +130,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         — <?php echo count($layer['rows']); ?> سطرًا · المجموع
         <strong><?php echo htmlspecialchars((string)$layer['total']); ?></strong></h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap cst-w100">
             <thead><tr><th>تاريخ الإنشاء</th><th>البيان</th><th>المبلغ</th><th>العملة</th>
                 <th>السياق</th><th>المصدر</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -165,7 +166,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <tr>
                     <td><?php echo htmlspecialchars((string)$r['date']); ?></td>
                     <td><?php echo htmlspecialchars((string)$r['description']); ?></td>
-                    <td style="<?php echo $r['amount'] < 0 ? 'color:#0a7' : ''; ?>">
+                    <td<?php echo $r['amount'] < 0 ? ' class="cst-credit"' : ''; ?>>
                         <?php echo htmlspecialchars((string)$r['amount']); ?></td>
                     <td><?php echo htmlspecialchars((string)$r['currency']); ?></td>
                     <td><small><?php echo htmlspecialchars((string)$r['context']); ?></small></td>
@@ -186,5 +187,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 </div>
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
+<style>
+    /* UXW-01 ①+②: الأنماطُ الموضعيةُ صارت أصنافًا والألوانُ من الرموز — القيمُ ذاتُها بلا style= */
+    .cst-filter { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .cst-client-select { min-width:320px; }
+    .cst-note { color:var(--c-666, #666); margin-top:10px; }
+    .cst-badges { display:flex; gap:14px; flex-wrap:wrap; }
+    .cst-badge { font-size:15px; padding:8px 14px; }
+    .cst-badge-balance { font-size:16px; padding:8px 14px; }
+    .cst-alert { margin:8px 0; }
+    .cst-w100 { width:100%; }
+    .cst-credit { color:var(--c-0a7, #0a7); }
+</style>
 </body>
 </html>
