@@ -251,7 +251,75 @@ function gen_value($col, $type, $dataType, $enum, $i, $uniq, $ctx)
         return mb_substr('storage/uat/' . preg_replace('/[^a-z_]/', '', $ctx) . '-' . ($i + 1) . '.pdf', 0, $len);
     }
     if (str_contains($c, 'json')) return '{"source":"UAT-2026"}';
+
+    /* ═══════════════════════════════════════════════════════════════════════
+     * ◆ **خانةُ الرمزِ لا تقبل جملةً — والقياسُ أثبت الضررَ لا التوقُّع.**
+     * ═══════════════════════════════════════════════════════════════════════
+     * كان السطرُ التالي يردُّ جملةَ ملاحظةٍ **لكلِّ عمودِ نصٍّ لم يُعرَف اسمُه**،
+     * فوقعت في خاناتِ رموزٍ ودلالاتِ حالة. والجردُ الحيُّ عدَّ **991 صفًّا في
+     * 81 جدولًا**، منها `fleet_model.fuel_type` = «مطابقٌ للمستند المرفق ·
+     * UAT-2026» بينما الصفُّ الحقيقيُّ إلى جانبِه فيه «بنزين»، و
+     * `ems_state_transitions.from_state` جملةٌ في موضعِ حالة.
+     *
+     * ودليلُ سوءِ الموضعِ في القيمةِ نفسِها: **بترٌ في منتصفِ الكلمة**
+     * («UAT-202») لأن عمودَ الرمزِ أضيقُ من الجملة.
+     *
+     * ◆ والعلاجُ يتبع قاعدةَ المالك حرفًا: «حدّدِ القيمةَ الصحيحةَ من مصدرٍ
+     *   حاكم — فإن لم توجد يقينًا فلا تخمّن». والمصدرُ الحاكمُ **موجودٌ**:
+     *   القيمُ الحقيقيةُ القائمةُ في العمودِ نفسِه. فإن خلا العمودُ منها
+     *   **يُترك فارغًا ويُعلَن** — لا يُلفَّق، على سنَّةِ هذا الباذرِ نفسِه:
+     *   «الجدولُ الذي يأبى الامتلاءَ آليًّا يُقيَّد ملاحظةً لا يُلفَّق له صفٌّ كاذب».
+     * ═══════════════════════════════════════════════════════════════════════ */
+    if (uat_is_code_column($c, $len)) {
+        $real = uat_existing_code_value($ctx, $c, $i);
+        if ($real !== null) { return $real; }
+        return null;                       /* لا تخمينَ — والإعلانُ في التقرير */
+    }
+
     return mb_substr($pick($NOTES) . ' · ' . UAT_TAG . $seq, 0, $len);
+}
+
+/**
+ * أخانةُ رمزٍ هي؟ — بلاحقةِ الاسمِ أو بضيقِ العمود.
+ * فالحقولُ المنتهيةُ بـ_type/_state/_kind/_category/_status/_mode/_uom/_unit
+ * مفرداتُها معجمٌ مغلقٌ يقرؤه منطقُ العمل، لا نصٌّ حرٌّ يقرؤه إنسان.
+ */
+function uat_is_code_column($c, $len)
+{
+    $suffix = array('_type', '_state', '_kind', '_category', '_status', '_mode',
+                    '_uom', '_unit', '_class', '_level', '_direction', '_scope');
+    foreach ($suffix as $s) {
+        if (substr($c, -strlen($s)) === $s) { return true; }
+    }
+    if (in_array($c, array('type', 'state', 'kind', 'category', 'status', 'mode',
+                           'unit', 'uom', 'direction', 'scope'), true)) { return true; }
+    /* عمودٌ نصيٌّ شديدُ الضيقِ لا يتّسع لجملةٍ أصلًا — فالجملةُ فيه بترٌ حتمًا */
+    return ($len > 0 && $len <= 24);
+}
+
+/**
+ * القيمةُ من **مصدرٍ حاكم**: ما هو قائمٌ فعلًا في العمودِ نفسِه ولا يحمل وسمَ
+ * التجربةِ ولا يشبه جملة. وإن لم يوجد شيءٌ رُدَّ null — ولا يُخترع.
+ */
+function uat_existing_code_value($table, $col, $i)
+{
+    static $cache = array();
+    $k = "{$table}.{$col}";
+    if (!isset($cache[$k])) {
+        $db = uat_db();
+        $vals = array();
+        try {
+            $sql = "SELECT DISTINCT `{$col}` v FROM `{$table}`
+                     WHERE `{$col}` IS NOT NULL AND `{$col}` <> ''
+                       AND `{$col}` NOT LIKE '%" . UAT_TAG . "%'
+                       AND `{$col}` NOT LIKE '% %'
+                     LIMIT 40";
+            foreach ($db->query($sql) as $r) { $vals[] = $r['v']; }
+        } catch (Throwable $e) { /* جدولٌ لا يُقرأ — يبقى فارغًا ويُعلَن */ }
+        $cache[$k] = $vals;
+    }
+    if (!$cache[$k]) { return null; }
+    return $cache[$k][$i % count($cache[$k])];
 }
 
 // ── التنفيذ ──────────────────────────────────────────────────────────────────
