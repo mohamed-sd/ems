@@ -307,9 +307,49 @@ function get_module_permissions($conn, $module_id) {
 
     $role_id = $_SESSION['user']['role'];
 
+    /* ── GOV-AUTH-01 التبديلُ الجزئي (قرارُ المالك 2026-08-17) ─────────────
+       المستخدمُ المغطًّى بقالبٍ نافذٍ يُحكَم بقالبِه حصرًا — «لا شاشةَ خارجَ
+       القالب». غيرُ المغطَّى (قالبُه مسودةٌ أو بلا قالبٍ) على القائمِ كما هو.
+       سلامةُ الفشل: أيُّ خللٍ في القراءةِ ⇒ يسقط للمسارِ القائمِ لا للفتح. */
+    $gov_user_id = intval($_SESSION['user']['id'] ?? 0);
+    if ($gov_user_id > 0 && strval($role_id) !== '-1') {
+        $gst = $conn->prepare(
+            "SELECT MAX(CASE WHEN i.item_id IS NULL THEN -1 ELSE i.allow END) t_view,
+                    MAX(COALESCE(i.can_add,0)) t_add,
+                    MAX(COALESCE(i.can_edit,0)) t_edit,
+                    MAX(COALESCE(i.can_delete,0)) t_del
+               FROM gov_authority_grants g
+               JOIN gov_role_profiles p ON p.profile_id = g.profile_id AND p.state = 'active'
+               LEFT JOIN gov_profile_items i ON i.profile_id = p.profile_id
+                    AND i.item_kind = 'screen'
+                    AND i.item_ref = (SELECT code FROM modules WHERE id = ? LIMIT 1)
+              WHERE g.user_id = ? AND g.revoked_at IS NULL
+                AND (g.valid_to IS NULL OR g.valid_to > NOW())"
+        );
+        if ($gst) {
+            $gst->bind_param('ii', $module_id, $gov_user_id);
+            if ($gst->execute()) {
+                $gv = $gst->get_result()->fetch_assoc();
+                // t_view: NULL = لا تغطيةَ بقالبٍ نافذٍ ⇒ المسارُ القائم
+                //         -1  = مغطًّى والشاشةُ خارجَ قالبِه ⇒ منعٌ بالقالب
+                if ($gv !== null && $gv['t_view'] !== null) {
+                    $gst->close();
+                    $allowed = ((int) $gv['t_view']) === 1;
+                    return [
+                        'can_view' => $allowed,
+                        'can_add' => $allowed && (int) $gv['t_add'] === 1,
+                        'can_edit' => $allowed && (int) $gv['t_edit'] === 1,
+                        'can_delete' => $allowed && (int) $gv['t_del'] === 1,
+                    ];
+                }
+            }
+            $gst->close();
+        }
+    }
+
     $stmt = $conn->prepare(
-        "SELECT can_view, can_add, can_edit, can_delete 
-         FROM role_permissions 
+        "SELECT can_view, can_add, can_edit, can_delete
+         FROM role_permissions
          WHERE role_id = ? AND module_id = ? LIMIT 1"
     );
 
