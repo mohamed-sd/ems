@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-17 17:45:43
+-- المصدر: equipation_manage · التوليد: 2026-08-17 18:29:13
 -- الجداول: 569 · المناظير: 23
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -230,6 +230,9 @@ CREATE TABLE `activity_logs` (
   `request_payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `response_status` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `acted_by` bigint(20) unsigned DEFAULT NULL COMMENT 'الفاعلُ الحقيقيُّ في جلسةِ النيابة (A5)',
+  `acted_for` bigint(20) unsigned DEFAULT NULL COMMENT 'من نُفِّذ عنه',
+  `impersonation_id` int(10) unsigned DEFAULT NULL COMMENT 'مرجعُ جلسةِ impersonation_sessions',
   PRIMARY KEY (`id`),
   KEY `idx_company_created` (`company_id`,`created_at`),
   KEY `idx_user_created` (`user_id`,`created_at`),
@@ -242,7 +245,9 @@ CREATE TABLE `activity_logs` (
   KEY `idx_module_name` (`module_name`),
   KEY `idx_action_type` (`action_type`),
   KEY `idx_record_id` (`record_id`),
-  KEY `idx_employee_created` (`employee_id`,`created_at`)
+  KEY `idx_employee_created` (`employee_id`,`created_at`),
+  KEY `ix_impersonation` (`impersonation_id`),
+  CONSTRAINT `chk_act_attribution` CHECK (`impersonation_id` is null or `acted_by` is not null and `acted_for` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ── Table: admin_audit_log ──

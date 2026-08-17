@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-17 17:45:43
+-- المصدر: equipation_manage · التوليد: 2026-08-17 18:29:13
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -542,7 +542,10 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (494,'ربط الأصل بساعات تشغيله','Finance/asset_hours_link.php',19,NULL,0,0,'fa fa-link',27,NULL),
 (495,'احتساب إهلاك الفترة','Finance/depr_run.php',19,NULL,0,0,'fa fa-calculator',28,NULL),
 (496,'مركز الحوكمة التقني — الروابط اليتيمة','Governance/tech_gov_center.php',15,NULL,0,0,'fa fa-scale-balanced',610,NULL),
-(497,'النظام التصميمي — مرجع حي','Governance/design_system.php',15,NULL,0,0,'fa fa-palette',611,NULL);
+(497,'النظام التصميمي — مرجع حي','Governance/design_system.php',15,NULL,0,0,'fa fa-palette',611,NULL),
+(498,'قوالب الصلاحيات المعيارية','Governance/auth_profiles.php',15,NULL,0,0,'fa fa-id-card',612,NULL),
+(499,'منح الصلاحية','Governance/auth_grants.php',15,NULL,0,0,'fa fa-key',613,NULL),
+(500,'جلسات النيابة','Governance/impersonations.php',15,NULL,0,0,'fa fa-user-shield',614,NULL);
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -3568,7 +3571,19 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (3414,15,497,1,0,1,0),
 (3415,9,497,1,0,0,0),
 (3416,20,497,1,0,0,0),
-(3417,33,497,1,0,0,0);
+(3417,33,497,1,0,0,0),
+(3418,15,498,1,0,0,0),
+(3419,9,498,1,0,0,0),
+(3420,20,498,1,0,0,0),
+(3421,33,498,1,0,0,0),
+(3422,15,499,1,0,1,0),
+(3423,9,499,1,0,0,0),
+(3424,20,499,1,0,0,0),
+(3425,33,499,1,0,0,0),
+(3426,15,500,1,0,0,0),
+(3427,9,500,1,0,0,0),
+(3428,20,500,1,0,0,0),
+(3429,33,500,1,0,0,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -6488,7 +6503,10 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (10221,19,'DAILY',3666,494,'ربط الأصل بساعات تشغيله','Finance/asset_hours_link.php','fa fa-link',27,NULL,0,1,'2026-08-16 22:18:45','2026-08-16 22:18:45'),
 (10222,19,'DAILY',3666,495,'احتساب إهلاك الفترة','Finance/depr_run.php','fa fa-calculator',28,NULL,0,1,'2026-08-16 22:18:45','2026-08-16 22:18:45'),
 (10224,15,'GOV',3996,496,'مركز الحوكمة التقني','Governance/tech_gov_center.php','fa fa-scale-balanced',90,NULL,'Governance/tech_gov_center.php',1,'2026-08-17 17:03:07','2026-08-17 17:03:07'),
-(10225,15,'GOV',3996,497,'النظام التصميمي','Governance/design_system.php','fa fa-palette',91,NULL,'Governance/design_system.php',1,'2026-08-17 17:11:46','2026-08-17 17:11:46');
+(10225,15,'GOV',3996,497,'النظام التصميمي','Governance/design_system.php','fa fa-palette',91,NULL,'Governance/design_system.php',1,'2026-08-17 17:11:46','2026-08-17 17:11:46'),
+(10226,15,'GOV',3996,498,'قوالب الصلاحيات','Governance/auth_profiles.php','fa fa-id-card',92,NULL,'Governance/auth_profiles.php',1,'2026-08-17 18:28:30','2026-08-17 18:28:30'),
+(10227,15,'GOV',3996,499,'منح الصلاحية','Governance/auth_grants.php','fa fa-key',93,NULL,'Governance/auth_grants.php',1,'2026-08-17 18:28:30','2026-08-17 18:28:30'),
+(10228,15,'GOV',3996,500,'جلسات النيابة','Governance/impersonations.php','fa fa-user-shield',94,NULL,'Governance/impersonations.php',1,'2026-08-17 18:28:30','2026-08-17 18:28:30');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;

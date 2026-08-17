@@ -1,6 +1,9 @@
 ﻿الشاشة,في النطاق المرحَّل,مخالفات البوابات الآن,خط الأساس البصري,الحالة
 Governance/tech_gov_center.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
 Governance/design_system.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Governance/auth_profiles.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Governance/auth_grants.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
+Governance/impersonations.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
 Portal/ceo_board.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
 Portal/my_tasks.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
 Operations/sites_board.php,نعم,0,موجود,مُرحَّلة — بوابات صفر وخط أساس
