@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-17 06:13:32
--- الجداول: 589 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-17 06:20:09
+-- الجداول: 590 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -492,7 +492,8 @@ CREATE TABLE `approval_workflow_rules` (
   `source_ladder` varchar(12) DEFAULT NULL COMMENT 'رمزُ السلّمِ الحاكمِ في gov_ladders — والصفُّ المشتقُّ لا يُحرَّر يدويًّا',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_workflow_rule` (`entity_type`,`action`,`step_order`),
-  KEY `idx_workflow_rule_lookup` (`entity_type`,`action`,`is_active`)
+  KEY `idx_workflow_rule_lookup` (`entity_type`,`action`,`is_active`),
+  CONSTRAINT `chk_rules_retired` CHECK (`is_active` = 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: asset_hour_reconciliations ──
@@ -6505,6 +6506,16 @@ CREATE TABLE `gov_inheritance_denials` (
   PRIMARY KEY (`id`),
   KEY `ix_field` (`company_id`,`child_entity`,`child_field`,`denied_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-OBL-01 IN-01 — سجلُّ رفضِ تعديلِ الموروث';
+
+-- ── Table: gov_ladder_actor_roles ──
+CREATE TABLE `gov_ladder_actor_roles` (
+  `actor_code` varchar(40) NOT NULL,
+  `role_id` int(11) NOT NULL COMMENT 'دورُ النظامِ الذي يحمل هذا الموضع',
+  `basis` varchar(255) NOT NULL COMMENT 'سندُ الإسناد — لا إسنادَ بلا مرجع',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`actor_code`),
+  KEY `ix_role` (`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جسرُ موضعِ السلطةِ في السلّمِ بدورِ النظام — والموضعُ لا شخص';
 
 -- ── Table: gov_ladder_steps ──
 CREATE TABLE `gov_ladder_steps` (
@@ -14528,7 +14539,7 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_active_impersonations` A
 
 -- ── View: v_approval_rules_effective ──
 SET collation_connection = 'utf8mb4_unicode_ci';
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_approval_rules_effective` AS select `l`.`ladder_code` AS `ladder_code`,`l`.`slug` AS `entity_type`,`s`.`step_no` AS `step_order`,`s`.`actor_code` AS `role_required`,`s`.`actor_name_ar` AS `actor_name_ar`,`s`.`step_kind` AS `step_kind`,`s`.`may_approve` AS `may_approve`,`l`.`name_ar` AS `ladder_name`,`l`.`cap_kind` AS `cap_kind`,`l`.`cap_amount` AS `cap_amount`,`l`.`cap_currency` AS `cap_currency`,`l`.`cap_state` AS `cap_state`,`l`.`escalate_after_hours` AS `escalate_after_hours`,`l`.`is_active` AS `is_active` from (`gov_ladders` `l` join `gov_ladder_steps` `s` on(`s`.`ladder_code` = `l`.`ladder_code`)) where `l`.`is_active` = 1;
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_approval_rules_effective` AS select `l`.`ladder_code` AS `ladder_code`,`l`.`slug` AS `entity_type`,`s`.`step_no` AS `step_order`,coalesce(`a`.`role_id`,-99) AS `role_required`,`s`.`actor_code` AS `actor_code`,`s`.`actor_name_ar` AS `actor_name_ar`,`s`.`step_kind` AS `step_kind`,`s`.`may_approve` AS `may_approve`,`l`.`name_ar` AS `ladder_name`,`l`.`cap_kind` AS `cap_kind`,`l`.`cap_amount` AS `cap_amount`,`l`.`cap_currency` AS `cap_currency`,`l`.`cap_state` AS `cap_state`,`l`.`escalate_after_hours` AS `escalate_after_hours`,`l`.`is_active` AS `is_active` from ((`gov_ladders` `l` join `gov_ladder_steps` `s` on(`s`.`ladder_code` = `l`.`ladder_code`)) left join `gov_ladder_actor_roles` `a` on(`a`.`actor_code` = `s`.`actor_code`)) where `l`.`is_active` = 1;
 
 -- ── View: v_authority_expiring ──
 SET collation_connection = 'utf8mb4_general_ci';

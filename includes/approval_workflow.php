@@ -129,11 +129,23 @@ if (!function_exists('approval_get_workflow_rules')) {
         $entity_type = mysqli_real_escape_string($conn, $entity_type);
         $action = mysqli_real_escape_string($conn, $action);
 
-        $sql = "SELECT role_required, step_order
-                FROM approval_workflow_rules
+        /* ══ مصدرُ قاعدةِ الاعتمادِ الوحيد: سلاليمُ الحوكمة (ج · 2026-08-19) ══
+           كان المحرّكُ يقرأ `approval_workflow_rules` — جدولًا **بلا حاكم**،
+           بينما `gov_ladders` وثيقةٌ محكومةٌ **بلا منفِّذ**. فما في الوثيقةِ لا
+           يُنفَّذ وما يُنفَّذ لا تحكمه وثيقة.
+           ◆ والآن يقرأ `v_approval_rules_effective` المشتقَّ من السلاليمِ
+             وخطواتِها، بدورٍ مجسورٍ من `gov_ladder_actor_roles` (موضعُ سلطةٍ
+             لا اسمُ شخص). و`may_approve` تميّز خطوةَ **الاعتماد** من خطوةِ
+             الإدخالِ والمراجعة — فيُفرض الترتيبُ واليدُ كما في الوثيقة.
+           ◆ والمصدرُ القديمُ عُطِّل وقُيِّد بـCHECK فلا يُحيا صامتًا.
+           ◆ وارتدادٌ **معلَنٌ لا صامت**: سلّمٌ غيرُ معرَّفٍ يُرجع صفرَ قواعدَ
+             فيرفع المحرّكُ استثناءَه المنصوصَ («لا توجد مراحلُ موافقة») —
+             ولا يسقط لمصدرٍ ثانٍ. */
+        $sql = "SELECT role_required, step_order, may_approve, actor_code, ladder_code
+                FROM v_approval_rules_effective
                 WHERE entity_type = '$entity_type'
-                  AND action = '$action'
                   AND is_active = 1
+                  AND role_required <> -99
                 ORDER BY step_order ASC";
 
         $result = mysqli_query($conn, $sql);
