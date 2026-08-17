@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-17 20:05:20
--- الجداول: 569 · المناظير: 23
+-- المصدر: equipation_manage · التوليد: 2026-08-17 22:23:04
+-- الجداول: 570 · المناظير: 23
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6503,6 +6503,28 @@ CREATE TABLE `gov_role_profiles` (
   UNIQUE KEY `uq_profile` (`company_id`,`profile_code`,`version`),
   KEY `ix_grade_dept` (`grade`,`dept_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-AUTH-01 A2 — قالبُ المسمَّى: تسعُ درجاتٍ × الإداراتِ التسعَ عشرة';
+
+-- ── Table: gov_screen_cycle ──
+CREATE TABLE `gov_screen_cycle` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'عمودُ العزل — 0: مصفوفةٌ معياريةٌ لكلِّ الكيانات',
+  `dept_name` varchar(120) NOT NULL,
+  `layer_name` varchar(60) NOT NULL COMMENT 'مركزُ العمل · دورةُ الإدارة · المرجعُ والإدارة',
+  `stage_order` varchar(10) NOT NULL DEFAULT '',
+  `stage_name` varchar(160) NOT NULL DEFAULT '',
+  `group_name` varchar(160) NOT NULL DEFAULT '',
+  `screen_title` varchar(255) NOT NULL,
+  `screen_file` varchar(160) NOT NULL DEFAULT '' COMMENT 'مفتاحُ عرضِ الترويسة — فارغٌ حيث لا ملفَ في الورقة',
+  `inputs_note` varchar(255) NOT NULL DEFAULT '' COMMENT '① ما يدخل',
+  `output_doc` varchar(255) NOT NULL DEFAULT '' COMMENT '② المستندُ الرسميُّ الناتج — NM-06',
+  `resp_role` varchar(160) NOT NULL DEFAULT '' COMMENT '③④ من يراجع/يعتمد',
+  `next_state` varchar(255) NOT NULL DEFAULT '' COMMENT '⑤ الحالةُ التالية',
+  `consumers` varchar(255) NOT NULL DEFAULT '' COMMENT '⑥ الإدارةُ المستهلكة',
+  `fin_impact` varchar(160) NOT NULL DEFAULT '' COMMENT '⑦ الأثرُ الماليّ',
+  PRIMARY KEY (`id`),
+  KEY `ix_file` (`screen_file`),
+  KEY `ix_dept` (`dept_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXW-01 §7-1 — مصفوفةُ التحققِ الحاكمةُ: عناصرُ الدورةِ السبعةُ لكلِّ شاشة';
 
 -- ── Table: gov_stage_outputs ──
 CREATE TABLE `gov_stage_outputs` (

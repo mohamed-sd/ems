@@ -206,18 +206,18 @@ if ($__showBack && isset($header_back) && !empty($header_back)) {
     <?php } ?>
 
     <?php
-    // TKT-15 (update0004 · TKT-01 §2-⑧): «أي شاشة في النظام» موضع فتح بلاغ —
-    // زر عام في الرأس الموحد يحمل مسار الشاشة، والشاشات التشغيلية تضيف فوقه
-    // زرها الغني بالسياق (المعدة والموقع). يُخفى بـ$header_no_report عند اللزوم.
-    if (empty($header_no_report) && basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')) !== 'ticket_contextual_open.php') {
-        $__rbScreen = trim(str_replace('\\', '/', dirname((string) ($_SERVER['SCRIPT_NAME'] ?? ''))), '/');
-        $__rbScreen = basename($__rbScreen) . '/' . basename((string) ($_SERVER['SCRIPT_NAME'] ?? ''));
-        echo '<form method="post" action="../Tickets/ticket_contextual_open.php" style="display:inline" class="ems-report-btn-secondary">'
-            . '<input type="hidden" name="ctx_screen" value="' . htmlspecialchars($__rbScreen, ENT_QUOTES, 'UTF-8') . '">'
-            . '<button type="submit" class="head_back ems-head-circle" title="أبلغ عن مشكلة" '
-            . 'style="border:0;background:transparent;cursor:pointer;color:#c0392b">'
-            . '<i class="fas fa-bullhorn"></i></button></form>';
-    }
+    /* ── زرُّ «أبلغ عن مشكلة» رُفع من شريطِ الترويسة — قرارُ المالك 2026-08-17 ──
+       كان هنا زرٌّ دائريٌّ (بوقٌ أحمر) يُعرض في ترويسةِ **كلِّ** شاشةٍ إلى جانبِ
+       «عن الشاشة» والإحصاءاتِ وأزرارِ الإضافة، فيزاحمها ويكرّر بابًا مفتوحًا
+       أصلًا. رُفع من هذا الشريطِ بطلبِ المالك.
+
+       ◆ ومطلبُ TKT-01 §2-⑧ («أيُّ شاشةٍ في النظام موضعُ فتحِ بلاغ») **لم يسقط**:
+         يحمله `ems_report_button_fallback()` الطافي أسفلَ كلِّ شاشةٍ مصادَقة —
+         يُحقن من `insidebar.php` قبلَ `</body>` ويحمل مسارَ الشاشةِ ووقتَها.
+         والشاشاتُ التشغيليةُ تبقى تستدعي زرَها الغنيَّ بالسياق (المعدةُ والموقعُ
+         والوردية) بـ`ems_report_button()` — فلا يضيع سياقٌ ولا يُغلق باب.
+       ◆ ولإعادتِه: أعِدْ كتلةَ الإصدارِ هذه — و`$header_no_report` كان مفتاحَ
+         إخفائه في شاشةٍ بعينها، وصار بلا أثرٍ برفعِ الزرِّ كليًّا. */
     ?>
 </div>
 <?php
@@ -256,6 +256,37 @@ if (!empty($header_context) && is_array($header_context)) {
     }
     echo '</div>';
     $header_context = array(); // لا تسرُّبَ لتضمينٍ لاحقٍ في الصفحة نفسها
+}
+
+/* ◆ سطرُ الدورةِ المستنديةِ (UXW-01 §7-1) — من «مصفوفة التحقق» الحاكمةِ
+     المبذورةِ في gov_screen_cycle: الحالةُ التاليةُ والمستندُ الرسميُّ الناتج.
+     «ولا تُعَدُّ الملاحةُ كاملةً بمعرفةِ الشاشةِ التاليةِ وحدَها — بل بمعرفةِ
+      الناتجِ الرسميِّ للمرحلة». يُطبع مرةً واحدةً، وبصمتٍ عند أيِّ تعذُّر،
+     ويُحجم إن تعددت صفوفُ الشاشةِ بحالاتٍ متباينةٍ (الغموضُ لا يُخمَّن). */
+if (empty($GLOBALS['__ems_cycle_line_done']) && isset($GLOBALS['conn']) && $GLOBALS['conn'] instanceof mysqli) {
+    $GLOBALS['__ems_cycle_line_done'] = true;
+    $__scr = str_replace('\\', '/', isset($_SERVER['SCRIPT_NAME']) ? $_SERVER['SCRIPT_NAME'] : '');
+    /* مفتاحُ المصفوفةِ اسمُ الملفِّ بلا مجلدِه — كما وردت الورقةُ حرفًا */
+    if (preg_match('~/([A-Za-z0-9_]+\.php)$~', $__scr, $__sm)) {
+        $__key = $GLOBALS['conn']->real_escape_string($__sm[1]);
+        $__cr = @$GLOBALS['conn']->query(
+            "SELECT COUNT(DISTINCT next_state) dn, MAX(next_state) ns, MAX(output_doc) od
+               FROM gov_screen_cycle
+              WHERE screen_file = '{$__key}'
+                AND next_state NOT IN ('', '—', '-')");
+        $__cy = $__cr ? $__cr->fetch_assoc() : null;
+        if ($__cy !== null && (int) $__cy['dn'] === 1 && function_exists('ems_next_step')) {
+            $__od = (string) $__cy['od'];
+            $__odShown = ($__od !== '' && mb_strpos($__od, 'بلا مستندٍ رسمي') === false
+                          && $__od !== '—' && $__od !== '-')
+                ? ' <span class="ems-cycle-doc">← ينتج: ' . htmlspecialchars($__od, ENT_QUOTES, 'UTF-8') . '</span>'
+                : '';
+            echo '<div class="ems-cycle-line" dir="rtl">'
+               . ems_next_step((string) $__cy['ns'])
+               . $__odShown
+               . '</div>';
+        }
+    }
 }
 
 /* ◆ شارةُ المنظرِ تحت الترويسةِ مباشرةً — تُعلن أيَّ منظرٍ أنت فيه وتردُّك

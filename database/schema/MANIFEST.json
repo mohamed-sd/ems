@@ -1,19 +1,19 @@
 {
-    "generated_at": "2026-08-17 20:05:20",
+    "generated_at": "2026-08-17 22:23:04",
     "source_db": "equipation_manage",
     "server_version": "11.4.9-MariaDB-log",
     "files": {
         "schema.sql": {
-            "sha1": "ed417cbdf823ca5333f2a24d558239abe8dc1eb7",
-            "bytes": 974123
+            "sha1": "746b26d4087075135d9f794e96a4711f01ef7f27",
+            "bytes": 975772
         },
         "seed_reference.sql": {
-            "sha1": "0d2acfacedc2bb04821ad3c80d5196db08a22d08",
+            "sha1": "9746ed86d3259d8c3b29a4e35ab2ada51cdb5714",
             "bytes": 882395
         }
     },
     "schema": {
-        "tables": 569,
+        "tables": 570,
         "views": 23
     },
     "seed": {
