@@ -295,6 +295,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     <?php endif; ?>
 
+    <?= ems_states_bundle('لا موردين ضمنَ هذا الترشيح', 'وسّع الترشيحَ أو سجِّل موردًا جديدًا') ?>
+
     <div class="stats-section suppliers-hidden" id="suppliersStatsSection">
         <div class="stats-grid">
             <div class="stats-card stats-primary">
@@ -381,41 +383,41 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <label for="commercial_registration">المعدات (يمكن اختيار أكثر من نوع)</label>
                         <div class="checkbox-grid">
                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="حفارات" checked>
+                                <input type="checkbox" name="equipment_types[]" value="حفارات" aria-label="حفارات" checked>
                                 <span>حفارات</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="مكنات تخريم">
+                                <input type="checkbox" name="equipment_types[]" value="مكنات تخريم" aria-label="مكنات تخريم">
                                 <span>مكنات تخريم</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="دوازر">
+                                <input type="checkbox" name="equipment_types[]" value="دوازر" aria-label="دوازر">
                                 <span>دوازر</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="شاحنات قلابة">
+                                <input type="checkbox" name="equipment_types[]" value="شاحنات قلابة" aria-label="شاحنات قلابة">
                                 <span>شاحنات قلابة</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="شاحنات تناكر">
+                                <input type="checkbox" name="equipment_types[]" value="شاحنات تناكر" aria-label="شاحنات تناكر">
                                 <span>شاحنات تناكر</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="جرافات">
+                                <input type="checkbox" name="equipment_types[]" value="جرافات" aria-label="جرافات">
                                 <span>جرافات</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="معدات معالجة">
+                                <input type="checkbox" name="equipment_types[]" value="معدات معالجة" aria-label="معدات معالجة">
                                 <span>معدات معالجة</span>
                             </label>
 
                              <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="السيارات والكرفانات">
+                                <input type="checkbox" name="equipment_types[]" value="السيارات والكرفانات" aria-label="السيارات والكرفانات">
                                 <span> السيارات والكرفانات</span>
                             </label>
 
                                 <label class="checkbox-label">
-                                    <input type="checkbox" name="equipment_types[]" value="معدات أخرى">
+                                    <input type="checkbox" name="equipment_types[]" value="معدات أخرى" aria-label="معدات أخرى">
                                     <span>معدات أخرى</span>
                             </label>
 
@@ -431,41 +433,41 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <label>رقم التسجيل التجاري/الرخصة</label>
                         <div class="checkbox-grid">
                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="حفارات" checked>
+                                <input type="checkbox" name="equipment_types[]" value="حفارات" aria-label="حفارات" checked>
                                 <span>حفارات</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="مكنات تخريم">
+                                <input type="checkbox" name="equipment_types[]" value="مكنات تخريم" aria-label="مكنات تخريم">
                                 <span>مكنات تخريم</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="دوازر">
+                                <input type="checkbox" name="equipment_types[]" value="دوازر" aria-label="دوازر">
                                 <span>دوازر</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="شاحنات قلابة">
+                                <input type="checkbox" name="equipment_types[]" value="شاحنات قلابة" aria-label="شاحنات قلابة">
                                 <span>شاحنات قلابة</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="شاحنات تناكر">
+                                <input type="checkbox" name="equipment_types[]" value="شاحنات تناكر" aria-label="شاحنات تناكر">
                                 <span>شاحنات تناكر</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="جرافات">
+                                <input type="checkbox" name="equipment_types[]" value="جرافات" aria-label="جرافات">
                                 <span>جرافات</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="معدات معالجة">
+                                <input type="checkbox" name="equipment_types[]" value="معدات معالجة" aria-label="معدات معالجة">
                                 <span>معدات معالجة</span>
                             </label>
 
                              <label class="checkbox-label">
-                                <input type="checkbox" name="equipment_types[]" value="السيارات والكرفانات">
+                                <input type="checkbox" name="equipment_types[]" value="السيارات والكرفانات" aria-label="السيارات والكرفانات">
                                 <span> السيارات والكرفانات</span>
                             </label>
 
                                 <label class="checkbox-label">
-                                    <input type="checkbox" name="equipment_types[]" value="معدات أخرى">
+                                    <input type="checkbox" name="equipment_types[]" value="معدات أخرى" aria-label="معدات أخرى">
                                     <span>معدات أخرى</span>
                             </label>
 
@@ -709,25 +711,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     (function () {
 
         // ════════════════════════════════════════════════
-        // تشغيل DataTable بالعربية
+        // تهيئةُ جدولِ الموردين انتقلت إلى المكوّنِ المركزي
+        // (assets/js/ui-unification.js — initializeMissingDataTables):
+        // لغةٌ عربية وضبطُ أعمدةٍ وتمريرٌ أفقيٌّ وزرُّ إكسل موحَّد.
         // ════════════════════════════════════════════════
-        $(document).ready(function () {
-            $('#projectsTable').DataTable({
-                scrollX: true,
-                autoWidth: false,
-                dom: 'Bfrtip',
-                buttons: [
-                    { extend: 'copy', text: '📋 نسخ' },
-                    { extend: 'excel', text: '📊 Excel' },
-                    { extend: 'csv', text: '📄 CSV' },
-                    { extend: 'pdf', text: '📕 PDF' },
-                    { extend: 'print', text: '🖨️ طباعة' }
-                ],
-                "language": {
-                    "url": "/ems/assets/i18n/datatables/ar.json"
-                }
-            });
-        });
 
         // ════════════════════════════════════════════════
         // إظهار / إخفاء فورم الإضافة

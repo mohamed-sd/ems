@@ -114,6 +114,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 $sf_supplier_id = intval($_GET['supplier_id'] ?? $_GET['id'] ?? 0); $sf_active = 'closure';
 if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php';
 ?>
+<style>
+    /* أنماطُ الشاشةِ الصفحية — الألوانُ رموزٌ من design-tokens.css حصرًا */
+    .scl-note { color: var(--c-s-666); }
+    .scl-table-full { width: 100%; }
+    .scl-form-inline { margin: 0; }
+    .scl-form-flex { margin: 0; display: flex; gap: 6px; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'تصفية إنهاء عقد المورد'; $header_icon = 'fa fa-file-circle-check';
@@ -126,8 +133,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     }
     ?>
 
+    <?= ems_states_bundle('لا تصفياتِ إنهاءٍ ضمنَ هذا النطاق', 'التصفيةُ تُفتح لعقدٍ منتهٍ من قائمةِ «عقودٌ منتهيةٌ بلا تصفية»') ?>
+
     <div class="card"><div class="card-body">
-        <p style="color:#666">
+        <p class="scl-note">
             «عند الإنهاء: <strong>إقفالُ الحصة</strong> · <strong>تسويةُ العهد والسلف</strong> ·
             <strong>ردُّ الضمان بعد مهلته</strong> · و<strong>شهادةُ إخلاءٍ موثَّقة</strong>» (ENT-02 §4)
             — والخطواتُ <strong>بترتيبها لا بالنيّة</strong>: لا إخلاءَ وحاويةٌ مفتوحةٌ أو سلفةٌ برصيد،
@@ -139,10 +148,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-folder-open"></i> عقودٌ منتهيةٌ بلا تصفية</h5></div>
     <div class="card-body">
         <?php if (!$endedContracts): ?>
-            <p style="color:#666">لا عقدَ منتهيًا ينتظر تصفيةً — <strong>والتصفيةُ عند الإنهاء لا قبله</strong>.</p>
+            <p class="scl-note">لا عقدَ منتهيًا ينتظر تصفيةً — <strong>والتصفيةُ عند الإنهاء لا قبله</strong>.</p>
         <?php else: ?>
         <div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap scl-table-full">
             <thead><tr><th>العقد</th><th>المورد</th><th>الحالة</th><th>ينتهي</th>
                 <th>ضمان الأداء</th><th>مهلة الردّ</th><th></th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -190,7 +199,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <td><?php echo $c['guarantee_retention_days'] !== null
                         ? htmlspecialchars((string)$c['guarantee_retention_days']) . ' يومًا' : '—'; ?></td>
                     <td>
-                        <form method="post" style="margin:0">
+                        <form method="post" class="scl-form-inline">
         <?= csrf_field() ?>
                             <input type="hidden" name="cl_action" value="open">
                             <input type="hidden" name="contract_id" value="<?php echo intval($c['id']); ?>">
@@ -225,7 +234,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <?php endif; ?>
 
         <div class="table-container">
-        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <table class="alltables display nowrap scl-table-full" data-no-dt="1">
             <thead><tr><th>الخطوة</th><th>القياس ومصدره</th><th>الحال</th><th>الفعل</th></tr></thead>
             <tbody>
             <tr>
@@ -237,7 +246,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         <br><small><?php echo htmlspecialchars((string)$cl['quota_close_reason']); ?></small>
                     <?php endif; ?></td>
                 <td><?php if ($can_edit && $cl['quota_closed_at'] === null && (string)$cl['state'] !== 'closed'): ?>
-                    <form method="post" style="margin:0;display:flex;gap:6px">
+                    <form method="post" class="scl-form-flex">
         <?= csrf_field() ?>
                         <input type="hidden" name="cl_action" value="quota">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
@@ -253,7 +262,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <td><?php echo $cl['advances_settled_at'] !== null
                     ? '<span class="badge badge-success">مسوّاة</span>' : '<span class="badge badge-warning">قائمة</span>'; ?></td>
                 <td><?php if ($can_edit && $cl['advances_settled_at'] === null && (string)$cl['state'] !== 'closed'): ?>
-                    <form method="post" style="margin:0">
+                    <form method="post" class="scl-form-inline">
         <?= csrf_field() ?>
                         <input type="hidden" name="cl_action" value="advances">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
@@ -272,7 +281,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     : '<span class="badge badge-warning">محتجز</span>'; ?></td>
                 <td><?php if ($can_edit && $cl['guarantee_amount'] !== null
                             && $cl['guarantee_released_at'] === null && (string)$cl['state'] !== 'closed'): ?>
-                    <form method="post" style="margin:0">
+                    <form method="post" class="scl-form-inline">
         <?= csrf_field() ?>
                         <input type="hidden" name="cl_action" value="guarantee">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">
@@ -287,7 +296,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <td><?php echo (string)$cl['state'] === 'closed'
                     ? '<span class="badge badge-success">أُخلي</span>' : '<span class="badge badge-warning">قيد التصفية</span>'; ?></td>
                 <td><?php if ($can_edit && (string)$cl['state'] !== 'closed'): ?>
-                    <form method="post" style="margin:0;display:flex;gap:6px">
+                    <form method="post" class="scl-form-flex">
         <?= csrf_field() ?>
                         <input type="hidden" name="cl_action" value="close">
                         <input type="hidden" name="closure_id" value="<?php echo intval($cl['id']); ?>">

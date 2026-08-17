@@ -195,7 +195,11 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main ems-unified-page-shell" dir="rtl">
+<style>
+/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصناف */
+.supbk-form-actions { margin-top: 12px; display: flex; gap: 10px; }
+</style>
+<div class="main ems-unified-page-shell ems-doc-cycle" dir="rtl">
     <?php
     $header_title = 'حسابات الموردين البنكية';
     $header_icon = 'fa fa-building-columns';
@@ -208,6 +212,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
+    echo ems_next_step('توثيقُ الحسابِ بمستندِ إثباتٍ ومحقِّقٍ مسجَّلٍ — من شاشةِ «وثائق المورد»');
+    echo ems_states_bundle('لا حساباتٍ بنكيةً مسجَّلةً بعد', 'وثِّقِ الحسابَ من شاشةِ وثائقِ الموردِ فيظهر صفُّه هنا');
     ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
@@ -261,7 +267,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_1426_00a90">درجة الأثر</label>
                     <input type="text" name="f20" maxlength="190" id="emsf_1426_00a90"></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <div class="supbk-form-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
                 <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>

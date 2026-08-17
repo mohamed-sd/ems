@@ -75,14 +75,27 @@ include __DIR__ . '/../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="content-wrapper" dir="rtl">
+<style>
+/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصنافٍ — والألوانُ رموزٌ حصرًا */
+.suph-sub { color: var(--c-666666, #666); margin: 4px 0 0; }
+.suph-flash { display: flex; gap: 8px; align-items: center; }
+.suph-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.suph-req { color: var(--c-state-danger-strong); }
+.suph-span-all { grid-column: 1 / -1; }
+.suph-empty-note { color: var(--c-777777, #777); }
+</style>
+<div class="content-wrapper ems-doc-cycle" dir="rtl">
   <section class="content-header"><h1>تسليمُ الحصص بين الموردين</h1>
-    <p style="color:#666;margin:4px 0 0">هنا نسجّل انتقالَ حصةِ ساعاتٍ من موردٍ إلى آخر — بمستندٍ وتاريخٍ، ولا يُمسُّ شهرٌ مغلق.</p>
+    <p class="suph-sub">هنا نسجّل انتقالَ حصةِ ساعاتٍ من موردٍ إلى آخر — بمستندٍ وتاريخٍ، ولا يُمسُّ شهرٌ مغلق.</p>
   </section>
   <section class="content">
+    <?php
+    echo ems_next_step('تسجيلُ التسليمِ بمستندِه وتاريخِ سريانِه — والحصةُ تنتقل بين الحاويتين فورَ الحفظ');
+    echo ems_states_bundle('لا تسليماتِ حصصٍ مسجَّلةً بعد', 'سجّلِ التسليمَ بمستندِه وتاريخِه فيظهر أثرُه هنا');
+    ?>
 
     <?php if ($flash !== null): ?>
-      <div class="alert <?= $flash_ok ? 'alert-success' : 'alert-danger' ?>" style="display:flex;gap:8px;align-items:center">
+      <div class="alert suph-flash <?= $flash_ok ? 'alert-success' : 'alert-danger' ?>">
         <span><?= $flash_ok ? '✔ نجح:' : '✖ توقف:' ?></span>
         <span><?= htmlspecialchars($flash, ENT_QUOTES, 'UTF-8') ?></span>
       </div>
@@ -90,31 +103,31 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 
     <?php if (!empty($PERMS['can_add'])): ?>
     <div class="box box-primary"><div class="box-header with-border"><h3 class="box-title">سجّل تسليمًا جديدًا</h3></div>
-      <form method="post" class="box-body ems-form" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+      <form method="post" class="box-body ems-form suph-grid">
         <?= csrf_field() ?>
-        <div><label>الموردُ المسلِّم <span style="color:#c00">*</span></label>
-          <select name="from_container_id" class="form-control" required>
+        <div><label for="suph_from">الموردُ المسلِّم <span class="suph-req">*</span></label>
+          <select name="from_container_id" id="suph_from" class="form-control" required>
             <option value="">— اختر —</option>
             <?php foreach ($containers as $c): ?>
               <option value="<?= (int) $c['id'] ?>"><?= htmlspecialchars($c['container_no'] . ' — ' . ($c['legal_name'] ?: 'مورد؟') . ' (متاح ' . number_format((float) $c['allocated_qty']) . ' ساعة)', ENT_QUOTES, 'UTF-8') ?></option>
             <?php endforeach; ?>
           </select></div>
-        <div><label>الموردُ المستلِم <span style="color:#c00">*</span></label>
-          <select name="to_container_id" class="form-control" required>
+        <div><label for="suph_to">الموردُ المستلِم <span class="suph-req">*</span></label>
+          <select name="to_container_id" id="suph_to" class="form-control" required>
             <option value="">— اختر —</option>
             <?php foreach ($containers as $c): ?>
               <option value="<?= (int) $c['id'] ?>"><?= htmlspecialchars($c['container_no'] . ' — ' . ($c['legal_name'] ?: 'مورد؟'), ENT_QUOTES, 'UTF-8') ?></option>
             <?php endforeach; ?>
           </select></div>
-        <div><label>الكميةُ المنقولة (ساعة) <span style="color:#c00">*</span></label>
+        <div><label>الكميةُ المنقولة (ساعة) <span class="suph-req">*</span></label>
           <input type="number" step="0.01" min="0.01" name="moved_qty" class="form-control" required placeholder="مثال: 300 ساعة"></div>
-        <div><label>تاريخُ السريان <span style="color:#c00">*</span></label>
-          <input type="date" name="effective_from" class="form-control" required></div>
-        <div><label>مستندُ التسليم <span style="color:#c00">*</span></label>
+        <div><label for="suph_eff">تاريخُ السريان <span class="suph-req">*</span></label>
+          <input type="date" name="effective_from" id="suph_eff" class="form-control" required></div>
+        <div><label>مستندُ التسليم <span class="suph-req">*</span></label>
           <input type="text" name="doc_ref" class="form-control" required placeholder="رقمُ المحضرِ أو الخطاب"></div>
-        <div><label>السبب <span style="color:#c00">*</span></label>
+        <div><label>السبب <span class="suph-req">*</span></label>
           <input type="text" name="reason" class="form-control" required placeholder="لماذا يُسلَّم؟"></div>
-        <div style="grid-column:1/-1"><button type="submit" class="btn btn-primary">احفظِ التسليم</button></div>
+        <div class="suph-span-all"><button type="submit" class="btn btn-primary">احفظِ التسليم</button></div>
       </form>
     </div>
     <?php endif; ?>
@@ -122,7 +135,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="box"><div class="box-header with-border"><h3 class="box-title">آخرُ التسليمات</h3></div>
       <div class="box-body table-responsive">
         <?php if (!$swaps): ?>
-          <p style="color:#777">لا تسليماتَ بعدُ — أولُ تسليمٍ تسجّله يظهر هنا.</p>
+          <p class="suph-empty-note">لا تسليماتَ بعدُ — أولُ تسليمٍ تسجّله يظهر هنا.</p>
         <?php else: ?>
         <table class="table table-bordered table-striped">
           <thead><tr><th>#</th><th>التاريخ</th><th>من</th><th>إلى</th><th>الكمية</th><th>المستند</th><th>السبب</th></tr></thead>

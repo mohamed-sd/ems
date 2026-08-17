@@ -45,3 +45,13 @@ FinRequests/accountant_desk.php
 FinRequests/effect_map.php
 FinRequests/my_requests.php
 FinRequests/routing_admin.php
+# موجةُ الإداراتِ ٢ — الموردون (بالشدة) — رُحِّلت 2026-08-17
+Suppliers/sup_handover.php
+Suppliers/supplier_advances.php
+Suppliers/supplier_bank.php
+Suppliers/supplier_capacity.php
+Suppliers/supplier_evaluation.php
+Suppliers/supplier_rules.php
+Suppliers/unit_statement_supplier.php
+Suppliers/supplier_closure.php
+Suppliers/suppliers.php

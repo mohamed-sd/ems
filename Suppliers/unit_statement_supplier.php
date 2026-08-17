@@ -45,14 +45,20 @@ include __DIR__ . '/../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+  /* أنماطُ الشاشةِ الصفحية — الألوانُ رموزٌ من design-tokens.css حصرًا */
+  .uss-sub { color: var(--c-s-666); margin: 4px 0 0; }
+  .uss-muted { color: var(--c-s-777); }
+</style>
 <div class="content-wrapper" dir="rtl">
   <section class="content-header"><h1>كشفُ وحداتِ المورد</h1>
-    <p style="color:#666;margin:4px 0 0">أداءُ كلِّ موردٍ شهرًا شهرًا من القيدِ اليومي — وتسوياتُه بالمنفَّذِ المحسوبِ والمتحمَّلِ من الخزينة.</p>
+    <p class="uss-sub">أداءُ كلِّ موردٍ شهرًا شهرًا من القيدِ اليومي — وتسوياتُه بالمنفَّذِ المحسوبِ والمتحمَّلِ من الخزينة.</p>
   </section>
   <section class="content">
+    <?= ems_states_bundle('لا قيودَ منسوبةً لموردين ضمنَ هذا النطاق', 'سجِّل القيدَ اليوميَّ منسوبًا لمورده ثم عُد لهذا الكشف') ?>
     <div class="box"><div class="box-header with-border"><h3 class="box-title">الأداءُ الشهري (من القيدِ اليومي)</h3></div>
       <div class="box-body table-responsive">
-      <?php if (!$rows): ?><p style="color:#777">لا قيودَ منسوبةً لموردين بعدُ.</p>
+      <?php if (!$rows): ?><p class="uss-muted">لا قيودَ منسوبةً لموردين بعدُ.</p>
       <?php else: ?>
       <table class="table table-bordered table-striped">
         <thead><tr><th>الشهر</th><th>المورد</th><th>تشغيلٌ (ساعة)</th><th>استعدادٌ (ساعة)</th><th>تعطلٌ يتحمّله (ساعة)</th><th>أيامُ العمل</th></tr></thead>
@@ -73,7 +79,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     </div></div>
     <div class="box"><div class="box-header with-border"><h3 class="box-title">التسويات (F-07 منفَّذُ الموردِ · F-08 المتحمَّلُ من الخزينة)</h3></div>
       <div class="box-body table-responsive">
-      <?php if (!$settle): ?><p style="color:#777">لا تسوياتِ موردين بعدُ.</p>
+      <?php if (!$settle): ?><p class="uss-muted">لا تسوياتِ موردين بعدُ.</p>
       <?php else: ?>
       <table class="table table-bordered table-striped">
         <thead><tr><th>التسوية</th><th>المورد</th><th>الفترة</th><th>منفَّذُ العميل (ساعة)</th><th>منفَّذُ المورد (ساعة)</th><th>المتحمَّلُ من الخزينة (ساعة)</th><th>الحالة</th></tr></thead>

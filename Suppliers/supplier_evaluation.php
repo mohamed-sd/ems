@@ -125,7 +125,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 $sf_supplier_id = intval($_GET['supplier_id'] ?? $_GET['id'] ?? 0); $sf_active = 'evaluation';
 if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php';
 ?>
-<div class="main ems-unified-page-shell">
+<style>
+/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصنافٍ — والألوانُ رموزٌ حصرًا */
+.sev-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.sev-supplier-select { min-width: 320px; }
+.sev-quote { color: var(--c-666666, #666); margin-top: 10px; }
+.sev-muted { color: var(--c-666666, #666); }
+.sev-req { color: var(--c-state-danger-strong); }
+.sev-table-gap { margin-top: 12px; }
+.sev-table { width: 100%; }
+.sev-actions { margin-top: 12px; }
+.sev-partial-note { color: var(--c-a15c00, #a15c00); }
+.sev-decide-form { margin-top: 14px; }
+.sev-decision-note { color: var(--c-a15c00, #a15c00); }
+</style>
+<div class="main ems-unified-page-shell ems-doc-cycle">
     <?php
     $header_title = 'تقييم المورد الدوري'; $header_icon = 'fa fa-star-half-stroke';
     $header_actions = array();
@@ -135,23 +149,25 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
+    echo ems_next_step('اعتمادُ قرارِ التجديدِ على التقييمِ المسودةِ — الرقمُ يخبر والإنسانُ يقرّر');
+    echo ems_states_bundle('لا تقييماتٍ لهذا الموردِ في الفترة', 'ولّدِ التقييمَ من سجلاتِ النظامِ أو غيّرِ الفترة');
     ?>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="sev-filter">
             <strong>المورد:</strong>
-            <select name="supplier_id" onchange="this.form.submit()" style="min-width:320px">
+            <select name="supplier_id" onchange="this.form.submit()" class="sev-supplier-select" aria-label="اختيارُ الموردِ المُقيَّم">
                 <?php foreach ($suppliers as $s): ?>
                     <option value="<?php echo intval($s['id']); ?>" <?php echo $selected === intval($s['id']) ? 'selected' : ''; ?>>
                         #<?php echo intval($s['id']); ?> — <?php echo htmlspecialchars((string)$s['name']); ?>
                     </option>
                 <?php endforeach; ?>
             </select>
-            <label for="emsf_501_419f9">من</label><input type="date" name="from" value="<?php echo htmlspecialchars($pFrom); ?>" id="emsf_501_419f9">
-            <label for="emsf_502_5b9fd">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($pTo); ?>" id="emsf_502_5b9fd">
+            <label for="emsf_501_419f9">من</label><input type="date" name="from" id="emsf_501_419f9" value="<?php echo htmlspecialchars($pFrom); ?>">
+            <label for="emsf_502_5b9fd">إلى</label><input type="date" name="to" id="emsf_502_5b9fd" value="<?php echo htmlspecialchars($pTo); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اضبط الفترة</button>
         </form>
-        <p style="color:#666;margin-top:10px">
+        <p class="sev-quote">
             «دوريٌّ <strong>بمؤشراتٍ من سجلات النظام لا انطباعًا</strong>» (§4) — فلا حقلَ هنا
             لكتابة نتيجةٍ ولا قيمةِ مؤشر: كلُّ رقمٍ <strong>يُقرأ من مصدره</strong>، والقرارُ وحدَه إنسانيّ.
         </p>
@@ -173,23 +189,23 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="ev_action" value="weight">
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
-                <div class="form-group"><label for="emsf_503_295f9">المؤشر <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_503_295f9">المؤشر <span class="sev-req">*</span></label>
                     <select name="indicator" required id="emsf_503_295f9">
                         <?php foreach (SES::INDICATOR_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                         <?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label for="emsf_504_462de">الوزن ٪ <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_504_462de">الوزن ٪ <span class="sev-req">*</span></label>
                     <input type="number" step="0.01" min="0.01" max="100" name="weight" required id="emsf_504_462de"></div>
                 <div class="form-group"><label for="emsf_505_1f9c5">المقياس <small>— للحوادث: العددُ الذي تبلغ عنده النتيجةُ صفرًا</small></label>
                     <input type="number" step="0.01" min="0" name="scale_max" id="emsf_505_1f9c5"></div>
                 <div class="form-group"><label for="emsf_506_2aa6a">ملاحظة</label><input type="text" name="wnote" maxlength="255" id="emsf_506_2aa6a"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ الوزن</button></div>
+            <div class="sev-actions"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ الوزن</button></div>
         </form>
         <?php endif; ?>
-        <div class="table-container" style="margin-top:12px">
-        <table class="alltables display nowrap" style="width:100%">
+        <div class="table-container sev-table-gap">
+        <table class="alltables display nowrap sev-table">
             <thead><tr><th>المؤشر</th><th>الوزن</th><th>المقياس</th><th>ملاحظة</th></tr></thead>
             <tbody>
             <?php foreach ($weights as $w): ?>
@@ -208,7 +224,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
 
     <?php if ($can_add && $selected > 0): ?>
     <div class="card"><div class="card-body">
-        <form method="post" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <form method="post" class="sev-filter">
         <?= csrf_field() ?>
             <input type="hidden" name="ev_action" value="generate">
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
@@ -216,14 +232,14 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="to" value="<?php echo htmlspecialchars($pTo); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-gears"></i>
                 ولّد تقييمَ <?php echo htmlspecialchars($pFrom); ?> → <?php echo htmlspecialchars($pTo); ?></button>
-            <span style="color:#666">— يُقرأ من السجلات، ولا يُكتب رقمٌ يدويًّا</span>
+            <span class="sev-muted">— يُقرأ من السجلات، ولا يُكتب رقمٌ يدويًّا</span>
         </form>
     </div></div>
     <?php endif; ?>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> تقييماتُ المورد</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap sev-table">
             <thead><tr><th>الفترة</th><th>النتيجة</th><th>تغطيةُ الوزن</th><th>الحالة</th>
                 <th>قرار التجديد</th><th>السبب</th><th></th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -258,7 +274,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                         : '—'; ?></strong></td>
                     <td><?php echo htmlspecialchars((string)$e['weight_measured']); ?>٪
                         <?php if ((float)$e['weight_measured'] < 100): ?>
-                            <small style="color:#a15c00">(الباقي بلا مصدرٍ — معلَن)</small>
+                            <small class="sev-partial-note">(الباقي بلا مصدرٍ — معلَن)</small>
                         <?php endif; ?></td>
                     <td><?php echo (string)$e['state'] === 'decided'
                         ? "<span class='badge badge-success'>معتمَد</span>"
@@ -282,7 +298,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         من 100 بتغطيةِ وزنٍ <?php echo htmlspecialchars((string)$openEval['weight_measured']); ?>٪</h5></div>
     <div class="card-body">
         <div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap sev-table">
             <thead><tr><th>المؤشر</th><th>القياس</th><th>الأساس</th><th>النسبة</th>
                 <th>الوزن</th><th>المكتسَب</th><th>المصدر</th></tr></thead>
             <tbody>
@@ -305,13 +321,13 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         </div>
 
         <?php if ($can_edit && (string)$openEval['state'] === 'draft'): ?>
-        <form method="post" class="ems-form" style="margin-top:14px">
+        <form method="post" class="ems-form sev-decide-form">
         <?= csrf_field() ?>
             <input type="hidden" name="ev_action" value="decide">
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
             <input type="hidden" name="evaluation_id" value="<?php echo intval($openEval['id']); ?>">
             <div class="form-grid">
-                <div class="form-group"><label for="emsf_507_b93ae">قرار التجديد <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_507_b93ae">قرار التجديد <span class="sev-req">*</span></label>
                     <select name="renewal_flag" required id="emsf_507_b93ae">
                         <?php foreach (SES::RENEWAL_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
@@ -320,7 +336,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <div class="form-group"><label for="emsf_508_d31f7">السبب <small>— إلزاميٌّ عند منع التجديد</small></label>
                     <input type="text" name="decision_note" maxlength="255" id="emsf_508_d31f7"></div>
             </div>
-            <p style="color:#a15c00">الرقمُ يخبر و<strong>الإنسانُ يقرّر</strong> — والقرارُ يصير
+            <p class="sev-decision-note">الرقمُ يخبر و<strong>الإنسانُ يقرّر</strong> — والقرارُ يصير
                 <strong>شرطًا في التجديد</strong> بعد اعتماده، ولا يُعاد.</p>
             <div><button type="submit" class="btn-primary"><i class="fa fa-gavel"></i> اعتمد القرار</button></div>
         </form>

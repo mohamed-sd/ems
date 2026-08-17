@@ -114,7 +114,18 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main ems-unified-page-shell">
+<style>
+/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصنافٍ — والألوانُ رموزٌ حصرًا */
+.sadv-note { margin-bottom: 14px; }
+.sadv-req { color: var(--c-state-danger-strong); }
+.sadv-actions { margin-top: 12px; }
+.sadv-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.sadv-filter-select { min-width: 280px; }
+.sadv-balance-badge { font-size: 1.05em; }
+.sadv-table { width: 100%; }
+.sadv-inline-form { display: inline; }
+</style>
+<div class="main ems-unified-page-shell ems-doc-cycle">
     <?php
     $header_title = 'سلفيات الموردين'; $header_icon = 'fa fa-money-bill-transfer';
     $header_actions = array();
@@ -128,9 +139,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
+    echo ems_next_step('اعتمادُ السلفةِ المسودةِ بيدِ غيرِ مُعِدِّها — فيظهر قسطُها بندًا في تسويةِ المورد');
+    echo ems_states_bundle('لا سلفياتٍ مسجَّلةً ضمن هذا الترشيح', 'افتح سلفةً بمستندِ صرفٍ وجدولِ استرداد، أو غيّر ترشيحَ المورد');
     ?>
 
-    <div class="alert alert-info" style="margin-bottom:14px">
+    <div class="alert alert-info sadv-note">
         <i class="fa fa-circle-info"></i>
         القسطُ يظهر <strong>بندًا في تسوية المورد</strong> عند توليدها، ولا يُنقص الرصيدَ
         إلا <strong>باعتمادها</strong> — المسودةُ نيّةٌ والمعتمَدةُ واقعة (ENT-02 §3).
@@ -143,7 +156,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card"><div class="card-header"><h5><i class="fa fa-money-bill-transfer"></i> سلفةٌ جديدة</h5></div>
         <div class="card-body"><div class="form-grid">
             <div class="form-group">
-                <label for="emsf_1396_5d86b">المورد <span style="color:#c00">*</span></label>
+                <label for="emsf_1396_5d86b">المورد <span class="sadv-req">*</span></label>
                 <select name="supplier_id" required id="emsf_1396_5d86b">
                     <option value="">— اختر —</option>
                     <?php foreach ($suppliers as $s): ?>
@@ -161,13 +174,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="form-group"><label for="emsf_1398_77be1">المبلغ <span style="color:#c00">*</span></label>
+            <div class="form-group"><label for="emsf_1398_77be1">المبلغ <span class="sadv-req">*</span></label>
                 <input type="number" step="0.01" min="0.01" name="amount" required id="emsf_1398_77be1"></div>
             <div class="form-group"><label for="emsf_1399_9ea11">العملة</label><input type="text" name="currency" maxlength="8" id="emsf_1399_9ea11"></div>
-            <div class="form-group"><label for="emsf_1400_708c5">سند الصرف <span style="color:#c00">*</span>
+            <div class="form-group"><label for="emsf_1400_708c5">سند الصرف <span class="sadv-req">*</span>
                     <small>— «ما لا مستندَ له لا يُحمَّل»</small></label>
                 <input type="text" name="doc_ref" required maxlength="120" placeholder="إذنُ صرف 2051/77" id="emsf_1400_708c5"></div>
-            <div class="form-group"><label for="emsf_1401_6c205">تاريخ الصرف <span style="color:#c00">*</span></label>
+            <div class="form-group"><label for="emsf_1401_6c205">تاريخ الصرف <span class="sadv-req">*</span></label>
                 <input type="date" name="issued_date" required id="emsf_1401_6c205"></div>
             <div class="form-group"><label for="emsf_1402_9f0db">عدد الأقساط</label>
                 <input type="number" min="1" name="installments_count" value="1" id="emsf_1402_9f0db"></div>
@@ -177,15 +190,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="date" name="first_recovery_period" id="emsf_1404_10b6b"></div>
             <div class="form-group"><label for="emsf_1405_824a7">ملاحظة</label><input type="text" name="note" maxlength="255" id="emsf_1405_824a7"></div>
         </div>
-        <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> فتح السلفة</button></div>
+        <div class="sadv-actions"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> فتح السلفة</button></div>
         </div></div>
     </form>
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="sadv-filter">
             <strong>المورد:</strong>
-            <select name="supplier_id" onchange="this.form.submit()" style="min-width:280px">
+            <select name="supplier_id" onchange="this.form.submit()" class="sadv-filter-select" aria-label="ترشيحُ السلفياتِ بالمورد">
                 <option value="0">الكل</option>
                 <?php foreach ($suppliers as $s): ?>
                     <option value="<?php echo intval($s['id']); ?>"
@@ -196,7 +209,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </select>
             <?php if ($filterSup > 0): ?>
                 <strong>الرصيدُ المفتوح:</strong>
-                <span class="badge badge-info" style="font-size:1.05em">
+                <span class="badge badge-info sadv-balance-badge">
                     <?php echo number_format(SAS::openBalance($gate, $filterSup), 2); ?></span>
             <?php endif; ?>
         </form>
@@ -204,7 +217,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> السلفيات وأرصدتُها</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap sadv-table">
             <thead><tr>
                 <th>الإجراءات</th><th>المورد</th><th>النوع</th><th>المبلغ</th>
                 <th>القسط</th><th>المستردّ</th><th>الرصيد</th><th>سند الصرف</th><th>الحالة</th>
@@ -243,7 +256,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <tr>
                     <td>
                     <?php if ($can_edit && (string)$a['state'] === 'draft'): ?>
-                        <form method="post" style="display:inline">
+                        <form method="post" class="sadv-inline-form">
         <?= csrf_field() ?>
                             <input type="hidden" name="sa_action" value="approve">
                             <input type="hidden" name="advance_id" value="<?php echo intval($a['id']); ?>">

@@ -126,6 +126,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 $sf_supplier_id = intval($_GET['supplier_id'] ?? $_GET['id'] ?? 0); $sf_active = 'rules';
 if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php';
 ?>
+<style>
+    /* أنماطُ الشاشةِ الصفحية — الألوانُ رموزٌ من design-tokens.css حصرًا */
+    .sr-filter-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .sr-contract-select { min-width: 360px; }
+    .sr-note { color: var(--c-s-666); }
+    .sr-gap { margin-top: 10px; }
+    .sr-actions { margin-top: 12px; }
+    .sr-table-full { width: 100%; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'قواعد تحميل المورد وجزاءاته'; $header_icon = 'fa fa-scale-unbalanced';
@@ -138,10 +147,12 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     }
     ?>
 
+    <?= ems_states_bundle('لا قواعدَ لهذا العقدِ بعدُ', 'اختر عقدًا آخرَ أو دوِّن قاعدةً مسعَّرةً من النموذجِ أعلاه') ?>
+
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="sr-filter-form">
             <strong>عقد المورد:</strong>
-            <select name="contract_id" onchange="this.form.submit()" style="min-width:360px">
+            <select name="contract_id" aria-label="عقد المورد" class="sr-contract-select" onchange="this.form.submit()">
                 <?php foreach ($contracts as $c): ?>
                     <option value="<?php echo intval($c['id']); ?>" <?php echo $selected === intval($c['id']) ? 'selected' : ''; ?>>
                         #<?php echo intval($c['id']); ?> — <?php echo htmlspecialchars((string)($c['supplier_name'] ?? '—')); ?>
@@ -152,7 +163,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <?php endforeach; ?>
             </select>
         </form>
-        <p style="color:#666;margin-top:10px">
+        <p class="sr-note sr-gap">
             القاعدةُ تسري بسريانها <strong>وبمدة عقدها معًا</strong> — فقاعدةٌ مفتوحةُ النهاية
             لا تعيش بعد انتهاء عقدها: لا عقدَ ⇒ لا تحميلَ بقاعدته.
         </p>
@@ -161,7 +172,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <?php if ($can_add): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-coins"></i> قاعدةُ تحميلٍ مسعَّرة</h5></div>
     <div class="card-body">
-        <p style="color:#666">«ما يُحمَّل عليه من مصروفاتنا … <strong>بأسعارٍ وقواعدَ مكتوبة</strong>» (§2-⑥)
+        <p class="sr-note">«ما يُحمَّل عليه من مصروفاتنا … <strong>بأسعارٍ وقواعدَ مكتوبة</strong>» (§2-⑥)
             — و<strong>قاعدةٌ بلا سعرٍ مكتوبٍ مرفوضة</strong>.</p>
         <form method="post" class="ems-form">
         <?= csrf_field() ?>
@@ -169,7 +180,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="emsf_1463_9c647">نوع التحميل <span style="color:#c00">*</span></label>
+                    <label for="emsf_1463_9c647">نوع التحميل <span class="required">*</span></label>
                     <select name="charge_type" required id="emsf_1463_9c647">
                         <?php foreach (SRS::CHARGE_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
@@ -177,7 +188,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="emsf_1464_13b98">طريقة التسعير <span style="color:#c00">*</span></label>
+                    <label for="emsf_1464_13b98">طريقة التسعير <span class="required">*</span></label>
                     <select name="pricing" required id="emsf_1464_13b98">
                         <?php foreach (SRS::PRICING_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
@@ -188,19 +199,19 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <input type="number" step="0.001" min="0" name="rate" id="emsf_1465_2ea0c"></div>
                 <div class="form-group"><label for="emsf_1466_59356">السقف <small>— فارغٌ = بلا سقفٍ مكتوب</small></label>
                     <input type="number" step="0.01" min="0" name="cap" id="emsf_1466_59356"></div>
-                <div class="form-group"><label for="emsf_1467_e006f">سريان من <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_1467_e006f">سريان من <span class="required">*</span></label>
                     <input type="date" name="valid_from" required id="emsf_1467_e006f"></div>
                 <div class="form-group"><label for="emsf_1468_495a4">سريان إلى</label><input type="date" name="valid_to" id="emsf_1468_495a4"></div>
                 <div class="form-group"><label for="emsf_1469_989cd">ملاحظة</label><input type="text" name="note" maxlength="255" id="emsf_1469_989cd"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ القاعدة</button></div>
+            <div class="sr-actions"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ القاعدة</button></div>
         </form>
     </div></div>
     <?php endif; ?>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> قواعدُ التحميل</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap sr-table-full">
             <thead><tr><th>نوع التحميل</th><th>التسعير</th><th>المعدل</th><th>السقف الأقصى</th>
                 <th>تاريخ السريان</th><th>الحالة</th><th>ملاحظة</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -247,7 +258,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <?php if ($can_add): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-gavel"></i> قاعدةُ جزاءٍ بسقفها</h5></div>
     <div class="card-body">
-        <p style="color:#666">«الجزاءاتُ … <strong>وسقوفُها</strong>» (§2-⑦) — و<strong>«له أن يشدّد جزاءَه
+        <p class="sr-note">«الجزاءاتُ … <strong>وسقوفُها</strong>» (§2-⑦) — و<strong>«له أن يشدّد جزاءَه
             لا أن يعكس إسنادًا»</strong> (§4): نقضُ الإسناد الموروث يلزمه سببٌ مكتوب.</p>
         <form method="post" class="ems-form">
         <?= csrf_field() ?>
@@ -255,7 +266,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="emsf_1470_bba4c">نوع الجزاء <span style="color:#c00">*</span></label>
+                    <label for="emsf_1470_bba4c">نوع الجزاء <span class="required">*</span></label>
                     <select name="kind" required id="emsf_1470_bba4c">
                         <?php foreach (SRS::PENALTY_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
@@ -264,7 +275,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 </div>
                 <div class="form-group"><label for="emsf_1471_0ffcb">الحد/العتبة <small>— نسبةُ جاهزيةٍ دنيا · ساعاتُ إحلال …</small></label>
                     <input type="number" step="0.001" name="threshold" id="emsf_1471_0ffcb"></div>
-                <div class="form-group"><label for="emsf_1472_69e56">المعدل <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_1472_69e56">المعدل <span class="required">*</span></label>
                     <input type="number" step="0.001" min="0.001" name="prate" required id="emsf_1472_69e56"></div>
                 <div class="form-group">
                     <label for="emsf_1473_03214">أساس المعدل</label>
@@ -284,7 +295,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="emsf_1476_89fd5"><input type="checkbox" name="inherits" value="1" checked>
+                    <label for="emsf_1476_89fd5"><input type="checkbox" name="inherits" value="1" aria-label="يرث إسنادَ عقد العميل" checked>
                         يرث إسنادَ عقد العميل (CON-02)</label>
                 </div>
                 <div class="form-group"><label>سبب نقض الإسناد <small>— إلزاميٌّ متى نُقض</small></label>
@@ -293,18 +304,18 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <input type="text" name="override_reason" maxlength="255" id="emsf_1476_89fd5"></div>
                 <div class="form-group"><label for="emsf_1477_c87f9">توثيقُ الصيغة <small>— نصٌّ لا يُقيَّم</small></label>
                     <input type="text" name="formula_note" maxlength="255" id="emsf_1477_c87f9"></div>
-                <div class="form-group"><label for="emsf_1478_8080c">سريان من <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_1478_8080c">سريان من <span class="required">*</span></label>
                     <input type="date" name="pvalid_from" required id="emsf_1478_8080c"></div>
                 <div class="form-group"><label for="emsf_1479_62c2a">سريان إلى</label><input type="date" name="pvalid_to" id="emsf_1479_62c2a"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ القاعدة</button></div>
+            <div class="sr-actions"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ القاعدة</button></div>
         </form>
     </div></div>
     <?php endif; ?>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> قواعدُ الجزاء</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap sr-table-full">
             <thead><tr><th>النوع</th><th>العتبة</th><th>المعدل</th><th>الأساس</th>
                 <th>السقف</th><th>الإسناد</th><th>السريان</th><th>الصيغة</th></tr></thead>
             <tbody>

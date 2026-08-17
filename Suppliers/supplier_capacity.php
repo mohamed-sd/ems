@@ -126,6 +126,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 $sf_supplier_id = intval($_GET['supplier_id'] ?? $_GET['id'] ?? 0); $sf_active = 'capacity';
 if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php';
 ?>
+<style>
+/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصنافٍ — والألوانُ رموزٌ حصرًا */
+.scap-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.scap-contract-select { min-width: 360px; }
+.scap-penalty-note { color: var(--c-a15c00, #a15c00); margin-top: 10px; background: var(--c-brand-gold-soft); padding: 10px; border-radius: 6px; }
+.scap-quote { color: var(--c-666666, #666); }
+.scap-req { color: var(--c-state-danger-strong); }
+.scap-actions { margin-top: 12px; }
+.scap-table { width: 100%; }
+.scap-badges { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.scap-badge-lg { font-size: 15px; padding: 8px 14px; }
+.scap-note-inline { margin: 6px 0; }
+.scap-raw-note { color: var(--c-a15c00, #a15c00); }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'الطاقة والجاهزية ومهلة الإحلال'; $header_icon = 'fa fa-gauge-high';
@@ -136,12 +150,13 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
+    echo ems_states_bundle('لا بطاقاتِ طاقةٍ لهذا العقدِ في الفترة', 'أضف بطاقةَ طاقةٍ لكلِّ معدةٍ مخصَّصة، أو غيّرِ العقدَ والفترة');
     ?>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="scap-filter">
             <strong>عقد المورد:</strong>
-            <select name="contract_id" onchange="this.form.submit()" style="min-width:360px">
+            <select name="contract_id" onchange="this.form.submit()" class="scap-contract-select" aria-label="اختيارُ عقدِ الموردِ المقيس">
                 <?php foreach ($contracts as $c): ?>
                     <option value="<?php echo intval($c['id']); ?>" <?php echo $selected === intval($c['id']) ? 'selected' : ''; ?>>
                         #<?php echo intval($c['id']); ?> — <?php echo htmlspecialchars((string)($c['supplier_name'] ?? '—')); ?>
@@ -151,11 +166,11 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </option>
                 <?php endforeach; ?>
             </select>
-            <label for="emsf_479_f7ce7">القياس من</label><input type="date" name="from" value="<?php echo htmlspecialchars($mFrom); ?>" id="emsf_479_f7ce7">
-            <label for="emsf_480_e0019">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($mTo); ?>" id="emsf_480_e0019">
+            <label for="emsf_479_f7ce7">القياس من</label><input type="date" name="from" id="emsf_479_f7ce7" value="<?php echo htmlspecialchars($mFrom); ?>">
+            <label for="emsf_480_e0019">إلى</label><input type="date" name="to" id="emsf_480_e0019" value="<?php echo htmlspecialchars($mTo); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-magnifying-glass"></i> اقرأ القياس</button>
         </form>
-        <p style="color:#a15c00;margin-top:10px;background:#fff8e6;padding:10px;border-radius:6px">
+        <p class="scap-penalty-note">
             <i class="fa fa-triangle-exclamation"></i>
             <strong>تحذيرُ الأثر على الجزاءات:</strong> ما يُكتب هنا <strong>يفعّل مالًا</strong> —
             <strong>نسبةُ الجاهزية الدنيا</strong> هي بوابةُ تفعيل جزاء الجاهزية («نقصُها عن الحد التعاقدي
@@ -168,7 +183,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <?php if ($can_add): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-gauge-high"></i> بطاقةُ طاقةٍ لمعدة</h5></div>
     <div class="card-body">
-        <p style="color:#666">«لكل معدةٍ مخصَّصةٍ <strong>طاقةٌ نظريةٌ يوميةٌ بنموذجها</strong> …
+        <p class="scap-quote">«لكل معدةٍ مخصَّصةٍ <strong>طاقةٌ نظريةٌ يوميةٌ بنموذجها</strong> …
             <strong>تُثبَّت في العقد</strong> — ومنها يُقاس أداءُ المورد <strong>لا من تقديرٍ لاحق</strong>» (§3).</p>
         <form method="post" class="ems-form">
         <?= csrf_field() ?>
@@ -176,7 +191,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="emsf_481_2cc73">المعدة <span style="color:#c00">*</span></label>
+                    <label for="emsf_481_2cc73">المعدة <span class="scap-req">*</span></label>
                     <select name="equipment_id" required id="emsf_481_2cc73">
                         <?php foreach ($equipments as $e): ?>
                             <option value="<?php echo intval($e['id']); ?>">
@@ -187,32 +202,32 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="emsf_482_2ecb4">نموذج الطاقة <span style="color:#c00">*</span></label>
+                    <label for="emsf_482_2ecb4">نموذج الطاقة <span class="scap-req">*</span></label>
                     <select name="work_model" required id="emsf_482_2ecb4">
                         <?php foreach (SCAP::WORK_MODEL_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
-                <div class="form-group"><label for="emsf_483_91e41">الطاقة النظرية اليومية <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_483_91e41">الطاقة النظرية اليومية <span class="scap-req">*</span></label>
                     <input type="number" step="0.01" min="0.01" name="theoretical_daily" required id="emsf_483_91e41"></div>
                 <div class="form-group"><label for="emsf_484_0af35">نسبة الجاهزية الدنيا ٪ <small>— فارغٌ = لم يُشترط (يُعلَن)</small></label>
                     <input type="number" step="0.01" min="0" max="100" name="min_readiness_percent" id="emsf_484_0af35"></div>
                 <div class="form-group"><label for="emsf_485_75cf7">مهلة الإحلال (ساعات) <small>— فارغٌ = لا مهلةَ مكتوبة</small></label>
                     <input type="number" step="1" min="1" name="replace_hours" id="emsf_485_75cf7"></div>
-                <div class="form-group"><label for="emsf_486_96b94">سريان من <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_486_96b94">سريان من <span class="scap-req">*</span></label>
                     <input type="date" name="valid_from" required id="emsf_486_96b94"></div>
                 <div class="form-group"><label for="emsf_487_58350">سريان إلى</label><input type="date" name="valid_to" id="emsf_487_58350"></div>
                 <div class="form-group"><label for="emsf_488_d5d66">ملاحظة</label><input type="text" name="note" maxlength="255" id="emsf_488_d5d66"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ البطاقة</button></div>
+            <div class="scap-actions"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ البطاقة</button></div>
         </form>
     </div></div>
     <?php endif; ?>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> صفٌّ لكل معدة</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap scap-table">
             <thead><tr><th>نوع المعدة</th><th>النموذج</th><th>الطاقة اليومية</th>
                 <th>نسبة الجاهزية الدنيا</th><th>مهلة الإحلال المتفقة</th><th>السريان</th><th>الحالة</th><th>ملاحظة</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -281,40 +296,39 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-chart-line"></i>
         قياسُ الجاهزية <?php echo htmlspecialchars($mFrom); ?> → <?php echo htmlspecialchars($mTo); ?></h5></div>
     <div class="card-body">
-        <p style="color:#666">
+        <p class="scap-quote">
             الجاهزية٪ = <strong>(الزمنُ المخطط − زمنُ عدمِ الصلاحية) ÷ الزمنِ المخطط</strong> —
             تُقرأ من <strong>سجل الزمن الموحّد</strong> (§3). والزمنُ المخطط يستثني الوقفةَ المخططةَ والقوةَ
             القاهرة، وغيرُ المسجَّل <strong>يُعلَن عددًا مستقلًّا</strong> ولا يُطرح صامتًا.
         </p>
-        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-bottom:12px">
-            <div class="badge <?php echo ($measure['readiness'] !== null && $measure['contract_min'] !== null
-                && $measure['readiness'] < $measure['contract_min']) ? 'badge-danger' : 'badge-success'; ?>"
-                 style="font-size:15px;padding:8px 14px">
+        <div class="scap-badges">
+            <div class="badge scap-badge-lg <?php echo ($measure['readiness'] !== null && $measure['contract_min'] !== null
+                && $measure['readiness'] < $measure['contract_min']) ? 'badge-danger' : 'badge-success'; ?>">
                 الجاهزية: <?php echo $measure['readiness'] !== null
                     ? htmlspecialchars((string)$measure['readiness']) . '٪' : 'لا قياس'; ?>
             </div>
-            <div class="badge badge-secondary" style="font-size:15px;padding:8px 14px">
+            <div class="badge badge-secondary scap-badge-lg">
                 الحد التعاقدي: <?php echo $measure['contract_min'] !== null
                     ? htmlspecialchars((string)$measure['contract_min']) . '٪' : 'غير مشترط'; ?>
             </div>
-            <div class="badge badge-secondary" style="font-size:15px;padding:8px 14px">
+            <div class="badge badge-secondary scap-badge-lg">
                 الزمن المخطط: <?php echo htmlspecialchars((string)$measure['planned_hours']); ?> ساعة
             </div>
-            <div class="badge badge-secondary" style="font-size:15px;padding:8px 14px">
+            <div class="badge badge-secondary scap-badge-lg">
                 غير صالح للعمل: <?php echo htmlspecialchars((string)$measure['unfit_hours']); ?> ساعة
             </div>
-            <div class="badge badge-warning" style="font-size:15px;padding:8px 14px">
+            <div class="badge badge-warning scap-badge-lg">
                 نُقل إلى التغطية: <?php echo htmlspecialchars((string)$measure['coverage_hours']); ?> ساعة
             </div>
-            <div class="badge badge-warning" style="font-size:15px;padding:8px 14px">
+            <div class="badge badge-warning scap-badge-lg">
                 غير مسجَّل: <?php echo htmlspecialchars((string)$measure['unlogged_hours']); ?> ساعة
             </div>
         </div>
         <?php foreach ($measure['notes'] as $n): ?>
-            <div class="alert alert-info" style="margin:6px 0"><?php echo htmlspecialchars($n); ?></div>
+            <div class="alert alert-info scap-note-inline"><?php echo htmlspecialchars($n); ?></div>
         <?php endforeach; ?>
         <div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap scap-table">
             <thead><tr><th>المعدة</th><th>الزمن المخطط</th><th>غير صالح</th><th>نُقل للتغطية</th>
                 <th>غير مسجَّل</th><th>الجاهزية الفعلية</th><th>الحد</th><th>النوب</th></tr></thead>
             <tbody>
@@ -325,7 +339,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <td><?php echo htmlspecialchars((string)$m['planned_hours']); ?></td>
                     <td><?php echo htmlspecialchars((string)$m['unfit_hours']); ?>
                         <?php if ($m['unfit_raw'] != $m['unfit_hours']): ?>
-                            <small style="color:#a15c00">(الخام <?php echo htmlspecialchars((string)$m['unfit_raw']); ?>)</small>
+                            <small class="scap-raw-note">(الخام <?php echo htmlspecialchars((string)$m['unfit_raw']); ?>)</small>
                         <?php endif; ?></td>
                     <td><?php echo htmlspecialchars((string)$m['coverage_hours']); ?></td>
                     <td><?php echo htmlspecialchars((string)$m['unlogged_hours']); ?></td>
