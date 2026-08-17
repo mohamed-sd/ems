@@ -76,13 +76,33 @@ while ($q && ($x = $q->fetch_assoc())) { $screens[] = $x; }
 
 $css = (string) @file_get_contents($ROOT . '/assets/css/ems-screens.css');
 /* قواعدُ الورقةِ المركزيةِ مفكَّكةً: المحدِّدُ ⇐ نصُّه */
-$rules = array();
+$rules = array(); $ruleBody = array();
 if (preg_match_all('~([^{}]+)\{([^}]*)\}~s', $css, $mm, PREG_SET_ORDER)) {
     foreach ($mm as $r) {
         $sel = trim(preg_replace('~/\*.*?\*/~s', '', $r[1]));
         if ($sel === '' || $sel[0] === '@') { continue; }
         $rules[] = $sel;
+        $ruleBody[$sel] = $r[2];
     }
+}
+
+/**
+ * أهي **تصميمُ مكوّنٍ** أم **معدِّلٌ فوقَ مكوّن؟** — والفرقُ هو المسألةُ كلُّها.
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ تصحيحُ تصنيفي بعدَ قراءةِ القيمِ الفعلية: أولُ صياغةٍ وسمت كلَّ محدِّدٍ فيه
+ *   `badge`/`card`/`alert` نمطًا مدفونًا — فوسمت `.fin-inbox-badge`
+ *   (`font-size` و`padding` فقط) كما وسمت `.stats-card` (سبعُ خصائصَ بخلفيةٍ
+ *   وحدٍّ وظلٍّ ونصفِ قطر). والثاني تصميمٌ كاملٌ مدفون، والأولُ **معدِّلُ مقاسٍ
+ *   فوقَ مكوّنٍ قائم** — وهو استعمالٌ مشروعٌ لا مخالفة.
+ * ◆ ونصُّ المالك يميّزهما: «المشكلةُ ليست التفرّدَ بل **نمطًا قابلًا لإعادةِ
+ *   الاستعمال** مدفونًا» — والمعدِّلُ ليس نمطًا يُعاد استعمالُه بل ضبطُ نسخةٍ.
+ * ◆ فالمعيارُ المقيس: **ثلاثُ خصائصَ فأكثر ومنها خاصيةُ هيكلٍ** (خلفيةٌ · حدٌّ ·
+ *   نصفُ قطرٍ · ظلٌّ · شبكةٌ) ⇒ تصميمٌ مدفون. وما دونَه معدِّل.
+ */
+function is_structural($body) {
+    $decls = array_filter(array_map('trim', explode(';', (string) $body)));
+    if (count($decls) < 3) { return false; }
+    return (bool) preg_match('~(^|\s)(background|border|border-radius|box-shadow|grid-template)~i', (string) $body);
 }
 /* بادئةُ كلِّ سطحٍ تُشتقُّ من أصنافِه في مصدرِه — لا تُخمَّن */
 function prefixes_of($src) {
@@ -141,9 +161,11 @@ foreach ($screens as $s) {
         foreach ($SURFACE_SPECIFIC as $h) { if (strpos($low, $h) !== false) { $isSurface = true; break; } }
         $isReusable = false;
         foreach ($REUSABLE_HINTS as $h) { if (strpos($low, $h) !== false) { $isReusable = true; break; } }
+        /* المعدِّلُ ليس نمطًا مدفونًا مهما كان اسمُه — والتصميمُ الكاملُ مدفونٌ ولو لم يُسمَّ */
+        $structural = is_structural(isset($ruleBody[$sel]) ? $ruleBody[$sel] : '');
         if ($isSurface && !$isReusable) { $just[] = $sel; }
-        elseif ($isReusable) { $unjust[] = $sel; }
-        else { $just[] = $sel; }   /* لا يشبه نمطًا معادًا — تفرُّدٌ مبرَّر */
+        elseif ($isReusable && $structural) { $unjust[] = $sel; }
+        else { $just[] = $sel; }
     }
     $totalSingle += count($single); $totalJust += count($just); $totalUnjust += count($unjust);
 

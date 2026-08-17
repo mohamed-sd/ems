@@ -209,3 +209,27 @@ a.ux-chip:hover { background: var(--ux-accent); color: var(--white, #fff); }
   outline-offset: 2px;
   border-radius: var(--ux-radius-field, 4px);
 }
+
+/* ══ ⑬ بطاقةُ الإحصاءِ — مكوّنٌ واحدٌ بثلاثةِ أشكالٍ مقيسة (⑥ · 2026-08-19) ══
+   ◆ القياسُ كشف **ثلاثةَ تصاميمَ لبطاقةٍ واحدةٍ** في ثلاثِ شاشات:
+     `.clients-main .stats-card`      نصفُ قطر 35px · حشو 18px · سطحُ eee
+     `.suppliers-main .stats-card`    نصفُ قطر 12px · حشو 12px · سطحُ s1
+     `.supplier-profile-page .profile-card`  نصفُ قطر 12px · حشو 12px · بلا ظل
+   ◆ وهي **ليست تكرارًا يُدمَج** بل ثلاثةُ تصاميمَ مختلفةٍ فعلًا — فتوحيدُها
+     **يحرّك بكسلاتٍ** (35px ⇐ 12px مثلًا) ويلزمه خطُّ أساسٍ خاصٌّ به وقرارُ
+     عرضٍ من المالك. فلا تُدمج صامتةً هنا.
+   ◆ والمكوّنُ المركزيُّ أدناه هو **الهدفُ المعلَن** الذي تُرحَّل إليه في موجتِها:
+     شكلٌ واحدٌ بثلاثةِ متغيّراتٍ مصرَّحةٍ بدل ثلاثةِ تصاميمَ متفرقة. */
+.ux-statcard {
+  background: var(--ux-surface-card);
+  border: var(--ux-border);
+  border-radius: var(--ux-radius-card);
+  padding: var(--ux-sp-3);
+  box-shadow: var(--ux-shadow-card);
+  position: relative; overflow: hidden;
+  font-family: var(--ux-font);
+}
+.ux-statcard--roomy   { padding: var(--ux-sp-4); }
+.ux-statcard--flat    { box-shadow: none; }
+.ux-statcard__grid    { display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: var(--ux-sp-3); }
+.ux-statcard__grid--fit { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }

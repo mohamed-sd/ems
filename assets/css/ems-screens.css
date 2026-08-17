@@ -1298,7 +1298,8 @@ body.ems-site,
         margin-bottom: 14px;
     }
 
-    .clients-main .stats-grid {
+    .clients-main .stats-grid,
+.suppliers-main .stats-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(170px, 1fr));
         gap: 12px;
@@ -1472,11 +1473,7 @@ body.ems-site,
         margin-bottom: 14px;
     }
 
-    .suppliers-main .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(170px, 1fr));
-        gap: 12px;
-    }
+    
 
     .suppliers-main .stats-card {
         background: var(--s1);
