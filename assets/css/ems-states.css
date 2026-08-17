@@ -1,0 +1,151 @@
+/**
+ * ems-states.css — حالاتُ الشاشةِ التسعُ والخطوةُ التالية (UXW-01 §6-1)
+ * ═══════════════════════════════════════════════════════════════════════════
+ * المكوّنُ الواحدُ لكلِّ الشاشات — ولا حالةَ تُبنى داخلَ صفحة.
+ * كلُّ قيمةٍ من رموزِ design-tokens.css — ولا لونَ مثبَّتًا (بوابةُ المنعِ ١).
+ * لغةُ الحالاتِ لغةُ مؤسسةٍ لا لغةُ مطوِّر (§7-3) — النصُّ من الشاشةِ
+ * والهيكلُ من هنا. RTL أصلًا.
+ *
+ * التسع: تحميلٌ · فراغٌ · لا نتائجَ · خطأٌ · لا صلاحيةَ · قراءةٌ فقط ·
+ *        غيرُ متصلٍ · مزامنةٌ معلَّقةٌ · بياناتٌ متقادمة
+ * ومعها: الخطوةُ التاليةُ (بوابة ١٢) · بطاقةُ السقفِ الموقوفِ (المكوّنُ الخاص ٣)
+ */
+
+.ems-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-10) var(--space-6);
+  border: var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--gray-50);
+  color: var(--gray-700);
+  text-align: center;
+  font-size: var(--text-body);
+}
+
+.ems-state[hidden] { display: none; }
+
+.ems-state .ems-state-icon { font-size: var(--icon-xl); color: var(--gray-500); }
+.ems-state .ems-state-title { font-size: var(--text-h3); font-weight: var(--weight-semi); color: var(--gray-900); }
+.ems-state .ems-state-hint { color: var(--gray-500); max-width: 60ch; }
+.ems-state .ems-state-action { margin-top: var(--space-2); }
+
+/* ① تحميل */
+.ems-state-loading .ems-state-icon { color: var(--info-600); }
+.ems-state-loading .ems-spinner {
+  width: var(--icon-lg);
+  height: var(--icon-lg);
+  border: 3px solid var(--gray-200);
+  border-top-color: var(--info-600);
+  border-radius: var(--radius-pill);
+  animation: ems-spin 0.9s linear infinite;
+}
+@keyframes ems-spin { to { transform: rotate(360deg); } }
+
+/* ② فراغ — «لا توجد بياناتٌ لهذه الفترة» وتحتها الإجراءُ المقترح */
+.ems-state-empty { background: var(--gray-50); }
+
+/* ③ لا نتائجَ للترشيح */
+.ems-state-noresults { background: var(--white); }
+
+/* ④ خطأ — مُسمًّى ومقترنٌ بسببِه (فحصُ الوصولِ ١٢) */
+.ems-state-error {
+  background: var(--danger-100);
+  border-color: var(--danger-600);
+  color: var(--danger-deep);
+}
+.ems-state-error .ems-state-icon,
+.ems-state-error .ems-state-title { color: var(--danger-deep); }
+
+/* ⑤ لا صلاحية — سببُ المنعِ مكتوبٌ لا بابٌ مغلقٌ صامت */
+.ems-state-noperm {
+  background: var(--warning-100);
+  border-color: var(--warning-600);
+  color: var(--warning-deep);
+}
+.ems-state-noperm .ems-state-icon,
+.ems-state-noperm .ems-state-title { color: var(--warning-deep); }
+
+/* ⑥ قراءةٌ فقط — شريطٌ لاصقٌ أعلى المحتوى لا غطاءٌ عليه */
+.ems-state-readonly {
+  flex-direction: row;
+  padding: var(--space-2) var(--space-4);
+  background: var(--info-100);
+  border-color: var(--info-600);
+  color: var(--info-deep);
+  font-size: var(--text-caption);
+}
+
+/* ⑦ غيرُ متصل — بيئةُ مواقعِ تعدينٍ بشبكةٍ ضعيفة */
+.ems-state-offline {
+  flex-direction: row;
+  padding: var(--space-2) var(--space-4);
+  background: var(--gray-900);
+  color: var(--white);
+  border-color: var(--gray-700);
+  font-size: var(--text-caption);
+}
+
+/* ⑧ مزامنةٌ معلَّقة — العملُ محفوظٌ لم يُرفَع بعد (صندوقُ الخروج) */
+.ems-state-syncpending {
+  flex-direction: row;
+  padding: var(--space-2) var(--space-4);
+  background: var(--brand-cream-light);
+  border-color: var(--brand-amber);
+  color: var(--gray-900);
+  font-size: var(--text-caption);
+}
+
+/* ⑨ بياناتٌ متقادمة — وقتُ آخرِ تحديثٍ ظاهر */
+.ems-state-stale {
+  flex-direction: row;
+  padding: var(--space-2) var(--space-4);
+  background: var(--gray-100);
+  color: var(--gray-700);
+  font-size: var(--text-caption);
+}
+
+/* الخطوةُ التالية (بوابةُ المنعِ ١٢) — شاشةُ دورةٍ تُري ما بعدَها */
+.ems-next-step {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  color: var(--gray-900);
+  font-size: var(--text-body);
+}
+.ems-next-step .ems-next-step-label { color: var(--gray-500); font-size: var(--text-caption); }
+.ems-next-step .ems-next-step-value { font-weight: var(--weight-semi); }
+
+/* بطاقةُ السقفِ الموقوف — وقفٌ آمنٌ لا عطل (المكوّنُ الخاصُّ الثالث) */
+.ems-cap-hold {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--warning-600);
+  border-right-width: 4px;
+  border-radius: var(--radius-md);
+  background: var(--warning-100);
+  color: var(--warning-deep);
+}
+.ems-cap-hold .ems-cap-hold-title { font-weight: var(--weight-bold); }
+
+/* عنوانٌ مقروءٌ لقارئِ الشاشةِ دون العين — لحقولٍ سياقُها البصريُّ كافٍ (فحصُ الوصولِ ٤) */
+.ems-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

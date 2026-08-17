@@ -129,9 +129,13 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
 
 <style>
 .supplier-profile-page .profile-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:14px; }
-.supplier-profile-page .profile-card { background:#fff; border:1px solid #ece6d8; border-radius:12px; padding:12px; }
-.supplier-profile-page .kpi { font-weight:800; font-size:1.4rem; color:#0f766e; }
-.supplier-profile-page .label { color:#6b7280; font-size:.9rem; }
+.supplier-profile-page .profile-card { background:var(--c-surface); border:1px solid var(--c-ece2d3); border-radius:12px; padding:12px; }
+.supplier-profile-page .kpi { font-weight:800; font-size:1.4rem; color:var(--c-0f766e); }
+.supplier-profile-page .label { color:var(--c-ink-500); font-size:.9rem; }
+.supplier-profile-page .spf-lead-card { margin-bottom:12px; }
+.supplier-profile-page .spf-lead-title { margin:0 0 8px 0; }
+.supplier-profile-page .spf-section-card { margin-bottom:14px; }
+.supplier-profile-page .spf-table { width:100%; }
 </style>
 
 <div class="main supplier-profile-page ems-unified-page-shell">
@@ -146,8 +150,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     include('../includes/page_header.php');
     ?>
 
-    <div class="profile-card" style="margin-bottom:12px;">
-        <h2 style="margin:0 0 8px 0;"><?php echo htmlspecialchars($supplier['name']); ?></h2>
+    <?php echo ems_states_bundle('لا بياناتَ مسجَّلةً لهذا المورد بعد', 'ستظهر معداتُه وعقودُه هنا فورَ تسجيلِها'); ?>
+
+    <div class="profile-card spf-lead-card">
+        <h2 class="spf-lead-title"><?php echo htmlspecialchars($supplier['name']); ?></h2>
         <div class="label">
             الكود: <?php echo htmlspecialchars($supplier['supplier_code'] ?: '-'); ?> |
             النوع: <?php echo htmlspecialchars($supplier['supplier_type'] ?: 'غير محدد'); ?> |
@@ -241,10 +247,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <?php endif; ?>
     </div>
 
-    <div class="card" style="margin-bottom:14px;">
+    <div class="card spf-section-card">
         <div class="card-header"><h5><i class="fas fa-truck"></i> المعدات المرتبطة بالمورد</h5></div>
         <div class="card-body">
-            <table id="supplierEquipmentsTable" class="display" style="width:100%;">
+            <table id="supplierEquipmentsTable" class="display spf-table">
                 <thead><tr><th>المعدة</th><th>الكود</th><th>عدد المشاريع</th><th>الساعات</th></tr></thead>
                 <tbody>
                     <?php foreach ($equipments_breakdown as $row): ?>
@@ -263,7 +269,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <div class="card">
         <div class="card-header"><h5><i class="fas fa-file-contract"></i> آخر عقود المورد</h5></div>
         <div class="card-body">
-            <table id="supplierContractsTable" class="display" style="width:100%;">
+            <table id="supplierContractsTable" class="display spf-table">
                 <thead><tr><th>المشروع</th><th>تاريخ التوقيع</th><th>مستهدف شهري</th><th>إجمالي ساعات</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -292,12 +298,9 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script>
-$(function () {
-    $('#supplierEquipmentsTable').DataTable({ language: { url: '/ems/assets/i18n/datatables/ar.json' } });
-    $('#supplierContractsTable').DataTable({ language: { url: '/ems/assets/i18n/datatables/ar.json' } });
-});
-</script>
+<!-- تهيئة الجدولين انتقلت إلى المكوّن المركزي (assets/js/ui-unification.js —
+     initializeMissingDataTables): لغةٌ عربية وضبطُ أعمدةٍ وزرُّ إكسل موحَّد. -->
+
 
 <?php // NAV-01 §5-④ (update0006 B-03): البلاغاتُ المتصلة
 $rt_kind = 'supplier'; $rt_ref = $supplier_id;

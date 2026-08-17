@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-16 17:56:06
--- الجداول: 555 · المناظير: 12
+-- المصدر: equipation_manage · التوليد: 2026-08-17 17:11:47
+-- الجداول: 562 · المناظير: 18
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -493,9 +493,25 @@ CREATE TABLE `asset_hour_reconciliations` (
   `explained_at` datetime DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `asset_id` int(10) unsigned DEFAULT NULL COMMENT 'TSP-0275: fin_assets.id — NULL أي معدةٌ بلا أصلٍ مسجَّل',
+  `machine_code` varchar(32) DEFAULT NULL COMMENT 'TSP-0276: الوصلُ بالقيدِ اليومي — equipments.code',
+  `owner_type` enum('company','supplier') NOT NULL DEFAULT 'company' COMMENT 'TSP-0277: معدةُ الموردِ لا تُهلَك عندنا',
+  `depr_method` enum('straight_line','usage_hours','units_produced') DEFAULT NULL COMMENT 'TSP-0278: تُقرَّر لا تُفترض',
+  `useful_life_hours` int(10) unsigned DEFAULT NULL COMMENT 'TSP-0279',
+  `hours_from_shifts` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'TSP-0282 · F-17: محسوبةٌ من القيدِ اليومي (unit_time_log actual_work)',
+  `hours_undepreciated` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'TSP-0283: ساعاتٌ بلا إهلاك — كميةٌ لا راية',
+  `cost_center_id` int(10) unsigned DEFAULT NULL COMMENT 'TSP-0284',
+  `project_id` int(10) unsigned DEFAULT NULL COMMENT 'TSP-0285',
+  `journal_ref` varchar(64) DEFAULT NULL COMMENT 'TSP-0287',
+  `seed_tag` varchar(32) DEFAULT NULL COMMENT 'وسمُ البيانِ المبذور',
+  `depr_reversed_amount` decimal(18,2) DEFAULT NULL COMMENT 'المبلغُ المعكوس — محفوظٌ لا ممحوٌّ (TSP-0290 · معدةُ الموردِ لا تُهلَك عندنا)',
+  `depr_reversal_ref` varchar(64) DEFAULT NULL COMMENT 'مرجعُ الحركةِ العاكسة — ولا إلغاءَ بلا مرجع',
+  `depr_reversed_at` datetime DEFAULT NULL,
   PRIMARY KEY (`rec_id`),
   UNIQUE KEY `uq_ahr` (`company_id`,`equipment_id`,`period`),
-  CONSTRAINT `ck_ahr_explained` CHECK (`state` <> _utf8mb4'explained' or `explanation` is not null and `explained_by` is not null)
+  KEY `ix_machine` (`machine_code`,`period`),
+  CONSTRAINT `ck_ahr_explained` CHECK (`state` <> _utf8mb4'explained' or `explanation` is not null and `explained_by` is not null),
+  CONSTRAINT `chk_owner` CHECK (`owner_type` <> 'supplier' or `depreciation_amount` is null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: asset_ownership_shares ──
@@ -2123,6 +2139,42 @@ CREATE TABLE `dept_policies` (
   KEY `ix_dp_domain` (`company_id`,`domain`,`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='POL-01 §2: هوية السياسة ونطاقها — ولا سياسة بلا نطاق ومدة، ولا تشغيل لإدارة بلا سياسة نافذة';
 
+-- ── Table: dr_drills ──
+CREATE TABLE `dr_drills` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 1 COMMENT 'عمودُ العزل — TS-02',
+  `entity_layer` enum('operations','contracting','holding') NOT NULL DEFAULT 'operations' COMMENT 'TS-03',
+  `drill_no` varchar(32) NOT NULL COMMENT 'رقمُ المحضر',
+  `drill_kind` enum('pitr','full_restore','failover') NOT NULL DEFAULT 'pitr',
+  `started_at` datetime(3) NOT NULL COMMENT 'بدءُ التجربة',
+  `finished_at` datetime(3) DEFAULT NULL COMMENT 'نهايتُها — والفارقُ زمنُ الاستعادة',
+  `target_point` datetime NOT NULL COMMENT 'PR-04: الدقيقةُ التي استُعيد إليها — لا نسخةٌ بل لحظة',
+  `rpo_target_minutes` smallint(5) unsigned NOT NULL DEFAULT 15 COMMENT 'PR-03: كم دقيقةً نقبل فقدَها — معلَنٌ ومقيس',
+  `rpo_actual_minutes` smallint(5) unsigned DEFAULT NULL COMMENT 'PR-03: المقيسُ فعلًا لا المقدَّر',
+  `rto_actual_seconds` int(10) unsigned DEFAULT NULL COMMENT 'زمنُ الاستعادةِ المقيس',
+  `rows_before` bigint(20) unsigned DEFAULT NULL COMMENT 'صفوفٌ قبلَ نقطةِ الاستعادة — يجب أن تبقى',
+  `rows_after_expected_gone` bigint(20) unsigned DEFAULT NULL COMMENT 'صفوفٌ بعدَها — يجب ألا تعود',
+  `rows_after_actual` bigint(20) unsigned DEFAULT NULL COMMENT 'ما عاد فعلًا — والنجاحُ أن يكون صفرًا',
+  `verdict` enum('pass','fail','aborted') DEFAULT NULL COMMENT 'الحكمُ من القياسِ لا من الادعاء',
+  `binlog_first_file` varchar(64) DEFAULT NULL,
+  `binlog_last_file` varchar(64) DEFAULT NULL,
+  `evidence_path` varchar(255) DEFAULT NULL COMMENT 'مسارُ الشواهدِ المحفوظة',
+  `runbook_ref` varchar(128) DEFAULT NULL COMMENT 'PR-06: محضرٌ يقرؤه من لم يبنِ النظام',
+  `operator_note` varchar(500) DEFAULT NULL,
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_by_role` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(10) unsigned DEFAULT NULL,
+  `approved_by_role` smallint(5) unsigned DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `seed_tag` varchar(32) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_drill_no` (`company_id`,`drill_no`),
+  KEY `ix_drill_time` (`company_id`,`started_at`),
+  CONSTRAINT `chk_drill_verdict` CHECK (`verdict` is null or `finished_at` is not null),
+  CONSTRAINT `chk_drill_pass` CHECK (`verdict` <> 'pass' or `rows_after_actual` = 0 and `rpo_actual_minutes` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ENG-01 PR-01..PR-06: محاضرُ الاستعادةِ لنقطةِ زمن — ونسخةٌ لم تُختبر ليست نسخة';
+
 -- ── Table: driver_contract_notes ──
 CREATE TABLE `driver_contract_notes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -2543,6 +2595,11 @@ CREATE TABLE `ems_business_events` (
   `schema_version` smallint(5) unsigned DEFAULT 1,
   `created_by` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `consumers_declared` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'TSP-0210: عددُ المستهلكينَ المعلَنينَ لحظةَ النشر — والقيدُ يمنع صفرًا',
+  `delivered_ok` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'TSP-0211: كم مستهلكًا نجح',
+  `delivered_failed` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'TSP-0212: كم مستهلكًا فشل',
+  `in_dlq` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'TSP-0213: في صندوقِ الموتى',
+  `seed_tag` varchar(32) DEFAULT NULL COMMENT 'TSP-0214: وسمُ البيانِ المبذور — CK-10',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_ebe_no` (`company_id`,`event_no`),
   UNIQUE KEY `uq_ebe_uuid` (`event_uuid`),
@@ -2555,7 +2612,10 @@ CREATE TABLE `ems_business_events` (
   KEY `ix_ebe_occurred` (`company_id`,`occurred_at`),
   KEY `ix_ebe_reverses` (`reverses_event_id`),
   KEY `fk_be_currency` (`company_id`,`currency`),
-  CONSTRAINT `fk_be_currency` FOREIGN KEY (`company_id`, `currency`) REFERENCES `fin_currencies` (`company_id`, `code`) ON UPDATE CASCADE
+  KEY `ix_pub` (`created_at`),
+  KEY `ix_code` (`event_key`,`created_at`),
+  CONSTRAINT `fk_be_currency` FOREIGN KEY (`company_id`, `currency`) REFERENCES `fin_currencies` (`company_id`, `code`) ON UPDATE CASCADE,
+  CONSTRAINT `chk_consumers` CHECK (`consumers_declared` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ADR-15: الجذر المحايد — سجل الحقائق المؤسسي append-only؛ القناة: EventPublisher حصرًا؛ الدفتر المالي إسقاطه الأول';
 
 -- ── Table: ems_event_consumers ──
@@ -2581,13 +2641,33 @@ CREATE TABLE `ems_event_dead_letter` (
 
 -- ── Table: ems_event_deliveries ──
 CREATE TABLE `ems_event_deliveries` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `consumer` varchar(64) NOT NULL,
   `event_id` bigint(20) unsigned NOT NULL,
   `attempts` int(10) unsigned NOT NULL DEFAULT 1,
   `last_error` varchar(500) DEFAULT NULL,
   `next_retry_at` datetime DEFAULT NULL COMMENT 'N-06: موعد المحاولة التالية (تصاعد 2^attempts دقيقة) — NULL = مستحقة الآن',
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  PRIMARY KEY (`consumer`,`event_id`)
+  `seed_tag` varchar(32) DEFAULT NULL COMMENT 'وسمُ البيانِ المبذور — الصفوفُ الملوَّثةُ تُوسَم ولا تُحذف',
+  `outbox_id` bigint(20) unsigned NOT NULL DEFAULT 0 COMMENT 'TSP-0229: ems_business_events.id — و0 للصفوفِ السابقةِ للدفتر',
+  `consumer_key` varchar(64) NOT NULL DEFAULT '' COMMENT 'TSP-0230: مفتاحُ المستهلك',
+  `state` enum('published','claimed','processing','processed','failed','dlq') NOT NULL DEFAULT 'published' COMMENT 'TSP-0231: الحالاتُ الست',
+  `attempt_no` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT 'TSP-0232',
+  `next_attempt_at` datetime(3) DEFAULT NULL COMMENT 'TSP-0233: التباعدُ المتزايد — F-13 POW(4,attempt_no) ثانية',
+  `claimed_at` datetime(3) DEFAULT NULL COMMENT 'TSP-0234',
+  `processed_at` datetime(3) DEFAULT NULL COMMENT 'TSP-0235',
+  `idempotency_key` char(64) DEFAULT NULL COMMENT 'TSP-0236 · F-14: SHA2(outbox_id|consumer_key,256) — خمسُ إعاداتٍ صفٌّ واحد',
+  `result_ref` varchar(128) DEFAULT NULL COMMENT 'TSP-0237: مرجعُ ما كتبه المستهلك — والقيدُ يمنع نجاحًا بلا مرجع',
+  `fail_code` varchar(32) DEFAULT NULL COMMENT 'TSP-0238',
+  `fail_text` text DEFAULT NULL COMMENT 'TSP-0239',
+  `company_id` int(10) unsigned NOT NULL DEFAULT 1 COMMENT 'عمودُ العزل — TS-02',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_legacy_consumer_event` (`consumer`,`event_id`),
+  UNIQUE KEY `uq_idem` (`idempotency_key`),
+  KEY `ix_state` (`state`,`next_attempt_at`),
+  KEY `ix_outbox` (`outbox_id`),
+  CONSTRAINT `chk_result` CHECK (`state` <> 'processed' or `result_ref` is not null),
+  CONSTRAINT `chk_fail` CHECK (`state` not in ('failed','dlq') or `fail_code` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='K4: محاولات تسليمٍ جارية (تُحذف عند النجاح أو تنتقل للرسائل الميتة)';
 
 -- ── Table: ems_job_queue ──
@@ -2596,7 +2676,7 @@ CREATE TABLE `ems_job_queue` (
   `company_id` int(11) NOT NULL,
   `job_type` varchar(60) NOT NULL COMMENT 'payroll_bind · periodic_cron · bank_recon · batch_loop …',
   `payload_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`payload_json`)),
-  `state` enum('queued','processing','done','failed','dead') NOT NULL DEFAULT 'queued',
+  `state` enum('queued','claimed','processing','running','done','failed','dead','dlq') NOT NULL DEFAULT 'queued' COMMENT 'TSP-0252 — الستُّ المعلَنةُ + running/dead الموروثتان (المخطّطُ أصدق)',
   `attempts` int(11) NOT NULL DEFAULT 0,
   `max_attempts` int(11) NOT NULL DEFAULT 3,
   `next_attempt_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'التصاعد: 1د ثم 5د ثم 25د — بساعة القاعدة',
@@ -2608,10 +2688,41 @@ CREATE TABLE `ems_job_queue` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `started_at` datetime DEFAULT NULL,
   `finished_at` datetime DEFAULT NULL,
+  `source` enum('event','schedule','manual') NOT NULL DEFAULT 'schedule' COMMENT 'TSP-0249: حدثٌ أم جدولة — وmanual للموروثِ قبلَ الإلغاء',
+  `source_ref` varchar(128) DEFAULT NULL COMMENT 'TSP-0250',
+  `worker_id` varchar(64) DEFAULT NULL COMMENT 'TSP-0253: العاملُ الذي التقط',
+  `claimed_at` datetime(3) DEFAULT NULL COMMENT 'TSP-0254',
+  `lock_expires_at` datetime(3) DEFAULT NULL COMMENT 'TSP-0255: مهلةُ تحريرِ القفل — F-16',
+  `fail_code` varchar(32) DEFAULT NULL COMMENT 'TSP-0257',
+  `seed_tag` varchar(32) DEFAULT NULL COMMENT 'وسمُ البيانِ المبذور',
   PRIMARY KEY (`job_id`),
   KEY `idx_jq_claim` (`state`,`next_attempt_at`),
-  KEY `idx_jq_company` (`company_id`,`state`,`created_at`)
+  KEY `idx_jq_company` (`company_id`,`state`,`created_at`),
+  KEY `ix_type` (`job_type`,`state`),
+  CONSTRAINT `chk_lock` CHECK (`state` <> 'claimed' or `worker_id` is not null and `lock_expires_at` is not null),
+  CONSTRAINT `chk_job_type` CHECK (`job_type` in ('fin_posting','capacity_rollup','depreciation_run','statement_build','alert_dispatch','event_retry','settlement_recalc','pilot_monitor'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='N-24: «قيد المعالجة» ثم إشعار الاكتمال — والصفحة لا تتجمد أبدًا';
+
+-- ── Table: ems_job_schedule ──
+CREATE TABLE `ems_job_schedule` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'عمودُ العزل — و0 تعني كلَّ كيانٍ نشط، فيُفرَد صفُّ مهمةٍ لكلِّ كيان',
+  `entity_layer` enum('operations','contracting','holding') NOT NULL DEFAULT 'operations' COMMENT 'TS-03',
+  `job_type` varchar(48) NOT NULL COMMENT 'TSP-0264',
+  `cron_expr` varchar(64) NOT NULL COMMENT 'TSP-0265: التعبيرُ الزمني',
+  `max_runtime_seconds` smallint(5) unsigned NOT NULL DEFAULT 600 COMMENT 'TSP-0266',
+  `alert_after_seconds` smallint(5) unsigned NOT NULL DEFAULT 3600 COMMENT 'TSP-0267: مهلةُ إنذارِ التوقف',
+  `last_success_at` datetime(3) DEFAULT NULL COMMENT 'TSP-0268',
+  `owner_role_id` smallint(5) unsigned NOT NULL COMMENT 'TSP-0269: المسؤولُ عند التوقف',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'TSP-0270',
+  `replaces_manual` varchar(190) DEFAULT NULL COMMENT 'الأمرُ اليدويُّ الذي ألغته هذه الجدولة (البند ⑥)',
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_sched` (`job_type`),
+  KEY `ix_sched_active` (`is_active`,`last_success_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ENG-01 JB-06: جدولةُ المهامِّ الدورية — وتوقفُ العاملِ صامتًا أخطرُ من فشلِ مهمة';
 
 -- ── Table: ems_post_idempotency ──
 CREATE TABLE `ems_post_idempotency` (
@@ -2958,8 +3069,14 @@ CREATE TABLE `event_consumers` (
   `consumer_method` varchar(120) DEFAULT NULL,
   `produces` enum('write','notify','dashboard_refresh') NOT NULL DEFAULT 'write' COMMENT 'مستهلكٌ لا يُنتج أثرًا مرئيًّا أو مسجَّلًا يُراجَع',
   `active` tinyint(1) NOT NULL DEFAULT 1,
+  `consumer_key` varchar(64) DEFAULT NULL COMMENT 'TSP-0221: معرّفُ المستهلك — مفتاحُ العطالةِ يُبنى عليه',
+  `max_attempts` tinyint(3) unsigned NOT NULL DEFAULT 5 COMMENT 'TSP-0223: خمسُ محاولاتٍ ثم dlq',
+  `timeout_seconds` smallint(5) unsigned NOT NULL DEFAULT 60 COMMENT 'TSP-0224: مهلةُ المعالجة',
+  `inactive_reason` varchar(255) DEFAULT NULL COMMENT 'سببُ التعطيل — ولا يُعطَّل اشتراكٌ بلا سبب',
+  `inactive_at` datetime DEFAULT NULL,
   PRIMARY KEY (`c_id`),
   UNIQUE KEY `uq_ec` (`event_name`,`consumer_class`),
+  UNIQUE KEY `uq_sub` (`event_name`,`consumer_key`),
   KEY `ix_ec_event` (`event_name`,`active`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -3502,6 +3619,9 @@ CREATE TABLE `fin_authority_caps` (
   `created_by` int(10) unsigned NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `cap_state` enum('resolved','unresolved') NOT NULL DEFAULT 'unresolved' COMMENT '③ غيرُ المحسومِ يوقف — لا يمرّ',
+  `approved_by_owner` varchar(120) DEFAULT NULL COMMENT 'مَن اعتمد الرقمَ رسميًّا',
+  `approved_at` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_cap` (`company_id`,`scope_kind`,`scope_ref`,`apr_code`),
   KEY `ix_live` (`company_id`,`apr_code`,`active`)
@@ -5945,6 +6065,24 @@ CREATE TABLE `founding_mode` (
   CONSTRAINT `chk_fm_ends` CHECK (`enabled` = 0 or `ends_at` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: gov_alternate_authority ──
+CREATE TABLE `gov_alternate_authority` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `when_requester_role_id` smallint(5) unsigned NOT NULL COMMENT 'الدورُ الذي يتعذّر اعتمادُه لنفسِه',
+  `alternate_kind` enum('role','committee','board') NOT NULL DEFAULT 'committee',
+  `alternate_role_id` smallint(5) unsigned DEFAULT NULL,
+  `alternate_label` varchar(120) NOT NULL,
+  `quorum` tinyint(3) unsigned NOT NULL DEFAULT 2 COMMENT 'يدان لا يد',
+  `doc_ref` varchar(40) NOT NULL DEFAULT 'LAD-01',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_alt` (`company_id`,`when_requester_role_id`),
+  CONSTRAINT `chk_alt_independent` CHECK (`alternate_role_id` is null or `alternate_role_id` <> `when_requester_role_id`),
+  CONSTRAINT `chk_alt_quorum` CHECK (`quorum` >= 2)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='② جهةُ اعتمادٍ بديلةٌ مستقلة — فلا يكون الرئيسُ معتمِدًا وحيدًا وممنوعًا معًا';
+
 -- ── Table: gov_approval_decisions ──
 CREATE TABLE `gov_approval_decisions` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -6191,6 +6329,88 @@ CREATE TABLE `gov_inheritance_denials` (
   PRIMARY KEY (`id`),
   KEY `ix_field` (`company_id`,`child_entity`,`child_field`,`denied_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-OBL-01 IN-01 — سجلُّ رفضِ تعديلِ الموروث';
+
+-- ── Table: gov_ladder_steps ──
+CREATE TABLE `gov_ladder_steps` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'عمودُ العزل TS-02 — 0 = كلُّ كيانٍ نشط (يرثه من سلّمِه)',
+  `ladder_code` varchar(12) NOT NULL,
+  `step_no` tinyint(3) unsigned NOT NULL,
+  `actor_code` varchar(40) NOT NULL COMMENT 'رمزُ الفاعلِ الوظيفيّ',
+  `actor_name_ar` varchar(120) NOT NULL,
+  `step_kind` enum('entry','review','approve','system') NOT NULL,
+  `is_accountant` tinyint(1) NOT NULL DEFAULT 0 COMMENT '① محاسبٌ — ممنوعٌ في المراحلِ التشغيليةِ قبلَ بوابةِ المالية',
+  `is_finance_gate` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'هذه الخطوةُ بوابةُ المالية أو بعدَها',
+  `may_approve` tinyint(1) NOT NULL DEFAULT 0,
+  `forbid_note` varchar(255) DEFAULT NULL COMMENT 'قيدُ منعٍ صريحٌ على هذه الخطوة',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ld_step` (`ladder_code`,`step_no`),
+  KEY `ix_ld` (`ladder_code`),
+  KEY `ix_company` (`company_id`),
+  CONSTRAINT `fk_ld_step` FOREIGN KEY (`ladder_code`) REFERENCES `gov_ladders` (`ladder_code`) ON DELETE CASCADE,
+  CONSTRAINT `chk_step_entry_no_approve` CHECK (`step_kind` <> 'entry' or `may_approve` = 0),
+  CONSTRAINT `chk_step_accountant` CHECK (`is_accountant` = 0 or `is_finance_gate` = 1 or `actor_code` = 'FIN_FIELD_VERIFY')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='① لا محاسبَ في مرحلةٍ تشغيليةٍ قبلَ بوابةِ المالية — يفرضه chk_step_accountant';
+
+-- ── Table: gov_ladders ──
+CREATE TABLE `gov_ladders` (
+  `ladder_code` varchar(12) NOT NULL COMMENT 'LD-01 … LD-09',
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT '0 = كلُّ كيانٍ نشط',
+  `slug` varchar(48) NOT NULL COMMENT 'unit_daily_approve …',
+  `name_ar` varchar(160) NOT NULL,
+  `cycle_no` tinyint(3) unsigned DEFAULT NULL COMMENT 'موضعُه في الدورةِ التسعية — NULL لغيرِ التايم شيت',
+  `escalate_after_hours` smallint(5) unsigned DEFAULT NULL COMMENT 'تجاوزُها تصعيدٌ لا إغلاق',
+  `cap_kind` enum('none','scope','amount') NOT NULL DEFAULT 'none',
+  `cap_amount` decimal(16,2) DEFAULT NULL,
+  `cap_currency` varchar(8) DEFAULT NULL,
+  `cap_state` enum('resolved','unresolved','not_applicable') NOT NULL DEFAULT 'unresolved' COMMENT '③ غيرُ المحسومِ يوقف السلّمَ — fail-closed',
+  `payload_note` varchar(255) DEFAULT NULL COMMENT 'ما يكتبه المحرّكُ بعدَ الاكتمال',
+  `doc_ref` varchar(40) NOT NULL DEFAULT 'LAD-01',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`ladder_code`),
+  KEY `ix_ld_cycle` (`cycle_no`),
+  CONSTRAINT `chk_ld_cap` CHECK (`cap_state` <> 'resolved' or `cap_kind` <> 'amount' or `cap_amount` is not null and `cap_currency` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LAD-01: سلاليمُ الاعتماد — والسقفُ غيرُ المحسومِ يوقف السلّم';
+
+-- ── Table: gov_orphan_links ──
+CREATE TABLE `gov_orphan_links` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `sheet_role` varchar(120) NOT NULL COMMENT 'الورقةُ الحية — دورُ القائمةِ في الدفتر',
+  `label_ar` varchar(200) NOT NULL,
+  `route` varchar(160) NOT NULL,
+  `live_class` varchar(120) NOT NULL DEFAULT '' COMMENT 'التصنيفُ الحي',
+  `proposed_group` varchar(160) NOT NULL DEFAULT '' COMMENT 'المجموعةُ المقترحةُ في الدفتر',
+  `proposal_method` varchar(120) NOT NULL DEFAULT '',
+  `owner_decision` enum('pending','approved','relocated','retired') NOT NULL DEFAULT 'pending' COMMENT 'قرارُ المالكِ صفًّا صفًّا — pending حتى يصدر',
+  `decided_at` datetime DEFAULT NULL,
+  `deactivated_nav_ids` varchar(255) NOT NULL DEFAULT '' COMMENT 'روابطُ nav_items التي عُطِّلت — للعكسِ الدقيق',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_orphan` (`sheet_role`,`route`,`label_ar`),
+  KEY `ix_decision` (`owner_decision`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXW-01 §8 — الروابطُ اليتيمةُ في مركزِ الحوكمةِ التقنيِّ حتى قرارِ المالك';
+
+-- ── Table: gov_stage_outputs ──
+CREATE TABLE `gov_stage_outputs` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'عمودُ العزل — 0 = كلُّ كيان',
+  `role_id` smallint(5) unsigned NOT NULL COMMENT 'الإدارةُ المالكة',
+  `stage_no` tinyint(3) unsigned NOT NULL,
+  `stage_title` varchar(190) NOT NULL,
+  `output_doc` varchar(255) DEFAULT NULL COMMENT 'المستندُ الناتج',
+  `output_source` enum('GOV-24','LAD-01','action_writes','nav09_map','none') NOT NULL DEFAULT 'none',
+  `next_state` varchar(255) DEFAULT NULL COMMENT 'الحالةُ التالية',
+  `next_source` enum('GOV-24','LAD-01','cycle_order','nav09_map','none') NOT NULL DEFAULT 'none',
+  `approver_note` varchar(190) DEFAULT NULL COMMENT 'المعتمِدُ كما في الوثيقة',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_stage` (`role_id`,`stage_no`),
+  KEY `ix_src` (`output_source`,`next_source`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='⑨ المستندُ الناتجُ والحالةُ التالية — ولكلِّ خانةٍ مصدرُها المعلَن';
 
 -- ── Table: governance_flags ──
 CREATE TABLE `governance_flags` (
@@ -7005,6 +7225,7 @@ CREATE TABLE `modules` (
   `is_quick` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'تظهر في روابط الوصول السريع بلوحة التحكم',
   `icon` varchar(50) NOT NULL,
   `display_order` int(11) DEFAULT 0 COMMENT 'ترتيب العرض في القوائم',
+  `owner_dept_note` varchar(120) DEFAULT NULL COMMENT 'الإدارةُ المالكةُ نصًّا (nav09_file_map.owner_dept) — للوحداتِ المشترَكةِ بين أدوارٍ كثيرة',
   PRIMARY KEY (`id`),
   KEY `owner_role_id` (`owner_role_id`),
   KEY `idx_display_order` (`display_order`),
@@ -9416,6 +9637,8 @@ CREATE TABLE `roles` (
   `role_scope` enum('gloable','mine') NOT NULL DEFAULT 'gloable',
   `status` varchar(10) NOT NULL DEFAULT '1',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `oversight_role_id` smallint(5) unsigned DEFAULT NULL COMMENT '⑥ الخطُّ الرقابيُّ المباشر — مستقلٌّ عن parent_role_id الإداريّ',
+  `oversight_note` varchar(190) DEFAULT NULL COMMENT 'حجّةُ الخطِّ الرقابيِّ ومصدرُه',
   PRIMARY KEY (`id`),
   KEY `parent_role_id` (`parent_role_id`),
   CONSTRAINT `roles_ibfk_1` FOREIGN KEY (`parent_role_id`) REFERENCES `roles` (`id`)
@@ -9559,8 +9782,15 @@ CREATE TABLE `scr_break_glass` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `requester_role_id` smallint(5) unsigned DEFAULT NULL COMMENT 'دورُ الطالب — بنيويٌّ لا نصّ',
+  `approver_role_id` smallint(5) unsigned DEFAULT NULL COMMENT 'دورُ المعتمِدِ الأول',
+  `approver2_role_id` smallint(5) unsigned DEFAULT NULL COMMENT 'دورُ المعتمِدِ الثاني — يدان لا يد',
+  `alternate_authority` varchar(120) DEFAULT NULL COMMENT '② الجهةُ البديلةُ حين يكون الطالبُ هو المعتمِدَ المعتاد',
+  `alternate_reason` varchar(255) DEFAULT NULL COMMENT 'سببُ اللجوءِ إلى البديل',
   PRIMARY KEY (`id`),
-  KEY `ix_break_glass_live` (`company_id`,`status`)
+  KEY `ix_break_glass_live` (`company_id`,`status`),
+  CONSTRAINT `chk_bg_no_self_approval` CHECK (`requester_role_id` is null or (`approver_role_id` is null or `approver_role_id` <> `requester_role_id`) and (`approver2_role_id` is null or `approver2_role_id` <> `requester_role_id`) or `alternate_authority` is not null and `alternate_reason` is not null),
+  CONSTRAINT `chk_bg_two_hands` CHECK (`approver_role_id` is null or `approver2_role_id` is null or `approver_role_id` <> `approver2_role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة break_glass.php';
 
 -- ── Table: scr_business_models ──
@@ -13780,12 +14010,29 @@ CREATE TABLE `workspace_views` (
 SET collation_connection = 'utf8mb4_unicode_ci';
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `client_contracts` AS select `c`.`id` AS `id`,`c`.`company_id` AS `company_id`,`c`.`contract_signing_date` AS `contract_signing_date`,`c`.`grace_period_days` AS `grace_period_days`,`c`.`contract_duration_months` AS `contract_duration_months`,`c`.`contract_duration_days` AS `contract_duration_days`,`c`.`equip_shifts_contract` AS `equip_shifts_contract`,`c`.`shift_contract` AS `shift_contract`,`c`.`equip_total_contract_daily` AS `equip_total_contract_daily`,`c`.`total_contract_permonth` AS `total_contract_permonth`,`c`.`total_contract_units` AS `total_contract_units`,`c`.`actual_start` AS `actual_start`,`c`.`actual_end` AS `actual_end`,`c`.`transportation` AS `transportation`,`c`.`accommodation` AS `accommodation`,`c`.`place_for_living` AS `place_for_living`,`c`.`workshop` AS `workshop`,`c`.`hours_monthly_target` AS `hours_monthly_target`,`c`.`forecasted_contracted_hours` AS `forecasted_contracted_hours`,`c`.`created_at` AS `created_at`,`c`.`updated_at` AS `updated_at`,`c`.`daily_work_hours` AS `daily_work_hours`,`c`.`daily_operators` AS `daily_operators`,`c`.`first_party` AS `first_party`,`c`.`second_party` AS `second_party`,`c`.`witness_one` AS `witness_one`,`c`.`witness_two` AS `witness_two`,`c`.`price_currency_contract` AS `price_currency_contract`,`c`.`paid_contract` AS `paid_contract`,`c`.`payment_time` AS `payment_time`,`c`.`guarantees` AS `guarantees`,`c`.`retention_pct` AS `retention_pct`,`c`.`advance_recovery_pct` AS `advance_recovery_pct`,`c`.`payment_date` AS `payment_date`,`c`.`contract_status` AS `contract_status`,`c`.`pause_state_before` AS `pause_state_before`,`c`.`pause_reason` AS `pause_reason`,`c`.`pause_date` AS `pause_date`,`c`.`resume_date` AS `resume_date`,`c`.`termination_type` AS `termination_type`,`c`.`termination_reason` AS `termination_reason`,`c`.`merged_with` AS `merged_with`,`c`.`status` AS `status`,`c`.`is_deleted` AS `is_deleted`,`c`.`deleted_at` AS `deleted_at`,`c`.`deleted_by` AS `deleted_by`,`c`.`project_id` AS `project_id`,`c`.`site_id` AS `site_id`,`c`.`readiness_state` AS `readiness_state`,`c`.`signing_authority_ref` AS `signing_authority_ref`,`cos`.`id` AS `primary_scope_id`,`cos`.`site_id` AS `primary_site_id`,`cos`.`scope_name` AS `primary_scope_name` from (`contracts` `c` left join `contract_operational_sites` `cos` on(`cos`.`contract_id` = `c`.`id` and `cos`.`is_primary` = 1 and coalesce(`cos`.`is_deleted`,0) = 0));
 
+-- ── View: ems_event_outbox ──
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `ems_event_outbox` AS select `e`.`id` AS `id`,`e`.`company_id` AS `company_id`,`e`.`event_key` AS `event_code`,`e`.`entity_type` AS `aggregate_type`,`e`.`entity_id` AS `aggregate_id`,`e`.`payload` AS `payload`,`e`.`created_at` AS `published_at`,`e`.`consumers_declared` AS `consumers_declared`,`e`.`delivered_ok` AS `delivered_ok`,`e`.`delivered_failed` AS `delivered_failed`,`e`.`in_dlq` AS `in_dlq`,`e`.`seed_tag` AS `seed_tag` from `ems_business_events` `e`;
+
+-- ── View: ems_event_subscriptions ──
+SET collation_connection = 'utf8mb4_unicode_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `ems_event_subscriptions` AS select `c`.`c_id` AS `id`,`c`.`event_name` AS `event_code`,`c`.`consumer_key` AS `consumer_key`,`c`.`consumer_class` AS `handler_class`,`c`.`consumer_method` AS `handler_method`,`c`.`max_attempts` AS `max_attempts`,`c`.`timeout_seconds` AS `timeout_seconds`,`c`.`active` AS `is_active` from `event_consumers` `c`;
+
+-- ── View: fa_asset_hours ──
+SET collation_connection = 'utf8mb4_unicode_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `fa_asset_hours` AS select `a`.`rec_id` AS `id`,`a`.`company_id` AS `company_id`,`a`.`asset_id` AS `asset_id`,`a`.`equipment_id` AS `equipment_id`,`a`.`machine_code` AS `machine_code`,`a`.`owner_type` AS `owner_type`,`a`.`depr_method` AS `depr_method`,`a`.`useful_life_hours` AS `useful_life_hours`,`a`.`depreciation_per_hour` AS `rate_per_hour`,str_to_date(concat(`a`.`period`,'-01'),'%Y-%m-%d') AS `period_month`,`a`.`hours_from_shifts` AS `hours_from_shifts`,`a`.`hours_undepreciated` AS `hours_undepreciated`,`a`.`cost_center_id` AS `cost_center_id`,`a`.`project_id` AS `project_id`,`a`.`depreciation_amount` AS `depr_amount`,`a`.`journal_ref` AS `journal_ref`,`a`.`seed_tag` AS `seed_tag` from `asset_hour_reconciliations` `a`;
+
 -- ── View: unified_fault_taxonomy ──
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `unified_fault_taxonomy` AS select distinct `fc`.`main_category_code` AS `code`,`fc`.`main_category_name` AS `name`,`fc`.`equipment_type` AS `equipment_type`,'failure_codes' AS `source` from `failure_codes` `fc` where `fc`.`main_category_code` is not null and `fc`.`main_category_code` <> '';
+
+-- ── View: v_caps_unresolved ──
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_caps_unresolved` AS select 'fin_authority_caps' AS `src`,`fin_authority_caps`.`id` AS `id`,`fin_authority_caps`.`company_id` AS `company_id`,`fin_authority_caps`.`scope_kind` AS `scope_kind`,`fin_authority_caps`.`scope_ref` AS `scope_ref`,`fin_authority_caps`.`apr_code` AS `apr_code`,`fin_authority_caps`.`max_amount` AS `max_amount`,`fin_authority_caps`.`currency` AS `currency`,`fin_authority_caps`.`cap_state` AS `cap_state` from `fin_authority_caps` where `fin_authority_caps`.`cap_state` <> 'resolved' union all select 'gov_ladders' AS `gov_ladders`,NULL AS `NULL`,`gov_ladders`.`company_id` AS `company_id`,'ladder' AS `ladder`,`gov_ladders`.`ladder_code` AS `ladder_code`,`gov_ladders`.`slug` AS `slug`,`gov_ladders`.`cap_amount` AS `cap_amount`,`gov_ladders`.`cap_currency` AS `cap_currency`,`gov_ladders`.`cap_state` AS `cap_state` from `gov_ladders` where `gov_ladders`.`cap_kind` = 'amount' and `gov_ladders`.`cap_state` <> 'resolved';
 
 -- ── View: v_container_elapsed_target ──
 SET collation_connection = 'utf8mb4_unicode_ci';
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_container_elapsed_target` AS select `c`.`company_id` AS `company_id`,`c`.`id` AS `container_id`,`c`.`container_no` AS `container_no`,`c`.`cap_qty` AS `cap_qty`,`k`.`actual_start` AS `actual_start`,`k`.`actual_end` AS `actual_end`,least(`c`.`cap_qty`,greatest(0,round(`c`.`cap_qty` * (to_days(least(curdate(),`k`.`actual_end`)) - to_days(`k`.`actual_start`)) / nullif(to_days(`k`.`actual_end`) - to_days(`k`.`actual_start`),0),2))) AS `elapsed_target` from (`op_containers` `c` join `contracts` `k` on(`k`.`id` = `c`.`contract_id`)) where `c`.`level` = 'رئيسية' and `c`.`is_deleted` = 0 and `k`.`actual_start` is not null and `k`.`actual_end` is not null;
+
+-- ── View: v_group_load ──
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_group_load` AS select `g`.`owner_role_id` AS `role_id`,`g`.`id` AS `group_id`,`g`.`group_code` AS `group_code`,`g`.`name` AS `group_name`,`g`.`stage_no` AS `stage_no`,`g`.`stage_title` AS `stage_title`,count(`n`.`id`) AS `screens`,case when count(`n`.`id`) >= 8 then 'overloaded' when count(`n`.`id`) = 0 then 'empty' else 'ok' end AS `load_state` from (`link_groups` `g` left join `nav_items` `n` on(`n`.`group_id` = `g`.`id` and `n`.`active` = 1)) where `g`.`is_active` = 1 group by `g`.`id`;
 
 -- ── View: v_machine_daily_hours ──
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_machine_daily_hours` AS select `ue`.`company_id` AS `company_id`,`ue`.`equipment_id` AS `equipment_id`,`ue`.`entry_date` AS `work_date`,round(coalesce(sum(case when `l`.`ops_state` = 'actual_work' then `l`.`hours` end),0),2) AS `daily_hours` from (`unit_entries` `ue` left join `unit_time_log` `l` on(`l`.`entry_id` = `ue`.`id`)) where `ue`.`seed_tag` is null and `ue`.`state` not in ('rejected','cancelled','superseded','reversed') group by `ue`.`company_id`,`ue`.`equipment_id`,`ue`.`entry_date`;
@@ -13800,6 +14047,10 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_monthly_performance` AS 
 -- ── View: v_org_unit_heads ──
 SET collation_connection = 'utf8mb4_unicode_ci';
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_org_unit_heads` AS select `u`.`unit_id` AS `unit_id`,`u`.`company_id` AS `company_id`,`u`.`unit_code` AS `unit_code`,`u`.`name_ar` AS `name_ar`,`a`.`person_id` AS `head_person_id`,`a`.`asg_id` AS `head_assignment_id`,`a`.`scope_type` AS `head_scope_type`,`a`.`scope_id` AS `head_scope_id` from (`org_units` `u` left join `org_assignments` `a` on(`a`.`org_unit_id` = `u`.`unit_id` and `a`.`state` = 'active' and curdate() between `a`.`valid_from` and `a`.`valid_to` and `a`.`assignment_type_code` in (select `t`.`type_code` from `org_assignment_types` `t` where `t`.`is_unit_head` = 1)));
+
+-- ── View: v_oversight_lines ──
+SET collation_connection = 'utf8mb4_unicode_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_oversight_lines` AS select `r`.`id` AS `role_id`,`r`.`name` AS `role_name`,`r`.`parent_role_id` AS `admin_parent_id`,`pa`.`name` AS `admin_parent_name`,`r`.`oversight_role_id` AS `oversight_role_id`,`ov`.`name` AS `oversight_role_name`,`r`.`oversight_note` AS `oversight_note` from ((`roles` `r` left join `roles` `pa` on(`pa`.`id` = `r`.`parent_role_id`)) left join `roles` `ov` on(`ov`.`id` = `r`.`oversight_role_id`)) where `r`.`oversight_role_id` is not null or `r`.`id` = 9;
 
 -- ── View: v_slot_total_margin ──
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_slot_total_margin` AS select `seat`.`company_id` AS `company_id`,`seat`.`id` AS `slot_id`,`seat`.`container_no` AS `container_no`,`sup`.`supplier_id` AS `supplier_id`,`seat`.`unit_margin` AS `unit_margin`,round(coalesce(`st`.`settled`,0) * coalesce(`seat`.`monthly_basis`,0) / nullif(`basis`.`total_basis`,0),2) AS `slot_settled_hours`,round(coalesce(`seat`.`unit_margin`,0) * coalesce(`st`.`settled`,0) * coalesce(`seat`.`monthly_basis`,0) / nullif(`basis`.`total_basis`,0),2) AS `slot_total_margin`,case when coalesce(`seat`.`unit_margin`,0) < 0 then 'سالبٌ — يُرفع لمالكِ العقد' else '' end AS `margin_flag` from (((`op_containers` `seat` join `op_containers` `sup` on(`sup`.`id` = `seat`.`parent_id` and `sup`.`level` = 'مورد' and `sup`.`is_deleted` = 0)) left join (select `op_containers`.`parent_id` AS `parent_id`,sum(`op_containers`.`monthly_basis`) AS `total_basis` from `op_containers` where `op_containers`.`is_deleted` = 0 and `op_containers`.`level` = 'معدة' group by `op_containers`.`parent_id`) `basis` on(`basis`.`parent_id` = `sup`.`id`)) left join (select `settlements`.`company_id` AS `company_id`,`settlements`.`party_ref` AS `party_ref`,sum(`settlements`.`client_settled_hours`) AS `settled` from `settlements` where `settlements`.`is_deleted` = 0 and `settlements`.`party_type` = 'supplier' group by `settlements`.`company_id`,`settlements`.`party_ref`) `st` on(`st`.`company_id` = `seat`.`company_id` and `st`.`party_ref` = cast(`sup`.`supplier_id` as char charset utf8mb4))) where `seat`.`level` = 'معدة' and `seat`.`is_deleted` = 0;

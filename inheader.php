@@ -2,6 +2,8 @@
 if (!headers_sent()) {
     header('Content-Type: text/html; charset=UTF-8');
 }
+// UXW-01: مكوّناتُ الحالاتِ والخطوةِ التاليةِ متاحةٌ لكلِّ شاشةٍ داخلَ القشرة
+require_once __DIR__ . '/includes/ux_components.php';
 $iconsCss = function_exists('ems_url') ? ems_url('assets/css/all.min.css') : '../assets/css/all.min.css';
 
 // Cache-busting version for unified stylesheets so CSS edits show immediately
@@ -53,18 +55,22 @@ if (!function_exists('ems_css_ver')) {
     <!-- Unified Table Styles — loaded LAST so ems-tables.css is the single authoritative source for all table design -->
     <link rel="stylesheet" href="/ems/assets/css/ems-tables.css<?php echo ems_css_ver('ems-tables.css'); ?>">
     <!-- Unified Form Styles — loaded LAST so ems-forms.css is the single authoritative source for ALL form design -->
-    <link rel="stylesheet" href="/ems/assets/css/ems-forms.css<?php echo ems_css_ver('ems-forms.css'); ?>
+    <link rel="stylesheet" href="/ems/assets/css/ems-forms.css<?php echo ems_css_ver('ems-forms.css'); ?>">
     <!-- أنماطُ الأزرارِ الأربعةُ — تُحمَّل بعد بوتستراب لتَغلبَ أزرقَه بذهبيِّ العلامة -->
-    <link rel="stylesheet" href="/ems/assets/css/ems-buttons.css<?php echo ems_css_ver('ems-buttons.css'); ?>">">
+    <link rel="stylesheet" href="/ems/assets/css/ems-buttons.css<?php echo ems_css_ver('ems-buttons.css'); ?>">
     <!-- شريط الرحلة الموحّد (الدستور §5) — مكوّنٌ واحدٌ للطلب والبلاغ والوحدة -->
     <link rel="stylesheet" href="/ems/assets/css/ems-journey.css<?php echo ems_css_ver('ems-journey.css'); ?>">
     <!-- نظام الرسائل الموحّد: توست عابر + لافتة سطرية بلغةٍ بصريةٍ واحدة -->
     <link rel="stylesheet" href="/ems/assets/css/ems-alerts.css<?php echo ems_css_ver('ems-alerts.css'); ?>">
     <!-- قشرة التطبيق الموحدة (UXR-01 · AS-01..08) — تُحمَّل بعد الهوية فتحكم القياسات -->
     <link rel="stylesheet" href="/ems/assets/css/ems-shell.css<?php echo ems_css_ver('ems-shell.css'); ?>">
+    <!-- UXW-01: حالاتُ الشاشةِ التسعُ والخطوةُ التالية — مكوّنٌ واحدٌ لكلِّ الشاشات -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-states.css<?php echo ems_css_ver('ems-states.css'); ?>">
     <!-- INJ-0442: أنماطُ الشاشاتِ الخاصةُ — تُحمَّل **آخرًا** كما كانت كتلُها
          داخلَ الصفحة، فالنقلُ لا يغيّر مَن يغلب مَن. -->
     <link rel="stylesheet" href="/ems/assets/css/ems-screens.css<?php echo ems_css_ver('ems-screens.css'); ?>">
+    <!-- شاشةُ التذكرة — مكوّناتُها مُنطاقةٌ تحت .tkt-form-main فلا تتسرّب لغيرها -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-ticket.css<?php echo ems_css_ver('ems-ticket.css'); ?>">
     <!-- INJ-0378 · INJ-0548: صندوقُ الإرسالِ دونَ اتصالٍ وعاملُ الخدمة —
          الطابورُ يعمل على النماذجِ الموسومةِ صراحةً وحدَها، والعاملُ يخزّن
          الأصولَ الساكنةَ لا صفحاتِ PHP (صفحةٌ محفوظةٌ ببياناتٍ قديمةٍ أخطرُ

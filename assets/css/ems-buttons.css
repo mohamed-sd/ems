@@ -112,3 +112,113 @@ body .btn-danger:focus-visible,  body .btn-ghost:focus-visible {
   outline: 2px solid var(--c-brand-navy);
   outline-offset: 2px;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ems-btn-group-toggle / ems-btn-group-toggle-all — أزرارُ مجموعاتِ الأعمدة
+   بالاسمِ المؤسسيِّ المعتمد (بوابة المنع ٣ · UXW-01). مرآةٌ بصريةٌ حرفيةٌ
+   لقواعد .btn-group-toggle في ems-tables.css — تعمل مع assets/js/column-groups.js
+   عبر تمريرِ المحدِّدَين buttons/allButton في تهيئةِ الشاشة.
+   ═══════════════════════════════════════════════════════════════════════════ */
+.contracts-group-toolbar .ems-btn-group-toggle,
+.contracts-group-toolbar .ems-btn-group-toggle-all {
+    flex: 1 1 auto;
+    justify-content: center;
+}
+.contracts-group-toolbar .ems-btn-group-toggle-all {
+    margin-left: 0;
+}
+
+.ems-btn-group-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid var(--c-6d6d6d) !important;
+    background: var(--c-6d6d6d) !important;
+    color: var(--c-ink-max) !important;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+.ems-btn-group-toggle:hover {
+    border-color: var(--c-d9ab32) !important;
+    color: var(--c-surface) !important;
+    background: var(--c-7d7d7d) !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+.ems-btn-group-toggle.active {
+    background: var(--c-f5c64f) !important;
+    color: var(--c-2a2010) !important;
+    border-color: var(--c-c2941c) !important;
+    box-shadow: var(--shadow-md);
+}
+.ems-btn-group-toggle.active:hover {
+    background: var(--c-e8b637) !important;
+    color: var(--c-2a2010) !important;
+}
+
+.ems-btn-group-toggle-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1.5px solid var(--c-6d6d6d) !important;
+    background: var(--c-6d6d6d) !important;
+    color: var(--c-ink-max) !important;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.18s ease;
+    margin-left: auto;
+    white-space: nowrap;
+}
+.ems-btn-group-toggle-all:hover {
+    border-color: var(--c-d9ab32) !important;
+    color: var(--c-ink-max) !important;
+    background: var(--c-7d7d7d) !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+.ems-btn-group-toggle-all.active {
+    background: var(--c-d9ab32) !important;
+    color: var(--c-2a2010) !important;
+    border-color: var(--c-c2941c) !important;
+    box-shadow: var(--shadow-md);
+}
+
+/* التغلُّب على توحيدِ الأزرارِ العام (.ems-site .main button) — كما في الأصل */
+.ems-site .main .ems-btn-group-toggle,
+.ems-site .main .ems-btn-group-toggle-all {
+    background: var(--c-e6e6e6) !important;
+    color: var(--c-ink-max) !important;
+    border: 1.5px solid var(--c-6d6d6d) !important;
+}
+.ems-site .main .ems-btn-group-toggle:hover,
+.ems-site .main .ems-btn-group-toggle-all:hover {
+    background: var(--c-d9ab32) !important;
+    border-color: var(--c-d9ab32) !important;
+    color: var(--c-ink-max) !important;
+}
+.ems-site .main .ems-btn-group-toggle.active,
+.ems-site .main .ems-btn-group-toggle-all.active {
+    background: var(--c-d9ab32) !important;
+    color: var(--c-2a2010) !important;
+    border-color: var(--c-c2941c) !important;
+}
+
+/* المرآةُ الجوّالة — كما في كتلة ≤767.98px بملف ems-tables.css */
+@media (max-width: 767.98px) {
+    .ems-btn-group-toggle {
+        padding: 6px 8px;
+        font-size: 0.75rem;
+    }
+    .ems-btn-group-toggle-all {
+        margin-left: 0;
+        margin-top: 6px;
+    }
+}

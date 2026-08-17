@@ -96,6 +96,25 @@
   --transition-normal: 200ms ease;
   --transition-slow: 300ms ease;
 
+  /* ── UXW-01 §5-3: مقاساتُ الأيقوناتِ الأربع — ولا خامسة ─────────────── */
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-xl: 32px;
+
+  /* ── UXW-01 §5-3: نقاطُ الانكسارِ المعتمدة — الدقاتُ الأربعُ + لوحي وجوال
+     تُقرأ في @media بقيمها الحرفية (المتغيرات لا تعمل داخل media query)
+     وهذه الرموزُ مرجعُ القيمِ الحاكم: 1280 · 1366 · 1440 · 1920 · 1024 · 768 */
+  --bp-desktop-1: 1280px;
+  --bp-desktop-2: 1366px;
+  --bp-desktop-3: 1440px;
+  --bp-desktop-4: 1920px;
+  --bp-tablet: 1024px;
+  --bp-mobile: 768px;
+
+  /* ── UXW-01 §5-3: حدُّ الجدولِ الواحدُ في النظامِ كلِّه ────────────── */
+  --table-border: 1px solid var(--gray-200);
+
   --bs-primary: var(--brand-orange-bright);
   --bs-primary-rgb: 247, 127, 14;
   --bs-secondary: var(--brand-amber);

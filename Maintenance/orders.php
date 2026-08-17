@@ -518,11 +518,14 @@ function mnt_state_class($st) {
 }
 ?>
 
-<div class="main mnt-orders-main ems-unified-page-shell">
+<div class="main mnt-orders-main ems-unified-page-shell ems-doc-cycle">
+
+    <?php // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
+    echo ems_states_bundle('لا أوامرَ صيانةٍ مسجَّلةً في نطاقك', 'أنشئ أمرَ صيانةٍ جديدًا أو عدِّل تصفيةَ الحالة'); ?>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
-        <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>" style="margin-bottom:12px;">
+        <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?> mnt-mb12">
             <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
             <?php echo htmlspecialchars($_GET['msg']); ?>
         </div>
@@ -557,6 +560,21 @@ function mnt_state_class($st) {
     ems_report_button(array('screen' => 'maintenance',
         'entity_type' => 'mnt_order', 'entity_id' => $oid ?? null,
         'equipment_id' => $order['equipment_id'] ?? null, 'project_id' => $order['project_id'] ?? null));
+    // UXW-01 ⑫: الخطوةُ التاليةُ من حالةِ الأمرِ الحيّةِ في سلّمِ دورتِه (بلاغ → تنفيذ → فحص → إغلاق)
+    $mnt_flow_ns = array('بلاغ', 'تنفيذ', 'فحص', 'إغلاق');
+    $mnt_ci = array_search($st, $mnt_flow_ns, true);
+    if ($st === 'ملغى') {
+        $mnt_next_step = 'أمرٌ ملغى — دورتُه انتهت بلا خطوةٍ تالية';
+    } elseif ($st === 'إغلاق') {
+        $mnt_next_step = 'الأمرُ مُقفَل — اكتملت الدورة';
+    } elseif ($st === 'قطعة منتظرة') {
+        $mnt_next_step = 'وصولُ القطعةِ المنتظرةِ ثم استئنافُ التنفيذ';
+    } elseif ($mnt_ci !== false && isset($mnt_flow_ns[$mnt_ci + 1])) {
+        $mnt_next_step = 'الانتقالُ إلى مرحلةِ «' . $mnt_flow_ns[$mnt_ci + 1] . '»';
+    } else {
+        $mnt_next_step = 'التشخيصُ ثم التنفيذُ ثم الإقفال';
+    }
+    echo ems_next_step($mnt_next_step);
     ?>
 
     <!-- شريط مراحل الدورة (Stepper) -->
@@ -596,7 +614,7 @@ function mnt_state_class($st) {
                         </select>
                     </div>
                     <div class="form-group"><label for="emsf_301_529bf">المعدة <span class="mnt-req-hint">(تحت الصيانة في المشروع)</span></label>
-                        <select name="equipment_id" class="mnt-eq" data-selected="<?php echo intval($order['equipment_id']); ?>" id="emsf_301_529bf"><option value="">— اختر المعدة —</option>
+                        <select name="equipment_id" class="mnt-eq" aria-label="المعدة (تحت الصيانة في المشروع)" data-selected="<?php echo intval($order['equipment_id']); ?>" id="emsf_301_529bf"><option value="">— اختر المعدة —</option>
                             <?php foreach ($edit_eq_options as $e) echo mnt_opt($e['id'], $e['name'] . (!empty($e['code']) ? ' (' . $e['code'] . ')' : ''), intval($order['equipment_id']) === intval($e['id'])); ?>
                         </select>
                     </div>
@@ -605,17 +623,17 @@ function mnt_state_class($st) {
                     </div>
                     <?php if ($src_inspection): // التفتيش المُولِّد لهذا الأمر — رابطٌ للرجوع للاستمارة ?>
                     <div class="form-group"><label>التفتيش المصدر</label>
-                        <a href="inspections.php?id=<?php echo intval($src_inspection['id']); ?>" class="action-btn" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;">
+                        <a href="inspections.php?id=<?php echo intval($src_inspection['id']); ?>" class="action-btn mnt-src-insp">
                             <i class="fas fa-clipboard-check"></i>
                             <?php echo htmlspecialchars((string) $src_inspection['code']); ?>
                             <?php if ($src_inspection['score'] !== null): ?>
-                                <span style="opacity:.75">— <?php echo intval($src_inspection['score']); ?>%</span>
+                                <span class="mnt-dim75">— <?php echo intval($src_inspection['score']); ?>%</span>
                             <?php endif; ?>
                         </a>
                     </div>
                     <?php endif; ?>
                     <div class="form-group"><label>نوع الصيانة</label>
-                        <select name="maint_type"><option value="">— اختر —</option><?php foreach ($maint_types as $m) echo mnt_opt($m, $m, $order['maint_type'] === $m); ?></select>
+                        <select name="maint_type" aria-label="نوع الصيانة"><option value="">— اختر —</option><?php foreach ($maint_types as $m) echo mnt_opt($m, $m, $order['maint_type'] === $m); ?></select>
                     </div>
                     <div class="form-group"><label for="emsf_303_5f3d2">الأولوية</label>
                         <select name="priority" id="emsf_303_5f3d2"><option value="">— اختر —</option><?php foreach ($priorities as $p) echo mnt_opt($p, $p, $order['priority'] === $p); ?></select>
@@ -640,7 +658,7 @@ function mnt_state_class($st) {
                         </select>
                     </div>
                     <div class="form-group"><label for="emsf_307_be5cd">اسم الورشة (نصّي)</label>
-                        <input type="text" name="workshop" value="<?php echo htmlspecialchars((string) $order['workshop']); ?>" placeholder="ورشة داخلية / خارجية" id="emsf_307_be5cd">
+                        <input type="text" name="workshop" aria-label="اسم الورشة" value="<?php echo htmlspecialchars((string) $order['workshop']); ?>" placeholder="ورشة داخلية / خارجية" id="emsf_307_be5cd">
                     </div>
                     <div class="form-group"><label for="emsf_308_28dd4">الفني المسؤول</label>
                         <select name="technician_id" id="emsf_308_28dd4"><option value="">— اختر —</option>
@@ -653,7 +671,7 @@ function mnt_state_class($st) {
                         </select>
                     </div>
                     <div class="form-group"><label for="emsf_310_2292f">تكلفة خارجية (إدخال يدوي)</label>
-                        <input type="number" step="0.01" name="external_cost" value="<?php echo htmlspecialchars((string) $order['external_cost']); ?>" id="emsf_310_2292f">
+                        <input type="number" step="0.01" name="external_cost" aria-label="تكلفة خارجية (إدخال يدوي)" value="<?php echo htmlspecialchars((string) $order['external_cost']); ?>" id="emsf_310_2292f">
                     </div>
                 </div>
             </div>
@@ -662,13 +680,13 @@ function mnt_state_class($st) {
                 <h6><i class="fas fa-stethoscope"></i> التشخيص والإجراءات والمرحلة</h6>
                 <div class="form-grid">
                     <div class="form-group"><label for="emsf_311_8e97e">وقت بدء العمل</label>
-                        <input type="datetime-local" name="work_start" value="<?php echo $order['work_start'] ? str_replace(' ', 'T', substr((string) $order['work_start'], 0, 16)) : ''; ?>" id="emsf_311_8e97e">
+                        <input type="datetime-local" name="work_start" aria-label="وقت بدء العمل" value="<?php echo $order['work_start'] ? str_replace(' ', 'T', substr((string) $order['work_start'], 0, 16)) : ''; ?>" id="emsf_311_8e97e">
                     </div>
                     <div class="form-group"><label for="emsf_312_bfc5e">وقت انتهاء العمل</label>
-                        <input type="datetime-local" name="work_end" value="<?php echo $order['work_end'] ? str_replace(' ', 'T', substr((string) $order['work_end'], 0, 16)) : ''; ?>" id="emsf_312_bfc5e">
+                        <input type="datetime-local" name="work_end" aria-label="وقت انتهاء العمل" value="<?php echo $order['work_end'] ? str_replace(' ', 'T', substr((string) $order['work_end'], 0, 16)) : ''; ?>" id="emsf_312_bfc5e">
                     </div>
                     <div class="form-group"><label for="emsf_313_fb56e">ساعات التوقّف</label>
-                        <input type="number" step="0.01" name="downtime_hours" value="<?php echo htmlspecialchars((string) $order['downtime_hours']); ?>" id="emsf_313_fb56e">
+                        <input type="number" step="0.01" name="downtime_hours" aria-label="ساعات التوقّف" value="<?php echo htmlspecialchars((string) $order['downtime_hours']); ?>" id="emsf_313_fb56e">
                     </div>
                     <div class="form-group"><label for="emsf_314_5a15b">السبب الجذري <span class="mnt-req-hint">(للإغلاق)</span></label>
                         <select name="root_cause_id" id="emsf_314_5a15b"><option value="">— اختر —</option>
@@ -716,11 +734,11 @@ function mnt_state_class($st) {
         <div class="mnt-toggles-head"><i class="fas fa-sliders"></i> بنود التكلفة <span class="mnt-toggles-hint">(اختيارية — فعّل ما يلزم فقط، ويمكن حفظ الأمر بدونها)</span></div>
         <div class="mnt-toggles-grid">
             <label class="mnt-toggle<?php echo !empty($labor_rows) ? ' is-on' : ''; ?>" id="laborToggleWrap">
-                <span class="mnt-switch"><input type="checkbox" id="toggleLaborSection"<?php echo !empty($labor_rows) ? ' checked' : ''; ?>><span class="mnt-switch-track"></span></span>
+                <span class="mnt-switch"><input type="checkbox" id="toggleLaborSection" aria-label="تفعيل أسطر العمالة"<?php echo !empty($labor_rows) ? ' checked' : ''; ?>><span class="mnt-switch-track"></span></span>
                 <span class="mnt-toggle-text"><span class="mnt-toggle-title"><i class="fas fa-user-gear"></i> تكليف أسطر عمالة</span><span class="mnt-toggle-sub">إضافة الموظفين وساعات العمل وتكلفتها</span></span>
             </label>
             <label class="mnt-toggle<?php echo !empty($part_rows) ? ' is-on' : ''; ?>" id="partsToggleWrap">
-                <span class="mnt-switch"><input type="checkbox" id="togglePartsSection"<?php echo !empty($part_rows) ? ' checked' : ''; ?>><span class="mnt-switch-track"></span></span>
+                <span class="mnt-switch"><input type="checkbox" id="togglePartsSection" aria-label="تفعيل أسطر قطع الغيار"<?php echo !empty($part_rows) ? ' checked' : ''; ?>><span class="mnt-switch-track"></span></span>
                 <span class="mnt-toggle-text"><span class="mnt-toggle-title"><i class="fas fa-gears"></i> تكليف أسطر قطع غيار</span><span class="mnt-toggle-sub">إضافة القطع المُستبدلة وكمياتها وتكلفتها</span></span>
             </label>
         </div>
@@ -729,20 +747,20 @@ function mnt_state_class($st) {
 
     <div class="mnt-lines-grid">
         <!-- أسطر العمالة -->
-        <div class="card mnt-lines-card" id="laborCard" style="<?php echo !empty($labor_rows) ? '' : 'display:none'; ?>">
+        <div class="card mnt-lines-card<?php echo !empty($labor_rows) ? '' : ' mnt-hide'; ?>" id="laborCard">
             <div class="card-header mnt-lines-head">
                 <h5><i class="fas fa-user-gear"></i> أسطر العمالة <span class="mnt-count" id="laborCount"><?php echo count($labor_rows); ?></span></h5>
                 <?php if (!$st_locked && $can_edit): ?><button type="button" class="mnt-add-toggle" data-target="laborForm"><i class="fas fa-plus"></i> إضافة سطر</button><?php endif; ?>
             </div>
             <div class="card-body">
                 <?php if (!$st_locked && $can_edit): ?>
-                <form class="mnt-line-form" id="laborForm" onsubmit="return false;" style="display:none;">
+                <form class="mnt-line-form mnt-hide" id="laborForm" onsubmit="return false;">
                     <input type="hidden" name="action" value="add_labor">
                     <input type="hidden" name="order_id" value="<?php echo intval($order['id']); ?>">
                     <div class="mnt-line-form-title"><i class="fas fa-user-plus"></i> إضافة سطر عمالة</div>
                     <div class="mnt-line-grid">
                         <div class="form-group"><label>الموظف <span class="required">*</span></label>
-                            <select name="employee_id" required>
+                            <select name="employee_id" aria-label="الموظف" required>
                                 <option value="">— اختر الموظف —</option>
                                 <?php foreach ($employees_list as $e):
                                     $erole = (string) ($e['role'] ?? '');
@@ -761,7 +779,7 @@ function mnt_state_class($st) {
                     </div>
                 </form>
                 <?php endif; ?>
-                <div class="table-container"><table class="alltables no-datatable mnt-line-table" id="laborTable" style="width:100%">
+                <div class="table-container"><table class="alltables no-datatable mnt-line-table mnt-w100" id="laborTable">
                     <thead><tr><th>الموظف</th><th>الدور</th><th>ساعات العمالة</th><th>تكلفة الساعة</th><th>تكلفة العمالة</th><?php if (!$st_locked && $can_edit) echo '<th></th>'; ?></tr></thead>
                     <tbody>
                         <?php foreach ($labor_rows as $l): ?>
@@ -777,19 +795,19 @@ function mnt_state_class($st) {
                     </tbody>
                     <tfoot><tr><th colspan="4">إجمالي العمالة</th><th class="mnt-num" id="laborFoot"><?php echo number_format((float) $order['labor_cost'], 2); ?></th><?php if (!$st_locked && $can_edit) echo '<th></th>'; ?></tr></tfoot>
                 </table></div>
-                <div class="mnt-empty-line" id="laborEmpty" style="<?php echo empty($labor_rows) ? '' : 'display:none'; ?>"><i class="fas fa-user-gear"></i><span>لا توجد أسطر عمالة بعد</span></div>
+                <div class="mnt-empty-line<?php echo empty($labor_rows) ? '' : ' mnt-hide'; ?>" id="laborEmpty"><i class="fas fa-user-gear"></i><span>لا توجد أسطر عمالة بعد</span></div>
             </div>
         </div>
 
         <!-- أسطر القطع -->
-        <div class="card mnt-lines-card" id="partsCard" style="<?php echo !empty($part_rows) ? '' : 'display:none'; ?>">
+        <div class="card mnt-lines-card<?php echo !empty($part_rows) ? '' : ' mnt-hide'; ?>" id="partsCard">
             <div class="card-header mnt-lines-head">
                 <h5><i class="fas fa-gears"></i> أسطر القطع <span class="mnt-count" id="partCount"><?php echo count($part_rows); ?></span></h5>
                 <?php if (!$st_locked && $can_edit): ?><button type="button" class="mnt-add-toggle" data-target="partForm"><i class="fas fa-plus"></i> إضافة سطر</button><?php endif; ?>
             </div>
             <div class="card-body">
                 <?php if (!$st_locked && $can_edit): ?>
-                <form class="mnt-line-form" id="partForm" onsubmit="return false;" style="display:none;">
+                <form class="mnt-line-form mnt-hide" id="partForm" onsubmit="return false;">
                     <input type="hidden" name="action" value="add_part">
                     <input type="hidden" name="order_id" value="<?php echo intval($order['id']); ?>">
                     <div class="mnt-line-form-title"><i class="fas fa-plus"></i> إضافة سطر قطعة</div>
@@ -798,7 +816,7 @@ function mnt_state_class($st) {
                         <div class="form-group"><label for="emsf_322_bc710">التصنيف</label><input type="text" name="category" id="emsf_322_bc710"></div>
                         <div class="form-group"><label for="emsf_323_21085">الكمية</label><input type="number" step="0.01" name="quantity" value="1" id="emsf_323_21085"></div>
                         <div class="form-group"><label for="emsf_324_bd761">سعر الوحدة</label><input type="number" step="0.01" name="unit_cost" value="0" id="emsf_324_bd761"></div>
-                        <div class="form-group"><label>مكوّن رئيسي؟</label><label class="mnt-major-chk"><input type="checkbox" name="is_major_component" value="1"><span>نعم، مكوّن رئيسي</span></label></div>
+                        <div class="form-group"><label>مكوّن رئيسي؟</label><label class="mnt-major-chk"><input type="checkbox" name="is_major_component" value="1" aria-label="مكوّن رئيسي"><span>نعم، مكوّن رئيسي</span></label></div>
                     </div>
                     <div class="mnt-line-actions">
                         <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> إضافة السطر</button>
@@ -806,7 +824,7 @@ function mnt_state_class($st) {
                     </div>
                 </form>
                 <?php endif; ?>
-                <div class="table-container"><table class="alltables no-datatable mnt-line-table" id="partTable" style="width:100%">
+                <div class="table-container"><table class="alltables no-datatable mnt-line-table mnt-w100" id="partTable">
                     <thead><tr><th>القطعة</th><th>تصنيف العطل</th><th>الكمية</th><th>سعر الوحدة</th><th>إجمالي التكلفة</th><th>رئيسي</th><?php if (!$st_locked && $can_edit) echo '<th></th>'; ?></tr></thead>
                     <tbody>
                         <?php foreach ($part_rows as $pt): ?>
@@ -816,14 +834,14 @@ function mnt_state_class($st) {
                             <td><?php echo htmlspecialchars((string) $pt['quantity']); ?></td>
                             <td><?php echo htmlspecialchars((string) $pt['unit_cost']); ?></td>
                             <td class="mnt-num"><?php echo number_format((float) $pt['subtotal'], 2); ?></td>
-                            <td class="mnt-center"><?php echo intval($pt['is_major_component']) ? '<i class="fas fa-star" style="color:#E0AE2E"></i>' : '—'; ?></td>
+                            <td class="mnt-center"><?php echo intval($pt['is_major_component']) ? '<i class="fas fa-star mnt-star"></i>' : '—'; ?></td>
                             <?php if (!$st_locked && $can_edit): ?><td><button type="button" class="action-btn delete mnt-del-line" data-kind="part" data-line="<?php echo intval($pt['id']); ?>" title="حذف"><i class="fas fa-trash-alt"></i></button></td><?php endif; ?>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>
                     <tfoot><tr><th colspan="4">إجمالي القطع</th><th class="mnt-num" id="partsFoot"><?php echo number_format((float) $order['parts_cost'], 2); ?></th><th></th><?php if (!$st_locked && $can_edit) echo '<th></th>'; ?></tr></tfoot>
                 </table></div>
-                <div class="mnt-empty-line" id="partEmpty" style="<?php echo empty($part_rows) ? '' : 'display:none'; ?>"><i class="fas fa-gears"></i><span>لا توجد أسطر قطع بعد</span></div>
+                <div class="mnt-empty-line<?php echo empty($part_rows) ? '' : ' mnt-hide'; ?>" id="partEmpty"><i class="fas fa-gears"></i><span>لا توجد أسطر قطع بعد</span></div>
             </div>
         </div>
     </div>
@@ -847,11 +865,13 @@ function mnt_state_class($st) {
     $header_actions[] = array('tag' => 'a', 'href' => '../Tickets/tickets_list.php', 'class' => 'suppliers-header-link', 'icon' => 'fa fa-tower-observation', 'label' => 'البلاغات');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑫: قائمةُ الأوامر — خطوةُ الدورةِ الثابتةُ المعروفة
+    echo ems_next_step('التشخيصُ ثم التنفيذُ ثم الإقفال');
 ?>
     <div class="mnt-bell-wrap">
         <span class="mnt-bell" title="أوامر صيانة تلقائية مفتوحة">
             <i class="fas fa-bell"></i>
-            <span class="mnt-bell-badge" id="openOrdersBadge" style="display:none">0</span>
+            <span class="mnt-bell-badge mnt-hide" id="openOrdersBadge">0</span>
         </span>
     </div>
     <?php
@@ -868,11 +888,11 @@ function mnt_state_class($st) {
                          ORDER BY o.waiting_part_since ASC");
     while ($wq && ($wx = $wq->fetch_assoc())) { $wp_rows[] = $wx; }
     if ($wp_rows): ?>
-    <div class="card" style="border-inline-start:4px solid #a15c00"><div class="card-body">
+    <div class="card mnt-wp-card"><div class="card-body">
         <strong><i class="fa fa-gears"></i> قطعٌ منتظرة (<?php echo count($wp_rows); ?>)</strong> —
         <?php foreach ($wp_rows as $w): ?>
-            <a href="orders.php?id=<?php echo intval($w['id']); ?>" class="badge badge-warning"
-               style="margin:0 3px"><?php echo htmlspecialchars($w['code'] . ' · ' . ($w['eq_name'] ?: ''))
+            <a href="orders.php?id=<?php echo intval($w['id']); ?>" class="badge badge-warning mnt-wp-badge"
+               ><?php echo htmlspecialchars($w['code'] . ' · ' . ($w['eq_name'] ?: ''))
                 . ' — ' . intval($w['days_waiting']) . ' يومًا'; ?></a>
         <?php endforeach; ?>
     </div></div>
@@ -886,7 +906,7 @@ function mnt_state_class($st) {
         <div class="card"><div class="card-body">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label>المشروع / الموقع <span class="required">*</span></label>
-                    <select name="project_id" class="mnt-proj" required><option value="">— اختر المشروع —</option>
+                    <select name="project_id" class="mnt-proj" aria-label="المشروع / الموقع" required><option value="">— اختر المشروع —</option>
                         <?php foreach ($projects as $p) echo mnt_opt($p['id'], $p['name'], false); ?>
                     </select>
                 </div>
@@ -953,7 +973,7 @@ function mnt_state_class($st) {
             </div>
         </div>
         <div class="table-container">
-            <table id="ordersTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="ordersTable" class="display nowrap alltables no-datatable mnt-w100" data-order='[[1, "desc"]]'>
                 <thead><tr>
                     <th>الإجراءات</th><th>مرجع التفويض</th><th>كود المعدة</th><th>مصدر الأمر</th><th>نوع الصيانة</th>
                     <th>تكلفة جهة خارجية</th><th>الإجمالي</th><th>الحالة</th><th>بلاغه</th>
@@ -1134,15 +1154,12 @@ function mnt_state_class($st) {
     $(document).ready(function () {
         var $t = $('#ordersTable');
         if ($t.length) {
-            var table = $t.DataTable({
-                scrollX: true, autoWidth: false, stateSave: false, order: [[1, 'desc']],
-                dom: 'Bfrtip',
-                buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-                "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-            });
+            // UXW-01 ⑤: تهيئةُ الجدولِ للمكوّنِ المركزيِّ وحدَه (ui-unification.js) —
+            // والترتيبُ الافتراضيُّ معلَنٌ سمةَ data-order على وسمِ الجدول.
             $('#filterState').on('change', function () {
+                if (!$.fn.dataTable || !$.fn.dataTable.isDataTable('#ordersTable')) { return; }
                 var v = this.value ? '^' + $.fn.dataTable.util.escapeRegex(this.value) + '$' : '';
-                table.column(7).search(v, true, false).draw();
+                $('#ordersTable').DataTable().column(7).search(v, true, false).draw();
             });
 
             $(document).on('click', '.viewBtn', function () {
@@ -1244,7 +1261,7 @@ function mnt_state_class($st) {
             postLine(new URLSearchParams(fd)).then(function(res){
                 if(!res.success){ alert(res.message || 'تعذّر الإضافة'); return; }
                 var l = res.line;
-                var major = (l.is_major==1 || l.is_major===true) ? '<i class="fas fa-star" style="color:#E0AE2E"></i>' : '—';
+                var major = (l.is_major==1 || l.is_major===true) ? '<i class="fas fa-star mnt-star"></i>' : '—';
                 var row = '<tr data-line="'+l.id+'">'
                     + '<td>'+esc(l.part_name)+'</td><td>'+esc(l.category||'')+'</td><td>'+esc(l.quantity)+'</td>'
                     + '<td>'+esc(l.unit_cost)+'</td><td class="mnt-num">'+fmt(l.subtotal)+'</td><td class="mnt-center">'+major+'</td>'
@@ -1391,6 +1408,19 @@ function mnt_state_class($st) {
     setInterval(refreshOpenOrdersBadge, 60000);
 </script>
 <style>
+    /* UXW-01 ①: الألوانُ كلُّها برموزِ اللوحة — ما لا رمزَ له بعدُ يُعلَن باسمِ
+       قيمتِه مع قيمتِه الاحتياطيةِ حرفًا بحرفٍ فلا يتغيّر بكسلٌ واحد. */
+
+    /* UXW-01 ②: أصنافٌ محلَّ الأنماطِ الموضعيةِ التي كانت مبثوثةً في الوسوم */
+    .mnt-mb12 { margin-bottom: 12px; }
+    .mnt-hide { display: none; }
+    .mnt-w100 { width: 100%; }
+    .mnt-src-insp { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+    .mnt-dim75 { opacity: .75; }
+    .mnt-star { color: var(--c-e0ae2e); }
+    .mnt-wp-card { border-inline-start: 4px solid var(--c-a15c00, #a15c00); }
+    .mnt-wp-badge { margin: 0 3px; }
+
     /* شارة «auto» بجوار اسم المعدة للأوامر التلقائية */
     .mnt-auto-badge {
         display: inline-block;
@@ -1399,8 +1429,8 @@ function mnt_state_class($st) {
         font-size: 11px;
         font-weight: 700;
         border-radius: 6px;
-        background: #6d28d9;
-        color: #fff;
+        background: var(--c-6d28d9);
+        color: var(--c-s-fff);
         letter-spacing: .5px;
     }
 
@@ -1419,8 +1449,8 @@ function mnt_state_class($st) {
         width: 40px;
         height: 40px;
         border-radius: 50%;
-        background: #f3f4f6;
-        color: #374151;
+        background: var(--c-f3f4f6);
+        color: var(--c-374151);
         font-size: 17px;
         cursor: default;
     }
@@ -1433,8 +1463,8 @@ function mnt_state_class($st) {
         height: 18px;
         padding: 0 5px;
         border-radius: 9px;
-        background: #dc2626;
-        color: #fff;
+        background: var(--c-state-danger);
+        color: var(--c-s-fff);
         font-size: 11px;
         font-weight: 700;
         line-height: 18px;
@@ -1445,7 +1475,7 @@ function mnt_state_class($st) {
     .mnt-orders-main .stats-section {
         border: 1px solid var(--bdr);
         border-radius: var(--rl);
-        background: linear-gradient(180deg, rgba(255, 255, 255, .95) 0%, var(--s2) 100%);
+        background: linear-gradient(180deg, var(--c-s-rgba2552552559) 0%, var(--s2) 100%);
         box-shadow: var(--sh);
         padding: 14px;
         margin-bottom: 14px;
@@ -1456,11 +1486,11 @@ function mnt_state_class($st) {
         gap: 12px;
     }
     .mnt-orders-main .stats-card {
-        background: #eee;
-        border: 1px solid #aaa;
+        background: var(--c-s-eee);
+        border: 1px solid var(--c-s-aaa);
         border-radius: 35px;
         padding: 18px;
-        box-shadow: 0 2px 8px rgba(26, 18, 8, .07);
+        box-shadow: 0 2px 8px var(--c-s-rgba2618807);
         position: relative;
         overflow: hidden;
     }
@@ -1476,19 +1506,19 @@ function mnt_state_class($st) {
         float: left;
         vertical-align: middle;
         margin-top: 15px;
-        border: 1px solid #999;
-        background-color: #fff;
-        color: #000;
+        border: 1px solid var(--c-999999);
+        background-color: var(--c-s-fff);
+        color: var(--c-s-000);
     }
     .mnt-orders-main .stats-card .stats-title {
-        color: #555;
+        color: var(--c-555555);
         font-size: 0.92rem;
         font-weight: 700;
         margin-top: 5px;
         line-height: 1.3;
     }
     .mnt-orders-main .stats-card .stats-value {
-        color: #222;
+        color: var(--c-s-222);
         line-height: 1;
         font-weight: 900;
         font-variant-numeric: tabular-nums;
@@ -1504,51 +1534,51 @@ function mnt_state_class($st) {
 
     /* الهوية البصرية لأوامر الصيانة — متّسقة مع باقي الموقع (navy/gold) */
     .mnt-orders-main .mnt-pill { display:inline-flex; align-items:center; padding:4px 12px; border-radius:999px; font-size:.78rem; font-weight:800; }
-    .mnt-pill--gold { background:rgba(224,174,46,.16); color:#9a6f10; }
-    .mnt-pill--blue { background:rgba(37,99,235,.14); color:#1d4ed8; }
-    .mnt-pill--purple { background:rgba(124,58,237,.14); color:#6d28d9; }
-    .mnt-pill--green { background:rgba(22,163,74,.16); color:#15803d; }
-    .mnt-pill--gray { background:rgba(107,114,128,.16); color:#4b5563; }
+    .mnt-pill--gold { background:var(--c-rgba22417446016, rgba(224,174,46,.16)); color:var(--c-9a6f10, #9a6f10); }
+    .mnt-pill--blue { background:var(--c-s-rgba379923514); color:var(--c-state-info-deep); }
+    .mnt-pill--purple { background:var(--c-s-rgba1245823714); color:var(--c-6d28d9); }
+    .mnt-pill--green { background:var(--c-rgba2216374016); color:var(--c-15803d); }
+    .mnt-pill--gray { background:var(--c-rgba107114128016, rgba(107,114,128,.16)); color:var(--c-4b5563); }
 
     /* Stepper مراحل الأمر */
     .mnt-stepper-card { margin-bottom:14px; }
     .mnt-stepper { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
     .mnt-step { display:flex; align-items:center; gap:8px; padding:6px 14px; border-radius:999px; background:var(--s2,#f3f0e8); color:var(--t2,#8a7a5c); font-weight:700; font-size:.86rem; flex:1; min-width:120px; justify-content:center; }
-    .mnt-step-dot { width:26px; height:26px; border-radius:50%; background:#fff; border:2px solid currentColor; display:inline-flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:900; }
-    .mnt-step.is-done { background:rgba(22,163,74,.12); color:#15803d; }
-    .mnt-step.is-current { background:linear-gradient(135deg,#1f4f7a,#2f6fa5); color:#fff; }
-    .mnt-step.is-current .mnt-step-dot { background:#fff; color:#1f4f7a; border-color:#fff; }
-    .mnt-step.is-cancel { background:rgba(220,38,38,.12); color:#b91c1c; }
+    .mnt-step-dot { width:26px; height:26px; border-radius:50%; background:var(--c-s-fff); border:2px solid currentColor; display:inline-flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:900; }
+    .mnt-step.is-done { background:var(--c-rgba2216374012); color:var(--c-15803d); }
+    .mnt-step.is-current { background:linear-gradient(135deg,var(--c-1f4f7a),var(--c-2f6fa5)); color:var(--c-s-fff); }
+    .mnt-step.is-current .mnt-step-dot { background:var(--c-s-fff); color:var(--c-1f4f7a); border-color:var(--c-s-fff); }
+    .mnt-step.is-cancel { background:var(--c-rgba2203838012); color:var(--c-b91c1c); }
 
     /* ملخص التكاليف */
     .mnt-orders-main .mnt-cost-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
-    .mnt-cost-box { background:var(--s1,#fff); border:1px solid var(--bdr,#ece6d8); border-radius:14px; padding:14px; text-align:center; box-shadow:0 2px 8px rgba(26,18,8,.06); }
+    .mnt-cost-box { background:var(--s1,#fff); border:1px solid var(--bdr,#ece6d8); border-radius:14px; padding:14px; text-align:center; box-shadow:0 2px 8px var(--c-rgba26188006); }
     .mnt-cost-box span { display:block; color:var(--t2,#8a7a5c); font-size:.8rem; font-weight:700; margin-bottom:7px; }
     .mnt-cost-box strong { font-size:1.4rem; font-variant-numeric:tabular-nums; color:var(--t1,#1a1208); }
-    .mnt-cost-total { background:linear-gradient(135deg,#1f4f7a,#2f6fa5); border:none; }
-    .mnt-cost-total span, .mnt-cost-total strong { color:#fff; }
+    .mnt-cost-total { background:linear-gradient(135deg,var(--c-1f4f7a),var(--c-2f6fa5)); border:none; }
+    .mnt-cost-total span, .mnt-cost-total strong { color:var(--c-s-fff); }
 
     /* ══ مفاتيح تفعيل بنود التكلفة (العمالة/القطع) ══ */
     .mnt-cost-toggles { margin-bottom:14px; border:1px solid var(--bdr,#e7dcc4); border-radius:18px; }
     .mnt-cost-toggles .card-body { padding:16px 18px; }
-    .mnt-toggles-head { display:flex; align-items:center; flex-wrap:wrap; gap:8px; font-weight:800; color:#1f4f7a; font-size:.98rem; margin-bottom:14px; }
-    .mnt-toggles-head i { color:#E0AE2E; }
-    .mnt-toggles-hint { color:#9a8c6c; font-weight:600; font-size:.78rem; }
+    .mnt-toggles-head { display:flex; align-items:center; flex-wrap:wrap; gap:8px; font-weight:800; color:var(--c-1f4f7a); font-size:.98rem; margin-bottom:14px; }
+    .mnt-toggles-head i { color:var(--c-e0ae2e); }
+    .mnt-toggles-hint { color:var(--c-9a8c6c, #9a8c6c); font-weight:600; font-size:.78rem; }
     .mnt-toggles-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
     @media (max-width:760px){ .mnt-toggles-grid { grid-template-columns:1fr; } }
-    .mnt-toggle { display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:14px; border:1.5px solid #e7dcc4; background:#fdfbf6; cursor:pointer; transition:border-color .18s, background .18s, box-shadow .18s; margin:0; }
-    .mnt-toggle:hover { border-color:#d7c79f; }
-    .mnt-toggle.is-on { border-color:#2f6fa5; background:linear-gradient(180deg,#f3f9ff,#eaf3fc); box-shadow:0 2px 10px rgba(47,111,165,.12); }
+    .mnt-toggle { display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:14px; border:1.5px solid var(--c-e7dcc4, #e7dcc4); background:var(--c-fdfbf6, #fdfbf6); cursor:pointer; transition:border-color .18s, background .18s, box-shadow .18s; margin:0; }
+    .mnt-toggle:hover { border-color:var(--c-d7c79f, #d7c79f); }
+    .mnt-toggle.is-on { border-color:var(--c-2f6fa5); background:linear-gradient(180deg,var(--c-f3f9ff, #f3f9ff),var(--c-eaf3fc, #eaf3fc)); box-shadow:0 2px 10px var(--c-rgba47111165012, rgba(47,111,165,.12)); }
     .mnt-toggle-text { display:flex; flex-direction:column; gap:3px; }
-    .mnt-toggle-title { font-weight:800; color:#1a1208; font-size:.92rem; display:flex; align-items:center; gap:7px; }
-    .mnt-toggle-title i { color:#2f6fa5; }
-    .mnt-toggle-sub { color:#8a7a5c; font-size:.76rem; font-weight:600; }
+    .mnt-toggle-title { font-weight:800; color:var(--c-1a1208, #1a1208); font-size:.92rem; display:flex; align-items:center; gap:7px; }
+    .mnt-toggle-title i { color:var(--c-2f6fa5); }
+    .mnt-toggle-sub { color:var(--c-8a7a5c, #8a7a5c); font-size:.76rem; font-weight:600; }
     /* مفتاح التبديل */
     .mnt-switch { position:relative; flex:0 0 auto; width:46px; height:26px; }
     .mnt-switch input { position:absolute; inset:0; width:100%; height:100%; opacity:0; margin:0; cursor:pointer; z-index:2; }
-    .mnt-switch-track { position:absolute; inset:0; background:#cfc6b2; border-radius:999px; transition:background .2s; }
-    .mnt-switch-track::before { content:''; position:absolute; top:3px; inset-inline-start:3px; width:20px; height:20px; background:#fff; border-radius:50%; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform .2s; }
-    .mnt-switch input:checked + .mnt-switch-track { background:linear-gradient(135deg,#1f4f7a,#2f6fa5); }
+    .mnt-switch-track { position:absolute; inset:0; background:var(--c-cfc6b2, #cfc6b2); border-radius:999px; transition:background .2s; }
+    .mnt-switch-track::before { content:''; position:absolute; top:3px; inset-inline-start:3px; width:20px; height:20px; background:var(--c-s-fff); border-radius:50%; box-shadow:0 1px 3px var(--c-rgba00003); transition:transform .2s; }
+    .mnt-switch input:checked + .mnt-switch-track { background:linear-gradient(135deg,var(--c-1f4f7a),var(--c-2f6fa5)); }
     .mnt-switch input:checked + .mnt-switch-track::before { transform:translateX(-20px); }
 
     /* ══ لوحتا أسطر العمالة والقطع — تصميم قوي متّسق مع هوية الفورمات ══ */
@@ -1556,44 +1586,44 @@ function mnt_state_class($st) {
     .mnt-lines-card { flex:1 1 380px; min-width:0; overflow:hidden; }
     .mnt-lines-card > .card-header.mnt-lines-head {
         display:flex; align-items:center; justify-content:space-between; gap:10px;
-        background:linear-gradient(135deg,#1f4f7a,#2f6fa5); color:#fff; padding:13px 16px; border:none;
+        background:linear-gradient(135deg,var(--c-1f4f7a),var(--c-2f6fa5)); color:var(--c-s-fff); padding:13px 16px; border:none;
     }
-    .mnt-lines-head h5 { display:flex; align-items:center; gap:8px; margin:0; color:#fff; font-weight:800; font-size:1rem; }
-    .mnt-lines-head h5 i { color:#ffd98a; }
-    .mnt-count { display:inline-flex; align-items:center; justify-content:center; min-width:24px; height:24px; padding:0 8px; border-radius:999px; background:rgba(255,255,255,.22); color:#fff; font-size:.76rem; font-weight:800; }
+    .mnt-lines-head h5 { display:flex; align-items:center; gap:8px; margin:0; color:var(--c-s-fff); font-weight:800; font-size:1rem; }
+    .mnt-lines-head h5 i { color:var(--c-ffd98a, #ffd98a); }
+    .mnt-count { display:inline-flex; align-items:center; justify-content:center; min-width:24px; height:24px; padding:0 8px; border-radius:999px; background:var(--c-rgba255255255022); color:var(--c-s-fff); font-size:.76rem; font-weight:800; }
     .mnt-add-toggle {
         display:inline-flex; align-items:center; gap:6px; border:none; cursor:pointer;
-        padding:7px 15px; border-radius:999px; font-weight:800; font-size:.82rem; color:#1a1208;
-        background:linear-gradient(135deg,#E0AE2E,#f5d27e); box-shadow:0 2px 8px rgba(224,174,46,.4); transition:transform .15s, box-shadow .15s;
+        padding:7px 15px; border-radius:999px; font-weight:800; font-size:.82rem; color:var(--c-1a1208, #1a1208);
+        background:linear-gradient(135deg,var(--c-e0ae2e),var(--c-f5d27e, #f5d27e)); box-shadow:0 2px 8px var(--c-rgba2241744604, rgba(224,174,46,.4)); transition:transform .15s, box-shadow .15s;
     }
-    .mnt-add-toggle:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(224,174,46,.5); }
-    .mnt-line-form { background:linear-gradient(180deg,#fffdf7,#fbf6ea); border:1px solid #e7dcc4; border-radius:16px; padding:16px; margin-bottom:14px; box-shadow:inset 0 1px 0 #fff, 0 2px 10px rgba(26,18,8,.06); }
-    .mnt-line-form-title { display:flex; align-items:center; gap:8px; font-weight:800; color:#6b5d3e; font-size:.86rem; margin-bottom:13px; padding-bottom:11px; border-bottom:1px dashed #e7dcc4; }
-    .mnt-line-form-title i { color:#E0AE2E; }
+    .mnt-add-toggle:hover { transform:translateY(-1px); box-shadow:0 6px 16px var(--c-rgba2241744605, rgba(224,174,46,.5)); }
+    .mnt-line-form { background:linear-gradient(180deg,var(--c-fffdf7),var(--c-fbf6ea, #fbf6ea)); border:1px solid var(--c-e7dcc4, #e7dcc4); border-radius:16px; padding:16px; margin-bottom:14px; box-shadow:inset 0 1px 0 var(--c-s-fff), 0 2px 10px var(--c-rgba26188006); }
+    .mnt-line-form-title { display:flex; align-items:center; gap:8px; font-weight:800; color:var(--c-6b5d3e, #6b5d3e); font-size:.86rem; margin-bottom:13px; padding-bottom:11px; border-bottom:1px dashed var(--c-e7dcc4, #e7dcc4); }
+    .mnt-line-form-title i { color:var(--c-e0ae2e); }
     .mnt-line-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px 14px; align-items:end; }
     .mnt-line-grid .form-group { margin:0; }
-    .mnt-line-grid .form-group label:not(.mnt-major-chk) { display:block; font-size:.8rem; font-weight:700; color:#6b5d3e; margin-bottom:6px; }
-    .mnt-line-form input, .mnt-line-form select { width:100%; height:40px; border:1.5px solid #e2d8c0; border-radius:10px; padding:0 12px; background:#fff; color:#1a1208; font-size:.88rem; font-family:inherit; transition:border-color .15s, box-shadow .15s; }
-    .mnt-line-form input:focus, .mnt-line-form select:focus { outline:none; border-color:#2f6fa5; box-shadow:0 0 0 3px rgba(47,111,165,.14); }
-    .mnt-line-form input[readonly] { background:#f3ede0; color:#7a6a48; cursor:default; border-style:dashed; }
-    .mnt-line-actions { display:flex; align-items:center; gap:10px; margin-top:16px; flex-wrap:wrap; padding-top:13px; border-top:1px dashed #e7dcc4; }
+    .mnt-line-grid .form-group label:not(.mnt-major-chk) { display:block; font-size:.8rem; font-weight:700; color:var(--c-6b5d3e, #6b5d3e); margin-bottom:6px; }
+    .mnt-line-form input, .mnt-line-form select { width:100%; height:40px; border:1.5px solid var(--c-e2d8c0, #e2d8c0); border-radius:10px; padding:0 12px; background:var(--c-s-fff); color:var(--c-1a1208, #1a1208); font-size:.88rem; font-family:inherit; transition:border-color .15s, box-shadow .15s; }
+    .mnt-line-form input:focus, .mnt-line-form select:focus { outline:none; border-color:var(--c-2f6fa5); box-shadow:0 0 0 3px var(--c-rgba47111165014, rgba(47,111,165,.14)); }
+    .mnt-line-form input[readonly] { background:var(--c-f3ede0, #f3ede0); color:var(--c-7a6a48, #7a6a48); cursor:default; border-style:dashed; }
+    .mnt-line-actions { display:flex; align-items:center; gap:10px; margin-top:16px; flex-wrap:wrap; padding-top:13px; border-top:1px dashed var(--c-e7dcc4, #e7dcc4); }
     .mnt-line-cancel { display:inline-flex; align-items:center; gap:6px; cursor:pointer; }
     .mnt-major-chk { display:inline-flex; align-items:center; gap:7px; white-space:nowrap; font-weight:700; font-size:.85rem; margin:0; cursor:pointer; height:40px; }
     .mnt-major-chk input { width:auto !important; height:auto !important; }
 
     /* جداول الأسطر — قوية وواضحة */
     .mnt-line-table { width:100%; border-collapse:separate; border-spacing:0; }
-    .mnt-line-table thead th { background:#f3ede0; color:#6b5d3e; font-weight:800; font-size:.82rem; padding:10px 12px; border-bottom:2px solid #e7dcc4; }
-    .mnt-line-table tbody td { font-size:.88rem; padding:10px 12px; border-bottom:1px solid #f0e9da; }
-    .mnt-line-table tbody tr:hover { background:rgba(224,174,46,.07); }
+    .mnt-line-table thead th { background:var(--c-f3ede0, #f3ede0); color:var(--c-6b5d3e, #6b5d3e); font-weight:800; font-size:.82rem; padding:10px 12px; border-bottom:2px solid var(--c-e7dcc4, #e7dcc4); }
+    .mnt-line-table tbody td { font-size:.88rem; padding:10px 12px; border-bottom:1px solid var(--c-f0e9da, #f0e9da); }
+    .mnt-line-table tbody tr:hover { background:var(--c-rgba22417446007, rgba(224,174,46,.07)); }
     .mnt-line-table .mnt-num { font-variant-numeric:tabular-nums; font-weight:700; text-align:start; }
     .mnt-line-table .mnt-center, .mnt-line-table td:last-child, .mnt-line-table th:last-child { text-align:center; }
-    .mnt-line-table tfoot th { background:#1f4f7a; color:#fff; font-weight:800; font-variant-numeric:tabular-nums; font-size:.92rem; padding:11px 12px; }
+    .mnt-line-table tfoot th { background:var(--c-1f4f7a); color:var(--c-s-fff); font-weight:800; font-variant-numeric:tabular-nums; font-size:.92rem; padding:11px 12px; }
     .mnt-line-table tfoot th:first-child { text-align:start; }
-    .mnt-empty-line { display:flex; flex-direction:column; align-items:center; gap:8px; color:#b0a489; padding:22px 10px; }
+    .mnt-empty-line { display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--c-b0a489, #b0a489); padding:22px 10px; }
     .mnt-empty-line i { font-size:1.9rem; opacity:.5; }
     .mnt-empty-line span { font-size:.9rem; font-weight:600; }
-    .mnt-req-hint { color:#b45309; font-size:.72rem; font-weight:700; }
+    .mnt-req-hint { color:var(--c-b45309); font-size:.72rem; font-weight:700; }
     @media (max-width:992px){ .mnt-lines-grid{ grid-template-columns:1fr; } .mnt-orders-main .mnt-cost-summary{ grid-template-columns:repeat(2,1fr);} }
 </style>
 </body>

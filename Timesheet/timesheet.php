@@ -559,8 +559,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
           // بلا مخرج. وحارسُ الحاويات يُرجع `blocked` **بروابط الإصلاح**،
           // و`alert()` لا تحمل رابطًا يُنقر — فيُصيَّر لوحٌ حقيقيّ.
           if (!empty($svc_res['blocked'])) {
-            echo '<div style="max-width:760px;margin:40px auto;padding:20px;border:1px solid #fca5a5;'
-               . 'border-radius:12px;background:#fef2f2;font-family:Tajawal,sans-serif;direction:rtl">';
+            /* UXW-01 ①/②: مخرَجٌ مستقلٌّ قبل تحميلِ القشرة — الأصنافُ محلُّ الأنماطِ
+               السطرية، والرموزُ تحمل قيمَها الاحتياطيةَ حرفًا بحرفٍ لأن design-tokens
+               غيرُ محمَّلٍ في هذا المخرَجِ المبكر (فلا يتغيّر بكسلٌ واحد). */
+            echo '<style>'
+               . '.ts-blocked-wrap{max-width:760px;margin:40px auto;padding:20px;border:1px solid var(--c-fca5a5, #fca5a5);'
+               . 'border-radius:12px;background:var(--c-fef2f2, #fef2f2);font-family:Tajawal,sans-serif;direction:rtl}'
+               . '.ts-blocked-fix{color:var(--c-state-info-deep, #1d4ed8);font-weight:700}'
+               . '.ts-blocked-back{padding:8px 16px;background:var(--c-e5e7eb, #e5e7eb);'
+               . 'border-radius:8px;color:var(--c-111111, #111);text-decoration:none}'
+               . '</style>';
+            echo '<div class="ts-blocked-wrap">';
             echo '<h3 data-ems-c="ts-1">لم يُسجَّل يومُ العمل — حاوياتُ الموقع لم تكتمل</h3>';
             echo '<p data-ems-c="ts-2">'
                . 'الوحدةُ لا تُسجَّل في موقعٍ لم تكتمل حاوياتُه. وهذا ما ينقص، ولكلٍّ موضعُ إصلاحه:</p><ul data-ems-c="ts-3">';
@@ -568,12 +577,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
               echo '<li data-ems-c="ts-4">'
                  . '<strong>' . htmlspecialchars((string) $b['text'], ENT_QUOTES, 'UTF-8') . '</strong><br>'
                  . '<a href="' . htmlspecialchars((string) $b['href'], ENT_QUOTES, 'UTF-8') . '" '
-                 . 'style="color:#1d4ed8;font-weight:700">'
+                 . 'class="ts-blocked-fix">'
                  . htmlspecialchars((string) $b['label'], ENT_QUOTES, 'UTF-8') . ' ↗</a></li>';
             }
             echo '</ul><div data-ems-c="ts-5">'
-               . '<a href="javascript:history.back()" style="padding:8px 16px;background:#e5e7eb;'
-               . 'border-radius:8px;color:#111;text-decoration:none">رجوعٌ للنموذج</a></div>';
+               . '<a href="javascript:history.back()" class="ts-blocked-back">رجوعٌ للنموذج</a></div>';
             echo '<p data-ems-c="ts-6">'
                . 'بياناتُ اليوم لم تُفقد — ارجع وأكمل بعد الإصلاح.</p></div>';
             exit;
@@ -837,8 +845,18 @@ try {
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
+<style>
+  /* UXW-01 ①/②: ما كان أنماطًا سطريةً وألوانًا مثبَّتةً صار أصنافًا برموز اللوحة */
+  .ts-day-ico-ok { color: var(--c-state-ok); }
+  .ts-day-ico-warn { color: var(--c-d97706); }
+  .ts-day-fill { height: 100%; }
+  .ts-day-fill-ok { background: var(--c-state-ok); }
+  .ts-day-fill-warn { background: var(--c-s-f0b429); }
+  /* خلفيةُ الخانةِ المشتقةِ من سطور الزمن — الرمزُ باسم قيمته مع احتياطيِّه الحرفي */
+  .ts-derived-lock { background: var(--c-fdf6e3, #fdf6e3); }
+</style>
 
-<div class="main timesheet-entry-page ems-unified-page-shell">
+<div class="main timesheet-entry-page ems-unified-page-shell ems-doc-cycle">
 
   <?php
   // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
@@ -853,6 +871,10 @@ try {
   foreach (ems_excel_header_actions('timesheet', 'ساعات العمل', true) as $__xlAction) { $header_actions[] = $__xlAction; }
   $header_back = array('href' => 'timesheet_type.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
   include('../includes/page_header.php');
+  // UXW-01 ⑫: شاشةُ دورةٍ مستندية — خطوةُ الدورةِ الثابتةُ التالية لإدخالِ اليوم
+  echo ems_next_step('مراجعةُ محاسبِ الموقعِ ثم اعتمادُ مديرِ الموقع');
+  // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
+  echo ems_states_bundle('لا سجلاتِ تايم شيت لهذا اليومِ بعد', 'أضف ساعاتِ عملٍ من زرِّ «إضافة ساعات عمل جديدة» أو غيّر نوعَ المعدة');
   ?>
 
   <?php /* UI-16 (UXR-0063): شريحة المزامنة ظاهرة دائمًا في الشاشة الميدانية —
@@ -869,7 +891,7 @@ try {
   <div class="card ts-8">
     <div class="card-body ts-9">
       <span class="ts-10">
-        <i class="fas fa-clipboard-check" style="color:<?php echo $ts_day_done >= $ts_day_total ? '#16a34a' : '#d97706'; ?>;"></i>
+        <i class="fas fa-clipboard-check <?php echo $ts_day_done >= $ts_day_total ? 'ts-day-ico-ok' : 'ts-day-ico-warn'; ?>"></i>
         تايم شيت اليوم: سُجّل <?php echo $ts_day_done; ?> من <?php echo $ts_day_total; ?> معدةً نشطة
         <?php if ($ts_day_done < $ts_day_total): ?>
           — <span class="ts-11">متبقٍ <?php echo $ts_day_total - $ts_day_done; ?></span>
@@ -878,7 +900,9 @@ try {
         <?php endif; ?>
       </span>
       <div class="ts-13">
-        <div style="width:<?php echo $ts_day_total > 0 ? round($ts_day_done * 100 / $ts_day_total) : 0; ?>%;height:100%;background:<?php echo $ts_day_done >= $ts_day_total ? '#16a34a' : '#f0b429'; ?>;"></div>
+        <?php /* عرضُ الشريطِ نسبةٌ محسوبةٌ لحظيًّا — نمطٌ سطريٌّ مصرَّحٌ (data-allow-style)
+                 واللونُ صنفٌ برمزِه */ ?>
+        <div class="ts-day-fill <?php echo $ts_day_done >= $ts_day_total ? 'ts-day-fill-ok' : 'ts-day-fill-warn'; ?>" data-allow-style style="width:<?php echo $ts_day_total > 0 ? round($ts_day_done * 100 / $ts_day_total) : 0; ?>%;"></div>
       </div>
       <?php if (!empty($ts_day_missing)): ?>
         <span class="ts-14">
@@ -1380,7 +1404,7 @@ try {
             <input type="hidden" name="user_id" value="<?php echo $_SESSION['user']['id']; ?>">
             <div>
               <label for="date">السائق</label>
-              <!-- <select name="employee_id"  required>
+              <!-- <select name="employee_id" aria-label="السائق" required>
             <option value="">-- اختر السائق --</option>
             <?php
             // (كتلة معطَّلة في الواجهة — الاستعلام يبقى منفَّذًا عبر البوابة حفاظًا على البايتات داخل التعليق)
@@ -1405,7 +1429,7 @@ try {
             </div>
             <div>
               <label> التاريخ </label>
-              <!-- <select name="employee_id"  required>
+              <!-- <select name="employee_id" aria-label="السائق" required>
             <option value="">-- اختر السائق --</option>
             <?php
             // (كتلة معطَّلة في الواجهة — الاستعلام يبقى منفَّذًا عبر البوابة حفاظًا على البايتات داخل التعليق)
@@ -2189,7 +2213,7 @@ try {
       <h5><i class="fas fa-list-alt"></i> قائمة ساعات العمل</h5>
     </div>
     <div class="card-body table-container">
-      <table id="projectsTable" class="display">
+      <table id="projectsTable" class="display" data-order='[[3, "desc"]]' data-page-length="10">
         <thead>
           <tr>
             <th><i class="fas fa-hashtag"></i> #</th>
@@ -2303,33 +2327,17 @@ try {
 
 <script>
   $(document).ready(function () {
-    var table = $('#projectsTable').DataTable({
-      processing: true,
-      order: [[3, 'desc']], // Sort by date descending by default
-      pageLength: 10,
-      lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "الكل"]],
-      scrollX: true,
-      fixedHeader: true,
-      dom: 'Blfrtip', // Buttons + Length + Search + Table + Info + Pagination
-      buttons: [
-        { extend: 'copy', text: 'نسخ' },
-        { extend: 'excel', text: 'تصدير Excel' },
-        { extend: 'csv', text: 'تصدير CSV' },
-        { extend: 'pdf', text: 'تصدير PDF' },
-        { extend: 'print', text: 'طباعة' }
-      ],
-      language: {
-        url: "/ems/assets/i18n/datatables/ar.json",
-        processing: '<i class="fas fa-spinner fa-spin fa-3x"></i><br>جاري التحميل...'
-      }
-    });
+    // UXW-01 ⑤: تهيئةُ الجدولِ صارت للمكوّنِ المركزيِّ وحدَه (ui-unification.js) —
+    // والترتيبُ الافتراضيُّ يُعلَن سماتٍ على وسمِ الجدولِ نفسِه (data-order/data-page-length).
 
     // Update table when sidebar toggles
     const sidebarToggle = document.getElementById('toggleBtn');
     if (sidebarToggle) {
       sidebarToggle.addEventListener('click', function () {
         setTimeout(function () {
-          table.columns.adjust().draw();
+          if (window.jQuery && $.fn.dataTable && $.fn.dataTable.isDataTable('#projectsTable')) {
+            $('#projectsTable').DataTable().columns.adjust().draw();
+          }
         }, 400);
       });
     }
@@ -3273,7 +3281,7 @@ try {
     if (!el) { return; }
     el.value = (Math.round(val * 100) / 100);
     el.setAttribute('readonly', 'readonly');
-    el.style.background = '#fdf6e3';
+    el.classList.add('ts-derived-lock'); // UXW-01 ②: صنفٌ برمزِ اللون بدل نمطٍ من JS
     el.title = 'يُشتق من سطور الزمن — عدّل السطور لا هذه الخانة';
   }
 
@@ -3328,11 +3336,11 @@ try {
       var stDef = STATES.filter(function (s) { return s.v === l.ops_state; })[0] || STATES[0];
       tr.className = 'tsl-state-' + stDef.cls;
       tr.innerHTML =
-        '<td class="ts-75"><input type="number" step="0.25" min="0.25" max="24" value="' + l.hours + '" data-i="' + i + '" data-k="hours"></td>'
-        + '<td class="ts-76"><select data-i="' + i + '" data-k="ops_state">'
+        '<td class="ts-75"><input type="number" aria-label="ساعاتُ التشغيل في السطر" step="0.25" min="0.25" max="24" value="' + l.hours + '" data-i="' + i + '" data-k="hours"></td>'
+        + '<td class="ts-76"><select aria-label="حالةُ التشغيل" data-i="' + i + '" data-k="ops_state">'
         + STATES.map(function (s) { return '<option value="' + s.v + '"' + (s.v === l.ops_state ? ' selected' : '') + '>' + s.t + '</option>'; }).join('')
         + '</select></td>'
-        + '<td class="ts-77"><select data-i="' + i + '" data-k="resp_party">'
+        + '<td class="ts-77"><select aria-label="الطرفُ المسؤولُ المقترح" data-i="' + i + '" data-k="resp_party">'
         + RESPS.map(function (r) { return '<option value="' + r.v + '"' + (r.v === l.resp_party ? ' selected' : '') + '>' + r.t + '</option>'; }).join('')
         + '</select></td>'
         + '<td><input type="text" maxlength="190" placeholder="المرجع/السبب (WO-5511…)" value="' + (l.cause_note || '') + '" data-i="' + i + '" data-k="cause_note" aria-label="المرجع/السبب (WO-5511…)"></td>'

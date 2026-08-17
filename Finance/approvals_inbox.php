@@ -47,7 +47,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
 include '../inheader.php';
 include '../insidebar.php';
 ?>
-<div class="main ems-unified-page-shell">
+<div class="main ems-unified-page-shell ems-doc-cycle">
     <?php
     $header_title = 'صندوق الاعتمادات الموحد'; $header_icon = 'fa fa-inbox';
     $header_actions = array();
@@ -61,30 +61,38 @@ include '../insidebar.php';
         array('افتح الصندوقَ صباحًا واقرأ العدّادات',
               'انقر السطرَ فيفتح موضعَ الفعل في شاشة مالكه',
               'اتخذ القرارَ هناك — يدان لا يدٌ واحدة، ومن أنشأ لا يعتمد'));
+    echo ems_next_step('قرارُك: اعتمادٌ أو رفضٌ مسبَّب');
+    echo ems_states_bundle('لا اعتماداتٍ تنتظر دورَك', 'ما يستجدُّ من الصناديق الأربعة يظهر هنا فورَ وروده');
     ?>
+    <style>
+        .fin-inbox-counters { display: flex; gap: 14px; flex-wrap: wrap; }
+        .fin-inbox-badge { font-size: 15px; padding: 8px 14px; }
+        .fin-inbox-badge-total { font-size: 16px; padding: 8px 14px; }
+        .fin-inbox-owner { color: var(--c-s-888); }
+        .fin-w100 { width: 100%; }
+    </style>
 
-    <div class="card"><div class="card-body" style="display:flex;gap:14px;flex-wrap:wrap">
+    <div class="card"><div class="card-body fin-inbox-counters">
         <?php foreach ($inbox['boxes'] as $b): ?>
-            <div class="badge <?php echo $b['count'] > 0 ? 'badge-warning' : 'badge-secondary'; ?>"
-                 style="font-size:15px;padding:8px 14px">
+            <div class="badge fin-inbox-badge <?php echo $b['count'] > 0 ? 'badge-warning' : 'badge-secondary'; ?>">
                 <?php echo htmlspecialchars($b['title']); ?>: <strong><?php echo intval($b['count']); ?></strong>
             </div>
         <?php endforeach; ?>
-        <div class="badge badge-danger" style="font-size:16px;padding:8px 14px">
+        <div class="badge badge-danger fin-inbox-badge-total">
             المجموع: <strong><?php echo intval($inbox['total']); ?></strong></div>
     </div></div>
 
     <?php foreach ($inbox['boxes'] as $b): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-folder-open"></i>
         <?php echo htmlspecialchars($b['title']); ?> (<?php echo intval($b['count']); ?>)
-        <small style="color:#888">— القرارُ في <?php echo htmlspecialchars($b['owner']); ?></small></h5></div>
+        <small class="fin-inbox-owner">— القرارُ في <?php echo htmlspecialchars($b['owner']); ?></small></h5></div>
     <div class="card-body">
         <?php if (!$b['rows']):
             // M-44: الحالةُ الفارغة الموحّدة — لا نصَّ DataTables العام
             ems_state_empty('لا شيءَ ينتظر قرارًا في هذا الصندوق — نظيف ✨');
         else: ?>
         <div class="table-container">
-        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <table class="alltables display nowrap fin-w100" data-no-dt="1">
             <thead><tr><th>العنصر</th><th>منذ</th><th></th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم الطلب</th>

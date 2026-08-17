@@ -1,0 +1,3 @@
+# شاشاتٌ تشترط معاملَ مسارٍ للدخول — مسار<TAB>سلسلةُ الاستعلام
+Timesheet/timesheet.php	type=1
+Suppliers/supplier_profile.php	id=1

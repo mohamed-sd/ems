@@ -249,6 +249,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   include('../includes/page_header.php');
   ?>
 
+  <?php echo ems_states_bundle('لا عقودَ ضمن هذا الترشيح', 'وسّع الفترةَ أو غيّر المرشِّحات'); ?>
+
   <?php if ($csm_msg !== ''): ?>
     <!-- INJ-0001: حصيلةُ نقلِ الحالة — والتصعيدُ يُعلَن بلونٍ ثالثٍ لا يُخلط بالفشل -->
     <div class="alert <?= (mb_strpos($csm_msg, '✅') !== false ? 'alert-success'
@@ -275,7 +277,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           <h6><i class="fas fa-file-contract"></i> اختيار المشروع </h6>
           <div class="form-grid">
             <div class="field md-6 sm-6">
-              <label for="filter_project_select">المشروع <font color="red">*</font></label>
+              <label for="contract_project_id">المشروع <font color="red">*</font></label>
               <div class="control">
                 <select name="project_id" id="contract_project_id" required>
                   <option value="">— اختر المشروع —</option>
@@ -325,7 +327,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <!-- صف 1: 3 خانات -->
             <div class="field md-3 sm-6">
               <label>تاريخ توقيع العقد </label>
-              <div class="control"><input name="contract_signing_date" id="contract_signing_date" type="date"></div>
+              <div class="control"><input name="contract_signing_date" id="contract_signing_date" type="date" aria-label="تاريخ توقيع العقد"></div>
             </div>
 
             <div class="field md-3 sm-6">
@@ -336,13 +338,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="field md-3 sm-6">
               <label>بداية التنفيذ الفعلي المتفق عليه</label>
-              <div class="control"><input name="actual_start" id="actual_start" type="date"></div>
+              <div class="control"><input name="actual_start" id="actual_start" type="date" aria-label="بداية التنفيذ الفعلي المتفق عليه"></div>
             </div>
 
 
             <div class="field md-3 sm-6">
               <label>نهاية التنفيذ الفعلي المتفق عليه</label>
-              <div class="control"><input name="actual_end" id="actual_end" type="date"></div>
+              <div class="control"><input name="actual_end" id="actual_end" type="date" aria-label="نهاية التنفيذ الفعلي المتفق عليه"></div>
             </div>
 
 
@@ -365,7 +367,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="field md-3 sm-6">
               <label>العملة</label>
               <div class="control">
-                <select name="price_currency_contract" id="price_currency_contract">
+                <select name="price_currency_contract" id="price_currency_contract" aria-label="عملة العقد">
                   <option value="">— اختر —</option>
                   <option value="دولار">دولار</option>
                   <option value="جنيه">جنيه</option>
@@ -374,13 +376,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <div class="field md-3 sm-6">
               <label>المبلغ المدفوع</label>
-              <div class="control"><input name="paid_contract" type="text"></div>
+              <div class="control"><input name="paid_contract" type="text" aria-label="المبلغ المدفوع"></div>
             </div>
 
             <div class="field md-3 sm-6">
               <label>وقت الدفع</label>
               <div class="control">
-                <select name="payment_time" id="payment_time">
+                <select name="payment_time" id="payment_time" aria-label="وقت الدفع">
                   <option value="">— اختر —</option>
                   <option value="مقدم">مقدم</option>
                   <option value=" مؤخر">مؤخر </option>
@@ -391,12 +393,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="field md-3 sm-6">
               <label> الضمانات</label>
-              <div class="control"><input name="guarantees" type="text"></div>
+              <div class="control"><input name="guarantees" type="text" aria-label="الضمانات"></div>
             </div>
 
             <div class="field md-3 sm-6">
               <label> تاريخ الدفع</label>
-              <div class="control"><input name="payment_date" id="payment_date" type="date"></div>
+              <div class="control"><input name="payment_date" id="payment_date" type="date" aria-label="تاريخ الدفع"></div>
             </div>
 
 
@@ -417,7 +419,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="field md-3 sm-6">
               <label> ساعات الوردية للعقد</label>
-              <div class="control"><input name="shift_contract" type="number" min="0"></div>
+              <div class="control"><input name="shift_contract" type="number" min="0" aria-label="ساعات الوردية للعقد"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>إجمالي الوحدات يومياً للعقد </label>
@@ -425,7 +427,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <div class="field md-3 sm-6">
               <label>وحدات العمل في الشهر للعقد</label>
-              <div class="control"><input name="total_contract_permonth" type="number" min="0"></div>
+              <div class="control"><input name="total_contract_permonth" type="number" min="0" aria-label="وحدات العمل في الشهر للعقد"></div>
             </div>
 
 
@@ -445,7 +447,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="field md-3 sm-6">
               <label>الترحيل (Transportation)</label>
               <div class="control">
-                <select name="transportation" id="transportation">
+                <select name="transportation" id="transportation" aria-label="جهة توفير الترحيل">
                   <option value="">— اختر —</option>
                   <option value="مالك المعدة">مالك المعدة</option>
                   <option value="مالك المشروع">مالك المشروع</option>
@@ -457,7 +459,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="field md-3 sm-6">
               <label>السكن (Place for Living)</label>
               <div class="control">
-                <select name="place_for_living" id="place_for_living">
+                <select name="place_for_living" id="place_for_living" aria-label="جهة توفير السكن">
                   <option value="">— اختر —</option>
                   <option value="مالك المعدة">مالك المعدة</option>
                   <option value="مالك المشروع">مالك المشروع</option>
@@ -469,7 +471,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="field md-3 sm-6">
               <label>الإعاشة (Accommodation)</label>
               <div class="control">
-                <select name="accommodation" id="accommodation">
+                <select name="accommodation" id="accommodation" aria-label="جهة توفير الإعاشة">
                   <option value="">— اختر —</option>
                   <option value="مالك المعدة">مالك المعدة</option>
                   <option value="مالك المشروع">مالك المشروع</option>
@@ -481,7 +483,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="field md-3 sm-6">
               <label>الورشة (Workshop)</label>
               <div class="control">
-                <select name="workshop" id="workshop">
+                <select name="workshop" id="workshop" aria-label="جهة توفير الورشة">
                   <option value="">— اختر —</option>
                   <option value="مالك المعدة">مالك المعدة</option>
                   <option value="مالك المشروع">مالك المشروع</option>
@@ -508,36 +510,36 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                   <div class="field md-3 sm-6">
                     <label>نوع المعدة</label>
                     <div class="control">
-                      <select name="equip_type_1" class="equip-type">
+                      <select name="equip_type_1" class="equip-type" aria-label="نوع المعدة">
                         <?php echo $equipmentTypeOptionsHtml; ?>
                       </select>
                     </div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>عدد المعدات</label>
-                    <div class="control"><input name="equip_count_1" type="number" min="0"></div>
+                    <div class="control"><input name="equip_count_1" type="number" min="0" aria-label="عدد المعدات"></div>
                   </div>
 
                   <div class="field md-3 sm-6">
                     <label><span class="equip-basic-mark">■</span> المعدات الأساسية</label>
                     <div class="control"><input name="equip_count_basic_1" type="number" min="0"
-                        class="equip-basic-input"></div>
+                        class="equip-basic-input" aria-label="عدد المعدات الأساسية"></div>
                   </div>
 
                   <div class="field md-3 sm-6">
                     <label><span class="equip-backup-mark">■</span> المعدات الاحتياطية</label>
                     <div class="control"><input name="equip_count_backup_1" type="number" min="0"
-                        class="equip-backup-input"></div>
+                        class="equip-backup-input" aria-label="عدد المعدات الاحتياطية"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>عدد المشغلين</label>
-                    <div class="control"><input name="equip_operators_1" type="number" min="0"></div>
+                    <div class="control"><input name="equip_operators_1" type="number" min="0" aria-label="عدد المشغلين"></div>
                   </div>
 
 
                   <div class="field md-3 sm-6">
                     <label>عدد المساعدين</label>
-                    <div class="control"><input name="equip_assistants_1" type="number" min="0"></div>
+                    <div class="control"><input name="equip_assistants_1" type="number" min="0" aria-label="عدد المساعدين"></div>
                   </div>
 
 
@@ -565,7 +567,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                   <div class="field md-3 sm-6">
                     <label>وحدة القياس</label>
                     <div class="control">
-                      <select name="equip_unit_1" class="equip-unit">
+                      <select name="equip_unit_1" class="equip-unit" aria-label="وحدة القياس">
                         <option value="">— اختر —</option>
                         <option value="ساعة">ساعة</option>
                         <option value="طن">طن</option>
@@ -577,7 +579,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                   <div class="field md-3 sm-6">
                     <label>ساعات الوردية</label>
-                    <div class="control"><input name="shift_hours_1" type="number" min="0"></div>
+                    <div class="control"><input name="shift_hours_1" type="number" min="0" aria-label="ساعات الوردية"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>إجمالي الوحدات يومياً</label>
@@ -586,7 +588,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                   </div>
                   <div class="field md-3 sm-6">
                     <label>وحدات العمل في الشهر</label>
-                    <div class="control"><input name="equip_target_per_month_1" type="number" min="0"></div>
+                    <div class="control"><input name="equip_target_per_month_1" type="number" min="0" aria-label="وحدات العمل في الشهر"></div>
                   </div>
 
 
@@ -600,7 +602,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                   <div class="field md-3 sm-6">
                     <label>العملة</label>
                     <div class="control">
-                      <select name="equip_price_currency_1">
+                      <select name="equip_price_currency_1" aria-label="عملة التسعير">
                         <option value="">— اختر —</option>
                         <option value="دولار">دولار</option>
                         <option value="جنيه">جنيه</option>
@@ -619,12 +621,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                   <div class="field md-3 sm-6">
                     <label>عدد المشرفين</label>
-                    <div class="control"><input name="equip_supervisors_1" type="number" min="0"></div>
+                    <div class="control"><input name="equip_supervisors_1" type="number" min="0" aria-label="عدد المشرفين"></div>
                   </div>
 
                   <div class="field md-3 sm-6">
                     <label>عدد الفنيين</label>
-                    <div class="control"><input name="equip_technicians_1" type="number" min="0"></div>
+                    <div class="control"><input name="equip_technicians_1" type="number" min="0" aria-label="عدد الفنيين"></div>
                   </div>
                   <!-- إكمال الصف بثلاث خانات -->
                   <div class="field md-3 sm-6"></div>
@@ -711,7 +713,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
       </div>
       <div class="filter-body">
         <div class="filter-field">
-          <label><i class="fa fa-calendar"></i> فلتر المشروع</label>
+          <label for="filter_project_select"><i class="fa fa-calendar"></i> فلتر المشروع</label>
           <select name="filter_project_id" id="filter_project_select" class="form-control">
             <option value="0">كل المشاريع</option>
             <?php foreach ($projects_filter_options as $project_option_id => $project_option_name): ?>
@@ -738,28 +740,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           <span class="contracts-group-toolbar-label">
             <i class="fas fa-filter"></i> عرض المجموعات:
           </span>
-          <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
+          <button class="ems-btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
             <i class="fas fa-info-circle"></i> أساسية
           </button>
-          <button class="btn-group-toggle active" data-group="dates" title="التواريخ والمدد">
+          <button class="ems-btn-group-toggle active" data-group="dates" title="التواريخ والمدد">
             <i class="far fa-calendar"></i> تواريخ
           </button>
-          <button class="btn-group-toggle active" data-group="hours" title="الساعات والأهداف">
+          <button class="ems-btn-group-toggle active" data-group="hours" title="الساعات والأهداف">
             <i class="fas fa-clock"></i> ساعات
           </button>
-          <button class="btn-group-toggle" data-group="parties" title="أطراف العقد">
+          <button class="ems-btn-group-toggle" data-group="parties" title="أطراف العقد">
             <i class="fas fa-users"></i> أطراف
           </button>
-          <button class="btn-group-toggle" data-group="services" title="الخدمات المقدمة">
+          <button class="ems-btn-group-toggle" data-group="services" title="الخدمات المقدمة">
             <i class="fas fa-hands-helping"></i> خدمات
           </button>
-          <button class="btn-group-toggle" data-group="operations" title="التشغيل اليومي">
+          <button class="ems-btn-group-toggle" data-group="operations" title="التشغيل اليومي">
             <i class="fas fa-cogs"></i> تشغيل
           </button>
-          <button class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
+          <button class="ems-btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
             <i class="fas fa-check-circle"></i> حالة
           </button>
-          <button class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
+          <button class="ems-btn-group-toggle-all" title="إظهار/إخفاء الكل">
             <i class="fas fa-eye"></i> الكل
           </button>
         </div>
@@ -1327,27 +1329,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
   <script>
     (function () {
-      // تشغيل DataTable بالعربية
-
-
-      $(document).ready(function () {
-        $('#projectsTable').DataTable({
-          dom: 'Bfrtip', // Buttons + Search + Pagination
-          scrollX: true,
-          autoWidth: false,
-          buttons: [
-            { extend: 'copy', text: 'نسخ' },
-            { extend: 'excel', text: 'تصدير Excel' },
-            { extend: 'csv', text: 'تصدير CSV' },
-            { extend: 'pdf', text: 'تصدير PDF' },
-            { extend: 'print', text: 'طباعة' }
-          ],
-          "language": {
-            "url": "/ems/assets/i18n/datatables/ar.json"
-          }
-        });
-      });
-
+      // تهيئةُ جدولِ العقود انتقلت إلى المكوّنِ المركزي
+      // (assets/js/ui-unification.js — initializeMissingDataTables):
+      // لغةٌ عربية وضبطُ أعمدةٍ وتمريرٌ أفقيٌّ وزرُّ إكسل موحَّد.
 
       // التحكم في إظهار وإخفاء الفورم
       const toggleContractFormBtn = document.getElementById('toggleForm');
@@ -1481,60 +1465,60 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="field md-3 sm-6">
               <label>نوع المعدة</label>
               <div class="control">
-                <select name="equip_type_${equipmentIndex}" class="equip-type">
+                <select name="equip_type_${equipmentIndex}" class="equip-type" aria-label="نوع المعدة">
                   <?php echo $equipmentTypeOptionsHtml; ?>
                 </select>
               </div>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد المعدات</label>
-              <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0" aria-label="عدد المعدات"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><span class="equip-basic-mark">■</span> المعدات الأساسية</label>
-              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" class="equip-basic-input"></div>
+              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" class="equip-basic-input" aria-label="عدد المعدات الأساسية"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><span class="equip-backup-mark">■</span> المعدات الاحتياطية</label>
-              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" class="equip-backup-input"></div>
+              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" class="equip-backup-input" aria-label="عدد المعدات الاحتياطية"></div>
             </div>
 
             <div class="field md-3 sm-6">
               <label>عدد المشغلين</label>
-              <div class="control"><input name="equip_operators_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_operators_${equipmentIndex}" type="number" min="0" aria-label="عدد المشغلين"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد المساعدين</label>
-              <div class="control"><input name="equip_assistants_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_assistants_${equipmentIndex}" type="number" min="0" aria-label="عدد المساعدين"></div>
             </div>
 
             <div class="field md-3 sm-6">
               <label>عدد الورديات</label>
-              <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" aria-label="مثال: 2"></div>
+              <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" aria-label="عدد الورديات"></div>
             </div>
 
             <!-- أوقات الورديات -->
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
-              <div class="control"><input name="shift1_start_${equipmentIndex}" type="time" placeholder="مثال: 08:00" aria-label="مثال: 08:00"></div>
+              <div class="control"><input name="shift1_start_${equipmentIndex}" type="time" placeholder="مثال: 08:00" aria-label="بداية الوردية الأولى"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> نهاية الوردية الأولى</label>
-              <div class="control"><input name="shift1_end_${equipmentIndex}" type="time" placeholder="مثال: 16:00" aria-label="مثال: 16:00"></div>
+              <div class="control"><input name="shift1_end_${equipmentIndex}" type="time" placeholder="مثال: 16:00" aria-label="نهاية الوردية الأولى"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> بداية الوردية الثانية</label>
-              <div class="control"><input name="shift2_start_${equipmentIndex}" type="time" placeholder="مثال: 16:00" aria-label="مثال: 16:00"></div>
+              <div class="control"><input name="shift2_start_${equipmentIndex}" type="time" placeholder="مثال: 16:00" aria-label="بداية الوردية الثانية"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
-              <div class="control"><input name="shift2_end_${equipmentIndex}" type="time" placeholder="مثال: 00:00" aria-label="مثال: 00:00"></div>
+              <div class="control"><input name="shift2_end_${equipmentIndex}" type="time" placeholder="مثال: 00:00" aria-label="نهاية الوردية الثانية"></div>
             </div>
 
             <div class="field md-3 sm-6">
               <label>وحدة القياس</label>
               <div class="control">
-                <select name="equip_unit_${equipmentIndex}" class="equip-unit">
+                <select name="equip_unit_${equipmentIndex}" class="equip-unit" aria-label="وحدة القياس">
                   <option value="">— اختر —</option>
                   <option value="ساعة">ساعة</option>
                   <option value="طن">طن</option>
@@ -1546,25 +1530,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="field md-3 sm-6">
               <label>ساعات الوردية</label>
-              <div class="control"><input name="shift_hours_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="shift_hours_${equipmentIndex}" type="number" min="0" aria-label="ساعات الوردية"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>إجمالي الساعات يومياً</label>
-              <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" aria-label="يُحتسب تلقائياً"></div>
+              <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" aria-label="إجمالي الساعات يومياً"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>وحدات العمل في الشهر</label>
-              <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0" aria-label="وحدات العمل في الشهر"></div>
             </div>
 
             <div class="field md-3 sm-6">
               <label>إجمالي ساعات العقد</label>
-              <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" aria-label="يُحتسب تلقائياً"></div>
+              <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" aria-label="إجمالي ساعات العقد"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>العملة</label>
               <div class="control">
-                <select name="equip_price_currency_${equipmentIndex}">
+                <select name="equip_price_currency_${equipmentIndex}" aria-label="عملة التسعير">
                   <option value="">— اختر —</option>
                   <option value="دولار">دولار</option>
                   <option value="جنيه">جنيه</option>
@@ -1573,15 +1557,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <div class="field md-3 sm-6">
               <label>السعر</label>
-              <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00" aria-label="0.00"></div>
+              <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00" aria-label="السعر للوحدة"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد المشرفين</label>
-              <div class="control"><input name="equip_supervisors_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_supervisors_${equipmentIndex}" type="number" min="0" aria-label="عدد المشرفين"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد الفنيين</label>
-              <div class="control"><input name="equip_technicians_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_technicians_${equipmentIndex}" type="number" min="0" aria-label="عدد الفنيين"></div>
             </div>
           </div>
         </div>
@@ -1801,58 +1785,58 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                       <div class="field md-3 sm-6">
                         <label>نوع المعدة</label>
                         <div class="control">
-                          <select name="equip_type_${equipmentIndex}" class="equip-type">
+                          <select name="equip_type_${equipmentIndex}" class="equip-type" aria-label="نوع المعدة">
                             <?php echo $equipmentTypeOptionsHtml; ?>
                           </select>
                         </div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المعدات</label>
-                        <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0" value="${equip.equip_count}"></div>
+                        <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0" value="${equip.equip_count}" aria-label="عدد المعدات"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label><span class="equip-basic-mark">■</span> المعدات الأساسية</label>
-                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" class="equip-basic-input" value="${equip.equip_count_basic || 0}"></div>
+                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" class="equip-basic-input" value="${equip.equip_count_basic || 0}" aria-label="عدد المعدات الأساسية"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label><span class="equip-backup-mark">■</span> المعدات الاحتياطية</label>
-                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" class="equip-backup-input" value="${equip.equip_count_backup || 0}"></div>
+                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" class="equip-backup-input" value="${equip.equip_count_backup || 0}" aria-label="عدد المعدات الاحتياطية"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المشغلين</label>
-                        <div class="control"><input name="equip_operators_${equipmentIndex}" type="number" min="0" value="${equip.equip_operators}"></div>
+                        <div class="control"><input name="equip_operators_${equipmentIndex}" type="number" min="0" value="${equip.equip_operators}" aria-label="عدد المشغلين"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المساعدين</label>
-                        <div class="control"><input name="equip_assistants_${equipmentIndex}" type="number" min="0" value="${equip.equip_assistants}"></div>
+                        <div class="control"><input name="equip_assistants_${equipmentIndex}" type="number" min="0" value="${equip.equip_assistants}" aria-label="عدد المساعدين"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد الورديات</label>
-                        <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" value="${equip.equip_shifts}" aria-label="مثال: 2"></div>
+                        <div class="control"><input name="equip_shifts_${equipmentIndex}" type="number" min="0" placeholder="مثال: 2" value="${equip.equip_shifts}" aria-label="عدد الورديات"></div>
                       </div>
 
                       <!-- أوقات الورديات -->
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
-                        <div class="control"><input name="shift1_start_${equipmentIndex}" type="time" value="${equip.shift1_start || ''}"></div>
+                        <div class="control"><input name="shift1_start_${equipmentIndex}" type="time" value="${equip.shift1_start || ''}" aria-label="بداية الوردية الأولى"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> نهاية الوردية الأولى</label>
-                        <div class="control"><input name="shift1_end_${equipmentIndex}" type="time" value="${equip.shift1_end || ''}"></div>
+                        <div class="control"><input name="shift1_end_${equipmentIndex}" type="time" value="${equip.shift1_end || ''}" aria-label="نهاية الوردية الأولى"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> بداية الوردية الثانية</label>
-                        <div class="control"><input name="shift2_start_${equipmentIndex}" type="time" value="${equip.shift2_start || ''}"></div>
+                        <div class="control"><input name="shift2_start_${equipmentIndex}" type="time" value="${equip.shift2_start || ''}" aria-label="بداية الوردية الثانية"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
-                        <div class="control"><input name="shift2_end_${equipmentIndex}" type="time" value="${equip.shift2_end || ''}"></div>
+                        <div class="control"><input name="shift2_end_${equipmentIndex}" type="time" value="${equip.shift2_end || ''}" aria-label="نهاية الوردية الثانية"></div>
                       </div>
 
                       <div class="field md-3 sm-6">
                         <label>وحدة القياس</label>
                         <div class="control">
-                          <select name="equip_unit_${equipmentIndex}" class="equip-unit">
+                          <select name="equip_unit_${equipmentIndex}" class="equip-unit" aria-label="وحدة القياس">
                             <option value="">— اختر —</option>
                             <option value="ساعة" ${equip.equip_unit === 'ساعة' ? 'selected' : ''}>ساعة</option>
                             <option value="طن" ${equip.equip_unit === 'طن' ? 'selected' : ''}>طن</option>
@@ -1864,24 +1848,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                       <div class="field md-3 sm-6">
                         <label>ساعات الوردية</label>
-                        <div class="control"><input name="shift_hours_${equipmentIndex}" type="number" min="0" value="${equip.shift_hours}"></div>
+                        <div class="control"><input name="shift_hours_${equipmentIndex}" type="number" min="0" value="${equip.shift_hours}" aria-label="ساعات الوردية"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي الساعات يومياً</label>
-                        <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_month}" aria-label="يُحتسب تلقائياً"></div>
+                        <div class="control"><input name="equip_total_month_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_month}" aria-label="إجمالي الساعات يومياً"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>وحدات العمل في الشهر</label>
-                        <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0" value="${equip.equip_monthly_target || 0}"></div>
+                        <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0" value="${equip.equip_monthly_target || 0}" aria-label="وحدات العمل في الشهر"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي ساعات العقد</label>
-                        <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_contract}" aria-label="يُحتسب تلقائياً"></div>
+                        <div class="control"><input name="equip_total_contract_${equipmentIndex}" type="number" readonly placeholder="يُحتسب تلقائياً" value="${equip.equip_total_contract}" aria-label="إجمالي ساعات العقد"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>العملة</label>
                         <div class="control">
-                          <select name="equip_price_currency_${equipmentIndex}">
+                          <select name="equip_price_currency_${equipmentIndex}" aria-label="عملة التسعير">
                             <option value="">— اختر —</option>
                             <option value="دولار" ${equip.equip_price_currency === 'دولار' ? 'selected' : ''}>دولار</option>
                             <option value="جنيه" ${equip.equip_price_currency === 'جنيه' ? 'selected' : ''}>جنيه</option>
@@ -1890,15 +1874,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                       </div>
                       <div class="field md-3 sm-6">
                         <label>السعر</label>
-                        <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00" value="${equip.equip_price}" aria-label="0.00"></div>
+                        <div class="control"><input name="equip_price_${equipmentIndex}" type="number" min="0" step="0.01" placeholder="0.00" value="${equip.equip_price}" aria-label="السعر للوحدة"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المشرفين</label>
-                        <div class="control"><input name="equip_supervisors_${equipmentIndex}" type="number" min="0" value="${equip.equip_supervisors}"></div>
+                        <div class="control"><input name="equip_supervisors_${equipmentIndex}" type="number" min="0" value="${equip.equip_supervisors}" aria-label="عدد المشرفين"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد الفنيين</label>
-                        <div class="control"><input name="equip_technicians_${equipmentIndex}" type="number" min="0" value="${equip.equip_technicians}"></div>
+                        <div class="control"><input name="equip_technicians_${equipmentIndex}" type="number" min="0" value="${equip.equip_technicians}" aria-label="عدد الفنيين"></div>
                       </div>
                     </div>
                   </div>
@@ -1935,7 +1919,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     (function () {
       function go() {
         if (window.EmsColumnGroups) {
-          EmsColumnGroups.init({ storageKey: 'contractGroupStates', mode: 'classic' });
+          // الأصنافُ اعتُمدت باسمِ العائلةِ المؤسسية ems-btn — المحدِّدان يمرَّران صراحةً
+          EmsColumnGroups.init({
+            storageKey: 'contractGroupStates', mode: 'classic',
+            buttons: '.ems-btn-group-toggle[data-group]',
+            allButton: '.ems-btn-group-toggle-all'
+          });
         }
       }
       if (window.EmsColumnGroups) { go(); } else { window.addEventListener('DOMContentLoaded', go); }

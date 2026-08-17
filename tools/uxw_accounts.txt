@@ -1,0 +1,12 @@
+# حسابُ الاختبارِ المخوَّلُ لكلِّ بادئةِ مسارٍ (كلمةُ مرورِ حساباتِ الاختبار 12345678 — دليلُ UAT co4)
+# الافتراضُ لغيرِ المذكور: محمد (الدور 1 — إدارة التشغيل)
+Governance/	مشرف الصلاحيات
+Portal/ceo_board.php	تنفيذ
+Contracts/	مبيعات
+Timesheet/	محمد
+Maintenance/	صيانة
+Suppliers/	مصعب
+Risk/	مخاطر
+FinRequests/	محمد
+Finance/	مشرف المالية
+Operations/	محمد

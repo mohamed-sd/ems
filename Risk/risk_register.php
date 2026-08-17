@@ -84,12 +84,22 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
               'نموذجُ البياناتِ لا يُختزل: المنظرُ يقلّل الأعمدةَ والفلترُ يقلّل الصفوف — ولا يُخفى عمودُ حوكمة'));
     risk_view_bar('risk_register', $view, array_filter(array(
         'ru' => $fUnit ?: null, 'level' => $fLevel ?: null, 'state' => $fState ?: null)));
+    echo ems_states_bundle('لا مخاطرَ مسجَّلةً ضمن هذا الترشيح', 'وسّع الترشيحَ أو راجع صندوقَ الإشارات');
     ?>
+    <style>
+        .rsk-filter-form { align-items: flex-end; }
+        .rsk-filter-label { font-size: .8rem; }
+        .rsk-ru-select { min-width: 200px; }
+        .rsk-w100 { width: 100%; }
+        .rsk-new-card { margin-top: 16px; }
+        .rsk-new-card.is-hidden { display: none; }
+        .rsk-new-msg { margin-inline-start: 10px; }
+    </style>
 
-    <form method="get" class="ems-toolbar" style="align-items:flex-end">
+    <form method="get" class="ems-toolbar rsk-filter-form">
         <input type="hidden" name="view" value="<?php echo htmlspecialchars($view); ?>">
-        <label style="font-size:.8rem">الوحدة
-            <select name="ru" class="form-control" style="min-width:200px">
+        <label class="rsk-filter-label">الوحدة
+            <select name="ru" class="form-control rsk-ru-select" aria-label="الوحدة">
                 <option value="0">الكل</option>
                 <?php foreach ($units as $u): ?>
                 <option value="<?php echo (int) $u['id']; ?>" <?php echo $fUnit == $u['id'] ? 'selected' : ''; ?>>
@@ -97,16 +107,16 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <?php endforeach; ?>
             </select>
         </label>
-        <label style="font-size:.8rem">المستوى
-            <select name="level" class="form-control">
+        <label class="rsk-filter-label">المستوى
+            <select name="level" class="form-control" aria-label="المستوى">
                 <option value="">الكل</option>
                 <?php foreach ($RISK_LEVELS as $lv): ?>
                 <option value="<?php echo $lv; ?>" <?php echo $fLevel === $lv ? 'selected' : ''; ?>><?php echo $lv; ?></option>
                 <?php endforeach; ?>
             </select>
         </label>
-        <label style="font-size:.8rem">الحالة
-            <select name="state" class="form-control">
+        <label class="rsk-filter-label">الحالة
+            <select name="state" class="form-control" aria-label="الحالة">
                 <option value="">الكل</option>
                 <?php foreach ($STATE_AR as $k => $v): ?>
                 <option value="<?php echo $k; ?>" <?php echo $fState === $k ? 'selected' : ''; ?>><?php echo $v; ?></option>
@@ -126,7 +136,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     });</script>
     <?php else: ?>
     <div class="card"><div class="card-body table-responsive">
-        <table class="table table-striped" style="width:100%">
+        <table class="table table-striped rsk-w100">
             <?php $V = function ($c) use ($view) { return risk_col_visible('risk_register', $view, $c); }; ?>
             <thead><tr>
                 <th>الرمز</th><th>العنوان</th><th>الوحدة</th>
@@ -198,15 +208,15 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <?php endif; ?>
 
     <?php if ($RISK_FULL && (!empty($__pp['can_add']) || $is_super_admin)): ?>
-    <div class="card" id="rskNewCard" style="display:none;margin-top:16px"><div class="card-body">
+    <div class="card rsk-new-card is-hidden" id="rskNewCard"><div class="card-body">
         <h5>خطر جديد (بعد الفرز — RK-05: الإشارة أولًا إن لم يكن مصدره فرزًا)</h5>
         <form id="rskNewForm" class="allforms">
             <div class="row">
-                <div class="col-md-4"><label>الوحدة *<select name="ru_id" class="form-control" required>
+                <div class="col-md-4"><label>الوحدة *<select name="ru_id" class="form-control" aria-label="الوحدة" required>
                     <?php foreach ($units as $u): ?><option value="<?php echo (int) $u['id']; ?>"><?php echo htmlspecialchars($u['ru_code'] . ' · ' . $u['name_ar']); ?></option><?php endforeach; ?>
                 </select></label></div>
-                <div class="col-md-8"><label>العنوان *<input name="title" class="form-control" required></label></div>
-                <div class="col-md-4"><label>النطاق<select name="scope_type" class="form-control">
+                <div class="col-md-8"><label>العنوان *<input name="title" class="form-control" aria-label="عنوان الخطر" required></label></div>
+                <div class="col-md-4"><label>النطاق<select name="scope_type" class="form-control" aria-label="النطاق">
                     <option>إداري</option><option>مؤسسي</option><option>مشروعي</option><option>موقعي</option>
                 </select></label></div>
                 <?php /* INJ-0577: كان رقمًا حرًّا يُحفظ عن ظهرِ قلب — صار قائمةَ
@@ -220,11 +230,11 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                             if ($ou['unit_code'] !== '') { echo ' · ' . htmlspecialchars($ou['unit_code']); } ?></option>
                         <?php endforeach; ?>
                     </select></label></div>
-                <div class="col-md-4"><label>السبب الجذري *<input name="root_cause" class="form-control" required></label></div>
-                <div class="col-md-12"><label>الوصف<textarea name="description" class="form-control"></textarea></label></div>
+                <div class="col-md-4"><label>السبب الجذري *<input name="root_cause" class="form-control" aria-label="السبب الجذري" required></label></div>
+                <div class="col-md-12"><label>الوصف<textarea name="description" class="form-control" aria-label="وصف الخطر"></textarea></label></div>
             </div>
             <button type="submit" class="ems-btn-primary">تسجيل الخطر</button>
-            <span id="rskNewMsg" style="margin-inline-start:10px"></span>
+            <span id="rskNewMsg" class="rsk-new-msg"></span>
         </form>
     </div></div>
     <script>
@@ -232,7 +242,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         var btn = document.getElementById('rskNewBtn');
         if (btn) { btn.addEventListener('click', function () {
             var c = document.getElementById('rskNewCard');
-            c.style.display = c.style.display === 'none' ? '' : 'none';
+            c.classList.toggle('is-hidden');
         }); }
         document.getElementById('rskNewForm').addEventListener('submit', function (ev) {
             ev.preventDefault();

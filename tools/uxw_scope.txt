@@ -1,0 +1,16 @@
+# tools/uxw_scope.txt — النطاقُ المرحَّلُ لبواباتِ UXW-01 (سطرٌ لكلِّ شاشة)
+# الشاشةُ تُضاف لحظةَ ترحيلِها إلى القشرةِ والرموزِ والمكوّناتِ — ولا تُحذف أبدًا.
+# العشرُ الذهبيةُ تدخل هنا واحدةً واحدةً مع اعتمادِها (UXW-01 §8-1).
+Governance/tech_gov_center.php
+Governance/design_system.php
+# العشرُ الذهبية (UXW-01 §8-1) — رُحِّلت 2026-08-17
+Portal/ceo_board.php
+Portal/my_tasks.php
+Operations/sites_board.php
+Contracts/contracts.php
+Timesheet/timesheet.php
+Maintenance/orders.php
+Suppliers/supplier_profile.php
+Risk/risk_register.php
+FinRequests/request_form.php
+Finance/approvals_inbox.php

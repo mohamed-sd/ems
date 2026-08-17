@@ -149,6 +149,24 @@ ems_shell_axes(isset($__pp) ? $__pp : null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ems-wi-accent-card { margin-bottom:12px; border-right:4px solid var(--c-7c3aed); }
+.ems-wi-close { float:left; }
+.ems-wi-line { margin:4px 0; }
+.ems-wi-chain-warn { margin-top:8px; }
+.ems-wi-views { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+.ems-wi-dels-body { padding:10px 14px; }
+.ems-wi-whylink { font-size:.78rem; }
+.ems-wi-title-cell { max-width:260px; white-space:normal; }
+.ems-wi-sub { font-size:.8rem; }
+.ems-wi-reason { color:var(--c-92400e); font-size:.78rem; }
+.ems-wi-actions-cell { min-width:170px; }
+.ems-wi-inline-form { display:inline; }
+.ems-wi-inline-block { display:inline-block; }
+.ems-wi-dropform { margin-top:4px; }
+.ems-wi-field-gap { margin-bottom:4px; }
+</style>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
     $header_title = 'مهامي';
@@ -158,6 +176,7 @@ include '../insidebar.php';
     include '../includes/page_header.php';
     require_once __DIR__ . '/../includes/screen_contract.php';
     ems_screen_about('كلُّ ما ينتظر تنفيذي أنا — بعروضه العشرة، وكلُّ عنصرٍ يرجع لأصله بضغطةٍ ويشرح «لماذا أراه» بسلسلته الخماسية.');
+    echo ems_states_bundle('لا عناصرَ في هذا العرض', 'بدّل العرضَ أو تحقق من مصادرِ التكليف');
 
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
@@ -165,22 +184,22 @@ include '../insidebar.php';
     ?>
 
     <?php if ($explain): ?>
-    <div class="card" style="margin-bottom:12px;border-right:4px solid #6c5ce7;">
+    <div class="card ems-wi-accent-card">
         <div class="card-header"><strong><i class="fas fa-circle-question"></i> لماذا يظهر لي هذا العنصر؟</strong>
-            <a class="btn btn-sm btn-secondary" style="float:left" href="my_tasks.php?view=<?php echo htmlspecialchars($VIEW); ?>">إغلاق</a></div>
+            <a class="btn btn-sm btn-secondary ems-wi-close" href="my_tasks.php?view=<?php echo htmlspecialchars($VIEW); ?>">إغلاق</a></div>
         <div class="card-body">
             <?php foreach ($explain['steps'] as $i => $s): ?>
-                <div style="margin:4px 0"><span class="badge <?php echo $s['ok'] ? 'bg-success' : 'bg-danger'; ?>"><?php echo $i + 1; ?></span>
+                <div class="ems-wi-line"><span class="badge <?php echo $s['ok'] ? 'bg-success' : 'bg-danger'; ?>"><?php echo $i + 1; ?></span>
                     <strong><?php echo htmlspecialchars($s['q']); ?></strong> — <?php echo htmlspecialchars($s['a']); ?></div>
             <?php endforeach; ?>
             <?php if (!$explain['complete']): ?>
-                <div class="alert alert-warning" style="margin-top:8px">سلسلةٌ ناقصة — والحجبُ أسلمُ من الظهور بلا تفسير (AC-WFM-13)</div>
+                <div class="alert alert-warning ems-wi-chain-warn">سلسلةٌ ناقصة — والحجبُ أسلمُ من الظهور بلا تفسير (AC-WFM-13)</div>
             <?php endif; ?>
         </div>
     </div>
     <?php endif; ?>
 
-    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+    <div class="ems-wi-views">
         <?php foreach ($views as $k => $v): ?>
             <a href="my_tasks.php?view=<?php echo $k; ?>"
                class="btn btn-sm <?php echo $k === $VIEW ? 'btn-primary' : 'btn-secondary'; ?>">
@@ -200,13 +219,13 @@ include '../insidebar.php';
         $KIND_AR = array('task_assign' => 'إسناد مهمة', 'role_assign' => 'تكليف بدور', 'deputize' => 'إنابة',
                          'delegate_approval' => 'تفويض اعتماد', 'reassign' => 'إعادة إسناد', 'workload_move' => 'نقل عبء');
     ?>
-    <div class="card" style="margin-bottom:12px;border-right:4px solid #6c5ce7;">
+    <div class="card ems-wi-accent-card">
         <div class="card-header"><strong><i class="fas fa-user-shield"></i> تفويضاتٌ وإناباتٌ نافذةٌ إليّ</strong>
             <span class="badge bg-secondary"><?php echo count($dels); ?></span></div>
-        <div class="card-body" style="padding:10px 14px">
+        <div class="card-body ems-wi-dels-body">
             <?php if (!$dels): ?><span class="text-muted">لا تفويضَ نافذًا إليك الآن — «انتهاءُ التفويض يوقف التوليدَ في اللحظة» (WF-08)</span>
             <?php else: foreach ($dels as $d): ?>
-                <div style="margin:4px 0">· <strong><?php echo htmlspecialchars($KIND_AR[$d['kind']] ?? $d['kind']); ?></strong>
+                <div class="ems-wi-line">· <strong><?php echo htmlspecialchars($KIND_AR[$d['kind']] ?? $d['kind']); ?></strong>
                     من <?php echo htmlspecialchars((string) ($d['from_name'] ?: '—')); ?>
                     — النطاق: <code><?php echo htmlspecialchars((string) $d['scope_ref']); ?></code>
                     · حتى <?php echo htmlspecialchars((string) $d['ends_at']); ?></div>
@@ -243,10 +262,10 @@ include '../insidebar.php';
                 <tr>
                     <td><code>WI-<?php echo $id; ?></code><br>
                         <a href="my_tasks.php?view=<?php echo $VIEW; ?>&explain=<?php echo $id; ?>" title="لماذا أرى هذا؟"
-                           style="font-size:.78rem"><i class="fas fa-circle-question"></i> لماذا؟</a></td>
-                    <td style="max-width:260px;white-space:normal"><strong><?php echo htmlspecialchars((string) $t['title']); ?></strong>
-                        <div class="text-muted" style="font-size:.8rem">المخرَج: <?php echo htmlspecialchars((string) $t['deliverable']); ?></div>
-                        <?php if ($t['status_reason']): ?><div style="color:#9a6a00;font-size:.78rem"><?php echo htmlspecialchars((string) $t['status_reason']); ?></div><?php endif; ?></td>
+                           class="ems-wi-whylink"><i class="fas fa-circle-question"></i> لماذا؟</a></td>
+                    <td class="ems-wi-title-cell"><strong><?php echo htmlspecialchars((string) $t['title']); ?></strong>
+                        <div class="text-muted ems-wi-sub">المخرَج: <?php echo htmlspecialchars((string) $t['deliverable']); ?></div>
+                        <?php if ($t['status_reason']): ?><div class="ems-wi-reason"><?php echo htmlspecialchars((string) $t['status_reason']); ?></div><?php endif; ?></td>
                     <td><span class="badge bg-secondary" title="<?php echo htmlspecialchars((string) $t['source_type']); ?>"><?php echo htmlspecialchars($SRC_AR[$t['source_type']] ?? $t['source_type']); ?></span></td>
                     <td><?php if ($t['source_screen']): ?>
                         <a href="../<?php echo htmlspecialchars((string) $t['source_screen']); ?>" title="فتح الأصل بضغطة (WF-01)">
@@ -259,49 +278,49 @@ include '../insidebar.php';
                     <td><?php echo htmlspecialchars($leftTxt); ?></td>
                     <td><span class="badge <?php echo in_array($t['priority'], array('P0', 'P1'), true) ? 'bg-danger' : ($t['priority'] === 'P2' ? 'bg-warning text-dark' : 'bg-light text-dark'); ?>"><?php echo htmlspecialchars((string) $t['priority']); ?></span></td>
                     <td><?php echo htmlspecialchars($STATE_AR[$t['status']] ?? $t['status']); ?></td>
-                    <td style="min-width:170px">
+                    <td class="ems-wi-actions-cell">
                         <?php $s = (string) $t['status']; ?>
                         <?php if ($isExec && $s === 'assigned'): ?>
-                            <form method="post" style="display:inline">
+                            <form method="post" class="ems-wi-inline-form">
         <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="accepted">
                                 <button class="btn btn-sm btn-secondary">استلام</button></form>
                         <?php endif; ?>
                         <?php if ($isExec && in_array($s, array('accepted', 'returned', 'reopened', 'blocked'), true)): ?>
-                            <form method="post" style="display:inline">
+                            <form method="post" class="ems-wi-inline-form">
         <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="in_progress">
                                 <button class="btn btn-sm btn-secondary">بدء</button></form>
                         <?php endif; ?>
                         <?php if ($isExec && in_array($s, array('accepted', 'in_progress'), true)): ?>
-                            <details style="display:inline-block"><summary class="btn btn-sm btn-secondary" style="display:inline-block">توقف</summary>
-                                <form method="post" style="margin-top:4px">
+                            <details class="ems-wi-inline-block"><summary class="btn btn-sm btn-secondary ems-wi-inline-block">توقف</summary>
+                                <form method="post" class="ems-wi-dropform">
         <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="blocked">
-                                    <select name="reason" class="form-control form-control-sm" style="margin-bottom:4px">
+                                    <select name="reason" class="form-control form-control-sm ems-wi-field-gap" aria-label="سببُ التوقف">
                                         <option value="awaiting_part">انتظار قطعة</option><option value="awaiting_client">قرار عميل</option>
                                         <option value="awaiting_higher_approval">اعتماد أعلى</option><option value="awaiting_external">طرف خارجي</option>
                                         <option value="force_majeure">قوة قاهرة</option></select>
                                     <button class="btn btn-sm btn-secondary">تأكيد التوقف</button></form></details>
-                            <details style="display:inline-block"><summary class="btn btn-sm btn-primary" style="display:inline-block">إكمال</summary>
-                                <form method="post" style="margin-top:4px">
+                            <details class="ems-wi-inline-block"><summary class="btn btn-sm btn-primary ems-wi-inline-block">إكمال</summary>
+                                <form method="post" class="ems-wi-dropform">
         <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="done_pending_verify">
-                                    <input name="evidence" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="دليل الإنجاز (إلزامي منطقًا: <?php echo htmlspecialchars((string) $t['evidence_required']); ?>)" required aria-label="دليل الإنجاز (إلزامي منطقًا: )">
+                                    <input name="evidence" class="form-control form-control-sm ems-wi-field-gap" placeholder="دليل الإنجاز (إلزامي منطقًا: <?php echo htmlspecialchars((string) $t['evidence_required']); ?>)" required aria-label="دليل الإنجاز (إلزامي منطقًا: )">
                                     <button class="btn btn-sm btn-primary">تقديم للتحقق</button></form></details>
                         <?php endif; ?>
                         <?php if ($isVerifier && $s === 'done_pending_verify'): ?>
-                            <form method="post" style="display:inline">
+                            <form method="post" class="ems-wi-inline-form">
         <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="closed_accepted">
                                 <button class="btn btn-sm btn-primary" title="الدليل: <?php echo htmlspecialchars((string) $t['evidence_ref']); ?>">قبول وإغلاق</button></form>
-                            <details style="display:inline-block"><summary class="btn btn-sm btn-danger" style="display:inline-block">إعادة</summary>
-                                <form method="post" style="margin-top:4px">
+                            <details class="ems-wi-inline-block"><summary class="btn btn-sm btn-danger ems-wi-inline-block">إعادة</summary>
+                                <form method="post" class="ems-wi-dropform">
         <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="returned">
-                                    <input name="reason" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="سبب الإعادة (إلزامي)" required aria-label="سبب الإعادة (إلزامي)">
+                                    <input name="reason" class="form-control form-control-sm ems-wi-field-gap" placeholder="سبب الإعادة (إلزامي)" required aria-label="سبب الإعادة (إلزامي)">
                                     <button class="btn btn-sm btn-danger">إعادة للمنفِّذ</button></form></details>
                         <?php endif; ?>
                         <?php if ($isOwner && in_array($s, array('assigned', 'accepted', 'in_progress', 'blocked', 'overdue'), true)): ?>
-                            <details style="display:inline-block"><summary class="btn btn-sm btn-secondary" style="display:inline-block">نقل</summary>
-                                <form method="post" style="margin-top:4px">
+                            <details class="ems-wi-inline-block"><summary class="btn btn-sm btn-secondary ems-wi-inline-block">نقل</summary>
+                                <form method="post" class="ems-wi-dropform">
         <?= csrf_field() ?><input type="hidden" name="action" value="wi_transition"><input type="hidden" name="item_id" value="<?php echo $id; ?>"><input type="hidden" name="to" value="reassign">
-                                    <input name="to_user" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="معرّف المنفِّذ الجديد" required aria-label="معرّف المنفِّذ الجديد">
-                                    <input name="reason" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="السبب (إلزامي — العدُّ يستمر)" required aria-label="السبب (إلزامي — العدُّ يستمر)">
+                                    <input name="to_user" class="form-control form-control-sm ems-wi-field-gap" placeholder="معرّف المنفِّذ الجديد" required aria-label="معرّف المنفِّذ الجديد">
+                                    <input name="reason" class="form-control form-control-sm ems-wi-field-gap" placeholder="السبب (إلزامي — العدُّ يستمر)" required aria-label="السبب (إلزامي — العدُّ يستمر)">
                                     <button class="btn btn-sm btn-secondary">نقل</button></form></details>
                         <?php endif; ?>
                     </td>

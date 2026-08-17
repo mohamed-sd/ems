@@ -185,6 +185,15 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ems-ceo-kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
+.ems-ceo-kpi-card { border:1px solid var(--ems-border, var(--c-e5e5e5)); border-radius:10px; padding:10px; text-align:center; }
+.ems-ceo-kpi-num { font-size:20px; font-weight:700; }
+.ems-ceo-kpi-label { font-size:12px; }
+.ems-ceo-kpi-note { margin-top:6px; font-size:12px; }
+.ems-ceo-form-actions { margin-top:12px; display:flex; gap:10px; }
+</style>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
     $header_title = 'لوحة المدير التنفيذي';
@@ -195,6 +204,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = false;
     include '../includes/page_header.php';
+    echo ems_states_bundle('لا لقطاتَ محفوظةً لهذه الفترة', 'أضف لقطةً بزر «إضافة» أو تحقق من توفرِ السجلات');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
@@ -228,15 +238,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     ?>
     <div class="card"><div class="card-body">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+        <div class="ems-ceo-kpi-grid">
             <?php foreach ($bdCards as $c): ?>
-            <div style="border:1px solid var(--ems-border,#e5e5e5);border-radius:10px;padding:10px;text-align:center">
-                <div style="font-size:20px;font-weight:700"><?php echo (int) $c[1]; ?></div>
-                <div class="text-muted" style="font-size:12px"><i class="fa <?php echo $c[2]; ?>"></i> <?php echo htmlspecialchars($c[0], ENT_QUOTES, 'UTF-8'); ?></div>
+            <div class="ems-ceo-kpi-card">
+                <div class="ems-ceo-kpi-num"><?php echo (int) $c[1]; ?></div>
+                <div class="text-muted ems-ceo-kpi-label"><i class="fa <?php echo $c[2]; ?>"></i> <?php echo htmlspecialchars($c[0], ENT_QUOTES, 'UTF-8'); ?></div>
             </div>
             <?php endforeach; ?>
         </div>
-        <div class="text-muted" style="margin-top:6px;font-size:12px">
+        <div class="text-muted ems-ceo-kpi-note">
             مؤشراتٌ حيةٌ من المصادر (لا من لقطات هذا الجدول) — التفصيل في
             <a href="ceo_reports.php">تقارير الإدارة التنفيذية الثمانية</a>
         </div>
@@ -279,14 +289,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                      فلا حقلَ `f12` ولا `f13` في هذه الصفحة. -->
                 <div class="form-group"><label>المخاطر المفتوحة</label>
                     <input type="text" value="مشتقٌّ من سجل المخاطر — لا يُكتب" disabled
-                           class="form-control" aria-readonly="true"></div>
+                           class="form-control" aria-readonly="true" aria-label="المخاطر المفتوحة — مؤشرٌ مشتقٌّ من سجل المخاطر"></div>
                 <div class="form-group"><label>الاعتمادات المعلَّقة</label>
                     <input type="text" value="مشتقٌّ من صندوق الاعتماد — لا يُكتب" disabled
-                           class="form-control" aria-readonly="true"></div>
+                           class="form-control" aria-readonly="true" aria-label="الاعتمادات المعلَّقة — مؤشرٌ مشتقٌّ من صندوق الاعتماد"></div>
                 <div class="form-group"><label for="emsf_1105_88267">آخر تحديث</label>
                     <input type="text" name="f14" maxlength="190" id="emsf_1105_88267"></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <div class="ems-ceo-form-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
                 <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>

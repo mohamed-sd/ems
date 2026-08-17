@@ -63,6 +63,16 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ems-sites-tiles { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+.ems-site-tile { display:block; min-width:150px; padding:10px 14px; border:1px solid var(--c-dee2e6); border-radius:8px; background:var(--c-f8f9fa); color:var(--c-1f2937); text-decoration:none; }
+.ems-site-tile.is-active { background:var(--c-0d6efd); color:var(--c-s-fff); }
+.ems-row-stopped { background:var(--c-fff3f4); }
+.ems-badge-stopped { background:var(--c-dc3545); }
+.ems-badge-working { background:var(--c-198754); }
+.ems-sites-note { font-size:.85em; }
+</style>
 <div class="main" dir="rtl">
   <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
@@ -72,16 +82,15 @@ $header_title_html = htmlspecialchars('لوحةُ المواقع', ENT_QUOTES, '
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+echo ems_states_bundle('لا مواقعَ مسجَّلةً لهذا الكيان', 'تحقق من تسجيلِ المشاريعِ أو من نطاقِ صلاحيتك');
 ?>
 
-  <div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px">
+  <div class="ems-sites-tiles">
     <?php foreach ($sites as $s):
         $ok  = intval($s['eq_active']); $tot = intval($s['eq_total']); $gap = intval($s['seat_gap']);
         $mark = ($gap > 0 || $ok < $tot) ? '⚠' : '✔';
-        $bg   = $s['id'] == $sel_site ? '#0d6efd' : '#f8f9fa';
-        $fg   = $s['id'] == $sel_site ? '#fff' : '#212529';
     ?>
-    <a href="?site=<?= intval($s['id']) ?>" style="display:block;min-width:150px;padding:10px 14px;border:1px solid #dee2e6;border-radius:8px;background:<?= $bg ?>;color:<?= $fg ?>;text-decoration:none">
+    <a href="?site=<?= intval($s['id']) ?>" class="ems-site-tile<?= $s['id'] == $sel_site ? ' is-active' : '' ?>">
       <strong><?= htmlspecialchars($s['name'], ENT_QUOTES, 'UTF-8') ?></strong><br>
       <?= $tot ?> معدة<br>
       <?= $mark ?> <?= $ok ?> عاملة<br>
@@ -108,9 +117,9 @@ include __DIR__ . '/../includes/page_header.php';
     <?php endif; ?>
     <?php foreach ($rows as $eqId => $r):
         $stopped = intval($r['status']) !== 1; ?>
-      <tr<?= $stopped ? ' style="background:#fff3f3"' : '' ?>>
+      <tr<?= $stopped ? ' class="ems-row-stopped"' : '' ?>>
         <td><a href="../Equipments/equipment_profile.php?id=<?= intval($eqId) ?>"><?= htmlspecialchars($r['name'], ENT_QUOTES, 'UTF-8') ?></a></td>
-        <td><?= $stopped ? '<span class="badge" style="background:#dc3545">متوقفة</span>' : '<span class="badge" style="background:#198754">عاملة</span>' ?></td>
+        <td><?= $stopped ? '<span class="badge ems-badge-stopped">متوقفة</span>' : '<span class="badge ems-badge-working">عاملة</span>' ?></td>
         <td><?= htmlspecialchars($r['shifts'][1] ?? '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($r['shifts'][2] ?? '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td>
@@ -121,6 +130,6 @@ include __DIR__ . '/../includes/page_header.php';
     <?php endforeach; ?>
     </tbody>
   </table>
-  <p class="text-muted" style="font-size:.85em">زرُّ التبديل يفتح طلبًا بموافقتين لا فعلًا مباشرًا (NAV-01 §6.3) — ولا يُعرض مالكُ المعدة ولا مموّلُها (المجالُ المقيَّد).</p>
+  <p class="text-muted ems-sites-note">زرُّ التبديل يفتح طلبًا بموافقتين لا فعلًا مباشرًا (NAV-01 §6.3) — ولا يُعرض مالكُ المعدة ولا مموّلُها (المجالُ المقيَّد).</p>
   <?php endif; ?>
 </div>
