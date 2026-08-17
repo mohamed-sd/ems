@@ -52,11 +52,26 @@
   const primaries = [...document.querySelectorAll('.ux-btn--primary, .btn-primary, .ems-btn-primary')]
     .filter(visible).length;
 
-  /* ── ④ أشرطةُ الأدواتِ الظاهرة (G20) ── */
-  const toolbars = [...document.querySelectorAll('.ux-toolbar, .dt-buttons, .dataTables_filter, [class*="toolbar"]')]
+  /* ═══════════════════════════════════════════════════════════════════════
+     ④ أشرطةُ الأدواتِ الظاهرة (G20) — **صفوفٌ مكدَّسةٌ لا عناصرُ مرشَّحة**
+     ─────────────────────────────────────────────────────────────────────────
+     ◆ كان العدُّ عناصرَ فأخطأ مرتين، والقياسُ الحيُّ كشفهما في `my_tasks`:
+       ① ثلاثةُ عناصرَ **في صفٍّ واحد** (`top=411` للثلاثة) عُدَّت ثلاثةَ
+         أشرطةٍ مكدَّسة — والبوابةُ تسأل عن **التكديس** لا عن عددِ الحاويات.
+       ② و`dt-buttons` **داخلَ** `ems-auto-buttons` فعُدَّ الأبُ وابنُه شريطَين.
+     ◆ فالمقياسُ الصحيح: **عددُ النطاقاتِ الأفقيةِ المتمايزة** بعد إسقاطِ
+       المتداخل. وشريطان في صفٍّ واحدٍ ليسا تكديسًا — التكديسُ ما يأكل ارتفاعًا.
+     ═══════════════════════════════════════════════════════════════════════ */
+  const barEls = [...document.querySelectorAll('.ux-toolbar, .dt-buttons, .dataTables_filter, [class*="toolbar"]')]
     .filter(visible)
-    .filter(el => !el.closest('.ux-viewpicker'))   /* منتقي المنظرِ أداةٌ لا شريط */
-    .length;
+    .filter(el => !el.closest('.ux-viewpicker'));      /* منتقي المنظرِ أداةٌ لا شريط */
+  const outerBars = barEls.filter(el => !barEls.some(o => o !== el && o.contains(el)));
+  const bands = new Set(outerBars.map(el => Math.round(el.getBoundingClientRect().top / 8)));
+  const toolbars = bands.size;
+  const toolbarDetail = outerBars.map(el => ({
+    cls: String(el.className).trim().split(/\s+/).slice(0, 2).join('.'),
+    top: Math.round(el.getBoundingClientRect().top)
+  }));
 
   /* ── ⑤ إجراءاتُ خليةِ الجدولِ (G18) — أظهرُ خليةٍ ── */
   let worstCell = 0;
@@ -83,6 +98,7 @@
     overflowingElements: overflowing,
     visiblePrimaryButtons: primaries,
     visibleToolbars: toolbars,
+    toolbarBands: toolbarDetail,
     worstCellActions: worstCell,
     measuredRowHeight: rowHeight
   };

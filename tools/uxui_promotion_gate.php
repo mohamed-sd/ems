@@ -97,12 +97,34 @@ if ($verTag !== null) {
     while ($q && ($x = $q->fetch_assoc())) { $meas[$x['screen_file']][(int) $x['viewport_w']] = $x; }
 }
 
-/* ⑧/⑨ المراجعةُ المستقلة — تُقرأ ولا تُشغَّل */
-$indep = array();
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ⑧/⑨ المراجعةُ المستقلة — تُقرأ ولا تُشغَّل، **وتُطابَق نسختُها**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * قرارُ المالك (ف١٣): «واجعلِ البوابةَ ترفض ثلاثيًّا غيرَ مطابق». وبلا هذا
+ * تُقرأ شهادةٌ صحيحةٌ في نصِّها على شيفرةٍ **لم يرَها المراجِعُ قطُّ** — فتصير
+ * كاذبةً في مدلولِها. والشهادةُ لا تُبطَل: هي محفوظةٌ بتاريخِها ونسختِها؛
+ * إنما يمتنع انسحابُها على غيرِ ما شهدت له.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+$indep = array(); $indepStale = array();
+$liveHash = trim((string) shell_exec('git -C ' . escapeshellarg($ROOT) . ' rev-parse --short=12 HEAD 2>&1'));
 $hasTbl = $conn->query("SHOW TABLES LIKE 'gov_independent_reviews'");
 if ($hasTbl && $hasTbl->num_rows) {
-    $q = $conn->query("SELECT screen_file, review_kind, verdict FROM gov_independent_reviews WHERE verdict = 'PASS'");
-    while ($q && ($x = $q->fetch_assoc())) { $indep[$x['screen_file']][$x['review_kind']] = true; }
+    $q = $conn->query("SELECT screen_file, review_kind, verdict, component_version,
+                              commit_hash, visual_baseline_version
+                         FROM gov_independent_reviews WHERE verdict = 'PASS'");
+    while ($q && ($x = $q->fetch_assoc())) {
+        $sameComp = ($x['component_version'] === $verTag);
+        $sameCode = ($liveHash !== '' && $x['commit_hash'] === $liveHash);
+        if ($sameComp && $sameCode) {
+            $indep[$x['screen_file']][$x['review_kind']] = true;
+        } else {
+            /* شهادةٌ لنسخةٍ أخرى — تُعلَن ولا تُسنِد */
+            $indepStale[] = sprintf('%s · %s — شهادة(%s/%s) ≠ حيّ(%s/%s)',
+                $x['screen_file'], $x['review_kind'],
+                $x['component_version'], substr($x['commit_hash'], 0, 8),
+                $verTag, substr($liveHash, 0, 8));
+        }
+    }
 }
 
 /* ── الحكمُ لكلِّ شاشة ── */
@@ -161,6 +183,11 @@ foreach ($rows as $r) {
 echo "\n  ◆ مرقَّاةٌ (VISUAL_PATTERN_APPROVED): {$approved}/" . count($rows) . "\n";
 echo "  ◆ «NOT_MEASURED» **خارجَ المقامِ** بنصِّ ف١٦-٢ — لا تُحسب مارّةً ولا راسبة.\n";
 echo "  ◆ البندان ⑧ و⑨ لا يُشغَّلان هنا بحال: منفِّذُهما مستقلٌّ عن البانِي.\n";
+if ($indepStale) {
+    echo "\n  ⚠ شهاداتٌ مسجَّلةٌ **لا تنطبق على النسخةِ الحالية** — محفوظةٌ ولا تُسنِد ترقية:\n";
+    foreach ($indepStale as $s) { echo "      · {$s}\n"; }
+    echo "      (الشهادةُ تخصُّ ما رآه المراجِعُ — لا ما بُني بعدَه.)\n";
+}
 
 if (!empty($args['md'])) {
     $L = array('# بوابةُ ترقيةِ النمطِ التسع — الحالُ المقيس', '',

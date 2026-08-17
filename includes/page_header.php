@@ -83,6 +83,31 @@ if (!function_exists('render_header_action')) {
         }
 
         $label = isset($item['label']) ? $item['label'] : '';
+
+        /* ═══════════════════════════════════════════════════════════════════
+         * الزرُّ الأيقونيُّ يلزمه اسمٌ ميسورٌ — و`title` وحدَه لا يكفي
+         * ───────────────────────────────────────────────────────────────────
+         * ◆ كشفه قياسُ متصفحٍ حيٌّ (2026-08-19 · `FinRequests/request_form.php`):
+         *   زرُّ «إنشاء طلب مالي» يُصيَّر دائرةً 40×40 **نصُّها خالٍ**، ويحمل
+         *   `title` ولا يحمل `aria-label`. و`title` اسمٌ ميسورٌ ضعيف: كثيرٌ من
+         *   قارئاتِ الشاشةِ لا تنطقه، ولا يظهر عند التنقلِ بلوحةِ المفاتيح.
+         *   فالزرُّ عمليًّا **بلا اسم** لمن لا يرى الأيقونة.
+         * ◆ والعلاجُ مركزيٌّ لا موضعيّ: كلُّ ترويسةٍ في النظامِ تمرُّ من هنا،
+         *   فيُشتقُّ `aria-label` من اللافتةِ المُعلَنةِ سلفًا — صفرُ تعديلٍ في
+         *   أيِّ شاشة، ولا يُكتب إن كان الكاتبُ قد صرَّح به بنفسِه.
+         * ═══════════════════════════════════════════════════════════════════ */
+        $__hasAria = (isset($item['attrs']) && stripos((string) $item['attrs'], 'aria-label') !== false);
+        $__iconOnly = ($icon !== '' && trim((string) $label) === '')
+                      || (strpos((string) (isset($item['class']) ? $item['class'] : ''), 'ems-head-circle') !== false);
+        if ($__iconOnly && !$__hasAria) {
+            $__name = trim((string) $label) !== '' ? $label
+                    : (isset($item['title']) ? $item['title'] : '');
+            if ($__name !== '') {
+                $ariaAttr = ' aria-label="' . htmlspecialchars($__name, ENT_QUOTES, 'UTF-8') . '"';
+                $open = preg_replace('~^(<[a-z]+)~i', '$1' . str_replace('$', '\\$', $ariaAttr), $open, 1);
+            }
+        }
+
         if (isset($item['label_class'])) {
             $labelHtml = '<span class="' . htmlspecialchars($item['label_class'], ENT_QUOTES, 'UTF-8') . '">'
                 . htmlspecialchars($label, ENT_QUOTES, 'UTF-8') . '</span>';
