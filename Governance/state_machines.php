@@ -131,6 +131,10 @@ ems_shell_axes(isset($__pp) ? $__pp : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
+// UXW-01 بوابة ٩: حالاتُ التحميلِ والفراغِ والخطأِ من المكوّنِ المركزيِّ ux_components
+if (function_exists('ems_states_bundle')) {
+    echo ems_states_bundle('لا انتقالاتِ حالاتٍ مسجَّلةً بعدُ', 'أضف أولَ انتقالٍ بزرِّ «إضافة» أعلى الشاشة');
+}
 ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
@@ -146,6 +150,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
     ?>
+
+    <style>
+        /* UXW-01 بوابة ٢: النمطُ في كتلةٍ لا في الوسم */
+        .cmp03-form-actions { margin-top: 12px; display: flex; gap: 10px; }
+    </style>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
     <form method="post" action="" class="allforms" id="cmp03AddForm">
@@ -188,7 +197,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_678_ff8d5">الحالة</label>
                     <select name="f15" id="emsf_678_ff8d5"><option value="مسودة">مسودة</option><option value="قيد المراجعة">قيد المراجعة</option><option value="معتمد">معتمد</option><option value="موقوف">موقوف</option><option value="ملغي">ملغي</option></select></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <div class="cmp03-form-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
                 <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>

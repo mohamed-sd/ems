@@ -37,7 +37,7 @@ include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main ems-unified-page-shell">
+<div class="main ems-unified-page-shell ems-doc-cycle">
     <?php
     $header_title = 'إشارات الخطر والفرز';
     $header_icon = 'fas fa-satellite-dish';
@@ -49,7 +49,21 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         'الإشارة تُفرز قبل أن تصير خطرًا (RK-05): تُهمل بسبب موسوم، أو تُربط بخطر قائم فيُعاد تقييمه، '
         . 'أو تُنشئ خطرًا جديدًا، أو تُصعَّد فورًا للرئيس في اليوم نفسه.',
         array('التحويل الآلي لكل بلاغ إلى خطر يُنتج آلاف المخاطر المزعجة — الفرز حارس المعنى'));
+    echo ems_next_step($canTriage
+        ? 'فرزُ المعلَّقِ بقرارٍ مسبَّبٍ — إهمالٌ بوسمٍ أو ربطٌ بقائمٍ أو تحويلٌ بوحدةٍ مالكةٍ أو تصعيد'
+        : 'الفرزُ بيدِ إدارةِ المخاطر — وإشارتُك تدخل الصندوقَ وتنتظر قرارَها');
+    echo ems_states_bundle('لا إشاراتٍ بهذه الحالة', 'الإشارةُ تُفرز قبل أن تصيرَ خطرًا — بدّل تبويبَ الحالةِ أو سجّل إشارةً جديدة');
     ?>
+    <style>
+        .rsk-w100 { width: 100%; }
+        .rsk-triage-cell { min-width: 330px; }
+        .rsk-inline-auto { display: inline-block; width: auto; }
+        .rsk-inline-110 { display: inline-block; width: 110px; }
+        .rsk-inline-150 { display: inline-block; width: 150px; }
+        .rsk-inline-160 { display: inline-block; width: 160px; }
+        .rsk-new-card { margin-top: 16px; }
+        .rsk-new-card.is-hidden { display: none; }
+    </style>
 
     <div class="ems-toolbar">
         <?php foreach (array('pending' => 'تنتظر', 'converted' => 'حُوّلت', 'linked' => 'رُبطت', 'dismissed' => 'أُهملت بوسم', 'escalated' => 'صُعِّدت') as $k => $v): ?>
@@ -64,7 +78,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     });</script>
     <?php else: ?>
     <div class="card"><div class="card-body table-responsive">
-        <table class="table table-striped" style="width:100%">
+        <table class="table table-striped rsk-w100">
             <thead><tr><th>#</th><th>المصدر</th><th>القاعدة</th><th>العنوان</th><th>الوحدة المرشحة</th>
                 <th>السبب الجذري</th><th>المُنشئ</th><th>التاريخ</th>
                 <?php if ($canTriage && $fState === 'pending'): ?><th>الفرز</th><?php endif; ?>
@@ -80,21 +94,21 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <td><?php echo htmlspecialchars((string) $s['creator']); ?></td>
                 <td><?php echo $s['created_at']; ?></td>
                 <?php if ($canTriage && $fState === 'pending'): ?>
-                <td style="min-width:330px">
-                    <select class="sigDecision form-control form-control-sm" data-id="<?php echo (int) $s['id']; ?>" style="display:inline-block;width:auto">
+                <td class="rsk-triage-cell">
+                    <select class="sigDecision form-control form-control-sm rsk-inline-auto" aria-label="قرار الفرز" data-id="<?php echo (int) $s['id']; ?>">
                         <option value="convert">يُنشئ خطرًا</option>
                         <option value="link">يُربط بقائم</option>
                         <option value="dismiss">يُهمل بوسم</option>
                         <option value="escalate">يُصعَّد فورًا</option>
                     </select>
-                    <input class="sigReason form-control form-control-sm" placeholder="السبب المكتوب *" style="display:inline-block;width:150px" aria-label="السبب المكتوب">
-                    <input class="sigExtra form-control form-control-sm" placeholder="رقم الخطر/الوحدة" style="display:inline-block;width:110px" aria-label="رقم الخطر/الوحدة">
+                    <input class="sigReason form-control form-control-sm rsk-inline-150" placeholder="السبب المكتوب *" aria-label="السبب المكتوب">
+                    <input class="sigExtra form-control form-control-sm rsk-inline-110" placeholder="رقم الخطر/الوحدة" aria-label="رقم الخطر/الوحدة">
                     <?php /* ⇐ INJ-0109 · «المستندُ المنتَج: خطرٌ مسجَّلٌ **بمالكٍ ووحدة**»
                              — فلا خطرَ يُسجَّل بلا وحدةٍ مالكة. وكان النموذجُ يرسل
                              `ru_id` وحدَه، فيُكتب `owner_unit_id = NULL`؛ وحارسُ
                              النطاقِ يطابق بالمساواة و**NULL لا يساوي شيئًا** —
                              فالخطرُ يختفي من سجلِّ إدارتِه إلى الأبد. */ ?>
-                    <select class="sigOwner form-control form-control-sm" style="display:inline-block;width:160px"
+                    <select class="sigOwner form-control form-control-sm rsk-inline-160"
                             aria-label="الوحدة المالكة (إلزامية للتحويل)">
                         <option value="">— الوحدة المالكة * —</option>
                         <?php foreach ($ORG_UNITS as $ou): ?>
@@ -115,17 +129,17 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     </div></div>
     <?php endif; ?>
 
-    <div class="card" id="sigNewCard" style="display:none;margin-top:16px"><div class="card-body">
+    <div class="card rsk-new-card is-hidden" id="sigNewCard"><div class="card-body">
         <h6>إشارة جديدة — حق كل إدارة (تدخل الفرز ولا تُسجَّل خطرًا مباشرة)</h6>
         <form id="sigNewForm" class="allforms">
             <div class="row">
-                <div class="col-md-6"><label>العنوان *<input name="title" class="form-control" required></label></div>
-                <div class="col-md-3"><label>الوحدة المرشحة<select name="ru_hint_id" class="form-control">
+                <div class="col-md-6"><label>العنوان *<input name="title" class="form-control" aria-label="عنوان الإشارة" required></label></div>
+                <div class="col-md-3"><label>الوحدة المرشحة<select name="ru_hint_id" class="form-control" aria-label="وحدة المخاطر المرشحة">
                     <option value="">—</option>
                     <?php foreach ($units as $u): ?><option value="<?php echo (int) $u['id']; ?>"><?php echo htmlspecialchars($u['ru_code']); ?></option><?php endforeach; ?>
                 </select></label></div>
-                <div class="col-md-3"><label>السبب الجذري<input name="root_cause" class="form-control"></label></div>
-                <div class="col-md-12"><label>التفاصيل<textarea name="details" class="form-control"></textarea></label></div>
+                <div class="col-md-3"><label>السبب الجذري<input name="root_cause" class="form-control" aria-label="السبب الجذري"></label></div>
+                <div class="col-md-12"><label>التفاصيل<textarea name="details" class="form-control" aria-label="تفاصيل الإشارة"></textarea></label></div>
             </div>
             <button class="ems-btn-primary" type="submit">تسجيل الإشارة</button>
             <span id="sigNewMsg"></span>
@@ -142,8 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     var nb = document.getElementById('sigNewBtn');
     if (nb) { nb.addEventListener('click', function () {
-        var c = document.getElementById('sigNewCard');
-        c.style.display = c.style.display === 'none' ? '' : 'none';
+        document.getElementById('sigNewCard').classList.toggle('is-hidden');
     }); }
     var nf = document.getElementById('sigNewForm');
     if (nf) { nf.addEventListener('submit', function (ev) {

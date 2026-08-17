@@ -17,6 +17,7 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 require_once '../includes/permissions_helper.php';
 require_once '../includes/gov_columns.php';
+require_once __DIR__ . '/../includes/ux_components.php'; // UXW-01: حالات الشاشة الموحدة
 
 $company_id     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
 $is_super_admin = (strval($_SESSION['user']['role'] ?? '') === '-1');
@@ -150,6 +151,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
+    echo ems_states_bundle('لا قواعدَ منعٍ مصنَّفةً بعد', 'سجِّل الحارسَ وصنِّف حمايتَه بزرِّ «إضافة» أعلى الشاشة');
     ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
@@ -197,7 +199,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_614_043a0">المرفق</label>
                     <input type="text" name="f17" maxlength="190" id="emsf_614_043a0"></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <div class="form-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
                 <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>

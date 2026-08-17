@@ -31,12 +31,19 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     ems_screen_about('مستوى الخطر الذي تقبله الشركة سعيًا لأهدافها — يحدده الرئيس بحسب الخطة العامة، '
         . 'وأنماط الخطة الثلاثة (نمو/تثبيت/حماية) تعدل الشهيات المتغيرة ولا تمس الأرضيات.',
         array('حد التحمل أضيق من الشهية وأدق منها — وعنده يبدأ التصعيد'));
+    echo ems_states_bundle('لا مجالاتِ شهيةٍ مبذورةً لهذا الكيان', 'شهيةُ المخاطرِ تُبذر بقرارِ الرئيسِ — والأرضياتُ الثلاثُ لا تتغير بحال');
     ?>
+    <style>
+        .rsk-w100 { width: 100%; }
+        .rsk-floor-row { background: var(--danger-100); }
+        .rsk-plans-card { margin-top: 16px; }
+        .rsk-plans-list { font-size: .86rem; color: var(--gray-700); }
+    </style>
     <div class="card"><div class="card-body table-responsive">
-        <table class="table table-striped" style="width:100%">
+        <table class="table table-striped rsk-w100">
             <thead><tr><th>المجال</th><th>الشهية</th><th>حد التحمل</th><th>المخوَّل</th><th>التغيّر</th><th>أرضية ثابتة</th></tr></thead>
             <tbody><?php foreach ($rows as $a): ?>
-            <tr <?php echo (int) $a['immutable_floor'] === 1 ? 'style="background:#fef2f2"' : ''; ?>>
+            <tr <?php echo (int) $a['immutable_floor'] === 1 ? 'class="rsk-floor-row"' : ''; ?>>
                 <td><b><?php echo htmlspecialchars($a['domain']); ?></b></td>
                 <td><?php echo htmlspecialchars($a['appetite_ar']); ?></td>
                 <td><?php echo htmlspecialchars($a['tolerance_ar']); ?></td>
@@ -47,9 +54,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <?php endforeach; ?></tbody>
         </table>
     </div></div>
-    <div class="ems-card" style="margin-top:16px">
+    <div class="ems-card rsk-plans-card">
         <h6>أنماط الخطة الثلاثة (تعديل الشهية بقرار المالك — لا من هذه الشاشة)</h6>
-        <ul style="font-size:.86rem;color:#4b5563">
+        <ul class="rsk-plans-list">
             <li><b>النمو والتوسع:</b> تُرفع شهية التعاقد والتشغيل والأفراد والتمويل — ولا تُرفع السلامة ولا القانون ولا تسرب البيانات، وتُشدَّد الضوابط المعوِّضة كلما رُفعت.</li>
             <li><b>التثبيت والكفاءة:</b> تُخفض شهية التعاقد الجديد والتمويل والتوسع الجغرافي — وتُرفع دقة المتابعة والوقائية، والتركيز على تقليل المتبقي لا قبوله.</li>
             <li><b>الحماية والانكماش:</b> تُخفض الشهية في المجالات كلها — وتُرفع حدود التصعيد فيصل للرئيس ما كان يُحسم أدنى، ويُراجَع كل قبول سابق.</li>

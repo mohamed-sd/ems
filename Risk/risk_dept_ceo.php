@@ -25,3 +25,10 @@ require_once __DIR__ . '/_risk_common.php';
 unset($_GET['unit']);
 
 require __DIR__ . '/dept_risk_space.php';
+
+/* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا
+   ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components التي تُحمِّلها القشرة. */
+if (function_exists('ems_states_bundle')) {
+    echo ems_states_bundle('لا بياناتِ مخاطرَ لهذه الإدارةِ بعد',
+                           'تُسجَّل المخاطرُ من سجلِّها المركزيِّ فتظهر هنا');
+}

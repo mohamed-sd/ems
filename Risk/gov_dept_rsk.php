@@ -93,6 +93,28 @@ include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell">
+    <style>
+    /* UXW-01 · أنماطُ الشاشةِ المصنَّفة (بوابة ٢) — ألوانُها من الرموز (بوابة ١) */
+    .rskg-alert-bad{padding:12px;margin:10px 0;border-inline-start:4px solid var(--c-dc3545)}
+    .rskg-alert-ok{padding:10px;margin:10px 0;border-inline-start:4px solid var(--c-198754)}
+    .rskg-text-bad{color:var(--c-b02a37, #b02a37)}
+    .rskg-text-ok{color:var(--c-146c43, #146c43)}
+    .rskg-list{font-size:.84rem;margin:6px 0 0;padding-inline-start:20px}
+    .rskg-soft{font-size:.82rem;opacity:.8}
+    .rskg-wfull{width:100%}
+    .rskg-mt{margin-top:12px}
+    .rskg-mono{font-size:.78rem;font-family:monospace}
+    .rskg-mono74{font-family:monospace;font-size:.74rem}
+    .rskg-xs{font-size:.76rem}
+    .rskg-sm{font-size:.82rem}
+    .rskg-fs78{font-size:.78rem}
+    .rskg-dim{opacity:.5}
+    .rskg-note{font-size:.78rem;opacity:.75;margin-top:6px}
+    .rskg-hint{font-size:.76rem;opacity:.75}
+    .rskg-missing{font-size:.85rem;color:var(--c-b02a37, #b02a37)}
+    .rskg-desc{font-size:.82rem;opacity:.85}
+    .rskg-msg{margin-inline-start:10px;font-size:.82rem}
+    </style>
     <?php
     $header_title = 'حوكمة إدارة المخاطر المؤسسية';
     $header_icon = 'fas fa-scale-unbalanced';
@@ -114,9 +136,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     ?>
 
     <?php if ($sodTotal > 0): ?>
-    <div class="ems-card" style="padding:12px;margin:10px 0;border-inline-start:4px solid #dc3545">
-        <strong style="color:#b02a37">⚠ خرق فصل الواجبات — <?php echo $sodTotal; ?> حالة</strong>
-        <ul style="font-size:.84rem;margin:6px 0 0;padding-inline-start:20px">
+    <div class="ems-card rskg-alert-bad">
+        <strong class="rskg-text-bad">⚠ خرق فصل الواجبات — <?php echo $sodTotal; ?> حالة</strong>
+        <ul class="rskg-list">
             <?php foreach ($sodCtl as $x): ?>
             <li>الضابط الحرج <strong><?php echo htmlspecialchars($x['control_code']); ?></strong>
                 — متحققه هو مالكه (<?php echo htmlspecialchars((string) $x['owner_name']); ?>) · RK-07 يرفض التحقق</li>
@@ -128,15 +150,15 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         </ul>
     </div>
     <?php else: ?>
-    <div class="ems-card" style="padding:10px;margin:10px 0;border-inline-start:4px solid #198754">
-        <strong style="color:#146c43">✔ صفر خرق لفصل الواجبات</strong>
-        <span style="font-size:.82rem;opacity:.8"> — لا متحققٌ يتحقق من ضابطِ نفسِه، ولا منفِّذٌ يقبل دليلَ إنجازِه.</span>
+    <div class="ems-card rskg-alert-ok">
+        <strong class="rskg-text-ok">✔ صفر خرق لفصل الواجبات</strong>
+        <span class="rskg-soft"> — لا متحققٌ يتحقق من ضابطِ نفسِه، ولا منفِّذٌ يقبل دليلَ إنجازِه.</span>
     </div>
     <?php endif; ?>
 
     <div class="card"><div class="card-body table-responsive">
         <h6>الحسابات التابعة (حقل حساس — §6-3)</h6>
-        <table class="table table-sm table-striped" style="width:100%">
+        <table class="table table-sm table-striped rskg-wfull">
             <thead><tr><th>#</th><th>الحساب</th><th>الاسم</th><th>الدور</th>
                 <th>المسمى الوظيفي</th><th>الموظف</th><th>الحالة</th></tr></thead>
             <tbody>
@@ -156,19 +178,19 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         </table>
     </div></div>
 
-    <div class="card" style="margin-top:12px"><div class="card-body table-responsive">
+    <div class="card rskg-mt"><div class="card-body table-responsive">
         <h6>صلاحيات شاشات المخاطر بالدور — من محرّك الصلاحيات</h6>
-        <table class="table table-sm table-striped" style="width:100%">
+        <table class="table table-sm table-striped rskg-wfull">
             <thead><tr><th>الشاشة</th>
                 <th>28 إدارة المخاطر</th><th>29 محلل المخاطر</th><th>30 مشرف المخاطر</th></tr></thead>
             <tbody>
             <?php foreach ($perms as $code => $byRole): ?>
                 <tr>
-                    <td style="font-size:.78rem;font-family:monospace"><?php echo htmlspecialchars($code); ?></td>
+                    <td class="rskg-mono"><?php echo htmlspecialchars($code); ?></td>
                     <?php foreach (array(28, 29, 30) as $rid):
                         $p = $byRole[$rid] ?? null; ?>
-                    <td style="font-size:.76rem"><?php
-                        if (!$p) { echo '<span style="opacity:.5">لا منحة</span>'; }
+                    <td class="rskg-xs"><?php
+                        if (!$p) { echo '<span class="rskg-dim">لا منحة</span>'; }
                         else {
                             $bits = array();
                             if ((int) $p['can_view']) { $bits[] = 'عرض'; }
@@ -182,27 +204,27 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <?php endforeach; ?>
             </tbody>
         </table>
-        <p style="font-size:.78rem;opacity:.75;margin-top:6px">
+        <p class="rskg-note">
             الدور 30 قراءةٌ خالصةٌ على العشرين — ولا حذفَ لأيِّ دورٍ في هذه الإدارة (لا حذفَ إطلاقًا).</p>
     </div></div>
 
-    <div class="row" style="margin-top:12px">
+    <div class="row rskg-mt">
         <div class="col-md-5"><div class="card"><div class="card-body">
             <h6>سجلات التدقيق الأربعة (§9-4)</h6>
             <table class="table table-sm">
                 <tbody>
                 <?php foreach ($auditCounts as $k => $v): ?>
-                    <tr><td style="font-size:.82rem"><?php echo htmlspecialchars($k); ?></td>
+                    <tr><td class="rskg-sm"><?php echo htmlspecialchars($k); ?></td>
                         <td><strong><?php echo $v; ?></strong></td></tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
-            <p style="font-size:.76rem;opacity:.75">تُكتب من الطبقةِ المشتركةِ لا من كودِ الشاشة — بنيويًّا ولا يُتجاوز.</p>
+            <p class="rskg-hint">تُكتب من الطبقةِ المشتركةِ لا من كودِ الشاشة — بنيويًّا ولا يُتجاوز.</p>
         </div></div></div>
         <div class="col-md-7"><div class="card"><div class="card-body table-responsive">
             <h6>الحقول الحساسة المسجَّلة (AC-06)</h6>
             <?php if (empty($sensFields)): ?>
-            <p style="font-size:.85rem;color:#b02a37">لا حقول حساسة مسجَّلة — AC-06 راسبة حتى تُسجَّل.</p>
+            <p class="rskg-missing">لا حقول حساسة مسجَّلة — AC-06 راسبة حتى تُسجَّل.</p>
             <?php else: ?>
             <table class="table table-sm table-striped">
                 <thead><tr><th>السياسة</th><th>الحقل</th><th>التصنيف</th>
@@ -211,9 +233,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <?php foreach ($sensFields as $x): ?>
                     <tr>
                         <td><?php echo htmlspecialchars($x['no_policy']); ?></td>
-                        <td style="font-family:monospace;font-size:.74rem"><?php echo htmlspecialchars($x['table_name'] . '.' . $x['field_name']); ?></td>
-                        <td style="font-size:.78rem"><?php echo htmlspecialchars((string) $x['classification_sensitivity']); ?></td>
-                        <td style="font-size:.76rem"><?php echo htmlspecialchars(mb_substr((string) $x['from_visible_to'], 0, 50)); ?></td>
+                        <td class="rskg-mono74"><?php echo htmlspecialchars($x['table_name'] . '.' . $x['field_name']); ?></td>
+                        <td class="rskg-fs78"><?php echo htmlspecialchars((string) $x['classification_sensitivity']); ?></td>
+                        <td class="rskg-xs"><?php echo htmlspecialchars(mb_substr((string) $x['from_visible_to'], 0, 50)); ?></td>
                         <td><?php echo htmlspecialchars((string) $x['log_views_flag']); ?></td>
                         <td><?php echo htmlspecialchars((string) $x['exportable_flag']); ?></td>
                     </tr>
@@ -225,20 +247,20 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     </div>
 
     <?php if ($canAttest): ?>
-    <div class="card" style="margin-top:12px"><div class="card-body">
+    <div class="card rskg-mt"><div class="card-body">
         <h6>تصديق مراجعة الوصول (GOV-RSK-ATTEST)</h6>
-        <p style="font-size:.82rem;opacity:.85">
+        <p class="rskg-desc">
             تشهد بصحةِ قائمةِ فريقك وصلاحياتِهم — ولا يمنح التصديقُ صلاحيةً ولا يسلبها.</p>
         <form id="attForm" class="allforms">
             <div class="row">
                 <div class="col-md-4"><label>نطاق التصديق *
-                    <input name="scope_code" class="form-control" value="RISK-DEPT-<?php echo (int) $company_id; ?>" required></label></div>
+                    <input name="scope_code" aria-label="نطاق التصديق" class="form-control" value="RISK-DEPT-<?php echo (int) $company_id; ?>" required></label></div>
                 <div class="col-md-2"><label>عدد الحسابات
-                    <input name="headcount" type="number" class="form-control" value="<?php echo count($team); ?>" readonly></label></div>
-                <div class="col-md-6"><label>ملاحظة<input name="note" class="form-control"></label></div>
+                    <input name="headcount" aria-label="عدد الحسابات" type="number" class="form-control" value="<?php echo count($team); ?>" readonly></label></div>
+                <div class="col-md-6"><label>ملاحظة<input name="note" aria-label="ملاحظة" class="form-control"></label></div>
             </div>
             <button type="submit" class="ems-btn-primary">تصديق</button>
-            <span id="attMsg" style="margin-inline-start:10px;font-size:.82rem"></span>
+            <span id="attMsg" class="rskg-msg"></span>
         </form>
     </div></div>
     <script>
@@ -258,6 +280,14 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     });
     </script>
     <?php endif; ?>
+    <?php
+    /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا
+       ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components التي تُحمِّلها القشرة. */
+    if (function_exists('ems_states_bundle')) {
+        echo ems_states_bundle('لا بياناتِ حوكمةٍ لهذه الإدارةِ بعد',
+                               'تُقاس الحساباتُ وفصلُ الواجباتِ على السجلاتِ الحيةِ فتظهر هنا');
+    }
+    ?>
 </div>
 </body>
 </html>

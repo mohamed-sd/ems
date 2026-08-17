@@ -144,6 +144,18 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 بوابة ٢: أنماطُ الشاشةِ في كتلةٍ بأصنافٍ لا style= موضعيًّا — والألوانُ رموزٌ (بوابة ١) */
+.px-filter-form { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.px-w-220 { min-width: 220px; }
+.px-w-320 { min-width: 320px; }
+.px-result { margin-top: 14px; padding: 12px; border-radius: 8px; border: 1px solid var(--c-s-ddd, #ddd); }
+.px-result-verdict { font-weight: 800; margin-bottom: 8px; }
+.px-table-full { width: 100%; }
+.px-th-source { width: 30%; }
+.px-grantor { margin-top: 8px; color: var(--c-s-555, #555); }
+.cmp03-form-actions { margin-top: 12px; display: flex; gap: 10px; }
+</style>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
     $header_title = 'تفسير مصدر الصلاحية';
@@ -157,14 +169,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>';
     }
+    /* حزمةُ الحالاتِ الدنيا (بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا
+       ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components التي تُحمِّلها القشرة. */
+    if (function_exists('ems_states_bundle')) {
+        echo ems_states_bundle('لا نتيجةَ تفسيرٍ بعدُ',
+                               'اختر الدورَ والشاشةَ ثم اضغط «فسِّر» لعرضِ كلِّ مصدرِ صلاحيةٍ بحكمِه والنتيجةِ النهائية');
+    }
     ?>
 
     <!-- ── المفسِّر الحي: دورٌ × شاشة ← كلُّ مصدرٍ بحكمه والنتيجة ── -->
     <div class="card"><div class="card-header">
         <h5><i class="fa fa-question-circle"></i> لماذا يرى هذا الدورُ هذه الشاشة — أو لا يراها؟</h5>
     </div><div class="card-body">
-        <form method="get" action="" class="ems-form" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
-            <div class="form-group" style="min-width:220px"><label for="emsf_615_52acc">الدور</label>
+        <form method="get" action="" class="ems-form px-filter-form">
+            <div class="form-group px-w-220"><label for="emsf_615_52acc">الدور</label>
                 <select name="px_role" class="form-control" id="emsf_615_52acc">
                     <option value="">— اختر —</option>
                     <?php foreach ($px_roles as $r0): ?>
@@ -172,7 +190,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php echo htmlspecialchars($r0['id'] . ' — ' . $r0['name'], ENT_QUOTES, 'UTF-8'); ?></option>
                     <?php endforeach; ?>
                 </select></div>
-            <div class="form-group" style="min-width:320px"><label for="emsf_616_5b519">الشاشة</label>
+            <div class="form-group px-w-320"><label for="emsf_616_5b519">الشاشة</label>
                 <select name="px_screen" class="form-control" id="emsf_616_5b519">
                     <option value="">— اختر —</option>
                     <?php foreach ($px_screens as $s0): ?>
@@ -183,13 +201,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <button type="submit" class="btn-primary"><i class="fa fa-search"></i> فسِّر</button>
         </form>
         <?php if ($px_result !== null): ?>
-        <div style="margin-top:14px;padding:12px;border-radius:8px;border:1px solid #ddd">
-            <div style="font-weight:800;margin-bottom:8px">
+        <div class="px-result">
+            <div class="px-result-verdict">
                 <?php echo $px_result['allowed'] ? '✔ مسموح' : '✘ ممنوع'; ?>
                 — <?php echo htmlspecialchars($px_result['reason'], ENT_QUOTES, 'UTF-8'); ?>
             </div>
-            <table class="alltables no-datatable" data-no-dt="1" style="width:100%">
-                <thead><tr><th style="width:30%">المصدر</th><th>حكمُه</th></tr></thead>
+            <table class="alltables no-datatable px-table-full" data-no-dt="1">
+                <thead><tr><th class="px-th-source">المصدر</th><th>حكمُه</th></tr></thead>
                 <tbody>
                 <?php foreach ($px_result['chain'] as $step): ?>
                     <tr><td><?php echo htmlspecialchars($step['step'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -198,7 +216,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tbody>
             </table>
             <?php if (!empty($px_result['grantor'])): ?>
-            <div style="margin-top:8px;color:#555">المنحُ من: <?php echo htmlspecialchars($px_result['grantor'], ENT_QUOTES, 'UTF-8'); ?></div>
+            <div class="px-grantor">المنحُ من: <?php echo htmlspecialchars($px_result['grantor'], ENT_QUOTES, 'UTF-8'); ?></div>
             <?php endif; ?>
         </div>
         <?php endif; ?>
@@ -243,7 +261,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_631_6c20b">الفاحص</label>
                     <input type="text" name="f14" maxlength="190" id="emsf_631_6c20b"></div>
             </div></div>
-            <div style="margin-top:12px;display:flex;gap:10px">
+            <div class="cmp03-form-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
                 <button type="button" class="btn-secondary" id="cmp03CancelBtn"><i class="fa fa-times"></i> إلغاء</button>
             </div>

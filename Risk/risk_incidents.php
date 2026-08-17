@@ -74,11 +74,22 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         array('تقييمُ الواقعةِ لا يُنشئ قيدًا ماليًّا — التعرضُ تقديرٌ وحدثٌ يُنشر للمالية (RK-06)',
               'واقعةٌ تُحقق خطرًا قائمًا تُعيد تقييمَه حتمًا — لا اختيارًا',
               'التصحيحُ واقعةٌ جديدةٌ بمرجعِ الأصلِ — ولا حذفَ إطلاقًا'));
+    echo ems_states_bundle('لا وقائعَ مسجَّلةً في نطاقك', 'الواقعةُ تُسجَّل بوقتِ وقوعِها لا بوقتِ تسجيلِها — و«كادت تقع» تولّد إشارةَ فرزٍ آليًّا');
     ?>
+    <style>
+        .rsk-filter-form { align-items: flex-end; }
+        .rsk-filter-label { font-size: .8rem; }
+        .rsk-minw190 { min-width: 190px; }
+        .rsk-w100 { width: 100%; }
+        .rsk-new-card { margin-top: 16px; }
+        .rsk-new-card.is-hidden { display: none; }
+        .rsk-hint { font-size: .72rem; opacity: .7; }
+        .rsk-ms10 { margin-inline-start: 10px; }
+    </style>
 
-    <form method="get" class="ems-toolbar" style="align-items:flex-end">
-        <label style="font-size:.8rem">النوع
-            <select name="itype" class="form-control" style="min-width:190px">
+    <form method="get" class="ems-toolbar rsk-filter-form">
+        <label class="rsk-filter-label">النوع
+            <select name="itype" class="form-control rsk-minw190" aria-label="نوع الواقعة للترشيح">
                 <option value="">الكل</option>
                 <?php foreach ($TYPES as $t): ?>
                 <option value="<?php echo $t; ?>" <?php echo $fType === $t ? 'selected' : ''; ?>><?php echo $t; ?></option>
@@ -97,7 +108,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     });</script>
     <?php else: ?>
     <div class="card"><div class="card-body table-responsive">
-        <table class="table table-striped" style="width:100%">
+        <table class="table table-striped rsk-w100">
             <thead><tr>
                 <th>الرمز</th><th>النوع</th><th>العنوان</th><th>وقت الوقوع</th>
                 <th>الوحدة</th><th>السبب الجذري</th><th>إصابات</th><th>توقف (ساعة)</th>
@@ -132,43 +143,42 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <?php endif; ?>
 
     <?php if ($canLog): ?>
-    <div class="card" id="incNewCard" style="display:none;margin-top:16px"><div class="card-body">
+    <div class="card rsk-new-card is-hidden" id="incNewCard"><div class="card-body">
         <h5>تسجيل واقعة</h5>
         <form id="incNewForm" class="allforms">
             <div class="row">
-                <div class="col-md-3"><label>النوع *<select name="itype" class="form-control" required>
+                <div class="col-md-3"><label>النوع *<select name="itype" class="form-control" aria-label="نوع الواقعة" required>
                     <?php foreach ($TYPES as $t): ?><option><?php echo $t; ?></option><?php endforeach; ?>
                 </select></label></div>
                 <div class="col-md-3"><label>وقت الوقوع *
-                    <input name="occurred_at" type="datetime-local" class="form-control" required></label>
-                    <span style="font-size:.72rem;opacity:.7">وقتُ الواقعةِ لا وقتُ التسجيل</span></div>
-                <div class="col-md-6"><label>العنوان *<input name="title" class="form-control" required></label></div>
-                <div class="col-md-4"><label>الوحدة المرشَّحة<select name="ru_id" class="form-control">
+                    <input name="occurred_at" type="datetime-local" class="form-control" aria-label="وقت وقوع الواقعة" required></label>
+                    <span class="rsk-hint">وقتُ الواقعةِ لا وقتُ التسجيل</span></div>
+                <div class="col-md-6"><label>العنوان *<input name="title" class="form-control" aria-label="عنوان الواقعة" required></label></div>
+                <div class="col-md-4"><label>الوحدة المرشَّحة<select name="ru_id" class="form-control" aria-label="وحدة المخاطر المرشَّحة">
                     <option value="">—</option>
                     <?php foreach ($units as $u): ?>
                     <option value="<?php echo (int) $u['id']; ?>"><?php echo htmlspecialchars($u['ru_code'] . ' · ' . $u['name_ar']); ?></option>
                     <?php endforeach; ?>
                 </select></label></div>
-                <div class="col-md-4"><label>السبب الجذري<input name="root_cause" class="form-control"></label></div>
-                <div class="col-md-4"><label>خطر قائم تحقق (id)<input name="realized_risk_id" type="number" class="form-control"></label>
-                    <span style="font-size:.72rem;opacity:.7">الربطُ يُعيد تقييمَ الخطرِ حتمًا</span></div>
-                <div class="col-md-2"><label>إصابات<input name="injury_count" type="number" min="0" value="0" class="form-control"></label></div>
-                <div class="col-md-2"><label>توقف (ساعة)<input name="downtime_hours" type="number" step="0.25" min="0" value="0" class="form-control"></label></div>
-                <div class="col-md-3"><label>تعرض مقدَّر<input name="loss_estimate" type="number" step="0.01" class="form-control"></label></div>
-                <div class="col-md-2"><label>العملة<input name="currency" class="form-control" maxlength="8"></label></div>
-                <div class="col-md-3"><label>المعدة (id)<input name="equipment_id" type="number" class="form-control"></label></div>
-                <div class="col-md-12"><label>التفاصيل<textarea name="details" class="form-control"></textarea></label></div>
+                <div class="col-md-4"><label>السبب الجذري<input name="root_cause" class="form-control" aria-label="السبب الجذري"></label></div>
+                <div class="col-md-4"><label>خطر قائم تحقق (id)<input name="realized_risk_id" type="number" class="form-control" aria-label="الخطر القائم الذي تحقق برقمه التسلسلي"></label>
+                    <span class="rsk-hint">الربطُ يُعيد تقييمَ الخطرِ حتمًا</span></div>
+                <div class="col-md-2"><label>إصابات<input name="injury_count" type="number" min="0" value="0" class="form-control" aria-label="عدد الإصابات"></label></div>
+                <div class="col-md-2"><label>توقف (ساعة)<input name="downtime_hours" type="number" step="0.25" min="0" value="0" class="form-control" aria-label="ساعات التوقف"></label></div>
+                <div class="col-md-3"><label>تعرض مقدَّر<input name="loss_estimate" type="number" step="0.01" class="form-control" aria-label="التعرض المالي المقدَّر"></label></div>
+                <div class="col-md-2"><label>العملة<input name="currency" class="form-control" maxlength="8" aria-label="عملة التعرض المقدَّر"></label></div>
+                <div class="col-md-3"><label>المعدة (id)<input name="equipment_id" type="number" class="form-control" aria-label="المعدة برقمها التسلسلي"></label></div>
+                <div class="col-md-12"><label>التفاصيل<textarea name="details" class="form-control" aria-label="تفاصيل الواقعة"></textarea></label></div>
             </div>
             <button type="submit" class="ems-btn-primary">تسجيل الواقعة (RSK-INCIDENT-LOG)</button>
-            <span id="incNewMsg" style="margin-inline-start:10px"></span>
+            <span id="incNewMsg" class="rsk-ms10"></span>
         </form>
     </div></div>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         var btn = document.getElementById('incNewBtn');
         if (btn) { btn.addEventListener('click', function () {
-            var c = document.getElementById('incNewCard');
-            c.style.display = c.style.display === 'none' ? '' : 'none';
+            document.getElementById('incNewCard').classList.toggle('is-hidden');
         }); }
         document.getElementById('incNewForm').addEventListener('submit', function (ev) {
             ev.preventDefault();

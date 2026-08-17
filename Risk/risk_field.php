@@ -86,46 +86,62 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         array('الإشارةُ تُحفظ في جهازك فورًا ثم تُزامن — والإعادةُ ترجع مرجعَ الأولى ولا تُنشئ ثانية',
               'فعاليةُ الضابطِ يحكمها متحقِّقٌ مستقلٌّ لا أنت — ودليلُك شاهدٌ لا حكم',
               'إغلاقُ الإجراءِ بقبولِ المتحقِّقِ لا بتنفيذك'));
+    echo ems_states_bundle('لا مهامَّ ميدانيةً في عهدتك بعد', 'الميدانيُّ يرفع إشارةً ويسجّل دليلَ ضابطِه ودليلَ إنجازِ إجرائِه — لا أكثر');
     ?>
+    <style>
+        .rsk-syncbar { padding: 10px; margin: 8px 0; }
+        .rsk-syncbar.is-hidden { display: none; }
+        .rsk-ms10 { margin-inline-start: 10px; }
+        .rsk-msg { margin-inline-start: 10px; font-size: .82rem; }
+        .rsk-note-sm { font-size: .8rem; opacity: .8; }
+        .rsk-empty-note { font-size: .85rem; opacity: .75; }
+        .rsk-mt12 { margin-top: 12px; }
+        .rsk-w100 { width: 100%; }
+        .rsk-fs76 { font-size: .76rem; }
+        .rsk-late-row { background: var(--warning-100); }
+        .rsk-plan-cell { font-size: .8rem; max-width: 280px; }
+        .rsk-mono-sm { font-family: monospace; font-size: .7rem; }
+        .rsk-ev-card.is-hidden { display: none; }
+    </style>
 
-    <div id="fieldSyncBar" class="ems-card" style="padding:10px;margin:8px 0;display:none">
+    <div id="fieldSyncBar" class="ems-card rsk-syncbar is-hidden">
         <span id="fieldPendCount"></span>
-        <button class="ems-btn-primary" id="fieldSyncBtn" style="margin-inline-start:10px">
+        <button class="ems-btn-primary rsk-ms10" id="fieldSyncBtn">
             <i class="fa fa-rotate"></i> مزامنة المعلَّق (RSK-FIELD-SYNC)</button>
-        <span id="fieldSyncMsg" style="margin-inline-start:10px;font-size:.82rem"></span>
+        <span id="fieldSyncMsg" class="rsk-msg"></span>
     </div>
 
     <div class="card"><div class="card-body">
         <h6>رفع إشارة خطر من الميدان</h6>
-        <p style="font-size:.8rem;opacity:.8">تُحفظ في جهازك أولًا — فلا تُفقد بانقطاعِ الشبكة.</p>
+        <p class="rsk-note-sm">تُحفظ في جهازك أولًا — فلا تُفقد بانقطاعِ الشبكة.</p>
         <form id="fieldSigForm" class="allforms">
             <div class="row">
-                <div class="col-md-6"><label>العنوان *<input name="title" class="form-control" required></label></div>
-                <div class="col-md-3"><label>الوحدة المرشَّحة<select name="ru_hint_id" class="form-control">
+                <div class="col-md-6"><label>العنوان *<input name="title" class="form-control" aria-label="عنوان الإشارة الميدانية" required></label></div>
+                <div class="col-md-3"><label>الوحدة المرشَّحة<select name="ru_hint_id" class="form-control" aria-label="وحدة المخاطر المرشَّحة">
                     <option value="">—</option>
                     <?php foreach ($units as $u): ?>
                     <option value="<?php echo (int) $u['id']; ?>"><?php echo htmlspecialchars($u['ru_code'] . ' · ' . $u['name_ar']); ?></option>
                     <?php endforeach; ?>
                 </select></label></div>
-                <div class="col-md-3"><label>الوردية<select name="shift_ar" class="form-control">
+                <div class="col-md-3"><label>الوردية<select name="shift_ar" class="form-control" aria-label="الوردية">
                     <option value="">—</option><option>صباحية</option><option>مسائية</option><option>ليلية</option>
                 </select></label></div>
-                <div class="col-md-4"><label>السبب الجذري<input name="root_cause" class="form-control"></label></div>
-                <div class="col-md-4"><label>المعدة (id)<input name="equipment_id" type="number" class="form-control"></label></div>
-                <div class="col-md-4"><label>الموقع (id)<input name="site_id" type="number" class="form-control"></label></div>
-                <div class="col-md-12"><label>التفاصيل<textarea name="details" class="form-control" rows="2"></textarea></label></div>
+                <div class="col-md-4"><label>السبب الجذري<input name="root_cause" class="form-control" aria-label="السبب الجذري"></label></div>
+                <div class="col-md-4"><label>المعدة (id)<input name="equipment_id" type="number" class="form-control" aria-label="المعدة برقمها التسلسلي"></label></div>
+                <div class="col-md-4"><label>الموقع (id)<input name="site_id" type="number" class="form-control" aria-label="الموقع برقمه التسلسلي"></label></div>
+                <div class="col-md-12"><label>التفاصيل<textarea name="details" class="form-control" rows="2" aria-label="تفاصيل الإشارة"></textarea></label></div>
             </div>
             <button type="submit" class="ems-btn-primary">حفظ ورفع الإشارة</button>
-            <span id="fieldSigMsg" style="margin-inline-start:10px;font-size:.82rem"></span>
+            <span id="fieldSigMsg" class="rsk-msg"></span>
         </form>
     </div></div>
 
-    <div class="card" style="margin-top:12px"><div class="card-body table-responsive">
+    <div class="card rsk-mt12"><div class="card-body table-responsive">
         <h6>ضوابطي — تسجيل دليل التنفيذ</h6>
         <?php if (empty($myControls)): ?>
-        <p style="font-size:.85rem;opacity:.75">لا ضوابط مسنَدة إليك — والدليلُ يسجّله مالكُ الضابطِ وحدَه.</p>
+        <p class="rsk-empty-note">لا ضوابط مسنَدة إليك — والدليلُ يسجّله مالكُ الضابطِ وحدَه.</p>
         <?php else: ?>
-        <table class="table table-sm table-striped" style="width:100%">
+        <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>الرمز</th><th>الضابط</th><th>التكرار</th><th>الدليل المطلوب</th>
                 <th>حرج</th><th>الفعالية</th><th>آخر تحقق</th><th>الفعل</th></tr></thead>
             <tbody>
@@ -134,7 +150,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php echo htmlspecialchars($c['control_code']); ?></td>
                     <td><?php echo htmlspecialchars($c['name_ar']); ?></td>
                     <td><?php echo htmlspecialchars((string) $c['frequency']); ?></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars((string) $c['evidence_spec'] ?: '—'); ?></td>
+                    <td class="rsk-fs76"><?php echo htmlspecialchars((string) $c['evidence_spec'] ?: '—'); ?></td>
                     <td><?php echo (int) $c['is_critical'] === 1 ? '<span class="badge badge-danger">حرج</span>' : '—'; ?></td>
                     <td><?php echo htmlspecialchars((string) $c['effectiveness']); ?></td>
                     <td><?php echo htmlspecialchars((string) $c['last_verified_at'] ?: '—'); ?></td>
@@ -148,20 +164,20 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         <?php endif; ?>
     </div></div>
 
-    <div class="card" style="margin-top:12px"><div class="card-body table-responsive">
+    <div class="card rsk-mt12"><div class="card-body table-responsive">
         <h6>إجراءاتي المسنَدة — تقديم دليل الإنجاز</h6>
         <?php if (empty($myTreatments)): ?>
-        <p style="font-size:.85rem;opacity:.75">لا إجراءات مسنَدة إليك.</p>
+        <p class="rsk-empty-note">لا إجراءات مسنَدة إليك.</p>
         <?php else: ?>
-        <table class="table table-sm table-striped" style="width:100%">
+        <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>الخطر</th><th>النوع</th><th>الخطة</th><th>المهلة</th><th>الحالة</th><th>الفعل</th></tr></thead>
             <tbody>
             <?php foreach ($myTreatments as $t):
                 $late = $t['due_date'] < date('Y-m-d'); ?>
-                <tr <?php echo $late ? 'style="background:rgba(255,193,7,.1)"' : ''; ?>>
+                <tr <?php echo $late ? 'class="rsk-late-row"' : ''; ?>>
                     <td><?php echo htmlspecialchars($t['risk_code']); ?></td>
                     <td><?php echo htmlspecialchars((string) $t['ttype']); ?></td>
-                    <td style="font-size:.8rem;max-width:280px"><?php echo htmlspecialchars(mb_substr((string) $t['plan_ar'], 0, 110)); ?></td>
+                    <td class="rsk-plan-cell"><?php echo htmlspecialchars(mb_substr((string) $t['plan_ar'], 0, 110)); ?></td>
                     <td><?php echo htmlspecialchars((string) $t['due_date']); ?>
                         <?php echo $late ? ' <span class="badge badge-warning">متأخر</span>' : ''; ?></td>
                     <td><?php echo htmlspecialchars((string) $t['state']); ?></td>
@@ -175,12 +191,12 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         <?php endif; ?>
     </div></div>
 
-    <div class="card" style="margin-top:12px"><div class="card-body table-responsive">
+    <div class="card rsk-mt12"><div class="card-body table-responsive">
         <h6>إشاراتي وحالة فرزها</h6>
         <?php if (empty($mySignals)): ?>
-        <p style="font-size:.85rem;opacity:.75">لا إشارات ميدانية منك بعد.</p>
+        <p class="rsk-empty-note">لا إشارات ميدانية منك بعد.</p>
         <?php else: ?>
-        <table class="table table-sm table-striped" style="width:100%">
+        <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>#</th><th>القاعدة</th><th>العنوان</th><th>الحالة</th>
                 <th>سبب الفرز</th><th>الخطر</th><th>مفتاح المزامنة</th><th>التاريخ</th></tr></thead>
             <tbody>
@@ -192,10 +208,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php $stt = (string) $s['state'];
                         $cls = $stt === 'pending' ? 'badge-warning' : ($stt === 'dismissed' ? 'badge-secondary' : 'badge-success'); ?>
                         <span class="badge <?php echo $cls; ?>"><?php echo htmlspecialchars($stt); ?></span></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars(mb_substr((string) $s['triage_reason'], 0, 60) ?: '—'); ?></td>
+                    <td class="rsk-fs76"><?php echo htmlspecialchars(mb_substr((string) $s['triage_reason'], 0, 60) ?: '—'); ?></td>
                     <td><?php echo !empty($s['linked_risk_id'])
                             ? '<a href="risk_card.php?id=' . (int) $s['linked_risk_id'] . '">فتح</a>' : '—'; ?></td>
-                    <td style="font-family:monospace;font-size:.7rem"><?php echo htmlspecialchars(mb_substr((string) $s['sync_uuid'], 0, 13)); ?></td>
+                    <td class="rsk-mono-sm"><?php echo htmlspecialchars(mb_substr((string) $s['sync_uuid'], 0, 13)); ?></td>
                     <td><?php echo htmlspecialchars((string) $s['created_at']); ?></td>
                 </tr>
             <?php endforeach; ?>
@@ -204,18 +220,18 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         <?php endif; ?>
     </div></div>
 
-    <div class="card" id="fieldEvCard" style="display:none;margin-top:12px"><div class="card-body">
+    <div class="card rsk-ev-card rsk-mt12 is-hidden" id="fieldEvCard"><div class="card-body">
         <h5><span id="fieldEvTitle"></span></h5>
         <form id="fieldEvForm" class="allforms">
             <input type="hidden" name="target_id" id="fieldEvId">
             <input type="hidden" name="target_kind" id="fieldEvKind">
             <div class="row">
                 <div class="col-md-12"><label>الدليل * (نص مثبت لا ادعاء)
-                    <textarea name="evidence_text" class="form-control" rows="3" required></textarea></label></div>
-                <div class="col-md-6"><label>مرجع الدليل (صورة/مستند)<input name="evidence_ref" class="form-control"></label></div>
+                    <textarea name="evidence_text" class="form-control" rows="3" aria-label="نص الدليل المثبت" required></textarea></label></div>
+                <div class="col-md-6"><label>مرجع الدليل (صورة/مستند)<input name="evidence_ref" class="form-control" aria-label="مرجع الدليل من صورة أو مستند"></label></div>
             </div>
             <button type="submit" class="ems-btn-primary">تسجيل الدليل</button>
-            <span id="fieldEvMsg" style="margin-inline-start:10px;font-size:.82rem"></span>
+            <span id="fieldEvMsg" class="rsk-msg"></span>
         </form>
     </div></div>
 
@@ -235,8 +251,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     function savePending(list) { localStorage.setItem(LS_KEY, JSON.stringify(list)); }
     function refreshBar() {
         var p = pending(), bar = document.getElementById('fieldSyncBar');
-        if (!p.length) { bar.style.display = 'none'; return; }
-        bar.style.display = '';
+        if (!p.length) { bar.classList.add('is-hidden'); return; }
+        bar.classList.remove('is-hidden');
         document.getElementById('fieldPendCount').textContent =
             '⏳ معلَّق في جهازك: ' + p.length + ' إشارة — تُرفع بمفاتيحها ولا تتكرر';
     }
@@ -294,7 +310,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         document.getElementById('fieldEvMsg').textContent = kind === 'control'
             ? 'الفعاليةُ يحكمها متحقِّقٌ مستقلٌّ — ودليلُك شاهدٌ لا حكم'
             : 'الإغلاقُ بقبولِ المتحقِّقِ لا بتنفيذك';
-        evCard.style.display = '';
+        evCard.classList.remove('is-hidden');
         evCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     document.querySelectorAll('.fieldEv').forEach(function (b) {

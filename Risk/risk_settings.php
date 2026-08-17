@@ -95,11 +95,24 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         . 'وتقنياتُ التقييمِ وقواعدُ الإشاراتِ ونوافذُ منعِ التكرار.',
         array('كلُّ رقمٍ هنا يُقرأ من مصدرِه الحيِّ — فلا يُكتب حكمٌ مرتين فيختلفا',
               'تعديلُ التصنيفِ ونوافذِه من شاشةِ وحداتِ المخاطر — والتعديلُ بترحيلٍ لا بحذف'));
+    echo ems_states_bundle('لا إعداداتِ تصنيفٍ مبذورةً لهذا الكيان', 'الإطارُ الحاكمُ يُقرأ من مصادرِه الحيةِ — والبذرةُ المرجعيةُ شرطُ التشغيل');
     ?>
+    <style>
+        .rsk-w100 { width: 100%; }
+        .rsk-mt12 { margin-top: 12px; }
+        .rsk-forbidden-row { background: var(--danger-100); }
+        .rsk-list { font-size: .84rem; margin: 0; padding-inline-start: 20px; }
+        .rsk-danger-text { color: var(--c-b02a37, #b02a37); }
+        .rsk-mono74 { font-size: .74rem; font-family: monospace; }
+        .rsk-mono76 { font-family: monospace; font-size: .76rem; }
+        .rsk-fs82 { font-size: .82rem; }
+        .rsk-empty-note { font-size: .85rem; opacity: .75; }
+        .rsk-footnote { font-size: .78rem; opacity: .75; margin-top: 6px; }
+    </style>
 
     <div class="card"><div class="card-body table-responsive">
         <h6>مصفوفة الاعتماد والتصعيد (§14-2) — تُقرأ من ثابت RiskService</h6>
-        <table class="table table-sm table-striped" style="width:100%">
+        <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>الدرجة</th><th>من يقبل</th><th>دورية المراجعة</th><th>التصعيد</th></tr></thead>
             <tbody>
             <?php foreach (RiskService::AUTHORITY_MATRIX as $lv => $auth): ?>
@@ -110,7 +123,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><?php echo htmlspecialchars($ESC_AR[$lv] ?? '—'); ?></td>
                 </tr>
             <?php endforeach; ?>
-                <tr style="background:rgba(220,53,69,.07)">
+                <tr class="rsk-forbidden-row">
                     <td><strong>محظور</strong></td>
                     <td><strong>لا يُقبل بحال</strong> — غائبٌ من المصفوفة عمدًا (RK-04)</td>
                     <td>—</td>
@@ -120,19 +133,19 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         </table>
     </div></div>
 
-    <div class="row" style="margin-top:12px">
+    <div class="row rsk-mt12">
         <div class="col-md-6"><div class="card"><div class="card-body">
             <h6>أبعاد الأثر الثمانية (§12-2) — لا تُدمج في رقم واحد</h6>
-            <ol style="font-size:.84rem;margin:0;padding-inline-start:20px">
+            <ol class="rsk-list">
                 <?php foreach ($RISK_IMPACT_DIMS as $k => $v): ?>
                 <li><?php echo htmlspecialchars($v); ?>
-                    <?php if ($k === 'safety'): ?><span style="color:#b02a37">— لا يُقايَض بالمال</span><?php endif; ?></li>
+                    <?php if ($k === 'safety'): ?><span class="rsk-danger-text">— لا يُقايَض بالمال</span><?php endif; ?></li>
                 <?php endforeach; ?>
             </ol>
         </div></div></div>
         <div class="col-md-6"><div class="card"><div class="card-body">
             <h6>عناصر القياس السبعة (§12-3)</h6>
-            <ol style="font-size:.84rem;margin:0;padding-inline-start:20px">
+            <ol class="rsk-list">
                 <li>الخطر المتأصل — قبل أي ضابط</li>
                 <li>فعالية الضوابط — بدليل تحقق لا بادعاء</li>
                 <li>الخطر المتبقي — عليه يُبنى قرار القبول</li>
@@ -144,9 +157,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         </div></div></div>
     </div>
 
-    <div class="card" style="margin-top:12px"><div class="card-body table-responsive">
+    <div class="card rsk-mt12"><div class="card-body table-responsive">
         <h6>قواعد إشارات الخطر الست عشرة (§13-5) — وحالة تنفيذ كل قاعدة</h6>
-        <table class="table table-sm table-striped" style="width:100%">
+        <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>الرمز</th><th>القاعدة</th><th>الوحدة</th><th>المنفِّذ</th><th>الحالة</th></tr></thead>
             <tbody>
             <?php foreach ($SG_RULES as $code => $desc):
@@ -156,9 +169,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 $impl = $periodic ? 'RiskSignalEngine::' . $method : ($instant ? $INSTANT[$code] : '—'); ?>
                 <tr>
                     <td><strong><?php echo $code; ?></strong></td>
-                    <td style="font-size:.82rem"><?php echo htmlspecialchars($desc); ?></td>
+                    <td class="rsk-fs82"><?php echo htmlspecialchars($desc); ?></td>
                     <td><?php echo htmlspecialchars(RiskSignalEngine::RULE_UNIT[$code] ?? '—'); ?></td>
-                    <td style="font-size:.74rem;font-family:monospace"><?php echo htmlspecialchars($impl); ?></td>
+                    <td class="rsk-mono74"><?php echo htmlspecialchars($impl); ?></td>
                     <td><?php if ($periodic || $instant): ?>
                         <span class="badge badge-success">منفَّذة<?php echo $instant && !$periodic ? ' (لحظية)' : ' (دورية)'; ?></span>
                         <?php else: ?><span class="badge badge-secondary">غير منفَّذة</span><?php endif; ?></td>
@@ -168,19 +181,19 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         </table>
     </div></div>
 
-    <div class="card" style="margin-top:12px"><div class="card-body table-responsive">
+    <div class="card rsk-mt12"><div class="card-body table-responsive">
         <h6>المؤشرات الآلية ومفاتيح قراءتها (المرحلة ١٢) — «تُقرأ من النظام آليًّا»</h6>
         <?php if (empty($autoKris)): ?>
-        <p style="font-size:.85rem;opacity:.75">لا مؤشرات آلية — والمرحلةُ الثانيةَ عشرةَ تلزم قراءةً آليةً لا يدوية.</p>
+        <p class="rsk-empty-note">لا مؤشرات آلية — والمرحلةُ الثانيةَ عشرةَ تلزم قراءةً آليةً لا يدوية.</p>
         <?php else: ?>
-        <table class="table table-sm table-striped" style="width:100%">
+        <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>المؤشر</th><th>مفتاح القارئ</th><th>الاتجاه</th>
                 <th>حد الإنذار</th><th>الحد الحرج</th><th>القيمة</th><th>الحالة</th><th>آخر قراءة</th></tr></thead>
             <tbody>
             <?php foreach ($autoKris as $x): ?>
                 <tr>
                     <td><?php echo htmlspecialchars($x['name_ar']); ?></td>
-                    <td style="font-family:monospace;font-size:.76rem"><?php echo htmlspecialchars((string) $x['source_key']); ?></td>
+                    <td class="rsk-mono76"><?php echo htmlspecialchars((string) $x['source_key']); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['direction']); ?></td>
                     <td><?php echo $x['warn_num'] === null ? '—' : (float) $x['warn_num']; ?></td>
                     <td><?php echo $x['critical_num'] === null ? '—' : (float) $x['critical_num']; ?></td>
@@ -193,14 +206,14 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <?php endforeach; ?>
             </tbody>
         </table>
-        <p style="font-size:.78rem;opacity:.75;margin-top:6px">
+        <p class="rsk-footnote">
             القراءةُ من نبضةِ <code>tools/m16_risk_cron.php</code> — والمؤشرُ اليدويُّ يُعلَن يدويًّا ولا يُدَّعى آليًّا.</p>
         <?php endif; ?>
     </div></div>
 
-    <div class="card" style="margin-top:12px"><div class="card-body table-responsive">
+    <div class="card rsk-mt12"><div class="card-body table-responsive">
         <h6>نوافذ منع التكرار بالوحدة (ورقة 32) — «الإدارة العارضة لا تدخل المفتاح»</h6>
-        <table class="table table-sm table-striped" style="width:100%">
+        <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>الوحدة</th><th>الاسم</th><th>النافذة</th><th>الحالة</th></tr></thead>
             <tbody>
             <?php foreach ($units as $x): ?>
@@ -213,7 +226,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <?php endforeach; ?>
             </tbody>
         </table>
-        <p style="font-size:.78rem;opacity:.75;margin-top:6px">
+        <p class="rsk-footnote">
             المفتاح: وحدة + كيان + سبب جذري + نطاق — داخل نافذة الوحدة.
             <a href="risk_units.php">تعديل النوافذ</a></p>
     </div></div>

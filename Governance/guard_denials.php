@@ -13,6 +13,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 require_once __DIR__ . '/../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/screen_contract.php';
+require_once __DIR__ . '/../includes/ux_components.php'; // UXW-01: حالات الشاشة الموحدة
 
 $current_role   = strval($_SESSION['user']['role'] ?? '');
 $is_super_admin = ($current_role === '-1');
@@ -66,6 +67,25 @@ include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ شاشةِ سجلِّ الرفض — من الرموزِ حصرًا (بوابتا ١ و٢) */
+.dnr-repeat-card { padding: 12px; margin: 10px 0; border-inline-start: 4px solid var(--warning-600); }
+.dnr-repeat-title { color: var(--c-b45309); }
+.dnr-repeat-list { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.dnr-fs-8 { font-size: .8rem; }
+.dnr-fs-76 { font-size: .76rem; }
+.dnr-fs-74 { font-size: .74rem; }
+.dnr-fs-72 { font-size: .72rem; }
+.dnr-mono { font-family: monospace; }
+.dnr-muted { opacity: .7; }
+.dnr-table-full { width: 100%; }
+.dnr-card-gap { margin-top: 12px; }
+.dnr-field { font-size: .8rem; display: block; margin-top: 8px; }
+.dnr-actions { display: flex; gap: 8px; margin-top: 12px; }
+.dnr-modal { position: fixed; inset: 0; background: var(--c-rgba000045); z-index: 1200; display: flex; align-items: center; justify-content: center; }
+.dnr-modal.is-hidden { display: none; }
+.dnr-modal-card { max-width: 520px; width: 94%; margin: auto; margin-top: 8vh; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'المحاولات الممنوعة';
@@ -85,14 +105,15 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         . 'أو خطأُ تصنيفِ حمايةٍ أو محاولةُ تجاوزٍ أو عابرٌ — وما يحتاج أثرًا يفتح مرجعَه.',
         array('المنعُ المتكرر على الحارس نفسِه إنذارٌ: راجع تصنيفَ الحماية قبل اتهام المحاوِل',
               'المراجعةُ واحدةٌ للمحاولة وتكرارُها يرجع الأولى — والسجلُّ لا يُحذف'));
+    echo ems_states_bundle('لا محاولاتٍ ممنوعةً في سجلِّ الرفض', 'الحرّاسُ لم يرفضوا محاولةً في نطاقِ شركتِك بعد');
     ?>
 
     <?php if ($repeats): ?>
-    <div class="ems-card" style="padding:12px;margin:10px 0;border-inline-start:4px solid #fd7e14">
-        <strong style="color:#b45309">منعٌ متكرر (3+) — يكشف حاجةً أو خطأً أو تجاوزًا</strong>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:6px">
+    <div class="ems-card dnr-repeat-card">
+        <strong class="dnr-repeat-title">منعٌ متكرر (3+) — يكشف حاجةً أو خطأً أو تجاوزًا</strong>
+        <div class="dnr-repeat-list">
             <?php foreach ($repeats as $x): ?>
-            <span class="badge badge-warning" style="font-size:.8rem">
+            <span class="badge badge-warning dnr-fs-8">
                 <?php echo htmlspecialchars($x['guard_code']); ?>: <?php echo (int) $x['c']; ?></span>
             <?php endforeach; ?>
         </div>
@@ -102,10 +123,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="card"><div class="card-body table-responsive">
         <h6>سجلُّ المحاولات (<?php echo count($denials); ?>)</h6>
         <?php if (!$denials): ?>
-            <?php if (function_exists('ems_state_empty')) { ems_state_empty('لا محاولاتٍ ممنوعةً مرصودة — الحرّاسُ هادئون ✨'); } else { echo '<p style="opacity:.7">لا محاولات.</p>'; } ?>
+            <?php if (function_exists('ems_state_empty')) { ems_state_empty('لا محاولاتٍ ممنوعةً مرصودة — الحرّاسُ هادئون ✨'); } else { echo '<p class="dnr-muted">لا محاولات.</p>'; } ?>
         <?php else: ?>
         <div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap dnr-table-full">
             <thead><tr>
                 <th>#</th><th>رمز الحارس</th><th>المحاوِل</th><th>المرجع المحاوَل</th>
                 <th>رمز السبب</th><th>الوقت</th>
@@ -121,15 +142,15 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <?php foreach ($denials as $d): ?>
                 <tr>
                     <td><?php echo (int) $d['deny_id']; ?></td>
-                    <td style="font-family:monospace;font-size:.76rem"><?php echo htmlspecialchars($d['guard_code']); ?></td>
+                    <td class="dnr-mono dnr-fs-76"><?php echo htmlspecialchars($d['guard_code']); ?></td>
                     <td><?php echo htmlspecialchars((string) ($d['person_name'] ?: ('#' . $d['person_id']))); ?></td>
-                    <td style="font-family:monospace;font-size:.72rem"><?php echo htmlspecialchars((string) $d['attempted_ref']); ?></td>
+                    <td class="dnr-mono dnr-fs-72"><?php echo htmlspecialchars((string) $d['attempted_ref']); ?></td>
                     <td><span class="badge badge-danger"><?php echo htmlspecialchars((string) $d['reason_code']); ?></span></td>
                     <td><small><?php echo htmlspecialchars((string) $d['at']); ?></small></td>
-                    <td style="font-family:monospace"><?php echo htmlspecialchars((string) ($d['review_code'] ?: '—')); ?></td>
+                    <td class="dnr-mono"><?php echo htmlspecialchars((string) ($d['review_code'] ?: '—')); ?></td>
                     <td><?php echo $d['classification'] !== null
                         ? '<span class="badge badge-info">' . htmlspecialchars($d['classification']) . '</span>' : '—'; ?></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars((string) ($d['decision_note'] ?: '—')); ?></td>
+                    <td class="dnr-fs-76"><?php echo htmlspecialchars((string) ($d['decision_note'] ?: '—')); ?></td>
                     <td><small><?php echo htmlspecialchars((string) ($d['review_at'] ?: '—')); ?></small></td>
                     <td><?php echo empty($d['review_code'])
                         ? '<span class="badge badge-warning">تنتظر المراجعة</span>'
@@ -148,48 +169,48 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         <?php endif; ?>
     </div></div>
 
-    <div class="card" style="margin-top:12px"><div class="card-body table-responsive">
+    <div class="card dnr-card-gap"><div class="card-body table-responsive">
         <h6>رفضُ الحارس المركزي (action_execution_log · denied) — <?php echo count($centralDenied); ?></h6>
-        <table class="table table-sm table-striped" style="width:100%" data-no-dt="1">
+        <table class="table table-sm table-striped dnr-table-full" data-no-dt="1">
             <thead><tr><th>الفعل</th><th>المحاوِل</th><th>الموضوع</th><th>رمز المنع</th><th>الوقت</th></tr></thead>
             <tbody>
             <?php foreach (array_slice($centralDenied, 0, 50) as $x): ?>
                 <tr>
-                    <td style="font-family:monospace;font-size:.74rem"><?php echo htmlspecialchars($x['action_code']); ?></td>
+                    <td class="dnr-mono dnr-fs-74"><?php echo htmlspecialchars($x['action_code']); ?></td>
                     <td><?php echo htmlspecialchars((string) ($x['person_name'] ?: ('#' . $x['person_id']))); ?></td>
-                    <td style="font-size:.74rem"><?php echo htmlspecialchars((string) $x['subject_ref']); ?></td>
+                    <td class="dnr-fs-74"><?php echo htmlspecialchars((string) $x['subject_ref']); ?></td>
                     <td><span class="badge badge-secondary"><?php echo htmlspecialchars((string) $x['denied_by_guard']); ?></span></td>
                     <td><small><?php echo htmlspecialchars((string) $x['at']); ?></small></td>
                 </tr>
             <?php endforeach; ?>
-            <?php if (!$centralDenied): ?><tr><td colspan="5" style="opacity:.7">لا رفضَ مركزيًّا مسجَّلًا.</td></tr><?php endif; ?>
+            <?php if (!$centralDenied): ?><tr><td colspan="5" class="dnr-muted">لا رفضَ مركزيًّا مسجَّلًا.</td></tr><?php endif; ?>
             </tbody>
         </table>
     </div></div>
 </div>
 
-<div id="dnrModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1200;align-items:center;justify-content:center">
-    <div class="card" style="max-width:520px;width:94%;margin:auto;margin-top:8vh">
+<div id="dnrModal" class="dnr-modal is-hidden">
+    <div class="card dnr-modal-card">
         <div class="card-body">
-            <h6>مراجعة محاولة ممنوعة <span id="dnrIdLbl" style="font-family:monospace"></span></h6>
+            <h6>مراجعة محاولة ممنوعة <span id="dnrIdLbl" class="dnr-mono"></span></h6>
             <input type="hidden" id="dnrDenialId">
-            <label style="font-size:.8rem;display:block;margin-top:8px">التصنيف
-                <select id="dnrClass" class="form-control form-control-sm">
+            <label class="dnr-field">التصنيف
+                <select id="dnrClass" class="form-control form-control-sm" aria-label="التصنيف">
                     <option>يحتاج استثناءً</option>
                     <option>خطأ تصنيف حماية</option>
                     <option>محاولة تجاوز</option>
                     <option>عابر — لا إجراء</option>
                 </select>
             </label>
-            <label style="font-size:.8rem;display:block;margin-top:8px">قرار المراجعة وتسبيبه
+            <label class="dnr-field">قرار المراجعة وتسبيبه
                 <input type="text" id="dnrNote" class="form-control form-control-sm" placeholder="ما وُجد وما تقرر" aria-label="ما وُجد وما تقرر">
             </label>
-            <label style="font-size:.8rem;display:block;margin-top:8px">المرجع التالي (طلب استثناء · تصحيح تصنيف · بلاغ)
+            <label class="dnr-field">المرجع التالي (طلب استثناء · تصحيح تصنيف · بلاغ)
                 <input type="text" id="dnrFollow" class="form-control form-control-sm" placeholder="اختياري — EXC-000123" aria-label="اختياري — EXC-000123">
             </label>
-            <div style="display:flex;gap:8px;margin-top:12px">
+            <div class="dnr-actions">
                 <button class="ems-btn-primary" onclick="dnrSubmit()">تسجيل المراجعة</button>
-                <button class="ems-btn-secondary" onclick="document.getElementById('dnrModal').style.display='none'">إلغاء</button>
+                <button class="ems-btn-secondary" onclick="document.getElementById('dnrModal').classList.add('is-hidden')">إلغاء</button>
             </div>
         </div>
     </div>
@@ -200,7 +221,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 function dnrReview(id) {
     document.getElementById('dnrDenialId').value = id;
     document.getElementById('dnrIdLbl').textContent = '#' + id;
-    document.getElementById('dnrModal').style.display = 'flex';
+    document.getElementById('dnrModal').classList.remove('is-hidden');
 }
 function dnrSubmit() {
     var fd = new FormData();

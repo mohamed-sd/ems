@@ -8,6 +8,8 @@ Maintenance/	صيانة
 Suppliers/	مصعب
 Risk/	مخاطر
 Audit/	مراجع
+Risk/risk_dept_sal.php	مبيعات
+Risk/risk_dept_sup.php	مصعب
 Tickets/	بلاغات
 Workforce/	مدير القوى
 Financing/	تمويل

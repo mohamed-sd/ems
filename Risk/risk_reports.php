@@ -79,15 +79,32 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         . 'كلُّ ملفٍّ يخرج يسجّل تسعةَ بنودٍ في سجلِّ التصدير (§9-4).',
         array('الحقولُ الحساسةُ محجوبةٌ من الخادمِ لغيرِ المخوَّلِ — والمستبعَدُ يُعلَن في السجل',
               'المقامُ معلَنٌ في كلِّ رقمٍ — ولا رقمَ بلا مقامٍ يُفسِّره'));
+    echo ems_states_bundle('لا حصيلةَ مخاطرَ في نطاقك بعد', 'الحصيلةُ تُبنى من السجلِّ المفتوحِ غيرِ المدموجِ — وتتّسع باتساعِ نطاقِك');
     ?>
+    <style>
+        .rsk-stat-row { margin-bottom: 12px; }
+        .rsk-stat-card { padding: 10px; text-align: center; }
+        .rsk-stat-num { font-size: 1.5rem; font-weight: 700; }
+        .rsk-stat-label { font-size: .78rem; opacity: .8; }
+        .rsk-mt12 { margin-top: 12px; }
+        .rsk-mt8 { margin-top: 8px; }
+        .rsk-w100 { width: 100%; }
+        .rsk-maxw520 { max-width: 520px; }
+        .rsk-empty-note { font-size: .85rem; opacity: .75; }
+        .rsk-msg { margin-inline-start: 10px; font-size: .82rem; }
+        .rsk-fs76 { font-size: .76rem; }
+        .rsk-fs72 { font-size: .72rem; }
+        .rsk-cell-w220 { font-size: .72rem; max-width: 220px; }
+        .rsk-blocked-cell { font-size: .72rem; color: var(--c-b02a37, #b02a37); }
+    </style>
 
-    <div class="row" style="margin-bottom:12px">
+    <div class="row rsk-stat-row">
         <?php foreach (array('محظور' => 'badge-danger', 'حرج' => 'badge-danger', 'مرتفع' => 'badge-warning',
                              'متوسط' => 'badge-secondary', 'منخفض' => 'badge-secondary', 'لم يقيَّم' => 'badge-light') as $lv => $cls):
             $n = $byLevel[$lv] ?? 0; if ($n === 0 && $lv === 'محظور') { continue; } ?>
-        <div class="col-md-2"><div class="ems-card" style="padding:10px;text-align:center">
-            <div style="font-size:1.5rem;font-weight:700"><?php echo $n; ?></div>
-            <div style="font-size:.78rem;opacity:.8"><?php echo $lv; ?></div>
+        <div class="col-md-2"><div class="ems-card rsk-stat-card">
+            <div class="rsk-stat-num"><?php echo $n; ?></div>
+            <div class="rsk-stat-label"><?php echo $lv; ?></div>
         </div></div>
         <?php endforeach; ?>
     </div>
@@ -95,9 +112,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <div class="card"><div class="card-body table-responsive">
         <h6>الحصيلة بوحدة المخاطر</h6>
         <?php if (empty($byUnit)): ?>
-        <p style="font-size:.85rem;opacity:.75">لا مخاطر في نطاقك — لا حصيلةَ تُعرض.</p>
+        <p class="rsk-empty-note">لا مخاطر في نطاقك — لا حصيلةَ تُعرض.</p>
         <?php else: ?>
-        <table class="table table-sm table-striped" style="width:100%">
+        <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>الوحدة</th><th>الاسم</th><th>الإجمالي</th><th>مفتوح</th>
                 <th>حرج/محظور</th><th>فوق الشهية</th><th>مراجعة متأخرة</th></tr></thead>
             <tbody>
@@ -117,40 +134,40 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         <?php endif; ?>
     </div></div>
 
-    <div class="card" style="margin-top:12px"><div class="card-body">
+    <div class="card rsk-mt12"><div class="card-body">
         <h6>فعالية الضوابط — «لا يُحتسب إلا بإثبات فعاليته» (RK-07)</h6>
-        <table class="table table-sm" style="max-width:520px">
+        <table class="table table-sm rsk-maxw520">
             <tbody>
             <?php foreach (array('فعال', 'فعال جزئيا', 'غير فعال', 'غير مثبت') as $ef): ?>
                 <tr><td><?php echo $ef; ?></td><td><strong><?php echo $ctlEff[$ef] ?? 0; ?></strong></td></tr>
             <?php endforeach; ?>
             </tbody>
         </table>
-        <form id="expForm" style="margin-top:8px">
+        <form id="expForm" class="rsk-mt8">
             <button type="submit" class="ems-btn-primary">
                 <i class="fa fa-file-export"></i> تصدير الحصيلة (RSK-REPORT-EXPORT)</button>
-            <span id="expMsg" style="margin-inline-start:10px;font-size:.82rem"></span>
+            <span id="expMsg" class="rsk-msg"></span>
         </form>
     </div></div>
 
-    <div class="card" style="margin-top:12px"><div class="card-body table-responsive">
+    <div class="card rsk-mt12"><div class="card-body table-responsive">
         <h6>سجل التصدير — تسعة بنود لكل ملف يخرج (§9-4)</h6>
         <?php if (empty($exports)): ?>
-        <p style="font-size:.85rem;opacity:.75">لا تصدير بعد — والسجلُّ يُكتب بأولِ تصدير.</p>
+        <p class="rsk-empty-note">لا تصدير بعد — والسجلُّ يُكتب بأولِ تصدير.</p>
         <?php else: ?>
-        <table class="table table-sm table-striped" style="width:100%">
+        <table class="table table-sm table-striped rsk-w100">
             <thead><tr><th>المصدِّر</th><th>بصفته</th><th>الشاشة</th><th>المنظر</th>
                 <th>الأعمدة</th><th>الفلاتر</th><th>المستبعَد بالصلاحية</th><th>الصفوف</th><th>الوقت</th></tr></thead>
             <tbody>
             <?php foreach ($exports as $x): ?>
                 <tr>
                     <td><?php echo htmlspecialchars((string) $x['exporter'] ?: '—'); ?></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars((string) $x['actor_capacity']); ?></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars((string) $x['screen_code']); ?></td>
+                    <td class="rsk-fs76"><?php echo htmlspecialchars((string) $x['actor_capacity']); ?></td>
+                    <td class="rsk-fs76"><?php echo htmlspecialchars((string) $x['screen_code']); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['view_key']); ?></td>
-                    <td style="font-size:.72rem;max-width:220px"><?php echo htmlspecialchars(mb_substr((string) $x['columns_text'], 0, 90)); ?></td>
-                    <td style="font-size:.72rem"><?php echo htmlspecialchars(mb_substr((string) $x['filters_text'], 0, 60) ?: '—'); ?></td>
-                    <td style="font-size:.72rem;color:#b02a37"><?php echo htmlspecialchars((string) $x['blocked_text'] ?: 'لا شيء'); ?></td>
+                    <td class="rsk-cell-w220"><?php echo htmlspecialchars(mb_substr((string) $x['columns_text'], 0, 90)); ?></td>
+                    <td class="rsk-fs72"><?php echo htmlspecialchars(mb_substr((string) $x['filters_text'], 0, 60) ?: '—'); ?></td>
+                    <td class="rsk-blocked-cell"><?php echo htmlspecialchars((string) $x['blocked_text'] ?: 'لا شيء'); ?></td>
                     <td><?php echo (int) $x['row_count']; ?></td>
                     <td><?php echo htmlspecialchars((string) $x['exported_at']); ?></td>
                 </tr>

@@ -161,9 +161,12 @@ foreach ($SCOPE as $rel) {
     /* ⑨ حالاتُ الشاشة — فراغٌ وخطأٌ وتحميلٌ حدًّا أدنى: الوسمُ الحرفيُّ أو نداءُ
        المكوّنِ المركزيِّ ems_state/ems_states_bundle (includes/ux_components.php) */
     /* شاشاتُ عُدَّةِ u13 تكتسب الحزمةَ من العُدَّةِ نفسِها وقتَ التصيير (سطر 305+) —
-       فلا تُطالَب بكتلةٍ ملفّيةٍ تمحوها إعادةُ التوليد */
+       فلا تُطالَب بكتلةٍ ملفّيةٍ تمحوها إعادةُ التوليد.
+       وكذلك شاشاتُ ENG-01: غلافُها eng01_screen_view.php يُخرِج الحزمةَ بذاتِه
+       بعدَ inheader/insidebar فتستوفيها الثماني دفعةً واحدة */
     $hasBundle = (bool) preg_match('/ems_states_bundle\s*\(/u', $src)
-              || (bool) preg_match('/(require|include)(_once)?\s*[( ].*u13_screen_kit\.php/u', $src);
+              || (bool) preg_match('/(require|include)(_once)?\s*[( ].*u13_screen_kit\.php/u', $src)
+              || (bool) preg_match('/(require|include)(_once)?\s*[( ].*eng01_screen_view\.php/u', $src);
     foreach (array('empty' => 'فراغ', 'error' => 'خطأ', 'loading' => 'تحميل') as $k => $name) {
         if ($hasBundle) break;
         if (!preg_match('/ems[-_]state[-_(\'"]*' . $k . '/u', $src)
