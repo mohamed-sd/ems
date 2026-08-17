@@ -41,7 +41,9 @@ $say('AC-A5', $n === 0, "جلساتٌ مغلقةٌ بلا إخطار: {$n}   [ا
 $n = (int) $one("SELECT COUNT(*) FROM impersonation_sessions i JOIN users t ON t.id=i.target_user
                   WHERE t.role IN (15,20,28,29,30,33)");
 $say('AC-A7', $n === 0, "جلساتٌ على رقابيّين: {$n}   [المتوقَّع 0]");
-$say('AC-A4', true, 'أعمدةُ النسبةِ في دفترِ الأفعالِ — الخطوةُ الرابعةُ لم تُنفَّذ بعدُ [معلَن: لا يُقاس قبلها]');
+$n = (int) $one("SELECT COUNT(*) FROM activity_logs
+                  WHERE impersonation_id IS NOT NULL AND (acted_by IS NULL OR acted_for IS NULL)");
+$say('AC-A4', $n === 0, "أفعالُ نيابةٍ بلا نسبةٍ مزدوجة: {$n}   [المتوقَّع 0 — يفرضه chk_act_attribution والختمُ الآليُّ في audit_trail]");
 $n = (int) $one("SELECT COUNT(*) FROM gov_authority_grants WHERE revoked_at IS NULL
                   AND valid_to IS NOT NULL AND valid_to < NOW()");
 $say('AC-A8', true, "منحٌ منتهيةٌ غيرُ مسحوبة: {$n} — كنسُها مهمةُ authority_expiry_sweep [تُبنى مع التبديل]");

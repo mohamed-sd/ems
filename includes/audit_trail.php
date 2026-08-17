@@ -64,12 +64,24 @@ if (!function_exists('ems_audit_change')) {
             $contract  = isset($ctx['contract_id']) ? intval($ctx['contract_id']) : null;
             if (!empty($ctx['note'])) { $changedNew['_note'] = (string) $ctx['note']; }
 
+            /* A5 — النسبةُ المزدوجةُ في جلسةِ النيابة (GOV-AUTH-01):
+               الفاعلُ الحقيقيُّ ومن نُفِّذ عنه ومرجعُ الجلسة — تُختم آليًّا
+               حين تكون جلسةٌ جارية، ويفرضها chk_act_attribution بنيويًّا. */
+            $actedBy = null; $actedFor = null; $impId = null;
+            if (isset($_SESSION['imp_session']['imp_id'])
+                && strtotime((string) ($_SESSION['imp_session']['valid_to'] ?? '')) >= time()) {
+                $actedBy  = $userId;
+                $actedFor = (int) $_SESSION['imp_session']['target_user'];
+                $impId    = (int) $_SESSION['imp_session']['imp_id'];
+            }
+
             $st = $conn->prepare(
                 "INSERT INTO activity_logs
                     (company_id, contract_id, user_id, role_id, ip_address,
                      screen_name, module_name, action_type, field_name, record_id,
-                     old_value, new_value, http_method, url)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+                     old_value, new_value, http_method, url,
+                     acted_by, acted_for, impersonation_id)
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
             if (!$st) { error_log('[audit-trail] prepare: ' . $conn->error); return false; }
             $ip     = isset($_SERVER['REMOTE_ADDR']) ? (string) $_SERVER['REMOTE_ADDR'] : 'cli';
@@ -79,10 +91,11 @@ if (!function_exists('ems_audit_change')) {
             $method = (PHP_SAPI === 'cli') ? 'CLI' : (isset($_SERVER['REQUEST_METHOD']) ? (string) $_SERVER['REQUEST_METHOD'] : '');
             $url    = isset($_SERVER['REQUEST_URI']) ? mb_substr((string) $_SERVER['REQUEST_URI'], 0, 500) : '';
             $rid    = intval($recordId);
-            $st->bind_param('iiiisssssissss',
+            $st->bind_param('iiiisssssissssiii',
                 $companyId, $contract, $userId, $roleId, $ip,
                 $screen, $module, $action, $fields, $rid,
-                $oldJ, $newJ, $method, $url);
+                $oldJ, $newJ, $method, $url,
+                $actedBy, $actedFor, $impId);
             if (!$st->execute()) {
                 error_log('[audit-trail] insert: ' . $st->error);
                 $st->close();

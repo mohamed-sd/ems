@@ -166,3 +166,21 @@
   border-radius: var(--radius-sm);
   padding: 2px var(--space-2);
 }
+
+/* شريطُ جلسةِ النيابةِ الدائم (GOV-AUTH-01 §6-2) — لا يُخفى عن الفاعلِ نفسِه */
+.ems-imp-strip {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-topbar);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  background: var(--c-brand-navy);
+  color: var(--white);
+  font-size: var(--text-body);
+  border-bottom: 2px solid var(--brand-amber);
+}
+.ems-imp-strip .ems-imp-strip-form { display: inline-flex; margin: 0; }

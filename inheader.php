@@ -134,6 +134,27 @@ if (!empty($GLOBALS['EMS_AX']) && is_array($GLOBALS['EMS_AX'])) {
      يُركَّز عليه — لا يزاحم البصرَ ويحضر للوحةِ المفاتيح. -->
 <a class="ems-skip-link" href="#ems-main-content">تخطّي إلى المحتوى</a>
 <?php
+/* GOV-AUTH-01 §6-2 — شريطُ جلسةِ النيابةِ الدائمُ الظاهر: «تعمل الآن موضعَ
+   فلان — بسببِ كذا — تنتهي في كذا». لا يُخفى عن الفاعلِ نفسِه فينسى أنه
+   فيها — وإنهاؤها بضغطةٍ من الشريط. يُعرض فقط حين تكون جلسةٌ جارية. */
+if (isset($_SESSION['imp_session']['imp_id'])
+    && strtotime((string) ($_SESSION['imp_session']['valid_to'] ?? '')) >= time()) {
+    $__imp = $_SESSION['imp_session'];
+    echo '<div class="ems-imp-strip" dir="rtl" role="status">'
+       . '<span class="ems-imp-strip-text">تعمل الآن موضعَ <b>'
+       . htmlspecialchars((string) $__imp['target_name'], ENT_QUOTES, 'UTF-8')
+       . '</b> — بسببِ: ' . htmlspecialchars((string) $__imp['reason'], ENT_QUOTES, 'UTF-8')
+       . ' — تنتهي في ' . htmlspecialchars((string) $__imp['valid_to'], ENT_QUOTES, 'UTF-8')
+       . '</span>'
+       . '<form method="post" action="' . htmlspecialchars(function_exists('ems_url') ? ems_url('Governance/impersonations.php') : 'Governance/impersonations.php', ENT_QUOTES, 'UTF-8') . '" class="ems-imp-strip-form">'
+       . (function_exists('csrf_field') ? csrf_field() : '')
+       . '<input type="hidden" name="imp_action" value="close">'
+       . '<button type="submit" class="btn btn-sm btn-light">إنهاءُ الجلسة</button>'
+       . '</form>'
+       . '</div>';
+}
+?>
+<?php
 /* UI-DEF-06 → UI-13 (Error State): رسائلُ الحوكمة تُعرض داخل الشاشة لا في
    الرابط — الحارسُ يودعها الجلسةَ (ems_gov_flash_redirect) وهذا الحاملُ
    المركزيُّ يعرضها مرةً واحدةً ثم يمسحها: ما حدث + كيف يُصحَّح + رمزُ الخطأ.
