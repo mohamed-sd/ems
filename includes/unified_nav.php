@@ -79,7 +79,7 @@ function getUnifiedNavItems($conn, $roleId) {
         array_keys(unifiedNavDoors())));
     $sql = "SELECT n.door, n.group_id, n.label_ar, n.route, n.icon, n.sort_order,
                    n.counter_source, g.name AS group_name,
-                   g.stage_no, g.stage_title, g.display_order AS group_order
+                   g.stage_no, g.stage_title, g.stage_desc, g.display_order AS group_order
             FROM nav_items n
             LEFT JOIN link_groups g ON g.id = n.group_id AND g.is_active = 1
             WHERE n.role_id = {$roleId} AND n.active = 1
@@ -271,7 +271,12 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
            . ($openDefault ? ' data-ems-open-default="1"' : '') . '>' . "\n";
         echo '  <button type="button" class="nav-group-head" aria-expanded="' . ($openDefault ? 'true' : 'false') . '"'
            . ' aria-controls="navgrp-' . $key . '">'
-           . '<i class="' . $icon . '"></i> <span class="nav-group-name">' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '</span>' . $badge
+           . '<i class="' . $icon . '"></i> <span class="nav-group-name">' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8')
+           // NM-05 (الوثيقة 70 §4-5): سطرُ شرحِ المرحلةِ تحتَ اسمِها — من stage_desc المبذورِ من النصِّ الحاكم
+           . ((isset($sItems[0]['stage_desc']) && trim((string) $sItems[0]['stage_desc']) !== '')
+               ? '<span class="nav-stage-desc">' . htmlspecialchars(trim((string) $sItems[0]['stage_desc']), ENT_QUOTES, 'UTF-8') . '</span>'
+               : '')
+           . '</span>' . $badge
            . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
         echo '  <ul class="nav-group-items" id="navgrp-' . $key . '">' . "\n";
 

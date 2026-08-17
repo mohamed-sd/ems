@@ -224,3 +224,14 @@
 }
 /* السايدبار المطويّ: الفاصل نصٌّ محض فلا معنى له — يُزال من التدفّق */
 .ems-site .sidebar.closed .nav-subhead { display: none; }
+
+/* NM-05 (الوثيقة 70 §4-5): سطرُ شرحِ المرحلةِ تحتَ اسمِها — فالمبتدئُ لا يسأل زميلَه */
+.nav-group-head .nav-stage-desc {
+  display: block;
+  font-size: var(--text-caption, 12px);
+  font-weight: var(--weight-regular, 400);
+  color: var(--c-ink-500, #6b7280);
+  line-height: var(--leading-snug, 1.4);
+  margin-top: 2px;
+  white-space: normal;
+}

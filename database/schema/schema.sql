@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-17 18:52:19
+-- المصدر: equipation_manage · التوليد: 2026-08-17 20:05:20
 -- الجداول: 569 · المناظير: 23
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -7018,6 +7018,7 @@ CREATE TABLE `link_groups` (
   `stage_no` tinyint(4) DEFAULT NULL,
   `stage_title` varchar(190) DEFAULT NULL,
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `stage_desc` varchar(200) DEFAULT NULL COMMENT 'NM-05: سطرُ شرحِ المرحلةِ من الوثيقةِ 70 §4-5 — لا يُخترع',
   PRIMARY KEY (`id`),
   KEY `ix_owner_role` (`owner_role_id`),
   KEY `ix_display_order` (`display_order`),
