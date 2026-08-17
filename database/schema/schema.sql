@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-17 17:11:47
--- الجداول: 562 · المناظير: 18
+-- المصدر: equipation_manage · التوليد: 2026-08-17 17:45:43
+-- الجداول: 569 · المناظير: 23
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6110,6 +6110,30 @@ CREATE TABLE `gov_approval_decisions` (
   KEY `ix_apd_reason` (`company_id`,`reason_code`) COMMENT 'السببُ يُقاس في تحليل الاختناقات'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-14 approval.reject/return: القرارُ بسببٍ محكومٍ يُقاس — وسجلُّه لا يُعدَّل';
 
+-- ── Table: gov_authority_grants ──
+CREATE TABLE `gov_authority_grants` (
+  `grant_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `user_id` int(11) NOT NULL,
+  `profile_id` int(10) unsigned NOT NULL,
+  `source` enum('profile','escalation','delegation','elevation') NOT NULL,
+  `elevation_id` int(10) unsigned DEFAULT NULL COMMENT 'إلزاميٌّ حين المصدرُ رفعٌ — chk_grant_source',
+  `delegation_id` int(10) unsigned DEFAULT NULL,
+  `valid_from` datetime NOT NULL DEFAULT current_timestamp(),
+  `valid_to` datetime DEFAULT NULL COMMENT 'NULL لقالبِ الأصلِ وحدَه — chk_temp_has_end',
+  `issued_by` int(11) NOT NULL COMMENT 'الجهةُ المانحة — حصرًا أدوارُ الحوكمة (قادحُ trg_grant_issuer)',
+  `reason` varchar(255) NOT NULL DEFAULT '',
+  `revoked_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`grant_id`),
+  KEY `ix_user` (`user_id`,`valid_to`),
+  KEY `ix_profile` (`profile_id`),
+  CONSTRAINT `fk_ag_profile` FOREIGN KEY (`profile_id`) REFERENCES `gov_role_profiles` (`profile_id`),
+  CONSTRAINT `chk_temp_has_end` CHECK (`source` = 'profile' or `valid_to` is not null),
+  CONSTRAINT `chk_grant_source` CHECK (`source` <> 'elevation' or `elevation_id` is not null),
+  CONSTRAINT `chk_no_single_hand` CHECK (`source` = 'profile' or `issued_by` <> `user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-AUTH-01 — المنحُ الفعليُّ بمصادرِه الأربعةِ لا خامسَ لها';
+
 -- ── Table: gov_authority_limits ──
 CREATE TABLE `gov_authority_limits` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -6157,6 +6181,25 @@ CREATE TABLE `gov_data_classes` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_dc` (`company_id`,`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-OBL-01 §4-17 — التصنيفُ الرباعيُّ للبيانات';
+
+-- ── Table: gov_delegations ──
+CREATE TABLE `gov_delegations` (
+  `delegation_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `from_user` int(11) NOT NULL,
+  `to_user` int(11) NOT NULL,
+  `scope_json` text NOT NULL COMMENT 'نطاقُ التفويض — أفعالٌ وشاشاتٌ وسقوف',
+  `valid_from` datetime NOT NULL DEFAULT current_timestamp(),
+  `valid_to` datetime NOT NULL COMMENT 'إلزاميٌّ — المؤقَّتُ ينتهي بنفسِه (A6)',
+  `reason` varchar(255) NOT NULL,
+  `revoked_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`delegation_id`),
+  KEY `ix_to` (`to_user`,`valid_to`),
+  KEY `ix_from` (`from_user`),
+  CONSTRAINT `chk_deleg_reason` CHECK (`reason` <> '' and `valid_to` > `valid_from`),
+  CONSTRAINT `chk_deleg_not_self` CHECK (`from_user` <> `to_user`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-AUTH-01 §6 — التفويضُ المؤقَّتُ بمدّةٍ وسببٍ إلزاميَّين';
 
 -- ── Table: gov_denial_reviews ──
 CREATE TABLE `gov_denial_reviews` (
@@ -6242,6 +6285,28 @@ CREATE TABLE `gov_doc_variance` (
   UNIQUE KEY `uq_var` (`company_id`,`variance_code`),
   KEY `ix_doc` (`doc_code`,`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='update0013 — مخالفاتُ الوثائقِ وحسمُها بأساسٍ مكتوبٍ يُفحص كلَّ بوابة';
+
+-- ── Table: gov_elevations ──
+CREATE TABLE `gov_elevations` (
+  `elevation_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `user_id` int(11) NOT NULL,
+  `target_grade` enum('G1','G2','G3','G4','G5','G6','G7','G8','G9') NOT NULL,
+  `target_dept` varchar(120) NOT NULL DEFAULT '',
+  `reason` varchar(255) NOT NULL,
+  `scope_note` varchar(255) NOT NULL DEFAULT '' COMMENT 'النطاقُ المحصور',
+  `hr_witness` int(11) DEFAULT NULL COMMENT 'شهادةُ الأهلية — الموارد البشرية (LD-21 ②)',
+  `fin_witness` int(11) DEFAULT NULL COMMENT 'شهادةُ الأثرِ الماليّ (LD-21 ③)',
+  `ceo_approver` int(11) DEFAULT NULL COMMENT 'اعتمادُ الرئيسِ حصرًا — لا يُفوَّض (LD-21 ④)',
+  `valid_to` datetime NOT NULL COMMENT 'مدّةٌ محصورةٌ إلزامية',
+  `state` enum('requested','hr_ok','fin_ok','approved','active','expired','rejected') NOT NULL DEFAULT 'requested',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`elevation_id`),
+  KEY `ix_user` (`user_id`,`state`),
+  CONSTRAINT `chk_elev_reason` CHECK (`reason` <> ''),
+  CONSTRAINT `chk_elev_four_parties` CHECK (`state` not in ('approved','active') or `hr_witness` is not null and `fin_witness` is not null and `ceo_approver` is not null),
+  CONSTRAINT `chk_elev_ceo_not_self` CHECK (`ceo_approver` is null or `ceo_approver` <> `user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-AUTH-01 §7 — الرفعُ الاستثنائيُّ LD-21: أربعةُ أطرافٍ في أربعةِ أعمدةٍ لا واحدٍ نصيّ';
 
 -- ── Table: gov_export_log ──
 CREATE TABLE `gov_export_log` (
@@ -6392,6 +6457,47 @@ CREATE TABLE `gov_orphan_links` (
   UNIQUE KEY `uq_orphan` (`sheet_role`,`route`,`label_ar`),
   KEY `ix_decision` (`owner_decision`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXW-01 §8 — الروابطُ اليتيمةُ في مركزِ الحوكمةِ التقنيِّ حتى قرارِ المالك';
+
+-- ── Table: gov_profile_items ──
+CREATE TABLE `gov_profile_items` (
+  `item_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `profile_id` int(10) unsigned NOT NULL,
+  `item_kind` enum('screen','action','cap','scope','field') NOT NULL,
+  `item_ref` varchar(160) NOT NULL COMMENT 'مرجعُ البند: كودُ الشاشةِ أو الفعلِ أو السقفِ أو النطاقِ أو الحقل',
+  `allow` tinyint(1) NOT NULL DEFAULT 1,
+  `can_add` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'للشاشة: يُعِدّ',
+  `can_edit` tinyint(1) NOT NULL DEFAULT 0,
+  `can_delete` tinyint(1) NOT NULL DEFAULT 0,
+  `seeded_from` varchar(60) NOT NULL DEFAULT '' COMMENT 'مصدرُ البذرِ المقيس: role_permissions:<role_id>',
+  PRIMARY KEY (`item_id`),
+  UNIQUE KEY `uq_item` (`profile_id`,`item_kind`,`item_ref`),
+  KEY `ix_profile` (`profile_id`),
+  CONSTRAINT `fk_pi_profile` FOREIGN KEY (`profile_id`) REFERENCES `gov_role_profiles` (`profile_id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-AUTH-01 §5-1 — بنودُ القالبِ الستة';
+
+-- ── Table: gov_role_profiles ──
+CREATE TABLE `gov_role_profiles` (
+  `profile_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'عمودُ العزل — 0: قالبٌ معياريٌّ لكلِّ الكيانات',
+  `profile_code` varchar(20) NOT NULL COMMENT 'رمزُ الورقة: DEPT-G#',
+  `grade` enum('G1','G2','G3','G4','G5','G6','G7','G8','G9') NOT NULL,
+  `dept_code` varchar(120) NOT NULL COMMENT 'الإدارةُ بنصِّ ورقةِ الدفتر',
+  `title_ar` varchar(120) NOT NULL,
+  `screens_target` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'عددُ الشاشاتِ المستهدَفُ من الورقة',
+  `prepares_target` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `approves_target` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `approval_cap_label` varchar(200) NOT NULL DEFAULT '' COMMENT 'سقفُ الاعتمادِ نصًّا — الأرقامُ مرجعُها 24-أ وهي موقوفةٌ Fail-Closed',
+  `data_scope` varchar(120) NOT NULL DEFAULT '',
+  `sensitive_fields` varchar(200) NOT NULL DEFAULT '',
+  `fixed_rule` varchar(255) NOT NULL DEFAULT '' COMMENT 'القيدُ الثابتُ من الورقة',
+  `version` smallint(5) unsigned NOT NULL DEFAULT 1 COMMENT 'لا يُعدَّل نافذٌ في مكانِه — إصدارٌ جديدٌ ويُرحَّل حاملوه',
+  `state` enum('draft','active','retired') NOT NULL DEFAULT 'draft' COMMENT 'draft حتى اعتمادِ تقريرِ الفروق',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`profile_id`),
+  UNIQUE KEY `uq_profile` (`company_id`,`profile_code`,`version`),
+  KEY `ix_grade_dept` (`grade`,`dept_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-AUTH-01 A2 — قالبُ المسمَّى: تسعُ درجاتٍ × الإداراتِ التسعَ عشرة';
 
 -- ── Table: gov_stage_outputs ──
 CREATE TABLE `gov_stage_outputs` (
@@ -6733,6 +6839,24 @@ CREATE TABLE `impact_matrix` (
   UNIQUE KEY `uq_mx` (`policy_id`,`state_code`,`party_type`),
   CONSTRAINT `fk_mx_policy` FOREIGN KEY (`policy_id`) REFERENCES `dept_policies` (`policy_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='POL-01 §8: مصفوفة الأثر — لا حالة بلا أثر معلن لكل طرف، ولا أثر يُستنتج';
+
+-- ── Table: impersonation_sessions ──
+CREATE TABLE `impersonation_sessions` (
+  `imp_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `actor_user` int(11) NOT NULL COMMENT 'الفاعلُ الحقيقيُّ — الجلسةُ باسمِه هو',
+  `target_user` int(11) NOT NULL COMMENT 'المُنابُ عنه',
+  `reason` varchar(255) NOT NULL,
+  `opened_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `closed_at` datetime DEFAULT NULL,
+  `valid_to` datetime NOT NULL,
+  `notified_at` datetime DEFAULT NULL COMMENT 'إخطارُ صاحبِ الموضعِ — AC-A5: لا جلسةَ مغلقةً بلا إخطار',
+  PRIMARY KEY (`imp_id`),
+  KEY `ix_actor` (`actor_user`,`closed_at`),
+  KEY `ix_target` (`target_user`),
+  CONSTRAINT `chk_imp_reason` CHECK (`reason` <> ''),
+  CONSTRAINT `chk_imp_not_self` CHECK (`actor_user` <> `target_user`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-AUTH-01 §6-2 — جلسةُ النيابةِ الموسومة: لا دخولَ بحسابِ الغير';
 
 -- ── Table: incentive_allocations ──
 CREATE TABLE `incentive_allocations` (
@@ -7508,6 +7632,16 @@ CREATE TABLE `nav_redirects` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_navred_old` (`old_route`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='تحويلُ المسارات القديمة — UX-01 §10.2';
+
+-- ── Table: non_delegable_actions ──
+CREATE TABLE `non_delegable_actions` (
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'عمودُ العزل — 0: قائمةٌ معياريةٌ لكلِّ الكيانات',
+  `action_code` varchar(80) NOT NULL,
+  `title_ar` varchar(160) NOT NULL,
+  `doc_ref` varchar(20) NOT NULL DEFAULT 'GOV-AUTH-01',
+  PRIMARY KEY (`action_code`),
+  KEY `ix_company` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='الخمسةُ التي لا تُفوَّض أبدًا — يرفضها القادحُ لا العُرف';
 
 -- ── Table: op_containers ──
 CREATE TABLE `op_containers` (
@@ -14024,6 +14158,14 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `fa_asset_hours` AS select 
 -- ── View: unified_fault_taxonomy ──
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `unified_fault_taxonomy` AS select distinct `fc`.`main_category_code` AS `code`,`fc`.`main_category_name` AS `name`,`fc`.`equipment_type` AS `equipment_type`,'failure_codes' AS `source` from `failure_codes` `fc` where `fc`.`main_category_code` is not null and `fc`.`main_category_code` <> '';
 
+-- ── View: v_active_impersonations ──
+SET collation_connection = 'utf8mb4_unicode_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_active_impersonations` AS select `i`.`imp_id` AS `imp_id`,`a`.`username` AS `actor`,`t`.`username` AS `target`,`i`.`reason` AS `reason`,`i`.`opened_at` AS `opened_at`,`i`.`valid_to` AS `valid_to`,`i`.`notified_at` AS `notified_at` from ((`impersonation_sessions` `i` join `users` `a` on(`a`.`id` = `i`.`actor_user`)) join `users` `t` on(`t`.`id` = `i`.`target_user`)) where `i`.`closed_at` is null;
+
+-- ── View: v_authority_expiring ──
+SET collation_connection = 'utf8mb4_general_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_authority_expiring` AS select 'grant' AS `kind`,`g`.`grant_id` AS `ref_id`,`g`.`user_id` AS `user_id`,`g`.`valid_to` AS `valid_to` from `gov_authority_grants` `g` where `g`.`revoked_at` is null and `g`.`valid_to` between current_timestamp() and current_timestamp() + interval 48 hour union all select 'delegation' AS `delegation`,`d`.`delegation_id` AS `delegation_id`,`d`.`to_user` AS `to_user`,`d`.`valid_to` AS `valid_to` from `gov_delegations` `d` where `d`.`revoked_at` is null and `d`.`valid_to` between current_timestamp() and current_timestamp() + interval 48 hour union all select 'elevation' AS `elevation`,`e`.`elevation_id` AS `elevation_id`,`e`.`user_id` AS `user_id`,`e`.`valid_to` AS `valid_to` from `gov_elevations` `e` where `e`.`state` = 'active' and `e`.`valid_to` between current_timestamp() and current_timestamp() + interval 48 hour union all select 'impersonation' AS `impersonation`,`i`.`imp_id` AS `imp_id`,`i`.`actor_user` AS `actor_user`,`i`.`valid_to` AS `valid_to` from `impersonation_sessions` `i` where `i`.`closed_at` is null and `i`.`valid_to` between current_timestamp() and current_timestamp() + interval 48 hour;
+
 -- ── View: v_caps_unresolved ──
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_caps_unresolved` AS select 'fin_authority_caps' AS `src`,`fin_authority_caps`.`id` AS `id`,`fin_authority_caps`.`company_id` AS `company_id`,`fin_authority_caps`.`scope_kind` AS `scope_kind`,`fin_authority_caps`.`scope_ref` AS `scope_ref`,`fin_authority_caps`.`apr_code` AS `apr_code`,`fin_authority_caps`.`max_amount` AS `max_amount`,`fin_authority_caps`.`currency` AS `currency`,`fin_authority_caps`.`cap_state` AS `cap_state` from `fin_authority_caps` where `fin_authority_caps`.`cap_state` <> 'resolved' union all select 'gov_ladders' AS `gov_ladders`,NULL AS `NULL`,`gov_ladders`.`company_id` AS `company_id`,'ladder' AS `ladder`,`gov_ladders`.`ladder_code` AS `ladder_code`,`gov_ladders`.`slug` AS `slug`,`gov_ladders`.`cap_amount` AS `cap_amount`,`gov_ladders`.`cap_currency` AS `cap_currency`,`gov_ladders`.`cap_state` AS `cap_state` from `gov_ladders` where `gov_ladders`.`cap_kind` = 'amount' and `gov_ladders`.`cap_state` <> 'resolved';
 
@@ -14031,8 +14173,16 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_caps_unresolved` AS sele
 SET collation_connection = 'utf8mb4_unicode_ci';
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_container_elapsed_target` AS select `c`.`company_id` AS `company_id`,`c`.`id` AS `container_id`,`c`.`container_no` AS `container_no`,`c`.`cap_qty` AS `cap_qty`,`k`.`actual_start` AS `actual_start`,`k`.`actual_end` AS `actual_end`,least(`c`.`cap_qty`,greatest(0,round(`c`.`cap_qty` * (to_days(least(curdate(),`k`.`actual_end`)) - to_days(`k`.`actual_start`)) / nullif(to_days(`k`.`actual_end`) - to_days(`k`.`actual_start`),0),2))) AS `elapsed_target` from (`op_containers` `c` join `contracts` `k` on(`k`.`id` = `c`.`contract_id`)) where `c`.`level` = 'رئيسية' and `c`.`is_deleted` = 0 and `k`.`actual_start` is not null and `k`.`actual_end` is not null;
 
+-- ── View: v_effective_authority ──
+SET collation_connection = 'utf8mb4_unicode_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_effective_authority` AS select `g`.`user_id` AS `user_id`,`u`.`username` AS `username`,`g`.`profile_id` AS `profile_id`,`p`.`profile_code` AS `profile_code`,`p`.`grade` AS `grade`,`p`.`dept_code` AS `dept_code`,`g`.`source` AS `source`,1 AS `priority`,`g`.`valid_from` AS `valid_from`,`g`.`valid_to` AS `valid_to` from ((`gov_authority_grants` `g` join `users` `u` on(`u`.`id` = `g`.`user_id`)) join `gov_role_profiles` `p` on(`p`.`profile_id` = `g`.`profile_id`)) where `g`.`revoked_at` is null and (`g`.`valid_to` is null or `g`.`valid_to` > current_timestamp()) and `g`.`source` = 'profile' union all select `boss_u`.`id` AS `id`,`boss_u`.`username` AS `username`,`g`.`profile_id` AS `profile_id`,`p`.`profile_code` AS `profile_code`,`p`.`grade` AS `grade`,`p`.`dept_code` AS `dept_code`,'escalation' AS `escalation`,2 AS `2`,`g`.`valid_from` AS `valid_from`,`g`.`valid_to` AS `valid_to` from (((((`gov_authority_grants` `g` join `users` `sub_u` on(`sub_u`.`id` = `g`.`user_id`)) join `roles` `sub_r` on(`sub_r`.`id` = `sub_u`.`role`)) join `roles` `boss_r` on(`boss_r`.`id` = `sub_r`.`parent_role_id`)) join `users` `boss_u` on(`boss_u`.`role` = `boss_r`.`id` and `boss_u`.`status` = 1)) join `gov_role_profiles` `p` on(`p`.`profile_id` = `g`.`profile_id`)) where `g`.`revoked_at` is null and (`g`.`valid_to` is null or `g`.`valid_to` > current_timestamp()) and `g`.`source` = 'profile' union all select `g`.`user_id` AS `user_id`,`u`.`username` AS `username`,`g`.`profile_id` AS `profile_id`,`p`.`profile_code` AS `profile_code`,`p`.`grade` AS `grade`,`p`.`dept_code` AS `dept_code`,`g`.`source` AS `source`,3 AS `3`,`g`.`valid_from` AS `valid_from`,`g`.`valid_to` AS `valid_to` from ((`gov_authority_grants` `g` join `users` `u` on(`u`.`id` = `g`.`user_id`)) join `gov_role_profiles` `p` on(`p`.`profile_id` = `g`.`profile_id`)) where `g`.`revoked_at` is null and `g`.`valid_to` > current_timestamp() and `g`.`source` in ('delegation','elevation');
+
 -- ── View: v_group_load ──
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_group_load` AS select `g`.`owner_role_id` AS `role_id`,`g`.`id` AS `group_id`,`g`.`group_code` AS `group_code`,`g`.`name` AS `group_name`,`g`.`stage_no` AS `stage_no`,`g`.`stage_title` AS `stage_title`,count(`n`.`id`) AS `screens`,case when count(`n`.`id`) >= 8 then 'overloaded' when count(`n`.`id`) = 0 then 'empty' else 'ok' end AS `load_state` from (`link_groups` `g` left join `nav_items` `n` on(`n`.`group_id` = `g`.`id` and `n`.`active` = 1)) where `g`.`is_active` = 1 group by `g`.`id`;
+
+-- ── View: v_hand_conflicts ──
+SET collation_connection = 'utf8mb4_general_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_hand_conflicts` AS select 'grant_self_issued' AS `conflict_kind`,`g`.`grant_id` AS `ref_id`,`g`.`user_id` AS `actor`,`g`.`issued_by` AS `second_party`,`g`.`created_at` AS `created_at` from `gov_authority_grants` `g` where `g`.`issued_by` = `g`.`user_id` and `g`.`source` <> 'profile' union all select 'elevation_self_approved' AS `elevation_self_approved`,`e`.`elevation_id` AS `elevation_id`,`e`.`user_id` AS `user_id`,`e`.`ceo_approver` AS `ceo_approver`,`e`.`created_at` AS `created_at` from `gov_elevations` `e` where `e`.`ceo_approver` = `e`.`user_id`;
 
 -- ── View: v_machine_daily_hours ──
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_machine_daily_hours` AS select `ue`.`company_id` AS `company_id`,`ue`.`equipment_id` AS `equipment_id`,`ue`.`entry_date` AS `work_date`,round(coalesce(sum(case when `l`.`ops_state` = 'actual_work' then `l`.`hours` end),0),2) AS `daily_hours` from (`unit_entries` `ue` left join `unit_time_log` `l` on(`l`.`entry_id` = `ue`.`id`)) where `ue`.`seed_tag` is null and `ue`.`state` not in ('rejected','cancelled','superseded','reversed') group by `ue`.`company_id`,`ue`.`equipment_id`,`ue`.`entry_date`;
@@ -14043,6 +14193,10 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_machine_daily_median` AS
 -- ── View: v_monthly_performance ──
 SET collation_connection = 'utf8mb4_unicode_ci';
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_monthly_performance` AS select `ue`.`company_id` AS `company_id`,date_format(`ue`.`entry_date`,'%Y-%m') AS `period`,`ue`.`supplier_entity_id` AS `supplier_entity_id`,`ue`.`contract_id` AS `contract_id`,`ue`.`project_id` AS `project_id`,`ue`.`equipment_id` AS `equipment_id`,count(distinct `ue`.`id`) AS `entries_count`,count(distinct `ue`.`entry_date`) AS `days_worked`,round(coalesce(sum(case when `l`.`ops_state` = 'actual_work' then `l`.`hours` end),0),2) AS `run_hours`,round(coalesce(sum(case when `l`.`ops_state` = 'standby' then `l`.`hours` end),0),2) AS `standby_hours`,round(coalesce(sum(case when `l`.`ops_state` in ('tech_breakdown','supplier_stop','operator_stop','client_stop','fuel_logistics_stop','planned_stop','force_majeure') then `l`.`hours` end),0),2) AS `breakdown_hours`,round(coalesce(sum(`l`.`hours`),0),2) AS `total_hours`,round(coalesce(sum(case when `l`.`resp_party` = 'client' then `l`.`hours` end),0),2) AS `client_liable_hours`,round(coalesce(sum(case when `l`.`resp_party` = 'supplier' then `l`.`hours` end),0),2) AS `supplier_liable_hours`,round(coalesce(sum(case when `l`.`resp_party` = 'company' then `l`.`hours` end),0),2) AS `company_liable_hours`,round(coalesce(sum(case when `l`.`ops_state` = 'standby' or `l`.`resp_party` = 'client' and `l`.`ops_state` in ('tech_breakdown','supplier_stop','operator_stop','client_stop','fuel_logistics_stop','planned_stop','force_majeure') then `l`.`hours` end),0),2) AS `billable_standby_hours`,case when coalesce(sum(`l`.`hours`),0) > 0 then round(100 * coalesce(sum(case when `l`.`ops_state` = 'actual_work' then `l`.`hours` end),0) / sum(`l`.`hours`),2) else NULL end AS `availability_pct`,round(coalesce(sum(`ue`.`fuel_issued_qty`),0),2) AS `fuel_issued_qty`,round(coalesce(sum(`ue`.`fuel_received_qty`),0),2) AS `fuel_received_qty`,round(coalesce(sum(case when `ue`.`meter_after` is not null and `ue`.`meter_before` is not null then `ue`.`meter_after` - `ue`.`meter_before` end),0),2) AS `meter_delta`,round(coalesce(sum(case when `ue`.`unit_type` = 'ton' then `ue`.`qty` end),0),2) AS `tons`,round(coalesce(sum(case when `ue`.`unit_type` = 'meter' then `ue`.`qty` end),0),2) AS `meters`,round(coalesce(sum(case when `ue`.`unit_type` = 'trip' then `ue`.`qty` end),0),2) AS `trips`,max(`ue`.`updated_at`) AS `last_entry_at` from (`unit_entries` `ue` left join `unit_time_log` `l` on(`l`.`entry_id` = `ue`.`id`)) where `ue`.`seed_tag` is null and `ue`.`state` not in ('rejected','cancelled','superseded','reversed') group by `ue`.`company_id`,date_format(`ue`.`entry_date`,'%Y-%m'),`ue`.`supplier_entity_id`,`ue`.`contract_id`,`ue`.`project_id`,`ue`.`equipment_id`;
+
+-- ── View: v_open_elevations ──
+SET collation_connection = 'utf8mb4_unicode_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_open_elevations` AS select `e`.`elevation_id` AS `elevation_id`,`e`.`user_id` AS `user_id`,`u`.`username` AS `username`,`e`.`target_grade` AS `target_grade`,`e`.`target_dept` AS `target_dept`,`e`.`state` AS `state`,`e`.`hr_witness` AS `hr_witness`,`e`.`fin_witness` AS `fin_witness`,`e`.`ceo_approver` AS `ceo_approver`,`e`.`valid_to` AS `valid_to`,`e`.`reason` AS `reason` from (`gov_elevations` `e` join `users` `u` on(`u`.`id` = `e`.`user_id`)) where `e`.`state` not in ('expired','rejected');
 
 -- ── View: v_org_unit_heads ──
 SET collation_connection = 'utf8mb4_unicode_ci';
