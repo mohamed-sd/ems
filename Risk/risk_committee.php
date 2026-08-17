@@ -77,7 +77,7 @@ include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main ems-unified-page-shell">
+<div class="main ems-unified-page-shell ems-doc-cycle">
     <?php
     $header_title = 'لجنة المخاطر';
     $header_icon = 'fas fa-users-rectangle';
@@ -97,10 +97,23 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         . 'ويعتمده الرئيسُ التنفيذيُّ، والمعتمدُ لا يُعدَّل ولا يُحذف.',
         array('التصحيحُ محضرٌ جديدٌ يشير إلى الأصلِ بالمرجعِ الأب — لا تعديلٌ للمعتمد',
               'الشهيةُ المعتمدةُ في المحضرِ تُغيّر حدودَ التصعيدِ في المجالاتِ كلِّها'));
+    echo ems_next_step($isCeo ? 'اعتمادُك للمسوَّداتِ — والمعتمدُ لا يُعدَّل بعدها'
+        : 'اعتمادُ الرئيسِ التنفيذيِّ للمسوَّدةِ — التصحيحُ بعدها محضرٌ جديدٌ بالمرجعِ الأب');
+    echo ems_states_bundle('لا محاضرَ لجنةٍ بعد', 'المرحلةُ الثامنةُ لا تكتمل بلا محضرٍ ومعتمِدٍ يشهد');
     if ($flash !== '') {
-        echo '<div class="ems-card" style="padding:10px;margin:8px 0;font-size:.85rem">' . htmlspecialchars($flash) . '</div>';
+        echo '<div class="ems-card rsk-flash">' . htmlspecialchars($flash) . '</div>';
     }
     ?>
+    <style>
+        .rsk-flash { padding: 10px; margin: 8px 0; font-size: .85rem; }
+        .rsk-w100 { width: 100%; }
+        .rsk-fs74 { font-size: .74rem; }
+        .rsk-cell-w200 { font-size: .76rem; max-width: 200px; }
+        .rsk-cell-w240 { font-size: .76rem; max-width: 240px; }
+        .rsk-new-card { margin-top: 16px; }
+        .rsk-new-card.is-hidden { display: none; }
+        .rsk-hint-inline { margin-inline-start: 10px; font-size: .78rem; opacity: .75; }
+    </style>
 
     <?php if (empty($rows)): ?>
     <div class="ems-card" id="cmtEmpty"></div>
@@ -111,7 +124,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     });</script>
     <?php else: ?>
     <div class="card"><div class="card-body table-responsive">
-        <table class="table table-striped" style="width:100%">
+        <table class="table table-striped rsk-w100">
             <thead><tr>
                 <th>الرمز</th><th>تاريخ الاجتماع</th><th>الدورية</th><th>الحاضرون</th>
                 <th>مخاطر روجعت</th><th>البنود</th><th>القرارات</th>
@@ -125,21 +138,21 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <td><strong><?php echo htmlspecialchars($x['minute_code']); ?></strong></td>
                     <td><?php echo htmlspecialchars((string) $x['meeting_date']); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['cycle_ar']); ?></td>
-                    <td style="font-size:.76rem;max-width:200px"><?php echo htmlspecialchars(mb_substr((string) $x['attendees_ar'], 0, 90) ?: '—'); ?></td>
+                    <td class="rsk-cell-w200"><?php echo htmlspecialchars(mb_substr((string) $x['attendees_ar'], 0, 90) ?: '—'); ?></td>
                     <td><?php echo (int) $x['risks_reviewed']; ?></td>
                     <td><?php echo (int) $x['items']; ?></td>
-                    <td style="font-size:.76rem;max-width:240px"><?php echo htmlspecialchars(mb_substr((string) $x['resolutions_ar'], 0, 110) ?: '—'); ?></td>
+                    <td class="rsk-cell-w240"><?php echo htmlspecialchars(mb_substr((string) $x['resolutions_ar'], 0, 110) ?: '—'); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['creator'] ?: '—'); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['created_at']); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['approver'] ?: '—'); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['approved_at'] ?: '—'); ?></td>
-                    <td style="font-size:.74rem"><?php echo htmlspecialchars((string) $x['authority_ref'] ?: '—'); ?></td>
-                    <td style="font-size:.74rem"><?php echo htmlspecialchars((string) $x['parent_ref'] ?: '—'); ?></td>
+                    <td class="rsk-fs74"><?php echo htmlspecialchars((string) $x['authority_ref'] ?: '—'); ?></td>
+                    <td class="rsk-fs74"><?php echo htmlspecialchars((string) $x['parent_ref'] ?: '—'); ?></td>
                     <td><span class="badge <?php echo $x['state'] === 'approved' ? 'badge-success' : 'badge-warning'; ?>">
                         <?php echo $x['state'] === 'approved' ? 'معتمد' : 'مسوَّدة'; ?></span></td>
                     <?php if ($isCeo): ?>
                     <td><?php if ($x['state'] === 'draft'): ?>
-                        <form method="post" style="display:inline">
+                        <form method="post" class="ems-inline-form">
         <?= csrf_field() ?>
                             <input type="hidden" name="cmt_do" value="approve">
                             <input type="hidden" name="minute_id" value="<?php echo (int) $x['id']; ?>">
@@ -155,31 +168,30 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <?php endif; ?>
 
     <?php if ($canAdd): ?>
-    <div class="card" id="cmtNewCard" style="display:none;margin-top:16px"><div class="card-body">
+    <div class="card rsk-new-card is-hidden" id="cmtNewCard"><div class="card-body">
         <h5>محضر لجنة جديد (مسوَّدة)</h5>
         <form method="post" class="allforms">
         <?= csrf_field() ?>
             <input type="hidden" name="cmt_do" value="create">
             <div class="row">
-                <div class="col-md-3"><label>تاريخ الاجتماع *<input name="meeting_date" type="date" class="form-control" required></label></div>
-                <div class="col-md-3"><label>الدورية<select name="cycle_ar" class="form-control">
+                <div class="col-md-3"><label>تاريخ الاجتماع *<input name="meeting_date" type="date" class="form-control" aria-label="تاريخ اجتماع اللجنة" required></label></div>
+                <div class="col-md-3"><label>الدورية<select name="cycle_ar" class="form-control" aria-label="دورية الاجتماع">
                     <option>ربع سنوي</option><option>نصف سنوي</option><option>شهري</option><option>استثنائي</option>
                 </select></label></div>
-                <div class="col-md-3"><label>مخاطر روجعت<input name="risks_reviewed" type="number" min="0" value="0" class="form-control"></label></div>
-                <div class="col-md-12"><label>الحاضرون بصفاتهم<textarea name="attendees_ar" class="form-control" rows="2"></textarea></label></div>
-                <div class="col-md-6"><label>جدول الأعمال<textarea name="agenda_ar" class="form-control" rows="3"></textarea></label></div>
-                <div class="col-md-6"><label>القرارات<textarea name="resolutions_ar" class="form-control" rows="3"></textarea></label></div>
+                <div class="col-md-3"><label>مخاطر روجعت<input name="risks_reviewed" type="number" min="0" aria-label="عدد المخاطر المراجعة" value="0" class="form-control"></label></div>
+                <div class="col-md-12"><label>الحاضرون بصفاتهم<textarea name="attendees_ar" class="form-control" aria-label="الحاضرون بصفاتهم" rows="2"></textarea></label></div>
+                <div class="col-md-6"><label>جدول الأعمال<textarea name="agenda_ar" class="form-control" aria-label="جدول أعمال الاجتماع" rows="3"></textarea></label></div>
+                <div class="col-md-6"><label>القرارات<textarea name="resolutions_ar" class="form-control" aria-label="قرارات اللجنة" rows="3"></textarea></label></div>
             </div>
             <button type="submit" class="ems-btn-primary">إنشاء المسوَّدة</button>
-            <span style="margin-inline-start:10px;font-size:.78rem;opacity:.75">الاعتمادُ للرئيسِ التنفيذيِّ حصرًا</span>
+            <span class="rsk-hint-inline">الاعتمادُ للرئيسِ التنفيذيِّ حصرًا</span>
         </form>
     </div></div>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         var btn = document.getElementById('cmtNewBtn');
         if (btn) { btn.addEventListener('click', function () {
-            var c = document.getElementById('cmtNewCard');
-            c.style.display = c.style.display === 'none' ? '' : 'none';
+            document.getElementById('cmtNewCard').classList.toggle('is-hidden');
         }); }
     });
     </script>

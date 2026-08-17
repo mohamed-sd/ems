@@ -73,14 +73,24 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
               'التسجيلُ من ملفِّ الخطرِ — وهذه الشاشةُ للقراءةِ والمقارنةِ التاريخية'));
     risk_view_bar('risk_assessment', $view, array_filter(array(
         'risk' => $fRisk ?: null, 'atype' => $fType ?: null)));
+    echo ems_states_bundle('لا نسخَ تقييمٍ ضمن هذا الترشيح', 'وسّع الترشيحَ — والتقييمُ يُسجَّل من ملفِّ الخطر');
     ?>
+    <style>
+        .rsk-filter-form { align-items: flex-end; }
+        .rsk-filter-label { font-size: .8rem; }
+        .rsk-id-input { max-width: 130px; }
+        .rsk-w100 { width: 100%; }
+        .rsk-subnote { font-size: .72rem; opacity: .7; }
+        .rsk-fs76 { font-size: .76rem; }
+        .rsk-fs74 { font-size: .74rem; }
+    </style>
 
-    <form method="get" class="ems-toolbar" style="align-items:flex-end">
+    <form method="get" class="ems-toolbar rsk-filter-form">
         <input type="hidden" name="view" value="<?php echo htmlspecialchars($view); ?>">
-        <label style="font-size:.8rem">الخطر (id)
-            <input name="risk" type="number" class="form-control" value="<?php echo $fRisk ?: ''; ?>" style="max-width:130px"></label>
-        <label style="font-size:.8rem">النوع
-            <select name="atype" class="form-control">
+        <label class="rsk-filter-label">الخطر (id)
+            <input name="risk" type="number" class="form-control rsk-id-input" aria-label="الخطر برقمه التسلسلي" value="<?php echo $fRisk ?: ''; ?>"></label>
+        <label class="rsk-filter-label">النوع
+            <select name="atype" class="form-control" aria-label="نوع التقييم">
                 <option value="">الكل</option>
                 <?php foreach ($TYPE_AR as $k => $v): ?>
                 <option value="<?php echo $k; ?>" <?php echo $fType === $k ? 'selected' : ''; ?>><?php echo $v; ?></option>
@@ -99,7 +109,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     });</script>
     <?php else: ?>
     <div class="card"><div class="card-body table-responsive">
-        <table class="table table-striped" style="width:100%">
+        <table class="table table-striped rsk-w100">
             <thead><tr>
                 <th>الخطر</th><th>النوع</th>
                 <?php if (risk_col_visible('risk_assessment', $view, 'likelihood')): ?><th>الاحتمال</th><?php endif; ?>
@@ -123,7 +133,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <?php foreach ($rows as $x): ?>
                 <tr>
                     <td><strong><?php echo htmlspecialchars($x['risk_code']); ?></strong>
-                        <div style="font-size:.72rem;opacity:.7"><?php echo htmlspecialchars(mb_substr((string) $x['risk_title'], 0, 40)); ?></div></td>
+                        <div class="rsk-subnote"><?php echo htmlspecialchars(mb_substr((string) $x['risk_title'], 0, 40)); ?></div></td>
                     <td><?php echo $TYPE_AR[$x['assess_type']] ?? $x['assess_type']; ?></td>
                     <?php if (risk_col_visible('risk_assessment', $view, 'likelihood')): ?>
                     <td><?php echo (int) $x['likelihood']; ?></td><?php endif; ?>
@@ -140,7 +150,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <?php if (risk_col_visible('risk_assessment', $view, 'confidence')): ?>
                     <td><?php echo htmlspecialchars((string) $x['confidence']); ?></td><?php endif; ?>
                     <?php if (risk_col_visible('risk_assessment', $view, 'technique')): ?>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars((string) $x['technique']); ?></td><?php endif; ?>
+                    <td class="rsk-fs76"><?php echo htmlspecialchars((string) $x['technique']); ?></td><?php endif; ?>
                     <?php if (risk_col_visible('risk_assessment', $view, 'assessor')): ?>
                     <td><?php echo htmlspecialchars((string) $x['assessor'] ?: '—'); ?></td><?php endif; ?>
                     <?php if (risk_col_visible('risk_assessment', $view, 'challenger')): ?>
@@ -148,11 +158,11 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <?php if (risk_col_visible('risk_assessment', $view, 'approved_at')): ?>
                     <td><?php echo htmlspecialchars((string) ($x['approver'] ?: '') . ' ' . (string) ($x['approved_at'] ?: '—')); ?></td><?php endif; ?>
                     <?php if (risk_col_visible('risk_assessment', $view, 'authority_ref')): ?>
-                    <td style="font-size:.74rem"><?php echo htmlspecialchars((string) $x['authority_ref'] ?: '—'); ?></td><?php endif; ?>
+                    <td class="rsk-fs74"><?php echo htmlspecialchars((string) $x['authority_ref'] ?: '—'); ?></td><?php endif; ?>
                     <?php if (risk_col_visible('risk_assessment', $view, 'assessed_at')): ?>
                     <td><?php echo htmlspecialchars((string) $x['assessed_at']); ?></td><?php endif; ?>
                     <?php if (risk_col_visible('risk_assessment', $view, 'parent_ref')): ?>
-                    <td style="font-size:.74rem"><?php echo htmlspecialchars((string) $x['parent_ref'] ?: 'أول نسخة'); ?></td><?php endif; ?>
+                    <td class="rsk-fs74"><?php echo htmlspecialchars((string) $x['parent_ref'] ?: 'أول نسخة'); ?></td><?php endif; ?>
                     <td><a class="btn btn-sm btn-secondary" href="risk_card.php?id=<?php echo (int) $x['risk_id']; ?>">ملف الخطر</a></td>
                 </tr>
             <?php endforeach; ?>

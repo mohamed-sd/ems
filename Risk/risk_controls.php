@@ -50,11 +50,25 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         array('لا يتحقق مالك الضابط من نفسه — الحارس يرفضه برمز',
               'نموذجُ البياناتِ لا يُختزل: المنظرُ يقلّل الأعمدةَ لا الصفوف'));
     risk_view_bar('risk_controls', $view);
+    echo ems_states_bundle('لا ضوابطَ مسجَّلةً بعد', 'الضابطُ يُسجَّل بدليلِ تنفيذٍ محدَّد — والحرجُ بحقوله الخمسة');
     ?>
+    <style>
+        .rsk-w100 { width: 100%; }
+        .rsk-fs78 { font-size: .78rem; }
+        .rsk-fs76 { font-size: .76rem; }
+        .rsk-cell-w200 { font-size: .76rem; max-width: 200px; }
+        .rsk-cell-w180 { font-size: .76rem; max-width: 180px; }
+        .rsk-cell-w160 { font-size: .76rem; max-width: 160px; }
+        .rsk-actions-cell { min-width: 260px; }
+        .rsk-guard-note { font-size: .74rem; color: var(--c-b02a37, #b02a37); }
+        .rsk-readonly-note { font-size: .74rem; opacity: .6; }
+        .rsk-new-card { margin-top: 16px; }
+        .rsk-new-card.is-hidden { display: none; }
+    </style>
 
     <div class="card"><div class="card-body table-responsive">
         <?php $V = function ($c) use ($view) { return risk_col_visible('risk_controls', $view, $c); }; ?>
-        <table class="table table-striped" style="width:100%">
+        <table class="table table-striped rsk-w100">
             <thead><tr><th>الرمز</th><th>الاسم</th>
                 <?php if ($V('ctype')): ?><th>النوع</th><?php endif; ?>
                 <?php if ($V('owner_name')): ?><th>المالك</th><?php endif; ?>
@@ -77,21 +91,21 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <td><?php echo htmlspecialchars($c['name_ar']); ?></td>
                 <?php if ($V('ctype')): ?><td><?php echo $c['ctype']; ?></td><?php endif; ?>
                 <?php if ($V('owner_name')): ?><td><?php echo htmlspecialchars((string) $c['owner_name']); ?></td><?php endif; ?>
-                <?php if ($V('process_ref')): ?><td style="font-size:.78rem"><?php echo htmlspecialchars((string) $c['process_ref'] ?: '—'); ?></td><?php endif; ?>
+                <?php if ($V('process_ref')): ?><td class="rsk-fs78"><?php echo htmlspecialchars((string) $c['process_ref'] ?: '—'); ?></td><?php endif; ?>
                 <?php if ($V('frequency')): ?><td><?php echo $c['frequency']; ?></td><?php endif; ?>
                 <?php if ($V('effectiveness')): ?>
                 <td><span class="badge badge-<?php echo $c['effectiveness'] === 'فعال' ? 'success' : ($c['effectiveness'] === 'غير فعال' ? 'danger' : 'secondary'); ?>">
                     <?php echo $c['effectiveness']; ?></span></td><?php endif; ?>
                 <?php if ($V('last_verified_at')): ?><td><?php echo htmlspecialchars((string) $c['last_verified_at'] ?: '—'); ?></td><?php endif; ?>
-                <?php if ($V('last_verify_result')): ?><td style="font-size:.76rem;max-width:200px"><?php echo htmlspecialchars(mb_substr((string) $c['last_verify_result'], 0, 80) ?: '—'); ?></td><?php endif; ?>
+                <?php if ($V('last_verify_result')): ?><td class="rsk-cell-w200"><?php echo htmlspecialchars(mb_substr((string) $c['last_verify_result'], 0, 80) ?: '—'); ?></td><?php endif; ?>
                 <?php if ($V('next_verify_due')): ?><td><?php echo htmlspecialchars((string) $c['next_verify_due'] ?: '—'); ?></td><?php endif; ?>
                 <?php if ($V('is_critical')): ?><td><?php echo (int) $c['is_critical'] === 1 ? '<span class="badge badge-danger">حرج</span>' : '—'; ?></td><?php endif; ?>
-                <?php if ($V('hico_event')): ?><td style="font-size:.76rem;max-width:180px"><?php echo htmlspecialchars((string) $c['hico_event'] ?: '—'); ?></td><?php endif; ?>
-                <?php if ($V('perf_criterion')): ?><td style="font-size:.76rem;max-width:160px"><?php echo htmlspecialchars((string) $c['perf_criterion'] ?: '—'); ?></td><?php endif; ?>
-                <?php if ($V('verify_method')): ?><td style="font-size:.76rem"><?php echo htmlspecialchars((string) $c['verify_method'] ?: '—'); ?></td><?php endif; ?>
+                <?php if ($V('hico_event')): ?><td class="rsk-cell-w180"><?php echo htmlspecialchars((string) $c['hico_event'] ?: '—'); ?></td><?php endif; ?>
+                <?php if ($V('perf_criterion')): ?><td class="rsk-cell-w160"><?php echo htmlspecialchars((string) $c['perf_criterion'] ?: '—'); ?></td><?php endif; ?>
+                <?php if ($V('verify_method')): ?><td class="rsk-fs76"><?php echo htmlspecialchars((string) $c['verify_method'] ?: '—'); ?></td><?php endif; ?>
                 <?php if ($V('verifier_name')): ?><td><?php echo htmlspecialchars((string) $c['verifier_name'] ?: '—'); ?></td><?php endif; ?>
-                <?php if ($V('fail_action')): ?><td style="font-size:.76rem;max-width:180px"><?php echo htmlspecialchars((string) $c['fail_action'] ?: '—'); ?></td><?php endif; ?>
-                <td style="min-width:260px">
+                <?php if ($V('fail_action')): ?><td class="rsk-cell-w180"><?php echo htmlspecialchars((string) $c['fail_action'] ?: '—'); ?></td><?php endif; ?>
+                <td class="rsk-actions-cell">
                     <?php
                     // §2-2: «إخفاءُ الزرِّ تحسينُ تجربةٍ لا حماية» — والخادمُ يمنع أصلًا.
                     // لكن إظهارَ زرٍّ يُرفض دائمًا عيبُ تجربةٍ لا حياد: دليلُ التنفيذِ
@@ -108,10 +122,10 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <?php if ($canVerifyThis): ?>
                     <button class="btn btn-sm btn-primary ctlVerify" data-id="<?php echo (int) $c['id']; ?>">تحقق</button>
                     <?php elseif ($canWrite): ?>
-                    <span style="font-size:.74rem;color:#b02a37" title="RK-07">مالكه — لا يتحقق</span>
+                    <span class="rsk-guard-note" title="RK-07">مالكه — لا يتحقق</span>
                     <?php endif; ?>
                     <?php if (!$canEvid && !$canVerifyThis): ?>
-                    <span style="font-size:.74rem;opacity:.6">قراءة</span>
+                    <span class="rsk-readonly-note">قراءة</span>
                     <?php endif; ?>
                 </td>
             </tr>
@@ -122,23 +136,23 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     </div></div>
 
     <?php if ($canWrite): ?>
-    <div class="card" id="ctlNewCard" style="display:none;margin-top:16px"><div class="card-body">
+    <div class="card rsk-new-card is-hidden" id="ctlNewCard"><div class="card-body">
         <h6>ضابط جديد — الحرج بحقوله الخمسة كاملة</h6>
         <form id="ctlNewForm" class="allforms">
             <div class="row">
-                <div class="col-md-4"><label>الاسم *<input name="name_ar" class="form-control" required></label></div>
-                <div class="col-md-2"><label>النوع<select name="ctype" class="form-control"><option>وقائي</option><option>كاشف</option><option>تصحيحي</option></select></label></div>
-                <div class="col-md-2"><label>المالك (user) *<input name="owner_user_id" type="number" class="form-control" required></label></div>
-                <div class="col-md-2"><label>التكرار<select name="frequency" class="form-control">
+                <div class="col-md-4"><label>الاسم *<input name="name_ar" class="form-control" aria-label="اسم الضابط" required></label></div>
+                <div class="col-md-2"><label>النوع<select name="ctype" class="form-control" aria-label="نوع الضابط"><option>وقائي</option><option>كاشف</option><option>تصحيحي</option></select></label></div>
+                <div class="col-md-2"><label>المالك (user) *<input name="owner_user_id" type="number" class="form-control" aria-label="مالك الضابط برقم المستخدم" required></label></div>
+                <div class="col-md-2"><label>التكرار<select name="frequency" class="form-control" aria-label="تكرار تنفيذ الضابط">
                     <option>يومي</option><option>كل وردية</option><option>أسبوعي</option><option>شهري</option><option>عند الحدث</option></select></label></div>
-                <div class="col-md-2"><label>حرج؟<select name="is_critical" class="form-control"><option value="0">لا</option><option value="1">نعم</option></select></label></div>
-                <div class="col-md-6"><label>العملية التي ينفَّذ فيها<input name="process_ref" class="form-control"></label></div>
-                <div class="col-md-6"><label>دليل التنفيذ المطلوب *<input name="evidence_spec" class="form-control" required></label></div>
-                <div class="col-md-4"><label>الحدث عالي العواقب (حرج)<input name="hico_event" class="form-control"></label></div>
-                <div class="col-md-4"><label>معيار الأداء (حرج)<input name="perf_criterion" class="form-control"></label></div>
-                <div class="col-md-4"><label>طريقة التحقق (حرج)<input name="verify_method" class="form-control"></label></div>
-                <div class="col-md-4"><label>المتحقق المستقل user (حرج)<input name="verifier_user_id" type="number" class="form-control"></label></div>
-                <div class="col-md-8"><label>ماذا يحدث عند فشله (حرج)<input name="fail_action" class="form-control"></label></div>
+                <div class="col-md-2"><label>حرج؟<select name="is_critical" class="form-control" aria-label="هل الضابط حرج"><option value="0">لا</option><option value="1">نعم</option></select></label></div>
+                <div class="col-md-6"><label>العملية التي ينفَّذ فيها<input name="process_ref" class="form-control" aria-label="العملية التي ينفذ فيها الضابط"></label></div>
+                <div class="col-md-6"><label>دليل التنفيذ المطلوب *<input name="evidence_spec" class="form-control" aria-label="دليل التنفيذ المطلوب" required></label></div>
+                <div class="col-md-4"><label>الحدث عالي العواقب (حرج)<input name="hico_event" class="form-control" aria-label="الحدث عالي العواقب الذي يمنعه الضابط"></label></div>
+                <div class="col-md-4"><label>معيار الأداء (حرج)<input name="perf_criterion" class="form-control" aria-label="معيار أداء الضابط الحرج"></label></div>
+                <div class="col-md-4"><label>طريقة التحقق (حرج)<input name="verify_method" class="form-control" aria-label="طريقة التحقق من الضابط الحرج"></label></div>
+                <div class="col-md-4"><label>المتحقق المستقل user (حرج)<input name="verifier_user_id" type="number" class="form-control" aria-label="المتحقق المستقل برقم المستخدم"></label></div>
+                <div class="col-md-8"><label>ماذا يحدث عند فشله (حرج)<input name="fail_action" class="form-control" aria-label="الإجراء عند فشل الضابط الحرج"></label></div>
             </div>
             <button class="ems-btn-primary" type="submit">تسجيل الضابط</button>
             <span id="ctlNewMsg"></span>
@@ -156,8 +170,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     var nb = document.getElementById('ctlNewBtn');
     if (nb) { nb.addEventListener('click', function () {
-        var c = document.getElementById('ctlNewCard');
-        c.style.display = c.style.display === 'none' ? '' : 'none';
+        document.getElementById('ctlNewCard').classList.toggle('is-hidden');
     }); }
     var nf = document.getElementById('ctlNewForm');
     if (nf) { nf.addEventListener('submit', function (ev) {

@@ -160,7 +160,10 @@ foreach ($SCOPE as $rel) {
 
     /* ⑨ حالاتُ الشاشة — فراغٌ وخطأٌ وتحميلٌ حدًّا أدنى: الوسمُ الحرفيُّ أو نداءُ
        المكوّنِ المركزيِّ ems_state/ems_states_bundle (includes/ux_components.php) */
-    $hasBundle = (bool) preg_match('/ems_states_bundle\s*\(/u', $src);
+    /* شاشاتُ عُدَّةِ u13 تكتسب الحزمةَ من العُدَّةِ نفسِها وقتَ التصيير (سطر 305+) —
+       فلا تُطالَب بكتلةٍ ملفّيةٍ تمحوها إعادةُ التوليد */
+    $hasBundle = (bool) preg_match('/ems_states_bundle\s*\(/u', $src)
+              || (bool) preg_match('/(require|include)(_once)?\s*[( ].*u13_screen_kit\.php/u', $src);
     foreach (array('empty' => 'فراغ', 'error' => 'خطأ', 'loading' => 'تحميل') as $k => $name) {
         if ($hasBundle) break;
         if (!preg_match('/ems[-_]state[-_(\'"]*' . $k . '/u', $src)

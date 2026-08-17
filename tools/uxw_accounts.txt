@@ -7,6 +7,8 @@ Timesheet/	محمد
 Maintenance/	صيانة
 Suppliers/	مصعب
 Risk/	مخاطر
+Audit/	مراجع
+Audit/iaf_reports.php	تنفيذ
 FinRequests/	محمد
 FinRequests/accountant_desk.php	مشرف المالية
 FinRequests/effect_map.php	مشرف المالية

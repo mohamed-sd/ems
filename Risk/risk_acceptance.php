@@ -50,7 +50,7 @@ include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main ems-unified-page-shell">
+<div class="main ems-unified-page-shell ems-doc-cycle">
     <?php
     $header_title = 'القبول والاستثناءات';
     $header_icon = 'fas fa-file-signature';
@@ -71,10 +71,22 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         array('محاولةُ قبولٍ فوقَ السقفِ تُرفض وتُصعَّد آليًّا — ولو وقّع إداريًّا',
               'مهلةُ المراجعةِ بالدرجة: سنويًّا للمنخفضِ وشهريًّا للحرج (§14-2)',
               'سحبُ القبولِ بقرارٍ من الجهةِ نفسِها أو أعلى — لا حذفَ للقرار'));
+    echo ems_next_step('مراجعةُ القرارِ قبل مهلتِه — وإعادةُ التقييمِ أو السحبُ من ملفِّ الخطر', 'risk_register.php');
+    echo ems_states_bundle('لا قراراتِ قبولٍ ضمن هذا الترشيح', 'القبولُ يُسجَّل من ملفِّ الخطرِ حيث الدرجةُ الجاريةُ وحارسُ السلطة');
     ?>
+    <style>
+        .rsk-filter-form { align-items: flex-end; }
+        .rsk-filter-label { font-size: .8rem; }
+        .rsk-w100 { width: 100%; }
+        .rsk-row-late { background: var(--c-rgba2551937008, rgba(255,193,7,.08)); }
+        .rsk-subnote { font-size: .72rem; opacity: .7; }
+        .rsk-fs76 { font-size: .76rem; }
+        .rsk-fs74 { font-size: .74rem; }
+        .rsk-cell-w200 { font-size: .76rem; max-width: 200px; }
+    </style>
 
-    <form method="get" class="ems-toolbar" style="align-items:flex-end">
-        <label style="font-size:.8rem"><input type="checkbox" name="late" value="1" <?php echo $fLate ? 'checked' : ''; ?>>
+    <form method="get" class="ems-toolbar rsk-filter-form">
+        <label class="rsk-filter-label"><input type="checkbox" name="late" value="1" aria-label="تجاوزت مهلة المراجعة فقط" <?php echo $fLate ? 'checked' : ''; ?>>
             تجاوزت مهلة المراجعة فقط</label>
         <button type="submit" class="ems-btn-secondary"><i class="fa fa-filter"></i> ترشيح</button>
     </form>
@@ -89,7 +101,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     });</script>
     <?php else: ?>
     <div class="card"><div class="card-body table-responsive">
-        <table class="table table-striped" style="width:100%">
+        <table class="table table-striped rsk-w100">
             <thead><tr>
                 <th>الخطر</th><th>الوحدة</th><th>الدرجة عند القبول</th><th>حكم الشهية</th>
                 <th>السلطة</th><th>مرجع التفويض</th><th>المُقِرّ</th><th>مراجعة المحلل</th>
@@ -99,23 +111,23 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <tbody>
             <?php foreach ($rows as $x):
                 $late = (int) $x['late_days'] > 0 && empty($x['withdrawn_at']); ?>
-                <tr <?php echo $late ? 'style="background:rgba(255,193,7,.08)"' : ''; ?>>
+                <tr<?php echo $late ? ' class="rsk-row-late"' : ''; ?>>
                     <td><strong><?php echo htmlspecialchars($x['risk_code']); ?></strong>
-                        <div style="font-size:.72rem;opacity:.7"><?php echo htmlspecialchars(mb_substr((string) $x['title'], 0, 40)); ?></div></td>
+                        <div class="rsk-subnote"><?php echo htmlspecialchars(mb_substr((string) $x['title'], 0, 40)); ?></div></td>
                     <td><?php echo htmlspecialchars((string) $x['ru_code']); ?></td>
                     <td><?php $lv = (string) $x['level_at_acceptance'];
                         $cls = ($lv === 'حرج' || $lv === 'محظور') ? 'badge-danger' : ($lv === 'مرتفع' ? 'badge-warning' : 'badge-secondary'); ?>
                         <span class="badge <?php echo $cls; ?>"><?php echo htmlspecialchars($lv); ?></span></td>
                     <td><?php echo htmlspecialchars((string) $x['appetite_verdict'] ?: '—'); ?></td>
                     <td><?php echo htmlspecialchars($AUTH_AR[$x['authority']] ?? (string) $x['authority']); ?></td>
-                    <td style="font-size:.74rem"><?php echo htmlspecialchars((string) $x['authority_ref'] ?: '—'); ?></td>
+                    <td class="rsk-fs74"><?php echo htmlspecialchars((string) $x['authority_ref'] ?: '—'); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['acceptor'] ?: '—'); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['analyst'] ?: '—'); ?></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars((string) $x['compensating_ctl'] ?: '—'); ?></td>
+                    <td class="rsk-fs76"><?php echo htmlspecialchars((string) $x['compensating_ctl'] ?: '—'); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['review_due']); ?></td>
                     <td><?php echo $late ? '<span class="badge badge-warning">' . (int) $x['late_days'] . ' يومًا</span>' : '—'; ?></td>
-                    <td style="font-size:.76rem;max-width:200px"><?php echo htmlspecialchars(mb_substr((string) $x['note'], 0, 80) ?: '—'); ?></td>
-                    <td style="font-size:.74rem"><?php echo htmlspecialchars((string) $x['parent_ref'] ?: '—'); ?></td>
+                    <td class="rsk-cell-w200"><?php echo htmlspecialchars(mb_substr((string) $x['note'], 0, 80) ?: '—'); ?></td>
+                    <td class="rsk-fs74"><?php echo htmlspecialchars((string) $x['parent_ref'] ?: '—'); ?></td>
                     <td><?php echo !empty($x['withdrawn_at'])
                             ? '<span class="badge badge-secondary">مسحوب</span>' : '<span class="badge badge-success">نافذ</span>'; ?></td>
                     <td><a class="btn btn-sm btn-secondary" href="risk_card.php?id=<?php echo (int) $x['risk_id']; ?>">ملف الخطر</a>

@@ -55,3 +55,21 @@ Suppliers/supplier_rules.php
 Suppliers/unit_statement_supplier.php
 Suppliers/supplier_closure.php
 Suppliers/suppliers.php
+# الموجاتُ ٣–٥ — التشغيلُ الحيُّ والمراجعُ الداخليُّ والمخاطر — رُحِّلت 2026-08-17
+Contracts/unit_client_match.php
+Contracts/unit_statement_client.php
+Operations/equipment_quota.php
+Audit/iaf_charter.php
+Audit/iaf_independence.php
+Audit/iaf_universe.php
+Audit/iaf_plan.php
+Audit/iaf_engagements.php
+Audit/iaf_findings.php
+Audit/iaf_reports.php
+Audit/iaf_quality.php
+Risk/risk_assessment.php
+Risk/risk_controls.php
+Risk/risk_control_verify.php
+Risk/risk_acceptance.php
+Risk/risk_reviews.php
+Risk/risk_committee.php

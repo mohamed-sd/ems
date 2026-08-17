@@ -68,17 +68,26 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 $canWrite = !empty($PERMS['can_edit']) || !empty($PERMS['can_add']);
 ?>
-<div class="content-wrapper" dir="rtl">
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ucm-sub { color: var(--c-666666); margin: 4px 0 0; }
+.ucm-empty-note { color: var(--c-777777, #777777); }
+.ucm-decide-form { display: flex; gap: 6px; align-items: center; }
+.ucm-ref-input { width: 130px; }
+</style>
+<div class="content-wrapper ems-doc-cycle" dir="rtl">
   <section class="content-header"><h1>مطابقةُ العميلِ على الوحدات</h1>
-    <p style="color:#666;margin:4px 0 0">القيودُ التي اعتمدتها المبيعاتُ تُعرض على العميل: نطابقُ ما قَبِله ونسجّل ما نازعَ فيه — بمرجعٍ دائمًا.</p>
+    <p class="ucm-sub">القيودُ التي اعتمدتها المبيعاتُ تُعرض على العميل: نطابقُ ما قَبِله ونسجّل ما نازعَ فيه — بمرجعٍ دائمًا.</p>
+    <?php echo ems_next_step('اعتمادُ مديرِ المبيعاتِ بعد مطابقةِ العميل'); ?>
   </section>
   <section class="content">
+    <?php echo ems_states_bundle('لا قيودَ في مرحلةِ المطابقة', 'القيدُ يصل هنا بعد اعتمادِ المبيعات'); ?>
     <?php if ($flash !== null): ?>
       <div class="alert <?= $flash_ok ? 'alert-success' : 'alert-danger' ?>"><?= ($flash_ok ? '✔ ' : '✖ ') . htmlspecialchars($flash, ENT_QUOTES, 'UTF-8') ?></div>
     <?php endif; ?>
     <div class="box"><div class="box-body table-responsive">
       <?php if (!$rows): ?>
-        <p style="color:#777">لا قيودَ في مرحلةِ المطابقة — القيدُ يصل هنا بعد اعتمادِ المبيعات.</p>
+        <p class="ucm-empty-note">لا قيودَ في مرحلةِ المطابقة — القيدُ يصل هنا بعد اعتمادِ المبيعات.</p>
       <?php else: ?>
       <table class="table table-bordered table-striped">
         <thead><tr><th>القيد</th><th>التاريخ</th><th>الوردية</th><th>الكمية</th><th>حالةُ المطابقة</th><th>المرجع</th><?php if ($canWrite): ?><th>القرار</th><?php endif; ?></tr></thead>
@@ -98,10 +107,10 @@ $canWrite = !empty($PERMS['can_edit']) || !empty($PERMS['can_add']);
             <?php if ($canWrite): ?>
             <td>
               <?php if ($r['mstate'] === ''): ?>
-              <form method="post" style="display:flex;gap:6px;align-items:center">
+              <form method="post" class="ucm-decide-form">
                 <?= csrf_field() ?>
                 <input type="hidden" name="entry_id" value="<?= (int) $r['id'] ?>">
-                <input type="text" name="match_ref" placeholder="مرجعُ الكشف *" required class="form-control input-sm" style="width:130px">
+                <input type="text" name="match_ref" placeholder="مرجعُ الكشف *" required class="form-control input-sm ucm-ref-input">
                 <button name="decision" value="matched" class="btn btn-success btn-sm">اقبل</button>
                 <button name="decision" value="disputed" class="btn btn-danger btn-sm">سجّل نزاعًا</button>
               </form>

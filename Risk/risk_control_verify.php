@@ -70,11 +70,28 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         . 'فعاليته بدليلِ تنفيذٍ وتحققٍ دوريٍّ ونتيجةٍ موثَّقة (RK-07).',
         array('المتحقِّقُ المستقلُّ ≠ مالكُ الضابط — والحارسُ يرفض في الخادم لا بإخفاءِ الزر',
               'فشلُ ضابطٍ حرجٍ يصعَّد للرئيسِ في اليومِ نفسِه ولا يُعكس — يُغلق بإجراءٍ تصحيحيٍّ متحقَّقٍ منه'));
+    echo ems_states_bundle('لا ضوابطَ حرجةً ضمن هذا الترشيح', 'الحرجُ يُوسَم بحقوله الخمسةِ من شاشةِ الضوابط');
     ?>
+    <style>
+        .rsk-filter-form { align-items: flex-end; }
+        .rsk-filter-label { font-size: .8rem; }
+        .rsk-due-select { min-width: 200px; }
+        .rsk-w100 { width: 100%; }
+        .rsk-row-overdue { background: var(--c-rgba2205369005, rgba(220,53,69,.05)); }
+        .rsk-fs76 { font-size: .76rem; }
+        .rsk-cell-w200 { font-size: .76rem; max-width: 200px; }
+        .rsk-cell-w180 { font-size: .76rem; max-width: 180px; }
+        .rsk-cell-w160 { font-size: .76rem; max-width: 160px; }
+        .rsk-subnote { font-size: .72rem; opacity: .7; }
+        .rsk-guard-note { font-size: .74rem; color: var(--c-b02a37, #b02a37); }
+        .rsk-form-card { margin-top: 16px; }
+        .rsk-form-card.is-hidden { display: none; }
+        .rsk-msg-inline { margin-inline-start: 10px; }
+    </style>
 
-    <form method="get" class="ems-toolbar" style="align-items:flex-end">
-        <label style="font-size:.8rem">الحالة
-            <select name="due" class="form-control" style="min-width:200px">
+    <form method="get" class="ems-toolbar rsk-filter-form">
+        <label class="rsk-filter-label">الحالة
+            <select name="due" class="form-control rsk-due-select" aria-label="حالة التحقق">
                 <option value="">الكل</option>
                 <option value="overdue" <?php echo $fState === 'overdue' ? 'selected' : ''; ?>>تجاوزت موعد التحقق</option>
                 <option value="soon" <?php echo $fState === 'soon' ? 'selected' : ''; ?>>تحقق مستحق خلال 14 يومًا</option>
@@ -93,7 +110,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     });</script>
     <?php else: ?>
     <div class="card"><div class="card-body table-responsive">
-        <table class="table table-striped" style="width:100%">
+        <table class="table table-striped rsk-w100">
             <thead><tr>
                 <th>الرمز</th><th>الضابط</th><th>الحدث عالي العواقب</th><th>معيار الأداء</th>
                 <th>طريقة التحقق</th><th>المالك</th><th>المتحقق المستقل</th>
@@ -106,12 +123,12 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 $conflict = !empty($x['verifier_user_id']) && (int) $x['verifier_user_id'] === (int) $x['owner_user_id'];
                 $selfOwner = (int) $x['owner_user_id'] === $uid;
                 $overdue = empty($x['next_verify_due']) || $x['next_verify_due'] < date('Y-m-d'); ?>
-                <tr <?php echo $overdue ? 'style="background:rgba(220,53,69,.05)"' : ''; ?>>
+                <tr<?php echo $overdue ? ' class="rsk-row-overdue"' : ''; ?>>
                     <td><strong><?php echo htmlspecialchars($x['control_code']); ?></strong></td>
                     <td><?php echo htmlspecialchars($x['name_ar']); ?></td>
-                    <td style="font-size:.76rem;max-width:200px"><?php echo htmlspecialchars((string) $x['hico_event'] ?: '—'); ?></td>
-                    <td style="font-size:.76rem;max-width:160px"><?php echo htmlspecialchars((string) $x['perf_criterion'] ?: '—'); ?></td>
-                    <td style="font-size:.76rem"><?php echo htmlspecialchars((string) $x['verify_method'] ?: '—'); ?></td>
+                    <td class="rsk-cell-w200"><?php echo htmlspecialchars((string) $x['hico_event'] ?: '—'); ?></td>
+                    <td class="rsk-cell-w160"><?php echo htmlspecialchars((string) $x['perf_criterion'] ?: '—'); ?></td>
+                    <td class="rsk-fs76"><?php echo htmlspecialchars((string) $x['verify_method'] ?: '—'); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['owner_name'] ?: '—'); ?></td>
                     <td><?php echo htmlspecialchars((string) $x['verifier_name'] ?: '—'); ?>
                         <?php if ($conflict): ?>
@@ -122,16 +139,16 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                         <span class="badge <?php echo $cls; ?>"><?php echo htmlspecialchars($ef); ?></span></td>
                     <td><?php echo htmlspecialchars((string) $x['last_verified_at'] ?: '—'); ?>
                         <?php if (!empty($x['last_verifier'])): ?>
-                        <div style="font-size:.72rem;opacity:.7"><?php echo htmlspecialchars($x['last_verifier']); ?></div>
+                        <div class="rsk-subnote"><?php echo htmlspecialchars($x['last_verifier']); ?></div>
                         <?php endif; ?></td>
                     <td><?php echo htmlspecialchars((string) $x['next_verify_due'] ?: 'غير محدد'); ?></td>
                     <td><?php echo (int) $x['linked_risks']; ?></td>
                     <td><?php echo (int) $x['evidence_count']; ?></td>
-                    <td style="font-size:.76rem;max-width:180px"><?php echo htmlspecialchars((string) $x['fail_action'] ?: '—'); ?></td>
+                    <td class="rsk-cell-w180"><?php echo htmlspecialchars((string) $x['fail_action'] ?: '—'); ?></td>
                     <?php if ($canVerify): ?>
                     <td>
                         <?php if ($selfOwner): ?>
-                        <span style="font-size:.74rem;color:#b02a37" title="RK-07">مالكه — لا يتحقق</span>
+                        <span class="rsk-guard-note" title="RK-07">مالكه — لا يتحقق</span>
                         <?php else: ?>
                         <button class="btn btn-sm btn-primary cvDo" data-id="<?php echo (int) $x['id']; ?>"
                             data-code="<?php echo htmlspecialchars($x['control_code']); ?>">تحقق</button>
@@ -148,20 +165,20 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     <?php endif; ?>
 
     <?php if ($canVerify): ?>
-    <div class="card" id="cvCard" style="display:none;margin-top:16px"><div class="card-body">
+    <div class="card rsk-form-card is-hidden" id="cvCard"><div class="card-body">
         <h5><span id="cvTitle"></span></h5>
         <form id="cvForm" class="allforms">
             <input type="hidden" name="control_id" id="cvId">
             <input type="hidden" name="mode" id="cvMode">
             <div class="row">
-                <div class="col-md-4" id="cvResultWrap"><label>نتيجة التحقق *<select name="result" class="form-control">
+                <div class="col-md-4" id="cvResultWrap"><label>نتيجة التحقق *<select name="result" class="form-control" aria-label="نتيجة التحقق">
                     <option>فعال</option><option>فعال جزئيا</option><option>غير فعال</option>
                 </select></label></div>
                 <div class="col-md-8"><label>الدليل أو السبب * (نص مثبت لا ادعاء)
-                    <textarea name="evidence_text" id="cvText" class="form-control" required></textarea></label></div>
+                    <textarea name="evidence_text" id="cvText" class="form-control" aria-label="دليل التحقق أو سبب الفشل" required></textarea></label></div>
             </div>
             <button type="submit" class="ems-btn-primary" id="cvSubmit">حفظ</button>
-            <span id="cvMsg" style="margin-inline-start:10px"></span>
+            <span id="cvMsg" class="rsk-msg-inline"></span>
         </form>
     </div></div>
     <script>
@@ -177,7 +194,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 ? 'تسجيل الفشل — تصعيد فوري (RSK-CTL-FAIL)' : 'حفظ التحقق (RSK-CTL-VERIFY)';
             document.getElementById('cvMsg').textContent = mode === 'fail'
                 ? '⚠ الفشل يصعَّد للرئيس في اليوم نفسه ولا يُعكس' : '';
-            card.style.display = '';
+            card.classList.remove('is-hidden');
             card.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
         document.querySelectorAll('.cvDo').forEach(function (b) {

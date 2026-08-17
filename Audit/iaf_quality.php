@@ -30,3 +30,9 @@ $U13 = array(
     'order'       => 'reviewed_at DESC',
 );
 require __DIR__ . '/../includes/u13_screen_kit.php';
+/* حزمةُ الحالاتِ الدنيا (UXW-01 بوابة ٩): تحميلٌ وفراغٌ وخطأٌ — مخفيةٌ افتراضًا
+   ويُظهرها منطقُ الشاشةِ عند حالِها. الدالةُ من ux_components التي تُحمِّلها القشرة. */
+if (function_exists('ems_states_bundle')) {
+    echo ems_states_bundle('لا تقييماتِ جودةٍ مسجَّلة',
+                           'يُسجَّل التقييمُ الداخليُّ دوريًّا والخارجيُّ عند الانطباق (IAF-0008 · IAF-0031)');
+}

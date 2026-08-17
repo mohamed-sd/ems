@@ -39,14 +39,18 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     include('../includes/page_header.php');
     ems_screen_about('دورية المراجعة بالمستوى: الحرج شهريًّا والمرتفع ربعيًّا والمتوسط نصف سنوي والمنخفض سنويًّا — '
         . 'وإعادة التقييم تحفظ السابق ولا تمحوه (RK-03).', array());
+    echo ems_states_bundle('لا مراجعاتٍ مستحقةً ولا قراراتِ قبولٍ في نطاقك', 'المهلُ تُحتسب من مستوى الخطرِ — والقبولُ يُسجَّل من ملفِّ الخطر');
     ?>
+    <style>
+        .rsk-row-overdue { background: var(--c-fef2f2); }
+    </style>
     <div class="ems-grid">
         <div class="ems-card ems-col-5">
             <h6>مراجعات مستحقة أو متأخرة</h6>
             <table class="table table-sm table-striped">
                 <thead><tr><th>الخطر</th><th>المستوى</th><th>الموعد</th><th></th></tr></thead>
                 <tbody><?php foreach ($due as $d): ?>
-                <tr <?php echo $d['review_due'] < date('Y-m-d') ? 'style="background:#fef2f2"' : ''; ?>>
+                <tr<?php echo $d['review_due'] < date('Y-m-d') ? ' class="rsk-row-overdue"' : ''; ?>>
                     <td><?php echo $d['risk_code']; ?></td>
                     <td><?php echo $d['current_level'] ?: '—'; ?></td>
                     <td><?php echo $d['review_due']; ?></td>

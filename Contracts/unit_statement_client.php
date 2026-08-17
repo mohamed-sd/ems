@@ -34,12 +34,19 @@ include __DIR__ . '/../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ucs-sub { color: var(--c-666666); margin: 4px 0 0; }
+.ucs-empty-note { color: var(--c-777777, #777777); }
+</style>
 <div class="content-wrapper" dir="rtl">
   <section class="content-header"><h1>كشفُ وحداتِ العميل</h1>
-    <p style="color:#666;margin:4px 0 0">لكلِّ شهرٍ وعقد: ساعاتُ التشغيلِ والاستعدادِ المفوترِ (F-11) — محسوبةٌ من القيدِ اليوميِّ لا مُدخَلة.</p>
+    <p class="ucs-sub">لكلِّ شهرٍ وعقد: ساعاتُ التشغيلِ والاستعدادِ المفوترِ (F-11) — محسوبةٌ من القيدِ اليوميِّ لا مُدخَلة.</p>
   </section>
-  <section class="content"><div class="box"><div class="box-body table-responsive">
-    <?php if (!$rows): ?><p style="color:#777">لا قيودَ بعدُ — الكشفُ يمتلئ من القيدِ اليومي.</p>
+  <section class="content">
+  <?php echo ems_states_bundle('لا قيودَ في الكشفِ بعدُ', 'الكشفُ يمتلئ من القيدِ اليوميِّ بعد اعتمادِه'); ?>
+  <div class="box"><div class="box-body table-responsive">
+    <?php if (!$rows): ?><p class="ucs-empty-note">لا قيودَ بعدُ — الكشفُ يمتلئ من القيدِ اليومي.</p>
     <?php else: ?>
     <table class="table table-bordered table-striped">
       <thead><tr><th>الشهر</th><th>العقد</th><th>المشروع</th><th>تشغيلٌ (ساعة)</th><th>استعدادٌ مفوتر (ساعة)</th><th>تعطلٌ (ساعة)</th><th>أيامُ العمل</th><th>أطنان</th><th>أمتار</th></tr></thead>
