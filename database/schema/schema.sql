@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-18 21:24:51
+-- المصدر: equipation_manage · التوليد: 2026-08-17 05:45:19
 -- الجداول: 588 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -7669,6 +7669,7 @@ CREATE TABLE `nav_canonical` (
   `decided_at` datetime DEFAULT NULL,
   `provisional_since` datetime DEFAULT NULL COMMENT 'متى بدأ التطبيقُ المؤقَّت',
   `provisional_reversible` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'حصرُ النطاق: 1 = تسميةٌ/موضعٌ يُعكسان · 0 يمنع التطبيقَ المؤقَّت',
+  `policy_domain` enum('NAVIGATION_NAMING_POSITION','PERMISSIONS','APPROVAL_LADDERS','FINANCIAL_CAPS','SEGREGATION_OF_DUTIES','LEGAL_OBLIGATIONS','FINANCIAL_DECISIONS') NOT NULL DEFAULT 'NAVIGATION_NAMING_POSITION' COMMENT 'مجالُ الصفّ — والتطبيقُ المؤقَّتُ ممنوعٌ بنيويًّا في الستةِ المحظورة',
   `old_names` text DEFAULT NULL COMMENT 'المسمياتُ الملغاة — مرادفاتٌ تاريخية',
   `derivation` varchar(190) DEFAULT NULL COMMENT 'مصدرُ الاشتقاق (بند ٤ — إلزاميّ)',
   `view_of` varchar(255) DEFAULT NULL COMMENT 'علاقةُ المنظر/الارتباط بمسارٍ داخل الـ359',
