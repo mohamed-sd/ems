@@ -33,7 +33,7 @@ foreach (array_slice($argv, 1) as $a) {
 /** الإصدارُ العاملُ من بصمةِ ملفاتِ المكتبةِ الآن — لا من رقمٍ مكتوب */
 function ux_current_version($conn, $ROOT) {
     $FILES = array('assets/css/uxui-tokens.css', 'assets/css/uxui-components.css',
-                   'includes/uxui_components.php', 'includes/status_display.php');
+                   'includes/uxui_components.php', 'includes/status_display.php', 'assets/css/ems-screens.css');
     $parts = array();
     foreach ($FILES as $f) {
         $p = $ROOT . '/' . $f;

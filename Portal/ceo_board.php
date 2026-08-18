@@ -185,15 +185,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
-.ems-ceo-kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
-.ems-ceo-kpi-card { border:1px solid var(--ems-border, var(--c-e5e5e5)); border-radius:10px; padding:10px; text-align:center; }
-.ems-ceo-kpi-num { font-size:20px; font-weight:700; }
-.ems-ceo-kpi-label { font-size:12px; }
-.ems-ceo-kpi-note { margin-top:6px; font-size:12px; }
-.ems-ceo-form-actions { margin-top:12px; display:flex; gap:10px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
     $header_title = 'لوحة المدير التنفيذي';

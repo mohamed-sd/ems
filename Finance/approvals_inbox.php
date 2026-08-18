@@ -65,13 +65,7 @@ include '../insidebar.php';
     echo ems_next_step('قرارُك: اعتمادٌ أو رفضٌ مسبَّب');
     echo ems_states_bundle('لا اعتماداتٍ تنتظر دورَك', 'ما يستجدُّ من الصناديق الأربعة يظهر هنا فورَ وروده');
     ?>
-    <style>
-        .fin-inbox-counters { display: flex; gap: 14px; flex-wrap: wrap; }
-        .fin-inbox-badge { font-size: 15px; padding: 8px 14px; }
-        .fin-inbox-badge-total { font-size: 16px; padding: 8px 14px; }
-        .fin-inbox-owner { color: var(--c-s-888); }
-        .fin-w100 { width: 100%; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card"><div class="card-body fin-inbox-counters">
         <?php foreach ($inbox['boxes'] as $b): ?>

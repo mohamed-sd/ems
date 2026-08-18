@@ -63,8 +63,16 @@ foreach ($files as $rel) {
 
     /* ① كتلُ style المحلية */
     $styleBlocks = preg_match_all('~<style\b[^>]*>~iu', $src);
-    /* ② سماتُ style السطرية */
-    $inlineStyles = preg_match_all('~\sstyle\s*=\s*["\']~iu', $src);
+    /* ② سماتُ style السطرية — و**الاستثناءُ المصرَّح** يُعَدُّ ولا يُرسِّب:
+       قيمةٌ تُحسب من بياناتٍ حيةٍ لحظةَ التصيير (عرضُ شريطِ تقدمٍ بنسبةٍ مقيسة)
+       لا يمكن أن تعيش في ورقةِ أنماطٍ ثابتة. والمستودعُ يعلّمها سلفًا بـ
+       `data-allow-style` — فهي «مُعتمَدةٌ بسببٍ مكتوب» لا مخالفةٌ مسكوتٌ عنها،
+       وتُعرض في التقريرِ بعددِها فلا تختفي خلف رقمٍ أخضر. */
+    /* ◆ ولا يُطابَق الوسمُ بـ`[^>]*`: وسمُ PHP بداخله `>` فيبتر المطابقةَ باكرًا
+         (وقع فعلًا). فالمطابقةُ على السطرِ بنافذةٍ محدودةٍ بعد العلامة. */
+    $allowed = preg_match_all('~data-allow-style[^\n]{0,240}?\sstyle\s*=~iu', $src);
+    $inlineStyles = preg_match_all('~\sstyle\s*=\s*["\']~iu', $src) - $allowed;
+    if ($inlineStyles < 0) { $inlineStyles = 0; }
     /* ③ ألوانٌ مثبَّتة */
     $hex = array();
     if (preg_match_all('~#[0-9a-fA-F]{3,8}\b~u', $src, $m3)) { $hex = array_unique($m3[0]); }
@@ -78,7 +86,7 @@ foreach ($files as $rel) {
     }
     $v = $styleBlocks + $inlineStyles + count($hex) + $rgb + count($offScale);
     $totalViol += $v;
-    $rows[] = array('file' => $rel, 'style_blocks' => $styleBlocks, 'inline' => $inlineStyles,
+    $rows[] = array('file' => $rel, 'style_blocks' => $styleBlocks, 'inline' => $inlineStyles, 'allowed' => $allowed,
                     'hex' => count($hex), 'rgb' => $rgb, 'offscale' => count($offScale),
                     'hex_s' => array_slice(array_values($hex), 0, 3),
                     'off_s' => array_slice($offScale, 0, 4), 'total' => $v);

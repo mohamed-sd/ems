@@ -562,13 +562,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['operator'])) {
             /* UXW-01 ①/②: مخرَجٌ مستقلٌّ قبل تحميلِ القشرة — الأصنافُ محلُّ الأنماطِ
                السطرية، والرموزُ تحمل قيمَها الاحتياطيةَ حرفًا بحرفٍ لأن design-tokens
                غيرُ محمَّلٍ في هذا المخرَجِ المبكر (فلا يتغيّر بكسلٌ واحد). */
-            echo '<style>'
-               . '.ts-blocked-wrap{max-width:760px;margin:40px auto;padding:20px;border:1px solid var(--c-fca5a5, #fca5a5);'
-               . 'border-radius:12px;background:var(--c-fef2f2, #fef2f2);font-family:Tajawal,sans-serif;direction:rtl}'
-               . '.ts-blocked-fix{color:var(--c-state-info-deep, #1d4ed8);font-weight:700}'
-               . '.ts-blocked-back{padding:8px 16px;background:var(--c-e5e7eb, #e5e7eb);'
-               . 'border-radius:8px;color:var(--c-111111, #111);text-decoration:none}'
-               . '</style>';
+            echo '<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>';
             echo '<div class="ts-blocked-wrap">';
             echo '<h3 data-ems-c="ts-1">لم يُسجَّل يومُ العمل — حاوياتُ الموقع لم تكتمل</h3>';
             echo '<p data-ems-c="ts-2">'
@@ -845,16 +839,7 @@ try {
 <link rel="stylesheet" href="../assets/css/main_admin_style.css">
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-<style>
-  /* UXW-01 ①/②: ما كان أنماطًا سطريةً وألوانًا مثبَّتةً صار أصنافًا برموز اللوحة */
-  .ts-day-ico-ok { color: var(--c-state-ok); }
-  .ts-day-ico-warn { color: var(--c-d97706); }
-  .ts-day-fill { height: 100%; }
-  .ts-day-fill-ok { background: var(--c-state-ok); }
-  .ts-day-fill-warn { background: var(--c-s-f0b429); }
-  /* خلفيةُ الخانةِ المشتقةِ من سطور الزمن — الرمزُ باسم قيمته مع احتياطيِّه الحرفي */
-  .ts-derived-lock { background: var(--c-fdf6e3, #fdf6e3); }
-</style>
+
 
 <div class="main timesheet-entry-page ems-unified-page-shell ems-doc-cycle">
 

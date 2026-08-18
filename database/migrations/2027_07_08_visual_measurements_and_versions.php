@@ -70,7 +70,7 @@ $FILES = array(
     'assets/css/uxui-tokens.css',
     'assets/css/uxui-components.css',
     'includes/uxui_components.php',
-    'includes/status_display.php',
+    'includes/status_display.php', 'assets/css/ems-screens.css',
 );
 $parts = array(); $missing = array();
 foreach ($FILES as $f) {

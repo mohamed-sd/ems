@@ -127,16 +127,7 @@ $sf_supplier_id = intval($_GET['id'] ?? 0); $sf_active = 'profile';
 if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php';
 ?>
 
-<style>
-.supplier-profile-page .profile-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:14px; }
-.supplier-profile-page .profile-card { background:var(--c-surface); border:1px solid var(--c-ece2d3); border-radius:12px; padding:12px; }
-.supplier-profile-page .kpi { font-weight:800; font-size:1.4rem; color:var(--c-0f766e); }
-.supplier-profile-page .label { color:var(--c-ink-500); font-size:.9rem; }
-.supplier-profile-page .spf-lead-card { margin-bottom:12px; }
-.supplier-profile-page .spf-lead-title { margin:0 0 8px 0; }
-.supplier-profile-page .spf-section-card { margin-bottom:14px; }
-.supplier-profile-page .spf-table { width:100%; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <div class="main supplier-profile-page ems-unified-page-shell">
     <?php

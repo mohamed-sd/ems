@@ -41,7 +41,7 @@ function run($cmd) { return (string) @shell_exec($cmd . ' 2>&1'); }
 
 /* الإصدارُ العاملُ من بصمةِ الملفاتِ الآن — القياسُ الأقدمُ منه لا يُقرأ */
 $FILES = array('assets/css/uxui-tokens.css', 'assets/css/uxui-components.css',
-               'includes/uxui_components.php', 'includes/status_display.php');
+               'includes/uxui_components.php', 'includes/status_display.php', 'assets/css/ems-screens.css');
 $parts = array();
 foreach ($FILES as $f) { if (is_file($ROOT . '/' . $f)) { $parts[$f] = hash_file('sha256', $ROOT . '/' . $f); } }
 ksort($parts);

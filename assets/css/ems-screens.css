@@ -1621,3 +1621,334 @@ body.ems-site,
 .u13-views .btn-secondary{border:1px solid var(--ems-border,var(--c-s-d8dbe0));background:transparent;border-radius:8px;
   padding:6px 14px;cursor:pointer;font-size:.9em;font-family:inherit;color:inherit}
 .u13-views .btn-secondary.is-active{background:var(--ems-primary,var(--c-s-f5c518));border-color:transparent;font-weight:600;color:var(--c-s-111)}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   نُقل من كتلِ النمطِ المحليةِ في الشاشاتِ الذهبية (UXUI-01 · البند ٦)
+   2026-08-18 18:31 — **نقلٌ حرفيٌّ بلا مسِّ قيمة**: صفرُ انحرافٍ بصريٍّ بالتصميم.
+   وموضعُ التحميلِ هنا قربَ الآخرِ كما كانت الكتلُ داخلَ الصفحة، فلا يتغيّر مَن يغلب مَن.
+   والعكسُ بأمرٍ واحد: php tools/uxui_extract_local_styles.php --revert
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Portal/ceo_board.php ── */
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ems-ceo-kpi-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:10px; }
+.ems-ceo-kpi-card { border:1px solid var(--ems-border, var(--c-e5e5e5)); border-radius:10px; padding:10px; text-align:center; }
+.ems-ceo-kpi-num { font-size:20px; font-weight:700; }
+.ems-ceo-kpi-label { font-size:12px; }
+.ems-ceo-kpi-note { margin-top:6px; font-size:12px; }
+.ems-ceo-form-actions { margin-top:12px; display:flex; gap:10px; }
+
+/* ── Portal/my_tasks.php ── */
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ems-wi-accent-card { margin-bottom:12px; border-right:4px solid var(--c-7c3aed); }
+.ems-wi-close { float:left; }
+.ems-wi-line { margin:4px 0; }
+.ems-wi-chain-warn { margin-top:8px; }
+.ems-wi-views { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
+.ems-wi-dels-body { padding:10px 14px; }
+.ems-wi-whylink { font-size:.78rem; }
+.ems-wi-title-cell { max-width:260px; white-space:normal; }
+.ems-wi-sub { font-size:.8rem; }
+.ems-wi-reason { color:var(--c-92400e); font-size:.78rem; }
+.ems-wi-actions-cell { min-width:170px; }
+.ems-wi-inline-form { display:inline; }
+.ems-wi-inline-block { display:inline-block; }
+.ems-wi-dropform { margin-top:4px; }
+.ems-wi-field-gap { margin-bottom:4px; }
+
+/* ── Operations/sites_board.php ── */
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ems-sites-tiles { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+.ems-site-tile { display:block; min-width:150px; padding:10px 14px; border:1px solid var(--c-dee2e6); border-radius:8px; background:var(--c-f8f9fa); color:var(--c-1f2937); text-decoration:none; }
+.ems-site-tile.is-active { background:var(--c-0d6efd); color:var(--c-s-fff); }
+.ems-row-stopped { background:var(--c-fff3f4); }
+.ems-badge-stopped { background:var(--c-dc3545); }
+.ems-badge-working { background:var(--c-198754); }
+.ems-sites-note { font-size:.85em; }
+
+/* ── Timesheet/timesheet.php ── */
+'
+               . '.ts-blocked-wrap{max-width:760px;margin:40px auto;padding:20px;border:1px solid var(--c-fca5a5, #fca5a5);'
+               . 'border-radius:12px;background:var(--c-fef2f2, #fef2f2);font-family:Tajawal,sans-serif;direction:rtl}'
+               . '.ts-blocked-fix{color:var(--c-state-info-deep, #1d4ed8);font-weight:700}'
+               . '.ts-blocked-back{padding:8px 16px;background:var(--c-e5e7eb, #e5e7eb);'
+               . 'border-radius:8px;color:var(--c-111111, #111);text-decoration:none}'
+               . '
+/* UXW-01 ①/②: ما كان أنماطًا سطريةً وألوانًا مثبَّتةً صار أصنافًا برموز اللوحة */
+  .ts-day-ico-ok { color: var(--c-state-ok); }
+  .ts-day-ico-warn { color: var(--c-d97706); }
+  .ts-day-fill { height: 100%; }
+  .ts-day-fill-ok { background: var(--c-state-ok); }
+  .ts-day-fill-warn { background: var(--c-s-f0b429); }
+  /* خلفيةُ الخانةِ المشتقةِ من سطور الزمن — الرمزُ باسم قيمته مع احتياطيِّه الحرفي */
+  .ts-derived-lock { background: var(--c-fdf6e3, #fdf6e3); }
+
+/* ── Maintenance/orders.php ── */
+/* UXW-01 ①: الألوانُ كلُّها برموزِ اللوحة — ما لا رمزَ له بعدُ يُعلَن باسمِ
+       قيمتِه مع قيمتِه الاحتياطيةِ حرفًا بحرفٍ فلا يتغيّر بكسلٌ واحد. */
+
+    /* UXW-01 ②: أصنافٌ محلَّ الأنماطِ الموضعيةِ التي كانت مبثوثةً في الوسوم */
+    .mnt-mb12 { margin-bottom: 12px; }
+    .mnt-hide { display: none; }
+    .mnt-w100 { width: 100%; }
+    .mnt-src-insp { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; }
+    .mnt-dim75 { opacity: .75; }
+    .mnt-star { color: var(--c-e0ae2e); }
+    .mnt-wp-card { border-inline-start: 4px solid var(--c-a15c00, #a15c00); }
+    .mnt-wp-badge { margin: 0 3px; }
+
+    /* شارة «auto» بجوار اسم المعدة للأوامر التلقائية */
+    .mnt-auto-badge {
+        display: inline-block;
+        margin-inline-start: 6px;
+        padding: 1px 7px;
+        font-size: 11px;
+        font-weight: 700;
+        border-radius: 6px;
+        background: var(--c-6d28d9);
+        color: var(--c-s-fff);
+        letter-spacing: .5px;
+    }
+
+    /* أيقونة جرس الأوامر التلقائية المفتوحة + شارتها الحمراء */
+    .mnt-bell-wrap {
+        display: flex;
+        justify-content: flex-end;
+        margin: 6px 2px 0;
+    }
+
+    .mnt-bell {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--c-f3f4f6);
+        color: var(--c-374151);
+        font-size: 17px;
+        cursor: default;
+    }
+
+    .mnt-bell-badge {
+        position: absolute;
+        top: -4px;
+        inset-inline-end: -4px;
+        min-width: 18px;
+        height: 18px;
+        padding: 0 5px;
+        border-radius: 9px;
+        background: var(--c-state-danger);
+        color: var(--c-s-fff);
+        font-size: 11px;
+        font-weight: 700;
+        line-height: 18px;
+        text-align: center;
+    }
+
+    /* بطاقات الإحصائيات — نفس تصميم إحصائيات المشاريع والعملاء حرفياً */
+    .mnt-orders-main .stats-section {
+        border: 1px solid var(--bdr);
+        border-radius: var(--rl);
+        background: linear-gradient(180deg, var(--c-s-rgba2552552559) 0%, var(--s2) 100%);
+        box-shadow: var(--sh);
+        padding: 14px;
+        margin-bottom: 14px;
+    }
+    .mnt-orders-main .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(170px, 1fr));
+        gap: 12px;
+    }
+    .mnt-orders-main .stats-card {
+        background: var(--c-s-eee);
+        border: 1px solid var(--c-s-aaa);
+        border-radius: 35px;
+        padding: 18px;
+        box-shadow: 0 2px 8px var(--c-s-rgba2618807);
+        position: relative;
+        overflow: hidden;
+    }
+    .mnt-orders-main .stats-card .stats-icon {
+        width: 55px;
+        height: 55px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+        float: left;
+        vertical-align: middle;
+        margin-top: 15px;
+        border: 1px solid var(--c-999999);
+        background-color: var(--c-s-fff);
+        color: var(--c-s-000);
+    }
+    .mnt-orders-main .stats-card .stats-title {
+        color: var(--c-555555);
+        font-size: 0.92rem;
+        font-weight: 700;
+        margin-top: 5px;
+        line-height: 1.3;
+    }
+    .mnt-orders-main .stats-card .stats-value {
+        color: var(--c-s-222);
+        line-height: 1;
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+        margin-top: 10px;
+        font-size: 35px;
+    }
+    @media (max-width: 900px) {
+        .mnt-orders-main .stats-grid { grid-template-columns: repeat(2, minmax(150px, 1fr)); }
+    }
+    @media (max-width: 560px) {
+        .mnt-orders-main .stats-grid { grid-template-columns: 1fr; }
+    }
+
+    /* الهوية البصرية لأوامر الصيانة — متّسقة مع باقي الموقع (navy/gold) */
+    .mnt-orders-main .mnt-pill { display:inline-flex; align-items:center; padding:4px 12px; border-radius:999px; font-size:.78rem; font-weight:800; }
+    .mnt-pill--gold { background:var(--c-rgba22417446016, rgba(224,174,46,.16)); color:var(--c-9a6f10, #9a6f10); }
+    .mnt-pill--blue { background:var(--c-s-rgba379923514); color:var(--c-state-info-deep); }
+    .mnt-pill--purple { background:var(--c-s-rgba1245823714); color:var(--c-6d28d9); }
+    .mnt-pill--green { background:var(--c-rgba2216374016); color:var(--c-15803d); }
+    .mnt-pill--gray { background:var(--c-rgba107114128016, rgba(107,114,128,.16)); color:var(--c-4b5563); }
+
+    /* Stepper مراحل الأمر */
+    .mnt-stepper-card { margin-bottom:14px; }
+    .mnt-stepper { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+    .mnt-step { display:flex; align-items:center; gap:8px; padding:6px 14px; border-radius:999px; background:var(--s2,#f3f0e8); color:var(--t2,#8a7a5c); font-weight:700; font-size:.86rem; flex:1; min-width:120px; justify-content:center; }
+    .mnt-step-dot { width:26px; height:26px; border-radius:50%; background:var(--c-s-fff); border:2px solid currentColor; display:inline-flex; align-items:center; justify-content:center; font-size:.8rem; font-weight:900; }
+    .mnt-step.is-done { background:var(--c-rgba2216374012); color:var(--c-15803d); }
+    .mnt-step.is-current { background:linear-gradient(135deg,var(--c-1f4f7a),var(--c-2f6fa5)); color:var(--c-s-fff); }
+    .mnt-step.is-current .mnt-step-dot { background:var(--c-s-fff); color:var(--c-1f4f7a); border-color:var(--c-s-fff); }
+    .mnt-step.is-cancel { background:var(--c-rgba2203838012); color:var(--c-b91c1c); }
+
+    /* ملخص التكاليف */
+    .mnt-orders-main .mnt-cost-summary { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; }
+    .mnt-cost-box { background:var(--s1,#fff); border:1px solid var(--bdr,#ece6d8); border-radius:14px; padding:14px; text-align:center; box-shadow:0 2px 8px var(--c-rgba26188006); }
+    .mnt-cost-box span { display:block; color:var(--t2,#8a7a5c); font-size:.8rem; font-weight:700; margin-bottom:7px; }
+    .mnt-cost-box strong { font-size:1.4rem; font-variant-numeric:tabular-nums; color:var(--t1,#1a1208); }
+    .mnt-cost-total { background:linear-gradient(135deg,var(--c-1f4f7a),var(--c-2f6fa5)); border:none; }
+    .mnt-cost-total span, .mnt-cost-total strong { color:var(--c-s-fff); }
+
+    /* ══ مفاتيح تفعيل بنود التكلفة (العمالة/القطع) ══ */
+    .mnt-cost-toggles { margin-bottom:14px; border:1px solid var(--bdr,#e7dcc4); border-radius:18px; }
+    .mnt-cost-toggles .card-body { padding:16px 18px; }
+    .mnt-toggles-head { display:flex; align-items:center; flex-wrap:wrap; gap:8px; font-weight:800; color:var(--c-1f4f7a); font-size:.98rem; margin-bottom:14px; }
+    .mnt-toggles-head i { color:var(--c-e0ae2e); }
+    .mnt-toggles-hint { color:var(--c-9a8c6c, #9a8c6c); font-weight:600; font-size:.78rem; }
+    .mnt-toggles-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    @media (max-width:760px){ .mnt-toggles-grid { grid-template-columns:1fr; } }
+    .mnt-toggle { display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:14px; border:1.5px solid var(--c-e7dcc4, #e7dcc4); background:var(--c-fdfbf6, #fdfbf6); cursor:pointer; transition:border-color .18s, background .18s, box-shadow .18s; margin:0; }
+    .mnt-toggle:hover { border-color:var(--c-d7c79f, #d7c79f); }
+    .mnt-toggle.is-on { border-color:var(--c-2f6fa5); background:linear-gradient(180deg,var(--c-f3f9ff, #f3f9ff),var(--c-eaf3fc, #eaf3fc)); box-shadow:0 2px 10px var(--c-rgba47111165012, rgba(47,111,165,.12)); }
+    .mnt-toggle-text { display:flex; flex-direction:column; gap:3px; }
+    .mnt-toggle-title { font-weight:800; color:var(--c-1a1208, #1a1208); font-size:.92rem; display:flex; align-items:center; gap:7px; }
+    .mnt-toggle-title i { color:var(--c-2f6fa5); }
+    .mnt-toggle-sub { color:var(--c-8a7a5c, #8a7a5c); font-size:.76rem; font-weight:600; }
+    /* مفتاح التبديل */
+    .mnt-switch { position:relative; flex:0 0 auto; width:46px; height:26px; }
+    .mnt-switch input { position:absolute; inset:0; width:100%; height:100%; opacity:0; margin:0; cursor:pointer; z-index:2; }
+    .mnt-switch-track { position:absolute; inset:0; background:var(--c-cfc6b2, #cfc6b2); border-radius:999px; transition:background .2s; }
+    .mnt-switch-track::before { content:''; position:absolute; top:3px; inset-inline-start:3px; width:20px; height:20px; background:var(--c-s-fff); border-radius:50%; box-shadow:0 1px 3px var(--c-rgba00003); transition:transform .2s; }
+    .mnt-switch input:checked + .mnt-switch-track { background:linear-gradient(135deg,var(--c-1f4f7a),var(--c-2f6fa5)); }
+    .mnt-switch input:checked + .mnt-switch-track::before { transform:translateX(-20px); }
+
+    /* ══ لوحتا أسطر العمالة والقطع — تصميم قوي متّسق مع هوية الفورمات ══ */
+    .mnt-lines-grid { display:flex; flex-wrap:wrap; gap:14px; }
+    .mnt-lines-card { flex:1 1 380px; min-width:0; overflow:hidden; }
+    .mnt-lines-card > .card-header.mnt-lines-head {
+        display:flex; align-items:center; justify-content:space-between; gap:10px;
+        background:linear-gradient(135deg,var(--c-1f4f7a),var(--c-2f6fa5)); color:var(--c-s-fff); padding:13px 16px; border:none;
+    }
+    .mnt-lines-head h5 { display:flex; align-items:center; gap:8px; margin:0; color:var(--c-s-fff); font-weight:800; font-size:1rem; }
+    .mnt-lines-head h5 i { color:var(--c-ffd98a, #ffd98a); }
+    .mnt-count { display:inline-flex; align-items:center; justify-content:center; min-width:24px; height:24px; padding:0 8px; border-radius:999px; background:var(--c-rgba255255255022); color:var(--c-s-fff); font-size:.76rem; font-weight:800; }
+    .mnt-add-toggle {
+        display:inline-flex; align-items:center; gap:6px; border:none; cursor:pointer;
+        padding:7px 15px; border-radius:999px; font-weight:800; font-size:.82rem; color:var(--c-1a1208, #1a1208);
+        background:linear-gradient(135deg,var(--c-e0ae2e),var(--c-f5d27e, #f5d27e)); box-shadow:0 2px 8px var(--c-rgba2241744604, rgba(224,174,46,.4)); transition:transform .15s, box-shadow .15s;
+    }
+    .mnt-add-toggle:hover { transform:translateY(-1px); box-shadow:0 6px 16px var(--c-rgba2241744605, rgba(224,174,46,.5)); }
+    .mnt-line-form { background:linear-gradient(180deg,var(--c-fffdf7),var(--c-fbf6ea, #fbf6ea)); border:1px solid var(--c-e7dcc4, #e7dcc4); border-radius:16px; padding:16px; margin-bottom:14px; box-shadow:inset 0 1px 0 var(--c-s-fff), 0 2px 10px var(--c-rgba26188006); }
+    .mnt-line-form-title { display:flex; align-items:center; gap:8px; font-weight:800; color:var(--c-6b5d3e, #6b5d3e); font-size:.86rem; margin-bottom:13px; padding-bottom:11px; border-bottom:1px dashed var(--c-e7dcc4, #e7dcc4); }
+    .mnt-line-form-title i { color:var(--c-e0ae2e); }
+    .mnt-line-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px 14px; align-items:end; }
+    .mnt-line-grid .form-group { margin:0; }
+    .mnt-line-grid .form-group label:not(.mnt-major-chk) { display:block; font-size:.8rem; font-weight:700; color:var(--c-6b5d3e, #6b5d3e); margin-bottom:6px; }
+    .mnt-line-form input, .mnt-line-form select { width:100%; height:40px; border:1.5px solid var(--c-e2d8c0, #e2d8c0); border-radius:10px; padding:0 12px; background:var(--c-s-fff); color:var(--c-1a1208, #1a1208); font-size:.88rem; font-family:inherit; transition:border-color .15s, box-shadow .15s; }
+    .mnt-line-form input:focus, .mnt-line-form select:focus { outline:none; border-color:var(--c-2f6fa5); box-shadow:0 0 0 3px var(--c-rgba47111165014, rgba(47,111,165,.14)); }
+    .mnt-line-form input[readonly] { background:var(--c-f3ede0, #f3ede0); color:var(--c-7a6a48, #7a6a48); cursor:default; border-style:dashed; }
+    .mnt-line-actions { display:flex; align-items:center; gap:10px; margin-top:16px; flex-wrap:wrap; padding-top:13px; border-top:1px dashed var(--c-e7dcc4, #e7dcc4); }
+    .mnt-line-cancel { display:inline-flex; align-items:center; gap:6px; cursor:pointer; }
+    .mnt-major-chk { display:inline-flex; align-items:center; gap:7px; white-space:nowrap; font-weight:700; font-size:.85rem; margin:0; cursor:pointer; height:40px; }
+    .mnt-major-chk input { width:auto !important; height:auto !important; }
+
+    /* جداول الأسطر — قوية وواضحة */
+    .mnt-line-table { width:100%; border-collapse:separate; border-spacing:0; }
+    .mnt-line-table thead th { background:var(--c-f3ede0, #f3ede0); color:var(--c-6b5d3e, #6b5d3e); font-weight:800; font-size:.82rem; padding:10px 12px; border-bottom:2px solid var(--c-e7dcc4, #e7dcc4); }
+    .mnt-line-table tbody td { font-size:.88rem; padding:10px 12px; border-bottom:1px solid var(--c-f0e9da, #f0e9da); }
+    .mnt-line-table tbody tr:hover { background:var(--c-rgba22417446007, rgba(224,174,46,.07)); }
+    .mnt-line-table .mnt-num { font-variant-numeric:tabular-nums; font-weight:700; text-align:start; }
+    .mnt-line-table .mnt-center, .mnt-line-table td:last-child, .mnt-line-table th:last-child { text-align:center; }
+    .mnt-line-table tfoot th { background:var(--c-1f4f7a); color:var(--c-s-fff); font-weight:800; font-variant-numeric:tabular-nums; font-size:.92rem; padding:11px 12px; }
+    .mnt-line-table tfoot th:first-child { text-align:start; }
+    .mnt-empty-line { display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--c-b0a489, #b0a489); padding:22px 10px; }
+    .mnt-empty-line i { font-size:1.9rem; opacity:.5; }
+    .mnt-empty-line span { font-size:.9rem; font-weight:600; }
+    .mnt-req-hint { color:var(--c-b45309); font-size:.72rem; font-weight:700; }
+    @media (max-width:992px){ .mnt-lines-grid{ grid-template-columns:1fr; } .mnt-orders-main .mnt-cost-summary{ grid-template-columns:repeat(2,1fr);} }
+
+/* ── Suppliers/supplier_profile.php ── */
+.supplier-profile-page .profile-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:14px; }
+.supplier-profile-page .profile-card { background:var(--c-surface); border:1px solid var(--c-ece2d3); border-radius:12px; padding:12px; }
+.supplier-profile-page .kpi { font-weight:800; font-size:1.4rem; color:var(--c-0f766e); }
+.supplier-profile-page .label { color:var(--c-ink-500); font-size:.9rem; }
+.supplier-profile-page .spf-lead-card { margin-bottom:12px; }
+.supplier-profile-page .spf-lead-title { margin:0 0 8px 0; }
+.supplier-profile-page .spf-section-card { margin-bottom:14px; }
+.supplier-profile-page .spf-table { width:100%; }
+
+/* ── Risk/risk_register.php ── */
+.rsk-filter-form { align-items: flex-end; }
+        .rsk-filter-label { font-size: .8rem; }
+        .rsk-ru-select { min-width: 200px; }
+        .rsk-w100 { width: 100%; }
+        .rsk-new-card { margin-top: 16px; }
+        .rsk-new-card.is-hidden { display: none; }
+        .rsk-new-msg { margin-inline-start: 10px; }
+
+/* ── FinRequests/request_form.php ── */
+/* UXW-01 ①/②: الأنماطُ الموضعيةُ صارت أصنافًا — والألوانُ برموزِ اللوحة
+           (ما لا رمزَ له بعدُ يُعلَن باسمِ قيمتِه مع قيمتِه الاحتياطيةِ حرفًا بحرف) */
+        .fr-alert { margin-bottom:14px; font-weight:700; }
+        .fr-mb14 { margin-bottom:14px; }
+        .fr-head-flex { display:flex; gap:18px; flex-wrap:wrap; align-items:center; }
+        .fr-link-inherit { color:inherit; text-decoration:underline; }
+        .fr-form-inline { display:flex; gap:8px; align-items:center; }
+        .fr-split-card { margin-bottom:14px; border-right:4px solid var(--c-0e7490); }
+        .fr-branch-row { padding:6px 0; border-bottom:1px dashed var(--c-e3d9c6, #e3d9c6); }
+        .fr-note-ink { color:var(--c-6b4e2a); font-size:.9em; }
+        .fr-sum { margin-top:8px; font-weight:700; }
+        .fr-split-form { display:flex; gap:10px; flex-wrap:wrap; align-items:end; margin-top:10px; }
+        .fr-hint { margin-top:8px; color:var(--c-6b4e2a); font-size:.9em; }
+        .fr-w200 { min-width:200px; }
+        .fr-w140 { min-width:140px; }
+        .fr-w220 { min-width:220px; }
+        .fr-mt14 { margin-top:14px; }
+        .fr-mt10 { margin-top:10px; }
+        .fr-self-end { align-self:end; }
+        .fr-inline-form { display:inline; }
+        .fr-actions-flex { display:flex; gap:12px; flex-wrap:wrap; }
+        .fr-form-row { display:flex; gap:8px; }
+
+/* ── Finance/approvals_inbox.php ── */
+.fin-inbox-counters { display: flex; gap: 14px; flex-wrap: wrap; }
+        .fin-inbox-badge { font-size: 15px; padding: 8px 14px; }
+        .fin-inbox-badge-total { font-size: 16px; padding: 8px 14px; }
+        .fin-inbox-owner { color: var(--c-s-888); }
+        .fin-w100 { width: 100%; }

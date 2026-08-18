@@ -149,24 +149,7 @@ ems_shell_axes(isset($__pp) ? $__pp : null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
-.ems-wi-accent-card { margin-bottom:12px; border-right:4px solid var(--c-7c3aed); }
-.ems-wi-close { float:left; }
-.ems-wi-line { margin:4px 0; }
-.ems-wi-chain-warn { margin-top:8px; }
-.ems-wi-views { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:12px; }
-.ems-wi-dels-body { padding:10px 14px; }
-.ems-wi-whylink { font-size:.78rem; }
-.ems-wi-title-cell { max-width:260px; white-space:normal; }
-.ems-wi-sub { font-size:.8rem; }
-.ems-wi-reason { color:var(--c-92400e); font-size:.78rem; }
-.ems-wi-actions-cell { min-width:170px; }
-.ems-wi-inline-form { display:inline; }
-.ems-wi-inline-block { display:inline-block; }
-.ems-wi-dropform { margin-top:4px; }
-.ems-wi-field-gap { margin-bottom:4px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
     $header_title = 'مهامي';

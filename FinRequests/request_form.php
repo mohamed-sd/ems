@@ -84,30 +84,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
     echo ems_states_bundle('لا بياناتِ طلبٍ ماليٍّ للعرض', 'أنشئ طلبًا جديدًا أو افتح طلبًا قائمًا من «طلباتي»');
     ?>
-    <style>
-        /* UXW-01 ①/②: الأنماطُ الموضعيةُ صارت أصنافًا — والألوانُ برموزِ اللوحة
-           (ما لا رمزَ له بعدُ يُعلَن باسمِ قيمتِه مع قيمتِه الاحتياطيةِ حرفًا بحرف) */
-        .fr-alert { margin-bottom:14px; font-weight:700; }
-        .fr-mb14 { margin-bottom:14px; }
-        .fr-head-flex { display:flex; gap:18px; flex-wrap:wrap; align-items:center; }
-        .fr-link-inherit { color:inherit; text-decoration:underline; }
-        .fr-form-inline { display:flex; gap:8px; align-items:center; }
-        .fr-split-card { margin-bottom:14px; border-right:4px solid var(--c-0e7490); }
-        .fr-branch-row { padding:6px 0; border-bottom:1px dashed var(--c-e3d9c6, #e3d9c6); }
-        .fr-note-ink { color:var(--c-6b4e2a); font-size:.9em; }
-        .fr-sum { margin-top:8px; font-weight:700; }
-        .fr-split-form { display:flex; gap:10px; flex-wrap:wrap; align-items:end; margin-top:10px; }
-        .fr-hint { margin-top:8px; color:var(--c-6b4e2a); font-size:.9em; }
-        .fr-w200 { min-width:200px; }
-        .fr-w140 { min-width:140px; }
-        .fr-w220 { min-width:220px; }
-        .fr-mt14 { margin-top:14px; }
-        .fr-mt10 { margin-top:10px; }
-        .fr-self-end { align-self:end; }
-        .fr-inline-form { display:inline; }
-        .fr-actions-flex { display:flex; gap:12px; flex-wrap:wrap; }
-        .fr-form-row { display:flex; gap:8px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if (isset($_GET['msg']) && trim($_GET['msg']) !== ''): ?>
         <div class="alert alert-info fr-alert"><?php echo htmlspecialchars($_GET['msg']); ?></div>

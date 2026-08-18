@@ -87,15 +87,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         'ru' => $fUnit ?: null, 'level' => $fLevel ?: null, 'state' => $fState ?: null)));
     echo ems_states_bundle('لا مخاطرَ مسجَّلةً ضمن هذا الترشيح', 'وسّع الترشيحَ أو راجع صندوقَ الإشارات');
     ?>
-    <style>
-        .rsk-filter-form { align-items: flex-end; }
-        .rsk-filter-label { font-size: .8rem; }
-        .rsk-ru-select { min-width: 200px; }
-        .rsk-w100 { width: 100%; }
-        .rsk-new-card { margin-top: 16px; }
-        .rsk-new-card.is-hidden { display: none; }
-        .rsk-new-msg { margin-inline-start: 10px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <form method="get" class="ems-toolbar rsk-filter-form">
         <input type="hidden" name="view" value="<?php echo htmlspecialchars($view); ?>">

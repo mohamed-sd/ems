@@ -65,16 +65,7 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('project', 'المواقع');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
-.ems-sites-tiles { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
-.ems-site-tile { display:block; min-width:150px; padding:10px 14px; border:1px solid var(--c-dee2e6); border-radius:8px; background:var(--c-f8f9fa); color:var(--c-1f2937); text-decoration:none; }
-.ems-site-tile.is-active { background:var(--c-0d6efd); color:var(--c-s-fff); }
-.ems-row-stopped { background:var(--c-fff3f4); }
-.ems-badge-stopped { background:var(--c-dc3545); }
-.ems-badge-working { background:var(--c-198754); }
-.ems-sites-note { font-size:.85em; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main" dir="rtl">
   <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
