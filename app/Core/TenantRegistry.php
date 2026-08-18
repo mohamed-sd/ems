@@ -563,6 +563,9 @@ class TenantRegistry
         'nav_canonical' => array('type' => self::T_GLOBAL, 'soft' => false),
         'nav_canonical_current' => array('type' => self::T_GLOBAL, 'soft' => false),
         'nav_canonical_variants' => array('type' => self::T_GLOBAL, 'soft' => false),
+        // UXUI-01 (ج): مقترحاتُ السقوفِ وحجرُ قواعدِ الاعتماد — مراجعُ نظامٍ عامّة
+        'gov_cap_proposals' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'approval_rules_quarantine' => array('type' => self::T_GLOBAL, 'soft' => false),
         // تعريفُ الشاشة خاصيةُ الشاشة لا بياناتُ شركة — مرجعٌ عامٌّ كأخواته
         'screen_about' => array('type' => self::T_GLOBAL, 'soft' => false),
         'nav_redirects' => array('type' => self::T_GLOBAL, 'soft' => false),

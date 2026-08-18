@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-18 14:47:04
--- الجداول: 579 · المناظير: 23
+-- المصدر: equipation_manage · التوليد: 2026-08-18 15:30:15
+-- الجداول: 581 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -424,6 +424,20 @@ CREATE TABLE `approval_requests` (
   KEY `idx_approval_user` (`requested_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: approval_rules_quarantine ──
+CREATE TABLE `approval_rules_quarantine` (
+  `id` int(11) NOT NULL,
+  `entity_type` varchar(200) NOT NULL,
+  `action` varchar(300) NOT NULL,
+  `role_required` varchar(200) NOT NULL,
+  `step_order` int(11) NOT NULL,
+  `was_active` tinyint(1) NOT NULL,
+  `quarantined_at` datetime NOT NULL,
+  `purge_after` date NOT NULL,
+  `reason` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='حجرُ قواعدِ اعتمادٍ ملوَّثةٍ ببياناتِ UAT — ثلاثون يومًا ثم حذف';
+
 -- ── Table: approval_signatures ──
 CREATE TABLE `approval_signatures` (
   `sig_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -475,6 +489,7 @@ CREATE TABLE `approval_workflow_rules` (
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime DEFAULT NULL,
+  `source_ladder` varchar(12) DEFAULT NULL COMMENT 'رمزُ السلّمِ الحاكمِ في gov_ladders — والصفُّ المشتقُّ لا يُحرَّر يدويًّا',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_workflow_rule` (`entity_type`,`action`,`step_order`),
   KEY `idx_workflow_rule_lookup` (`entity_type`,`action`,`is_active`)
@@ -6180,6 +6195,23 @@ CREATE TABLE `gov_cap_history` (
   KEY `ix_ladder` (`ladder_code`,`effective_from`),
   CONSTRAINT `chk_cap_reason` CHECK (`reason` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='قرارُ المالكِ ⑥ — سقوفٌ مرنةٌ بسجلٍّ لا يُحذف: من غيَّر ومتى ولماذا';
+
+-- ── Table: gov_cap_proposals ──
+CREATE TABLE `gov_cap_proposals` (
+  `ladder_code` varchar(12) NOT NULL,
+  `proposed_amount` decimal(16,2) DEFAULT NULL COMMENT 'NULL = لا سكّانَ للاشتقاق — لا يُخترع رقم',
+  `currency` varchar(8) NOT NULL DEFAULT 'USD',
+  `pop_n` int(11) NOT NULL,
+  `p50` decimal(16,2) DEFAULT NULL,
+  `p90` decimal(16,2) DEFAULT NULL,
+  `p95` decimal(16,2) DEFAULT NULL,
+  `p99` decimal(16,2) DEFAULT NULL,
+  `pmax` decimal(16,2) DEFAULT NULL,
+  `basis` varchar(600) NOT NULL COMMENT 'أساسُ الاشتقاقِ كاملًا — لا رقمَ بلا مصدر',
+  `measured_at` datetime NOT NULL,
+  `applied_at` datetime DEFAULT NULL COMMENT 'يُملأ حين يعتمده المالكُ من الشاشة',
+  PRIMARY KEY (`ladder_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='مقترحاتُ السقوفِ المشتقةُ آليًّا — تُعرض في شاشةِ حدودِ المبالغِ ويعتمدها المالك';
 
 -- ── Table: gov_data_classes ──
 CREATE TABLE `gov_data_classes` (
@@ -14339,6 +14371,10 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `unified_fault_taxonomy` AS
 SET collation_connection = 'utf8mb4_unicode_ci';
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_active_impersonations` AS select `i`.`imp_id` AS `imp_id`,`a`.`username` AS `actor`,`t`.`username` AS `target`,`i`.`reason` AS `reason`,`i`.`opened_at` AS `opened_at`,`i`.`valid_to` AS `valid_to`,`i`.`notified_at` AS `notified_at` from ((`impersonation_sessions` `i` join `users` `a` on(`a`.`id` = `i`.`actor_user`)) join `users` `t` on(`t`.`id` = `i`.`target_user`)) where `i`.`closed_at` is null;
 
+-- ── View: v_approval_rules_effective ──
+SET collation_connection = 'utf8mb4_unicode_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_approval_rules_effective` AS select `l`.`ladder_code` AS `ladder_code`,`l`.`slug` AS `entity_type`,`s`.`step_no` AS `step_order`,`s`.`actor_code` AS `role_required`,`s`.`actor_name_ar` AS `actor_name_ar`,`s`.`step_kind` AS `step_kind`,`s`.`may_approve` AS `may_approve`,`l`.`name_ar` AS `ladder_name`,`l`.`cap_kind` AS `cap_kind`,`l`.`cap_amount` AS `cap_amount`,`l`.`cap_currency` AS `cap_currency`,`l`.`cap_state` AS `cap_state`,`l`.`escalate_after_hours` AS `escalate_after_hours`,`l`.`is_active` AS `is_active` from (`gov_ladders` `l` join `gov_ladder_steps` `s` on(`s`.`ladder_code` = `l`.`ladder_code`)) where `l`.`is_active` = 1;
+
 -- ── View: v_authority_expiring ──
 SET collation_connection = 'utf8mb4_general_ci';
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_authority_expiring` AS select 'grant' AS `kind`,`g`.`grant_id` AS `ref_id`,`g`.`user_id` AS `user_id`,`g`.`valid_to` AS `valid_to` from `gov_authority_grants` `g` where `g`.`revoked_at` is null and `g`.`valid_to` between current_timestamp() and current_timestamp() + interval 48 hour union all select 'delegation' AS `delegation`,`d`.`delegation_id` AS `delegation_id`,`d`.`to_user` AS `to_user`,`d`.`valid_to` AS `valid_to` from `gov_delegations` `d` where `d`.`revoked_at` is null and `d`.`valid_to` between current_timestamp() and current_timestamp() + interval 48 hour union all select 'elevation' AS `elevation`,`e`.`elevation_id` AS `elevation_id`,`e`.`user_id` AS `user_id`,`e`.`valid_to` AS `valid_to` from `gov_elevations` `e` where `e`.`state` = 'active' and `e`.`valid_to` between current_timestamp() and current_timestamp() + interval 48 hour union all select 'impersonation' AS `impersonation`,`i`.`imp_id` AS `imp_id`,`i`.`actor_user` AS `actor_user`,`i`.`valid_to` AS `valid_to` from `impersonation_sessions` `i` where `i`.`closed_at` is null and `i`.`valid_to` between current_timestamp() and current_timestamp() + interval 48 hour;
@@ -14360,6 +14396,9 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_group_load` AS select `g
 -- ── View: v_hand_conflicts ──
 SET collation_connection = 'utf8mb4_general_ci';
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_hand_conflicts` AS select 'grant_self_issued' AS `conflict_kind`,`g`.`grant_id` AS `ref_id`,`g`.`user_id` AS `actor`,`g`.`issued_by` AS `second_party`,`g`.`created_at` AS `created_at` from `gov_authority_grants` `g` where `g`.`issued_by` = `g`.`user_id` and `g`.`source` <> 'profile' union all select 'elevation_self_approved' AS `elevation_self_approved`,`e`.`elevation_id` AS `elevation_id`,`e`.`user_id` AS `user_id`,`e`.`ceo_approver` AS `ceo_approver`,`e`.`created_at` AS `created_at` from `gov_elevations` `e` where `e`.`ceo_approver` = `e`.`user_id`;
+
+-- ── View: v_ladder_step_limit ──
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_ladder_step_limit` AS select `l`.`ladder_code` AS `ladder_code`,`l`.`name_ar` AS `name_ar`,count(`s`.`id`) AS `steps`,sum(`s`.`may_approve`) AS `approvers`,case when count(`s`.`id`) > 3 then 'exceeds_three' else 'within_limit' end AS `verdict` from (`gov_ladders` `l` left join `gov_ladder_steps` `s` on(`s`.`ladder_code` = `l`.`ladder_code`)) where `l`.`is_active` = 1 group by `l`.`ladder_code`,`l`.`name_ar`;
 
 -- ── View: v_machine_daily_hours ──
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_machine_daily_hours` AS select `ue`.`company_id` AS `company_id`,`ue`.`equipment_id` AS `equipment_id`,`ue`.`entry_date` AS `work_date`,round(coalesce(sum(case when `l`.`ops_state` = 'actual_work' then `l`.`hours` end),0),2) AS `daily_hours` from (`unit_entries` `ue` left join `unit_time_log` `l` on(`l`.`entry_id` = `ue`.`id`)) where `ue`.`seed_tag` is null and `ue`.`state` not in ('rejected','cancelled','superseded','reversed') group by `ue`.`company_id`,`ue`.`equipment_id`,`ue`.`entry_date`;
