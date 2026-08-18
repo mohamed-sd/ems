@@ -1,0 +1,912 @@
+role_id	role	uid	seq	group	label	href	route	matrix_n	status	canonical
+1	ادارة التشغيل	4	1	لوحة الإدارة	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+1	ادارة التشغيل	4	2	لوحة الإدارة	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+1	ادارة التشغيل	4	3	لوحة الإدارة	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+1	ادارة التشغيل	4	4	لوحة الإدارة	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+1	ادارة التشغيل	4	5	لوحة الإدارة	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+1	ادارة التشغيل	4	6	لوحة الإدارة	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+1	ادارة التشغيل	4	7	لوحة الإدارة	غرفة عمليات المواقع	../Operations/operations_room.php	Operations/operations_room.php	276	APPROVED	غرفة عمليات المواقع
+1	ادارة التشغيل	4	8	لوحة الإدارة	توزيع المعدات والمشغّلين	../Operations/distribution_space.php	Operations/distribution_space.php	271	APPROVED	تكليف المشغّل على المعدة
+1	ادارة التشغيل	4	9	خطة الشهر	عقود العملاء	../Contracts/contracts.php	Contracts/contracts.php	197	APPROVED	عقود العملاء
+1	ادارة التشغيل	4	10	خطة الشهر	التزام العقد بنوع المعدة	../Contracts/contract_coverage.php	Contracts/contract_coverage.php	219	APPROVED	التزام العقد بنوع المعدة
+1	ادارة التشغيل	4	11	خطة الشهر	الوحدات التعاقدية المرقَّمة	../Operations/containers.php	Operations/containers.php	270	APPROVED	إسناد المعدات للوحدات
+1	ادارة التشغيل	4	12	خطة الشهر	حصص الموردين من العقود	../Suppliers/shares_coverage.php	Suppliers/shares_coverage.php	251	PENDING_DEDUP	حصص الموردين من العقود
+1	ادارة التشغيل	4	13	خطة الشهر	توزيع وحدات المورد على معداته	../Operations/equipment_quota.php	Operations/equipment_quota.php	272	APPROVED	توزيع وحدات المورد على معداته
+1	ادارة التشغيل	4	14	خطة الشهر	خطة عمل الغد	../Operations/daily_plan.php	Operations/daily_plan.php	340	APPROVED	خطة عمل الغد
+1	ادارة التشغيل	4	15	توزيع الموارد	سجل المعدات	../Equipments/equipments.php	Equipments/equipments.php	256	PENDING_DEDUP	سجل المعدات
+1	ادارة التشغيل	4	16	توزيع الموارد	تكليف المشغّل على المعدة	../Operations/distribution_space.php#3	Operations/distribution_space.php	271	APPROVED	تكليف المشغّل على المعدة
+1	ادارة التشغيل	4	17	توزيع الموارد	إسناد المعدات للوحدات	../Operations/containers.php#2	Operations/containers.php	270	APPROVED	إسناد المعدات للوحدات
+1	ادارة التشغيل	4	18	توزيع الموارد	جاهزية المعدات للتشغيل	../Fleet/readiness_board.php	Fleet/readiness_board.php	262	APPROVED	جاهزية المعدات للتشغيل
+1	ادارة التشغيل	4	19	توزيع الموارد	طلبات الترحيل	../Transport/transfer_requests.php	Transport/transfer_requests.php	301	APPROVED	طلبات الترحيل
+1	ادارة التشغيل	4	20	اعتماد الوحدات	تسجيل التايم شيت والإنتاج	../Timesheet/timesheet.php	Timesheet/timesheet.php	341	APPROVED	تسجيل التايم شيت والإنتاج — الموقع
+1	ادارة التشغيل	4	21	اعتماد الوحدات	الإنتاج والقياس	../Operations/production.php	Operations/production.php	273	APPROVED	الإنتاج والقياس
+1	ادارة التشغيل	4	22	اعتماد الوحدات	التوقفات وتحديد المتحمل	../Operations/stops_unattributed.php	Operations/stops_unattributed.php	267	APPROVED	التوقفات وتحديد المتحمل
+1	ادارة التشغيل	4	23	اعتماد الوحدات	ما ينتظر اعتمادي	../Approvals/hours_approval.php	Approvals/hours_approval.php	24	APPROVED	ما ينتظر اعتمادي
+1	ادارة التشغيل	4	24	اعتماد الوحدات	صندوقُ موافقاتي — ما ينتظر يدي	../Approvals/requests.php	Approvals/requests.php	23	PENDING_OWNER	صندوقُ موافقاتي — ما ينتظر يدي
+1	ادارة التشغيل	4	25	اعتماد الوحدات	تصنيف قواعد المنع	../Settings/guard_classification.php	Settings/guard_classification.php	51	APPROVED	تصنيف قواعد المنع — الحوكمة — الظهور وضبط البوابة
+1	ادارة التشغيل	4	26	متابعة الانحراف	الأداء الشهري للوحدة	../Operations/unit_perf.php	Operations/unit_perf.php	268	APPROVED	الأداء الشهري للوحدة
+1	ادارة التشغيل	4	27	متابعة الانحراف	متابعة انحراف المنفَّذ عن المخطط	../Finance/variance_monitor_fin.php	Finance/variance_monitor_fin.php	153	APPROVED	متابعة انحراف المنفَّذ عن المخطط
+1	ادارة التشغيل	4	28	متابعة الانحراف	هامش الربح للعقد والواقعة	../Reports/margin_report.php	Reports/margin_report.php	14	PENDING_OWNER	هامش الربح للعقد والواقعة
+1	ادارة التشغيل	4	29	متابعة الانحراف	أوامر الصيانة	../Maintenance/orders.php	Maintenance/orders.php	278	APPROVED	أوامر الصيانة
+1	ادارة التشغيل	4	30	متابعة الانحراف	تصنيف الأعطال وأسبابها	../Equipments/manage_failure_codes.php	Equipments/manage_failure_codes.php	265	PENDING_OWNER	تصنيف الأعطال وأسبابها
+1	ادارة التشغيل	4	31	متابعة الانحراف	بلاغات إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+1	ادارة التشغيل	4	32	إقفال الفترة	الإقفال الشهري للوحدة	../Operations/monthly_close.php	Operations/monthly_close.php	269	APPROVED	الإقفال الشهري للوحدة
+1	ادارة التشغيل	4	33	إقفال الفترة	الأعمال غير المفوترة	../Operations/unbilled.php	Operations/unbilled.php	214	APPROVED	الأعمال غير المفوترة
+1	ادارة التشغيل	4	34	إقفال الفترة	ميزانية إدارتي	../Finance/budget_dept.php	Finance/budget_dept.php	230	APPROVED	ميزانية إدارتي — التمويل
+1	ادارة التشغيل	4	35	إقفال الفترة	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+1	ادارة التشغيل	4	36	إقفال الفترة	مركز التقارير	../emsreports/index.php	emsreports/index.php	19	PENDING_DEDUP	مركز التقارير — الحوكمة
+1	ادارة التشغيل	4	37	سجلات التشغيل	المشاريع والمواقع	../Projects/projects.php	Projects/projects.php	200	APPROVED	المشاريع والمواقع
+1	ادارة التشغيل	4	38	سجلات التشغيل	سجل العملاء	../Clients/clients.php	Clients/clients.php	199	APPROVED	سجل العملاء
+1	ادارة التشغيل	4	39	سجلات التشغيل	أرصدة المخزون بحالاتها	../Procurement/stock_proc.php	Procurement/stock_proc.php	289	APPROVED	أرصدة المخزون بحالاتها
+1	ادارة التشغيل	4	40	سجلات التشغيل	وثائق المعدات والمشغّلين	../Equipments/equipment_documents.php	Equipments/equipment_documents.php	260	APPROVED	وثائق المعدات والمشغّلين
+1	ادارة التشغيل	4	41	طلبات التشغيل	طلبات الشراء	../Procurement/requests_proc.php	Procurement/requests_proc.php	284	APPROVED	طلبات الشراء
+1	ادارة التشغيل	4	42	طلبات التشغيل	طلبات الدفع والسداد	../Finance/payments_fin.php	Finance/payments_fin.php	109	APPROVED	طلبات الدفع والسداد
+1	ادارة التشغيل	4	43	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+1	ادارة التشغيل	4	44	خارج الوثيقة — بانتظار قرار المالك	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+1	ادارة التشغيل	4	45	العمل اليومي	طلب مالي جديد	../FinRequests/request_form.php	FinRequests/request_form.php	130	PENDING_OWNER	طلب مالي جديد
+1	ادارة التشغيل	4	46	العمل اليومي	تسجيل الوحدات	../Timesheet/timesheet_type.php	Timesheet/timesheet_type.php	22	APPROVED	تسجيل التايم شيت والإنتاج — الحوكمة
+1	ادارة التشغيل	4	47	العمل اليومي	أحكام العميل والمورد والمشغّل	../Finance/unit_records_fin.php	Finance/unit_records_fin.php	143	PENDING_OWNER	أحكام العميل والمورد والمشغّل
+1	ادارة التشغيل	4	48	العمل اليومي	لوحة الإسناد اليومي	../Approvals/attribution_board.php	Approvals/attribution_board.php	35	APPROVED	لوحة الإسناد اليومي
+1	ادارة التشغيل	4	49	العمل اليومي	ميزانية إدارتي	../Finance/budget_form_fin.php	Finance/budget_form_fin.php	124	PENDING_OWNER	ميزانية إدارتي — المالية
+1	ادارة التشغيل	4	50	العمل اليومي	سجل الأحداث المالية	../Finance/events_list_fin.php	Finance/events_list_fin.php	123	APPROVED	سجل الأحداث المالية
+1	ادارة التشغيل	4	51	العمل اليومي	التكاليف والربحية	../Finance/cost_report_fin.php	Finance/cost_report_fin.php	119	APPROVED	التكاليف والربحية بالمركز
+1	ادارة التشغيل	4	52	العمل اليومي	أنواع المعدات	../Equipments/equipments_types.php	Equipments/equipments_types.php	264	PENDING_OWNER	أنواع المعدات وفئاتها
+1	ادارة التشغيل	4	53	العمل اليومي	الإعدادات	../Settings/settings.php	Settings/settings.php	20	APPROVED	الإعدادات
+1	ادارة التشغيل	4	54	العمل اليومي	مصفوفة التزامات العقد	../Contracts/contract_obligations.php	Contracts/contract_obligations.php	211	PENDING_DEDUP	مصفوفة التزامات العقد
+1	ادارة التشغيل	4	55	العمل اليومي	مواقع التنفيذ	../Projects/sites.php	Projects/sites.php	64	PENDING_OWNER	مواقع التنفيذ
+1	ادارة التشغيل	4	56	العمل اليومي	شروط تعديل السعر	../Contracts/price_terms.php	Contracts/price_terms.php	220	PENDING_OWNER	شروط تعديل السعر
+1	ادارة التشغيل	4	57	العمل اليومي	خطة موارد العقد	../Contracts/contract_resource_plan.php	Contracts/contract_resource_plan.php	209	APPROVED	خطة موارد العقد
+1	ادارة التشغيل	4	58	العمل اليومي	مركز التقارير	../Reports/reports.php	Reports/reports.php	13	APPROVED	مركز التقارير — التنفيذية
+1	ادارة التشغيل	4	59	العمل اليومي	سجل الوحدات اليومية	../Reports/daily_units_report.php	Reports/daily_units_report.php	12	PENDING_OWNER	سجل الوحدات اليومية
+1	ادارة التشغيل	4	60	العمل اليومي	الاعتمادات المتأخرة والوثائق	../Reports/approval_lag_report.php	Reports/approval_lag_report.php	11	PENDING_OWNER	الاعتمادات المتأخرة والوثائق
+1	ادارة التشغيل	4	61	العمل اليومي	لوحة مدير التشغيل	../admin/ops_manager_board.php	admin/ops_manager_board.php	47	PENDING_OWNER	لوحة مدير التشغيل
+1	ادارة التشغيل	4	62	العمل اليومي	سجل النشاط	../ActivityLogs/activity_logs.php	ActivityLogs/activity_logs.php	42	APPROVED	سجل التدقيق والاطّلاع
+1	ادارة التشغيل	4	63	العمل اليومي	المستخلصات	../Contracts/claims.php	Contracts/claims.php	213	APPROVED	المستخلصات والمطالبات
+1	ادارة التشغيل	4	64	العمل اليومي	احتساب الجزاءات والحوافز	../Contracts/penalties.php	Contracts/penalties.php	198	APPROVED	الجزاءات والحوافز التعاقدية
+1	ادارة التشغيل	4	65	العمل اليومي	التكليفات التنظيمية	../admin/org_assignments.php	admin/org_assignments.php	41	APPROVED	التكليفات التنظيمية
+1	ادارة التشغيل	4	66	العمل اليومي	الهيكل التنظيمي	../admin/org_structure.php	admin/org_structure.php	40	APPROVED	الهيكل التنظيمي والمسميات
+1	ادارة التشغيل	4	67	المتابعة والموافقات	موافقات إدارتي	../FinRequests/dept_inbox.php	FinRequests/dept_inbox.php	144	APPROVED	موافقات إدارتي
+1	ادارة التشغيل	4	68	السجلات الرئيسية	أذونات الدخول والخروج والحركة	../admin/org_permits.php	admin/org_permits.php	344	APPROVED	أذون الزيارة والمركبات الخارجية
+1	ادارة التشغيل	4	69	السجلات الرئيسية	الموظفون	../Employees/employees.php	Employees/employees.php	182	APPROVED	سجل الموظفين
+1	ادارة التشغيل	4	70	السجلات الرئيسية	المعدات	../Equipments/equipments_fleet.php	Equipments/equipments_fleet.php	261	PENDING_DEDUP	المعدات
+1	ادارة التشغيل	4	71	الحوكمة	سجل الكيانات	../Governance/entities_registry.php	Governance/entities_registry.php	63	PENDING_OWNER	سجل الشركات والكيانات
+1	ادارة التشغيل	4	72	الحوكمة	التفويض بالتوقيع	../Governance/signing_authority.php	Governance/signing_authority.php	57	PENDING_OWNER	التفويض بالتوقيع
+1	ادارة التشغيل	4	73	الحوكمة	التراخيص والكفالات	../Governance/licenses_guarantees.php	Governance/licenses_guarantees.php	62	PENDING_OWNER	التراخيص والكفالات
+1	ادارة التشغيل	4	74	الحوكمة	أنماط التفعيل	../Governance/activation_patterns.php	Governance/activation_patterns.php	61	APPROVED	أنماط تفعيل المزايا
+1	ادارة التشغيل	4	75	الحوكمة	منح المجال المقيَّد	../Governance/ownership_grants.php	Governance/ownership_grants.php	67	PENDING_OWNER	منح المجال المقيَّد
+1	ادارة التشغيل	4	76	التمويل	سجل الممولين	../Financing/financiers_registry.php	Financing/financiers_registry.php	233	APPROVED	سجل الممولين
+1	ادارة التشغيل	4	77	التمويل	إنشاء عملية تمويل	../Financing/financing_operation_new.php	Financing/financing_operation_new.php	226	APPROVED	إنشاء عملية تمويل
+1	ادارة التشغيل	4	78	الإعدادات والتدقيق	الأنواع والموديلات	../Equipments/fleet_models.php	Equipments/fleet_models.php	263	PENDING_OWNER	موديلات المعدات ومواصفاتها
+1	ادارة التشغيل	4	79	الإعدادات والتدقيق	إعداد الإهلاك	../Equipments/fleet_depreciation_profiles.php	Equipments/fleet_depreciation_profiles.php	266	PENDING_OWNER	سياسات الإهلاك المعتمدة
+1	ادارة التشغيل	4	80	الإعدادات والتدقيق	الصلاحيات	../main/users.php	main/users.php	37	APPROVED	حسابات المستخدمين
+1	ادارة التشغيل	4	81	المخاطر	مخاطرُ الميدان	../Risk/risk_field.php	Risk/risk_field.php	86	APPROVED	مخاطر الميدان
+1	ادارة التشغيل	4	82	المخاطر	مساحة مخاطر الإدارة	../Risk/dept_risk_space.php	Risk/dept_risk_space.php	74	PENDING_OWNER	مساحة مخاطر الإدارة
+2	ادارة الموردين	5	1	لوحة الإدارة	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+2	ادارة الموردين	5	2	لوحة الإدارة	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+2	ادارة الموردين	5	3	لوحة الإدارة	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+2	ادارة الموردين	5	4	لوحة الإدارة	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+2	ادارة الموردين	5	5	لوحة الإدارة	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+2	ادارة الموردين	5	6	لوحة الإدارة	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+2	ادارة الموردين	5	7	لوحة الإدارة	سجل الموردين	../Suppliers/suppliers.php	Suppliers/suppliers.php	245	APPROVED	سجل الموردين
+2	ادارة الموردين	5	8	لوحة الإدارة	وثائق المعدات والمشغّلين	../Equipments/equipment_documents.php	Equipments/equipment_documents.php	260	APPROVED	وثائق المعدات والمشغّلين
+2	ادارة الموردين	5	9	لوحة الإدارة	التراخيص والكفالات	../Governance/licenses_guarantees.php	Governance/licenses_guarantees.php	62	PENDING_OWNER	التراخيص والكفالات
+2	ادارة الموردين	5	10	لوحة الإدارة	حسابات الموردين البنكية	../Suppliers/supplier_bank.php	Suppliers/supplier_bank.php	246	APPROVED	حسابات الموردين البنكية
+2	ادارة الموردين	5	11	لوحة الإدارة	نماذج العمل ووحدات القياس	../Portal/business_models.php	Portal/business_models.php	195	APPROVED	نماذج العمل ووحدات القياس
+2	ادارة الموردين	5	12	لوحة الإدارة	عقود الموردين	../Suppliers/supplierscontracts.php	Suppliers/supplierscontracts.php	244	PENDING_DEDUP	عقود الموردين
+2	ادارة الموردين	5	13	لوحة الإدارة	حصص الموردين من العقود	../Suppliers/shares_coverage.php	Suppliers/shares_coverage.php	251	PENDING_DEDUP	حصص الموردين من العقود
+2	ادارة الموردين	5	14	لوحة الإدارة	التزام العقد بنوع المعدة	../Contracts/contract_coverage.php	Contracts/contract_coverage.php	219	APPROVED	التزام العقد بنوع المعدة
+2	ادارة الموردين	5	15	لوحة الإدارة	طاقة المورد وجاهزيته ومهلة الإحلال	../Suppliers/supplier_capacity.php	Suppliers/supplier_capacity.php	237	APPROVED	طاقة المورد وجاهزيته ومهلة الإحلال
+2	ادارة الموردين	5	16	لوحة الإدارة	قواعد التحميل والجزاءات على المورد	../Suppliers/supplier_rules.php	Suppliers/supplier_rules.php	240	APPROVED	قواعد التحميل والجزاءات على المورد
+2	ادارة الموردين	5	17	لوحة الإدارة	طلب العروض ومقارنتها	../Procurement/rfq_compare_award.php	Procurement/rfq_compare_award.php	288	APPROVED	طلب العروض ومقارنتها
+2	ادارة الموردين	5	18	لوحة الإدارة	خطة معدات المورد المتعهَّد بها	../Suppliers/equipment_plan.php	Suppliers/equipment_plan.php	242	APPROVED	خطة معدات المورد المتعهَّد بها
+2	ادارة الموردين	5	19	لوحة الإدارة	توزيع وحدات المورد على معداته	../Operations/equipment_quota.php	Operations/equipment_quota.php	272	APPROVED	توزيع وحدات المورد على معداته
+2	ادارة الموردين	5	20	لوحة الإدارة	معدات المورد ومالكوها	../Suppliers/equipment_plan.php#2	Suppliers/equipment_plan.php	242	APPROVED	خطة معدات المورد المتعهَّد بها
+2	ادارة الموردين	5	21	لوحة الإدارة	ملّاك الأسطول	../Financing/owners_registry.php	Financing/owners_registry.php	232	APPROVED	حصص الملكية في الأصول
+2	ادارة الموردين	5	22	لوحة الإدارة	جاهزية المعدات للتشغيل	../Fleet/readiness_board.php	Fleet/readiness_board.php	262	APPROVED	جاهزية المعدات للتشغيل
+2	ادارة الموردين	5	23	لوحة الإدارة	الوحدات التعاقدية المرقَّمة	../Operations/containers.php	Operations/containers.php	270	APPROVED	إسناد المعدات للوحدات
+2	ادارة الموردين	5	24	لوحة الإدارة	إسناد المعدات للوحدات	../Operations/containers.php#2	Operations/containers.php	270	APPROVED	إسناد المعدات للوحدات
+2	ادارة الموردين	5	25	لوحة الإدارة	تسليمُ الحصص بين الموردين	../Suppliers/sup_handover.php	Suppliers/sup_handover.php	249	APPROVED	تسليم الحصص بين الموردين
+2	ادارة الموردين	5	26	لوحة الإدارة	تسجيل التايم شيت والإنتاج	../Timesheet/timesheet.php	Timesheet/timesheet.php	341	APPROVED	تسجيل التايم شيت والإنتاج — الموقع
+2	ادارة الموردين	5	27	لوحة الإدارة	دفتر استهلاك حصص الموردين	../Suppliers/shares_coverage.php#2	Suppliers/shares_coverage.php	251	PENDING_DEDUP	حصص الموردين من العقود
+2	ادارة الموردين	5	28	لوحة الإدارة	الأداء الشهري للوحدة	../Operations/unit_perf.php	Operations/unit_perf.php	268	APPROVED	الأداء الشهري للوحدة
+2	ادارة الموردين	5	29	لوحة الإدارة	أداء الموردين وجاهزيتهم	../Suppliers/supplier_capacity.php#2	Suppliers/supplier_capacity.php	237	APPROVED	طاقة المورد وجاهزيته ومهلة الإحلال
+2	ادارة الموردين	5	30	لوحة الإدارة	سجل المشغّلين	../Employees/equipment_operators.php	Employees/equipment_operators.php	183	APPROVED	سجل المشغّلين
+2	ادارة الموردين	5	31	لوحة الإدارة	ما ينتظر اعتمادي	../Approvals/hours_approval.php	Approvals/hours_approval.php	24	APPROVED	ما ينتظر اعتمادي
+2	ادارة الموردين	5	32	لوحة الإدارة	صندوقُ موافقاتي — ما ينتظر يدي	../Approvals/requests.php	Approvals/requests.php	23	PENDING_OWNER	صندوقُ موافقاتي — ما ينتظر يدي
+2	ادارة الموردين	5	33	لوحة الإدارة	تسويات ومستحقات الموردين	../Suppliers/settlements.php	Suppliers/settlements.php	236	APPROVED	تسويات ومستحقات الموردين
+2	ادارة الموردين	5	34	لوحة الإدارة	كشف حساب المورد الشهري	../Finance/supplier_statement_fin.php	Finance/supplier_statement_fin.php	159	PENDING_OWNER	كشف حساب المورد الشهري
+2	ادارة الموردين	5	35	لوحة الإدارة	سلفيات الموردين	../Suppliers/supplier_advances.php	Suppliers/supplier_advances.php	238	APPROVED	سلفيات الموردين
+2	ادارة الموردين	5	36	لوحة الإدارة	ذمم الموردين والمستحقات	../Finance/dues_fin.php	Finance/dues_fin.php	108	APPROVED	ذمم الموردين والمستحقات
+2	ادارة الموردين	5	37	لوحة الإدارة	طلبات الدفع والسداد	../Finance/payments_fin.php	Finance/payments_fin.php	109	APPROVED	طلبات الدفع والسداد
+2	ادارة الموردين	5	38	لوحة الإدارة	مخاطرُ الموردين	../Risk/risk_dept_sup.php	Risk/risk_dept_sup.php	252	APPROVED	مخاطر الموردين
+2	ادارة الموردين	5	39	لوحة الإدارة	حوكمةُ الموردين	../Governance/gov_dept_sup.php	Governance/gov_dept_sup.php	253	APPROVED	حوكمة إدارة الموردين
+2	ادارة الموردين	5	40	لوحة الإدارة	أوامر الصيانة	../Maintenance/orders.php	Maintenance/orders.php	278	APPROVED	أوامر الصيانة
+2	ادارة الموردين	5	41	لوحة الإدارة	الجزاءات والحوافز التعاقدية	../Contracts/penalties.php	Contracts/penalties.php	198	APPROVED	الجزاءات والحوافز التعاقدية
+2	ادارة الموردين	5	42	لوحة الإدارة	بلاغات إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+2	ادارة الموردين	5	43	لوحة الإدارة	أبلغ عن مشكلة من هذه الشاشة	../Tickets/ticket_contextual_open.php	Tickets/ticket_contextual_open.php	332	APPROVED	أبلغ عن مشكلة من هذه الشاشة
+2	ادارة الموردين	5	44	لوحة الإدارة	صندوق ما ينتظر اعتمادي	../Finance/approvals_inbox.php	Finance/approvals_inbox.php	331	APPROVED	صندوق ما ينتظر اعتمادي
+2	ادارة الموردين	5	45	لوحة الإدارة	تقييم المورد الدوري	../Suppliers/supplier_evaluation.php	Suppliers/supplier_evaluation.php	247	APPROVED	تقييم المورد الدوري
+2	ادارة الموردين	5	46	لوحة الإدارة	تصفية إنهاء عقد مورد	../Suppliers/supplier_closure.php	Suppliers/supplier_closure.php	248	APPROVED	تصفية إنهاء عقد مورد
+2	ادارة الموردين	5	47	تقارير الموردين	ميزانية إدارتي	../Finance/budget_dept.php	Finance/budget_dept.php	230	APPROVED	ميزانية إدارتي — التمويل
+2	ادارة الموردين	5	48	تقارير الموردين	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+2	ادارة الموردين	5	49	تقارير الموردين	مركز التقارير	../emsreports/index.php	emsreports/index.php	19	PENDING_DEDUP	مركز التقارير — الحوكمة
+2	ادارة الموردين	5	50	إضافاتُ المالك	كشفُ وحداتِ المورد	../Suppliers/unit_statement_supplier.php	Suppliers/unit_statement_supplier.php	239	APPROVED	كشف التايم شيت — المورد
+2	ادارة الموردين	5	51	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+2	ادارة الموردين	5	52	فريق العمل	قاموسُ المبتدئ	../main/glossary.php	main/glossary.php	356	PENDING_OWNER	قاموسُ المبتدئ — بلغةِ أولِ يوم
+2	ادارة الموردين	5	53	خارج الوثيقة — بانتظار قرار المالك	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+2	ادارة الموردين	5	54	العمل اليومي	طلب مالي جديد	../FinRequests/request_form.php	FinRequests/request_form.php	130	PENDING_OWNER	طلب مالي جديد
+2	ادارة الموردين	5	55	العمل اليومي	مركز التقارير	../Reports/reports.php	Reports/reports.php	13	APPROVED	مركز التقارير — التنفيذية
+2	ادارة الموردين	5	56	العمل اليومي	الإعدادات	../Settings/settings.php	Settings/settings.php	20	APPROVED	الإعدادات
+2	ادارة الموردين	5	57	العمل اليومي	ميزانية إدارتي	../Finance/budget_form_fin.php	Finance/budget_form_fin.php	124	PENDING_OWNER	ميزانية إدارتي — المالية
+2	ادارة الموردين	5	58	العمل اليومي	بنود عقد المورد	../Suppliers/supplier_contract_lines.php	Suppliers/supplier_contract_lines.php	241	PENDING_DEDUP	بنود عقد المورد
+2	ادارة الموردين	5	59	العمل اليومي	وثائق المورد وحسابه البنكي	../Suppliers/supplier_documents.php	Suppliers/supplier_documents.php	250	APPROVED	وثائق المورد وحسابه البنكي
+2	ادارة الموردين	5	60	العمل اليومي	تعرفة الترحيل وتسعير الأوامر	../Transport/transfer_tariffs.php	Transport/transfer_tariffs.php	311	PENDING_OWNER	تعرفة الترحيل وتسعير الأوامر
+2	ادارة الموردين	5	61	العمل اليومي	طلبات عروض الموردين	../Suppliers/rfq_requests.php	Suppliers/rfq_requests.php	243	APPROVED	طلبات عروض الموردين
+2	ادارة الموردين	5	62	المتابعة والموافقات	موافقات إدارتي	../FinRequests/dept_inbox.php	FinRequests/dept_inbox.php	144	APPROVED	موافقات إدارتي
+2	ادارة الموردين	5	63	السجلات الرئيسية	حصص الموردين والتغطية	../Contracts/contracts.php	Contracts/contracts.php	197	APPROVED	عقود العملاء
+2	ادارة الموردين	5	64	المخاطر	مخاطر إدارة الموردين	../Risk/dept_risk_space.php	Risk/dept_risk_space.php	74	PENDING_OWNER	مساحة مخاطر الإدارة
+3	ادارة الاسطول	6	1	لوحة الإدارة	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+3	ادارة الاسطول	6	2	لوحة الإدارة	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+3	ادارة الاسطول	6	3	لوحة الإدارة	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+3	ادارة الاسطول	6	4	لوحة الإدارة	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+3	ادارة الاسطول	6	5	لوحة الإدارة	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+3	ادارة الاسطول	6	6	لوحة الإدارة	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+3	ادارة الاسطول	6	7	لوحة الإدارة	جاهزية المعدات للتشغيل	../Fleet/readiness_board.php	Fleet/readiness_board.php	262	APPROVED	جاهزية المعدات للتشغيل
+3	ادارة الاسطول	6	8	إدخال الأصل والترميز	سجل المعدات	../Equipments/equipments.php	Equipments/equipments.php	256	PENDING_DEDUP	سجل المعدات
+3	ادارة الاسطول	6	9	إدخال الأصل والترميز	جسر ترقيم المعدات	../Equipments/code_bridge.php	Equipments/code_bridge.php	257	APPROVED	جسر ترقيم المعدات
+3	ادارة الاسطول	6	10	إدخال الأصل والترميز	أنواع المعدات وفئاتها	../Equipments/equipments_types.php	Equipments/equipments_types.php	264	PENDING_OWNER	أنواع المعدات وفئاتها
+3	ادارة الاسطول	6	11	إدخال الأصل والترميز	موديلات المعدات ومواصفاتها	../Equipments/fleet_models.php	Equipments/fleet_models.php	263	PENDING_OWNER	موديلات المعدات ومواصفاتها
+3	ادارة الاسطول	6	12	إدخال الأصل والترميز	مصدر المعدة ونمط تملّكها	../Equipments/equipment_sourcing.php	Equipments/equipment_sourcing.php	258	APPROVED	مصدر المعدة ونمط تملّكها
+3	ادارة الاسطول	6	13	إدخال الأصل والترميز	ملّاك الأسطول	../Financing/owners_registry.php	Financing/owners_registry.php	232	APPROVED	حصص الملكية في الأصول
+3	ادارة الاسطول	6	14	الجاهزية والتفعيل	الفحص الفني اليومي	../Maintenance/inspections.php	Maintenance/inspections.php	277	APPROVED	الفحص الفني اليومي
+3	ادارة الاسطول	6	15	الجاهزية والتفعيل	أوامر الصيانة	../Maintenance/orders.php	Maintenance/orders.php	278	APPROVED	أوامر الصيانة
+3	ادارة الاسطول	6	16	الجاهزية والتفعيل	خطط الصيانة الوقائية	../Maintenance/preventive_plans.php	Maintenance/preventive_plans.php	279	APPROVED	خطط الصيانة الوقائية
+3	ادارة الاسطول	6	17	التخصيص والحركة	توزيع المعدات والمشغّلين	../Operations/distribution_space.php	Operations/distribution_space.php	271	APPROVED	تكليف المشغّل على المعدة
+3	ادارة الاسطول	6	18	التخصيص والحركة	إسناد المعدات للوحدات	../Operations/containers.php	Operations/containers.php	270	APPROVED	إسناد المعدات للوحدات
+3	ادارة الاسطول	6	19	التخصيص والحركة	أوامر الترحيل	../Transport/transfer_orders_list.php	Transport/transfer_orders_list.php	300	APPROVED	أوامر الترحيل
+3	ادارة الاسطول	6	20	العدّادات والوثائق	قراءات العدّادات	../Equipments/meter_readings.php	Equipments/meter_readings.php	255	APPROVED	قراءات العدّادات
+3	ادارة الاسطول	6	21	العدّادات والوثائق	تسجيل التايم شيت والإنتاج	../Timesheet/timesheet.php	Timesheet/timesheet.php	341	APPROVED	تسجيل التايم شيت والإنتاج — الموقع
+3	ادارة الاسطول	6	22	العدّادات والوثائق	وثائق المعدات والمشغّلين	../Equipments/equipment_documents.php	Equipments/equipment_documents.php	260	APPROVED	وثائق المعدات والمشغّلين
+3	ادارة الاسطول	6	23	المطابقة والإهلاك	مطابقة سجل الأصول بالتشغيل	../Equipments/asset_recon.php	Equipments/asset_recon.php	254	APPROVED	مطابقة سجل الأصول بالتشغيل
+3	ادارة الاسطول	6	24	المطابقة والإهلاك	الإهلاك والقيمة الدفترية	../Finance/assets_fin.php	Finance/assets_fin.php	120	APPROVED	الإهلاك والقيمة الدفترية
+3	ادارة الاسطول	6	25	المطابقة والإهلاك	سياسات الإهلاك المعتمدة	../Equipments/fleet_depreciation_profiles.php	Equipments/fleet_depreciation_profiles.php	266	PENDING_OWNER	سياسات الإهلاك المعتمدة
+3	ادارة الاسطول	6	26	التمويل والملكية	الأعيان المموَّلة	../Equipments/fin_assets.php	Equipments/fin_assets.php	259	APPROVED	الأعيان المموَّلة
+3	ادارة الاسطول	6	27	التمويل والملكية	حصص الملكية في الأصول	../Financing/owners_registry.php#2	Financing/owners_registry.php	232	APPROVED	حصص الملكية في الأصول
+3	ادارة الاسطول	6	28	متابعة وتقارير الأسطول	تصنيف الأعطال وأسبابها	../Equipments/manage_failure_codes.php	Equipments/manage_failure_codes.php	265	PENDING_OWNER	تصنيف الأعطال وأسبابها
+3	ادارة الاسطول	6	29	متابعة وتقارير الأسطول	بلاغات إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+3	ادارة الاسطول	6	30	متابعة وتقارير الأسطول	أبلغ عن مشكلة من هذه الشاشة	../Tickets/ticket_contextual_open.php	Tickets/ticket_contextual_open.php	332	APPROVED	أبلغ عن مشكلة من هذه الشاشة
+3	ادارة الاسطول	6	31	متابعة وتقارير الأسطول	صندوق ما ينتظر اعتمادي	../Finance/approvals_inbox.php	Finance/approvals_inbox.php	331	APPROVED	صندوق ما ينتظر اعتمادي
+3	ادارة الاسطول	6	32	متابعة وتقارير الأسطول	ميزانية إدارتي	../Finance/budget_dept.php	Finance/budget_dept.php	230	APPROVED	ميزانية إدارتي — التمويل
+3	ادارة الاسطول	6	33	متابعة وتقارير الأسطول	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+3	ادارة الاسطول	6	34	متابعة وتقارير الأسطول	مركز التقارير	../emsreports/index.php	emsreports/index.php	19	PENDING_DEDUP	مركز التقارير — الحوكمة
+3	ادارة الاسطول	6	35	متابعة وتقارير الأسطول	ما ينتظر اعتمادي	../Approvals/hours_approval.php	Approvals/hours_approval.php	24	APPROVED	ما ينتظر اعتمادي
+3	ادارة الاسطول	6	36	متابعة وتقارير الأسطول	صندوقُ موافقاتي — ما ينتظر يدي	../Approvals/requests.php	Approvals/requests.php	23	PENDING_OWNER	صندوقُ موافقاتي — ما ينتظر يدي
+3	ادارة الاسطول	6	37	إضافاتُ المالك	حوكمة إدارة الأسطول	../Governance/gov_dept.php	Governance/gov_dept.php	34	APPROVED	حوكمة إدارة الأسطول
+3	ادارة الاسطول	6	38	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+3	ادارة الاسطول	6	39	خارج الوثيقة — بانتظار قرار المالك	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+3	ادارة الاسطول	6	40	العمل اليومي	طلب مالي جديد	../FinRequests/request_form.php	FinRequests/request_form.php	130	PENDING_OWNER	طلب مالي جديد
+3	ادارة الاسطول	6	41	العمل اليومي	المعدات	../Equipments/equipments_fleet.php	Equipments/equipments_fleet.php	261	PENDING_DEDUP	المعدات
+3	ادارة الاسطول	6	42	العمل اليومي	تخصيص المعدات للمشروعات	../Oprators/select_project.php	Oprators/select_project.php	21	APPROVED	تخصيص المعدات للمشروعات
+3	ادارة الاسطول	6	43	العمل اليومي	التكاليف والربحية	../Finance/cost_report_fin.php	Finance/cost_report_fin.php	119	APPROVED	التكاليف والربحية بالمركز
+3	ادارة الاسطول	6	44	العمل اليومي	الإعدادات	../Settings/settings.php	Settings/settings.php	20	APPROVED	الإعدادات
+3	ادارة الاسطول	6	45	العمل اليومي	ميزانية إدارتي	../Finance/budget_form_fin.php	Finance/budget_form_fin.php	124	PENDING_OWNER	ميزانية إدارتي — المالية
+3	ادارة الاسطول	6	46	العمل اليومي	مواقع التنفيذ	../Projects/sites.php	Projects/sites.php	64	PENDING_OWNER	مواقع التنفيذ
+3	ادارة الاسطول	6	47	العمل اليومي	مركز التقارير	../Reports/reports.php	Reports/reports.php	13	APPROVED	مركز التقارير — التنفيذية
+3	ادارة الاسطول	6	48	العمل اليومي	أحكام العميل والمورد والمشغّل	../Finance/unit_records_fin.php	Finance/unit_records_fin.php	143	PENDING_OWNER	أحكام العميل والمورد والمشغّل
+3	ادارة الاسطول	6	49	العمل اليومي	خطة عمل الغد	../Operations/daily_plan.php	Operations/daily_plan.php	340	APPROVED	خطة عمل الغد
+3	ادارة الاسطول	6	50	المتابعة والموافقات	موافقات إدارتي	../FinRequests/dept_inbox.php	FinRequests/dept_inbox.php	144	APPROVED	موافقات إدارتي
+3	ادارة الاسطول	6	51	المخاطر	مساحة مخاطر الإدارة	../Risk/dept_risk_space.php	Risk/dept_risk_space.php	74	PENDING_OWNER	مساحة مخاطر الإدارة
+4	ادارة الموارد البشرية	7	1	لوحة الإدارة	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+4	ادارة الموارد البشرية	7	2	لوحة الإدارة	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+4	ادارة الموارد البشرية	7	3	لوحة الإدارة	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+4	ادارة الموارد البشرية	7	4	لوحة الإدارة	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+4	ادارة الموارد البشرية	7	5	لوحة الإدارة	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+4	ادارة الموارد البشرية	7	6	لوحة الإدارة	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+4	ادارة الموارد البشرية	7	7	التوظيف	التوظيف من الشاغر إلى المباشرة	../Workforce/recruitment_pipeline.php	Workforce/recruitment_pipeline.php	318	APPROVED	التوظيف من الشاغر إلى المباشرة
+4	ادارة الموارد البشرية	7	8	التعاقد والمباشرة	سجل الموظفين	../Employees/employees.php	Employees/employees.php	182	APPROVED	سجل الموظفين
+4	ادارة الموارد البشرية	7	9	التعاقد والمباشرة	عقود الموظفين	../Employees/employee_contracts.php	Employees/employee_contracts.php	179	APPROVED	عقود الموظفين
+4	ادارة الموارد البشرية	7	10	التعاقد والمباشرة	عقود المشاريع المؤقتة	../Workforce/project_contracts.php	Workforce/project_contracts.php	327	APPROVED	عقود المشاريع المؤقتة
+4	ادارة الموارد البشرية	7	11	التعاقد والمباشرة	وثائق المعدات والمشغّلين	../Equipments/equipment_documents.php	Equipments/equipment_documents.php	260	APPROVED	وثائق المعدات والمشغّلين
+4	ادارة الموارد البشرية	7	12	الحضور والإجازات	الحضور والانصراف	../Operations/attendance.php	Operations/attendance.php	181	APPROVED	الحضور والانصراف
+4	ادارة الموارد البشرية	7	13	الحضور والإجازات	الإجازات والغياب	../Workforce/worker_leave_absence.php	Workforce/worker_leave_absence.php	319	APPROVED	الإجازات والغياب
+4	ادارة الموارد البشرية	7	14	الحضور والإجازات	تسجيل التايم شيت والإنتاج	../Timesheet/timesheet.php	Timesheet/timesheet.php	341	APPROVED	تسجيل التايم شيت والإنتاج — الموقع
+4	ادارة الموارد البشرية	7	15	القوى الميدانية	سجل المشغّلين	../Employees/equipment_operators.php	Employees/equipment_operators.php	183	APPROVED	سجل المشغّلين
+4	ادارة الموارد البشرية	7	16	القوى الميدانية	تكليف المشغّل على المعدة	../Operations/distribution_space.php	Operations/distribution_space.php	271	APPROVED	تكليف المشغّل على المعدة
+4	ادارة الموارد البشرية	7	17	القوى الميدانية	تأهيل المشغّلين على أنواع المعدات	../Workforce/op_qual.php	Workforce/op_qual.php	312	APPROVED	تأهيل المشغّلين على أنواع المعدات
+4	ادارة الموارد البشرية	7	18	القوى الميدانية	الأداء الشهري للمشغّل	../Workforce/op_monthly.php	Workforce/op_monthly.php	180	APPROVED	الأداء الشهري للمشغّل
+4	ادارة الموارد البشرية	7	19	القوى الميدانية	سجل المعدات	../Equipments/equipments.php	Equipments/equipments.php	256	PENDING_DEDUP	سجل المعدات
+4	ادارة الموارد البشرية	7	20	الخصومات والسلف	الخصومات والجزاءات	../Workforce/deductions.php	Workforce/deductions.php	313	APPROVED	الخصومات والجزاءات
+4	ادارة الموارد البشرية	7	21	الخصومات والسلف	خصومات المشغّلين المقترحة	../Workforce/proposed_deductions.php	Workforce/proposed_deductions.php	320	APPROVED	خصومات المشغّلين المقترحة
+4	ادارة الموارد البشرية	7	22	الخصومات والسلف	السلف والعهد المالية	../Workforce/employee_advances.php	Workforce/employee_advances.php	321	PENDING_OWNER	السلف والعهد المالية
+4	ادارة الموارد البشرية	7	23	التقييم والتصفية	تقييم أداء العاملين	../Workforce/worker_evaluation.php	Workforce/worker_evaluation.php	177	APPROVED	تقييم أداء العاملين
+4	ادارة الموارد البشرية	7	24	التقييم والتصفية	تصفية إنهاء خدمة موظف	../Workforce/final_settlement.php	Workforce/final_settlement.php	178	APPROVED	تصفية إنهاء خدمة موظف
+4	ادارة الموارد البشرية	7	25	المسيّر والدفع	مسيّر الرواتب	../Workforce/payroll_runs.php	Workforce/payroll_runs.php	326	PENDING_OWNER	مسيّر الرواتب
+4	ادارة الموارد البشرية	7	26	المسيّر والدفع	طلبات الدفع والسداد	../Finance/payments_fin.php	Finance/payments_fin.php	109	APPROVED	طلبات الدفع والسداد
+4	ادارة الموارد البشرية	7	27	متابعة الموارد	من يرى ماذا ومكوّنات البوابة	../Portal/visibility_keys.php	Portal/visibility_keys.php	359	PENDING_OWNER	من يرى ماذا ومكوّنات البوابة
+4	ادارة الموارد البشرية	7	28	متابعة الموارد	بلاغات إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+4	ادارة الموارد البشرية	7	29	متابعة الموارد	أبلغ عن مشكلة من هذه الشاشة	../Tickets/ticket_contextual_open.php	Tickets/ticket_contextual_open.php	332	APPROVED	أبلغ عن مشكلة من هذه الشاشة
+4	ادارة الموارد البشرية	7	30	متابعة الموارد	صندوق ما ينتظر اعتمادي	../Finance/approvals_inbox.php	Finance/approvals_inbox.php	331	APPROVED	صندوق ما ينتظر اعتمادي
+4	ادارة الموارد البشرية	7	31	متابعة الموارد	ما ينتظر اعتمادي	../Approvals/hours_approval.php	Approvals/hours_approval.php	24	APPROVED	ما ينتظر اعتمادي
+4	ادارة الموارد البشرية	7	32	متابعة الموارد	صندوقُ موافقاتي — ما ينتظر يدي	../Approvals/requests.php	Approvals/requests.php	23	PENDING_OWNER	صندوقُ موافقاتي — ما ينتظر يدي
+4	ادارة الموارد البشرية	7	33	تقارير الموارد	ميزانية إدارتي	../Finance/budget_dept.php	Finance/budget_dept.php	230	APPROVED	ميزانية إدارتي — التمويل
+4	ادارة الموارد البشرية	7	34	تقارير الموارد	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+4	ادارة الموارد البشرية	7	35	تقارير الموارد	مركز التقارير	../emsreports/index.php	emsreports/index.php	19	PENDING_DEDUP	مركز التقارير — الحوكمة
+4	ادارة الموارد البشرية	7	36	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+4	ادارة الموارد البشرية	7	37	خارج الوثيقة — بانتظار قرار المالك	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+4	ادارة الموارد البشرية	7	38	العمل اليومي	احتياج القوى والتخطيط	../Workforce/workforce_requirement.php	Workforce/workforce_requirement.php	322	PENDING_OWNER	احتياج القوى والتخطيط
+4	ادارة الموارد البشرية	7	39	العمل اليومي	المسميات الوظيفية	../Employees/job_titles.php	Employees/job_titles.php	185	PENDING_OWNER	المسميات الوظيفية
+4	ادارة الموارد البشرية	7	40	العمل اليومي	الأدوار الوظيفية	../Employees/employee_roles.php	Employees/employee_roles.php	184	PENDING_OWNER	الأدوار الوظيفية
+4	ادارة الموارد البشرية	7	41	العمل اليومي	ملف العامل التشغيلي	../Workforce/worker_register.php	Workforce/worker_register.php	329	PENDING_OWNER	ملف العامل التشغيلي
+4	ادارة الموارد البشرية	7	42	العمل اليومي	عقود العاملين	../Workforce/worker_contract.php	Workforce/worker_contract.php	325	PENDING_OWNER	عقود العاملين
+4	ادارة الموارد البشرية	7	43	العمل اليومي	تسويات العاملين	../Workforce/worker_settlement.php	Workforce/worker_settlement.php	323	APPROVED	تسويات العاملين
+4	ادارة الموارد البشرية	7	44	العمل اليومي	ميزانية إدارتي	../Finance/budget_form_fin.php	Finance/budget_form_fin.php	124	PENDING_OWNER	ميزانية إدارتي — المالية
+4	ادارة الموارد البشرية	7	45	العمل اليومي	الذمم والتحصيل	../Finance/dues_fin.php	Finance/dues_fin.php	108	APPROVED	ذمم الموردين والمستحقات
+4	ادارة الموارد البشرية	7	46	العمل اليومي	الإعدادات	../Settings/settings.php	Settings/settings.php	20	APPROVED	الإعدادات
+4	ادارة الموارد البشرية	7	47	العمل اليومي	تسويات الموظفين	../Workforce/employee_settlements.php	Workforce/employee_settlements.php	324	PENDING_OWNER	تسويات الموظفين
+4	ادارة الموارد البشرية	7	48	العمل اليومي	تنقلات العاملين	../Workforce/worker_movement.php	Workforce/worker_movement.php	316	APPROVED	تنقلات العاملين
+4	ادارة الموارد البشرية	7	49	العمل اليومي	السكن والإعاشة	../Workforce/housing_units.php	Workforce/housing_units.php	317	APPROVED	السكن والإعاشة والمعسكرات
+4	ادارة الموارد البشرية	7	50	العمل اليومي	سجل الأحداث التشغيلية	../Workforce/worker_worklog.php	Workforce/worker_worklog.php	330	PENDING_OWNER	سجل الأحداث التشغيلية
+4	ادارة الموارد البشرية	7	51	العمل اليومي	مركز التقارير	../Reports/reports.php	Reports/reports.php	13	APPROVED	مركز التقارير — التنفيذية
+4	ادارة الموارد البشرية	7	52	العمل اليومي	طلب مالي جديد	../FinRequests/request_form.php	FinRequests/request_form.php	130	PENDING_OWNER	طلب مالي جديد
+4	ادارة الموارد البشرية	7	53	العمل اليومي	سجل العقود الموحّد	../Workforce/contract_registry.php	Workforce/contract_registry.php	10	APPROVED	سجل العقود الموحَّد
+4	ادارة الموارد البشرية	7	54	المتابعة والموافقات	موافقات إدارتي	../FinRequests/dept_inbox.php	FinRequests/dept_inbox.php	144	APPROVED	موافقات إدارتي
+4	ادارة الموارد البشرية	7	55	المخاطر	مساحة مخاطر الإدارة	../Risk/dept_risk_space.php	Risk/dept_risk_space.php	74	PENDING_OWNER	مساحة مخاطر الإدارة
+5	إدارة الموقع (قديم — مدمج في 6)	0	1	— خارج التبويب	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+5	إدارة الموقع (قديم — مدمج في 6)	0	2	— خارج التبويب	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+5	إدارة الموقع (قديم — مدمج في 6)	0	3	العمل اليومي	غرفة عمليات التشغيل	../Operations/operations_room.php	Operations/operations_room.php	276	APPROVED	غرفة عمليات المواقع
+5	إدارة الموقع (قديم — مدمج في 6)	0	4	العمل اليومي	مساحة التوزيع	../Operations/distribution_space.php	Operations/distribution_space.php	271	APPROVED	تكليف المشغّل على المعدة
+5	إدارة الموقع (قديم — مدمج في 6)	0	5	العمل اليومي	تسجيل الوحدات	../Timesheet/timesheet_type.php	Timesheet/timesheet_type.php	22	APPROVED	تسجيل التايم شيت والإنتاج — الحوكمة
+5	إدارة الموقع (قديم — مدمج في 6)	0	6	العمل اليومي	خطة عمل الغد	../Operations/daily_plan.php	Operations/daily_plan.php	340	APPROVED	خطة عمل الغد
+5	إدارة الموقع (قديم — مدمج في 6)	0	7	العمل اليومي	طلب مالي جديد	../FinRequests/request_form.php	FinRequests/request_form.php	130	PENDING_OWNER	طلب مالي جديد
+5	إدارة الموقع (قديم — مدمج في 6)	0	8	العمل اليومي	طلباتي المالية	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+5	إدارة الموقع (قديم — مدمج في 6)	0	9	المتابعة والموافقات	أحكام العميل والمورد والمشغّل	../Finance/unit_records_fin.php	Finance/unit_records_fin.php	143	PENDING_OWNER	أحكام العميل والمورد والمشغّل
+5	إدارة الموقع (قديم — مدمج في 6)	0	10	المتابعة والموافقات	موافقات إدارتي	../FinRequests/dept_inbox.php	FinRequests/dept_inbox.php	144	APPROVED	موافقات إدارتي
+5	إدارة الموقع (قديم — مدمج في 6)	0	11	المتابعة والموافقات	الميزانية والانحراف	../Finance/budget_form_fin.php	Finance/budget_form_fin.php	124	PENDING_OWNER	ميزانية إدارتي — المالية
+5	إدارة الموقع (قديم — مدمج في 6)	0	12	السجلات الرئيسية	المشرفين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+5	إدارة الموقع (قديم — مدمج في 6)	0	13	السجلات الرئيسية	المعاملات المالية	../Finance/events_list_fin.php	Finance/events_list_fin.php	123	APPROVED	سجل الأحداث المالية
+5	إدارة الموقع (قديم — مدمج في 6)	0	14	السجلات الرئيسية	حاويات العقود	../Operations/containers.php	Operations/containers.php	270	APPROVED	إسناد المعدات للوحدات
+5	إدارة الموقع (قديم — مدمج في 6)	0	15	السجلات الرئيسية	مواقع التنفيذ	../Projects/sites.php	Projects/sites.php	64	PENDING_OWNER	مواقع التنفيذ
+5	إدارة الموقع (قديم — مدمج في 6)	0	16	التقارير والتحليلات	التكاليف والربحية	../Finance/cost_report_fin.php	Finance/cost_report_fin.php	119	APPROVED	التكاليف والربحية بالمركز
+5	إدارة الموقع (قديم — مدمج في 6)	0	17	التقارير والتحليلات	مركز التقارير	../Reports/reports.php	Reports/reports.php	13	APPROVED	مركز التقارير — التنفيذية
+5	إدارة الموقع (قديم — مدمج في 6)	0	18	الإعدادات والتدقيق	الإعدادات	../Settings/settings.php	Settings/settings.php	20	APPROVED	الإعدادات
+6	إدارة الموقع	8	1	لوحة الموقع	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+6	إدارة الموقع	8	2	لوحة الموقع	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+6	إدارة الموقع	8	3	لوحة الموقع	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+6	إدارة الموقع	8	4	لوحة الموقع	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+6	إدارة الموقع	8	5	لوحة الموقع	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+6	إدارة الموقع	8	6	لوحة الموقع	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+6	إدارة الموقع	8	7	لوحة الموقع	غرفة عمليات المواقع	../Operations/operations_room.php	Operations/operations_room.php	276	APPROVED	غرفة عمليات المواقع
+6	إدارة الموقع	8	8	لوحة الموقع	جدول عمل المنجم — الأسبوعي والشهري	../Operations/site_work_calendar.php	Operations/site_work_calendar.php	342	APPROVED	جدول عمل المنجم — الأسبوعي والشهري
+6	إدارة الموقع	8	9	لوحة الموقع	جدول الورديات — النهار والليل	../Operations/site_shift_plan.php	Operations/site_shift_plan.php	345	APPROVED	جدول الورديات — النهار والليل
+6	إدارة الموقع	8	10	لوحة الموقع	خطة عمل الغد	../Operations/daily_plan.php	Operations/daily_plan.php	340	APPROVED	خطة عمل الغد
+6	إدارة الموقع	8	11	لوحة الموقع	أذون دخول وخروج المعدات	../Operations/site_gate_equip.php	Operations/site_gate_equip.php	346	APPROVED	أذون دخول وخروج المعدات
+6	إدارة الموقع	8	12	لوحة الموقع	أذون دخول وخروج المشغّلين	../Operations/site_gate_person.php	Operations/site_gate_person.php	347	APPROVED	أذون دخول وخروج المشغّلين
+6	إدارة الموقع	8	13	لوحة الموقع	أذون الزيارة والمركبات الخارجية	../admin/org_permits.php	admin/org_permits.php	344	APPROVED	أذون الزيارة والمركبات الخارجية
+6	إدارة الموقع	8	14	لوحة الموقع	سجل المعدات	../Equipments/equipments.php	Equipments/equipments.php	256	PENDING_DEDUP	سجل المعدات
+6	إدارة الموقع	8	15	لوحة الموقع	سجل المشغّلين	../Employees/equipment_operators.php	Employees/equipment_operators.php	183	APPROVED	سجل المشغّلين
+6	إدارة الموقع	8	16	لوحة الموقع	تكليف المشغّل على المعدة	../Operations/distribution_space.php	Operations/distribution_space.php	271	APPROVED	تكليف المشغّل على المعدة
+6	إدارة الموقع	8	17	لوحة الموقع	جاهزية المعدات للتشغيل	../Fleet/readiness_board.php	Fleet/readiness_board.php	262	APPROVED	جاهزية المعدات للتشغيل
+6	إدارة الموقع	8	18	لوحة الموقع	وثائق المعدات والمشغّلين	../Equipments/equipment_documents.php	Equipments/equipment_documents.php	260	APPROVED	وثائق المعدات والمشغّلين
+6	إدارة الموقع	8	19	لوحة الموقع	سجل الوردية	../Operations/shift_log.php	Operations/shift_log.php	314	APPROVED	سجل الوردية
+6	إدارة الموقع	8	20	لوحة الموقع	تسجيل التايم شيت والإنتاج	../Timesheet/timesheet.php	Timesheet/timesheet.php	341	APPROVED	تسجيل التايم شيت والإنتاج — الموقع
+6	إدارة الموقع	8	21	لوحة الموقع	الإنتاج والقياس	../Operations/production.php	Operations/production.php	273	APPROVED	الإنتاج والقياس
+6	إدارة الموقع	8	22	لوحة الموقع	التوقفات وتحديد المتحمل	../Operations/stops_unattributed.php	Operations/stops_unattributed.php	267	APPROVED	التوقفات وتحديد المتحمل
+6	إدارة الموقع	8	23	لوحة الموقع	قيدُ الوردية اليومي	../Operations/shift_entry.php	Operations/shift_entry.php	343	APPROVED	القيد اليومي للوردية
+6	إدارة الموقع	8	24	لوحة الموقع	صندوق ما ينتظر اعتمادي	../Finance/approvals_inbox.php	Finance/approvals_inbox.php	331	APPROVED	صندوق ما ينتظر اعتمادي
+6	إدارة الموقع	8	25	لوحة الموقع	بلاغات إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+6	إدارة الموقع	8	26	لوحة الموقع	أبلغ عن مشكلة من هذه الشاشة	../Tickets/ticket_contextual_open.php	Tickets/ticket_contextual_open.php	332	APPROVED	أبلغ عن مشكلة من هذه الشاشة
+6	إدارة الموقع	8	27	لوحة الموقع	أوامر الصيانة	../Maintenance/orders.php	Maintenance/orders.php	278	APPROVED	أوامر الصيانة
+6	إدارة الموقع	8	28	لوحة الموقع	الفحص الفني اليومي	../Maintenance/inspections.php	Maintenance/inspections.php	277	APPROVED	الفحص الفني اليومي
+6	إدارة الموقع	8	29	لوحة الموقع	أوامر الترحيل	../Transport/transfer_orders_list.php	Transport/transfer_orders_list.php	300	APPROVED	أوامر الترحيل
+6	إدارة الموقع	8	30	لوحة الموقع	صرف مواد من المخزن	../Procurement/issue_proc.php	Procurement/issue_proc.php	286	APPROVED	صرف مواد من المخزن
+6	إدارة الموقع	8	31	لوحة الموقع	أرصدة المخزون بحالاتها	../Procurement/stock_proc.php	Procurement/stock_proc.php	289	APPROVED	أرصدة المخزون بحالاتها
+6	إدارة الموقع	8	32	لوحة الموقع	العهد والمرتجعات	../Procurement/receipt_custody_proc.php	Procurement/receipt_custody_proc.php	287	APPROVED	الاستلام المؤقت
+6	إدارة الموقع	8	33	إقفال اليوم	الإقفال الشهري للوحدة	../Operations/monthly_close.php	Operations/monthly_close.php	269	APPROVED	الإقفال الشهري للوحدة
+6	إدارة الموقع	8	34	إقفال اليوم	ميزانية إدارتي	../Finance/budget_dept.php	Finance/budget_dept.php	230	APPROVED	ميزانية إدارتي — التمويل
+6	إدارة الموقع	8	35	إقفال اليوم	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+6	إدارة الموقع	8	36	إقفال اليوم	مركز التقارير	../emsreports/index.php	emsreports/index.php	19	PENDING_DEDUP	مركز التقارير — الحوكمة
+6	إدارة الموقع	8	37	سجلات الموقع	عقود العملاء	../Contracts/contracts.php	Contracts/contracts.php	197	APPROVED	عقود العملاء
+6	إدارة الموقع	8	38	سجلات الموقع	المشاريع والمواقع	../Projects/projects.php	Projects/projects.php	200	APPROVED	المشاريع والمواقع
+6	إدارة الموقع	8	39	سجلات الموقع	الحضور والانصراف	../Operations/attendance.php	Operations/attendance.php	181	APPROVED	الحضور والانصراف
+6	إدارة الموقع	8	40	سجلات الموقع	الإجازات والغياب	../Workforce/worker_leave_absence.php	Workforce/worker_leave_absence.php	319	APPROVED	الإجازات والغياب
+6	إدارة الموقع	8	41	طلبات الموقع	طلبات الشراء	../Procurement/requests_proc.php	Procurement/requests_proc.php	284	APPROVED	طلبات الشراء
+6	إدارة الموقع	8	42	طلبات الموقع	طلبات الترحيل	../Transport/transfer_requests.php	Transport/transfer_requests.php	301	APPROVED	طلبات الترحيل
+6	إدارة الموقع	8	43	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+6	إدارة الموقع	8	44	فريق العمل	قاموسُ المبتدئ	../main/glossary.php	main/glossary.php	356	PENDING_OWNER	قاموسُ المبتدئ — بلغةِ أولِ يوم
+6	إدارة الموقع	8	45	خارج الوثيقة — بانتظار قرار المالك	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+6	إدارة الموقع	8	46	العمل اليومي	طلب مالي جديد	../FinRequests/request_form.php	FinRequests/request_form.php	130	PENDING_OWNER	طلب مالي جديد
+6	إدارة الموقع	8	47	العمل اليومي	خريطة التشغيل اليومية	../movement/map_page.php	movement/map_page.php	46	PENDING_OWNER	خريطة التشغيل اليومية
+6	إدارة الموقع	8	48	العمل اليومي	مركز التقارير	../Reports/reports.php	Reports/reports.php	13	APPROVED	مركز التقارير — التنفيذية
+6	إدارة الموقع	8	49	العمل اليومي	الورديات	../movement/movement_operations.php	movement/movement_operations.php	33	PENDING_OWNER	الورديات
+6	إدارة الموقع	8	50	العمل اليومي	سجل الأحداث المالية	../Finance/events_list_fin.php	Finance/events_list_fin.php	123	APPROVED	سجل الأحداث المالية
+6	إدارة الموقع	8	51	العمل اليومي	التكاليف والربحية	../Finance/cost_report_fin.php	Finance/cost_report_fin.php	119	APPROVED	التكاليف والربحية بالمركز
+6	إدارة الموقع	8	52	العمل اليومي	الإعدادات	../Settings/settings.php	Settings/settings.php	20	APPROVED	الإعدادات
+6	إدارة الموقع	8	53	العمل اليومي	ميزانية إدارتي	../Finance/budget_form_fin.php	Finance/budget_form_fin.php	124	PENDING_OWNER	ميزانية إدارتي — المالية
+6	إدارة الموقع	8	54	العمل اليومي	نطاقات العقد التشغيلية	../Contracts/contract_sites.php	Contracts/contract_sites.php	212	APPROVED	نطاقات العقد التشغيلية
+6	إدارة الموقع	8	55	العمل اليومي	الجدول الشهري للعقد	../Contracts/contract_monthly_plan.php	Contracts/contract_monthly_plan.php	203	APPROVED	الجدول الشهري للعقد
+6	إدارة الموقع	8	56	العمل اليومي	خطة موارد العقد	../Contracts/contract_resource_plan.php	Contracts/contract_resource_plan.php	209	APPROVED	خطة موارد العقد
+6	إدارة الموقع	8	57	العمل اليومي	تسجيل التايم شيت والإنتاج	../Timesheet/timesheet_type.php	Timesheet/timesheet_type.php	22	APPROVED	تسجيل التايم شيت والإنتاج — الحوكمة
+6	إدارة الموقع	8	58	العمل اليومي	أحكام العميل والمورد والمشغّل	../Finance/unit_records_fin.php	Finance/unit_records_fin.php	143	PENDING_OWNER	أحكام العميل والمورد والمشغّل
+6	إدارة الموقع	8	59	العمل اليومي	التكليفات التنظيمية	../admin/org_assignments.php	admin/org_assignments.php	41	APPROVED	التكليفات التنظيمية
+6	إدارة الموقع	8	60	المتابعة والموافقات	موافقات إدارتي	../FinRequests/dept_inbox.php	FinRequests/dept_inbox.php	144	APPROVED	موافقات إدارتي
+6	إدارة الموقع	8	61	المخاطر	مخاطرُ الميدان	../Risk/risk_field.php	Risk/risk_field.php	86	APPROVED	مخاطر الميدان
+6	إدارة الموقع	8	62	المخاطر	مساحة مخاطر الإدارة	../Risk/dept_risk_space.php	Risk/dept_risk_space.php	74	PENDING_OWNER	مساحة مخاطر الإدارة
+9	الإدارة التنفيذية	881	1	لوحة الإدارة التنفيذية	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+9	الإدارة التنفيذية	881	2	لوحة الإدارة التنفيذية	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+9	الإدارة التنفيذية	881	3	لوحة الإدارة التنفيذية	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+9	الإدارة التنفيذية	881	4	لوحة الإدارة التنفيذية	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+9	الإدارة التنفيذية	881	5	لوحة الإدارة التنفيذية	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+9	الإدارة التنفيذية	881	6	لوحة الإدارة التنفيذية	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+9	الإدارة التنفيذية	881	7	لوحة الإدارة التنفيذية	لوحة المدير التنفيذي	../Portal/ceo_board.php	Portal/ceo_board.php	5	APPROVED	لوحة الرئيس التنفيذي
+9	الإدارة التنفيذية	881	8	نماذج العمل والحدود	نماذج العمل ووحدات القياس	../Portal/business_models.php	Portal/business_models.php	195	APPROVED	نماذج العمل ووحدات القياس
+9	الإدارة التنفيذية	881	9	نماذج العمل والحدود	الموازنة العامة	../Finance/budget_master.php	Finance/budget_master.php	6	APPROVED	الموازنة العامة
+9	الإدارة التنفيذية	881	10	الاعتمادات العليا	اعتمادات المدير التنفيذي	../Portal/ceo_approvals.php	Portal/ceo_approvals.php	1	APPROVED	اعتمادات الرئيس التنفيذي
+9	الإدارة التنفيذية	881	11	الاعتمادات العليا	التفويض بالتوقيع	../Governance/signing_authority.php	Governance/signing_authority.php	57	PENDING_OWNER	التفويض بالتوقيع
+9	الإدارة التنفيذية	881	12	توقيع العقود	توقيع العقود والالتزامات	../Portal/ceo_contracts.php	Portal/ceo_contracts.php	8	APPROVED	العقود والالتزامات المحجوزة أو المصعَّدة
+9	الإدارة التنفيذية	881	13	توقيع العقود	مراجعة العقود وملاحظاتها	../Portal/contract_review.php	Portal/contract_review.php	9	APPROVED	مراجعة العقود وملاحظاتها
+9	الإدارة التنفيذية	881	14	توقيع العقود	سجل العقود الموحَّد	../Workforce/contract_registry.php	Workforce/contract_registry.php	10	APPROVED	سجل العقود الموحَّد
+9	الإدارة التنفيذية	881	15	فتح المشاريع	قرار فتح مشروع جديد	../Portal/project_charter.php	Portal/project_charter.php	7	APPROVED	قرار فتح مشروع جديد
+9	الإدارة التنفيذية	881	16	فتح المشاريع	الهيكل التنظيمي والمسميات	../admin/org_structure.php	admin/org_structure.php	40	APPROVED	الهيكل التنظيمي والمسميات
+9	الإدارة التنفيذية	881	17	فتح المشاريع	التكليفات التنظيمية	../admin/org_assignments.php	admin/org_assignments.php	41	APPROVED	التكليفات التنظيمية
+9	الإدارة التنفيذية	881	18	المخاطر والحسم	المخاطر والقرارات العليا	../Portal/ceo_risk.php	Portal/ceo_risk.php	17	APPROVED	المخاطر والقرارات العليا
+9	الإدارة التنفيذية	881	19	المخاطر والحسم	المخاطر التجارية	../Clients/commercial_risks.php	Clients/commercial_risks.php	18	APPROVED	المخاطر التجارية
+9	الإدارة التنفيذية	881	20	الرقابة العليا	القوائم المالية	../Finance/financial_statements_fin.php	Finance/financial_statements_fin.php	113	APPROVED	القوائم المالية
+9	الإدارة التنفيذية	881	21	الرقابة العليا	هامش الربح للعقد والواقعة	../Reports/margin_report.php	Reports/margin_report.php	14	PENDING_OWNER	هامش الربح للعقد والواقعة
+9	الإدارة التنفيذية	881	22	الرقابة العليا	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+9	الإدارة التنفيذية	881	23	الرقابة العليا	مؤشرات البلاغات	../Tickets/ticket_dashboard.php	Tickets/ticket_dashboard.php	338	APPROVED	مؤشرات البلاغات
+9	الإدارة التنفيذية	881	24	التأسيس والإصدار	وضع التأسيس وإغلاقه	../Portal/founding_mode.php	Portal/founding_mode.php	15	APPROVED	وضع التأسيس وإغلاقه
+9	الإدارة التنفيذية	881	25	التأسيس والإصدار	بصمة الإصدار وتقرير النشر	../Portal/release_stamp.php	Portal/release_stamp.php	16	APPROVED	بصمة الإصدار وتقرير النشر
+9	الإدارة التنفيذية	881	26	التقارير والتصدير	تقارير الإدارة التنفيذية	../Portal/ceo_reports.php	Portal/ceo_reports.php	353	PENDING_OWNER	تقارير الإدارة التنفيذية
+9	الإدارة التنفيذية	881	27	التقارير والتصدير	تقارير الحوكمة	../Governance/gov_reports.php	Governance/gov_reports.php	48	PENDING_DEDUP	تقارير الحوكمة
+9	الإدارة التنفيذية	881	28	التقارير والتصدير	تقارير المراجعة للجهة المشرفة	../Audit/iaf_reports.php	Audit/iaf_reports.php	90	APPROVED	تقارير الجهة المشرفة
+9	الإدارة التنفيذية	881	29	التقارير والتصدير	تقارير المخاطر والتحليلات	../Risk/risk_reports.php	Risk/risk_reports.php	70	APPROVED	تقارير المخاطر والتحليلات
+9	الإدارة التنفيذية	881	30	التقارير والتصدير	حدود المبالغ	../Governance/authority_caps.php	Governance/authority_caps.php	60	PENDING_OWNER	حدود المبالغ
+9	الإدارة التنفيذية	881	31	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+9	الإدارة التنفيذية	881	32	فريق العمل	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+9	الإدارة التنفيذية	881	33	العمل اليومي	تقارير المراجعة الداخلية	../Portal/ceo_audit_reports.php	Portal/ceo_audit_reports.php	352	PENDING_OWNER	تقارير المراجعة الداخلية
+9	الإدارة التنفيذية	881	34	العمل اليومي	موافقات التكليف	../Portal/ceo_assignments.php	Portal/ceo_assignments.php	350	PENDING_OWNER	موافقات التكليف
+12	ادارة المبيعات	13	1	لوحة الإدارة	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+12	ادارة المبيعات	13	2	لوحة الإدارة	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+12	ادارة المبيعات	13	3	لوحة الإدارة	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+12	ادارة المبيعات	13	4	لوحة الإدارة	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+12	ادارة المبيعات	13	5	لوحة الإدارة	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+12	ادارة المبيعات	13	6	لوحة الإدارة	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+12	ادارة المبيعات	13	7	لوحة الإدارة	سجل العملاء	../Clients/clients.php	Clients/clients.php	199	APPROVED	سجل العملاء
+12	ادارة المبيعات	13	8	لوحة الإدارة	كشف حساب العميل	../Contracts/client_statement.php	Contracts/client_statement.php	145	APPROVED	كشف حساب العميل
+12	ادارة المبيعات	13	9	لوحة الإدارة	الفرص والزيارات والمناقصات	../Opportunities/opportunities.php	Opportunities/opportunities.php	191	APPROVED	الفرص والزيارات والمناقصات
+12	ادارة المبيعات	13	10	لوحة الإدارة	المشاريع والمواقع	../Projects/projects.php	Projects/projects.php	200	APPROVED	المشاريع والمواقع
+12	ادارة المبيعات	13	11	لوحة الإدارة	عروض الأسعار للعملاء	../Clients/quotations.php	Clients/quotations.php	192	APPROVED	عروض الأسعار للعملاء
+12	ادارة المبيعات	13	12	لوحة الإدارة	نماذج العمل ووحدات القياس	../Portal/business_models.php	Portal/business_models.php	195	APPROVED	نماذج العمل ووحدات القياس
+12	ادارة المبيعات	13	13	لوحة الإدارة	كتالوج الخدمات وبنود البيع	../Clients/products.php	Clients/products.php	194	APPROVED	كتالوج الخدمات وبنود البيع
+12	ادارة المبيعات	13	14	لوحة الإدارة	قوائم التسعير المعتمدة	../Clients/pricelists.php	Clients/pricelists.php	193	APPROVED	قوائم التسعير المعتمدة
+12	ادارة المبيعات	13	15	لوحة الإدارة	وحدات القياس والتحويل	../Clients/units_of_measure.php	Clients/units_of_measure.php	196	APPROVED	وحدات القياس والتحويل
+12	ادارة المبيعات	13	16	لوحة الإدارة	عقود العملاء	../Contracts/contracts.php	Contracts/contracts.php	197	APPROVED	عقود العملاء
+12	ادارة المبيعات	13	17	لوحة الإدارة	سجل العقود الموحَّد	../Workforce/contract_registry.php	Workforce/contract_registry.php	10	APPROVED	سجل العقود الموحَّد
+12	ادارة المبيعات	13	18	لوحة الإدارة	مراجعة العقود وملاحظاتها	../Portal/contract_review.php	Portal/contract_review.php	9	APPROVED	مراجعة العقود وملاحظاتها
+12	ادارة المبيعات	13	19	لوحة الإدارة	ملاحق العقود وتجديداتها	../Clients/contract_amendments.php	Clients/contract_amendments.php	187	APPROVED	ملاحق العقود وتجديداتها
+12	ادارة المبيعات	13	20	لوحة الإدارة	سجل حركة العقد	../Clients/contract_events.php	Clients/contract_events.php	188	APPROVED	سجل حركة العقد
+12	ادارة المبيعات	13	21	لوحة الإدارة	التراخيص والكفالات	../Governance/licenses_guarantees.php	Governance/licenses_guarantees.php	62	PENDING_OWNER	التراخيص والكفالات
+12	ادارة المبيعات	13	22	لوحة الإدارة	التزام العقد بنوع المعدة	../Contracts/contract_coverage.php	Contracts/contract_coverage.php	219	APPROVED	التزام العقد بنوع المعدة
+12	ادارة المبيعات	13	23	لوحة الإدارة	الوحدات التعاقدية المرقَّمة	../Operations/containers.php	Operations/containers.php	270	APPROVED	إسناد المعدات للوحدات
+12	ادارة المبيعات	13	24	لوحة الإدارة	أحكام العقد — العملات والمقدم والمهل	../Contracts/contract_card.php	Contracts/contract_card.php	215	APPROVED	أحكام العقد — العملات والمقدم والمهل
+12	ادارة المبيعات	13	25	لوحة الإدارة	آليات تعديل السعر	../Contracts/price_terms.php	Contracts/price_terms.php	220	PENDING_OWNER	شروط تعديل السعر
+12	ادارة المبيعات	13	26	لوحة الإدارة	الأداء الشهري للوحدة	../Operations/unit_perf.php	Operations/unit_perf.php	268	APPROVED	الأداء الشهري للوحدة
+12	ادارة المبيعات	13	27	لوحة الإدارة	تسجيل التايم شيت والإنتاج	../Timesheet/timesheet.php	Timesheet/timesheet.php	341	APPROVED	تسجيل التايم شيت والإنتاج — الموقع
+12	ادارة المبيعات	13	28	لوحة الإدارة	الإنتاج والقياس	../Operations/production.php	Operations/production.php	273	APPROVED	الإنتاج والقياس
+12	ادارة المبيعات	13	29	لوحة الإدارة	المستخلصات والمطالبات	../Contracts/claims.php	Contracts/claims.php	213	APPROVED	المستخلصات والمطالبات
+12	ادارة المبيعات	13	30	لوحة الإدارة	الجزاءات والحوافز التعاقدية	../Contracts/penalties.php	Contracts/penalties.php	198	APPROVED	الجزاءات والحوافز التعاقدية
+12	ادارة المبيعات	13	31	لوحة الإدارة	الأعمال غير المفوترة	../Operations/unbilled.php	Operations/unbilled.php	214	APPROVED	الأعمال غير المفوترة
+12	ادارة المبيعات	13	32	لوحة الإدارة	ذمم العملاء وأعمارها	../Contracts/collections.php	Contracts/collections.php	186	APPROVED	ذمم العملاء وأعمارها
+12	ادارة المبيعات	13	33	لوحة الإدارة	مخاطرُ المبيعاتِ والعقود	../Risk/risk_dept_sal.php	Risk/risk_dept_sal.php	222	APPROVED	مخاطر المبيعات والعقود
+12	ادارة المبيعات	13	34	لوحة الإدارة	حوكمةُ المبيعاتِ والعقود	../Governance/gov_dept_sal.php	Governance/gov_dept_sal.php	223	APPROVED	حوكمة المبيعات والعقود
+12	ادارة المبيعات	13	35	لوحة الإدارة	المخاطر التجارية	../Clients/commercial_risks.php	Clients/commercial_risks.php	18	APPROVED	المخاطر التجارية
+12	ادارة المبيعات	13	36	لوحة الإدارة	بلاغات إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+12	ادارة المبيعات	13	37	لوحة الإدارة	أبلغ عن مشكلة من هذه الشاشة	../Tickets/ticket_contextual_open.php	Tickets/ticket_contextual_open.php	332	APPROVED	أبلغ عن مشكلة من هذه الشاشة
+12	ادارة المبيعات	13	38	لوحة الإدارة	صندوق ما ينتظر اعتمادي	../Finance/approvals_inbox.php	Finance/approvals_inbox.php	331	APPROVED	صندوق ما ينتظر اعتمادي
+12	ادارة المبيعات	13	39	لوحة الإدارة	هامش الربح للعقد والواقعة	../Reports/margin_report.php	Reports/margin_report.php	14	PENDING_OWNER	هامش الربح للعقد والواقعة
+12	ادارة المبيعات	13	40	لوحة الإدارة	متابعة انحراف المنفَّذ عن المخطط	../Finance/variance_monitor_fin.php	Finance/variance_monitor_fin.php	153	APPROVED	متابعة انحراف المنفَّذ عن المخطط
+12	ادارة المبيعات	13	41	لوحة الإدارة	ميزانية إدارتي	../Finance/budget_dept.php	Finance/budget_dept.php	230	APPROVED	ميزانية إدارتي — التمويل
+12	ادارة المبيعات	13	42	لوحة الإدارة	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+12	ادارة المبيعات	13	43	لوحة الإدارة	مركز التقارير	../emsreports/index.php	emsreports/index.php	19	PENDING_DEDUP	مركز التقارير — الحوكمة
+12	ادارة المبيعات	13	44	التأجير قصير الأمد	تقويمُ الأسطول والحجز	../Operations/fleet_calendar.php	Operations/fleet_calendar.php	275	PENDING_OWNER	تقويمُ الأسطول والحجز
+12	ادارة المبيعات	13	45	التأجير قصير الأمد	دفترُ الأسعار بالشرائح	../Clients/rate_books.php	Clients/rate_books.php	221	PENDING_OWNER	دفترُ الأسعار بالشرائح
+12	ادارة المبيعات	13	46	التأجير قصير الأمد	استغلالُ الأسطول ومردودُه	../Operations/fleet_utilization.php	Operations/fleet_utilization.php	274	PENDING_OWNER	استغلالُ الأسطول ومردودُه
+12	ادارة المبيعات	13	47	إضافاتُ المالك	اعتمادُ ساعاتِ الوحدات (بوابةُ المبيعات)	../Approvals/hours_approval.php	Approvals/hours_approval.php	24	APPROVED	ما ينتظر اعتمادي
+12	ادارة المبيعات	13	48	إضافاتُ المالك	مطابقةُ العميلِ على الوحدات	../Contracts/unit_client_match.php	Contracts/unit_client_match.php	189	APPROVED	مطابقة بيانات العميل
+12	ادارة المبيعات	13	49	إضافاتُ المالك	كشفُ وحداتِ العميل	../Contracts/unit_statement_client.php	Contracts/unit_statement_client.php	190	APPROVED	كشف التايم شيت — العميل
+12	ادارة المبيعات	13	50	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+12	ادارة المبيعات	13	51	فريق العمل	قاموسُ المبتدئ — بلغةِ أولِ يوم	../main/glossary.php	main/glossary.php	356	PENDING_OWNER	قاموسُ المبتدئ — بلغةِ أولِ يوم
+12	ادارة المبيعات	13	52	خارج الوثيقة — بانتظار قرار المالك	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+12	ادارة المبيعات	13	53	العمل اليومي	أنشطة العملاء	../Clients/activities.php	Clients/activities.php	201	APPROVED	أنشطة العملاء
+12	ادارة المبيعات	13	54	العمل اليومي	المناقصات	../Clients/tenders.php	Clients/tenders.php	204	PENDING_OWNER	المناقصات
+12	ادارة المبيعات	13	55	العمل اليومي	التزامات العقود	../Clients/contract_commitments.php	Clients/contract_commitments.php	202	PENDING_DEDUP	التزامات العقود
+12	ادارة المبيعات	13	56	العمل اليومي	سجل الأحداث المالية	../Finance/events_list_fin.php	Finance/events_list_fin.php	123	APPROVED	سجل الأحداث المالية
+12	ادارة المبيعات	13	57	العمل اليومي	ميزانية إدارتي	../Finance/budget_form_fin.php	Finance/budget_form_fin.php	124	PENDING_OWNER	ميزانية إدارتي — المالية
+12	ادارة المبيعات	13	58	العمل اليومي	الإعدادات	../Settings/settings.php	Settings/settings.php	20	APPROVED	الإعدادات
+12	ادارة المبيعات	13	59	العمل اليومي	مصفوفة التزامات العقد	../Contracts/contract_obligations.php	Contracts/contract_obligations.php	211	PENDING_DEDUP	مصفوفة التزامات العقد
+12	ادارة المبيعات	13	60	العمل اليومي	نطاقات العقد التشغيلية	../Contracts/contract_sites.php	Contracts/contract_sites.php	212	APPROVED	نطاقات العقد التشغيلية
+12	ادارة المبيعات	13	61	العمل اليومي	بنود عقد العميل وقيمته	../Contracts/contract_lines.php	Contracts/contract_lines.php	205	APPROVED	بنود عقد العميل وقيمته
+12	ادارة المبيعات	13	62	العمل اليومي	الجدول الشهري للعقد	../Contracts/contract_monthly_plan.php	Contracts/contract_monthly_plan.php	203	APPROVED	الجدول الشهري للعقد
+12	ادارة المبيعات	13	63	العمل اليومي	خطة موارد العقد	../Contracts/contract_resource_plan.php	Contracts/contract_resource_plan.php	209	APPROVED	خطة موارد العقد
+12	ادارة المبيعات	13	64	العمل اليومي	خطة دفع العقد	../Contracts/contract_payment_schedule.php	Contracts/contract_payment_schedule.php	208	APPROVED	خطة دفع العقد
+12	ادارة المبيعات	13	65	العمل اليومي	ضمانات العقد	../Contracts/contract_guarantees.php	Contracts/contract_guarantees.php	210	APPROVED	ضمانات العقد
+12	ادارة المبيعات	13	66	العمل اليومي	جاهزية العروض	../Clients/readiness_lines.php	Clients/readiness_lines.php	206	APPROVED	جاهزية العروض
+12	ادارة المبيعات	13	67	العمل اليومي	لوحة الإسناد اليومي	../Approvals/attribution_board.php	Approvals/attribution_board.php	35	APPROVED	لوحة الإسناد اليومي
+12	ادارة المبيعات	13	68	العمل اليومي	خط أساس العقد	../Contracts/contract_baseline.php	Contracts/contract_baseline.php	207	APPROVED	خط أساس العقد
+12	ادارة المبيعات	13	69	العمل اليومي	طلب مالي جديد	../FinRequests/request_form.php	FinRequests/request_form.php	130	PENDING_OWNER	طلب مالي جديد
+12	ادارة المبيعات	13	70	العمل اليومي	مركز التقارير	../Reports/reports.php	Reports/reports.php	13	APPROVED	مركز التقارير — التنفيذية
+12	ادارة المبيعات	13	71	العمل اليومي	ربط الخطة بالفعلي	../Contracts/plan_actual_link.php	Contracts/plan_actual_link.php	218	APPROVED	ربط الخطة بالفعلي
+12	ادارة المبيعات	13	72	العمل اليومي	اقتصاد دورة حياة العقد	../Contracts/contract_lifecycle.php	Contracts/contract_lifecycle.php	216	APPROVED	اقتصاد دورة حياة العقد
+12	ادارة المبيعات	13	73	العمل اليومي	اللوحة التجارية للعقود	../Contracts/commercial_board.php	Contracts/commercial_board.php	217	PENDING_OWNER	اللوحة التجارية للعقود
+12	ادارة المبيعات	13	74	العمل اليومي	الفاتورة الضريبية	../Contracts/tax_invoices.php	Contracts/tax_invoices.php	107	APPROVED	الفاتورة الضريبية والإقرارات
+12	ادارة المبيعات	13	75	المتابعة والموافقات	موافقات إدارتي	../FinRequests/dept_inbox.php	FinRequests/dept_inbox.php	144	APPROVED	موافقات إدارتي
+12	ادارة المبيعات	13	76	المخاطر	مساحة مخاطر الإدارة	../Risk/dept_risk_space.php	Risk/dept_risk_space.php	74	PENDING_OWNER	مساحة مخاطر الإدارة
+13	ادارة الصيانة	19	1	لوحة الإدارة	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+13	ادارة الصيانة	19	2	لوحة الإدارة	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+13	ادارة الصيانة	19	3	لوحة الإدارة	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+13	ادارة الصيانة	19	4	لوحة الإدارة	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+13	ادارة الصيانة	19	5	لوحة الإدارة	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+13	ادارة الصيانة	19	6	لوحة الإدارة	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+13	ادارة الصيانة	19	7	لوحة الإدارة	جاهزية المعدات للتشغيل	../Fleet/readiness_board.php	Fleet/readiness_board.php	262	APPROVED	جاهزية المعدات للتشغيل
+13	ادارة الصيانة	19	8	استقبال العطل وتشخيصه	بلاغات إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+13	ادارة الصيانة	19	9	استقبال العطل وتشخيصه	أبلغ عن مشكلة من هذه الشاشة	../Tickets/ticket_contextual_open.php	Tickets/ticket_contextual_open.php	332	APPROVED	أبلغ عن مشكلة من هذه الشاشة
+13	ادارة الصيانة	19	10	استقبال العطل وتشخيصه	تحويل البلاغ وتفريعه لمسارات	../Tickets/ticket_workstreams_board.php	Tickets/ticket_workstreams_board.php	333	PENDING_OWNER	تحويل البلاغ وتفريعه لمسارات
+13	ادارة الصيانة	19	11	استقبال العطل وتشخيصه	الفحص الفني اليومي	../Maintenance/inspections.php	Maintenance/inspections.php	277	APPROVED	الفحص الفني اليومي
+13	ادارة الصيانة	19	12	استقبال العطل وتشخيصه	تصنيف الأعطال وأسبابها	../Equipments/manage_failure_codes.php	Equipments/manage_failure_codes.php	265	PENDING_OWNER	تصنيف الأعطال وأسبابها
+13	ادارة الصيانة	19	13	أمر العمل والتكليف	أوامر الصيانة	../Maintenance/orders.php	Maintenance/orders.php	278	APPROVED	أوامر الصيانة
+13	ادارة الصيانة	19	14	أمر العمل والتكليف	الورش والفنيون	../Maintenance/workshop.php	Maintenance/workshop.php	282	APPROVED	الورش والفنيون
+13	ادارة الصيانة	19	15	أمر العمل والتكليف	سجل المعدات	../Equipments/equipments.php	Equipments/equipments.php	256	PENDING_DEDUP	سجل المعدات
+13	ادارة الصيانة	19	16	أمر العمل والتكليف	موديلات المعدات ومواصفاتها	../Equipments/fleet_models.php	Equipments/fleet_models.php	263	PENDING_OWNER	موديلات المعدات ومواصفاتها
+13	ادارة الصيانة	19	17	القطع والمواد	صرف مواد من المخزن	../Procurement/issue_proc.php	Procurement/issue_proc.php	286	APPROVED	صرف مواد من المخزن
+13	ادارة الصيانة	19	18	القطع والمواد	أرصدة المخزون بحالاتها	../Procurement/stock_proc.php	Procurement/stock_proc.php	289	APPROVED	أرصدة المخزون بحالاتها
+13	ادارة الصيانة	19	19	القطع والمواد	العهد والمرتجعات	../Procurement/receipt_custody_proc.php	Procurement/receipt_custody_proc.php	287	APPROVED	الاستلام المؤقت
+13	ادارة الصيانة	19	20	القطع والمواد	طلبات الشراء	../Procurement/requests_proc.php	Procurement/requests_proc.php	284	APPROVED	طلبات الشراء
+13	ادارة الصيانة	19	21	القطع والمواد	كتالوج الأصناف والقطع الحرجة	../Procurement/items_proc.php	Procurement/items_proc.php	292	PENDING_OWNER	كتالوج الأصناف والقطع الحرجة
+13	ادارة الصيانة	19	22	الوقائية بالساعات	خطط الصيانة الوقائية	../Maintenance/preventive_plans.php	Maintenance/preventive_plans.php	279	APPROVED	خطط الصيانة الوقائية
+13	ادارة الصيانة	19	23	الوقائية بالساعات	تسجيل التايم شيت والإنتاج	../Timesheet/timesheet.php	Timesheet/timesheet.php	341	APPROVED	تسجيل التايم شيت والإنتاج — الموقع
+13	ادارة الصيانة	19	24	الوقائية بالساعات	قراءات العدّادات	../Equipments/meter_readings.php	Equipments/meter_readings.php	255	APPROVED	قراءات العدّادات
+13	ادارة الصيانة	19	25	متابعة الصيانة	البلاغات المتكررة وسببها الجذري	../Tickets/ticket_recurrence.php	Tickets/ticket_recurrence.php	339	PENDING_OWNER	البلاغات المتكررة وسببها الجذري
+13	ادارة الصيانة	19	26	متابعة الصيانة	طلبات الترحيل	../Transport/transfer_requests.php	Transport/transfer_requests.php	301	APPROVED	طلبات الترحيل
+13	ادارة الصيانة	19	27	متابعة الصيانة	صندوق ما ينتظر اعتمادي	../Finance/approvals_inbox.php	Finance/approvals_inbox.php	331	APPROVED	صندوق ما ينتظر اعتمادي
+13	ادارة الصيانة	19	28	تقارير الصيانة والإعدادات	ميزانية إدارتي	../Finance/budget_dept.php	Finance/budget_dept.php	230	APPROVED	ميزانية إدارتي — التمويل
+13	ادارة الصيانة	19	29	تقارير الصيانة والإعدادات	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+13	ادارة الصيانة	19	30	تقارير الصيانة والإعدادات	مركز التقارير	../emsreports/index.php	emsreports/index.php	19	PENDING_DEDUP	مركز التقارير — الحوكمة
+13	ادارة الصيانة	19	31	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+13	ادارة الصيانة	19	32	فريق العمل	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+13	ادارة الصيانة	19	33	العمل اليومي	طلب مالي جديد	../FinRequests/request_form.php	FinRequests/request_form.php	130	PENDING_OWNER	طلب مالي جديد
+13	ادارة الصيانة	19	34	العمل اليومي	إعدادات الصيانة	../Maintenance/master_data.php	Maintenance/master_data.php	281	APPROVED	إعدادات الصيانة
+13	ادارة الصيانة	19	35	العمل اليومي	سجل الأحداث المالية	../Finance/events_list_fin.php	Finance/events_list_fin.php	123	APPROVED	سجل الأحداث المالية
+13	ادارة الصيانة	19	36	العمل اليومي	ميزانية إدارتي	../Finance/budget_form_fin.php	Finance/budget_form_fin.php	124	PENDING_OWNER	ميزانية إدارتي — المالية
+13	ادارة الصيانة	19	37	العمل اليومي	التكاليف والربحية	../Finance/cost_report_fin.php	Finance/cost_report_fin.php	119	APPROVED	التكاليف والربحية بالمركز
+13	ادارة الصيانة	19	38	العمل اليومي	لوحة الإدارة	../Maintenance/dashboard_mnt.php	Maintenance/dashboard_mnt.php	280	APPROVED	لوحة الإدارة — الصيانة
+13	ادارة الصيانة	19	39	المتابعة والموافقات	موافقات إدارتي	../FinRequests/dept_inbox.php	FinRequests/dept_inbox.php	144	APPROVED	موافقات إدارتي
+13	ادارة الصيانة	19	40	المخاطر	مساحة مخاطر الإدارة	../Risk/dept_risk_space.php	Risk/dept_risk_space.php	74	PENDING_OWNER	مساحة مخاطر الإدارة
+15	إدارة الصلاحيات	56	1	لوحة الإدارة	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+15	إدارة الصلاحيات	56	2	لوحة الإدارة	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+15	إدارة الصلاحيات	56	3	لوحة الإدارة	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+15	إدارة الصلاحيات	56	4	لوحة الإدارة	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+15	إدارة الصلاحيات	56	5	لوحة الإدارة	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+15	إدارة الصلاحيات	56	6	لوحة الإدارة	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+15	إدارة الصلاحيات	56	7	الكيانات والملكية	سجل الشركات والكيانات	../Governance/entities_registry.php	Governance/entities_registry.php	63	PENDING_OWNER	سجل الشركات والكيانات
+15	إدارة الصلاحيات	56	8	الكيانات والملكية	سجل الأسماء المعتمدة	../Governance/canonical_names.php	Governance/canonical_names.php	36	APPROVED	سجل الأسماء المعتمدة
+15	إدارة الصلاحيات	56	9	الكيانات والملكية	علاقات الملكية بين الكيانات	../Financing/ownership_links.php	Financing/ownership_links.php	228	APPROVED	علاقات الملكية بين الكيانات
+15	إدارة الصلاحيات	56	10	الكيانات والملكية	التراخيص والكفالات	../Governance/licenses_guarantees.php	Governance/licenses_guarantees.php	62	PENDING_OWNER	التراخيص والكفالات
+15	إدارة الصلاحيات	56	11	التفويض بالتوقيع	التفويض بالتوقيع	../Governance/signing_authority.php	Governance/signing_authority.php	57	PENDING_OWNER	التفويض بالتوقيع
+15	إدارة الصلاحيات	56	12	الحسابات والأدوار	حسابات المستخدمين	../main/users.php	main/users.php	37	APPROVED	حسابات المستخدمين
+15	إدارة الصلاحيات	56	13	الحسابات والأدوار	الأدوار وقوالب صلاحياتها	../Settings/roles.php	Settings/roles.php	38	APPROVED	الأدوار وقوالب صلاحياتها
+15	إدارة الصلاحيات	56	14	الحسابات والأدوار	حسابات بوابة الأطراف الخارجية	../Governance/portal_users.php	Governance/portal_users.php	39	APPROVED	حسابات بوابة الأطراف الخارجية
+15	إدارة الصلاحيات	56	15	الحسابات والأدوار	المعاونون والنيابة المؤقتة	../main/all_assistants.php	main/all_assistants.php	357	PENDING_OWNER	المعاونون والنيابة المؤقتة
+15	إدارة الصلاحيات	56	16	الحسابات والأدوار	الهيكل التنظيمي والمسميات	../admin/org_structure.php	admin/org_structure.php	40	APPROVED	الهيكل التنظيمي والمسميات
+15	إدارة الصلاحيات	56	17	الحسابات والأدوار	التكليفات التنظيمية	../admin/org_assignments.php	admin/org_assignments.php	41	APPROVED	التكليفات التنظيمية
+15	إدارة الصلاحيات	56	18	الظهور والبوابة والصفحات	من يرى ماذا ومكوّنات البوابة	../Portal/visibility_keys.php	Portal/visibility_keys.php	359	PENDING_OWNER	من يرى ماذا ومكوّنات البوابة
+15	إدارة الصلاحيات	56	19	الظهور والبوابة والصفحات	صفحات النظام والإدارات	../Settings/modules.php	Settings/modules.php	69	APPROVED	صفحات النظام والإدارات
+15	إدارة الصلاحيات	56	20	الظهور والبوابة والصفحات	أنماط تفعيل المزايا	../Governance/activation_patterns.php	Governance/activation_patterns.php	61	APPROVED	أنماط تفعيل المزايا
+15	إدارة الصلاحيات	56	21	المنع والاستثناء	تصنيف قواعد المنع	../Governance/guards.php	Governance/guards.php	25	APPROVED	تصنيف قواعد المنع — الحوكمة — الالتزام والامتثال
+15	إدارة الصلاحيات	56	22	المنع والاستثناء	سياسات الحقول الحساسة	../Governance/sensitive_fields.php	Governance/sensitive_fields.php	26	APPROVED	سياسات الحقول الحساسة
+15	إدارة الصلاحيات	56	23	المنع والاستثناء	طلبات الاستثناء	../Governance/exceptions.php	Governance/exceptions.php	27	APPROVED	طلبات الاستثناء
+15	إدارة الصلاحيات	56	24	المنع والاستثناء	صلاحية الطوارئ اللحظية (كسر الزجاج)	../Governance/break_glass.php	Governance/break_glass.php	28	APPROVED	صلاحية الطوارئ اللحظية (كسر الزجاج)
+15	إدارة الصلاحيات	56	25	المنع والاستثناء	صندوق ما ينتظر اعتمادي	../Finance/approvals_inbox.php	Finance/approvals_inbox.php	331	APPROVED	صندوق ما ينتظر اعتمادي
+15	إدارة الصلاحيات	56	26	التدقيق والمراجعة	سجل التدقيق والاطّلاع	../ActivityLogs/activity_logs.php	ActivityLogs/activity_logs.php	42	APPROVED	سجل التدقيق والاطّلاع
+15	إدارة الصلاحيات	56	27	التدقيق والمراجعة	المحاولات الممنوعة	../Governance/guard_denials.php	Governance/guard_denials.php	29	APPROVED	المحاولات الممنوعة
+15	إدارة الصلاحيات	56	28	التدقيق والمراجعة	دورة المراجعة الدورية للصلاحيات	../Governance/access_review.php	Governance/access_review.php	30	APPROVED	دورة المراجعة الدورية للصلاحيات
+15	إدارة الصلاحيات	56	29	التدقيق والمراجعة	حدود المبالغ	../Governance/authority_caps.php	Governance/authority_caps.php	60	PENDING_OWNER	حدود المبالغ
+15	إدارة الصلاحيات	56	30	التدقيق والمراجعة	تفسير مصدر الصلاحية	../Governance/perm_explain.php	Governance/perm_explain.php	31	APPROVED	تفسير مصدر الصلاحية
+15	إدارة الصلاحيات	56	31	التدقيق والمراجعة	فصل الواجبات المتعارضة	../admin/sec_governance.php	admin/sec_governance.php	32	APPROVED	فصل الواجبات المتعارضة
+15	إدارة الصلاحيات	56	32	التدقيق والمراجعة	سجل العقود الموحَّد	../Workforce/contract_registry.php	Workforce/contract_registry.php	10	APPROVED	سجل العقود الموحَّد
+15	إدارة الصلاحيات	56	33	بنية المستندات	سجل أنواع المستندات	../Governance/doc_types.php	Governance/doc_types.php	49	APPROVED	سجل أنواع المستندات
+15	إدارة الصلاحيات	56	34	بنية المستندات	حالات المستندات وانتقالاتها	../Governance/state_machines.php	Governance/state_machines.php	50	APPROVED	حالات المستندات وانتقالاتها
+15	إدارة الصلاحيات	56	35	التأسيس والإصدار	وضع التأسيس وإغلاقه	../Portal/founding_mode.php	Portal/founding_mode.php	15	APPROVED	وضع التأسيس وإغلاقه
+15	إدارة الصلاحيات	56	36	التأسيس والإصدار	بصمة الإصدار وتقرير النشر	../Portal/release_stamp.php	Portal/release_stamp.php	16	APPROVED	بصمة الإصدار وتقرير النشر
+15	إدارة الصلاحيات	56	37	متابعة وتقارير الحوكمة	بلاغات إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+15	إدارة الصلاحيات	56	38	متابعة وتقارير الحوكمة	أبلغ عن مشكلة من هذه الشاشة	../Tickets/ticket_contextual_open.php	Tickets/ticket_contextual_open.php	332	APPROVED	أبلغ عن مشكلة من هذه الشاشة
+15	إدارة الصلاحيات	56	39	متابعة وتقارير الحوكمة	ميزانية إدارتي	../Finance/budget_dept.php	Finance/budget_dept.php	230	APPROVED	ميزانية إدارتي — التمويل
+15	إدارة الصلاحيات	56	40	متابعة وتقارير الحوكمة	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+15	إدارة الصلاحيات	56	41	متابعة وتقارير الحوكمة	مركز التقارير	../emsreports/index.php	emsreports/index.php	19	PENDING_DEDUP	مركز التقارير — الحوكمة
+15	إدارة الصلاحيات	56	42	نراقب الأحداثَ والمهام	صندوق الأحداث الصادر	../Governance/bus_outbox.php	Governance/bus_outbox.php	52	APPROVED	صندوق الأحداث الصادر
+15	إدارة الصلاحيات	56	43	نراقب الأحداثَ والمهام	تسليمات الأحداث وحالاتها	../Governance/bus_deliveries.php	Governance/bus_deliveries.php	53	APPROVED	تسليمات الأحداث وحالاتها
+15	إدارة الصلاحيات	56	44	نراقب الأحداثَ والمهام	لوحة الناقل	../Governance/bus_board.php	Governance/bus_board.php	45	APPROVED	لوحة الناقل
+15	إدارة الصلاحيات	56	45	نراقب الأحداثَ والمهام	مركز الحوكمة التقني	../Governance/tech_gov_center.php	Governance/tech_gov_center.php	59	APPROVED	مركز الحوكمة التقني
+15	إدارة الصلاحيات	56	46	نراقب الأحداثَ والمهام	النظام التصميمي	../Governance/design_system.php	Governance/design_system.php	58	APPROVED	النظام التصميمي
+15	إدارة الصلاحيات	56	47	نراقب الأحداثَ والمهام	قوالب الصلاحيات	../Governance/auth_profiles.php	Governance/auth_profiles.php	65	PENDING_OWNER	قوالب الصلاحيات
+15	إدارة الصلاحيات	56	48	نراقب الأحداثَ والمهام	منح الصلاحية	../Governance/auth_grants.php	Governance/auth_grants.php	66	APPROVED	منح الصلاحية
+15	إدارة الصلاحيات	56	49	نراقب الأحداثَ والمهام	جلسات النيابة	../Governance/impersonations.php	Governance/impersonations.php	43	PENDING_OWNER	جلسات النيابة
+15	إدارة الصلاحيات	56	50	نراقب الأحداثَ والمهام	طابور المهام	../Governance/job_queue.php	Governance/job_queue.php	54	APPROVED	طابور المهام
+15	إدارة الصلاحيات	56	51	نراقب الأحداثَ والمهام	جدولة المهام الدورية	../Governance/job_schedule.php	Governance/job_schedule.php	55	APPROVED	جدولة المهام الدورية
+15	إدارة الصلاحيات	56	52	نراقب الأحداثَ والمهام	الاستعادة ومحضرها	../Governance/dr_restore.php	Governance/dr_restore.php	56	APPROVED	الاستعادة ومحضرها
+15	إدارة الصلاحيات	56	53	إضافاتُ المالك	سجل الأمان	../Governance/security_log.php	Governance/security_log.php	44	APPROVED	سجل الأمان
+15	إدارة الصلاحيات	56	54	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+15	إدارة الصلاحيات	56	55	خارج الوثيقة — بانتظار قرار المالك	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+15	إدارة الصلاحيات	56	56	العمل اليومي	طلب مالي جديد	../FinRequests/request_form.php	FinRequests/request_form.php	130	PENDING_OWNER	طلب مالي جديد
+15	إدارة الصلاحيات	56	57	العمل اليومي	ميزانية إدارتي	../Finance/budget_form_fin.php	Finance/budget_form_fin.php	124	PENDING_OWNER	ميزانية إدارتي — المالية
+15	إدارة الصلاحيات	56	58	المتابعة والموافقات	موافقات إدارتي	../FinRequests/dept_inbox.php	FinRequests/dept_inbox.php	144	APPROVED	موافقات إدارتي
+15	إدارة الصلاحيات	56	59	السجلات الرئيسية	معالج إعداد الموظف	../admin/sec_employee_wizard.php	admin/sec_employee_wizard.php	68	PENDING_OWNER	معالج إعداد الموظف
+16	إدارة المشتريات	71	1	لوحة الإدارة	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+16	إدارة المشتريات	71	2	لوحة الإدارة	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+16	إدارة المشتريات	71	3	لوحة الإدارة	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+16	إدارة المشتريات	71	4	لوحة الإدارة	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+16	إدارة المشتريات	71	5	لوحة الإدارة	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+16	إدارة المشتريات	71	6	لوحة الإدارة	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+16	إدارة المشتريات	71	7	استقبال الاحتياج	طلبات الشراء	../Procurement/requests_proc.php	Procurement/requests_proc.php	284	APPROVED	طلبات الشراء
+16	إدارة المشتريات	71	8	استقبال الاحتياج	أرصدة المخزون بحالاتها	../Procurement/stock_proc.php	Procurement/stock_proc.php	289	APPROVED	أرصدة المخزون بحالاتها
+16	إدارة المشتريات	71	9	استقبال الاحتياج	كتالوج الأصناف والقطع الحرجة	../Procurement/items_proc.php	Procurement/items_proc.php	292	PENDING_OWNER	كتالوج الأصناف والقطع الحرجة
+16	إدارة المشتريات	71	10	العروض والترسية	طلب العروض ومقارنتها	../Procurement/rfq_compare_award.php	Procurement/rfq_compare_award.php	288	APPROVED	طلب العروض ومقارنتها
+16	إدارة المشتريات	71	11	العروض والترسية	سجل الموردين	../Suppliers/suppliers.php	Suppliers/suppliers.php	245	APPROVED	سجل الموردين
+16	إدارة المشتريات	71	12	أمر الشراء	أوامر الشراء	../Procurement/orders_proc.php	Procurement/orders_proc.php	283	APPROVED	أوامر الشراء
+16	إدارة المشتريات	71	13	الاستلام والمطابقة	الاستلام المؤقت قبل الإدخال	../Procurement/wh_receipt.php	Procurement/wh_receipt.php	296	APPROVED	الاستلام المؤقت قبل الإدخال
+16	إدارة المشتريات	71	14	الاستلام والمطابقة	مطابقة الفاتورة بالأمر والاستلام	../Procurement/po_match.php	Procurement/po_match.php	285	APPROVED	مطابقة الفاتورة بالأمر والاستلام
+16	إدارة المشتريات	71	15	الاستلام والمطابقة	طلبات الدفع والسداد	../Finance/payments_fin.php	Finance/payments_fin.php	109	APPROVED	طلبات الدفع والسداد
+16	إدارة المشتريات	71	16	متابعة المشتريات	بلاغات إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+16	إدارة المشتريات	71	17	متابعة المشتريات	أبلغ عن مشكلة من هذه الشاشة	../Tickets/ticket_contextual_open.php	Tickets/ticket_contextual_open.php	332	APPROVED	أبلغ عن مشكلة من هذه الشاشة
+16	إدارة المشتريات	71	18	متابعة المشتريات	صندوق ما ينتظر اعتمادي	../Finance/approvals_inbox.php	Finance/approvals_inbox.php	331	APPROVED	صندوق ما ينتظر اعتمادي
+16	إدارة المشتريات	71	19	سجلات وتقارير المشتريات	ميزانية إدارتي	../Finance/budget_dept.php	Finance/budget_dept.php	230	APPROVED	ميزانية إدارتي — التمويل
+16	إدارة المشتريات	71	20	سجلات وتقارير المشتريات	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+16	إدارة المشتريات	71	21	سجلات وتقارير المشتريات	مركز التقارير	../emsreports/index.php	emsreports/index.php	19	PENDING_DEDUP	مركز التقارير — الحوكمة
+16	إدارة المشتريات	71	22	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+16	إدارة المشتريات	71	23	فريق العمل	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+16	إدارة المشتريات	71	24	العمل اليومي	لوحة الإدارة	../Procurement/dashboard_proc.php	Procurement/dashboard_proc.php	290	PENDING_OWNER	لوحة الإدارة (dashboard_proc)
+16	إدارة المشتريات	71	25	العمل اليومي	الاستلام المؤقت	../Procurement/receipt_custody_proc.php	Procurement/receipt_custody_proc.php	287	APPROVED	الاستلام المؤقت
+16	إدارة المشتريات	71	26	العمل اليومي	صرف المخزون والعهدة	../Procurement/issue_proc.php	Procurement/issue_proc.php	286	APPROVED	صرف مواد من المخزن
+16	إدارة المشتريات	71	27	العمل اليومي	حدود إعادة الطلب	../Procurement/reordering_proc.php	Procurement/reordering_proc.php	293	PENDING_OWNER	حدود إعادة الطلب
+16	إدارة المشتريات	71	28	العمل اليومي	موردو المشتريات	../Procurement/suppliers_proc.php	Procurement/suppliers_proc.php	294	PENDING_OWNER	موردو المشتريات
+16	إدارة المشتريات	71	29	العمل اليومي	البيانات المرجعية	../Procurement/master_data_proc.php	Procurement/master_data_proc.php	295	PENDING_OWNER	المخازن وأنواعها
+16	إدارة المشتريات	71	30	العمل اليومي	سجل الأحداث المالية	../Finance/events_list_fin.php	Finance/events_list_fin.php	123	APPROVED	سجل الأحداث المالية
+16	إدارة المشتريات	71	31	العمل اليومي	ميزانية إدارتي	../Finance/budget_form_fin.php	Finance/budget_form_fin.php	124	PENDING_OWNER	ميزانية إدارتي — المالية
+16	إدارة المشتريات	71	32	العمل اليومي	طلبات عروض الموردين	../Suppliers/rfq_requests.php	Suppliers/rfq_requests.php	243	APPROVED	طلبات عروض الموردين
+16	إدارة المشتريات	71	33	العمل اليومي	طلب مالي جديد	../FinRequests/request_form.php	FinRequests/request_form.php	130	PENDING_OWNER	طلب مالي جديد
+16	إدارة المشتريات	71	34	المتابعة والموافقات	موافقات إدارتي	../FinRequests/dept_inbox.php	FinRequests/dept_inbox.php	144	APPROVED	موافقات إدارتي
+16	إدارة المشتريات	71	35	المخاطر	مساحة مخاطر الإدارة	../Risk/dept_risk_space.php	Risk/dept_risk_space.php	74	PENDING_OWNER	مساحة مخاطر الإدارة
+17	إدارة المالية	72	1	لوحة الإدارة	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+17	إدارة المالية	72	2	لوحة الإدارة	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+17	إدارة المالية	72	3	لوحة الإدارة	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+17	إدارة المالية	72	4	لوحة الإدارة	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+17	إدارة المالية	72	5	لوحة الإدارة	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+17	إدارة المالية	72	6	لوحة الإدارة	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+17	إدارة المالية	72	7	تحويل العمل إلى مستحق	فحص شروط الاستحقاق	../Finance/entitlement_gate.php	Finance/entitlement_gate.php	114	APPROVED	فحص شروط الاستحقاق
+17	إدارة المالية	72	8	تحويل العمل إلى مستحق	توليد المستحق من العمل المعتمد	../Finance/entitlement.php	Finance/entitlement.php	115	APPROVED	توليد المستحق من العمل المعتمد
+17	إدارة المالية	72	9	تحويل العمل إلى مستحق	الإقفال الشهري للوحدة	../Operations/monthly_close.php	Operations/monthly_close.php	269	APPROVED	الإقفال الشهري للوحدة
+17	إدارة المالية	72	10	تحويل العمل إلى مستحق	تسجيل التايم شيت والإنتاج	../Timesheet/timesheet.php	Timesheet/timesheet.php	341	APPROVED	تسجيل التايم شيت والإنتاج — الموقع
+17	إدارة المالية	72	11	تحويل العمل إلى مستحق	صندوق ما ينتظر اعتمادي	../Finance/approvals_inbox.php	Finance/approvals_inbox.php	331	APPROVED	صندوق ما ينتظر اعتمادي
+17	إدارة المالية	72	12	الإيراد والفوترة	المستخلصات والمطالبات	../Contracts/claims.php	Contracts/claims.php	213	APPROVED	المستخلصات والمطالبات
+17	إدارة المالية	72	13	الإيراد والفوترة	فواتير العملاء	../Contracts/tax_invoices.php	Contracts/tax_invoices.php	107	APPROVED	الفاتورة الضريبية والإقرارات
+17	إدارة المالية	72	14	الإيراد والفوترة	ذمم العملاء وأعمارها	../Contracts/collections.php	Contracts/collections.php	186	APPROVED	ذمم العملاء وأعمارها
+17	إدارة المالية	72	15	الإيراد والفوترة	عقود العملاء	../Contracts/contracts.php	Contracts/contracts.php	197	APPROVED	عقود العملاء
+17	إدارة المالية	72	16	الإيراد والفوترة	أحكام العقد — العملات والمقدم والمهل	../Contracts/contract_card.php	Contracts/contract_card.php	215	APPROVED	أحكام العقد — العملات والمقدم والمهل
+17	إدارة المالية	72	17	المصروف والدفع	طلبات الدفع والسداد	../Finance/payments_fin.php	Finance/payments_fin.php	109	APPROVED	طلبات الدفع والسداد
+17	إدارة المالية	72	18	المصروف والدفع	ذمم الموردين والمستحقات	../Finance/dues_fin.php	Finance/dues_fin.php	108	APPROVED	ذمم الموردين والمستحقات
+17	إدارة المالية	72	19	المصروف والدفع	تسويات ومستحقات الموردين	../Suppliers/settlements.php	Suppliers/settlements.php	236	APPROVED	تسويات ومستحقات الموردين
+17	إدارة المالية	72	20	المصروف والدفع	كشف حساب المورد الشهري	../Finance/supplier_statement_fin.php	Finance/supplier_statement_fin.php	159	PENDING_OWNER	كشف حساب المورد الشهري
+17	إدارة المالية	72	21	المصروف والدفع	مسيّر الرواتب	../Workforce/payroll_runs.php	Workforce/payroll_runs.php	326	PENDING_OWNER	مسيّر الرواتب
+17	إدارة المالية	72	22	التكلفة والتحميل	أوامر الصيانة	../Maintenance/orders.php	Maintenance/orders.php	278	APPROVED	أوامر الصيانة
+17	إدارة المالية	72	23	التكلفة والتحميل	صرف مواد من المخزن	../Procurement/issue_proc.php	Procurement/issue_proc.php	286	APPROVED	صرف مواد من المخزن
+17	إدارة المالية	72	24	التكلفة والتحميل	أرصدة المخزون بحالاتها	../Procurement/stock_proc.php	Procurement/stock_proc.php	289	APPROVED	أرصدة المخزون بحالاتها
+17	إدارة المالية	72	25	التكلفة والتحميل	إقفال الأمر وتحميل تكلفته	../Transport/transfer_close_cost.php	Transport/transfer_close_cost.php	302	APPROVED	إقفال الأمر وتحميل تكلفته
+17	إدارة المالية	72	26	التكلفة والتحميل	توزيع تكلفة التمويل على المشاريع	../Financing/cost_allocation.php	Financing/cost_allocation.php	234	APPROVED	توزيع تكلفة التمويل على المشاريع
+17	إدارة المالية	72	27	التكلفة والتحميل	الإهلاك والقيمة الدفترية	../Finance/assets_fin.php	Finance/assets_fin.php	120	APPROVED	الإهلاك والقيمة الدفترية
+17	إدارة المالية	72	28	الخزينة والمطابقة	الخزينة والصناديق	../Finance/accounts_fin.php	Finance/accounts_fin.php	170	PENDING_OWNER	الخزينة والصناديق
+17	إدارة المالية	72	29	الخزينة والمطابقة	المطابقة البنكية	../Finance/bank_reconciliation_fin.php	Finance/bank_reconciliation_fin.php	122	APPROVED	المطابقة البنكية
+17	إدارة المالية	72	30	الخزينة والمطابقة	أسعار الصرف	../Finance/currencies_fin.php	Finance/currencies_fin.php	169	PENDING_OWNER	أسعار الصرف
+17	إدارة المالية	72	31	الخزينة والمطابقة	التدفق النقدي والتنبؤ	../Finance/cash_forecast_fin.php	Finance/cash_forecast_fin.php	121	APPROVED	التدفق النقدي والتنبؤ
+17	إدارة المالية	72	32	القيود والدفاتر	مهام المحاسب اليومية	../FinRequests/accountant_desk.php	FinRequests/accountant_desk.php	106	APPROVED	مهام المحاسب اليومية
+17	إدارة المالية	72	33	القيود والدفاتر	القيود اليومية	../Finance/journal_form_fin.php	Finance/journal_form_fin.php	141	APPROVED	القيود اليومية
+17	إدارة المالية	72	34	القيود والدفاتر	دليل الحسابات ومراكز التكلفة	../Finance/management_accounting_fin.php	Finance/management_accounting_fin.php	142	APPROVED	دليل الحسابات ومراكز التكلفة
+17	إدارة المالية	72	35	القيود والدفاتر	الفاتورة الضريبية والإقرارات	../Contracts/tax_invoices.php#2	Contracts/tax_invoices.php	107	APPROVED	الفاتورة الضريبية والإقرارات
+17	إدارة المالية	72	36	الإقفال والموازنة	إقفال الفترة المحاسبية	../Finance/periods_fin.php	Finance/periods_fin.php	112	APPROVED	إقفال الفترة المحاسبية
+17	إدارة المالية	72	37	الإقفال والموازنة	الموازنة العامة	../Finance/budget_master.php	Finance/budget_master.php	6	APPROVED	الموازنة العامة
+17	إدارة المالية	72	38	الإقفال والموازنة	ميزانية إدارتي	../Finance/budget_dept.php	Finance/budget_dept.php	230	APPROVED	ميزانية إدارتي — التمويل
+17	إدارة المالية	72	39	الإقفال والموازنة	القوائم المالية	../Finance/financial_statements_fin.php	Finance/financial_statements_fin.php	113	APPROVED	القوائم المالية
+17	إدارة المالية	72	40	الإقفال والموازنة	مخصص الصيانة والعمرات	../Finance/maintenance_provision_fin.php	Finance/maintenance_provision_fin.php	164	PENDING_OWNER	مخصص الصيانة والعمرات
+17	إدارة المالية	72	41	متابعة وتقارير المالية	هامش الربح للعقد والواقعة	../Reports/margin_report.php	Reports/margin_report.php	14	PENDING_OWNER	هامش الربح للعقد والواقعة
+17	إدارة المالية	72	42	متابعة وتقارير المالية	التكاليف والربحية بالمركز	../Finance/cost_report_fin.php	Finance/cost_report_fin.php	119	APPROVED	التكاليف والربحية بالمركز
+17	إدارة المالية	72	43	متابعة وتقارير المالية	متابعة انحراف المنفَّذ عن المخطط	../Finance/variance_monitor_fin.php	Finance/variance_monitor_fin.php	153	APPROVED	متابعة انحراف المنفَّذ عن المخطط
+17	إدارة المالية	72	44	متابعة وتقارير المالية	زمن دورة الطلبات	../FinRequests/cycle_time_board.php	FinRequests/cycle_time_board.php	161	APPROVED	زمن دورة الطلبات
+17	إدارة المالية	72	45	متابعة وتقارير المالية	تتبّع الأثر من الواقعة إلى القيد	../FinRequests/effect_map.php	FinRequests/effect_map.php	160	APPROVED	تتبّع الأثر من الواقعة إلى القيد
+17	إدارة المالية	72	46	متابعة وتقارير المالية	بلاغات إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+17	إدارة المالية	72	47	متابعة وتقارير المالية	أبلغ عن مشكلة من هذه الشاشة	../Tickets/ticket_contextual_open.php	Tickets/ticket_contextual_open.php	332	APPROVED	أبلغ عن مشكلة من هذه الشاشة
+17	إدارة المالية	72	48	متابعة وتقارير المالية	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+17	إدارة المالية	72	49	متابعة وتقارير المالية	مركز التقارير	../emsreports/index.php	emsreports/index.php	19	PENDING_DEDUP	مركز التقارير — الحوكمة
+17	إدارة المالية	72	50	إعدادات المالية	قواعد توجيه الطلبات المالية	../FinRequests/routing_admin.php	FinRequests/routing_admin.php	116	APPROVED	قواعد توجيه الطلبات المالية
+17	إدارة المالية	72	51	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+17	إدارة المالية	72	52	فريق العمل	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+17	إدارة المالية	72	53	العمل اليومي	لوحة الإدارة	../Finance/cfo_daily_board_fin.php	Finance/cfo_daily_board_fin.php	158	PENDING_OWNER	لوحة الإدارة — المالية
+17	إدارة المالية	72	54	العمل اليومي	اللوحة التنفيذية	../Finance/executive_dashboard_fin.php	Finance/executive_dashboard_fin.php	156	APPROVED	اللوحة التنفيذية
+17	إدارة المالية	72	55	العمل اليومي	تقارير الطلبات المالية	../FinRequests/requests_reports.php	FinRequests/requests_reports.php	157	PENDING_DEDUP	تقارير الطلبات المالية
+17	إدارة المالية	72	56	العمل اليومي	ربط الخطة بالفعلي	../Contracts/plan_actual_link.php	Contracts/plan_actual_link.php	218	APPROVED	ربط الخطة بالفعلي
+17	إدارة المالية	72	57	العمل اليومي	اقتصاد دورة حياة العقد	../Contracts/contract_lifecycle.php	Contracts/contract_lifecycle.php	216	APPROVED	اقتصاد دورة حياة العقد
+17	إدارة المالية	72	58	العمل اليومي	اللوحة التجارية للعقود	../Contracts/commercial_board.php	Contracts/commercial_board.php	217	PENDING_OWNER	اللوحة التجارية للعقود
+17	إدارة المالية	72	59	العمل اليومي	سجل الوحدات اليومية	../Reports/daily_units_report.php	Reports/daily_units_report.php	12	PENDING_OWNER	سجل الوحدات اليومية
+17	إدارة المالية	72	60	العمل اليومي	المحاسبون والوحدات	../Finance/accountants_fin.php	Finance/accountants_fin.php	165	APPROVED	المحاسبون والوحدات
+17	إدارة المالية	72	61	العمل اليومي	سجل الأحداث المالية	../Finance/events_list_fin.php	Finance/events_list_fin.php	123	APPROVED	سجل الأحداث المالية
+17	إدارة المالية	72	62	العمل اليومي	استقبال معاملات الإدارات	../Finance/import_events_fin.php	Finance/import_events_fin.php	125	APPROVED	استقبال معاملات الإدارات
+17	إدارة المالية	72	63	العمل اليومي	الضرائب والقيمة المضافة	../Finance/tax_fin.php	Finance/tax_fin.php	128	APPROVED	الضرائب والقيمة المضافة
+17	إدارة المالية	72	64	العمل اليومي	التمويل والالتزامات	../Finance/funding_fin.php	Finance/funding_fin.php	126	APPROVED	التمويل والالتزامات
+17	إدارة المالية	72	65	العمل اليومي	سياسات مستحقات المشغّلين	../Finance/operator_pay_policies_fin.php	Finance/operator_pay_policies_fin.php	166	PENDING_OWNER	سياسات مستحقات المشغّلين
+17	إدارة المالية	72	66	العمل اليومي	مصفوفة التزامات العقد	../Contracts/contract_obligations.php	Contracts/contract_obligations.php	211	PENDING_DEDUP	مصفوفة التزامات العقد
+17	إدارة المالية	72	67	العمل اليومي	تسويات الموظفين	../Workforce/employee_settlements.php	Workforce/employee_settlements.php	324	PENDING_OWNER	تسويات الموظفين
+17	إدارة المالية	72	68	العمل اليومي	بنود عقد المورد	../Suppliers/supplier_contract_lines.php	Suppliers/supplier_contract_lines.php	241	PENDING_DEDUP	بنود عقد المورد
+17	إدارة المالية	72	69	العمل اليومي	سلفيات الموظفين	../Workforce/employee_advances.php	Workforce/employee_advances.php	321	PENDING_OWNER	السلف والعهد المالية
+17	إدارة المالية	72	70	العمل اليومي	وثائق المورد وحسابه البنكي	../Suppliers/supplier_documents.php	Suppliers/supplier_documents.php	250	APPROVED	وثائق المورد وحسابه البنكي
+17	إدارة المالية	72	71	العمل اليومي	تعرفة الترحيل وتسعير الأوامر	../Transport/transfer_tariffs.php	Transport/transfer_tariffs.php	311	PENDING_OWNER	تعرفة الترحيل وتسعير الأوامر
+17	إدارة المالية	72	72	العمل اليومي	الدوريات المالية	../Finance/periodic_events_fin.php	Finance/periodic_events_fin.php	127	APPROVED	الدوريات المالية
+17	إدارة المالية	72	73	العمل اليومي	طلبات عروض الموردين	../Suppliers/rfq_requests.php	Suppliers/rfq_requests.php	243	APPROVED	طلبات عروض الموردين
+17	إدارة المالية	72	74	العمل اليومي	بنود عقد العميل وقيمته	../Contracts/contract_lines.php	Contracts/contract_lines.php	205	APPROVED	بنود عقد العميل وقيمته
+17	إدارة المالية	72	75	العمل اليومي	أحكام العميل والمورد والمشغّل	../Finance/unit_records_fin.php	Finance/unit_records_fin.php	143	PENDING_OWNER	أحكام العميل والمورد والمشغّل
+17	إدارة المالية	72	76	العمل اليومي	الطلبات المالية	../FinRequests/finance_gateway.php	FinRequests/finance_gateway.php	129	PENDING_DEDUP	الطلبات المالية
+17	إدارة المالية	72	77	العمل اليومي	لوحة الإسناد اليومي	../Approvals/attribution_board.php	Approvals/attribution_board.php	35	APPROVED	لوحة الإسناد اليومي
+17	إدارة المالية	72	78	العمل اليومي	خط أساس العقد	../Contracts/contract_baseline.php	Contracts/contract_baseline.php	207	APPROVED	خط أساس العقد
+17	إدارة المالية	72	79	العمل اليومي	احتساب الجزاءات والحوافز	../Contracts/penalties.php	Contracts/penalties.php	198	APPROVED	الجزاءات والحوافز التعاقدية
+17	إدارة المالية	72	80	العمل اليومي	سلفيات الموردين	../Suppliers/supplier_advances.php	Suppliers/supplier_advances.php	238	APPROVED	سلفيات الموردين
+17	إدارة المالية	72	81	العمل اليومي	قواعد تحميل المورد وجزاءاته	../Suppliers/supplier_rules.php	Suppliers/supplier_rules.php	240	APPROVED	قواعد التحميل والجزاءات على المورد
+17	إدارة المالية	72	82	العمل اليومي	الطاقة والجاهزية ومهلة الإحلال	../Suppliers/supplier_capacity.php	Suppliers/supplier_capacity.php	237	APPROVED	طاقة المورد وجاهزيته ومهلة الإحلال
+17	إدارة المالية	72	83	العمل اليومي	تقييم المورد الدوري	../Suppliers/supplier_evaluation.php	Suppliers/supplier_evaluation.php	247	APPROVED	تقييم المورد الدوري
+17	إدارة المالية	72	84	العمل اليومي	تصفية إنهاء عقد المورد	../Suppliers/supplier_closure.php	Suppliers/supplier_closure.php	248	APPROVED	تصفية إنهاء عقد مورد
+17	إدارة المالية	72	85	العمل اليومي	كشف حساب العميل	../Contracts/client_statement.php	Contracts/client_statement.php	145	APPROVED	كشف حساب العميل
+17	إدارة المالية	72	86	العمل اليومي	تصفية إنهاء خدمة الموظف	../Workforce/final_settlement.php	Workforce/final_settlement.php	178	APPROVED	تصفية إنهاء خدمة موظف
+17	إدارة المالية	72	87	العمل اليومي	سجل الالتزامات	../Finance/ob_register.php	Finance/ob_register.php	146	APPROVED	سجل الالتزامات
+17	إدارة المالية	72	88	العمل اليومي	جدول الاستحقاقات	../Finance/ob_schedule.php	Finance/ob_schedule.php	147	APPROVED	جدول الاستحقاقات
+17	إدارة المالية	72	89	العمل اليومي	المستحق قريبًا والتذكيرات	../Finance/ob_due_soon.php	Finance/ob_due_soon.php	149	APPROVED	المستحق قريبًا والتذكيرات
+17	إدارة المالية	72	90	العمل اليومي	الالتزامات المتأخرة والذمم الدائنة	../Finance/ob_overdue.php	Finance/ob_overdue.php	150	APPROVED	الالتزامات المتأخرة والذمم الدائنة
+17	إدارة المالية	72	91	العمل اليومي	آفاق الالتزامات الثلاثة	../Finance/ob_horizon.php	Finance/ob_horizon.php	151	APPROVED	آفاق الالتزامات الثلاثة
+17	إدارة المالية	72	92	العمل اليومي	الملتزَم به وأثره في الموازنة	../Finance/ob_commitments.php	Finance/ob_commitments.php	148	APPROVED	الملتزَم به وأثره في الموازنة
+17	إدارة المالية	72	93	العمل اليومي	الالتزامات المحتملة والإفصاح	../Finance/ob_contingent.php	Finance/ob_contingent.php	152	APPROVED	الالتزامات المحتملة والإفصاح
+17	إدارة المالية	72	94	المتابعة والموافقات	موافقات إدارتي	../FinRequests/dept_inbox.php	FinRequests/dept_inbox.php	144	APPROVED	موافقات إدارتي
+17	إدارة المالية	72	95	السجلات الرئيسية	الميزانية والانحراف	../Finance/budget_form_fin.php	Finance/budget_form_fin.php	124	PENDING_OWNER	ميزانية إدارتي — المالية
+17	إدارة المالية	72	96	المخاطر	مساحة مخاطر الإدارة	../Risk/dept_risk_space.php	Risk/dept_risk_space.php	74	PENDING_OWNER	مساحة مخاطر الإدارة
+23	إدارة النقل والترحيل	78	1	لوحة الإدارة	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+23	إدارة النقل والترحيل	78	2	لوحة الإدارة	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+23	إدارة النقل والترحيل	78	3	لوحة الإدارة	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+23	إدارة النقل والترحيل	78	4	لوحة الإدارة	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+23	إدارة النقل والترحيل	78	5	لوحة الإدارة	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+23	إدارة النقل والترحيل	78	6	لوحة الإدارة	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+23	إدارة النقل والترحيل	78	7	لوحة الإدارة	متابعة الرحلات في الطريق	../Transport/transfer_in_transit.php	Transport/transfer_in_transit.php	304	APPROVED	متابعة الرحلات في الطريق
+23	إدارة النقل والترحيل	78	8	استقبال الطلب	طلبات الترحيل	../Transport/transfer_requests.php	Transport/transfer_requests.php	301	APPROVED	طلبات الترحيل
+23	إدارة النقل والترحيل	78	9	إصدار أمر الترحيل	أوامر الترحيل	../Transport/transfer_orders_list.php	Transport/transfer_orders_list.php	300	APPROVED	أوامر الترحيل
+23	إدارة النقل والترحيل	78	10	إصدار أمر الترحيل	سجل المعدات	../Equipments/equipments.php	Equipments/equipments.php	256	PENDING_DEDUP	سجل المعدات
+23	إدارة النقل والترحيل	78	11	إصدار أمر الترحيل	سجل المشغّلين	../Employees/equipment_operators.php	Employees/equipment_operators.php	183	APPROVED	سجل المشغّلين
+23	إدارة النقل والترحيل	78	12	التجهيز والتصاريح	تصاريح المسار والحمولة	../Transport/transfer_permits.php	Transport/transfer_permits.php	309	APPROVED	تصاريح المسار والحمولة
+23	إدارة النقل والترحيل	78	13	التجهيز والتصاريح	اللوابد والمركبات الناقلة	../Transport/transfer_fleet.php	Transport/transfer_fleet.php	310	APPROVED	اللوابد والمركبات الناقلة
+23	إدارة النقل والترحيل	78	14	الإقفال وتحميل التكلفة	إقفال الأمر وتحميل تكلفته	../Transport/transfer_close_cost.php	Transport/transfer_close_cost.php	302	APPROVED	إقفال الأمر وتحميل تكلفته
+23	إدارة النقل والترحيل	78	15	الإقفال وتحميل التكلفة	طلبات الدفع والسداد	../Finance/payments_fin.php	Finance/payments_fin.php	109	APPROVED	طلبات الدفع والسداد
+23	إدارة النقل والترحيل	78	16	متابعة الترحيل	بلاغات إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+23	إدارة النقل والترحيل	78	17	متابعة الترحيل	أبلغ عن مشكلة من هذه الشاشة	../Tickets/ticket_contextual_open.php	Tickets/ticket_contextual_open.php	332	APPROVED	أبلغ عن مشكلة من هذه الشاشة
+23	إدارة النقل والترحيل	78	18	متابعة الترحيل	صندوق ما ينتظر اعتمادي	../Finance/approvals_inbox.php	Finance/approvals_inbox.php	331	APPROVED	صندوق ما ينتظر اعتمادي
+23	إدارة النقل والترحيل	78	19	تقارير وإعدادات الترحيل	تعرفة الترحيل وقواعد التحميل	../Transport/transfer_tariffs.php	Transport/transfer_tariffs.php	311	PENDING_OWNER	تعرفة الترحيل وتسعير الأوامر
+23	إدارة النقل والترحيل	78	20	تقارير وإعدادات الترحيل	ميزانية إدارتي	../Finance/budget_dept.php	Finance/budget_dept.php	230	APPROVED	ميزانية إدارتي — التمويل
+23	إدارة النقل والترحيل	78	21	تقارير وإعدادات الترحيل	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+23	إدارة النقل والترحيل	78	22	تقارير وإعدادات الترحيل	مركز التقارير	../emsreports/index.php	emsreports/index.php	19	PENDING_DEDUP	مركز التقارير — الحوكمة
+23	إدارة النقل والترحيل	78	23	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+23	إدارة النقل والترحيل	78	24	فريق العمل	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+23	إدارة النقل والترحيل	78	25	العمل اليومي	طلب مالي جديد	../FinRequests/request_form.php	FinRequests/request_form.php	130	PENDING_OWNER	طلب مالي جديد
+23	إدارة النقل والترحيل	78	26	العمل اليومي	لوحة الإدارة	../Transport/transfer_dashboard.php	Transport/transfer_dashboard.php	305	APPROVED	لوحة الإدارة — النقل
+23	إدارة النقل والترحيل	78	27	العمل اليومي	إعدادات الترحيل	../Transport/transfer_types_config.php	Transport/transfer_types_config.php	306	PENDING_OWNER	إعدادات الترحيل
+23	إدارة النقل والترحيل	78	28	العمل اليومي	قواعد تحميل تكلفة الترحيل	../Transport/transfer_cost_rules_config.php	Transport/transfer_cost_rules_config.php	308	PENDING_OWNER	قواعد تحميل تكلفة الترحيل
+23	إدارة النقل والترحيل	78	29	العمل اليومي	المواقع	../Transport/trs_locations_config.php	Transport/trs_locations_config.php	307	PENDING_OWNER	المواقع
+23	إدارة النقل والترحيل	78	30	العمل اليومي	سجل الأحداث المالية	../Finance/events_list_fin.php	Finance/events_list_fin.php	123	APPROVED	سجل الأحداث المالية
+23	إدارة النقل والترحيل	78	31	العمل اليومي	التكاليف والربحية	../Finance/cost_report_fin.php	Finance/cost_report_fin.php	119	APPROVED	التكاليف والربحية بالمركز
+23	إدارة النقل والترحيل	78	32	العمل اليومي	الوصول والتسليم	../Transport/transfer_arrival.php	Transport/transfer_arrival.php	303	APPROVED	الوصول والتسليم
+23	إدارة النقل والترحيل	78	33	المتابعة والموافقات	موافقات إدارتي	../FinRequests/dept_inbox.php	FinRequests/dept_inbox.php	144	APPROVED	موافقات إدارتي
+23	إدارة النقل والترحيل	78	34	السجلات الرئيسية	ميزانية إدارتي	../Finance/budget_form_fin.php	Finance/budget_form_fin.php	124	PENDING_OWNER	ميزانية إدارتي — المالية
+23	إدارة النقل والترحيل	78	35	المخاطر	مخاطر النقل والترحيل	../Risk/dept_risk_space.php	Risk/dept_risk_space.php	74	PENDING_OWNER	مساحة مخاطر الإدارة
+25	أمين المستودع	882	1	لوحة الإدارة	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+25	أمين المستودع	882	2	لوحة الإدارة	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+25	أمين المستودع	882	3	لوحة الإدارة	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+25	أمين المستودع	882	4	لوحة الإدارة	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+25	أمين المستودع	882	5	لوحة الإدارة	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+25	أمين المستودع	882	6	لوحة الإدارة	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+25	أمين المستودع	882	7	الاستلام والفحص	الاستلام المؤقت قبل الإدخال	../Procurement/wh_receipt.php	Procurement/wh_receipt.php	296	APPROVED	الاستلام المؤقت قبل الإدخال
+25	أمين المستودع	882	8	الاستلام والفحص	أوامر الشراء	../Procurement/orders_proc.php	Procurement/orders_proc.php	283	APPROVED	أوامر الشراء
+25	أمين المستودع	882	9	الاستلام والفحص	أوامر الترحيل	../Transport/transfer_orders_list.php	Transport/transfer_orders_list.php	300	APPROVED	أوامر الترحيل
+25	أمين المستودع	882	10	الإدخال والرصيد	أرصدة المخزون بحالاتها	../Procurement/stock_proc.php	Procurement/stock_proc.php	289	APPROVED	أرصدة المخزون بحالاتها
+25	أمين المستودع	882	11	الإدخال والرصيد	التحويل بين المخازن	../Procurement/wh_transfer.php	Procurement/wh_transfer.php	297	APPROVED	التحويل بين المخازن
+25	أمين المستودع	882	12	الصرف والعهدة	صرف مواد من المخزن	../Procurement/issue_proc.php	Procurement/issue_proc.php	286	APPROVED	صرف مواد من المخزن
+25	أمين المستودع	882	13	الصرف والعهدة	العهد والمرتجعات	../Procurement/receipt_custody_proc.php	Procurement/receipt_custody_proc.php	287	APPROVED	الاستلام المؤقت
+25	أمين المستودع	882	14	الجرد والرقابة	الجرد ومعالجة الفروقات	../Procurement/wh_count.php	Procurement/wh_count.php	298	APPROVED	الجرد ومعالجة الفروقات
+25	أمين المستودع	882	15	الجرد والرقابة	استهلاك المعدة ومعدله	../Procurement/consumption_rate.php	Procurement/consumption_rate.php	299	APPROVED	استهلاك المعدة ومعدله
+25	أمين المستودع	882	16	متابعة المخازن	بلاغات إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+25	أمين المستودع	882	17	متابعة المخازن	أبلغ عن مشكلة من هذه الشاشة	../Tickets/ticket_contextual_open.php	Tickets/ticket_contextual_open.php	332	APPROVED	أبلغ عن مشكلة من هذه الشاشة
+25	أمين المستودع	882	18	متابعة المخازن	صندوق ما ينتظر اعتمادي	../Finance/approvals_inbox.php	Finance/approvals_inbox.php	331	APPROVED	صندوق ما ينتظر اعتمادي
+25	أمين المستودع	882	19	متابعة المخازن	طلبات الشراء	../Procurement/requests_proc.php	Procurement/requests_proc.php	284	APPROVED	طلبات الشراء
+25	أمين المستودع	882	20	متابعة المخازن	طلبات الترحيل	../Transport/transfer_requests.php	Transport/transfer_requests.php	301	APPROVED	طلبات الترحيل
+25	أمين المستودع	882	21	سجلات وإعدادات المخازن	كتالوج الأصناف والقطع الحرجة	../Procurement/items_proc.php	Procurement/items_proc.php	292	PENDING_OWNER	كتالوج الأصناف والقطع الحرجة
+25	أمين المستودع	882	22	سجلات وإعدادات المخازن	المخازن وأنواعها	../Procurement/master_data_proc.php	Procurement/master_data_proc.php	295	PENDING_OWNER	المخازن وأنواعها
+25	أمين المستودع	882	23	سجلات وإعدادات المخازن	ميزانية إدارتي	../Finance/budget_dept.php	Finance/budget_dept.php	230	APPROVED	ميزانية إدارتي — التمويل
+25	أمين المستودع	882	24	سجلات وإعدادات المخازن	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+25	أمين المستودع	882	25	سجلات وإعدادات المخازن	مركز التقارير	../emsreports/index.php	emsreports/index.php	19	PENDING_DEDUP	مركز التقارير — الحوكمة
+25	أمين المستودع	882	26	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+25	أمين المستودع	882	27	فريق العمل	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+25	أمين المستودع	882	28	العمل اليومي	حدود إعادة الطلب	../Procurement/reordering_proc.php	Procurement/reordering_proc.php	293	PENDING_OWNER	حدود إعادة الطلب
+25	أمين المستودع	882	29	العمل اليومي	لوحة الإدارة	../Procurement/warehouse_board.php	Procurement/warehouse_board.php	291	PENDING_OWNER	لوحة الإدارة (warehouse_board)
+25	أمين المستودع	882	30	المخاطر	مساحة مخاطر الإدارة	../Risk/dept_risk_space.php	Risk/dept_risk_space.php	74	PENDING_OWNER	مساحة مخاطر الإدارة
+26	إدارة التمويل	859	1	لوحة الإدارة	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+26	إدارة التمويل	859	2	لوحة الإدارة	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+26	إدارة التمويل	859	3	لوحة الإدارة	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+26	إدارة التمويل	859	4	لوحة الإدارة	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+26	إدارة التمويل	859	5	لوحة الإدارة	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+26	إدارة التمويل	859	6	لوحة الإدارة	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+26	إدارة التمويل	859	7	النموذج والممول	نماذج التمويل ومعالجتها	../Financing/fin_models.php	Financing/fin_models.php	227	APPROVED	نماذج التمويل ومعالجتها
+26	إدارة التمويل	859	8	النموذج والممول	سجل الممولين	../Financing/financiers_registry.php	Financing/financiers_registry.php	233	APPROVED	سجل الممولين
+26	إدارة التمويل	859	9	النموذج والممول	سجل الشركات والكيانات	../Governance/entities_registry.php	Governance/entities_registry.php	63	PENDING_OWNER	سجل الشركات والكيانات
+26	إدارة التمويل	859	10	النموذج والممول	علاقات الملكية بين الكيانات	../Financing/ownership_links.php	Financing/ownership_links.php	228	APPROVED	علاقات الملكية بين الكيانات
+26	إدارة التمويل	859	11	عملية التمويل	عمليات التمويل	../Financing/financing_board.php	Financing/financing_board.php	235	APPROVED	عمليات التمويل
+26	إدارة التمويل	859	12	عملية التمويل	تغيّرات عقود التمويل	../Financing/fin_changes.php	Financing/fin_changes.php	229	APPROVED	تغيّرات عقود التمويل
+26	إدارة التمويل	859	13	الأعيان والحصص	الأعيان المموَّلة	../Equipments/fin_assets.php	Equipments/fin_assets.php	259	APPROVED	الأعيان المموَّلة
+26	إدارة التمويل	859	14	الأعيان والحصص	سجل المعدات	../Equipments/equipments.php	Equipments/equipments.php	256	PENDING_DEDUP	سجل المعدات
+26	إدارة التمويل	859	15	الأعيان والحصص	حصص الملكية في الأصول	../Financing/owners_registry.php	Financing/owners_registry.php	232	APPROVED	حصص الملكية في الأصول
+26	إدارة التمويل	859	16	الأقساط والتكلفة	الأقساط ومواعيد السداد	../Financing/installments.php	Financing/installments.php	224	APPROVED	الأقساط ومواعيد السداد
+26	إدارة التمويل	859	17	الأقساط والتكلفة	توزيع تكلفة التمويل على المشاريع	../Financing/cost_allocation.php	Financing/cost_allocation.php	234	APPROVED	توزيع تكلفة التمويل على المشاريع
+26	إدارة التمويل	859	18	الأقساط والتكلفة	ذمم الموردين والمستحقات	../Finance/dues_fin.php	Finance/dues_fin.php	108	APPROVED	ذمم الموردين والمستحقات
+26	إدارة التمويل	859	19	الأقساط والتكلفة	طلبات الدفع والسداد	../Finance/payments_fin.php	Finance/payments_fin.php	109	APPROVED	طلبات الدفع والسداد
+26	إدارة التمويل	859	20	الانحراف والتصحيح	انحرافات التمويل — السداد والملكية والتوثيق	../Financing/deviations.php	Financing/deviations.php	225	APPROVED	انحرافات التمويل — السداد والملكية والتوثيق
+26	إدارة التمويل	859	21	الانحراف والتصحيح	فروق السداد والاستحقاق	../Financing/deviations.php#2	Financing/deviations.php	225	APPROVED	انحرافات التمويل — السداد والملكية والتوثيق
+26	إدارة التمويل	859	22	الانحراف والتصحيح	الخروج غير المسجَّل من الملكية	../Financing/deviations.php#3	Financing/deviations.php	225	APPROVED	انحرافات التمويل — السداد والملكية والتوثيق
+26	إدارة التمويل	859	23	الانحراف والتصحيح	عقود تمويل بلا حركة	../Financing/deviations.php#4	Financing/deviations.php	225	APPROVED	انحرافات التمويل — السداد والملكية والتوثيق
+26	إدارة التمويل	859	24	سرية الملكية	من يرى ماذا ومكوّنات البوابة	../Portal/visibility_keys.php	Portal/visibility_keys.php	359	PENDING_OWNER	من يرى ماذا ومكوّنات البوابة
+26	إدارة التمويل	859	25	سرية الملكية	سجل التدقيق والاطّلاع	../ActivityLogs/activity_logs.php	ActivityLogs/activity_logs.php	42	APPROVED	سجل التدقيق والاطّلاع
+26	إدارة التمويل	859	26	متابعة وتقارير التمويل	الإهلاك والقيمة الدفترية	../Finance/assets_fin.php	Finance/assets_fin.php	120	APPROVED	الإهلاك والقيمة الدفترية
+26	إدارة التمويل	859	27	متابعة وتقارير التمويل	أسعار الصرف	../Finance/currencies_fin.php	Finance/currencies_fin.php	169	PENDING_OWNER	أسعار الصرف
+26	إدارة التمويل	859	28	متابعة وتقارير التمويل	بلاغات إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+26	إدارة التمويل	859	29	متابعة وتقارير التمويل	أبلغ عن مشكلة من هذه الشاشة	../Tickets/ticket_contextual_open.php	Tickets/ticket_contextual_open.php	332	APPROVED	أبلغ عن مشكلة من هذه الشاشة
+26	إدارة التمويل	859	30	متابعة وتقارير التمويل	صندوق ما ينتظر اعتمادي	../Finance/approvals_inbox.php	Finance/approvals_inbox.php	331	APPROVED	صندوق ما ينتظر اعتمادي
+26	إدارة التمويل	859	31	متابعة وتقارير التمويل	ميزانية إدارتي	../Finance/budget_dept.php	Finance/budget_dept.php	230	APPROVED	ميزانية إدارتي — التمويل
+26	إدارة التمويل	859	32	متابعة وتقارير التمويل	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+26	إدارة التمويل	859	33	متابعة وتقارير التمويل	مركز التقارير	../emsreports/index.php	emsreports/index.php	19	PENDING_DEDUP	مركز التقارير — الحوكمة
+26	إدارة التمويل	859	34	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+26	إدارة التمويل	859	35	فريق العمل	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+26	إدارة التمويل	859	36	التقارير والتحليلات	الاعتمادات المتأخرة والوثائق	../Reports/approval_lag_report.php	Reports/approval_lag_report.php	11	PENDING_OWNER	الاعتمادات المتأخرة والوثائق
+26	إدارة التمويل	859	37	الحوكمة	التفويض بالتوقيع	../Governance/signing_authority.php	Governance/signing_authority.php	57	PENDING_OWNER	التفويض بالتوقيع
+26	إدارة التمويل	859	38	الحوكمة	التراخيص والكفالات	../Governance/licenses_guarantees.php	Governance/licenses_guarantees.php	62	PENDING_OWNER	التراخيص والكفالات
+26	إدارة التمويل	859	39	التمويل	إنشاء عملية تمويل	../Financing/financing_operation_new.php	Financing/financing_operation_new.php	226	APPROVED	إنشاء عملية تمويل
+26	إدارة التمويل	859	40	المخاطر	مساحة مخاطر الإدارة	../Risk/dept_risk_space.php	Risk/dept_risk_space.php	74	PENDING_OWNER	مساحة مخاطر الإدارة
+27	القوى التشغيلية	883	1	لوحة الإدارة	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+27	القوى التشغيلية	883	2	لوحة الإدارة	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+27	القوى التشغيلية	883	3	لوحة الإدارة	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+27	القوى التشغيلية	883	4	لوحة الإدارة	إنجازي	../Portal/my_achievement.php	Portal/my_achievement.php	3	APPROVED	إنجازي
+27	القوى التشغيلية	883	5	لوحة الإدارة	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+27	القوى التشغيلية	883	6	لوحة الإدارة	طلباتي	../FinRequests/my_requests.php	FinRequests/my_requests.php	4	APPROVED	طلباتي
+27	القوى التشغيلية	883	7	السجل والتكويد والتعاقد	سجل المشغّلين	../Employees/equipment_operators.php	Employees/equipment_operators.php	183	APPROVED	سجل المشغّلين
+27	القوى التشغيلية	883	8	السجل والتكويد والتعاقد	عقود المشاريع المؤقتة	../Workforce/project_contracts.php	Workforce/project_contracts.php	327	APPROVED	عقود المشاريع المؤقتة
+27	القوى التشغيلية	883	9	السجل والتكويد والتعاقد	أرقام المشغّلين الشاغرة	../Workforce/op_codes.php	Workforce/op_codes.php	328	APPROVED	أرقام المشغّلين الشاغرة
+27	القوى التشغيلية	883	10	السجل والتكويد والتعاقد	التوظيف من الشاغر إلى المباشرة	../Workforce/recruitment_pipeline.php	Workforce/recruitment_pipeline.php	318	APPROVED	التوظيف من الشاغر إلى المباشرة
+27	القوى التشغيلية	883	11	السجل والتكويد والتعاقد	الهيكل التنظيمي والمسميات	../admin/org_structure.php	admin/org_structure.php	40	APPROVED	الهيكل التنظيمي والمسميات
+27	القوى التشغيلية	883	12	السجل والتكويد والتعاقد	التكليفات التنظيمية	../admin/org_assignments.php	admin/org_assignments.php	41	APPROVED	التكليفات التنظيمية
+27	القوى التشغيلية	883	13	التأهيل والوثائق	تأهيل المشغّلين على أنواع المعدات	../Workforce/op_qual.php	Workforce/op_qual.php	312	APPROVED	تأهيل المشغّلين على أنواع المعدات
+27	القوى التشغيلية	883	14	التأهيل والوثائق	وثائق المعدات والمشغّلين	../Equipments/equipment_documents.php	Equipments/equipment_documents.php	260	APPROVED	وثائق المعدات والمشغّلين
+27	القوى التشغيلية	883	15	التكليف والتوزيع	تكليف المشغّل على المعدة	../Operations/distribution_space.php	Operations/distribution_space.php	271	APPROVED	تكليف المشغّل على المعدة
+27	القوى التشغيلية	883	16	التكليف والتوزيع	توزيع المعدات والمشغّلين	../Operations/distribution_space.php#2	Operations/distribution_space.php	271	APPROVED	تكليف المشغّل على المعدة
+27	القوى التشغيلية	883	17	التكليف والتوزيع	خطة عمل الغد	../Operations/daily_plan.php	Operations/daily_plan.php	340	APPROVED	خطة عمل الغد
+27	القوى التشغيلية	883	18	التكليف والتوزيع	سجل المعدات	../Equipments/equipments.php	Equipments/equipments.php	256	PENDING_DEDUP	سجل المعدات
+27	القوى التشغيلية	883	19	الوردية والتناوب التبادلي	سجل الوردية	../Operations/shift_log.php	Operations/shift_log.php	314	APPROVED	سجل الوردية
+27	القوى التشغيلية	883	20	الوردية والتناوب التبادلي	دورات التناوب والإجازة الميدانية	../Workforce/rotation.php	Workforce/rotation.php	315	APPROVED	دورات التناوب والإجازة الميدانية
+27	القوى التشغيلية	883	21	الوردية والتناوب التبادلي	تسجيل التايم شيت والإنتاج	../Timesheet/timesheet.php	Timesheet/timesheet.php	341	APPROVED	تسجيل التايم شيت والإنتاج — الموقع
+27	القوى التشغيلية	883	22	الوردية والتناوب التبادلي	الحضور والانصراف	../Operations/attendance.php	Operations/attendance.php	181	APPROVED	الحضور والانصراف
+27	القوى التشغيلية	883	23	الوردية والتناوب التبادلي	الإجازات والغياب	../Workforce/worker_leave_absence.php	Workforce/worker_leave_absence.php	319	APPROVED	الإجازات والغياب
+27	القوى التشغيلية	883	24	الوردية والتناوب التبادلي	تنقلات العاملين	../Workforce/worker_movement.php	Workforce/worker_movement.php	316	APPROVED	تنقلات العاملين
+27	القوى التشغيلية	883	25	الوردية والتناوب التبادلي	السكن والإعاشة والمعسكرات	../Workforce/housing_units.php	Workforce/housing_units.php	317	APPROVED	السكن والإعاشة والمعسكرات
+27	القوى التشغيلية	883	26	الأداء والاستحقاق	الأداء الشهري للمشغّل	../Workforce/op_monthly.php	Workforce/op_monthly.php	180	APPROVED	الأداء الشهري للمشغّل
+27	القوى التشغيلية	883	27	الأداء والاستحقاق	توليد المستحق من العمل المعتمد	../Finance/entitlement.php	Finance/entitlement.php	115	APPROVED	توليد المستحق من العمل المعتمد
+27	القوى التشغيلية	883	28	الأداء والاستحقاق	تسويات ومستحقات الموردين	../Suppliers/settlements.php	Suppliers/settlements.php	236	APPROVED	تسويات ومستحقات الموردين
+27	القوى التشغيلية	883	29	الخصومات	خصومات المشغّلين المقترحة	../Workforce/proposed_deductions.php	Workforce/proposed_deductions.php	320	APPROVED	خصومات المشغّلين المقترحة
+27	القوى التشغيلية	883	30	الخصومات	الخصومات والجزاءات	../Workforce/deductions.php	Workforce/deductions.php	313	APPROVED	الخصومات والجزاءات
+27	القوى التشغيلية	883	31	متابعة القوى	طلبات الترحيل	../Transport/transfer_requests.php	Transport/transfer_requests.php	301	APPROVED	طلبات الترحيل
+27	القوى التشغيلية	883	32	متابعة القوى	بلاغات إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+27	القوى التشغيلية	883	33	متابعة القوى	أبلغ عن مشكلة من هذه الشاشة	../Tickets/ticket_contextual_open.php	Tickets/ticket_contextual_open.php	332	APPROVED	أبلغ عن مشكلة من هذه الشاشة
+27	القوى التشغيلية	883	34	متابعة القوى	صندوق ما ينتظر اعتمادي	../Finance/approvals_inbox.php	Finance/approvals_inbox.php	331	APPROVED	صندوق ما ينتظر اعتمادي
+27	القوى التشغيلية	883	35	تقارير القوى	ميزانية إدارتي	../Finance/budget_dept.php	Finance/budget_dept.php	230	APPROVED	ميزانية إدارتي — التمويل
+27	القوى التشغيلية	883	36	تقارير القوى	إنجاز الإدارة	../Portal/dept_achievement.php	Portal/dept_achievement.php	231	APPROVED	إنجاز الإدارة
+27	القوى التشغيلية	883	37	تقارير القوى	مركز التقارير	../emsreports/index.php	emsreports/index.php	19	PENDING_DEDUP	مركز التقارير — الحوكمة
+27	القوى التشغيلية	883	38	شاشات مالية	فحص شروط الاستحقاق	../Finance/entitlement_gate.php	Finance/entitlement_gate.php	114	APPROVED	فحص شروط الاستحقاق
+27	القوى التشغيلية	883	39	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+27	القوى التشغيلية	883	40	فريق العمل	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+27	القوى التشغيلية	883	41	المخاطر	مساحة مخاطر الإدارة	../Risk/dept_risk_space.php	Risk/dept_risk_space.php	74	PENDING_OWNER	مساحة مخاطر الإدارة
+28	إدارة المخاطر	897	1	لوحة الإدارة	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+28	إدارة المخاطر	897	2	لوحة الإدارة	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+28	إدارة المخاطر	897	3	لوحة الإدارة	مهامي	../Portal/my_tasks.php	Portal/my_tasks.php	2	APPROVED	مهامي
+28	إدارة المخاطر	897	4	لوحة الإدارة	لوحة المخاطر العليا	../Risk/risk_board.php	Risk/risk_board.php	85	APPROVED	لوحة المخاطر العليا
+28	إدارة المخاطر	897	5	لوحة الإدارة	بلاغاتُ إدارتي	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+28	إدارة المخاطر	897	6	الإشارة والفرز	إشارات الخطر والفرز	../Risk/risk_signals.php	Risk/risk_signals.php	75	APPROVED	إشارات المخاطر والفرز
+28	إدارة المخاطر	897	7	الإشارة والفرز	الحوادث والوقائع	../Risk/risk_incidents.php	Risk/risk_incidents.php	76	APPROVED	الحوادث والوقائع
+28	إدارة المخاطر	897	8	الإشارة والفرز	مخاطر الميدان	../Risk/risk_field.php	Risk/risk_field.php	86	APPROVED	مخاطر الميدان
+28	إدارة المخاطر	897	9	السجل والتقييم	سجل المخاطر المركزي	../Risk/risk_register.php	Risk/risk_register.php	78	APPROVED	سجل المخاطر المؤسسي
+28	إدارة المخاطر	897	10	السجل والتقييم	ملف الخطر	../Risk/risk_card.php	Risk/risk_card.php	82	APPROVED	ملف الخطر
+28	إدارة المخاطر	897	11	السجل والتقييم	وحدات المخاطر والتصنيف	../Risk/risk_units.php	Risk/risk_units.php	79	APPROVED	وحدات المخاطر والتصنيف
+28	إدارة المخاطر	897	12	الضوابط والمؤشرات	الضوابط والضوابط الحرجة	../Risk/risk_controls.php	Risk/risk_controls.php	72	APPROVED	الضوابط والضوابط الحرجة
+28	إدارة المخاطر	897	13	الضوابط والمؤشرات	مؤشرات الخطر الرئيسة	../Risk/risk_kris.php	Risk/risk_kris.php	84	APPROVED	مؤشرات الخطر الرئيسة
+28	إدارة المخاطر	897	14	الضوابط والمؤشرات	تقييم الخطر ونسخه التاريخية	../Risk/risk_assessment.php	Risk/risk_assessment.php	71	APPROVED	تقييم الخطر ونسخُه التاريخية
+28	إدارة المخاطر	897	15	المعالجة والقبول	إجراءات معالجة المخاطر	../Risk/risk_treatments.php	Risk/risk_treatments.php	77	APPROVED	إجراءات معالجة المخاطر
+28	إدارة المخاطر	897	16	المعالجة والقبول	مراجعات المخاطر وقراراتها	../Risk/risk_reviews.php	Risk/risk_reviews.php	81	APPROVED	المراجعات والتصعيدات
+28	إدارة المخاطر	897	17	المعالجة والقبول	التحقق من الضوابط الحرجة	../Risk/risk_control_verify.php	Risk/risk_control_verify.php	73	APPROVED	التحقق من الضوابط الحرجة
+28	إدارة المخاطر	897	18	الشهية والمنهج	شهية المخاطر وحدودها	../Risk/risk_appetite.php	Risk/risk_appetite.php	88	APPROVED	الشهية وحدود التحمل
+28	إدارة المخاطر	897	19	الشهية والمنهج	مساحة مخاطر الإدارة	../Risk/dept_risk_space.php	Risk/dept_risk_space.php	74	PENDING_OWNER	مساحة مخاطر الإدارة
+28	إدارة المخاطر	897	20	القبول والتصعيد	القبول والاستثناءات	../Risk/risk_acceptance.php	Risk/risk_acceptance.php	80	APPROVED	القبول والاستثناءات
+28	إدارة المخاطر	897	21	الحوكمة والإطار	لجنة المخاطر	../Risk/risk_committee.php	Risk/risk_committee.php	87	APPROVED	لجنة المخاطر
+28	إدارة المخاطر	897	22	الحوكمة والإطار	تقارير المخاطر والتحليلات	../Risk/risk_reports.php	Risk/risk_reports.php	70	APPROVED	تقارير المخاطر والتحليلات
+28	إدارة المخاطر	897	23	الحوكمة والإطار	إعدادات المخاطر والتصنيف	../Risk/risk_settings.php	Risk/risk_settings.php	89	APPROVED	إعدادات المخاطر والتصنيف
+28	إدارة المخاطر	897	24	الحوكمة والإطار	حوكمة إدارة المخاطر	../Risk/gov_dept_rsk.php	Risk/gov_dept_rsk.php	83	APPROVED	حوكمة إدارة المخاطر المؤسسية
+28	إدارة المخاطر	897	25	شاشات مالية	لوحة النسب المالية	../Finance/fin_ratios.php	Finance/fin_ratios.php	131	APPROVED	لوحة النسب المالية
+28	إدارة المخاطر	897	26	شاشات مالية	تفصيل نسبة مالية	../Finance/fin_ratio_detail.php	Finance/fin_ratio_detail.php	132	APPROVED	تفصيل نسبة مالية
+28	إدارة المخاطر	897	27	شاشات مالية	حدود النسب وأهدافها	../Finance/fin_ratio_targets.php	Finance/fin_ratio_targets.php	133	APPROVED	حدود النسب وأهدافها
+28	إدارة المخاطر	897	28	شاشات مالية	الإنذار المالي المبكر	../Finance/fin_early_warning.php	Finance/fin_early_warning.php	134	APPROVED	الإنذار المالي المبكر
+28	إدارة المخاطر	897	29	شاشات مالية	ربحية المعدة الواحدة	../Finance/fin_unit_economics.php	Finance/fin_unit_economics.php	135	APPROVED	ربحية المعدة الواحدة
+28	إدارة المخاطر	897	30	شاشات مالية	هامش العقد ونموذج العمل	../Finance/fin_contract_margin.php	Finance/fin_contract_margin.php	136	APPROVED	هامش العقد ونموذج العمل
+28	إدارة المخاطر	897	31	شاشات مالية	قائمة دخل المشروع	../Finance/fin_project_pl.php	Finance/fin_project_pl.php	137	APPROVED	قائمة دخل المشروع
+28	إدارة المخاطر	897	32	شاشات مالية	قائمة التدفقات النقدية	../Finance/fin_cashflow_stmt.php	Finance/fin_cashflow_stmt.php	138	APPROVED	قائمة التدفقات النقدية
+28	إدارة المخاطر	897	33	شاشات مالية	قائمة التغيرات في حقوق الملكية	../Finance/fin_equity_stmt.php	Finance/fin_equity_stmt.php	139	APPROVED	قائمة التغيرات في حقوق الملكية
+28	إدارة المخاطر	897	34	شاشات مالية	مصفوفة الترحيل من الإدارات	../Finance/fin_posting_matrix.php	Finance/fin_posting_matrix.php	140	APPROVED	مصفوفة الترحيل من الإدارات
+28	إدارة المخاطر	897	35	فريق العمل	إدارة المعاونين	../main/project_users.php	main/project_users.php	358	PENDING_OWNER	إدارة المعاونين
+28	إدارة المخاطر	897	36	فريق العمل	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+32	المدير المالي	905	1	لوحة الدور	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+32	المدير المالي	905	2	لوحة الدور	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+32	المدير المالي	905	3	لوحة الدور	الرئيسية	../main/dashboard.php	main/dashboard.php	355	PENDING_OWNER	الرئيسية — الشخصية — لوحة الدور
+32	المدير المالي	905	4	السقوف وفصل الواجبات	سقوف سلطة الالتزام والدفع	../Finance/tre_authority_caps.php	Finance/tre_authority_caps.php	171	PENDING_OWNER	سقوف سلطة الالتزام والدفع
+32	المدير المالي	905	5	البلاغات	صندوقُ بلاغاتِ الإدارة	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
+32	المدير المالي	905	6	العمل اليومي	مركز التقارير	../Reports/reports.php	Reports/reports.php	13	APPROVED	مركز التقارير — التنفيذية
+32	المدير المالي	905	7	العمل اليومي	البلاغات	../Tickets/tickets_list.php	Tickets/tickets_list.php	335	APPROVED	البلاغات
+32	المدير المالي	905	8	العمل اليومي	تسجيل بلاغ	../Tickets/ticket_form.php	Tickets/ticket_form.php	337	APPROVED	تسجيل بلاغ
+32	المدير المالي	905	9	العمل اليومي	بوابتي	../Portal/my_portal.php	Portal/my_portal.php	348	APPROVED	بوابتي
+32	المدير المالي	905	10	العمل اليومي	بلاغ سياقي جديد	../Tickets/ticket_contextual_open.php	Tickets/ticket_contextual_open.php	332	APPROVED	أبلغ عن مشكلة من هذه الشاشة
+32	المدير المالي	905	11	العمل اليومي	مساحة عملي	../main/my_workspace.php	main/my_workspace.php	349	APPROVED	مساحة عملي
+32	المدير المالي	905	12	العمل اليومي	بلاغاتي	../Tickets/my_tickets.php	Tickets/my_tickets.php	336	APPROVED	بلاغاتي
+33	المراجع الداخلي المستقل	906	1	لوحة الدور	الرئيسية	../main/role_board.php	main/role_board.php	354	PENDING_OWNER	الرئيسية — الشخصية — التقارير والتحليلات
+33	المراجع الداخلي المستقل	906	2	لوحة الدور	المراسلات	../chats/index.php	chats/index.php	351	PENDING_OWNER	المراسلات
+33	المراجع الداخلي المستقل	906	3	لوحة الدور	الرئيسية	../main/dashboard.php	main/dashboard.php	355	PENDING_OWNER	الرئيسية — الشخصية — لوحة الدور
+33	المراجع الداخلي المستقل	906	4	الميثاق والخطة والمهام	سجل اطّلاع المراجع الحساس	../Audit/iaf_access_log.php	Audit/iaf_access_log.php	103	PENDING_OWNER	سجل اطّلاع المراجع الحساس
+33	المراجع الداخلي المستقل	906	5	الميثاق والخطة والمهام	خطط المعالجة ومتابعتها	../Audit/iaf_action_plans.php	Audit/iaf_action_plans.php	97	APPROVED	خطط المعالجة ومتابعتها
+33	المراجع الداخلي المستقل	906	6	الميثاق والخطة والمهام	صلاحيات المراجع داخل النظام	../Audit/iaf_authorities.php	Audit/iaf_authorities.php	105	PENDING_OWNER	صلاحيات المراجع داخل النظام
+33	المراجع الداخلي المستقل	906	7	الميثاق والخطة والمهام	ميثاق المراجعة الداخلية	../Audit/iaf_charter.php	Audit/iaf_charter.php	92	APPROVED	ميثاق المراجعة الداخلية
+33	المراجع الداخلي المستقل	906	8	الميثاق والخطة والمهام	محاضر الإغلاق	../Audit/iaf_closure.php	Audit/iaf_closure.php	99	APPROVED	محاضر الإغلاق
+33	المراجع الداخلي المستقل	906	9	الميثاق والخطة والمهام	اختصاصات المراجعة العشرون	../Audit/iaf_competencies.php	Audit/iaf_competencies.php	104	PENDING_OWNER	اختصاصات المراجعة العشرون
+33	المراجع الداخلي المستقل	906	10	الميثاق والخطة والمهام	مهام المراجعة	../Audit/iaf_engagements.php	Audit/iaf_engagements.php	100	APPROVED	مهام المراجعة
+33	المراجع الداخلي المستقل	906	11	الميثاق والخطة والمهام	المصعَّد إلى الجهة المشرفة	../Audit/iaf_escalations.php	Audit/iaf_escalations.php	96	PENDING_OWNER	المصعَّد إلى الجهة المشرفة
+33	المراجع الداخلي المستقل	906	12	الميثاق والخطة والمهام	ملاحظات المراجعة	../Audit/iaf_findings.php	Audit/iaf_findings.php	91	APPROVED	الملاحظات
+33	المراجع الداخلي المستقل	906	13	الميثاق والخطة والمهام	إقرارات الاستقلال وتعارض المصالح	../Audit/iaf_independence.php	Audit/iaf_independence.php	93	APPROVED	سجل الاستقلال وتعارض المصالح
+33	المراجع الداخلي المستقل	906	14	الميثاق والخطة والمهام	خطة المراجعة السنوية	../Audit/iaf_plan.php	Audit/iaf_plan.php	95	APPROVED	الخطة السنوية للمراجعة
+33	المراجع الداخلي المستقل	906	15	الميثاق والخطة والمهام	تقييم جودة المراجعة الدوري	../Audit/iaf_quality.php	Audit/iaf_quality.php	102	APPROVED	تقييم الجودة
+33	المراجع الداخلي المستقل	906	16	الميثاق والخطة والمهام	تقارير المراجعة للجهة المشرفة	../Audit/iaf_reports.php	Audit/iaf_reports.php	90	APPROVED	تقارير الجهة المشرفة
+33	المراجع الداخلي المستقل	906	17	الميثاق والخطة والمهام	ردود الإدارات على الملاحظات	../Audit/iaf_responses.php	Audit/iaf_responses.php	98	APPROVED	ردود الإدارات على الملاحظات
+33	المراجع الداخلي المستقل	906	18	الميثاق والخطة والمهام	الكون الرقابي	../Audit/iaf_universe.php	Audit/iaf_universe.php	94	APPROVED	سجل الكون الرقابي
+33	المراجع الداخلي المستقل	906	19	الميثاق والخطة والمهام	أوراق العمل والأدلة	../Audit/iaf_workpapers.php	Audit/iaf_workpapers.php	101	APPROVED	أوراق العمل
+33	المراجع الداخلي المستقل	906	20	التخصص والتوجيه	سلسلة الاعتماد الرباعية	../Finance/acc_approval_chain.php	Finance/acc_approval_chain.php	118	APPROVED	سلسلة الاعتماد الرباعية
+33	المراجع الداخلي المستقل	906	21	التخصص والتوجيه	المرتجَع المالي للإدارات	../Finance/acc_backflow.php	Finance/acc_backflow.php	117	APPROVED	المرتجَع المالي للإدارات
+33	المراجع الداخلي المستقل	906	22	التخصص والتوجيه	مساحة عملي اليوم — محاسب التخصص	../Finance/acc_my_day.php	Finance/acc_my_day.php	155	APPROVED	مساحة عملي اليوم — محاسب التخصص
+33	المراجع الداخلي المستقل	906	23	التخصص والتوجيه	مصفوفة التوجيه لمحاسبي التخصصات	../Finance/acc_routing_matrix.php	Finance/acc_routing_matrix.php	168	APPROVED	مصفوفة التوجيه لمحاسبي التخصصات
+33	المراجع الداخلي المستقل	906	24	التخصص والتوجيه	التخصصات المحاسبية العشرة	../Finance/acc_specializations.php	Finance/acc_specializations.php	167	APPROVED	التخصصات المحاسبية العشرة
+33	المراجع الداخلي المستقل	906	25	الإشراف والجودة والحدود	الحدود الصريحة — ما لا يملكه كل دور	../Finance/ctrl_authority_limits.php	Finance/ctrl_authority_limits.php	173	PENDING_OWNER	الحدود الصريحة — ما لا يملكه كل دور
+33	المراجع الداخلي المستقل	906	26	الإشراف والجودة والحدود	الأحكام المنتشرة على الإدارات الست عشرة	../Finance/ctrl_dept_propagation.php	Finance/ctrl_dept_propagation.php	162	APPROVED	الأحكام المنتشرة على الإدارات الست عشرة
+33	المراجع الداخلي المستقل	906	27	الإشراف والجودة والحدود	سجل بنود الوثائق وتغطيتها	../Finance/ctrl_doc_registry.php	Finance/ctrl_doc_registry.php	163	APPROVED	سجل بنود الوثائق وتغطيتها
+33	المراجع الداخلي المستقل	906	28	الإشراف والجودة والحدود	مخالفات الوثائق وحسمُها	../Finance/ctrl_doc_variance.php	Finance/ctrl_doc_variance.php	111	PENDING_OWNER	مخالفات الوثائق وحسمُها
+33	المراجع الداخلي المستقل	906	29	الإشراف والجودة والحدود	مؤشرات جودة المحاسبة الاثنا عشر	../Finance/ctrl_quality_kpis.php	Finance/ctrl_quality_kpis.php	154	APPROVED	مؤشرات جودة المحاسبة الاثنا عشر
+33	المراجع الداخلي المستقل	906	30	الإشراف والجودة والحدود	ترحيل الأدوار المالية القديمة	../Finance/ctrl_role_migration.php	Finance/ctrl_role_migration.php	174	APPROVED	ترحيل الأدوار المالية القديمة
+33	المراجع الداخلي المستقل	906	31	الإشراف والجودة والحدود	إشراف رئيس الحسابات على محاسبي التخصصات	../Finance/ctrl_supervision.php	Finance/ctrl_supervision.php	110	APPROVED	إشراف رئيس الحسابات على محاسبي التخصصات
+33	المراجع الداخلي المستقل	906	32	سجل الالتزامات	الملتزَم به وأثره في الموازنة	../Finance/ob_commitments.php	Finance/ob_commitments.php	148	APPROVED	الملتزَم به وأثره في الموازنة
+33	المراجع الداخلي المستقل	906	33	سجل الالتزامات	الالتزامات المحتملة والإفصاح	../Finance/ob_contingent.php	Finance/ob_contingent.php	152	APPROVED	الالتزامات المحتملة والإفصاح
+33	المراجع الداخلي المستقل	906	34	سجل الالتزامات	المستحق قريبًا والتذكيرات	../Finance/ob_due_soon.php	Finance/ob_due_soon.php	149	APPROVED	المستحق قريبًا والتذكيرات
+33	المراجع الداخلي المستقل	906	35	سجل الالتزامات	آفاق الالتزامات الثلاثة	../Finance/ob_horizon.php	Finance/ob_horizon.php	151	APPROVED	آفاق الالتزامات الثلاثة
+33	المراجع الداخلي المستقل	906	36	سجل الالتزامات	الالتزامات المتأخرة والذمم الدائنة	../Finance/ob_overdue.php	Finance/ob_overdue.php	150	APPROVED	الالتزامات المتأخرة والذمم الدائنة
+33	المراجع الداخلي المستقل	906	37	سجل الالتزامات	سجل الالتزامات	../Finance/ob_register.php	Finance/ob_register.php	146	APPROVED	سجل الالتزامات
+33	المراجع الداخلي المستقل	906	38	سجل الالتزامات	جدول الاستحقاقات	../Finance/ob_schedule.php	Finance/ob_schedule.php	147	APPROVED	جدول الاستحقاقات
+33	المراجع الداخلي المستقل	906	39	السقوف وفصل الواجبات	سقوف سلطة الالتزام والدفع	../Finance/tre_authority_caps.php	Finance/tre_authority_caps.php	171	PENDING_OWNER	سقوف سلطة الالتزام والدفع
+33	المراجع الداخلي المستقل	906	40	السقوف وفصل الواجبات	مراحل دورتي الدفع والقبض	../Finance/tre_cycle_stages.php	Finance/tre_cycle_stages.php	172	PENDING_OWNER	مراحل دورتي الدفع والقبض
+33	المراجع الداخلي المستقل	906	41	السقوف وفصل الواجبات	مصفوفة فصل الواجبات الثلاثة عشر	../Finance/tre_sod_matrix.php	Finance/tre_sod_matrix.php	176	PENDING_OWNER	مصفوفة فصل الواجبات الثلاثة عشر
+33	المراجع الداخلي المستقل	906	42	السقوف وفصل الواجبات	الأدوار الثمانية داخل وحدة الخزينة	../Finance/tre_unit_roles.php	Finance/tre_unit_roles.php	175	APPROVED	الأدوار الثمانية داخل وحدة الخزينة
+33	المراجع الداخلي المستقل	906	43	التقارير للجهة المشرفة	موافقات التكليف	../Portal/ceo_assignments.php	Portal/ceo_assignments.php	350	PENDING_OWNER	موافقات التكليف
+33	المراجع الداخلي المستقل	906	44	التقارير للجهة المشرفة	تقارير المراجعة الداخلية	../Portal/ceo_audit_reports.php	Portal/ceo_audit_reports.php	352	PENDING_OWNER	تقارير المراجعة الداخلية
+33	المراجع الداخلي المستقل	906	45	البلاغات	صندوقُ بلاغاتِ الإدارة	../Tickets/dept_inbox.php	Tickets/dept_inbox.php	334	APPROVED	صندوقُ بلاغاتِ الإدارة
