@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-18 20:49:51
--- الجداول: 587 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-18 21:24:51
+-- الجداول: 588 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6470,6 +6470,27 @@ CREATE TABLE `gov_governing_screens` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_scr` (`company_id`,`screen_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='PROP-01 §4-1 ⑤ — سجلُّ الشاشاتِ الحاكمةِ الخاضعةِ لشرطِ التصنيف';
+
+-- ── Table: gov_independent_reviews ──
+CREATE TABLE `gov_independent_reviews` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `screen_file` varchar(160) NOT NULL,
+  `review_kind` enum('human_test','investor_round') NOT NULL,
+  `executed_by_user` int(11) DEFAULT NULL COMMENT 'منفِّذٌ مستقلٌّ عن البانِي — يُقرأ من الجلسةِ لا يُكتب نصًّا',
+  `executed_by_dept` varchar(120) DEFAULT NULL COMMENT 'إدارةُ الحوكمةِ أو إدارةٌ غيرُ معنيةٍ بالشاشة',
+  `participants` smallint(5) unsigned DEFAULT NULL COMMENT 'عدةُ مستخدمينَ جددٍ لم يشاركوا في البناء',
+  `tasks_defined` smallint(5) unsigned DEFAULT NULL COMMENT 'مهامُّ محددةٌ سلفًا',
+  `attempts_total` smallint(5) unsigned DEFAULT NULL COMMENT 'مجموعُ محاولاتِ المهامِّ — مقامُ النسبة',
+  `attempts_success` smallint(5) unsigned DEFAULT NULL,
+  `success_rate` decimal(5,2) DEFAULT NULL COMMENT 'تُحسب على مجموعِ المحاولاتِ لا على رأيِ شخص',
+  `yes_answers` tinyint(3) unsigned DEFAULT NULL COMMENT 'جولةُ العرض: أسئلةُ الفجوةِ السبعُ = صفرُ نعم',
+  `verdict` enum('PASS','FAIL') DEFAULT NULL,
+  `minutes_ref` varchar(190) DEFAULT NULL COMMENT 'مرجعُ المحضرِ — لا حكمَ بلا شاهد',
+  `component_version` varchar(24) DEFAULT NULL,
+  `recorded_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_screen_kind_ver` (`screen_file`,`review_kind`,`component_version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='المراجعةُ البشريةُ المستقلةُ وجولةُ العرض — ينفّذهما مستقلٌّ عن البانِي';
 
 -- ── Table: gov_inheritance_denials ──
 CREATE TABLE `gov_inheritance_denials` (

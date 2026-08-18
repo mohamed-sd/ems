@@ -573,6 +573,7 @@ class TenantRegistry
         // ف١٦ ثامنًا: سجلُّ أسطحِ العرضِ وجردُ التلوث — مراجعُ نظامٍ عامّة
         'ui_surfaces' => array('type' => self::T_GLOBAL, 'soft' => false),
         'gov_pollution_findings' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'gov_independent_reviews' => array('type' => self::T_GLOBAL, 'soft' => false),
         'approval_rules_quarantine' => array('type' => self::T_GLOBAL, 'soft' => false),
         // تعريفُ الشاشة خاصيةُ الشاشة لا بياناتُ شركة — مرجعٌ عامٌّ كأخواته
         'screen_about' => array('type' => self::T_GLOBAL, 'soft' => false),
