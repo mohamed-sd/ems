@@ -46,6 +46,8 @@ else {
 $page_title = 'المخازنُ وأنواعُها';
 include '../inheader.php';
 include '../insidebar.php';
+// UXW-01 §8-2: موضعُ الشاشةِ من رحلةِ أمرِ الصيانة
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('mnt_order', 'قطعُ الغيارِ والمخزون');
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">

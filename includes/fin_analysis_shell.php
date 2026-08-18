@@ -47,6 +47,15 @@ $fa_period = isset($_GET['period']) && preg_match('/^\d{4}-\d{2}$/', $_GET['peri
 $page_title = 'إيكوبيشن | ' . $FA_SCREEN['title'];
 include __DIR__ . '/../inheader.php';
 include __DIR__ . '/../insidebar.php';
+
+/* UXW-01 §8-2: شريطُ رحلةِ الكيان — تضبطه الشاشةُ بـ$ENTITY_KEY (ومفتاحُ التبويبِ
+   النشطِ $ENTITY_TAB) قبلَ تضمينِ القشرة، والقشرةُ تُخرجه بعدَ السايدبارِ كما
+   تفعل الشاشاتُ القائمة. وضعُه في القشرةِ لا في الملفِّ يبقيه بعدَ إعادةِ التوليد. */
+if (!empty($ENTITY_KEY)) {
+    require_once __DIR__ . '/entity_tabs.php';
+    echo ems_entity_tabs((string) $ENTITY_KEY, isset($ENTITY_TAB) ? (string) $ENTITY_TAB : '');
+}
+
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell">

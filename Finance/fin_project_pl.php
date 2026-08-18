@@ -87,5 +87,9 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 <?php
 }
 
+/* UXW-01 §8-2: موضعُ الشاشةِ من رحلةِ المشروع — القشرةُ تُخرِج الشريط */
+$ENTITY_KEY = 'project';
+$ENTITY_TAB = 'الميزانيةُ والإنجاز';
+
 /* القشرةُ الموحَّدةُ هي التي تُنفِّذ include '../inheader.php' ثم insidebar بعد الحارسِ (البوابة ٤) */
 require __DIR__ . '/../includes/fin_analysis_shell.php';

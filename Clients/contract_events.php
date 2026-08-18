@@ -338,6 +338,8 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(isset($perms) ? $perms : null);
 include("../inheader.php");
 include('../insidebar.php');
+// UXW-01 §8-2: موضعُ الشاشةِ من رحلةِ العميل
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('client', 'سجلُّ التغييرات');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 // NAV-01 §8 (update0006-b): الشاشةُ قسمٌ من ملف العقد الأم لا صفحةٌ يتيمة
 $cf_contract_id = intval($_GET['contract'] ?? $_GET['id'] ?? 0); $cf_active = 'events';

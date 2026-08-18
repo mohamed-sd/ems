@@ -158,6 +158,8 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
+// UXW-01 §8-2: موضعُ الشاشةِ من رحلةِ المشغّل — فعلُها تكليفُ المشغّلين على المعدات
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('operator', 'التكليفُ على المعدات');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <style>

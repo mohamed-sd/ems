@@ -22,6 +22,14 @@ if (is_readable($__inc)) { include $__inc; }
 $__side = __DIR__ . '/../insidebar.php';
 if (is_readable($__side)) { include $__side; }
 
+/* UXW-01 §8-2: شريطُ رحلةِ الكيان — تضبطه الشاشةُ بـ$ENTITY_KEY (ومفتاحُ التبويبِ
+   النشطِ $ENTITY_TAB) قبلَ تضمينِ الغلاف، والغلافُ يُخرجه بعدَ السايدبارِ كما
+   تفعل الشاشاتُ القائمة. وضعُه في العُدَّةِ لا في الملفِّ يبقيه بعدَ إعادةِ التوليد. */
+if (!empty($ENTITY_KEY)) {
+    require_once __DIR__ . '/entity_tabs.php';
+    echo ems_entity_tabs((string) $ENTITY_KEY, isset($ENTITY_TAB) ? (string) $ENTITY_TAB : '');
+}
+
 /* UXW-01 بوابة ٩: حالاتُ التحميلِ والفراغِ والخطأِ من المكوّنِ المركزيِّ —
    في الغلافِ لا في الشاشةِ فتستوفيها شاشاتُ ENG-01 كلُّها دفعةً واحدة
    (كما تفعل عُدّةُ u13_screen_kit) — والشاشةُ تخصِّص نصَّها بـ$EMPTY_TITLE/$EMPTY_HINT */
