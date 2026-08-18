@@ -102,7 +102,8 @@ foreach ($fails as $p) {
 if (in_array('--csv', $argv, true)) {
     $out = array("الملف\tالمحدد\tالخلفية\tالنص\tالنسبة\tالحكم");
     foreach ($pairs as $p) {
-        $out[] = "{$p['file']}\t{$p['sel']}\t{$p['bg']}\t{$p['fg']}\t{$p['ratio']}\t" . ($p['ratio'] >= 4.5 ? 'مجتاز' : 'راسب');
+        $verdict = !empty($p['exempt']) ? 'مستثنى' : ($p['ratio'] >= 4.5 ? 'مجتاز' : 'راسب');
+        $out[] = "{$p['file']}\t{$p['sel']}\t{$p['bg']}\t{$p['fg']}\t{$p['ratio']}\t{$verdict}";
     }
     file_put_contents("$ROOT/storage/reports/uxw01_contrast.csv", "\xEF\xBB\xBF" . implode("\n", $out));
     echo "⇒ storage/reports/uxw01_contrast.csv\n";

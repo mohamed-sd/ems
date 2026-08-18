@@ -10,6 +10,7 @@ ems-states.css	/* الخطوةُ التالية (بوابةُ المنعِ ١٢)
 ems-states.css	/* بطاقةُ السقفِ الموقوف — وقفٌ آمنٌ لا عطل (المكوّنُ الخاصُّ الثالث) 	var(--warning-100)	var(--warning-deep)	7.58	مجتاز
 ems-states.css	.ems-cycle-line .ems-cycle-doc	var(--brand-cream-light)	var(--gray-700)	9.53	مجتاز
 ems-states.css	/* شريطُ جلسةِ النيابةِ الدائم (GOV-AUTH-01 §6-2) — لا يُخفى عن الفاعل	var(--c-brand-navy)	var(--white)	11.5	مجتاز
+ems-states.css	.ems-entity-tab.is-active	var(--white)	var(--gray-900)	17.49	مجتاز
 ems-buttons.css	/* ① مُنفِّذ — ذهبيُّ العلامةِ بنصٍّ داكنٍ عاليِ التباين */ body .btn-	var(--c-brand-gold)	var(--c-ink-900)	10.13	مجتاز
 ems-buttons.css	/* ② ثانويّ — محايدٌ بحدٍّ ظاهر */ body .btn-secondary, body .btn-seco	var(--c-surface)	var(--c-ink-700)	10.86	مجتاز
 ems-buttons.css	body .btn-secondary:hover, body .btn-secondary:focus-visible	var(--c-line-200)	var(--c-ink-900)	13.13	مجتاز
@@ -26,5 +27,5 @@ ems-shell.css	.ems-sync-failed	var(--c-fef2f2)	var(--c-991b1b)	7.6	مجتاز
 ems-forms.css	/* شارة الرقم (مثل 02) أقصى اليسار — صندوق أبيض بحدّ أسود */ :is(.allf	var(--c-surface)	var(--c-ink-max)	21	مجتاز
 ems-forms.css	:is(.allforms, .ems-form) .checkbox-label	var(--c-surface)	var(--c-41464d)	9.51	مجتاز
 ems-forms.css	:is(.allforms, .ems-form) .checkbox-label:hover	var(--c-fffdf4)	var(--c-ink-900)	16.18	مجتاز
-ems-forms.css	:is(.allforms, .ems-form) .emsf-select-trigger.is-disabled	var(--c-e7e9ed)	var(--c-8b8f96)	2.67	راسب
+ems-forms.css	:is(.allforms, .ems-form) .emsf-select-trigger.is-disabled	var(--c-e7e9ed)	var(--c-8b8f96)	2.67	مستثنى
 ems-forms.css	.emsf-select-search-input	var(--c-surface)	var(--c-1f2227)	15.95	مجتاز
