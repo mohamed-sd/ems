@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-18 07:53:59
+-- المصدر: equipation_manage · التوليد: 2026-08-18 08:44:12
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -545,7 +545,8 @@ INSERT INTO `modules` (`id`, `name`, `code`, `owner_role_id`, `group_id`, `is_li
 (497,'النظام التصميمي — مرجع حي','Governance/design_system.php',15,NULL,0,0,'fa fa-palette',611,NULL),
 (498,'قوالب الصلاحيات المعيارية','Governance/auth_profiles.php',15,NULL,0,0,'fa fa-id-card',612,NULL),
 (499,'منح الصلاحية','Governance/auth_grants.php',15,NULL,0,0,'fa fa-key',613,NULL),
-(500,'جلسات النيابة','Governance/impersonations.php',15,NULL,0,0,'fa fa-user-shield',614,NULL);
+(500,'جلسات النيابة','Governance/impersonations.php',15,NULL,0,0,'fa fa-user-shield',614,NULL),
+(505,'حدود المبالغ','Governance/authority_caps.php',15,NULL,0,0,'fa fa-scale-balanced',610,NULL);
 
 -- ── role_permissions ──
 DELETE FROM `role_permissions`;
@@ -3593,7 +3594,9 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (3437,34,4,1,0,0,0),
 (3439,35,187,1,0,0,0),
 (3440,35,227,1,0,0,0),
-(3441,35,4,1,0,0,0);
+(3441,35,4,1,0,0,0),
+(3442,9,505,1,1,1,0),
+(3443,15,505,1,0,0,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -6608,7 +6611,9 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (10327,35,'DAILY',4064,436,'إيكوبيشن | البحث الموحد','main/global_search.php','fa fa-file-lines',100,NULL,'main/global_search.php',1,'2026-08-18 02:27:11','2026-08-18 02:27:11'),
 (10328,35,'DAILY',4064,437,'قريبًا','main/soon.php','fa fa-file-lines',100,NULL,'main/soon.php',1,'2026-08-18 02:27:11','2026-08-18 02:27:11'),
 (10329,35,'DAILY',4064,438,'إيكوبيشن | بطاقة المستخدم','main/user_profile.php','fa fa-file-lines',100,NULL,'main/user_profile.php',1,'2026-08-18 02:27:11','2026-08-18 02:27:11'),
-(10330,35,'DAILY',4064,476,'بلاغاتي','Tickets/my_tickets.php','fa fa-inbox',100,NULL,'Tickets/my_tickets.php',1,'2026-08-18 02:27:11','2026-08-18 02:27:11');
+(10330,35,'DAILY',4064,476,'بلاغاتي','Tickets/my_tickets.php','fa fa-inbox',100,NULL,'Tickets/my_tickets.php',1,'2026-08-18 02:27:11','2026-08-18 02:27:11'),
+(10331,9,'GOV',3936,505,'حدود المبالغ','Governance/authority_caps.php','fa fa-scale-balanced',615,NULL,'Governance/authority_caps.php',1,'2026-08-18 08:34:25','2026-08-18 08:34:25'),
+(10332,15,'GOV',3846,505,'حدود المبالغ','Governance/authority_caps.php','fa fa-scale-balanced',615,NULL,'Governance/authority_caps.php',1,'2026-08-18 08:34:25','2026-08-18 08:34:25');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;

@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-18 07:53:59
--- الجداول: 571 · المناظير: 23
+-- المصدر: equipation_manage · التوليد: 2026-08-18 08:44:12
+-- الجداول: 572 · المناظير: 23
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6164,6 +6164,22 @@ CREATE TABLE `gov_authority_limits` (
   KEY `ix_enf` (`enforce_kind`,`active`),
   CONSTRAINT `chk_gal_conditional_unwired` CHECK (`limit_kind` <> 'conditional' or `action_codes` is null or `action_codes` = '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='الوثائقُ الخمس — الحدودُ الصريحةُ «ما لا يملكه» بمُنفِذِ كلٍّ';
+
+-- ── Table: gov_cap_history ──
+CREATE TABLE `gov_cap_history` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `ladder_code` varchar(10) NOT NULL COMMENT 'LD-01..LD-20',
+  `cap_amount` decimal(16,2) DEFAULT NULL COMMENT 'NULL = غيرُ محسومٍ (يوقف)',
+  `cap_currency` varchar(8) NOT NULL DEFAULT 'USD',
+  `effective_from` datetime NOT NULL COMMENT 'يسري على ما يُنشأ بعدَه فقط',
+  `changed_by` int(11) NOT NULL COMMENT 'باعتمادِ المالكِ وحدَه — يفرضه القادح',
+  `reason` varchar(300) NOT NULL COMMENT 'لماذا — يُقرأ بعدَ سنة',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_ladder` (`ladder_code`,`effective_from`),
+  CONSTRAINT `chk_cap_reason` CHECK (`reason` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='قرارُ المالكِ ⑥ — سقوفٌ مرنةٌ بسجلٍّ لا يُحذف: من غيَّر ومتى ولماذا';
 
 -- ── Table: gov_data_classes ──
 CREATE TABLE `gov_data_classes` (
@@ -13345,6 +13361,8 @@ CREATE TABLE `unit_approvals` (
   `note` varchar(200) DEFAULT NULL,
   `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
   `sync_uuid` char(36) DEFAULT NULL,
+  `cap_snapshot` decimal(16,2) DEFAULT NULL COMMENT 'سقفُ السلّمِ لحظةَ فتحِ حلقةِ الاعتماد — التعديلُ اللاحقُ لا يمسُّها (قرار ⑥)',
+  `cap_currency_snapshot` varchar(8) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_stage_once_per_round` (`company_id`,`entry_id`,`round_no`,`stage`) COMMENT 'قرارٌ واحدٌ لكل مرحلةٍ في الجولة',
   KEY `ix_entry` (`company_id`,`entry_id`),

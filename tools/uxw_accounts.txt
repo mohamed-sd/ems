@@ -98,3 +98,4 @@ Settings/guard_classification.php	محمد
 admin/ops_manager_board.php	محمد
 main/all_assistants.php	مشرف الصلاحيات
 main/dashboard.php	تنفيذ
+Governance/authority_caps.php	تنفيذ

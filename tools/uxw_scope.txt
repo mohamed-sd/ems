@@ -489,3 +489,4 @@ main/project_users.php
 main/role_board.php
 main/soon.php
 main/user_profile.php
+Governance/authority_caps.php
