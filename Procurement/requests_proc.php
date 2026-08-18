@@ -388,8 +388,8 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
     </div>
     <?php endif; ?>
 
-    <form id="procForm" action="requests_proc.php" method="post" class="allforms<?php echo $edit ? ' allforms-visible' : ''; ?>
-        <?= csrf_field() ?>">
+    <form id="procForm" action="requests_proc.php" method="post" class="allforms<?php echo $edit ? ' allforms-visible' : ''; ?>">
+        <?= csrf_field() ?>
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?php echo $edit ? 'تعديل طلب شراء' : 'طلب شراء جديد'; ?></h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="id" value="<?php echo $edit ? intval($edit['id']) : ''; ?>">

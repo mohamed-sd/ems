@@ -304,8 +304,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             </div>
             <?php if ($can_approve && $held > 0 && $ret_ended && !$ret_released): ?>
                 <form method="post" action="" class="pen-inline"
-                      onsubmit="return confirm('ردُّ ضمان حسن التنفيذ كاملًا (<?php echo pen_n($held); ?>
-        <?php echo csrf_field(); ?>)؟\n\nيُنشأ مستخلصٌ ختاميٌّ مسودةٌ ببندٍ موجب، ولا يصير مالًا حتى تُجيزه يدٌ ثانية.\nولا خصمَ للغرامات المعلّقة — خُصمت في مستخلصاتها.')">
+                      onsubmit="return confirm('ردُّ ضمان حسن التنفيذ كاملًا (<?php echo pen_n($held); ?>)؟\n\nيُنشأ مستخلصٌ ختاميٌّ مسودةٌ ببندٍ موجب، ولا يصير مالًا حتى تُجيزه يدٌ ثانية.\nولا خصمَ للغرامات المعلّقة — خُصمت في مستخلصاتها.')">
+                    <?php echo csrf_field(); ?>
                     <input type="hidden" name="pen_action" value="release_retention">
                     <input type="hidden" name="contract" value="<?php echo $sel; ?>">
                     <input type="hidden" name="from" value="<?php echo pen_e($from); ?>">

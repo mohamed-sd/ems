@@ -307,8 +307,8 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
     </div></div>
     <?php endif; ?>
 
-    <form id="procForm" action="issue_proc.php" method="post" class="allforms<?php echo $edit ? ' allforms-visible' : ''; ?>
-        <?= csrf_field() ?>">
+    <form id="procForm" action="issue_proc.php" method="post" class="allforms<?php echo $edit ? ' allforms-visible' : ''; ?>">
+        <?= csrf_field() ?>
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?php echo $edit ? 'تعديل صرف' : 'صرف جديد'; ?></h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="id" value="<?php echo $edit ? intval($edit['id']) : ''; ?>">

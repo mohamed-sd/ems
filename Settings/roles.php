@@ -166,8 +166,8 @@ include __DIR__ . '/../includes/page_header.php';
     <?php endif; ?>
 
     <!-- فورم إضافة / تعديل -->
-    <form id="roleForm" action="" method="post" class="ems-form" style="display:<?= !empty($editData) ? 'block' : 'none'; ?>
-        <?= csrf_field() ?>">
+    <form id="roleForm" action="" method="post" class="ems-form" style="display:<?= !empty($editData) ? 'block' : 'none'; ?>">
+        <?= csrf_field() ?>
         <div class="card">
             <div class="card-header">
                 <h5><i class="fas fa-edit"></i> <?= !empty($editData) ? 'تعديل الصلاحية' : 'إضافة صلاحية جديدة'; ?></h5>

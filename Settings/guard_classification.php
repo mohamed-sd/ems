@@ -116,8 +116,8 @@ include '../insidebar.php';
             <td><small><?php echo htmlspecialchars(mb_substr((string) $g['reason'], 0, 60)); ?></small></td>
             <td>
                 <form method="post" style="display:flex;gap:6px;align-items:center"
-                      onsubmit="return confirm('تحذير الأثر: تغيير صنف «<?php echo htmlspecialchars($g['name_ar']); ?>
-        <?= csrf_field() ?>» يغيّر سلوك الحارس الحي (منع/استثناء/تنبيه). أتؤكد بقرار موثَّق؟');">
+                      onsubmit="return confirm('تحذير الأثر: تغيير صنف «<?php echo htmlspecialchars($g['name_ar']); ?>» يغيّر سلوك الحارس الحي (منع/استثناء/تنبيه). أتؤكد بقرار موثَّق؟');">
+                    <?= csrf_field() ?>
                     <input type="hidden" name="guard_code" value="<?php echo htmlspecialchars($g['guard_code']); ?>">
                     <select name="guard_class">
                         <?php foreach ($CLASS_AR as $ck => $cl): ?>
