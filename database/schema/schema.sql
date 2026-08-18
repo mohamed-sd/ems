@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-18 15:30:15
--- الجداول: 581 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-18 15:54:58
+-- الجداول: 582 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -13476,6 +13476,20 @@ CREATE TABLE `uat_evidence` (
   KEY `idx_uatev_run` (`run_id`,`criterion`),
   CONSTRAINT `fk_uatev_run` FOREIGN KEY (`run_id`) REFERENCES `uat_runs` (`run_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UAT-14: الشواهد الأربعة عشر — موثقة كلها';
+
+-- ── Table: uat_field_quarantine ──
+CREATE TABLE `uat_field_quarantine` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `table_name` varchar(64) NOT NULL,
+  `row_id` int(11) NOT NULL,
+  `column_name` varchar(64) NOT NULL,
+  `polluted_value` text NOT NULL COMMENT 'النصُّ كما كان — يُستعاد بأمرٍ واحد',
+  `moved_to_notes` tinyint(1) NOT NULL DEFAULT 0,
+  `quarantined_at` datetime NOT NULL,
+  `purge_after` date NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_tbl_row` (`table_name`,`row_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='حجرُ قيمِ حقولٍ ملوَّثةٍ بنصِّ ملاحظةٍ/UAT — ثلاثون يومًا ثم حذف';
 
 -- ── Table: uat_runs ──
 CREATE TABLE `uat_runs` (

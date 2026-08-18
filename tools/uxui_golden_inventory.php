@@ -46,21 +46,33 @@ function ugi_login($user) {
     ugi_http("$BASE/login.php", array('username' => $user, 'password' => '12345678', 'csrf_token' => $csrf));
 }
 
-/** عزلُ جسمِ الشاشة: يسقط السايدبارُ والقشرةُ العلوية — فجردُ الشاشةِ لشاشتِها */
+/** عزلُ جسمِ الشاشة: يسقط السايدبارُ والقشرةُ العلوية — فجردُ الشاشةِ لشاشتِها
+ *  ◆ عيبُ قياسٍ وقع فعلًا وأُصلح (2026-08-18): كان يُسقط `ul.nav-group-items`
+ *    ولا يُسقط غلافَها `li.nav-group` — ورأسُ كلِّ مجموعةٍ **زرٌّ** (`button
+ *    .nav-group-head`). فلمّا غيّر مولّدُ السايدبارِ عددَ المجموعاتِ تغيّر عددُ
+ *    «أزرارِ الشاشة» في شاشاتٍ لم تُمَسّ، فأعلن الجردُ فقدًا لا وجودَ له.
+ *    القاعدة: ما لا يخصُّ الشاشةَ لا يدخل جردَها. */
 function ugi_body($html) {
     $h = preg_replace('~<nav\b.*?</nav>~su', '', $html);
     $h = preg_replace('~<aside\b.*?</aside>~su', '', $h);
     $h = preg_replace('~<div[^>]*(?:id|class)="[^"]*(?:sidebar|insidebar|ems-topbar)[^"]*".*?</div>\s*(?=<)~su', '', $h);
+    /* غلافُ المجموعةِ كاملًا — رأسُها زرٌّ وعناصرُها روابط */
+    $h = preg_replace('~<li[^>]*class="[^"]*nav-group[^"]*".*?</li>~su', '', $h);
     $h = preg_replace('~<ul[^>]*class="[^"]*nav-group-items[^"]*".*?</ul>~su', '', $h);
+    $h = preg_replace('~<button[^>]*class="[^"]*nav-group-head[^"]*".*?</button>~su', '', $h);
     $h = preg_replace('~<script\b.*?</script>~su', '', $h);
     $h = preg_replace('~<style\b.*?</style>~su', '', $h);
     return $h;
 }
 function ugi_counts($html) {
     $b = ugi_body($html);
+    /* ◆ مفرداتُ المكتبةِ الجديدةِ تُعَدُّ ضوابطَ كما القديمة: `ux-chip` رقاقةُ
+       منظرٍ **رابطٌ تفاعليٌّ** لا زخرفة. وبدونِها يقرأ الجردُ تغييرَ الشكلِ
+       (وهو من المسموحاتِ الأربعة) فقدًا — والعنصرُ باقٍ يُثبته ثباتُ عدِّ
+       الروابطِ قبلَ التغييرِ وبعدَه. */
     $buttons  = preg_match_all('~<button\b~iu', $b)
               + preg_match_all('~<input[^>]+type=["\'](?:submit|button)~iu', $b)
-              + preg_match_all('~<a[^>]+class="[^"]*btn[^"]*"~iu', $b);
+              + preg_match_all('~<a[^>]+class="[^"]*(?:btn|ux-chip)[^"]*"~iu', $b);
     $th       = preg_match_all('~<th\b~iu', $b);
     $selects  = preg_match_all('~<select\b~iu', $b);
     $inputs   = preg_match_all('~<input\b(?![^>]*type=["\'](?:hidden|submit|button))~iu', $b)

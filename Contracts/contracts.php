@@ -725,8 +725,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           </select>
         </div>
         <!-- كرّر .filter-field بقدر ما تريد من الحقول -->
+        <?php /* ف١٢-٢ · بوابة G17: زرٌّ رئيسيٌّ **واحدٌ** في الشاشة — وهو «حفظُ
+                 البيانات» فعلُ الشاشةِ الأهمّ. و«تطبيقُ المرشِّح» فعلٌ مساندٌ
+                 ظاهرٌ ⇒ ثانويّ. وتعدُّدُ الرئيسيِّ يُلغي معناه. */ ?>
         <div class="filter-actions">
-          <button type="submit" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button>
+          <button type="submit" class="btn-secondary"><i class="fa fa-search"></i> تطبيق</button>
           <button type="button" class="btn-secondary" title="إعادة تعيين"><a href="contracts.php" class="ct-1"><i class="fa fa-rotate-right"></i></a></button>
         </div>
       </div>

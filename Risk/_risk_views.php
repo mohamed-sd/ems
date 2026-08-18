@@ -126,19 +126,25 @@ function risk_view_bar($screen, $view, array $carry = array())
         $p['view'] = $v;
         return '?' . http_build_query($p);
     };
-    echo '<div class="ems-toolbar" role="group" aria-label="منتقي المنظر" '
+    /* ف٩-٢ · بوابة G20: منتقي المنظرِ **أداةٌ في الشريطِ الموحَّد** (الأداة ③)
+       لا شريطُ أدواتٍ ثانٍ في الصفحة — فيرث تخطيطَه ولا يحمل صنفَه.
+       ف١٢-٢ · بوابة G17: والمنظرُ النشطُ **حالةُ عنصرٍ** لا إجراءٌ رئيسيّ،
+       فيُصيَّر رقاقةً بلكنةِ العلامة (وهو موضعُها المنصوص: «للإجراءِ الرئيسيِّ
+       **والعنصرِ النشط**») — وكان صنفُ الزرِّ الرئيسيِّ يجعله رئيسيًّا ثانيًا
+       فيُلغي معنى الواحد. ويُصلَح هنا مرةً فيسري على شاشاتِ المخاطرِ الأربع. */
+    echo '<div class="ux-viewpicker" role="group" aria-label="منتقي المنظر" '
        . 'style="gap:6px;flex-wrap:wrap;align-items:center">';
     echo '<span style="font-size:.78rem;opacity:.75">المنظر:</span>';
     foreach ($defs as $k => $d) {
         if ($k === 'all') { continue; }
-        $cls = ($view === $k) ? 'ems-btn-primary' : 'ems-btn-secondary';
+        $cls = ($view === $k) ? 'ux-chip' : 'ems-btn-secondary';
         printf('<a class="%s" style="font-size:.78rem;padding:4px 10px" href="%s" %s>%s</a>',
             $cls, htmlspecialchars($qs($k)),
             $view === $k ? 'aria-current="true"' : '',
             htmlspecialchars($d['label']));
     }
     if (isset($defs['all'])) {
-        $cls = ($view === 'all') ? 'ems-btn-primary' : 'ems-btn-secondary';
+        $cls = ($view === 'all') ? 'ux-chip' : 'ems-btn-secondary';
         printf('<a class="%s" style="font-size:.78rem;padding:4px 10px" href="%s" '
              . 'title="نموذج البيانات لا يُختزل — والعلاج مناظر لا حذف"><i class="fa fa-table-columns"></i> %s</a>',
             $cls, htmlspecialchars($qs('all')), htmlspecialchars($defs['all']['label']));

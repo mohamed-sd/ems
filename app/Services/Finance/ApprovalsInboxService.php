@@ -13,6 +13,40 @@ namespace App\Services\Finance;
 class ApprovalsInboxService
 {
     /**
+     * الاسمُ المعياريُّ لشاشةِ القرار — من سجلِّ التنقلِ لا مسارًا خامًّا.
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ بوابة G14 (ف١٣-٣): «ظهورُ مسارِ ملفٍّ أو اسمِ جدولٍ في النصِّ المصيَّر
+     *   يُرسِّب البناء» — وكان الصندوقُ يعرض «القرارُ في FinRequests/…php».
+     *   فالمسارُ معرِّفٌ للمبرمجِ واسمُ الشاشةِ لغةُ المستخدم.
+     * ◆ ويسقط للمسارِ إن لم يجد صفًّا (لا يكسر عرضًا لأجلِ تسمية).
+     */
+    private static function screenName($conn, $route)
+    {
+        static $cache = null;
+        if ($cache === null) {
+            $cache = array();
+            /* ① السجلُّ المعياريُّ أولًا — اسمُ الشاشةِ الرسميّ */
+            $q = @mysqli_query($conn, "SELECT route, canonical_ar FROM nav_canonical");
+            while ($q && ($x = mysqli_fetch_assoc($q))) {
+                if (trim((string) $x['canonical_ar']) !== '') { $cache[strtolower($x['route'])] = $x['canonical_ar']; }
+            }
+            /* ② ثم اسمُ الوحدةِ المسجَّل — لشاشةٍ خارجَ السايدبارِ فلا صفَّ لها
+                  في السجل (كلوحةِ إدارةِ التشغيل: تُفتح من لوحةٍ لا من قائمة). */
+            $q = @mysqli_query($conn, "SELECT code, name FROM modules");
+            while ($q && ($x = mysqli_fetch_assoc($q))) {
+                $k = strtolower((string) $x['code']);
+                if (!isset($cache[$k]) && trim((string) $x['name']) !== '') { $cache[$k] = $x['name']; }
+            }
+        }
+        $k = strtolower(trim((string) $route));
+        if (isset($cache[$k])) { return $cache[$k]; }
+        /* ③ ولا يُعرض مسارٌ خامٌّ للمستخدمِ أبدًا (بوابة G14): اسمُ الملفِّ
+              مُنظَّفًا آخرَ ما يُعرض — أفضلُ من «Dir/file.php» وأصدقُ من اختراعِ اسم. */
+        $base = preg_replace('~\.php$~', '', basename((string) $route));
+        return str_replace('_', ' ', $base);
+    }
+
+    /**
      * كلُّ ما ينتظر قرارًا — من مصادره الأربعة الحية.
      * @return array{ok:bool,boxes:array,total:int}
      */
@@ -50,12 +84,12 @@ class ApprovalsInboxService
                             ORDER BY created_at LIMIT 50");
         while ($r && ($x = $r->fetch_assoc())) {
             $rows[] = array('label' => $x['request_no'] . ' — ' . $x['request_type']
-                    . ' (' . $x['amount'] . ' ' . $x['currency'] . ') · ' . $x['state'],
+                    . ' (' . $x['amount'] . ' ' . $x['currency'] . ')', 'state' => $x['state'],
                 'link' => '../FinRequests/finance_gateway.php?id=' . (int) $x['id'],
                 'since' => (string) $x['created_at']);
         }
         $boxes[] = array('key' => 'requests', 'title' => 'الطلبات المالية',
-            'owner' => 'FinRequests/finance_gateway.php', 'rows' => $rows, 'count' => count($rows));
+            'owner' => self::screenName($conn, 'FinRequests/finance_gateway.php'), 'rows' => $rows, 'count' => count($rows));
 
         // ── ② تسوياتُ الموردين — مسودّاتٌ ومطلوبُ دفعها ─────────────────────
         $rows = array();
@@ -66,12 +100,12 @@ class ApprovalsInboxService
                             ORDER BY created_at LIMIT 50");
         while ($r && ($x = $r->fetch_assoc())) {
             $rows[] = array('label' => ($x['settlement_no'] ?: ('تسوية #' . $x['id']))
-                    . ' — ' . $x['party_name'] . ' · ' . $x['state'],
+                    . ' — ' . $x['party_name'], 'state' => $x['state'],
                 'link' => '../Suppliers/settlements.php?id=' . (int) $x['id'],
                 'since' => (string) $x['created_at']);
         }
         $boxes[] = array('key' => 'settlements', 'title' => 'تسويات الموردين',
-            'owner' => 'Suppliers/settlements.php', 'rows' => $rows, 'count' => count($rows));
+            'owner' => self::screenName($conn, 'Suppliers/settlements.php'), 'rows' => $rows, 'count' => count($rows));
 
         // ── ③ القيودُ اليدوية — ما لم يُرحَّل بعد ───────────────────────────
         $rows = array();
@@ -82,12 +116,12 @@ class ApprovalsInboxService
                             ORDER BY posting_date LIMIT 50");
         while ($r && ($x = $r->fetch_assoc())) {
             $rows[] = array('label' => ($x['entry_no'] ?: ('قيد #' . $x['id'])) . ' — '
-                    . mb_substr((string) $x['memo'], 0, 60) . ' · ' . $x['state'],
+                    . mb_substr((string) $x['memo'], 0, 60), 'state' => $x['state'],
                 'link' => '../Finance/journal_form_fin.php?id=' . (int) $x['id'],
                 'since' => (string) $x['posting_date']);
         }
         $boxes[] = array('key' => 'journals', 'title' => 'القيود اليدوية غير المرحّلة',
-            'owner' => 'Finance/journal_form_fin.php', 'rows' => $rows, 'count' => count($rows));
+            'owner' => self::screenName($conn, 'Finance/journal_form_fin.php'), 'rows' => $rows, 'count' => count($rows));
 
         // ── ④ إقفالُ الفترات — المقفلةُ ناعمًا تنتظر الإقفالَ النهائي ────────
         $rows = array();
@@ -101,7 +135,7 @@ class ApprovalsInboxService
                 'since' => (string) $x['period_code']);
         }
         $boxes[] = array('key' => 'periods', 'title' => 'إقفال الفترات',
-            'owner' => 'Finance/periods_fin.php', 'rows' => $rows, 'count' => count($rows));
+            'owner' => self::screenName($conn, 'Finance/periods_fin.php'), 'rows' => $rows, 'count' => count($rows));
 
         // ── ⑤ أذونات المواقع — كل إذن بندٌ واحدٌ يعرض لكل موافقٍ في دوره ─────
         //    (update0004 · ORG-01 §5 «قاعدة التنفيذ» · ORG-14)
@@ -124,7 +158,7 @@ class ApprovalsInboxService
                 'since' => (string) $x['created_at']);
         }
         $boxes[] = array('key' => 'permits', 'title' => 'أذونات المواقع',
-            'owner' => 'admin/org_permits.php', 'rows' => $rows, 'count' => count($rows));
+            'owner' => self::screenName($conn, 'admin/org_permits.php'), 'rows' => $rows, 'count' => count($rows));
 
         // ── ⑥ طلباتُ التبديل (NAV-01 v6 §6.3 · update0007 S-02) — بموافقتين ──
         $rows = array();
@@ -139,7 +173,7 @@ class ApprovalsInboxService
                 'since' => (string) $x['created_at']);
         }
         $boxes[] = array('key' => 'swaps', 'title' => 'طلبات التبديل — بموافقتين',
-            'owner' => 'Operations/sites_board.php', 'rows' => $rows, 'count' => count($rows));
+            'owner' => self::screenName($conn, 'Operations/sites_board.php'), 'rows' => $rows, 'count' => count($rows));
 
         $total = 0;
         foreach ($boxes as $b) { $total += (int) $b['count']; }

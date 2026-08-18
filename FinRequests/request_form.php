@@ -224,7 +224,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <input type="hidden" name="action" value="<?php echo $req ? 'update_draft' : 'create'; ?>">
         <?php if ($req): ?><input type="hidden" name="id" value="<?php echo intval($req['id']); ?>"><?php endif; ?>
         <div class="card">
-            <div class="card-header"><h5><i class="fa fa-scale-balanced"></i> بوابة التبرير — قبل الإنشاء (3.0)</h5></div>
+            <?php /* ف١١-٢: عنوانُ القسمِ اسمٌ مؤسسيٌّ فقط — بلا رقمِ إصدارٍ ولا
+                     مرجعِ فقرةٍ ولا رمزِ وثيقة. والشرحُ في التلميحِ لا في الاسم. */ ?>
+            <div class="card-header"><h5 title="تُراجَع دواعي الطلبِ ومبرراتُه قبل إنشائِه"><i class="fa fa-scale-balanced"></i> مبررات الطلب</h5></div>
             <div class="card-body"><div class="form-grid">
                 <div>
                     <label for="emsf_173_c599f">الإدارة صاحبة الاحتياج *</label>
@@ -268,7 +270,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
                 <?php if (!$req && $company_users): ?>
                 <div>
-                    <label for="emsf_179_5d929">الإدخال نيابةً عن (اختياري — يُوثَّق الطرفان §13.1)</label>
+                    <label for="emsf_179_5d929" title="يُسجَّل صاحبُ الطلبِ والمُدخِلُ معًا في سجلِّ الطلب">الإدخال نيابةً عن (اختياري)</label>
                     <select name="requester_id" id="emsf_179_5d929">
                         <option value="">— أنا صاحب الطلب —</option>
                         <?php foreach ($company_users as $cu): if (intval($cu['id']) === $user_id) { continue; } ?>

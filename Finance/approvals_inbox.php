@@ -12,6 +12,7 @@ session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
 require_once __DIR__ . '/../app/Services/Finance/ApprovalsInboxService.php';
+require_once __DIR__ . '/../includes/status_display.php'; // ف٦-٢: دالةُ عرضِ الحالةِ الواحدة
 require_once __DIR__ . '/../includes/screen_contract.php';
 
 use App\Services\Finance\ApprovalsInboxService as AIS;
@@ -126,9 +127,16 @@ include '../insidebar.php';
             <tbody>
             <?php foreach ($b['rows'] as $r): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($r['label']); ?></td>
+                    <td><?php echo htmlspecialchars($r['label']); ?>
+                        <?php /* ف٦-٢ · بوابة G15: الحالةُ من القاموسِ الموحَّدِ بدالةِ العرضِ
+                                 الواحدة — وكانت قيمتُها الداخليةُ تُلصق نصًّا في التسمية
+                                 (draft · under_review · pending_approval · payment_requested). */ ?>
+                        <?php if (!empty($r['state'])) { echo ' ' . ems_status_badge($r['state']); } ?></td>
                     <td><small><?php echo htmlspecialchars($r['since']); ?></small></td>
-                    <td><a class="btn-primary" href="<?php echo htmlspecialchars($r['link']); ?>">
+                    <?php /* ف١٢-٢ · بوابة G17: زرٌّ رئيسيٌّ **واحدٌ** في الشاشة — وإجراءُ
+                             الصفِّ ثانويٌّ لا رئيسيّ. كان كلُّ صفٍّ يحمل btn-primary
+                             فبلغت الأزرارُ الرئيسيةُ ثلاثةً وستين، فأُلغي معنى الرئيسيِّ. */ ?>
+                    <td><a class="ux-btn ux-btn--secondary" href="<?php echo htmlspecialchars($r['link']); ?>">
                         اذهب إلى موضع الفعل ▸</a></td>
                 </tr>
             <?php endforeach; ?>

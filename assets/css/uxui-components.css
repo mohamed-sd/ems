@@ -179,3 +179,14 @@
 .ux-grid-density-standard td, .ux-grid-density-standard th { height: var(--ux-row-standard); padding: var(--ux-cell-pad-y) var(--ux-cell-pad-x); font-size: var(--ux-text-table); }
 .ux-grid-density-compact  td, .ux-grid-density-compact  th { height: var(--ux-row-compact); }
 .ux-grid-density-comfort  td, .ux-grid-density-comfort  th { height: var(--ux-row-comfort); }
+
+/* ══ ⑪ منتقي المنظر (ف٩-٢ أداة ③) — جزءٌ من الشريطِ الموحَّدِ لا شريطٌ ثانٍ ══
+   يرث تخطيطَ الشريطِ ولا يحمل صنفَه، فلا يُعدُّ شريطَ أدواتٍ مستقلًّا. */
+.ux-viewpicker {
+  display: flex; align-items: center; gap: var(--ux-sp-1);
+  flex-wrap: wrap; padding: var(--ux-sp-1) 0;
+  font-family: var(--ux-font);
+}
+/* الرقاقةُ رابطًا: المنظرُ النشطُ حالةٌ لا زرٌّ رئيسيّ */
+a.ux-chip { text-decoration: none; }
+a.ux-chip:hover { background: var(--ux-accent); color: var(--white, #fff); }
