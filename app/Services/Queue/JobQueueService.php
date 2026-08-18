@@ -36,6 +36,99 @@ class JobQueueService
             'reason' => 'قيد المعالجة — ستصلك إشارة الاكتمال (الصفحة لا تنتظر)');
     }
 
+    /**
+     * F-15 · «◆ التقاطُ المهمةِ بقفلٍ ذرّيّ» (ENG-01 · TSP-0293)
+     * ───────────────────────────────────────────────────────────────────────
+     * الشرطُ في WHERE هو القفل — وROW_COUNT()=1 يعني الالتقاطَ ونجاحَه.
+     * فعاملانِ على مهمةٍ واحدةٍ يُنتجان أثرًا مزدوجًا، والشرطُ يمنع ذلك بنيويًّا
+     * لا بترتيبِ النداءات. ويُخزَّن worker_id ومهلةُ تحريرِ القفلِ معًا لأن
+     * chk_lock يرفض 'claimed' بلا أحدهما.
+     *
+     * @param  string   $workerId معرّفُ العاملِ — يفصل عاملًا عن عامل في السجل
+     * @param  int      $lockSeconds مهلةُ تحريرِ القفلِ إن مات العامل
+     * @param  int|null $jobId       التقاطُ مهمةٍ بعينِها (للاختبار)؛ NULL = أوّلُ مستحق
+     * @return array|null صفُّ المهمةِ عند الالتقاط، وnull إن سبقه عاملٌ آخر
+     */
+    public static function claimAtomic(\mysqli $conn, $workerId, $lockSeconds = 600, $jobId = null)
+    {
+        $lockSeconds = max(30, (int) $lockSeconds);
+
+        if ($jobId === null) {
+            $row = $conn->query(
+                "SELECT `job_id` FROM `ems_job_queue`
+                  WHERE `state` IN ('queued','failed')
+                    AND `next_attempt_at` <= NOW(3)
+                  ORDER BY `job_id` LIMIT 1"
+            );
+            $row = $row ? $row->fetch_assoc() : null;
+            if (!$row) { return null; }
+            $jobId = (int) $row['job_id'];
+        }
+        $jobId = (int) $jobId;
+
+        // ◆ الالتقاطُ الذرّيُّ نفسُه — جملةٌ واحدةٌ بشرطِها
+        $st = $conn->prepare(
+            "UPDATE `ems_job_queue`
+                SET `state`='claimed', `worker_id`=?, `claimed_at`=NOW(3),
+                    `lock_expires_at`=NOW(3) + INTERVAL ? SECOND,
+                    `attempts`=`attempts`+1, `started_at`=NOW()
+              WHERE `job_id`=? AND `state` IN ('queued','failed') AND `next_attempt_at` <= NOW(3)"
+        );
+        $w = (string) $workerId;
+        $st->bind_param('sii', $w, $lockSeconds, $jobId);
+        $st->execute();
+        $got = $conn->affected_rows;   // ROW_COUNT()=1 يعني الالتقاط
+        $st->close();
+        if ($got !== 1) { return null; }
+
+        $j = $conn->query("SELECT * FROM `ems_job_queue` WHERE `job_id`={$jobId}");
+        return $j ? $j->fetch_assoc() : null;
+    }
+
+    /**
+     * F-16 · تحريرُ المهامِّ المعلَّقة (TSP-0294 · CK-14)
+     * «◆ فمهمةٌ مقفولةٌ إلى الأبدِ تُوقف سلسلةً كاملةً بصمت»
+     *
+     * ويحرّر حالتين لا واحدة:
+     *  ① قفلٌ انقضت مهلتُه — نصُّ F-16 حرفًا.
+     *  ② مهمةٌ عالقةٌ بلا قفلٍ أصلًا: صفوفُ ما قبلَ المحرّك (ومنها المبذورُ
+     *    الموروث) تركت 'processing' بلا lock_expires_at، فلا يبلغها ①
+     *    وتبقى إلى الأبد. وأخطرُ ما فيها أنها تحجب جدولةَ نوعِها كلِّه:
+     *    التجسيدُ يرى نوعًا «حيًّا» فلا يُدرج، ولا شيءَ يبدو معطَّلًا.
+     *    فتُحرَّر بعدَ تجاوزِ أقصى زمنِ تشغيلٍ من جدولتِها (أو 600ث افتراضًا).
+     *
+     * @return int عددُ ما حُرّر
+     */
+    public static function releaseExpiredLocks(\mysqli $conn)
+    {
+        // ① قفلٌ انقضت مهلتُه
+        $conn->query(
+            "UPDATE `ems_job_queue`
+                SET `state`='queued', `worker_id`=NULL, `lock_expires_at`=NULL, `claimed_at`=NULL,
+                    `fail_code`='LOCK_EXPIRED',
+                    `last_error`='قفلٌ انقضت مهلتُه — حُرّر آليًّا (F-16)'
+              WHERE `state`='claimed' AND `lock_expires_at` < NOW(3)"
+        );
+        $n = max(0, $conn->affected_rows);
+
+        // ② عالقٌ بلا قفلٍ — يُوسَم فاشلًا بسببِه لا يُعاد صامتًا، فمصدرُ عُلوقِه
+        //    مجهولٌ ولا يجوز أن يُنفَّذ ثانيةً كأن شيئًا لم يكن.
+        $conn->query(
+            "UPDATE `ems_job_queue` q
+        LEFT JOIN `ems_job_schedule` s ON s.`job_type` = q.`job_type`
+                SET q.`state`='failed', q.`worker_id`=NULL, q.`lock_expires_at`=NULL,
+                    q.`next_attempt_at`=NOW(3),
+                    q.`fail_code`='STUCK_NO_LOCK',
+                    q.`last_error`=CONCAT('عالقةٌ في ', q.`state`, ' بلا قفلٍ فوقَ ',
+                                          COALESCE(s.`max_runtime_seconds`, 600), 'ث — حُرّرت آليًّا (F-16②)')
+              WHERE q.`state` IN ('claimed','processing','running')
+                AND q.`lock_expires_at` IS NULL
+                AND COALESCE(q.`started_at`, q.`created_at`)
+                    < NOW() - INTERVAL COALESCE(s.`max_runtime_seconds`, 600) SECOND"
+        );
+        return $n + max(0, $conn->affected_rows);
+    }
+
     /** خطف مهمة مستحقة — قفل تنافسي بلا سباق. */
     public static function claim(\mysqli $conn)
     {

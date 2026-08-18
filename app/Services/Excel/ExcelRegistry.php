@@ -717,39 +717,20 @@ class ExcelRegistry
                 return $data;
             },
             // نطاق الرؤية — نفسُ قاعدة الشاشة: مدير البلاغات والمدير الأعلى
-            // يصدّران الكل؛ وغيرهما ما وُجِّه لشجرة دوره أو ما أبلغ عنه بنفسه.
+            // يصدّران الكل؛ وغيرهما ما وُجِّه لدورِه أو لمرؤوسيه أو ما أبلغ عنه.
             'exportRowScope'   => static function (array $ctx): array {
                 if ($ctx['isSuperAdmin'] || (string) $ctx['role'] === '24') {
                     return ['sql' => '', 'params' => [], 'types' => ''];
                 }
                 $roleId = (int) $ctx['role'];
-                $conn   = $ctx['conn'];
 
-                // شجرة الأدوار الحيّة: {دوري} ∪ أجدادي ∪ ذرّيّتي
-                $parent = [];
-                if ($res = @mysqli_query($conn, 'SELECT id, parent_role_id FROM roles')) {
-                    while ($r = mysqli_fetch_assoc($res)) {
-                        $parent[(int) $r['id']] = ($r['parent_role_id'] === null) ? null : (int) $r['parent_role_id'];
-                    }
-                    mysqli_free_result($res);
-                }
-                $visible = [$roleId => true];
-                $cur = $roleId; $guard = 0;
-                while (isset($parent[$cur]) && $parent[$cur] !== null && $guard < 10) {
-                    $cur = $parent[$cur]; $visible[$cur] = true; $guard++;
-                }
-                $frontier = [$roleId]; $guard = 0;
-                while ($frontier && $guard < 10) {
-                    $next = [];
-                    foreach ($parent as $id => $p) {
-                        if ($p !== null && in_array($p, $frontier, true) && !isset($visible[$id])) {
-                            $visible[$id] = true; $next[] = $id;
-                        }
-                    }
-                    $frontier = $next; $guard++;
-                }
-
-                $ids = array_keys($visible);
+                /* ◆ النطاقُ **يُقرأ من مالكِه ولا يُعاد بناؤه هنا**: كانت هذه
+                     الدالةُ تمشي شجرةَ الأدوارِ بنسخةٍ ثانيةٍ من المنطق، فحين
+                     أُغلق الصعودُ في الشاشة (2026-08-17) كان التصديرُ سيبقى
+                     صاعدًا — أي بابٌ خلفيٌّ يُخرج ما تحجبه الشاشة. تعريفٌ واحدٌ
+                     في `tkt_visible_owner_role_ids` يقرأه الاثنان. */
+                require_once dirname(__DIR__, 3) . '/Tickets/tkt_helpers.php';
+                $ids = tkt_visible_owner_role_ids($roleId);
                 $ph = implode(',', array_fill(0, count($ids), '?'));
                 $params = $ids;
                 $types  = str_repeat('i', count($ids));

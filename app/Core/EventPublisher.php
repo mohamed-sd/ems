@@ -53,6 +53,8 @@ require_once __DIR__ . '/../../includes/catch_log.php';
 
 require_once __DIR__ . '/ServerId.php';
 require_once __DIR__ . '/EventValidationException.php';
+// ENG-01 ④: مروحةُ الصادرِ تُنادى من writeRoot — ولا مُحمِّلَ تلقائيًّا مضمونًا هنا.
+require_once __DIR__ . '/../Services/Bus/EventOutboxFanout.php';
 
 class EventPublisher
 {
@@ -587,28 +589,35 @@ class EventPublisher
      */
     private static function writeRoot(\mysqli $conn, array $r)
     {
+        // ENG-01 ④ · «◆ ولا يُنشر حدثٌ لا اشتراكَ له» — الحارسُ قبلَ الكتابة لا بعدَها،
+        // فيقول السببَ بالعربيةِ قبلَ أن يقولَه chk_consumers برقمِ خطإٍ (CK-11).
+        // والعددُ يدخل جملةَ الإدراجِ نفسَها لأن القيدَ يُفحص لحظتَها لا بعدَها.
+        $declaredConsumers = \App\Services\Bus\EventOutboxFanout::assertHasConsumer($conn, $r['event_key']);
+
         $eventNo = ServerId::nextNo($conn, 'ems_business_events:BE:' . $r['company_id'], 'BE');
         $uuid = ServerId::ulid();
         $sql = 'INSERT INTO `ems_business_events`
             (company_id, event_no, event_uuid, event_key, category, source_module, source_ref,
              entity_type, entity_id, quantity, unit, amount, currency,
              project_id, contract_id, equipment_id, supplier_entity_id, customer_entity_id, operator_employee_id,
-             event_status, reverses_event_id, occurred_at, payload, correlation_id, idempotency_key, schema_version, created_by)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+             event_status, reverses_event_id, occurred_at, payload, correlation_id, idempotency_key, schema_version, created_by,
+             consumers_declared)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         $stmt = $conn->prepare($sql);
         if (!$stmt) {
             throw new \RuntimeException('EventPublisher(root): prepare failed: ' . $conn->error);
         }
         $schemaVer = 1;
-        // الأنواع للـ27 وسيطًا: i + s×7 + i + s×2 + d + s + i×6 + s + i + s×4 + i×2
+        // الأنواع للـ28 وسيطًا: i + s×7 + i + s×2 + d + s + i×6 + s + i + s×4 + i×3
         $stmt->bind_param(
-            'isssssssissdsiiiiiisissssii',
+            'isssssssissdsiiiiiisissssiii',
             $r['company_id'], $eventNo, $uuid, $r['event_key'], $r['category'], $r['source_module'], $r['source_ref'],
             $r['entity_type'], $r['entity_id'], $r['quantity'], $r['unit'], $r['amount'], $r['currency'],
             $r['refs']['project_id'], $r['refs']['contract_id'], $r['refs']['equipment_id'],
             $r['refs']['supplier_entity_id'], $r['refs']['customer_entity_id'], $r['refs']['operator_employee_id'],
             $r['event_status'], $r['reverses_event_id'], $r['occurred_at'], $r['payload'],
-            $r['correlation_id'], $r['idempotency_key'], $schemaVer, $r['created_by']
+            $r['correlation_id'], $r['idempotency_key'], $schemaVer, $r['created_by'],
+            $declaredConsumers
         );
         if (!$stmt->execute()) {
             $errno = $stmt->errno;
@@ -627,6 +636,13 @@ class EventPublisher
             throw new \RuntimeException('EventPublisher(root): execute failed: ' . $err);
         }
         $stmt->close();
-        return intval($conn->insert_id);
+        $rootId = intval($conn->insert_id);
+
+        // ENG-01 ④ · مروحةُ الصادرِ داخلَ معاملةِ الواقعةِ نفسِها: تُثبت
+        // consumers_declared وتفتح صفَّ تسليمٍ لكلِّ مشتركٍ بمفتاحِ عطالةٍ فريد.
+        // فإن انهارت الواقعةُ انهار معها الصادرُ والتسليم — ولا حدثَ لواقعةٍ لم تقع.
+        \App\Services\Bus\EventOutboxFanout::open($conn, $rootId, $r['event_key'], $r['company_id']);
+
+        return $rootId;
     }
 }

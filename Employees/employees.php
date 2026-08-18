@@ -632,7 +632,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <option value="">-- اختر السجل --</option>
                                     <option value="نظيف (لا توجد حوادث)">✅ نظيف (لا توجد حوادث)</option>
                                     <option value="حادث واحد (طفيف)">⚠️ حادث واحد (طفيف)</option>
-                                    <option value="حادثان (متوسط)">ðŸš¨ حادثان (متوسط)</option>
+                                    <option value=" ()">🚨  ()</option>
                                     <option value="ثلاثة حوادث فأكثر (خطير)">☠️ ثلاثة حوادث فأكثر (خطير)</option>
                                     <option value="غير محدد">غير محدد</option>
                                 </select>

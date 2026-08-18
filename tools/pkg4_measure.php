@@ -251,14 +251,15 @@ $CK['CK-18'] = tbl('fa_asset_hours') ? cnt("SELECT COUNT(*) FROM fa_asset_hours 
 
 $ckP = 0; $ckF = 0; $ckN = 0; $det = [];
 foreach ($CK as $k=>$v) { if ($v===null) { $ckN++; $det[]="$k=متعذِّر"; } elseif ((int)$v===0) { $ckP++; } else { $ckF++; $det[]="$k=$v ✘"; } }
-rec($D,'TS-CK','الفحوصُ الثمانيةَ عشرَ CK-01..CK-18',18,"$ckP ناجح · $ckF راسب · $ckN متعذِّر",($ckP===18)?'DONE':'PARTIAL',implode(' · ',$det));
+rec($D,'TS-CK','الفحوصُ الثمانيةَ عشرَ CK-01..CK-18',18,$ckP,($ckP===18)?'DONE':'PARTIAL',
+    "$ckP ناجحًا · $ckF راسبًا · $ckN متعذِّرًا لاختلافِ أسماءِ جداولِ الحاويات · ".implode(' · ',$det));
 
 $act8 = cnt("SELECT COUNT(*) FROM nav09_action_map WHERE canonical_code IN ('shift_entry_create','shift_entry_approve','container_define','slot_assign','handover_record','settlement_adjust','depr_run','asset_hours_link')");
 rec($D,'TS-ACT8','الأفعالُ الثمانيةُ مسجَّلةٌ في القاموسِ قبلَ شاشاتِها',8,$act8,($act8>=8)?'DONE':($act8?'PARTIAL':'TODO'),'');
 
 $navT = cnt("SELECT COUNT(*) FROM nav_items WHERE active=1");
 $navOrd = cnt("SELECT COUNT(*) FROM nav_items WHERE active=1 AND sort_order IS NOT NULL AND sort_order>0");
-rec($D,'TS-NAVORD','السايدبارُ مرتَّبٌ بالدورةِ المستنديةِ لا بالأبجدية',$navT,$navOrd,($navT && $navOrd>=$navT*0.95)?'DONE':'PARTIAL',sprintf('%.1f%%',$navT?$navOrd*100/$navT:0));
+rec($D,'TS-NAVORD','السايدبارُ مرتَّبٌ بالدورةِ المستنديةِ لا بالأبجدية',$navT,$navOrd,($navT && $navOrd>=$navT)?'DONE':'PARTIAL',sprintf('%.1f%%',$navT?$navOrd*100/$navT:0));
 // سطرُ شرحِ المرحلة — بيتُه `link_groups.stage_desc` (NM-05) لا nav_items
 $lgTot  = (tbl('link_groups')) ? cnt("SELECT COUNT(*) FROM link_groups WHERE is_active=1") : null;
 $lgDesc = (tbl('link_groups') && col('link_groups','stage_desc')) ? cnt("SELECT COUNT(*) FROM link_groups WHERE is_active=1 AND COALESCE(stage_desc,'')<>''") : 0;
@@ -367,13 +368,18 @@ foreach ($golden as $n=>$c) {
     $skel = "$ROOT/.ssdiff/" . str_replace('/','__', preg_replace('/\.php$/i','',$f)) . '.skel';
     if (is_file($skel)) { $gApproved++; } else { $gMissSkel[] = $n; }
 }
-rec($D,'UX-G10A','الموجةُ ٤ — العشرُ معتمَدةٌ وظيفيًّا وبصريًّا',10,$gApproved,
-    ($gApproved>=10)?'DONE':($gApproved?'PARTIAL':'TODO'),
-    $gApproved ? "خطُّ أساسٍ بنيويٌّ لـ$gApproved منها · بلا خطِّ أساسٍ: ".(implode(' · ',$gMissSkel) ?: '—')." — ولا سجلَّ اعتمادٍ وظيفيٍّ مستقلّ" : 'لا سجلَّ اعتمادٍ — والتعميمُ ممنوعٌ قبلَه');
+$funcSignoff = fx('.ssdiff/GOLDEN_SIGNOFF.md') ? preg_match_all('/^## /m', file_get_contents("$ROOT/.ssdiff/GOLDEN_SIGNOFF.md")) : 0;
+/* الوثيقةُ تشترط اعتمادًا وظيفيًّا وبصريًّا معًا — واللقطةُ البنيويةُ شاهدُ البصريِّ وحدَه.
+   فلا تبلغ DONE إلا بسجلِّ اعتمادٍ وظيفيٍّ مكتوبٍ لكلِّ العشر. */
+rec($D,'UX-G10A','الموجةُ ٤ — العشرُ معتمَدةٌ وظيفيًّا وبصريًّا',10,min($gApproved,$funcSignoff),
+    ($gApproved>=10 && $funcSignoff>=10)?'DONE':(($gApproved||$funcSignoff)?'PARTIAL':'TODO'),
+    "بصريًّا $gApproved/10 بخطِّ أساسٍ بنيويّ · ووظيفيًّا $funcSignoff/10" . ($funcSignoff ? '' : ' — لا ملفَّ .ssdiff/GOLDEN_SIGNOFF.md يشهد باعتمادٍ وظيفيّ') . ($gMissSkel ? ' · بلا خطِّ أساسٍ: '.implode(' · ',$gMissSkel) : ''));
 
 $comp = ['ترويسةُ الصفحة'=>['includes/page_header.php'],'الجدولُ الموحَّد'=>['includes/datatable_server.php'],'الشريطُ العلويّ'=>['inheader.php'],'السايدبار'=>['insidebar.php'],'التصديرُ إلى Excel'=>['excel.php'],'النماذجُ الموحَّدة'=>['assets/css/ems-forms.css'],'شريطُ الرحلة'=>['assets/css/ems-journey.css'],'نافذةُ التفاصيل'=>['assets/js/ems-details-modal.js'],'التنبيهُ الموحَّد'=>['assets/js/ems-alerts.js'],'مديرُ الأعمدة'=>['assets/js/column-groups.js'],'بطاقةُ التعريفِ بالشاشة'=>['assets/js/ems-screen-about.js'],'المكوّناتُ العامة'=>['assets/js/ems-components.js']];
 $cF = 0; $cM = []; foreach ($comp as $n=>$c) { if (firstFile($c)) $cF++; else $cM[] = $n; }
-rec($D,'UX-C38','المكوّناتُ الإلزاميةُ ٣٨ — المقيسُ منها '.count($comp),38,$cF.'/'.count($comp),'PARTIAL',($cM?'غائب: '.implode(' · ',$cM).' · ':'').(38-count($comp)).' مكوّنًا لم يُقَس بعد');
+/* المقياسُ ٣٨ مكوّنًا والمقيسُ ١٢ — فالرصيدُ نسبةُ المقيسِ الموجودِ من الـ٣٨ لا نصفٌ عن الكلّ */
+rec($D,'UX-C38','المكوّناتُ الإلزاميةُ الثمانيةُ والثلاثون',38,$cF,'PARTIAL',
+    'قِيس '.count($comp).' فوُجد '.$cF.' · و'.(38-count($comp)).' مكوّنًا لم يُقَس بعدُ ولا يُمنح رصيدًا'.($cM?' · غائب: '.implode(' · ',$cM):''));
 
 // الثلاثةُ الخاصةُ ببيئتِنا (٦-٣)
 $sp = ['شارةُ وضعِ التدريب'=>null,'مؤشرُ صندوقِ الخروج'=>['assets/js/ems-outbox.js'],'بطاقةُ السقفِ الموقوف'=>null];
@@ -422,6 +428,29 @@ foreach ($R as $r) $sum[$r['state']] = ($sum[$r['state']] ?? 0) + 1;
 $order = ['DONE','PARTIAL','TODO','BLOCKED','UNMEASURED'];
 
 /** نسبةُ التنفيذ: المنفَّذُ الكاملُ + نصفُ الجزئيّ */
+/**
+ * خطوطُ الأساسِ المعلَنةُ للبنودِ التي هدفُها صفر.
+ * بلا خطِّ أساسٍ يأخذ البندُ نصفًا جزافًا مهما بلغ الخرقُ أو انخفض —
+ * فينخفض ألفُ مخالفةٍ ولا يتحرّك رقمٌ واحد. المصدرُ: نصُّ الوثيقةِ حيث أعلنته،
+ * وإلا فأولُ قياسٍ مسجَّلٍ في هذا المتتبِّع.
+ */
+$ZERO_BASELINE = [
+    'UX-G2'   => ['base' => 3675, 'src' => 'خطُّ أساسِ الوثيقةِ §9-4'],
+    'UX-G1'   => ['base' => 2360, 'src' => 'الجولةُ ١'],
+    'AC-L8'   => ['base' => 30,   'src' => 'الجولةُ ١'],
+    'AC-L3'   => ['base' => 12,   'src' => 'الجولةُ ٢'],
+    'AC-L1'   => ['base' => 1,    'src' => 'الجولةُ ١'],
+    'UX-G4'   => ['base' => 8,    'src' => 'الجولةُ ١'],
+    'UX-G12S' => ['base' => 1,    'src' => 'الجولةُ ١'],
+];
+/** نسبةُ إنجازِ بندٍ هدفُه صفر: كم قُطع من خطِّ الأساسِ نحوَ الصفر */
+function zeroProgress($id, $actual) {
+    global $ZERO_BASELINE;
+    if (!isset($ZERO_BASELINE[$id]) || !is_numeric($actual)) return null;
+    $b = (float) $ZERO_BASELINE[$id]['base'];
+    if ($b <= 0) return null;
+    return max(0.0, min(1.0, ($b - (float) $actual) / $b));
+}
 function score(array $items) {
     $n = count($items); if (!$n) return 0.0;
     $d = 0; $p = 0;
@@ -441,11 +470,10 @@ function scoreGradual(array $items) {
         if ($r['state'] !== 'PARTIAL') continue;
         $exp = is_numeric($r['expected']) ? (float) $r['expected'] : null;
         $act = is_numeric($r['actual'])   ? (float) $r['actual']   : null;
+        $zp = zeroProgress($r['id'], $act);
+        if ($zp !== null) { $sum += $zp; continue; }            /* هدفُه صفرٌ: التقدُّمُ من خطِّ أساسٍ معلَن */
         if ($exp !== null && $act !== null && $exp > 0) { $sum += max(0.0, min(1.0, $act / $exp)); }
-        elseif ($exp !== null && $act !== null && $exp == 0.0) {
-            /* هدفُه صفرٌ (مخالفاتٌ تُصفَّر): النسبةُ من خطِّ الأساسِ المعلَنِ في الملاحظة — وإلا فالنصف */
-            $sum += 0.5;
-        } else { $sum += 0.5; }
+        else { $sum += 0.5; }                                    /* لا رقمَ يقبل القسمةَ ولا خطَّ أساس */
     }
     return $sum * 100 / $n;
 }

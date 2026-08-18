@@ -1,0 +1,21 @@
+# موروثٌ مبتورُ الأصلِ (بايتاتُه ضاعت قبلَ الحملة) — معلَنٌ بانتظارِ قرارِ المالكِ في هيئةِ الأيقونات
+# الصيغة: ملف<TAB>sha1(محتوى السطر بعد trim) — أيُّ تالفٍ جديدٍ خارجَ القائمةِ يُرسِّب
+Clients/clients.php	64ea26bf0b2fa047b70fc91953a5527ba360261d
+Clients/clients.php	decc53fd6f6c8917fc0533dcd8e82c891b7bc9ef
+Clients/clients.php	a8acead3b36817370caabffb01fd631590f56a26
+Employees/employees.php	72e4588df63c39b975ef72a0f80b9e49ab48e5c8
+Employees/employees.php	5fc11ce1ab9d4c228d2d63b05e09d4e42038ef64
+Employees/employees.php	f2d86921527f00899318f5f13f983fb662ebd157
+Employees/employees.php	4fbc40b0b3ca78f5f97de79332ac59f7f6382caa
+Equipments/equipments.php	72e4588df63c39b975ef72a0f80b9e49ab48e5c8
+Equipments/equipments_fleet.php	72e4588df63c39b975ef72a0f80b9e49ab48e5c8
+main/project_users.php	29277627bf29960cd48b3f038a374c4dcb0d7357
+Oprators/oprators.php	ca4bdcccc752c1b12180264223eacb7027a45140
+Oprators/oprators.php	ab51d59fa985e92a6ee3e70b2d2d5a7c7cbb3f27
+Settings/role_permissions.php	d23e7593fe6310b81257f8cc316af544623b8d63
+Settings/role_permissions.php	454088d78ee9fb9b675ecc7c129d0a79f1a985fc
+Suppliers/supplierscontracts_details.php	f9ebae325bf09314cb14d7f23721006ac49ae357
+Timesheet/timesheet.php	a456a1aa07b6d57e174e46730370381b35d39425
+Timesheet/timesheet.php	a456a1aa07b6d57e174e46730370381b35d39425
+Timesheet/timesheet.php	799e74bc3d96093e3d904f4a21bf4a0f9d857889
+Timesheet/timesheet.php	b4da534e16e012d735a12577b636919ddeee35d3

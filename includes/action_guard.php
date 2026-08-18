@@ -33,6 +33,19 @@ if (!function_exists('ems_action_guard_registry')) {
     function ems_action_guard_registry()
     {
         return array(
+            // ── ENG-01 · المحرّكاتُ المشتركة (TS-01 §٤-١٥) ──
+            // الفعلُ يُسجَّل قبلَ شاشتِه — وهنا يُربط المعالجُ بوحدتِه كي لا
+            // يُحجب بـfail-closed. والأفعالُ في قاموسِ الأفعال: bus.* · job.* ·
+            // dr.restore.drill · asset.hours.link · depr.run/reverse.
+            'governance/bus_outbox.php'      => array('modules' => array('Governance/bus_outbox.php'),      'action' => 'auto'),
+            'governance/bus_deliveries.php'  => array('modules' => array('Governance/bus_deliveries.php'),  'action' => 'auto'),
+            'governance/bus_board.php'       => array('modules' => array('Governance/bus_board.php'),       'action' => 'view'),
+            'governance/job_queue.php'       => array('modules' => array('Governance/job_queue.php'),       'action' => 'auto'),
+            'governance/job_schedule.php'    => array('modules' => array('Governance/job_schedule.php'),    'action' => 'auto'),
+            'governance/dr_restore.php'      => array('modules' => array('Governance/dr_restore.php'),      'action' => 'auto'),
+            'finance/asset_hours_link.php'   => array('modules' => array('Finance/asset_hours_link.php'),   'action' => 'auto'),
+            'finance/depr_run.php'           => array('modules' => array('Finance/depr_run.php'),           'action' => 'auto'),
+
             // ── Timesheet — شاشة الساعات ──
             // M-16 (update0011): معالج أفعال المخاطر الموحد — الحسم الدقيق
             // بالسلطة داخل RiskService (مصفوفة ورقة 27) فوق صلاحية الشاشة.

@@ -69,8 +69,8 @@ if (!function_exists('clients_fix_mojibake_output')) {
             '❌' => '❌',
             '⏸' => '⏸',
             'ðŸ”' => 'ðŸ”',
-            'ðŸ‘‹' => 'ðŸ‘‹',
-            'ðŸš€' => 'ðŸš€',
+            '👋' => '👋',
+            '🚀' => '🚀',
             'ðŸ†' => 'ðŸ†'
         );
         return strtr($buffer, $map);

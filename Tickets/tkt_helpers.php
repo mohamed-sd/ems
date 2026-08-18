@@ -205,6 +205,83 @@ if (!function_exists('tkt_stage_badge')) {
     }
 }
 
+if (!function_exists('tkt_stage_step')) {
+    /**
+     * موضعُ البلاغِ من رحلتِه الخمس — **تعريفٌ واحدٌ** يقرأه شريطُ الشاشةِ
+     * (`tkt_journey`) ومؤشِّرُ القائمةِ (`tkt_stage_mini`) معًا.
+     *
+     * ◆ ولماذا مصدرٌ واحد: عدّادٌ وعارضٌ في موضعين يتفرّقان — فلو أضيفتْ مرحلةٌ
+     *   أو أُعيدت تسميتُها في أحدِهما لقرأ المستخدمُ رقمين مختلفين للبلاغ نفسه.
+     * ◆ والمرحلتان الموقوفتان (`waiting`/`follow_up`) ليستا خانةً في الشريط بل
+     *   **وقفةٌ داخل «قيد التنفيذ»** — فالرحلةُ لا تتقدَّم بوقفة.
+     * ◆ ويُحسب من `stage` وحدَه بلا أحداث، فيصلح لصفِّ قائمةٍ لا استعلامَ له.
+     *
+     * @param string $stage قيمة tickets.stage
+     * @return array{index:int,total:int,map:array,labels:array,label:string,paused:bool,stopped:bool,final:bool}
+     */
+    function tkt_stage_step($stage)
+    {
+        $stage  = strval($stage);
+        $map    = array('new' => 1, 'classified' => 1, 'routed' => 2,
+                        'in_progress' => 3, 'done' => 4, 'closed' => 5);
+        $labels = array(1 => 'سُجّل', 2 => 'وُجّه', 3 => 'قيد التنفيذ', 4 => 'أُنجز', 5 => 'أُغلق');
+
+        $paused  = ($stage === 'waiting' || $stage === 'follow_up');
+        $stopped = ($stage === 'cancelled');
+
+        if     ($stopped)            { $index = 0; }   // توقفت الرحلة
+        elseif ($stage === 'closed') { $index = 6; }   // كلُّ الخمسِ منجَزة
+        elseif (isset($map[$stage])) { $index = $map[$stage]; }
+        else                         { $index = $paused ? 3 : 1; }
+
+        return array(
+            'index'   => $index,
+            'total'   => 5,
+            'map'     => $map,
+            'labels'  => $labels,
+            'label'   => isset($labels[$index]) ? $labels[$index] : '',
+            'paused'  => $paused,
+            'stopped' => $stopped,
+            'final'   => in_array($stage, array('done', 'closed', 'cancelled'), true),
+        );
+    }
+}
+
+if (!function_exists('tkt_stage_mini')) {
+    /**
+     * مؤشِّرُ تقدُّمٍ مُصغَّرٌ لصفِّ القائمة — خمسُ نقاطٍ تُضيء حتى المرحلةِ الحالية،
+     * فيُقرأ موقعُ كلِّ بلاغٍ من رحلتِه **بلا فتحِه**. الشريطُ الكاملُ بأسماءِ
+     * المراحلِ وأصحابِها وخطوتِها التالية يبقى داخلَ شاشةِ البلاغ.
+     *
+     * ◆ النصُّ لا يُستغنى عنه بلونٍ وحدَه: `title` و`aria-label` يحملان المرحلةَ
+     *   بالحروف، والبادجُ النصيُّ باقٍ إلى جانبِ المؤشِّر.
+     *
+     * @param string $stage   قيمة tickets.stage
+     * @param bool   $overdue هل كسر البلاغُ مهلتَه (يُلوَّن الحاليُّ إنذارًا)
+     */
+    function tkt_stage_mini($stage, $overdue = false)
+    {
+        $s = tkt_stage_step($stage);
+        $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); };
+
+        $now  = $s['stopped'] ? 'أُلغي — توقفت الرحلة'
+              : ($s['paused'] ? tkt_label(tkt_stages(), $stage) . ' (وقفةٌ داخل «قيد التنفيذ»)'
+                              : $s['label']);
+        $tip  = 'المرحلة: ' . $now . ' — ' . min($s['index'], $s['total']) . ' من ' . $s['total'];
+
+        $out = '<span class="ems-jmini' . ($s['stopped'] ? ' is-stopped' : '')
+             . '" role="img" aria-label="' . $e($tip) . '" title="' . $e($tip) . '">';
+        for ($k = 1; $k <= $s['total']; $k++) {
+            if     ($s['stopped'])      { $cls = 'is-off'; }
+            elseif ($k <  $s['index'])  { $cls = 'is-done'; }
+            elseif ($k === $s['index']) { $cls = 'is-current' . ($overdue ? ' is-overdue' : '') . ($s['paused'] ? ' is-paused' : ''); }
+            else                        { $cls = 'is-todo'; }
+            $out .= '<i class="ems-jmini-dot ' . $cls . '" aria-hidden="true"></i>';
+        }
+        return $out . '</span>';
+    }
+}
+
 if (!function_exists('tkt_priorities')) {
     function tkt_priorities()
     {
@@ -270,8 +347,19 @@ if (!function_exists('tkt_roles_tree')) {
 
 if (!function_exists('tkt_visible_owner_role_ids')) {
     /**
-     * نطاق رؤية التوجيه لدورٍ ما = دورُه نفسه + أجدادُه + ذرّيّتُه في شجرة
-     * الأدوار (parent_role_id).
+     * نطاق رؤية التوجيه لدورٍ ما = دورُه نفسه + **ذرّيّتُه** في شجرة الأدوار
+     * (parent_role_id). النزولُ وحدَه — والصعودُ مُغلق.
+     *
+     * ◆ لماذا أُغلق الصعود (قرارُ المالك 2026-08-17): كان النطاقُ يضمُّ
+     *   **الأجدادَ** أيضًا، فيرى المرؤوسُ بلاغاتِ رئيسِه. والمقيسُ وقتَ الإغلاق:
+     *   **١٢ دورًا** ترى ما لا تملك — أشدُّها «مشرف صيانة» (14) يرى **٣٤** بلاغًا
+     *   لـ«إدارة الصيانة» (13) وهو يملك صفرًا، وثمانيةُ أدوارٍ ماليةٍ تابعةٍ ترى
+     *   بلاغَ «إدارة المالية» (17). والقاعدةُ المعلَنة: «كلُّ دورٍ يرى بلاغَه
+     *   وتذكرتَه» — فالإشرافُ ينزل ولا يصعد.
+     * ◆ والنزولُ باقٍ عمدًا: رئيسُ الإدارةِ مسؤولٌ عمّا يجري تحته، فحجبُه عن
+     *   بلاغاتِ مرؤوسيه يكسر الإشرافَ لا يحميه.
+     * ◆ وما أبلغ به المستخدمُ نفسُه يبقى مرئيًّا له — شرطٌ منفصلٌ في الشاشة
+     *   (reporter_user_id/created_by) لا في هذه الدالة.
      *
      * تنبيه: لا يُستخدم العمود role_scope القائم لهذا الغرض — كلُّ مديري
      * الإدارات مضبوطون فيه على «عام»، فإعادةُ استخدامه تكشف كلَّ البلاغات
@@ -282,15 +370,6 @@ if (!function_exists('tkt_visible_owner_role_ids')) {
         $role_id = intval($role_id);
         $tree = tkt_roles_tree();
         $visible = array($role_id => true);
-
-        // الأجداد: صعودًا عبر parent_role_id (حارس عمق ضد الدورات)
-        $cur = $role_id;
-        $guard = 0;
-        while (isset($tree[$cur]) && $tree[$cur] !== null && $guard < 10) {
-            $cur = $tree[$cur];
-            $visible[$cur] = true;
-            $guard++;
-        }
 
         // الذرية: BFS على الأبناء
         $frontier = array($role_id);
@@ -762,8 +841,9 @@ if (!function_exists('tkt_journey')) {
         $stage = strval($t['stage']);
 
         // ── ① آخرُ دخولٍ لكل مرحلة + سببُ آخر وقفة ─────────────────────
-        $stageIdx = array('new' => 1, 'classified' => 1, 'routed' => 2,
-                          'in_progress' => 3, 'done' => 4, 'closed' => 5);
+        // خريطةُ المراحلِ وترتيبُها من **المصدرِ الواحد** — لا نسخةَ ثانيةً هنا.
+        $step     = tkt_stage_step($stage);
+        $stageIdx = $step['map'];
         $at = array();
         $pauseReason = null; $pauseAt = null;
         $escalations = 0;
@@ -783,12 +863,10 @@ if (!function_exists('tkt_journey')) {
         if (!isset($at[1])) { $at[1] = strval($t['created_at']); }
 
         // ── ② المرحلة الحالية ───────────────────────────────────────────
-        $paused = ($stage === 'waiting' || $stage === 'follow_up');
-        if     ($stage === 'cancelled')   { $current = 0; }      // توقف
-        elseif ($stage === 'closed')      { $current = 6; }      // كلُّها منجَزة
-        elseif (isset($stageIdx[$stage])) { $current = $stageIdx[$stage]; }
-        else                              { $current = $paused ? 3 : 1; }
+        $paused  = $step['paused'];
+        $current = $step['index'];
 
+        // والملغى وحدَه يحتاج الأحداثَ: أينَ وقف قبل الإلغاء لا يُعرف من stage.
         if ($stage === 'cancelled') {
             for ($k = 5; $k >= 1; $k--) { if (isset($at[$k])) { $current = $k + 1; break; } }
             if ($current === 0) { $current = 1; }
@@ -807,13 +885,12 @@ if (!function_exists('tkt_journey')) {
         }
         $doer = ($assignee !== '') ? $assignee : $ownerRole;
 
-        $defs = array(
-            1 => array('label' => 'سُجّل',        'owner' => 'المبلِّغ'),
-            2 => array('label' => 'وُجّه',        'owner' => $ownerRole),
-            3 => array('label' => 'قيد التنفيذ', 'owner' => $doer),
-            4 => array('label' => 'أُنجز',        'owner' => $doer),
-            5 => array('label' => 'أُغلق',        'owner' => $ownerRole),
-        );
+        // الأسماءُ من المصدرِ الواحد، وأصحابُها وحدَهم يُحسبون هنا.
+        $owners = array(1 => 'المبلِّغ', 2 => $ownerRole, 3 => $doer, 4 => $doer, 5 => $ownerRole);
+        $defs = array();
+        foreach ($step['labels'] as $k => $lbl) {
+            $defs[$k] = array('label' => $lbl, 'owner' => isset($owners[$k]) ? $owners[$k] : '');
+        }
 
         // ── ④ الساعتان: الاستجابة قبل البدء، والإنجاز بعده ──────────────
         $isStopped = ($stage === 'cancelled');

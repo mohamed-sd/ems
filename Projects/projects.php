@@ -60,7 +60,7 @@ function projects_redirect_with_msg($msg)
 }
 
 // ════════════════════════════════════════════════════════════════════════════
-// ðŸ”’ التحقق من صلاحيات المستخدم
+// 🔒    
 // ════════════════════════════════════════════════════════════════════════════
 $page_permissions = check_page_permissions($conn, 'Projects/projects.php');
 if (!isset($page_permissions['can_view']) || !$page_permissions['can_view']) {

@@ -306,7 +306,7 @@ echo ems_states_bundle('لا أدوارَ وظيفيةً معرَّفةً بعد
                                             <strong><?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?></strong>
                                         </a>
                                         <?php if ($row['parent_role_id'] === null): ?>
-                                            <br><small class="rls-root-note">ðŸ”µ مدير رئيسي</small>
+                                            <br><small class="rls-root-note">🔵  </small>
                                         <?php endif; ?>
                                     </td>
                                     <td>

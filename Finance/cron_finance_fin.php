@@ -6,6 +6,8 @@
  */
 $IS_CLI = (PHP_SAPI === 'cli');
 require __DIR__ . '/../config.php';
+require_once __DIR__ . '/..' . '/includes/manual_run_guard.php';
+ems_manual_run_retired('statement_build', 'Finance/cron_finance_fin.php');
 require_once __DIR__ . '/../includes/cron_guard.php';
 ems_cron_guard('cron_finance_fin.php'); // INJ-0025: لا تُشغَّل من المتصفّح
 

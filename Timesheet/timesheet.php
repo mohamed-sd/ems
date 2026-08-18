@@ -1333,7 +1333,7 @@ try {
               <input type="text" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
             </div>
             <div>
-              <label for="operator_standby_hours">ðŸ‘· ساعات استعداد المشغل</label>
+              <label for="operator_standby_hours">👷   </label>
               <input type="text" name="operator_standby_hours" id="operator_standby_hours" class="form-control" value="0">
             </div>
             <div>
@@ -1768,7 +1768,7 @@ try {
             <input type="hidden" name="bucket_standby_hours" id="bucket_standby_hours" value="0">
             <input type="hidden" name="extra_operator_hours" id="extra_operator_hours" class="form-control" value="0">
             <div>
-              <label for="emsf_1507_11f90">ðŸ‘· ساعات استعداد المشغل</label>
+              <label for="emsf_1507_11f90">👷   </label>
               <input type="text" name="operator_standby_hours" class="form-control" value="0" id="emsf_1507_11f90">
             </div>
             <div>

@@ -12,6 +12,8 @@
 
 $IS_CLI = (PHP_SAPI === 'cli');
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/includes/manual_run_guard.php';
+ems_manual_run_retired('event_retry', 'cron_events.php');
 
 if (!$IS_CLI) {
     $key = isset($_GET['key']) ? (string) $_GET['key'] : '';

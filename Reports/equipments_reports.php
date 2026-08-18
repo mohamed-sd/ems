@@ -148,7 +148,7 @@ echo ems_states_bundle('لا معداتِ مسجلةً لهذا الكيان', '
 
             <!-- زر الطباعة -->
             <div class="btns mb-3">
-                <button onclick="window.print()" class="btn btn-primary">ðŸ–¨ طباعة التقرير</button>
+                <button onclick="window.print()" class="btn btn-primary">🖨  </button>
             </div>
 
             <!-- الهيدر للطباعة -->

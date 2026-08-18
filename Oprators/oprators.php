@@ -1662,13 +1662,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 $(document).on("click", ".end-service-btn", function (e) {
                     e.preventDefault();
                     var opId = $(this).data('id');
-                    console.log('ðŸ”´ زر إنهاء الخدمة - ID:', opId);
+                    console.log('🔴    - ID:', opId);
                 });
 
                 $("#endServiceModal").on("show.bs.modal", function (event) {
                     var button = $(event.relatedTarget);
                     var opId = button.data("id") || "";
-                    console.log('ðŸš¨ إنهاء خدمة التشغيل رقم:', opId);
+                    console.log('🚨    :', opId);
                     $("#modal_operation_id").val(opId);
                     $("#service_end_date").val("");
                     $("#service_reason").val("");
@@ -1694,7 +1694,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 $(document).on('click', '.editOperationBtn', function () {
                     var btn = $(this);
 
-                    console.log('ðŸ”§ بدء التعديل - ID:', btn.data('id'));
+                    console.log('🔧   - ID:', btn.data('id'));
 
                     // تغيير عنوان النموذج
                     $('#formTitle').text('تعديل بيانات التشغيل');
@@ -1728,7 +1728,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             dataType: "json",
                             data: { project_id: editProjectId },
                             success: function (response) {
-                                console.log('ðŸ“‹ استجابة العقود:', response);
+                                console.log('📋  :', response);
                                 if (response.success) {
                                     var options = "<option value=''>-- اختر العقد --</option>";
                                     response.contracts.forEach(function (contract) {
@@ -1764,11 +1764,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                     // تحديد نوع المعدة
                                                     $('#type').val(btn.data('equipment-type'));
 
-                                                    console.log('ðŸ”§ نوع المعدة:', btn.data('equipment-type'));
+                                                    console.log('🔧  :', btn.data('equipment-type'));
 
                                                     // تحميل المعدات
                                                     setTimeout(function () {
-                                                        console.log('ðŸšœ تحميل المعدات...');
+                                                        console.log('🚜  ...');
                                                         loadEquipmentsForEdit(btn.data('equipment'));
                                                     }, 300);
                                                 }
@@ -1792,7 +1792,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     var typeId = $("#type").val();
                     var supplierId = $("#supplier_id").val();
 
-                    console.log('ðŸšœ تحميل المعدات - النوع:', typeId, '| المورد:', supplierId, '| المعدة المختارة:', selectedEquipmentId);
+                    console.log('🚜   - :', typeId, '| :', supplierId, '|  :', selectedEquipmentId);
 
                     if (typeId && supplierId) {
                         $.ajax({
