@@ -178,6 +178,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $ticket && ($_POST['action'] ?? '')
                     exit();
                 }
                 $upd['close_date'] = date('Y-m-d');
+                /* قرارُ المالكِ ④ (2026-08-18): «من رفعه يُخطَر بإغلاقِه وسببِه» */
+                if (intval($ticket['reporter_user_id'] ?? 0) > 0) {
+                    $g->insert('fin_notifications', array(
+                        'company_id' => intval($ticket['company_id'] ?? 0),
+                        'target_level' => 'user',
+                        'target_user_id' => intval($ticket['reporter_user_id']),
+                        'title' => 'أُغلق بلاغُك ' . (string) ($ticket['ticket_no'] ?? '') . ($reason !== '' ? ' — السبب: ' . mb_substr($reason, 0, 120) : ''),
+                        'link' => 'Tickets/ticket_form.php?id=' . intval($ticket_id),
+                        'is_read' => 0,
+                    ));
+                }
                 $upd['close_time'] = date('H:i');
                 $upd['closed_by']  = $current_user_id;
             }

@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-18 02:33:13
--- الجداول: 570 · المناظير: 23
+-- المصدر: equipation_manage · التوليد: 2026-08-18 07:53:59
+-- الجداول: 571 · المناظير: 23
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6370,6 +6370,24 @@ CREATE TABLE `gov_field_inheritance` (
   UNIQUE KEY `uq_inh` (`company_id`,`child_entity`,`child_field`),
   KEY `ix_parent` (`parent_entity`,`parent_field`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-OBL-01 §4-21 — التوريثُ ومنعُ إعادةِ الإدخال';
+
+-- ── Table: gov_golden_approvals ──
+CREATE TABLE `gov_golden_approvals` (
+  `id` tinyint(3) unsigned NOT NULL,
+  `company_id` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'عمودُ العزل — 0: قرارٌ معياريٌّ لكلِّ الكيانات',
+  `screen_file` varchar(160) NOT NULL,
+  `title_ar` varchar(160) NOT NULL,
+  `test_account` varchar(60) NOT NULL COMMENT 'حسابُ الدورِ المخوَّلِ لفتحِها — مقيسٌ من صلاحيتِها الحية',
+  `role_id` smallint(5) unsigned NOT NULL,
+  `url_params` varchar(60) NOT NULL DEFAULT '' COMMENT 'معاملُ مسارٍ تشترطه الشاشةُ للدخول',
+  `state` enum('pending','approved','noted') NOT NULL DEFAULT 'pending' COMMENT 'pending بانتظارِ المالك · approved تمضي في التعميم · noted ملاحظةٌ تُصلَّح ثم تُعاد',
+  `owner_note` varchar(500) NOT NULL DEFAULT '',
+  `decided_at` datetime DEFAULT NULL,
+  `fixed_at` datetime DEFAULT NULL COMMENT 'لحظةُ إصلاحِ الملاحظةِ قبلَ إعادتِها للمالك',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_screen` (`company_id`,`screen_file`),
+  KEY `ix_state` (`state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXW-01 §8-1 — اعتمادُ العشرِ الذهبيةِ إفراديًّا بقرارِ المالك 2026-08-18';
 
 -- ── Table: gov_governing_screens ──
 CREATE TABLE `gov_governing_screens` (

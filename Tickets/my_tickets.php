@@ -32,12 +32,12 @@ ems_shell_axes($__pp);
 
 $rows = array(); $failed = false;
 $sql = "SELECT t.`ticket_no`, t.`stage`, t.`priority`, t.`call_date`, t.`resolution_due_at` FROM `tickets` t
-         WHERE t.company_id = ? AND (reporter_user_id = ' . $uid . ')
+         WHERE t.company_id = ? AND (t.reporter_user_id = ? OR t.assigned_user_id = ?)
          ORDER BY t.id DESC LIMIT 500";
 $st = $conn->prepare($sql);
 if (!$st) { $failed = true; }
 else {
-    $st->bind_param('i', $company_id);
+    $st->bind_param('iii', $company_id, $uid, $uid);
     if (!$st->execute()) { $failed = true; }
     else { $res = $st->get_result(); while ($res && ($x = $res->fetch_assoc())) { $rows[] = $x; } }
     $st->close();

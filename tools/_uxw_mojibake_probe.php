@@ -18,8 +18,14 @@ if (is_file(__DIR__ . '/_uxw_mojibake_allow.txt')) {
 $legacy = 0;
 
 $SIGS = array("\u{00F0}\u{009F}", "\u{00F0}\u{0178}", "\u{00E2}\u{0080}\u{0099}", "\u{00C3}\u{00A9}", "\u{00E2}\u{0098}");
-$rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT, FilesystemIterator::SKIP_DOTS));
-foreach ($rii as $f) {
+if (in_array('--staged', $argv, true)) {
+    $staged = array_filter(explode("\n", (string) shell_exec('git -C ' . escapeshellarg($ROOT) . ' diff --cached --name-only')));
+    $iter = array();
+    foreach ($staged as $sf) { $p = $ROOT . '/' . trim($sf); if (is_file($p)) $iter[] = new SplFileInfo($p); }
+} else {
+    $iter = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT, FilesystemIterator::SKIP_DOTS));
+}
+foreach ($iter as $f) {
     $p = str_replace(chr(92), '/', $f->getPathname());
     if (!preg_match('/\.(php|css|js)$/', $p)) continue;
     if (preg_match('#/(vendor|node_modules|\.git|\.claude|storage/backups|tools/)#', $p)) continue;
@@ -65,3 +71,4 @@ if (in_array('--fix', $argv, true) && $hits > 0) {
     }
     echo "✔ أُصلح: $fixedLines سطرًا · تُرك معلَنًا (غيرُ حتميّ): $skipped\n";
 }
+/* --staged: يفحص الملفاتِ المرحلةَ للالتزامِ وحدَها (خطافُ التسليم — سرعةٌ لا مسحَ شجرة) */
