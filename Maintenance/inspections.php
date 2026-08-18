@@ -582,6 +582,7 @@ function mnt_seg_kind($c) {
     );
     include('../includes/page_header.php');
     ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('mnt_order', 'التشخيص'); ?>
     <form method="post" action="" class="allforms allforms-visible" id="inspForm">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="save_inspection">

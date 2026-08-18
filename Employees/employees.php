@@ -254,6 +254,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا موظفين مسجَّلين ضمن نطاقك بعدُ',
         'أضف موظفًا جديدًا من زرِّ «إضافة موظف جديد» أو استوردهم من معالجِ Excel الموحَّد');
     ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('employee', 'نظرةٌ عامة'); ?>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false;

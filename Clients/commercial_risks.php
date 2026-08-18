@@ -12,6 +12,7 @@ include '../includes/permissions_helper.php';
 
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
 // كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', 'المخاطر');
 // **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
 // الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
 if (function_exists('enforce_current_page_view_permission') && isset($conn)) {

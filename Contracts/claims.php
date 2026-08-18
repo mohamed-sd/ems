@@ -303,6 +303,7 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : null));
 include('../inheader.php');
 include('../insidebar.php');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', 'المستخلصاتُ والفواتير');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell ems-doc-cycle">

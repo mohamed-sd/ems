@@ -118,6 +118,49 @@ if (!function_exists('ems_entity_tabs')) {
                     'المستندات' => '',
                 ),
             ),
+            'contract' => array(
+                'label' => 'رحلةُ العقد',
+                'tabs' => array(
+                    'نظرةٌ عامة' => 'Contracts/contracts.php',
+                    'الأطراف' => '',
+                    'الأسعارُ والشروط' => '',
+                    'التغطية' => 'Suppliers/shares_coverage.php',
+                    'الموردون' => 'Suppliers/supplierscontracts.php',
+                    'المعدات' => '',
+                    'التنفيذ' => 'Contracts/unit_client_match.php',
+                    'المستخلصاتُ والفواتير' => 'Contracts/claims.php',
+                    'المخاطر' => 'Clients/commercial_risks.php',
+                    'المستندات' => '',
+                    'سجلُّ التغييرات' => 'Clients/contract_amendments.php',
+                ),
+            ),
+            'employee' => array(
+                'label' => 'رحلةُ الموظف',
+                'tabs' => array(
+                    'نظرةٌ عامة' => 'Employees/employees.php',
+                    'العقود' => 'Workforce/contract_registry.php',
+                    'الوثائق' => '',
+                    'الحضور' => 'Operations/attendance.php',
+                    'الأجورُ والمستحقات' => '',
+                    'الخصوماتُ والسلف' => 'Workforce/deductions.php',
+                    'العهد' => '',
+                    'الأداء' => 'Workforce/worker_evaluation.php',
+                    'إنهاءُ الخدمة' => 'Workforce/final_settlement.php',
+                ),
+            ),
+            'mnt_order' => array(
+                'label' => 'رحلةُ أمرِ الصيانة',
+                'tabs' => array(
+                    'نظرةٌ عامة' => 'Maintenance/orders.php',
+                    'البلاغُ الأصل' => 'Tickets/tickets_list.php',
+                    'التشخيص' => 'Maintenance/inspections.php',
+                    'قطعُ الغيارِ والمخزون' => 'Procurement/warehouses.php',
+                    'الفنيونَ والساعات' => '',
+                    'التكلفة' => '',
+                    'الإقفال' => '',
+                    'سجلُّ الحالات' => '',
+                ),
+            ),
         );
     }
 

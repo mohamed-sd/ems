@@ -868,6 +868,7 @@ function mnt_state_class($st) {
     // UXW-01 ⑫: قائمةُ الأوامر — خطوةُ الدورةِ الثابتةُ المعروفة
     echo ems_next_step('التشخيصُ ثم التنفيذُ ثم الإقفال');
 ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('mnt_order', 'نظرةٌ عامة'); ?>
     <div class="mnt-bell-wrap">
         <span class="mnt-bell" title="أوامر صيانة تلقائية مفتوحة">
             <i class="fas fa-bell"></i>

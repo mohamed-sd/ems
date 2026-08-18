@@ -244,6 +244,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا احتساباتِ جزاءاتٍ أو حوافزَ في هذه الفترة', 'اختر عقدًا وفترةً ثم اضغط «احتسِب الفترة» — ولا احتسابَ بلا قواعدَ مسجَّلةٍ على العقد');
     ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', ''); ?>
 
     <?php if (!empty($_GET['msg'])): $isS = strpos($_GET['msg'], '✅') !== false; ?>
         <div class="success-message <?= $isS ? 'is-success' : 'is-error' ?>">

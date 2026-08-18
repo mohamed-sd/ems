@@ -248,6 +248,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   $header_back = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
   include('../includes/page_header.php');
   ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('contract', 'نظرةٌ عامة'); ?>
 
   <?php echo ems_states_bundle('لا عقودَ ضمن هذا الترشيح', 'وسّع الفترةَ أو غيّر المرشِّحات'); ?>
 
