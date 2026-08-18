@@ -1,0 +1,587 @@
+{
+    "summary": {
+        "DONE": 31,
+        "TODO": 8,
+        "PARTIAL": 22,
+        "BLOCKED": 1,
+        "UNMEASURED": 2
+    },
+    "items": [
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-T",
+            "label": "الجداولُ الستةُ (٨-١)",
+            "expected": 6,
+            "actual": 6,
+            "state": "DONE",
+            "note": ""
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-ISO",
+            "label": "عمودُ العزلِ في الجداولِ الستة",
+            "expected": 6,
+            "actual": 6,
+            "state": "DONE",
+            "note": ""
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-C",
+            "label": "القيودُ الأربعةَ عشرَ (٨-٢)",
+            "expected": 14,
+            "actual": 14,
+            "state": "DONE",
+            "note": "منها 4 قادحًا (شاهدُه المستودعُ والفحصُ السلبيُّ 1644 — لا يراه information_schema بمستخدمِ التطبيق)"
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-V",
+            "label": "المناظرُ الخمسةُ الرقابية (٨-٣)",
+            "expected": 5,
+            "actual": 5,
+            "state": "DONE",
+            "note": ""
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-P171",
+            "label": "قوالبُ المسمياتِ ٩ درجاتٍ × ١٩ إدارة",
+            "expected": 171,
+            "actual": 171,
+            "state": "DONE",
+            "note": "درجات=9 · إدارات=19"
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-PI",
+            "label": "بنودُ القوالبِ (شاشة\/فعل\/سقف\/نطاق\/حقل)",
+            "expected": ">0",
+            "actual": 2523,
+            "state": "DONE",
+            "note": ""
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-A5",
+            "label": "أعمدةُ النسبةِ الثلاثةُ (A5) في دفترِ الأفعال",
+            "expected": 3,
+            "actual": 3,
+            "state": "DONE",
+            "note": "activity_logs"
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-SCR",
+            "label": "الشاشاتُ الثلاثُ (القوالبُ · المنحُ · النيابة)",
+            "expected": 3,
+            "actual": 3,
+            "state": "DONE",
+            "note": "auth_profiles.php · auth_grants.php · impersonations.php"
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-NAV",
+            "label": "الشاشاتُ الثلاثُ مسجَّلةٌ ومفعَّلةٌ في التنقل",
+            "expected": 3,
+            "actual": 3,
+            "state": "DONE",
+            "note": ""
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-A6",
+            "label": "مهمةُ authority_expiry_sweep مجدوَلةً كلَّ ٥ دقائق (A6)",
+            "expected": 1,
+            "actual": 0,
+            "state": "TODO",
+            "note": "8 مهامَّ مجدوَلةٍ ولا واحدةَ للانتهاء"
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-ND",
+            "label": "non_delegable_actions — الخمسةُ المحصورة",
+            "expected": 5,
+            "actual": 5,
+            "state": "DONE",
+            "note": ""
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-DIFF",
+            "label": "تقريرُ الفروقِ قبلَ التبديل (خطوةُ الترحيلِ ٣)",
+            "expected": 1,
+            "actual": 1,
+            "state": "DONE",
+            "note": "govauth01_diff_report.csv"
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-GRANT",
+            "label": "إلحاقُ القالبِ بكلِّ موظفٍ حاليّ",
+            "expected": 75,
+            "actual": "77 مستخدمًا · 77 منحًا",
+            "state": "DONE",
+            "note": "مستخدمون نشطون=75"
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-A4",
+            "label": "v_hand_conflicts = صفر (شرطُ إغلاقِ A4)",
+            "expected": 0,
+            "actual": 0,
+            "state": "DONE",
+            "note": ""
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-IMPBAR",
+            "label": "شريطُ جلسةِ الإنابةِ الدائمُ في القشرة",
+            "expected": "≥1",
+            "actual": 1,
+            "state": "DONE",
+            "note": "inheader.php"
+        },
+        {
+            "doc": "GOV-AUTH-01",
+            "id": "GA-LIVE",
+            "label": "استعمالٌ حيٌّ للطرقِ الثلاثِ (تفويض\/رفع\/نيابة)",
+            "expected": ">0",
+            "actual": "تفويض=0 · رفع=0 · نيابة=0",
+            "state": "TODO",
+            "note": "البنيةُ قائمةٌ وصفرُ حركةٍ — لا شاهدَ تشغيل"
+        },
+        {
+            "doc": "24-أ السلاليم",
+            "id": "LD-20",
+            "label": "السلاليمُ العشرون LD-01..LD-20 مسجَّلة",
+            "expected": 20,
+            "actual": 7,
+            "state": "PARTIAL",
+            "note": "مفعَّلة=7 · الناقصُ LD-08..LD-20"
+        },
+        {
+            "doc": "24-أ السلاليم",
+            "id": "LD-E7",
+            "label": "العناصرُ السبعةُ كاملةً في كلِّ سلّمٍ مسجَّل",
+            "expected": "7 × 7",
+            "actual": "5\/7 عنصرًا مكتمل",
+            "state": "PARTIAL",
+            "note": "E1 من يبدأ=7\/7 · E2 من يراجع=1\/7 · E3 من يعتمد=7\/7 · E4 السقف=7\/7 · E5 التصعيد=7\/7 · E6 منعُ الذات=4\/7 · E7 الحمولة=7\/7"
+        },
+        {
+            "doc": "24-أ السلاليم",
+            "id": "AC-L3",
+            "label": "صفرُ سلّمٍ مفعَّلٍ ينقصه عنصرٌ من السبعة",
+            "expected": 0,
+            "actual": 9,
+            "state": "PARTIAL",
+            "note": "من 49 خانةَ عنصر"
+        },
+        {
+            "doc": "24-أ السلاليم",
+            "id": "AC-L1",
+            "label": "صفرُ سلّمٍ يسقط على خطوةٍ واحدةٍ احتياطية",
+            "expected": 0,
+            "actual": 1,
+            "state": "PARTIAL",
+            "note": "بخطوةٍ واحدة: LD-04"
+        },
+        {
+            "doc": "24-أ السلاليم",
+            "id": "AC-L9",
+            "label": "قيدُ السقفِ: الفارغُ يوقف ولا يُمرِّر",
+            "expected": "قيدٌ نافذ",
+            "actual": "chk_ld_cap",
+            "state": "DONE",
+            "note": "سقوفٌ غيرُ محسومة=0"
+        },
+        {
+            "doc": "24-أ السلاليم",
+            "id": "LD-CAP9",
+            "label": "السقوفُ التسعةُ بانتظارِ رقمِ المالك",
+            "expected": 9,
+            "actual": "3 محسومًا من 3 مبنيًّا",
+            "state": "BLOCKED",
+            "note": "المبنيُّ كلُّه محسوم · 6 منها لم يُبنَ سلّمُها بعدُ فلا سقفَ لها يُحسم"
+        },
+        {
+            "doc": "24-أ السلاليم",
+            "id": "AC-L4",
+            "label": "منعُ اعتمادِ الذاتِ قيدًا لا سياسة",
+            "expected": "قيد",
+            "actual": "chk_step_entry_no_approve · chk_no_single_hand · chk_bg_no_self_approval",
+            "state": "PARTIAL",
+            "note": "مطبَّقٌ على 7 سلّمًا من 20"
+        },
+        {
+            "doc": "24-أ السلاليم",
+            "id": "AC-L5",
+            "label": "لا يدَ تمشي خطوتين متتاليتين في سلّمٍ واحد",
+            "expected": "قيدٌ عامّ",
+            "actual": "قيودٌ موضعيةٌ فقط",
+            "state": "PARTIAL",
+            "note": "قيودُ يدَين موجودةٌ في الخصومِ والطوارئ — ولا قيدَ عامٌّ على سجلِّ خطواتِ السلاليم"
+        },
+        {
+            "doc": "24-أ السلاليم",
+            "id": "AC-L2",
+            "label": "صفرُ صفٍّ في جدولِ القواعدِ يحمل نصًّا غيرَ قاعدة",
+            "expected": 0,
+            "actual": 0,
+            "state": "DONE",
+            "note": ""
+        },
+        {
+            "doc": "24-أ السلاليم",
+            "id": "AC-L8",
+            "label": "صفرُ حقلٍ يُكتب فيه اسمُ معتمِدٍ يدويًّا",
+            "expected": 0,
+            "actual": 30,
+            "state": "PARTIAL",
+            "note": ""
+        },
+        {
+            "doc": "24-أ السلاليم",
+            "id": "LD-BG",
+            "label": "LD-20 قفلُ الطوارئ سلّمًا مسجَّلًا",
+            "expected": 1,
+            "actual": 0,
+            "state": "PARTIAL",
+            "note": "scr_break_glass قائمٌ بقيدَيه — لكنْ خارجَ سجلِّ السلاليم"
+        },
+        {
+            "doc": "24-أ السلاليم",
+            "id": "LD-227",
+            "label": "سجلُّ تتبعِ المتطلباتِ الذريةِ ٢٢٧",
+            "expected": 227,
+            "actual": 0,
+            "state": "TODO",
+            "note": "لا ملفَّ تتبعٍ بحالاتِ التنفيذ"
+        },
+        {
+            "doc": "70 المواصفة",
+            "id": "TS-CNT",
+            "label": "جداولُ الحاوياتِ والموردينَ بأسماءِ الوثيقة",
+            "expected": 6,
+            "actual": 0,
+            "state": "TODO",
+            "note": "صفرٌ بأسماءِ الوثيقة · 6 نظيرًا حيًّا: op_containers,container_consumption,container_swaps,supplier_capacity,settlements,settlement_lines"
+        },
+        {
+            "doc": "70 المواصفة",
+            "id": "TS-ENG",
+            "label": "جداولُ المحرّكاتِ الستة",
+            "expected": 6,
+            "actual": 6,
+            "state": "DONE",
+            "note": ""
+        },
+        {
+            "doc": "70 المواصفة",
+            "id": "TS-SHIFT",
+            "label": "القيدُ اليوميُّ مبنيًّا ومُشغَّلًا",
+            "expected": 1,
+            "actual": "unit_time_log (12500 صفًّا)",
+            "state": "DONE",
+            "note": "قرارُ المخططِ الحيّ: وُسِّع unit_entries + unit_time_log بدلَ إنشاءِ shift_entries"
+        },
+        {
+            "doc": "70 المواصفة",
+            "id": "TS-6ST",
+            "label": "حالاتُ التسليمِ الستُّ المسمّاةُ في القيد",
+            "expected": 6,
+            "actual": 6,
+            "state": "DONE",
+            "note": "enum('published','claimed','processing','processed','failed','dlq')"
+        },
+        {
+            "doc": "70 المواصفة",
+            "id": "TS-8JOB",
+            "label": "أنواعُ المهمةِ الثمانيةُ محصورةً في القيدِ نفسِه",
+            "expected": 8,
+            "actual": "chk_job_type نافذ",
+            "state": "DONE",
+            "note": "أنواعٌ مستعمَلة=8 · نوعُ العمود=varchar(60)"
+        },
+        {
+            "doc": "70 المواصفة",
+            "id": "TS-BACK",
+            "label": "التباعدُ المتزايدُ ١·٤·١٦·٦٤·٢٥٦ صيغةً في قادح",
+            "expected": "قادح",
+            "actual": "غيرُ مقيس",
+            "state": "UNMEASURED",
+            "note": "information_schema.TRIGGERS يرجع صفرًا بمستخدمِ التطبيق — يلزم جسٌّ وظيفيّ"
+        },
+        {
+            "doc": "70 المواصفة",
+            "id": "TS-CK",
+            "label": "الفحوصُ الثمانيةَ عشرَ CK-01..CK-18",
+            "expected": 18,
+            "actual": "10 ناجح · 2 راسب · 6 متعذِّر",
+            "state": "PARTIAL",
+            "note": "CK-01=متعذِّر · CK-02=متعذِّر · CK-03=متعذِّر · CK-04=متعذِّر · CK-05=متعذِّر · CK-07=160 ✘ · CK-10=متعذِّر · CK-15=2 ✘"
+        },
+        {
+            "doc": "70 المواصفة",
+            "id": "TS-ACT8",
+            "label": "الأفعالُ الثمانيةُ مسجَّلةٌ في القاموسِ قبلَ شاشاتِها",
+            "expected": 8,
+            "actual": 0,
+            "state": "TODO",
+            "note": ""
+        },
+        {
+            "doc": "70 المواصفة",
+            "id": "TS-NAVORD",
+            "label": "السايدبارُ مرتَّبٌ بالدورةِ المستنديةِ لا بالأبجدية",
+            "expected": 1651,
+            "actual": 1650,
+            "state": "DONE",
+            "note": "99.9%"
+        },
+        {
+            "doc": "70 المواصفة",
+            "id": "TS-DESC",
+            "label": "سطرُ شرحٍ واحدٍ لكلِّ مرحلة",
+            "expected": 908,
+            "actual": 70,
+            "state": "PARTIAL",
+            "note": "7.7% · 22 شرحًا مميَّزًا في link_groups.stage_desc — والمجموعاتُ المكررةُ ترثه"
+        },
+        {
+            "doc": "70 المواصفة",
+            "id": "TS-STAGEOUT",
+            "label": "المستندُ الرسميُّ الناتجُ لكلِّ مرحلة",
+            "expected": 336,
+            "actual": 227,
+            "state": "PARTIAL",
+            "note": "67.6% · 109 مرحلةً بلا مستندٍ مُسمًّى"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-W1",
+            "label": "الموجةُ ١ — اللغةُ والتصنيفُ الثلاثيّ",
+            "expected": "مُجتازة",
+            "actual": "مُجتازة",
+            "state": "DONE",
+            "note": "179 مرحلةً مُرحَّلةً · 550 فعلًا مصنَّفًا"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-W2",
+            "label": "الموجةُ ٢ — دفترُ التدقيقِ الشامل",
+            "expected": "مُجتازة",
+            "actual": "مُجتازة",
+            "state": "DONE",
+            "note": "663 موضعَ ظهورٍ بقرارٍ ومالك"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-G12",
+            "label": "الموجةُ ٣ — بواباتُ المنعِ الاثنتا عشرةَ مبنيّة",
+            "expected": 12,
+            "actual": 12,
+            "state": "DONE",
+            "note": "tools\/uxw_gates.php"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-CI",
+            "label": "البواباتُ تُرسِّب البناءَ في خطِّ التسليم",
+            "expected": "مربوطةٌ بـCI",
+            "actual": "غيرُ مربوطة",
+            "state": "TODO",
+            "note": "0 ملفَّ خطِّ تسليمٍ في المستودع"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-DS",
+            "label": "النظامُ التصميميُّ مرجعًا حيًّا من الكودِ لا صورًا",
+            "expected": 1,
+            "actual": "Governance\/design_system.php",
+            "state": "DONE",
+            "note": "Governance\/design_system.php"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-G1",
+            "label": "البوابةُ ١ — لونٌ مثبَّتٌ في الكودِ خارجَ الرموز (نطاقُ الشاشات)",
+            "expected": 0,
+            "actual": 2185,
+            "state": "PARTIAL",
+            "note": "218 ملفَّ شاشة · وفي المستودعِ كلِّه 4837"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-G2",
+            "label": "البوابةُ ٢ — نمطٌ موضعيٌّ غيرُ مصرَّحٍ به (نطاقُ الشاشات)",
+            "expected": "0 · خطُّ الأساس 3,675",
+            "actual": 2975,
+            "state": "PARTIAL",
+            "note": "224 ملفَّ شاشة · وفي المستودعِ كلِّه 3512"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-G4",
+            "label": "البوابةُ ٤ — صفحةٌ خارجَ القشرةِ الموحَّدة",
+            "expected": 0,
+            "actual": 8,
+            "state": "PARTIAL",
+            "note": "353\/361 = 97.8% داخلَ القشرة"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-G8",
+            "label": "البوابةُ ٨ — مصطلحٌ ممنوعٌ في واجهةٍ حيّة",
+            "expected": 0,
+            "actual": 0,
+            "state": "DONE",
+            "note": "0 إشارةً في كودِ الشاشاتِ: []"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-G7",
+            "label": "البوابةُ ٧ — رابطُ سايدبارٍ بلا مالك",
+            "expected": 0,
+            "actual": 0,
+            "state": "DONE",
+            "note": ""
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-G12S",
+            "label": "البوابةُ ١٢ — مرحلةٌ في دورةٍ بلا خطوةٍ تالية",
+            "expected": 0,
+            "actual": 1,
+            "state": "PARTIAL",
+            "note": "من 336 مرحلة"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-C7",
+            "label": "عناصرُ الدورةِ المستنديةِ السبعةُ لكلِّ شاشة (٧-١)",
+            "expected": 7,
+            "actual": 6,
+            "state": "PARTIAL",
+            "note": "صفوف 663\/663 · مراحل 181\/181 · مستندٌ مُسمًّى 72\/85 · إعلانُ الغياب 96\/96 · الحالةُ التالية 663\/663 · المستهلكة 603\/603 · الأثرُ الماليّ 200\/200 · الترويسةُ تقرأ الورقةَ حيًّا"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-E11",
+            "label": "§8-2 الكياناتُ الأحدَ عشرَ برحلتِها في ملفٍّ واحد",
+            "expected": 11,
+            "actual": 11,
+            "state": "DONE",
+            "note": "كلُّها معرَّفةٌ في includes\/entity_tabs.php"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-T79",
+            "label": "٧٩ شاشةً تُدمج تبويبًا في ملفِّها الأمّ",
+            "expected": 79,
+            "actual": 56,
+            "state": "PARTIAL",
+            "note": "70.9% · 56 شاشةً تحمل شريطَ رحلتِها"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-G10",
+            "label": "العشرُ الذهبيةُ — الشاشاتُ قائمةٌ في المستودع",
+            "expected": 10,
+            "actual": 10,
+            "state": "DONE",
+            "note": ""
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-G10A",
+            "label": "الموجةُ ٤ — العشرُ معتمَدةٌ وظيفيًّا وبصريًّا",
+            "expected": 10,
+            "actual": 5,
+            "state": "PARTIAL",
+            "note": "خطُّ أساسٍ بنيويٌّ لـ5 منها · بلا خطِّ أساسٍ: المركزُ التنفيذيُّ للرئيسِ والنواب · لوحةُ إدارةِ التشغيل · ملفُّ المورد · المخاطر · طلبُ الدفعِ الماليّ — ولا سجلَّ اعتمادٍ وظيفيٍّ مستقلّ"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-C38",
+            "label": "المكوّناتُ الإلزاميةُ ٣٨ — المقيسُ منها 12",
+            "expected": 38,
+            "actual": "12\/12",
+            "state": "PARTIAL",
+            "note": "26 مكوّنًا لم يُقَس بعد"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-C3S",
+            "label": "الثلاثةُ الخاصةُ ببيئتِنا (٦-٣)",
+            "expected": 3,
+            "actual": 1,
+            "state": "PARTIAL",
+            "note": "غائب: شارةُ وضعِ التدريب · بطاقةُ السقفِ الموقوف"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-9ST",
+            "label": "حالاتُ الشاشةِ التسعُ إلزاميةً لكلِّ شاشة",
+            "expected": "كلُّ شاشة",
+            "actual": "غيرُ مقيس",
+            "state": "UNMEASURED",
+            "note": "يلزم فاحصٌ آليٌّ للحالاتِ التسع"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-TECHGOV",
+            "label": "مركزُ الحوكمةِ التقنيِّ (وعاءُ اليتيمة)",
+            "expected": "≥1",
+            "actual": 1,
+            "state": "DONE",
+            "note": "Governance\/tech_gov_center.php"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-ORPH",
+            "label": "الروابطُ اليتيمةُ ١٧٤ — قرارُ الإسنادِ صفًّا صفًّا",
+            "expected": 174,
+            "actual": "174\/174",
+            "state": "DONE",
+            "note": ""
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-W5",
+            "label": "الموجةُ ٥ — الاختبارُ البشريُّ ٦ مهامَّ × ٧ درجاتٍ × ٨ مقاييس",
+            "expected": "336 قياسًا",
+            "actual": 0,
+            "state": "TODO",
+            "note": "لا سجلَّ قياسٍ بشريّ · و65 جولةَ UAT تصليبٍ قائمةٌ لكنَّها اختبارُ نظامٍ لا اختبارُ استعمالٍ بشريّ"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-A11Y",
+            "label": "فحوصُ الوصولِ الرقميِّ الاثنا عشرَ (WCAG 2.2 AA)",
+            "expected": 12,
+            "actual": 0,
+            "state": "TODO",
+            "note": "لا يُعلَن المطابقةُ قبلَ القياس — ولا فاحصَ وصولٍ في المستودع"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-VIS",
+            "label": "خطواتُ الثباتِ البصريِّ الخمس",
+            "expected": 5,
+            "actual": 5,
+            "state": "PARTIAL",
+            "note": "216 خطَّ أساسٍ بنيويٍّ · 0 فرقًا معلَّقًا · 9 قبولًا مكتوبًا — والمقارنةُ البكسليةُ على الدقاتِ الأربعِ غائبة"
+        },
+        {
+            "doc": "UXW-01",
+            "id": "UX-W6",
+            "label": "الموجةُ ٦ — أرقامُ التقريرِ السبعةَ عشرَ مقيسة",
+            "expected": 17,
+            "actual": "هذا المسبار",
+            "state": "PARTIAL",
+            "note": "مقيسٌ بأمرٍ يُعاد تشغيلُه: tools\/pkg4_measure.php"
+        }
+    ]
+}
