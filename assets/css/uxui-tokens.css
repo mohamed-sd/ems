@@ -1,0 +1,102 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   uxui-tokens.css — رموزُ جولةِ الواجهة INJAZ-UXUI-01 (الفصل 12)
+   ───────────────────────────────────────────────────────────────────────────
+   ◆ «مصدرُ الحقيقةِ الوحيدُ للشكلِ هو الرموز. وبعدَ اعتمادِها يُمنع أيُّ لونٍ
+     مثبَّتٍ أو قياسٍ محليٍّ أو نمطٍ موضعيٍّ — والمنعُ ببوابةٍ ترسِّب البناء.»
+   ◆ طبقةٌ فوقَ design-tokens.css القائمِ لا بديلًا عنه: ما كان له رمزٌ قائمٌ
+     أُلبِس اسمَ العقدِ (alias) وما نصَّ عليه الفصلُ 12 ولم يوجد أُضيف هنا.
+   ◆ العوائلُ الإحدى عشرةَ: الأسطح · لكنةُ العلامة · الدلالية · الخطوط ·
+     المسافات · أنصافُ الأقطار · الحدود · الظلال · الحركة · الطبقات · الانكسار.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── ① الأسطح — محايدةٌ فاتحة، والداكنُ للسايدبارِ وحدَه ── */
+  --ux-surface-page: var(--gray-50, #FAFAF9);
+  --ux-surface-card: var(--white, #FFFFFF);
+  --ux-surface-header: var(--white, #FFFFFF);      /* لا برتقاليَّ ممتلئًا */
+  --ux-surface-sidebar: var(--brand-black, #0F1115);
+  --ux-surface-raised: var(--white, #FFFFFF);
+
+  /* ── ② لكنةُ العلامة — ثلاثُ درجاتٍ للإجراءِ الرئيسيِّ والنشطِ والوسم ── */
+  --ux-accent: var(--brand-orange, #F7931A);
+  --ux-accent-strong: var(--brand-orange-bright, #E67E00);
+  --ux-accent-soft: var(--brand-cream-light, #FFF5E8);
+
+  /* ── ③ الألوانُ الدلالية — من قاموسِ الحالاتِ حصرًا ── */
+  --ux-success: var(--success-600, #5B7F1E);
+  --ux-success-bg: var(--success-100, #ECF1DE);
+  --ux-warning: var(--warning-600, #A8541C);       /* الكهرمانيُّ التنبيهيّ */
+  --ux-warning-bg: var(--warning-100, #F4E5D3);
+  --ux-danger: var(--danger-600, #991B1B);
+  --ux-danger-bg: var(--danger-100, #F5DCDC);
+  --ux-info: #1D4ED8;                               /* معلوماتيٌّ أزرق (ف٦-٢) */
+  --ux-info-bg: #DBEAFE;
+  --ux-neutral: var(--gray-500, #78716C);
+  --ux-neutral-bg: var(--gray-100, #F5F5F4);
+  --ux-neutral-dark: var(--gray-700, #44403C);      /* مُلغى · مغلق */
+  --ux-neutral-dark-bg: var(--gray-200, #E7E5E4);
+  --ux-training: #7C3AED;                           /* بنفسجيُّ وضعِ التدريب */
+  --ux-training-bg: #EDE9FE;
+  --ux-suspend: #C2410C;                            /* برتقاليُّ التعليق */
+  --ux-suspend-bg: #FFEDD5;
+
+  /* ── ④ الخطوط — أسرةٌ عربيةٌ واحدةٌ وستةُ مقاسات (١٣ جدول · ١٤ نص · ١٦ · ٢٠ عناوين) ── */
+  --ux-font: var(--font-ar, "IBM Plex Sans Arabic", "Tajawal", "Segoe UI", Arial, sans-serif);
+  --ux-text-table: 13px;
+  --ux-text-body: 14px;
+  --ux-text-title: 16px;
+  --ux-text-heading: 20px;
+  --ux-text-caption: 12px;
+  --ux-text-display: 24px;
+
+  /* ── ⑤ المسافات — سلّمُ ٤·٨·١٢·١٦·٢٤·٣٢ ولا قيمةَ خارجَه ── */
+  --ux-sp-1: 4px;
+  --ux-sp-2: 8px;
+  --ux-sp-3: 12px;
+  --ux-sp-4: 16px;
+  --ux-sp-6: 24px;
+  --ux-sp-8: 32px;
+
+  /* ── ⑥ أنصافُ الأقطار — ٤ للحقولِ · ٦ للأزرارِ · ٨ للبطاقات، ثلاثٌ لا رابعةَ لها ── */
+  --ux-radius-field: 4px;
+  --ux-radius-button: 6px;
+  --ux-radius-card: 8px;
+
+  /* ── ⑦ الحدود — سماكةٌ واحدةٌ ولونٌ واحد ── */
+  --ux-border-w: 1px;
+  --ux-border-color: var(--gray-300, #D6D3D1);
+  --ux-border: var(--ux-border-w) solid var(--ux-border-color);
+
+  /* ── ⑧ الظلال — ثلاثُ درجات: بطاقةٌ مرفوعةٌ · درجٌ · نافذة ── */
+  --ux-shadow-card: var(--shadow-sm, 0 1px 2px rgba(0,0,0,.04));
+  --ux-shadow-drawer: var(--shadow-lg, 0 12px 24px rgba(0,0,0,.1));
+  --ux-shadow-modal: var(--shadow-xl, 0 24px 48px rgba(0,0,0,.18));
+
+  /* ── ⑨ الحركة — ١٥٠·٢٠٠·٣٠٠ مللي ── */
+  --ux-motion-fast: 150ms;
+  --ux-motion-base: 200ms;
+  --ux-motion-slow: 300ms;
+
+  /* ── ⑩ طبقاتُ الترتيب — سلّمٌ واحد (قائمٌ في design-tokens) ── */
+  /* --z-sidebar · --z-sticky · --z-dropdown(الدرج) · --z-modal · --z-tooltip · --z-toast */
+
+  /* ── ⑪ الكثافةُ والقياساتُ الحاكمة ── */
+  --ux-row-compact: 32px;
+  --ux-row-standard: 36px;    /* الافتراضيُّ للشاشاتِ الإدارية */
+  --ux-row-comfort: 44px;
+  --ux-cell-pad-y: 8px;
+  --ux-cell-pad-x: 12px;
+  --ux-thead-h: 40px;          /* ترويسةُ الجدولِ اللاصقة */
+  --ux-header-max: 96px;       /* سقفُ ترويسةِ الصفحة — والفائضُ يُرسِّب */
+}
+
+/* نقاطُ الانكسار (مرجعُ الفصل 12): 1280 · 1366 · 1440 · 1920 + لوحيٌّ وجوّال.
+   لا تمريرَ أفقيًّا للصفحةِ على المكتبيِّ — والتمريرُ داخلَ الجدولِ وحدَه. */
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ux-motion-fast: 0ms;
+    --ux-motion-base: 0ms;
+    --ux-motion-slow: 0ms;
+  }
+}

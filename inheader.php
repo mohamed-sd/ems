@@ -50,6 +50,10 @@ if (!function_exists('ems_css_ver')) {
          الذاكرةِ إلزاميٌّ هنا كما لأخواتها — بدونه يخدم المتصفحُ نسخةً قديمةً
          فتسقط كلُّ `var()` إلى الافتراضيّ والنظامُ بلا ألوان. -->
     <link rel="stylesheet" href="/ems/assets/css/design-tokens.css<?php echo ems_css_ver('design-tokens.css'); ?>">
+    <!-- INJAZ-UXUI-01 ف١٢: رموزُ جولةِ الواجهةِ ومكتبةُ مكوّناتِها (بادئة ux-) —
+         طبقةٌ فوق الرموزِ القائمة، خاملةٌ حتى تستعملَها شاشةٌ مرحَّلة -->
+    <link rel="stylesheet" href="/ems/assets/css/uxui-tokens.css<?php echo ems_css_ver('uxui-tokens.css'); ?>">
+    <link rel="stylesheet" href="/ems/assets/css/uxui-components.css<?php echo ems_css_ver('uxui-components.css'); ?>">
     <!-- Unified page styles: Dashboard + Chat -->
     <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css<?php echo ems_css_ver('ems.main.all.style.css'); ?>">
     <!-- Unified Table Styles — loaded LAST so ems-tables.css is the single authoritative source for all table design -->

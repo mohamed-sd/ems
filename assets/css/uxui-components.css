@@ -1,0 +1,181 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   uxui-components.css — مكتبةُ مكوّناتِ INJAZ-UXUI-01 (ف٨ · ف٩ · ف١٠ · ف١٢)
+   ───────────────────────────────────────────────────────────────────────────
+   ◆ «مكوّنٌ واحدٌ لكلِّ غرضٍ ولا نسخةَ محليةً في صفحة» — الأصنافُ ببادئة ux-
+     وكلُّ قيمةٍ من uxui-tokens.css حصرًا: صفرُ لونٍ مثبَّتٍ وصفرُ قياسٍ محليّ.
+   ◆ طبقةٌ خاملةٌ حتى تستعملَها شاشة: لا تلمس أنماطَ الشاشاتِ القائمةِ إطلاقًا
+     (الترحيلُ البصريُّ موجاتٌ لاحقةٌ بمصفوفةِ حفظ) — فوجودُها آمنٌ بالتعريف.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ══ ① ترويسةُ الصفحةِ المضغوطة (ف٨-٣) — سقفُها 96px والفائضُ يُرسِّب ══ */
+.ux-page-header {
+  display: flex; align-items: center; gap: var(--ux-sp-3);
+  max-height: var(--ux-header-max);
+  padding: var(--ux-sp-3) var(--ux-sp-4);
+  background: var(--ux-surface-header);
+  border-bottom: var(--ux-border);
+  font-family: var(--ux-font);
+}
+.ux-page-header__title {
+  font-size: var(--ux-text-heading); font-weight: 700;
+  color: var(--gray-900, #1C1917); margin: 0;
+}
+.ux-page-header__status { margin-inline-start: var(--ux-sp-1); }
+.ux-page-header__next {
+  font-size: var(--ux-text-caption); color: var(--ux-neutral);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ux-page-header__spacer { flex: 1 1 auto; }
+.ux-page-header__actions { display: flex; align-items: center; gap: var(--ux-sp-2); }
+
+/* ══ ② نظامُ الأزرارِ الخمسة (ف١٢-٢) — ولا نوعَ سادس ══ */
+.ux-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--ux-sp-1);
+  font-family: var(--ux-font); font-size: var(--ux-text-body); font-weight: 600;
+  padding: var(--ux-sp-2) var(--ux-sp-4);
+  border-radius: var(--ux-radius-button);
+  border: var(--ux-border-w) solid transparent;
+  cursor: pointer; text-decoration: none; line-height: 1.2;
+  transition: background-color var(--ux-motion-fast), border-color var(--ux-motion-fast), color var(--ux-motion-fast);
+}
+.ux-btn--primary   { background: var(--ux-accent); color: var(--white, #fff); }            /* واحدٌ لا غيرُ في الشاشة */
+.ux-btn--primary:hover { background: var(--ux-accent-strong); }
+.ux-btn--secondary { background: transparent; color: var(--ux-neutral-dark); border-color: var(--ux-border-color); }
+.ux-btn--secondary:hover { background: var(--ux-neutral-bg); }
+.ux-btn--ghost     { background: transparent; color: var(--ux-neutral-dark); }
+.ux-btn--ghost:hover { background: var(--ux-neutral-bg); }
+.ux-btn--danger    { background: transparent; color: var(--ux-danger); border-color: var(--ux-danger); } /* داخل «⋯» بتأكيد */
+.ux-btn--danger:hover { background: var(--ux-danger-bg); }
+.ux-btn--icon      { padding: var(--ux-sp-2); }                                            /* بتلميحٍ نصيٍّ دائمًا */
+.ux-btn:disabled, .ux-btn[aria-disabled="true"] { opacity: .55; cursor: not-allowed; }
+
+/* ══ ③ وسمُ الحالة (ف٦-٢) — الاثنتا عشرةَ نغمةً دلالية ══ */
+.ux-status {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: var(--ux-font); font-size: var(--ux-text-caption); font-weight: 700;
+  padding: 2px var(--ux-sp-2); border-radius: var(--ux-radius-field);
+  line-height: 1.6; white-space: nowrap;
+}
+.ux-status--neutral      { background: var(--ux-neutral-bg);      color: var(--ux-neutral-dark); }
+.ux-status--info         { background: var(--ux-info-bg);         color: var(--ux-info); }
+.ux-status--warning      { background: var(--ux-warning-bg);      color: var(--ux-warning); }
+.ux-status--success      { background: var(--ux-success-bg);      color: var(--ux-success); }
+.ux-status--danger       { background: var(--ux-danger-bg);       color: var(--ux-danger); }
+.ux-status--suspend      { background: var(--ux-suspend-bg);      color: var(--ux-suspend); }
+.ux-status--neutral-dark { background: var(--ux-neutral-dark-bg); color: var(--ux-neutral-dark); }
+.ux-status--training     { background: var(--ux-training-bg);     color: var(--ux-training); }
+
+/* ══ ④ الشريطُ الموحَّد (ف٩-٢) — بحث·مرشِّحات·منظر·أعمدة·تصدير·المزيد ══ */
+.ux-toolbar {
+  display: flex; align-items: center; gap: var(--ux-sp-2);
+  padding: var(--ux-sp-2) 0; flex-wrap: wrap;
+  font-family: var(--ux-font);
+}
+.ux-toolbar__search { flex: 0 1 260px; min-width: 180px; }
+.ux-toolbar__search input {
+  width: 100%; height: 32px; padding: 0 var(--ux-sp-3);
+  border: var(--ux-border); border-radius: var(--ux-radius-field);
+  font-family: var(--ux-font); font-size: var(--ux-text-body);
+  background: var(--ux-surface-card);
+}
+.ux-toolbar__spacer { flex: 1 1 auto; }
+.ux-chiprow { display: flex; align-items: center; gap: var(--ux-sp-1); flex-wrap: wrap; padding: var(--ux-sp-1) 0; }
+.ux-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: var(--ux-text-caption); font-weight: 600;
+  background: var(--ux-accent-soft); color: var(--ux-accent-strong);
+  border: var(--ux-border-w) solid var(--ux-accent);
+  border-radius: 999px; padding: 2px var(--ux-sp-2);
+}
+.ux-chip__x { cursor: pointer; border: 0; background: transparent; color: inherit; font-size: inherit; }
+
+/* ══ ⑤ بطاقاتُ اللوحة (ف٨-٢): مؤشرٌ · قرارٌ · مهمةٌ · اعتماد ══ */
+.ux-kpi, .ux-decision, .ux-task, .ux-approval {
+  background: var(--ux-surface-card);
+  border: var(--ux-border); border-radius: var(--ux-radius-card);
+  box-shadow: var(--ux-shadow-card);
+  padding: var(--ux-sp-3) var(--ux-sp-4);
+  font-family: var(--ux-font);
+}
+.ux-kpi { display: grid; gap: 2px; min-width: 150px; }
+.ux-kpi__label { font-size: var(--ux-text-caption); color: var(--ux-neutral); }
+.ux-kpi__value { font-size: var(--ux-text-display); font-weight: 700; color: var(--gray-900, #1C1917); display: flex; align-items: baseline; gap: var(--ux-sp-1); }
+.ux-kpi__unit  { font-size: var(--ux-text-caption); font-weight: 600; color: var(--ux-neutral); }
+.ux-kpi__meta  { font-size: var(--ux-text-caption); color: var(--ux-neutral); display: flex; gap: var(--ux-sp-2); }
+.ux-kpi--alert  { border-inline-start: 3px solid var(--ux-warning); }
+.ux-kpi--danger { border-inline-start: 3px solid var(--ux-danger); }
+
+.ux-decision { display: flex; align-items: center; gap: var(--ux-sp-3); }
+.ux-decision__count { font-size: var(--ux-text-display); font-weight: 700; color: var(--ux-accent-strong); min-width: 44px; text-align: center; }
+.ux-decision__body { flex: 1 1 auto; display: grid; gap: 2px; }
+.ux-decision__what { font-size: var(--ux-text-body); font-weight: 700; color: var(--gray-900, #1C1917); }
+.ux-decision__hint { font-size: var(--ux-text-caption); color: var(--ux-danger); }
+
+/* ══ ⑥ مكوّنُ الانتقال (ف١٠) — شارةٌ + رئيسيٌّ + «⋯» والممنوعُ معطَّلٌ بسببِه ══ */
+.ux-transition { display: inline-flex; align-items: center; gap: var(--ux-sp-2); font-family: var(--ux-font); position: relative; }
+.ux-transition__menu {
+  position: absolute; top: calc(100% + 4px); inset-inline-end: 0; min-width: 220px;
+  background: var(--ux-surface-raised); border: var(--ux-border);
+  border-radius: var(--ux-radius-card); box-shadow: var(--ux-shadow-drawer);
+  padding: var(--ux-sp-1); z-index: var(--z-dropdown, 100); display: none;
+}
+.ux-transition__menu[data-open="1"] { display: block; }
+.ux-transition__item {
+  display: block; width: 100%; text-align: start; background: transparent; border: 0;
+  font-family: var(--ux-font); font-size: var(--ux-text-body);
+  padding: var(--ux-sp-2) var(--ux-sp-3); border-radius: var(--ux-radius-field); cursor: pointer;
+}
+.ux-transition__item:hover { background: var(--ux-neutral-bg); }
+.ux-transition__item[aria-disabled="1"] { color: var(--ux-neutral); cursor: not-allowed; }
+.ux-transition__why { display: block; font-size: 11px; color: var(--ux-neutral); }
+
+/* ══ ⑦ حالاتُ الشاشة: فراغٌ · تحميلٌ · خطأٌ · لا صلاحية (ف٩-١) ══ */
+.ux-empty, .ux-error, .ux-noperm {
+  display: grid; justify-items: center; gap: var(--ux-sp-2);
+  padding: var(--ux-sp-8) var(--ux-sp-4); text-align: center;
+  font-family: var(--ux-font); color: var(--ux-neutral-dark);
+}
+.ux-empty__title, .ux-error__title, .ux-noperm__title { font-size: var(--ux-text-title); font-weight: 700; }
+.ux-empty__hint,  .ux-error__hint,  .ux-noperm__hint  { font-size: var(--ux-text-body); color: var(--ux-neutral); max-width: 46em; }
+.ux-error  { color: var(--ux-danger); }
+.ux-loading { display: grid; gap: var(--ux-sp-2); padding: var(--ux-sp-4); }
+.ux-loading__row { height: var(--ux-row-standard); border-radius: var(--ux-radius-field); background: linear-gradient(90deg, var(--ux-neutral-bg) 25%, var(--gray-200, #E7E5E4) 50%, var(--ux-neutral-bg) 75%); background-size: 200% 100%; animation: ux-shimmer 1.2s infinite; }
+@keyframes ux-shimmer { to { background-position: -200% 0; } }
+@media (prefers-reduced-motion: reduce) { .ux-loading__row { animation: none; } }
+
+/* ══ ⑧ شاراتُ السياق: تقادمٌ · تدريبٌ · سقفٌ موقوفٌ · غيرُ متصل ══ */
+.ux-stale { font-size: var(--ux-text-caption); color: var(--ux-neutral); font-family: var(--ux-font); }
+.ux-training-banner {
+  display: flex; align-items: center; gap: var(--ux-sp-2);
+  background: var(--ux-training-bg); color: var(--ux-training);
+  font-family: var(--ux-font); font-size: var(--ux-text-body); font-weight: 700;
+  padding: var(--ux-sp-1) var(--ux-sp-4); border-bottom: var(--ux-border-w) solid var(--ux-training);
+}
+.ux-cap-hold {
+  display: flex; gap: var(--ux-sp-3); align-items: flex-start;
+  background: var(--ux-warning-bg); border: var(--ux-border-w) solid var(--ux-warning);
+  border-radius: var(--ux-radius-card); padding: var(--ux-sp-3) var(--ux-sp-4);
+  font-family: var(--ux-font); font-size: var(--ux-text-body); color: var(--ux-warning);
+}
+.ux-offline {
+  display: flex; align-items: center; gap: var(--ux-sp-2);
+  background: var(--ux-warning-bg); color: var(--ux-warning);
+  font-family: var(--ux-font); font-size: var(--ux-text-body); font-weight: 700;
+  padding: var(--ux-sp-1) var(--ux-sp-4);
+}
+
+/* ══ ⑨ شريطُ الحفظِ اللاصق (ف١١-٢) ══ */
+.ux-savebar {
+  position: sticky; bottom: 0; z-index: var(--z-sticky, 10);
+  display: flex; align-items: center; gap: var(--ux-sp-2);
+  background: var(--ux-surface-card); border-top: var(--ux-border);
+  padding: var(--ux-sp-2) var(--ux-sp-4);
+  font-family: var(--ux-font);
+}
+.ux-savebar__hint { font-size: var(--ux-text-caption); color: var(--ux-neutral); }
+.ux-savebar__spacer { flex: 1 1 auto; }
+
+/* ══ ⑩ كثافةُ الجدولِ الموحَّد (ف٩-٣) — يستهلكها DataGrid عندَ الترحيل ══ */
+.ux-grid-density-standard td, .ux-grid-density-standard th { height: var(--ux-row-standard); padding: var(--ux-cell-pad-y) var(--ux-cell-pad-x); font-size: var(--ux-text-table); }
+.ux-grid-density-compact  td, .ux-grid-density-compact  th { height: var(--ux-row-compact); }
+.ux-grid-density-comfort  td, .ux-grid-density-comfort  th { height: var(--ux-row-comfort); }
