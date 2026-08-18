@@ -41,6 +41,20 @@ $GATE = in_array('--gate', $argv, true);
 $base = $ROOT . '/docs/uxui_live_positions.tsv';
 if (!is_file($base)) { fwrite(STDERR, "لا أساسَ قبليًّا: {$base}\n"); exit(2); }
 
+/* ── الأدوارُ المؤرشَفةُ بإثباتٍ — تُستثنى من المقارنةِ ولا تُضعِف البوابة ──
+   البوابةُ لا تفرّق بين فقدٍ وأرشفةٍ مقصودة، فالاستثناءُ يُصرَّح **من القاعدةِ
+   نفسِها** لا بقائمةٍ في الكود: دورٌ كلُّ صفوفِه محجورةٌ في nav_items_archive_*
+   بمستندِ إثباتٍ وموعدِ حذف. ولو أُلغيت الأرشفةُ عاد الدورُ للمقارنةِ تلقائيًّا،
+   ولو ضاع رابطٌ من دورٍ غيرِ مؤرشَفٍ رسّب كما كان. */
+$archivedRoles = array();
+$ar = @mysqli_query($conn, "SELECT role_id, COUNT(*) c, MIN(purge_after) p, MIN(proof_doc) d
+                              FROM nav_items_archive_role5 GROUP BY role_id");
+while ($ar && ($x = mysqli_fetch_assoc($ar))) {
+    $live = @mysqli_query($conn, "SELECT COUNT(*) c FROM nav_items WHERE role_id = " . (int) $x['role_id'] . " AND active = 1");
+    $liveN = $live ? (int) mysqli_fetch_assoc($live)['c'] : -1;
+    if ($liveN === 0) { $archivedRoles[(int) $x['role_id']] = array('n' => (int) $x['c'], 'purge' => $x['p'], 'proof' => $x['d']); }
+}
+
 /* ── السجلُّ المعتمَد: لكلِّ مسارٍ APPROVED اسمُه المعياريُّ ومسمياتُه الملغاة ── */
 $canon = array();   // file_lc => ['canon' => الاسم, 'old' => [الملغاة…]]
 $res = mysqli_query($conn, "SELECT route, canonical_ar, old_names FROM nav_canonical WHERE status = 'APPROVED'");
@@ -76,6 +90,12 @@ foreach ($lines as $l) {
 $fails = 0; $totPre = 0; $totNow = 0; $renamed = 0; $merged = 0; $resurfaced = 0;
 echo "════ مصفوفةُ الحفظِ — بنودُ السايدبارِ الظاهرةُ قبلًا وبعدًا ════\n";
 foreach (uxp_root_roles() as $rid) {
+    if (isset($archivedRoles[$rid])) {
+        $a = $archivedRoles[$rid];
+        echo "  ◆ دور {$rid}: مؤرشَفٌ بإثبات ({$a['proof']}) — {$a['n']} صفًّا محجورًا حتى {$a['purge']}"
+           . " · يُستثنى من المقارنةِ ولا يُعدُّ فقدًا\n";
+        continue;
+    }
     $now = array();
     foreach (uxp_render_role($conn, $rid) as $p) {
         $k = upc_key($p['href'], $p['label']);

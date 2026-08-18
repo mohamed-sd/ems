@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-18 14:38:56
--- الجداول: 575 · المناظير: 23
+-- المصدر: equipation_manage · التوليد: 2026-08-18 14:47:04
+-- الجداول: 579 · المناظير: 23
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -7574,6 +7574,21 @@ CREATE TABLE `nav_canonical_variants` (
   UNIQUE KEY `uq_variant` (`canonical_route`,`variant_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01 v3: سجلُّ المداخلِ الثانية — المرساةُ والمنظرُ المعلَن';
 
+-- ── Table: nav_dedup_verdicts ──
+CREATE TABLE `nav_dedup_verdicts` (
+  `pair_no` smallint(6) NOT NULL,
+  `route_a` varchar(160) NOT NULL,
+  `route_b` varchar(160) NOT NULL,
+  `similarity` decimal(5,4) DEFAULT NULL,
+  `auto_hint` varchar(190) DEFAULT NULL COMMENT 'الترجيحُ الآليُّ — اقتراحٌ لا حكم',
+  `verdict_class` enum('independent','related_containment','same_function','view_of_same_data','sequential_stages','header_lines') NOT NULL,
+  `verdict_text` varchar(600) NOT NULL COMMENT 'الحكمُ الفنيُّ المسبَّبُ من الكود',
+  `evidence` varchar(400) DEFAULT NULL COMMENT 'الجداولُ/الحوارسُ التي بُني عليها الحكم',
+  `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`pair_no`),
+  KEY `ix_class` (`verdict_class`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01: أحكامُ ازدواجِ المعنى الـ59 — مثبَّتةٌ حقولًا لا نصًّا في ملف';
+
 -- ── Table: nav_items ──
 CREATE TABLE `nav_items` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7704,6 +7719,25 @@ CREATE TABLE `nav_items_archive_dupes` (
   CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: nav_items_archive_role5 ──
+CREATE TABLE `nav_items_archive_role5` (
+  `id` int(11) NOT NULL COMMENT 'نفسُ معرِّفِ الصفِّ في nav_items — للاستعادةِ الحرفية',
+  `role_id` int(11) NOT NULL,
+  `door` varchar(16) DEFAULT NULL,
+  `group_id` int(11) DEFAULT NULL,
+  `module_id` int(11) DEFAULT NULL,
+  `label_ar` varchar(64) NOT NULL,
+  `route` varchar(128) NOT NULL,
+  `icon` varchar(50) DEFAULT NULL,
+  `sort_order` int(11) NOT NULL DEFAULT 0,
+  `permission_code` varchar(128) DEFAULT NULL,
+  `was_active` tinyint(1) NOT NULL,
+  `quarantined_at` datetime NOT NULL,
+  `purge_after` date NOT NULL COMMENT 'ثلاثون يومًا — ولا حذفَ قبلَها',
+  `proof_doc` varchar(120) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01: حجرُ تعريفِ التنقلِ القديم (الدور 5) — ثلاثون يومًا ثم حذف';
+
 -- ── Table: nav_items_archive_views ──
 CREATE TABLE `nav_items_archive_views` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -7729,6 +7763,37 @@ CREATE TABLE `nav_items_archive_views` (
   CONSTRAINT `chk_nav_door` CHECK (`door` in ('HOME','DAILY','APPR','REC','REP','SET','GOV','FIN','RISK')),
   CONSTRAINT `chk_nav_items_module_or_code` CHECK (`permission_code` is null or `permission_code` = '' or `module_id` is not null and `module_id` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: nav_pending_answers ──
+CREATE TABLE `nav_pending_answers` (
+  `closure_id` int(10) unsigned NOT NULL,
+  `q_no` tinyint(4) NOT NULL COMMENT '1 الاسم · 2 المجموعة · 3 الترتيب · 4 المستندُ الداخل · 5 الناتج · 6 الحالةُ التالية',
+  `answer` enum('yes','no','unanswered') NOT NULL DEFAULT 'unanswered',
+  `note` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`closure_id`,`q_no`),
+  CONSTRAINT `fk_ans_closure` FOREIGN KEY (`closure_id`) REFERENCES `nav_pending_closure` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01: أسئلةُ الإغلاقِ الستةُ بأجوبتِها';
+
+-- ── Table: nav_pending_closure ──
+CREATE TABLE `nav_pending_closure` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `route` varchar(160) NOT NULL,
+  `owner_dept` varchar(120) NOT NULL,
+  `proposed_label` varchar(190) NOT NULL COMMENT 'الاسمُ المعياريُّ المقترَح',
+  `proposed_group` varchar(190) NOT NULL,
+  `proposed_level` tinyint(4) NOT NULL,
+  `proposed_order` int(11) NOT NULL,
+  `sent_at` datetime NOT NULL COMMENT 'بدءُ مهلةِ الثلاثةِ أيام',
+  `due_at` datetime NOT NULL,
+  `decision` enum('pending','approved','modified','auto_approved_by_silence') NOT NULL DEFAULT 'pending',
+  `decided_by` int(11) DEFAULT NULL COMMENT 'users.id — يُقرأ من الجلسةِ لا يُكتب نصًّا',
+  `decided_at` datetime DEFAULT NULL,
+  `modification_note` varchar(500) DEFAULT NULL,
+  `reopened_at` datetime DEFAULT NULL COMMENT 'الصمتُ قابلٌ للنقضِ لاحقًا من الشاشة',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_route` (`route`),
+  KEY `ix_dept_state` (`owner_dept`,`decision`,`due_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01: إغلاقُ المعلَّقِ بقاعدةِ ثلاثةِ أيامٍ — الصمتُ يعتمد المقترحَ ويبقى قابلًا للنقض';
 
 -- ── Table: nav_redirects ──
 CREATE TABLE `nav_redirects` (
