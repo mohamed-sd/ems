@@ -881,7 +881,25 @@
            مُعلَّقٌ عليه يبقى يتيمًا في .main حين يزول. الوعاءُ ثابت. */
         container = api.table().container();
         if (!container) { tableEl.dataset.emsXlsx = ''; return; }
-        container.insertBefore(host, container.firstChild);
+        /* ف٩-٢ · بوابة G20 — «شريطٌ موحَّدٌ واحدٌ فوقَ الجدول»:
+           كان الزرُّ يُدرَج **صفًّا مستقلًّا** في رأسِ الوعاءِ فوقَ صفِّ البحث،
+           فينتج شريطانِ متراكبانِ فوقَ كلِّ جدولٍ في النظام. وقياسُ المتصفحِ
+           الحقيقيِّ (getBoundingClientRect) كشفه حيث لم يكشفه فحصُ النصّ:
+           صندوقُ الاعتمادِ «نظيفٌ» نصًّا وفيه شريطانِ فوقَ أربعةِ جداول.
+           فيُلحَق التصديرُ بصفِّ البحثِ نفسِه — شريطٌ واحدٌ لا شريطان.
+           ◆ والارتدادُ محفوظ: إن لم يوجد صفُّ بحثٍ (جدولٌ بلا فلترة) يعود
+             السلوكُ القديمُ فلا يفقد الزرَّ جدولٌ واحد (صفرُ فقد). */
+        var filterEl = container.querySelector('.dataTables_filter');
+        if (filterEl && filterEl.parentElement) {
+            /* شقيقًا **مباشرًا** لحقلِ البحث — لا صفًّا فوقَه. وحقلُ البحثِ
+               عائمٌ في RTL، فالشقيقُ ذو العرضِ السطريِّ يجلس في سطرِه نفسِه.
+               (وأولُ صياغةٍ اشترطت صفًّا وسيطًا فسقطت للسلوكِ القديمِ صامتةً:
+                DataTables يضع الفلترَ في الوعاءِ مباشرةً بلا صفٍّ وسيط.) */
+            host.className += ' ems-toolbar-inline';
+            filterEl.parentElement.insertBefore(host, filterEl.nextSibling);
+        } else {
+            container.insertBefore(host, container.firstChild);
+        }
         $(host).append(btns.container());
     }
 

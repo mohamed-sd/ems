@@ -64,24 +64,62 @@ function ugi_body($html) {
     $h = preg_replace('~<style\b.*?</style>~su', '', $h);
     return $h;
 }
+/**
+ * عدُّ القدرةِ لا عدُّ الصفوف — والفرقُ جوهريّ.
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ عيبُ قياسٍ ثالثٌ رُصد وأُصلح (2026-08-18): كانت الأداةُ تعدُّ كلَّ زرٍّ ورابطٍ
+ *   وحقلٍ في الصفحةِ **بما فيها ما يتضاعف بعددِ صفوفِ البيانات**. فشاشةُ
+ *   «مهامي» أعلنت فقدًا (نماذج 22⇐0) بينما ملفُّها لم يُلمَس: عشرون مهمةً
+ *   انقلبت `overdue` بمرورِ مهلتِها أثناءَ الجلسة، فخرجت من منظرِ «اليوم».
+ *   فالعددُ نزل بحركةِ بياناتٍ زمنيةٍ لا بفقدِ قدرة.
+ * ◆ و«صفرُ فقد» معناه: **لا قدرةَ تُنزَع** — لا «لا صفَّ ينقص». فالقياسُ صار
+ *   على محورَين:
+ *   ① القدرةُ البنيوية: ما هو خارجَ `tbody` (ترويسةٌ وشريطٌ ومرشِّحاتٌ وأعمدةٌ
+ *      ونماذجُ الصفحة) — لا يتحرك بالبيانات، وهو ما ترسِّب عليه البوابة.
+ *   ② قالبُ الصف: عناصرُ **صفٍّ واحدٍ** (الأولِ) لا مجموعُ الصفوف — فيُكشف
+ *      نقصُ إجراءٍ من الصفِّ ولو تغيّر عددُ الصفوف.
+ *   وعددُ الصفوفِ يُسجَّل خبرًا لا حكمًا (data_rows) فيُفسِّر ولا يُرسِّب.
+ */
 function ugi_counts($html) {
     $b = ugi_body($html);
-    /* ◆ مفرداتُ المكتبةِ الجديدةِ تُعَدُّ ضوابطَ كما القديمة: `ux-chip` رقاقةُ
-       منظرٍ **رابطٌ تفاعليٌّ** لا زخرفة. وبدونِها يقرأ الجردُ تغييرَ الشكلِ
-       (وهو من المسموحاتِ الأربعة) فقدًا — والعنصرُ باقٍ يُثبته ثباتُ عدِّ
-       الروابطِ قبلَ التغييرِ وبعدَه. */
-    $buttons  = preg_match_all('~<button\b~iu', $b)
-              + preg_match_all('~<input[^>]+type=["\'](?:submit|button)~iu', $b)
-              + preg_match_all('~<a[^>]+class="[^"]*(?:btn|ux-chip)[^"]*"~iu', $b);
-    $th       = preg_match_all('~<th\b~iu', $b);
-    $selects  = preg_match_all('~<select\b~iu', $b);
-    $inputs   = preg_match_all('~<input\b(?![^>]*type=["\'](?:hidden|submit|button))~iu', $b)
-              + preg_match_all('~<textarea\b~iu', $b);
-    $links    = preg_match_all('~<a\b[^>]*href=~iu', $b);
-    $tables   = preg_match_all('~<table\b~iu', $b);
-    $forms    = preg_match_all('~<form\b~iu', $b);
-    return array('buttons' => $buttons, 'columns' => $th, 'filters' => $selects, 'inputs' => $inputs,
-                 'links' => $links, 'tables' => $tables, 'forms' => $forms);
+
+    /* قالبُ الصفِّ: أولُ صفٍّ في أولِ tbody */
+    $rowTpl = '';
+    $dataRows = 0;
+    if (preg_match_all('~<tbody\b[^>]*>(.*?)</tbody>~su', $b, $tb)) {
+        foreach ($tb[1] as $body) {
+            $dataRows += preg_match_all('~<tr\b~iu', $body);
+            if ($rowTpl === '' && preg_match('~<tr\b[^>]*>(.*?)</tr>~su', $body, $m1)) { $rowTpl = $m1[1]; }
+        }
+    }
+    /* البنيةُ = الصفحةُ بلا محتوى tbody */
+    $struct = preg_replace('~<tbody\b[^>]*>.*?</tbody>~su', '<tbody></tbody>', $b);
+
+    $countIn = function ($s) {
+        return array(
+            'buttons' => preg_match_all('~<button\b~iu', $s)
+                       + preg_match_all('~<input[^>]+type=["\'](?:submit|button)~iu', $s)
+                       + preg_match_all('~<a[^>]+class="[^"]*(?:btn|ux-chip)[^"]*"~iu', $s),
+            'inputs'  => preg_match_all('~<input\b(?![^>]*type=["\'](?:hidden|submit|button))~iu', $s)
+                       + preg_match_all('~<textarea\b~iu', $s),
+            'links'   => preg_match_all('~<a\b[^>]*href=~iu', $s),
+            'forms'   => preg_match_all('~<form\b~iu', $s),
+        );
+    };
+    $S = $countIn($struct);
+    $R = $countIn($rowTpl);
+
+    return array(
+        /* ① القدرةُ البنيوية — عليها ترسِّب البوابة */
+        'buttons' => $S['buttons'], 'inputs' => $S['inputs'], 'links' => $S['links'], 'forms' => $S['forms'],
+        'columns' => preg_match_all('~<th\b~iu', $struct),
+        'filters' => preg_match_all('~<select\b~iu', $struct),
+        'tables'  => preg_match_all('~<table\b~iu', $struct),
+        /* ② قالبُ الصفِّ — نقصُ إجراءٍ في الصفِّ يُرسِّب أيضًا */
+        'row_buttons' => $R['buttons'], 'row_links' => $R['links'], 'row_inputs' => $R['inputs'],
+        /* خبرٌ يفسّر ولا يحكم */
+        'data_rows' => $dataRows,
+    );
 }
 
 /* ── العشرُ من سجلِّ المالك ── */
@@ -116,7 +154,8 @@ foreach ($golden as $g) {
 @unlink($COOKIES);
 
 /* ── الإخراج ── */
-$hdrCols = array('screen', 'title', 'state', 'buttons', 'columns', 'filters', 'inputs', 'links', 'tables', 'forms');
+$hdrCols = array('screen', 'title', 'state', 'buttons', 'columns', 'filters', 'inputs', 'links', 'tables', 'forms',
+                 'row_buttons', 'row_links', 'row_inputs', 'data_rows');
 if (!empty($args['save'])) {
     $f = fopen($args['save'], 'w');
     fwrite($f, implode("\t", $hdrCols) . "\n");
@@ -129,7 +168,7 @@ if (!empty($args['save'])) {
     echo "جردُ ما قبلَ الترحيلِ كُتب ⇐ {$args['save']}\n";
     foreach ($rows as $c) {
         if (isset($c['error'])) { echo "  ⚠ {$c['screen']}: {$c['error']}\n"; continue; }
-        echo "  ▪ {$c['screen']} ({$c['title']}): أزرار={$c['buttons']} · أعمدة={$c['columns']} · مرشِّحات={$c['filters']} · إدخال={$c['inputs']} · روابط={$c['links']} · جداول={$c['tables']} · نماذج={$c['forms']}\n";
+        echo "  ▪ {$c['screen']} ({$c['title']}): أزرار={$c['buttons']} · أعمدة={$c['columns']} · مرشِّحات={$c['filters']} · إدخال={$c['inputs']} · روابط={$c['links']} · جداول={$c['tables']} · نماذج={$c['forms']} · قالبُ الصفِّ(أزرار/روابط)={$c['row_buttons']}/{$c['row_links']} · صفوفُ بيانات={$c['data_rows']}\n";
     }
     exit(0);
 }
@@ -138,7 +177,7 @@ if (!empty($args['check'])) {
     $baseRows = array();
     foreach (array_slice(file($args['check']), 1) as $l) {
         $c = explode("\t", rtrim($l, "\n"));
-        if (count($c) >= 10) { $baseRows[$c[0]] = array_combine($hdrCols, $c); }
+        if (count($c) === count($hdrCols)) { $baseRows[$c[0]] = array_combine($hdrCols, $c); }
     }
     $fails = 0;
     foreach ($rows as $c) {
@@ -146,7 +185,9 @@ if (!empty($args['check'])) {
         if (!isset($baseRows[$c['screen']])) { echo "  ⚠ {$c['screen']}: لا صفَّ له في الأساس\n"; continue; }
         $b = $baseRows[$c['screen']];
         $bad = array();
-        foreach (array('buttons', 'columns', 'filters', 'inputs', 'links', 'tables', 'forms') as $k) {
+        /* data_rows خبرٌ يفسّر ولا يحكم — والحكمُ على القدرةِ وقالبِ الصفّ */
+        foreach (array('buttons', 'columns', 'filters', 'inputs', 'links', 'tables', 'forms',
+                      'row_buttons', 'row_links', 'row_inputs') as $k) {
             if ((int) $c[$k] < (int) $b[$k]) { $bad[] = "{$k}: {$b[$k]}⇐{$c[$k]}"; }
         }
         if ($bad) { $fails++; echo "  ✗ {$c['screen']}: نقصٌ — " . implode(' · ', $bad) . "\n"; }

@@ -568,6 +568,8 @@ class TenantRegistry
         // ف١٣ (تعديل 2026-08-18): سجلُّ تغييرِ الأحكامِ الحاكمة — تاريخُ سياسةٍ لا بياناتُ شركة
         'gov_policy_changes' => array('type' => self::T_GLOBAL, 'soft' => false),
         'uat_field_quarantine' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'gov_component_versions' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'gov_visual_measurements' => array('type' => self::T_GLOBAL, 'soft' => false),
         'approval_rules_quarantine' => array('type' => self::T_GLOBAL, 'soft' => false),
         // تعريفُ الشاشة خاصيةُ الشاشة لا بياناتُ شركة — مرجعٌ عامٌّ كأخواته
         'screen_about' => array('type' => self::T_GLOBAL, 'soft' => false),

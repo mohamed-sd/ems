@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-18 20:17:48
--- الجداول: 583 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-18 20:34:31
+-- الجداول: 585 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6213,6 +6213,21 @@ CREATE TABLE `gov_cap_proposals` (
   PRIMARY KEY (`ladder_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='مقترحاتُ السقوفِ المشتقةُ آليًّا — تُعرض في شاشةِ حدودِ المبالغِ ويعتمدها المالك';
 
+-- ── Table: gov_component_versions ──
+CREATE TABLE `gov_component_versions` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `version_tag` varchar(24) NOT NULL COMMENT 'مثال: ux-1.0.0',
+  `fingerprint` char(64) NOT NULL COMMENT 'sha256 لملفاتِ المكتبةِ مجتمعة',
+  `files_json` text NOT NULL COMMENT 'الملفاتُ الداخلةُ في البصمةِ وبصمةُ كلٍّ',
+  `state` enum('DRAFT','PROMOTED','SUPERSEDED') NOT NULL DEFAULT 'DRAFT' COMMENT 'PROMOTED غيرُ قابلٍ للتعديل — التغييرُ ينشئ إصدارًا جديدًا',
+  `promoted_at` datetime DEFAULT NULL,
+  `note` varchar(255) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_tag` (`version_tag`),
+  UNIQUE KEY `uq_fp` (`fingerprint`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='إصداراتُ مكتبةِ المكوّنات — المرقَّى ثابتٌ ولا يُعدَّل في صمت';
+
 -- ── Table: gov_data_classes ──
 CREATE TABLE `gov_data_classes` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -6628,6 +6643,26 @@ CREATE TABLE `gov_stage_outputs` (
   UNIQUE KEY `uq_stage` (`role_id`,`stage_no`),
   KEY `ix_src` (`output_source`,`next_source`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='⑨ المستندُ الناتجُ والحالةُ التالية — ولكلِّ خانةٍ مصدرُها المعلَن';
+
+-- ── Table: gov_visual_measurements ──
+CREATE TABLE `gov_visual_measurements` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `screen_file` varchar(160) NOT NULL,
+  `viewport_w` smallint(5) unsigned NOT NULL,
+  `viewport_h` smallint(5) unsigned NOT NULL,
+  `header_px` smallint(5) unsigned DEFAULT NULL COMMENT 'getBoundingClientRect — لا تقديرَ بنيويّ',
+  `header_within_limit` tinyint(1) DEFAULT NULL,
+  `has_h_scroll` tinyint(1) DEFAULT NULL COMMENT 'تمريرٌ أفقيٌّ للصفحة — والجدولُ مستثنًى',
+  `primary_buttons` smallint(5) unsigned DEFAULT NULL,
+  `stacked_toolbars` smallint(5) unsigned DEFAULT NULL COMMENT 'أشرطةٌ متراكبةٌ فوقَ جدولٍ واحد',
+  `worst_cell_actions` smallint(5) unsigned DEFAULT NULL,
+  `row_height_px` smallint(5) unsigned DEFAULT NULL,
+  `component_version` varchar(24) DEFAULT NULL COMMENT 'الإصدارُ وقتَ القياس — يبطل بتغيُّرِه',
+  `measured_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `measured_by` varchar(60) NOT NULL DEFAULT 'browser-probe',
+  PRIMARY KEY (`id`),
+  KEY `ix_screen_vp` (`screen_file`,`viewport_w`,`measured_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='قياساتُ محرّكِ العرضِ الحقيقيّ — كلُّ رقمٍ بدقتِه ووقتِه وإصدارِ مكوّنِه';
 
 -- ── Table: governance_flags ──
 CREATE TABLE `governance_flags` (

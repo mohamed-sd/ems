@@ -190,3 +190,13 @@
 /* الرقاقةُ رابطًا: المنظرُ النشطُ حالةٌ لا زرٌّ رئيسيّ */
 a.ux-chip { text-decoration: none; }
 a.ux-chip:hover { background: var(--ux-accent); color: var(--white, #fff); }
+
+/* ══ ⑫ إلحاقُ التصديرِ بصفِّ البحث (ف٩-٢ · بوابة G20) ══
+   شريطٌ موحَّدٌ واحدٌ فوقَ الجدولِ — لا صفٌّ مستقلٌّ للتصديرِ فوقَ صفِّ البحث. */
+.ems-toolbar-inline {
+  display: inline-flex; align-items: center; gap: var(--ux-sp-2);
+  margin-inline-start: var(--ux-sp-3); vertical-align: middle;
+}
+.ems-toolbar-inline .dt-buttons { margin: 0; float: none; }
+/* حقلُ البحثِ عائمٌ في RTL — فالشقيقُ يعوم معه ليجلسا سطرًا واحدًا */
+.dataTables_wrapper > .ems-toolbar-inline { float: right; margin-inline-start: var(--ux-sp-3); }
