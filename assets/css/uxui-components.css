@@ -200,3 +200,12 @@ a.ux-chip:hover { background: var(--ux-accent); color: var(--white, #fff); }
 .ems-toolbar-inline .dt-buttons { margin: 0; float: none; }
 /* حقلُ البحثِ عائمٌ في RTL — فالشقيقُ يعوم معه ليجلسا سطرًا واحدًا */
 .dataTables_wrapper > .ems-toolbar-inline { float: right; margin-inline-start: var(--ux-sp-3); }
+
+/* ══ ⑬ حالةُ التركيزِ المرئية (WCAG 2.2 AA · 2.4.7 و2.4.11) ══
+   قِيس حيًّا: 60 ضابطًا من 79 بلا مؤشرِ تركيزٍ مرئيّ (outline منزوعٌ بلا بديل).
+   و`:focus-visible` يظهر للوحةِ المفاتيحِ ولا يزاحم فأرةَ المستخدم. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--ux-accent, #F7931A);
+  outline-offset: 2px;
+  border-radius: var(--ux-radius-field, 4px);
+}

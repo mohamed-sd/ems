@@ -147,8 +147,8 @@ function printUnifiedNavDoor($doorKey, $doorMeta, $items, $basePrefix = '../', $
     $badge = $total > 0 ? ' <span class="nav-count-badge nav-group-badge">' . ($total > 99 ? '99+' : $total) . '</span>' : '';
 
     echo '<li class="nav-group" data-group-key="' . $key . '">' . "\n";
-    echo '  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-' . $key . '">'
-       . '<i class="' . $icon . '"></i> <span class="nav-group-name">' . $name . '</span>' . $badge
+    echo '  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-' . $key . '" aria-label="' . $name . '" title="' . $name . '">'
+       . '<i class="' . $icon . '" aria-hidden="true"></i> <span class="nav-group-name">' . $name . '</span>' . $badge
        . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
     echo '  <ul class="nav-group-items" id="navgrp-' . $key . '">' . "\n";
 
@@ -269,9 +269,13 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
              حرفيًّا فلا أثرَ لها — متغيّرٌ مُهمَلٌ يُوهم أنَّ القاعدةَ مطبَّقة. */
         echo '<li class="nav-group' . ($openDefault ? ' open' : '') . '" data-group-key="' . $key . '"'
            . ($openDefault ? ' data-ems-open-default="1"' : '') . '>' . "\n";
+        /* WCAG 2.2 AA · 4.1.2: اسمُ المرحلةِ يعيش في `span` قد يُخفيه طيُّ الشريط
+           فيبقى الزرُّ بلا اسمٍ لقارئِ الشاشة — يُثبَّت على الزرِّ نفسِه. */
         echo '  <button type="button" class="nav-group-head" aria-expanded="' . ($openDefault ? 'true' : 'false') . '"'
-           . ' aria-controls="navgrp-' . $key . '">'
-           . '<i class="' . $icon . '"></i> <span class="nav-group-name">' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8')
+           . ' aria-controls="navgrp-' . $key . '"'
+           . ' aria-label="' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '"'
+           . ' title="' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . '">'
+           . '<i class="' . $icon . '" aria-hidden="true"></i> <span class="nav-group-name">' . htmlspecialchars($title, ENT_QUOTES, 'UTF-8')
            // NM-05 (الوثيقة 70 §4-5): سطرُ شرحِ المرحلةِ تحتَ اسمِها — من stage_desc المبذورِ من النصِّ الحاكم
            . ((isset($sItems[0]['stage_desc']) && trim((string) $sItems[0]['stage_desc']) !== '')
                ? '<span class="nav-stage-desc">' . htmlspecialchars(trim((string) $sItems[0]['stage_desc']), ENT_QUOTES, 'UTF-8') . '</span>'
@@ -573,9 +577,12 @@ function printUxuiCurrentNav($items, $curMap, $basePrefix, $badges, $mode = 'gro
         foreach ($G['items'] as $r) { $total += isset($badges[$r['code']]) ? intval($badges[$r['code']]) : 0; }
         $badge = $total > 0 ? ' <span class="nav-count-badge nav-group-badge">' . ($total > 99 ? '99+' : $total) . '</span>' : '';
         echo '<li class="nav-group open" data-group-key="' . $key . '">' . "\n";
-        echo '  <button type="button" class="nav-group-head" aria-expanded="true" aria-controls="navgrp-' . $key . '">'
-           . '<i class="fa fa-folder"></i> <span class="nav-group-name">'
-           . htmlspecialchars($G['name'], ENT_QUOTES, 'UTF-8') . '</span>' . $badge
+        /* WCAG 2.2 AA · 4.1.2 — الاسمُ على الزرِّ لا في `span` قد يُخفيه الطيّ */
+        $gnm = htmlspecialchars($G['name'], ENT_QUOTES, 'UTF-8');
+        echo '  <button type="button" class="nav-group-head" aria-expanded="true" aria-controls="navgrp-' . $key . '"'
+           . ' aria-label="' . $gnm . '" title="' . $gnm . '">'
+           . '<i class="fa fa-folder" aria-hidden="true"></i> <span class="nav-group-name">'
+           . $gnm . '</span>' . $badge
            . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
         echo '  <ul class="nav-group-items" id="navgrp-' . $key . '">' . "\n";
         foreach ($G['items'] as $r) {
@@ -638,10 +645,17 @@ function printUxuiCanonicalNav($items, $map, $basePrefix, $badges) {
         foreach ($G['items'] as $r) { $total += isset($badges[$r['code']]) ? intval($badges[$r['code']]) : 0; }
         $badge = $total > 0 ? ' <span class="nav-count-badge nav-group-badge">' . ($total > 99 ? '99+' : $total) . '</span>' : '';
         echo '<li class="nav-group' . ($open ? ' open' : '') . '" data-group-key="' . $key . '">' . "\n";
+        /* الوصولُ الرقميُّ (WCAG 2.2 AA · بوابةُ الترقيةِ البند ٣): رأسُ المجموعةِ
+           **زرٌّ**، واسمُه يعيش في `span` قد يُخفيه طيُّ السايدبار. و`innerText`
+           لعنصرٍ مخفيٍّ فراغٌ — فيبقى الزرُّ ظاهرًا بلا اسمٍ لقارئِ الشاشة.
+           قِيس حيًّا: 37 زرًّا بلا اسمٍ في شاشةٍ واحدة. فالاسمُ يُثبَّت على الزرِّ
+           نفسِه (`aria-label` + `title`) فلا يسقط بطيِّ الشريط — وهو أيضًا حكمُ
+           ف١٢-٢: «الأيقونيُّ بتلميحٍ نصيٍّ إلزاميّ». */
+        $gnameAttr = htmlspecialchars($G['name'], ENT_QUOTES, 'UTF-8');
         echo '  <button type="button" class="nav-group-head" aria-expanded="' . ($open ? 'true' : 'false') . '"'
-           . ' aria-controls="navgrp-' . $key . '">'
-           . '<i class="' . htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') . '"></i> <span class="nav-group-name">'
-           . htmlspecialchars($G['name'], ENT_QUOTES, 'UTF-8') . '</span>' . $badge
+           . ' aria-controls="navgrp-' . $key . '" aria-label="' . $gnameAttr . '" title="' . $gnameAttr . '">'
+           . '<i class="' . htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') . '" aria-hidden="true"></i> <span class="nav-group-name">'
+           . $gnameAttr . '</span>' . $badge
            . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
         echo '  <ul class="nav-group-items" id="navgrp-' . $key . '">' . "\n";
         foreach ($G['items'] as $r) {

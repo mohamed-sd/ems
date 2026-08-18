@@ -106,7 +106,10 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
 <!-- طبقة الخلفية المعتمة (للموبايل) -->
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<div class="sidebar closed" id="sidebar">
+<?php /* الوصولُ الرقميُّ (WCAG 2.2 AA · 1.3.6 المعالم): الشريطُ الجانبيُّ معلَمُ
+         تنقلٍ معلَن — وقياسٌ حيٌّ أظهر صفرَ معلَمِ تنقلٍ في الصفحة. والدورُ
+         يُضاف على الغلافِ القائمِ بلا تغييرِ وسمٍ ولا صنفٍ (صفرُ أثرٍ بصريّ). */ ?>
+<div class="sidebar closed" id="sidebar" role="navigation" aria-label="التنقلُ الرئيسيّ">
   <?php
   /* رأسُ اللوح على الجوّال (NAV — واجهة الجوّال): هويّةٌ + مَن أنت + إغلاقٌ صريح.
      مخفيٌّ افتراضًا (display:none في ems.main.all.style.css؟ لا — هنا صراحةً)،

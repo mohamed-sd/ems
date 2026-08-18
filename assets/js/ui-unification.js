@@ -1694,9 +1694,26 @@
         });
     }
 
+    /* ══ معلَمُ المحتوى الرئيس (WCAG 2.2 AA · 1.3.6) ═══════════════════════════
+       قِيس حيًّا: صفرُ معلَمِ `main` في الصفحة. وغلافُ المحتوى
+       `.main.ems-unified-page-shell` مكتوبٌ **في كلِّ شاشةٍ على حدة** (مئاتُ
+       الملفات)، فإضافةُ الدورِ في كلٍّ منها كنسٌ واسعٌ بخطرٍ لا يوازي عائدَه.
+       والطبقةُ الموحَّدةُ تعمل في كلِّ صفحةٍ أصلًا — فيُضاف الدورُ هنا مرةً
+       واحدةً على الغلافِ القائمِ **بلا تغييرِ وسمٍ ولا صنفٍ ولا بكسل**.
+       ◆ ولا يُداس دورٌ مكتوبٌ سلفًا: من صرّح فقرارُه أولى. */
+    function ensureMainLandmark() {
+        try {
+            var el = document.querySelector('.main.ems-unified-page-shell, .main');
+            if (el && !el.getAttribute('role') && !document.querySelector('main, [role="main"]')) {
+                el.setAttribute('role', 'main');
+            }
+        } catch (e) { /* لا يعطل الصفحة */ }
+    }
+
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', boot);
+        document.addEventListener('DOMContentLoaded', function () { boot(); ensureMainLandmark(); });
     } else {
+        ensureMainLandmark();
         boot();
     }
 

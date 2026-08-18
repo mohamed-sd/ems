@@ -367,8 +367,8 @@ function printNavGroupItem($node, $basePrefix = '../', $badges = array()) {
     $badge = $total > 0 ? ' <span class="nav-count-badge nav-group-badge">' . ($total > 99 ? '99+' : $total) . '</span>' : '';
 
     echo '<li class="nav-group" data-group-key="' . $key . '">' . "\n";
-    echo '  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-' . $key . '">'
-       . '<i class="' . $icon . '"></i> '
+    echo '  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-' . $key . '" aria-label="' . $name . '" title="' . $name . '">'
+       . '<i class="' . $icon . '" aria-hidden="true"></i> '
        . '<span class="nav-group-name">' . $name . '</span>' . $badge
        . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i>'
        . '</button>' . "\n";
