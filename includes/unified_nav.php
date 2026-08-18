@@ -467,10 +467,119 @@ function emsNavLandingAnchors(array $items) {
     return count($out);
 }
 
+/* ═══ UXUI-01 (ف١٥ بند ٦): السايدبارُ يُولَّد من سجلِّ التنقلِ المعياريّ ═══
+   nav_canonical صورةُ «مصفوفة التنقل المعيارية» المعتمَدة (359):
+   · APPROVED (272) يُولَّد بالاسمِ والمجموعةِ والمستوى والترتيبِ المعياريةِ —
+     في كلِّ الأدوارِ سواءً (بندا ٢ و٣: same_route ⇒ same_label/same_group).
+   · PENDING_OWNER/PENDING_DEDUP لا يُولَّد ولا يُمَسُّ موضعُه الحاليُّ (ف١٥-٢)
+     حتى توقيعِ «جلسة إغلاق المعلَّق» — فيبقى في مجموعتِه المرحليةِ القائمة.
+   · الدورُ يبقى طبقةَ ظهورٍ فقط (بند ٥): التبعيةُ في nav_items كما هي،
+     وما يظهر للدورِ هو صفوفُه هو — لكنَّ اسمَه وموضعَه من السجلِّ الواحد.
+   · الرابطُ ذو المرساةِ أو المنظرِ (#n · ?view=) مدخلٌ مقصودٌ يحفظ تسميتَه
+     ويرث مجموعةَ ملفِّه الأم (بندا ٣ و٧) — فلا يضيع رابطٌ واحد (صفرُ فقد).
+   · مفتاحُ إيقافٍ تشغيليّ: EMS_UXUI_NAV=off في البيئةِ يعيد الوضعَ القديمَ حرفًا. */
+function uxuiNavBaseRoute($route) {
+    $r = preg_replace('~^(\.\./)+~', '', trim((string) $route));
+    $r = preg_replace('/[?#].*$/u', '', $r);
+    return strtolower(trim($r, '/'));
+}
+
+function uxuiCanonicalMap($conn) {
+    static $map = null;
+    if ($map !== null) { return $map; }
+    $map = array();
+    if (function_exists('ems_env') && strtolower((string) ems_env('EMS_UXUI_NAV')) === 'off') { return $map; }
+    $res = @mysqli_query($conn, "SELECT route, canonical_ar, level_no, group_name, sort_no
+                                   FROM nav_canonical WHERE status = 'APPROVED'");
+    if (!$res) { return $map; } /* الجدولُ لم يُبذر بعدُ = الوضعُ القديمُ كما هو (fail-open للعرض) */
+    while ($row = mysqli_fetch_assoc($res)) { $map[strtolower(trim($row['route']))] = $row; }
+    return $map;
+}
+
+/** طباعةُ الكتلةِ المعيارية: مجموعاتٌ بترتيبِ (المستوى ثم الدورةِ) — بهيكلِ nav-group نفسِه */
+function printUxuiCanonicalNav($items, $map, $basePrefix, $badges) {
+    if (empty($items)) { return; }
+    $rows = array();
+    foreach ($items as $idx => $it) {
+        $raw = (string) $it['route'];
+        $base = uxuiNavBaseRoute($raw);
+        if (!isset($map[$base])) { continue; }
+        $c = $map[$base];
+        $isVariant = (strpbrk($raw, '#?') !== false); /* مدخلٌ ثانٍ مقصودٌ — تسميتُه له */
+        $rows[] = array(
+            'code'    => $raw,
+            'name'    => $isVariant ? $it['label_ar'] : $c['canonical_ar'],
+            'icon'    => $it['icon'],
+            'level'   => (int) $c['level_no'],
+            'group'   => $c['group_name'],
+            'sort'    => (int) $c['sort_no'],
+            'variant' => $isVariant ? 1 : 0,
+            'idx'     => $idx,
+        );
+    }
+    if (empty($rows)) { return; }
+    $groups = array();
+    foreach ($rows as $r) { $groups[$r['group']]['items'][] = $r; }
+    foreach ($groups as $gname => &$G) {
+        $lv = 99; $ms = PHP_INT_MAX;
+        foreach ($G['items'] as $r) { if ($r['level'] < $lv) { $lv = $r['level']; } if ($r['sort'] < $ms) { $ms = $r['sort']; } }
+        $G['level'] = $lv; $G['minsort'] = $ms; $G['name'] = $gname;
+        usort($G['items'], function ($a, $b) {
+            if ($a['sort'] !== $b['sort']) { return $a['sort'] - $b['sort']; }
+            if ($a['variant'] !== $b['variant']) { return $a['variant'] - $b['variant']; } /* الأصلُ قبل منظرِه */
+            return $a['idx'] - $b['idx'];
+        });
+    }
+    unset($G);
+    $list = array_values($groups);
+    usort($list, function ($a, $b) {
+        if ($a['level'] !== $b['level']) { return $a['level'] - $b['level']; }
+        if ($a['minsort'] !== $b['minsort']) { return $a['minsort'] - $b['minsort']; }
+        return strcmp($a['name'], $b['name']);
+    });
+    $levelIcons = array(1 => 'fa fa-tachometer-alt', 2 => 'fa fa-briefcase', 3 => 'fa fa-database',
+                        4 => 'fa fa-chart-pie', 5 => 'fa fa-book', 6 => 'fa fa-cog');
+    $seq = 0;
+    foreach ($list as $G) {
+        $seq++;
+        $key = 'uxc-' . $seq;
+        $open = ($G['level'] <= 3); /* ف٧-٢: مطويٌّ افتراضيًّا للمستوياتِ ٤ و٥ و٦ */
+        $icon = isset($levelIcons[$G['level']]) ? $levelIcons[$G['level']] : 'fa fa-folder';
+        $total = 0;
+        foreach ($G['items'] as $r) { $total += isset($badges[$r['code']]) ? intval($badges[$r['code']]) : 0; }
+        $badge = $total > 0 ? ' <span class="nav-count-badge nav-group-badge">' . ($total > 99 ? '99+' : $total) . '</span>' : '';
+        echo '<li class="nav-group' . ($open ? ' open' : '') . '" data-group-key="' . $key . '">' . "\n";
+        echo '  <button type="button" class="nav-group-head" aria-expanded="' . ($open ? 'true' : 'false') . '"'
+           . ' aria-controls="navgrp-' . $key . '">'
+           . '<i class="' . htmlspecialchars($icon, ENT_QUOTES, 'UTF-8') . '"></i> <span class="nav-group-name">'
+           . htmlspecialchars($G['name'], ENT_QUOTES, 'UTF-8') . '</span>' . $badge
+           . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
+        echo '  <ul class="nav-group-items" id="navgrp-' . $key . '">' . "\n";
+        foreach ($G['items'] as $r) {
+            printNavLinkItem(array('code' => $r['code'], 'name' => $r['name'], 'icon' => $r['icon']), $basePrefix, $badges);
+        }
+        echo '  </ul>' . "\n" . '</li>' . "\n";
+    }
+}
+
 function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges = array(), $afterHome = '') {
     $items = getUnifiedNavItems($conn, $roleId);
     if (empty($items)) { return false; }
     emsNavLandingAnchors($items);
+
+    /* ── UXUI-01: فرزُ المعتمَدِ عن الباقي — المعتمَدُ للكتلةِ المعياريةِ
+       والباقي (PENDING + ما لا صفَّ له) يسلك مسارَه القائمَ بلا مساس.
+       والكتلةُ المعياريةُ تُطبع **بعد** القائمِ: فتبقى «الرئيسية» أولَ ما
+       يُرى، ويبقى المعلَّقُ في موضعِه الحاليِّ حرفًا بنصِّ العقد (ف١٥-٢). ── */
+    $uxMap = uxuiCanonicalMap($conn);
+    $uxItems = array();
+    if (!empty($uxMap)) {
+        $rest = array();
+        foreach ($items as $it) {
+            if (isset($uxMap[uxuiNavBaseRoute($it['route'])])) { $uxItems[] = $it; } else { $rest[] = $it; }
+        }
+        $items = $rest;
+    }
 
     // NAV-09: للدور المولَّد (مجموعاتٌ مرحلية) وضعُ المراحل يلغي كرومَ الأبواب،
     // وما بقي بلا مرحلةٍ (ثوابتُ قديمة) يُطبع بأبوابه بعده.
@@ -482,7 +591,10 @@ function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges 
         // afterHome (رابط المراسلات الثابت) لا يُطبع في الوضع المرحلي —
         // فالمراسلاتُ صارت الرابطَ الثاني داخل أول مرحلة (قرار المالك 2026-08-03)
         printStageNav($roleId, $staged, $basePrefix, $badges);
-        if (empty($doored)) { return true; }
+        if (empty($doored)) {
+            printUxuiCanonicalNav($uxItems, $uxMap, $basePrefix, $badges);
+            return true;
+        }
         $items = $doored; $afterHome = '';
     }
 
@@ -503,5 +615,7 @@ function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges 
     }
     // دورٌ بلا باب HOME (لا يقع اليوم — محروسٌ باختبار): لا تُفقد الثوابت
     if ($afterHome !== '' && !$injected) { echo $afterHome; }
+    // UXUI-01: الكتلةُ المعياريةُ (APPROVED) بعد القائمِ — والمعلَّقُ لم يُمَسَّ موضعُه
+    printUxuiCanonicalNav($uxItems, $uxMap, $basePrefix, $badges);
     return true;
 }

@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-18 10:48:18
--- الجداول: 572 · المناظير: 23
+-- المصدر: equipation_manage · التوليد: 2026-08-18 14:01:32
+-- الجداول: 573 · المناظير: 23
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -7525,6 +7525,28 @@ CREATE TABLE `nav09_file_map` (
   PRIMARY KEY (`canonical_file`),
   KEY `ix_n9m_state` (`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: nav_canonical ──
+CREATE TABLE `nav_canonical` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `route` varchar(160) NOT NULL COMMENT 'المعرِّف — Dir/file.php بلا استعلامٍ ولا مرساة',
+  `canonical_ar` varchar(190) NOT NULL COMMENT 'الاسمُ العربيُّ الرسميُّ الواحد',
+  `canonical_en` varchar(190) DEFAULT NULL,
+  `level_no` tinyint(4) NOT NULL COMMENT 'المستوى 1..6 (ف٧-١)',
+  `level_name` varchar(60) NOT NULL,
+  `group_name` varchar(190) NOT NULL COMMENT 'المجموعةُ المعياريةُ الواحدة (بند ٣)',
+  `sort_no` int(11) NOT NULL DEFAULT 999 COMMENT 'الترتيبُ داخل المجموعة — من الدورةِ المستندية',
+  `nature` varchar(60) DEFAULT NULL,
+  `owner_dept` varchar(120) DEFAULT NULL COMMENT 'الإدارةُ المالكةُ للمفهوم',
+  `status` enum('APPROVED','PENDING_OWNER','PENDING_DEDUP','TECHNICAL_ONLY','MERGED','RETIRED') NOT NULL,
+  `old_names` text DEFAULT NULL COMMENT 'المسمياتُ الملغاة — مرادفاتٌ تاريخية',
+  `derivation` varchar(190) DEFAULT NULL COMMENT 'مصدرُ الاشتقاق (بند ٤ — إلزاميّ)',
+  `matrix_row` smallint(6) DEFAULT NULL COMMENT 'رقمُ الصفِّ في الدفترِ المعتمَد',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_route` (`route`),
+  KEY `ix_status_level` (`status`,`level_no`,`sort_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01: سجلُّ التنقلِ المعياريُّ — صورةُ مصفوفةِ الـ359 المعتمَدة';
 
 -- ── Table: nav_items ──
 CREATE TABLE `nav_items` (
