@@ -5,9 +5,9 @@
  * نطاق الرؤية (يُحسب من شجرة الأدوار parent_role_id، لا من العمود role_scope):
  *   • المدير الأعلى: كل الشركات.
  *   • مدير البلاغات: كل بلاغات شركته.
- *   • أي دور آخر: البلاغات الموجَّهة إلى دوره أو أجداده أو ذرّيّته، إضافةً
- *     إلى ما أبلغ عنه بنفسه — عرضًا ومتابعةً فقط، فقيادةُ المراحل بيد فريق
- *     البلاغات.
+ *   • أي دور آخر: البلاغات الموجَّهة إلى دوره أو **ذرّيّته** (نزولًا لا صعودًا
+ *     — فالمرؤوسُ لا يرى بلاغاتِ رئيسه)، إضافةً إلى ما أبلغ عنه بنفسه — عرضًا
+ *     ومتابعةً فقط، فقيادةُ المراحل بيد فريق البلاغات.
  *
  * الوصول متاحٌ لكل مستخدم مسجَّل (كشاشة المراسلات)، والإنفاذ التفصيلي للنطاق
  * والأزرار داخل الشاشة نفسها.
@@ -94,7 +94,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_icon  = 'fa fa-tower-observation';
     $header_actions = array();
     $header_actions[] = array('tag' => 'a', 'href' => 'ticket_form.php', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'بلاغ جديد');
-    $header_actions[] = array('tag' => 'a', 'href' => 'ticket_dashboard.php', 'class' => 'suppliers-header-link', 'icon' => 'fa fa-gauge-high', 'label' => 'لوحة المتابعة');
+    // «لوحةُ المتابعة» كانت تُعرض للجميعِ وهي محروسةٌ بمنحتِها هي (الوحدة 137)
+    // — فمن ضغطها بلا منحةٍ يُرَدُّ ٤٠٣ من شاشةٍ أخرى، فيقرأ العطلَ منعًا
+    // متكرِّرًا لا حدًّا معلَنًا. والبابُ الذي لا يُفتح لا يُعرض: نفسُ شرطِ زرِّ
+    // «الأنواعُ والتوجيه» أدناه، لكنْ **بالمنحةِ لا بالدور** — فالوحدةُ ممنوحةٌ
+    // للإدارةِ التنفيذيةِ أيضًا لا لفريقِ البلاغاتِ وحدَه. ويُحسَب مرةً واحدةً
+    // هنا لأنّ بطاقاتِ اللمحةِ أدناه تحيل إلى الشاشةِ نفسِها.
+    $__tkt_can_dash = $is_super_admin
+        || !empty(tkt_page_perms($conn, 'Tickets/ticket_dashboard.php', $is_super_admin)['can_view']);
+    if ($__tkt_can_dash) {
+        $header_actions[] = array('tag' => 'a', 'href' => 'ticket_dashboard.php', 'class' => 'suppliers-header-link', 'icon' => 'fa fa-gauge-high', 'label' => 'لوحة المتابعة');
+    }
     if ($is_tickets_mgr || $is_super_admin) {
         $header_actions[] = array('tag' => 'a', 'href' => 'ticket_types_config.php', 'class' => 'suppliers-header-link', 'icon' => 'fa fa-route', 'label' => 'الأنواع والتوجيه');
     }
@@ -108,6 +118,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('ticket', 'نظرةٌ عامة'); ?>
 
     <?php tkt_msg_banner(); ?>
 
@@ -130,7 +141,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px">
         <?php foreach ($glance_cards as $c): ?>
+            <?php // الرقمُ يُعرض للجميع — والوصلةُ لمن يملك منحةَ اللوحةِ وحدَه.
+                  if ($__tkt_can_dash): ?>
             <a href="ticket_dashboard.php" style="text-decoration:none;color:inherit" title="افتح لوحة المتابعة">
+            <?php endif; ?>
                 <div class="card" style="border-top:3px solid <?php echo $c[3]; ?>"><div class="card-body" style="padding:12px">
                     <div style="display:flex;align-items:center;gap:10px">
                         <i class="fa <?php echo $c[2]; ?>" style="font-size:20px;color:<?php echo $c[3]; ?>"></i>
@@ -140,7 +154,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </div>
                     </div>
                 </div></div>
-            </a>
+            <?php if ($__tkt_can_dash): ?></a><?php endif; ?>
         <?php endforeach; ?>
     </div>
 
@@ -230,7 +244,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     echo "<td><strong>" . htmlspecialchars((string)$row['ticket_no']) . "</strong></td>";
                     echo "<td>" . htmlspecialchars((string)($row['type_name'] ?? '—')) . "</td>";
                     echo "<td>" . htmlspecialchars(tkt_label($natures, $row['ticket_nature'])) . "</td>";
-                    echo "<td>" . tkt_stage_badge($row['stage']) . "</td>";
+                    // المرحلةُ بادجًا **ومؤشِّرَ تقدُّمٍ**: أينَ وصل البلاغُ من رحلته
+                    // الخمسِ يُقرأ من الصفِّ بلا فتحِه — والشريطُ الكاملُ في شاشته.
+                    echo "<td><div class='ems-jmini-cell'>" . tkt_stage_badge($row['stage'])
+                       . tkt_stage_mini($row['stage'], tkt_is_overdue($row)) . "</div></td>";
                     echo "<td>" . htmlspecialchars(tkt_label($roles_map, intval($row['owner_role_id']))) . "</td>";
                     echo "<td>" . htmlspecialchars((string)$row['reporting_person']) . "</td>";
                     echo "<td>" . htmlspecialchars((string)($row['equipment_code'] ?? '—')) . "</td>";

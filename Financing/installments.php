@@ -131,6 +131,7 @@ echo ems_next_step('سدادُ القسطِ المستحقِّ بمرجعِ سن
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
 echo ems_states_bundle('لا أقساطَ ضمنَ هذا النطاق', 'تُولَّد الأقساطُ آليًّا عند إنشاءِ عمليةِ التمويل — راجع العملياتِ أو غيّر الترشيح');
 ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('financing', 'الأقساطُ والسداد'); ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <?php if ($op_filter): $ff_op_id = $op_filter; $ff_active = 'installments';
         include __DIR__ . '/../includes/financing_file_tabs.php'; endif; ?>

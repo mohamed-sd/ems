@@ -41,6 +41,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         . 'وإعادة التقييم تحفظ السابق ولا تمحوه (RK-03).', array());
     echo ems_states_bundle('لا مراجعاتٍ مستحقةً ولا قراراتِ قبولٍ في نطاقك', 'المهلُ تُحتسب من مستوى الخطرِ — والقبولُ يُسجَّل من ملفِّ الخطر');
     ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('risk', 'سجلُّ المراجعات'); ?>
     <style>
         .rsk-row-overdue { background: var(--c-fef2f2); }
     </style>

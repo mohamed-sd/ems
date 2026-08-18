@@ -658,6 +658,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     require_once __DIR__ . '/../includes/report_button.php';
     ems_report_button(array('screen' => 'operators', 'project_id' => $selected_project_id ?? null));
     ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('operator', 'نظرةٌ عامة'); ?>
 
     <div class="ems-content">
         <?php if (!empty($_GET['msg'])):

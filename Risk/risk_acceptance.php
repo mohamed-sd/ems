@@ -48,6 +48,7 @@ foreach ($rows as $x) {
 $page_title = 'إيكوبيشن | القبول والاستثناءات';
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('risk', 'القبولُ والتصعيد');
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell ems-doc-cycle">

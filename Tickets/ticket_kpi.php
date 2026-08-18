@@ -57,6 +57,7 @@ $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
 echo ems_states_bundle('لا بلاغاتِ ضمن نطاقِك بعدُ', 'المؤشراتُ تُحسب على البلاغاتِ الحيّةِ لحظةَ تسجيلِها من شاشةِ البلاغات');
 ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('ticket', ''); ?>
   <style>
     .tkpi-alert-gap { margin: 10px 0; }
     .tkpi-stat-card { padding: 10px 14px; margin: 10px 0; border-inline-start: 4px solid var(--c-0d6efd); display: inline-block; }

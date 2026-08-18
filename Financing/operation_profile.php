@@ -53,6 +53,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => 'financing_board.php', 'label' => 'رجوع');
     include __DIR__ . '/../includes/page_header.php';
     ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('financing', 'نظرةٌ عامة'); ?>
     <div class="alert alert-warning">عمليةٌ غيرُ موجودةٍ — <a href="financing_board.php">العودةُ للوحة</a></div>
   <?php else: ?>
   <?php

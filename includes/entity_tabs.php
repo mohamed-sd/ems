@@ -57,6 +57,67 @@ if (!function_exists('ems_entity_tabs')) {
                     'سجلُّ التغييرات' => '',
                 ),
             ),
+            'ticket' => array(
+                'label' => 'رحلةُ البلاغ',
+                'tabs' => array(
+                    'نظرةٌ عامة' => 'Tickets/tickets_list.php',
+                    'السياقُ والمصدر' => 'Tickets/ticket_form.php',
+                    'التصنيفُ والمهلة' => '',
+                    'التحويلُ والتفريع' => '',
+                    'الإجراءات' => '',
+                    'الإغلاق' => 'Tickets/ticket_close.php',
+                    'سجلُّ الحالات' => '',
+                ),
+            ),
+            'operator' => array(
+                'label' => 'رحلةُ المشغّل',
+                'tabs' => array(
+                    'نظرةٌ عامة' => 'Oprators/oprators.php',
+                    'التأهيلُ والرخص' => 'Workforce/op_qual.php',
+                    'التكليفُ على المعدات' => 'Operations/daily_plan.php',
+                    'الأداء' => '',
+                    'الوقائعُ اليومية' => '',
+                    'الخصومات' => 'Workforce/deductions.php',
+                    'المستندات' => '',
+                ),
+            ),
+            'risk' => array(
+                'label' => 'رحلةُ الخطر',
+                'tabs' => array(
+                    'نظرةٌ عامة' => 'Risk/risk_register.php',
+                    'التصنيفُ والمالك' => '',
+                    'التقييمُ والقياس' => 'Risk/risk_assessment.php',
+                    'الضوابطُ والمعالجة' => 'Risk/risk_controls.php',
+                    'القبولُ والتصعيد' => 'Risk/risk_acceptance.php',
+                    'المؤشرات' => 'Risk/risk_signals.php',
+                    'سجلُّ المراجعات' => 'Risk/risk_reviews.php',
+                ),
+            ),
+            'financing' => array(
+                'label' => 'رحلةُ عمليةِ التمويل',
+                'tabs' => array(
+                    'نظرةٌ عامة' => 'Financing/operation_profile.php',
+                    'الممولُ والشروط' => 'Financing/fin_models.php',
+                    'الأصولُ الممولة' => 'Equipments/fin_assets.php',
+                    'الأقساطُ والسداد' => 'Financing/installments.php',
+                    'الضمانات' => '',
+                    'تكلفةُ التمويل' => '',
+                    'المستندات' => '',
+                ),
+            ),
+            'project' => array(
+                'label' => 'رحلةُ المشروع',
+                'tabs' => array(
+                    'نظرةٌ عامة' => 'Projects/projects.php',
+                    'المواقع' => 'Operations/sites_board.php',
+                    'العقود' => 'Contracts/contracts.php',
+                    'المواردُ المخصَّصة' => '',
+                    'التنفيذ' => '',
+                    'الميزانيةُ والإنجاز' => 'Finance/fin_project_pl.php',
+                    'المخاطر' => 'Risk/risk_register.php',
+                    'المستندات' => '',
+                ),
+            ),
         );
     }
 

@@ -101,6 +101,7 @@ include __DIR__ . '/../includes/page_header.php';
 echo ems_next_step('تأكيدُ الحلِّ ثم الإقفالُ — يقعان في شاشةِ البلاغِ نفسِها بزرِّ «فتحُ البلاغ للإقفال»');
 echo ems_states_bundle('لا بلاغَ منجَزًا ينتظر الإقفال', 'الطابورُ يمتلئ حين تبلغ البلاغاتُ مرحلةَ «منجَز» فعلًا');
 ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('ticket', 'الإغلاق'); ?>
   <style>
     .tkc-alert-gap { margin: 10px 0; }
     .tkc-stat-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }

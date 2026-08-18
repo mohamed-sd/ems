@@ -418,6 +418,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('project', 'نظرةٌ عامة'); ?>
 
     <!-- <div class="header projects-header-shell">
         <a href="../main/dashboard.php" class="back-btn">

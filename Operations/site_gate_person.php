@@ -142,6 +142,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     echo ems_states_bundle('لا أذونَ دخولٍ أو خروجٍ مسجَّلةً بعدُ', 'أضف أولَ إذنٍ بزرِّ «إضافة» في رأسِ الشاشة');
     ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('operator', ''); ?>
     <style>
         .cmp03-form-actions { margin-top: 12px; display: flex; gap: 10px; }
     </style>

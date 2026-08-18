@@ -131,6 +131,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => 'projects.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('project', 'نظرةٌ عامة'); ?>
 
     <div class="profile-card" style="margin-bottom:12px;">
         <h2 style="margin:0 0 8px 0;"><?php echo htmlspecialchars($project['name']); ?></h2>
