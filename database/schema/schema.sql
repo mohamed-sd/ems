@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-18 15:54:58
--- الجداول: 582 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-18 20:17:48
+-- الجداول: 583 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6429,6 +6429,10 @@ CREATE TABLE `gov_golden_approvals` (
   `role_id` smallint(5) unsigned NOT NULL,
   `url_params` varchar(60) NOT NULL DEFAULT '' COMMENT 'معاملُ مسارٍ تشترطه الشاشةُ للدخول',
   `state` enum('pending','approved','noted') NOT NULL DEFAULT 'pending' COMMENT 'pending بانتظارِ المالك · approved تمضي في التعميم · noted ملاحظةٌ تُصلَّح ثم تُعاد',
+  `approval_basis` enum('OBJECTIVE_GATE','HUMAN_REVIEW','OWNER_OVERRIDE') DEFAULT NULL COMMENT 'كيفَ اعتُمد: بوابةٌ موضوعيةٌ · مراجعةٌ بشريةٌ مستقلةٌ · تجاوزُ المالك',
+  `basis_ref` varchar(190) DEFAULT NULL COMMENT 'مرجعُ الأساس: تقريرُ البوابةِ أو محضرُ المراجعةِ ومنفِّذُها',
+  `pattern_state` enum('PENDING','VISUAL_PATTERN_APPROVED','GOLDEN_SCREEN_FINAL','REJECTED') NOT NULL DEFAULT 'PENDING' COMMENT 'اعتمادٌ على مرحلتَين: النمطُ يفتح التعميمَ · والنهائيُّ بعد (ب) و(ج)',
+  `category` varchar(60) DEFAULT NULL COMMENT 'فئةُ التعميم: سجلات · كيانات · نماذج · لوحات · طوابير',
   `owner_note` varchar(500) NOT NULL DEFAULT '',
   `decided_at` datetime DEFAULT NULL,
   `fixed_at` datetime DEFAULT NULL COMMENT 'لحظةُ إصلاحِ الملاحظةِ قبلَ إعادتِها للمالك',
@@ -6528,6 +6532,20 @@ CREATE TABLE `gov_orphan_links` (
   UNIQUE KEY `uq_orphan` (`sheet_role`,`route`,`label_ar`),
   KEY `ix_decision` (`owner_decision`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXW-01 §8 — الروابطُ اليتيمةُ في مركزِ الحوكمةِ التقنيِّ حتى قرارِ المالك';
+
+-- ── Table: gov_policy_changes ──
+CREATE TABLE `gov_policy_changes` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `policy_key` varchar(80) NOT NULL,
+  `old_rule` text NOT NULL COMMENT 'نصُّ الحكمِ السابقِ كما كان — لا يُمحى',
+  `new_rule` text NOT NULL,
+  `changed_on` date NOT NULL,
+  `reason` text NOT NULL COMMENT 'سببُ التعديلِ بنصِّ صاحبِ القرار',
+  `source_ref` varchar(120) NOT NULL COMMENT 'مرجعُ الوثيقةِ والفصل',
+  `recorded_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_key_date` (`policy_key`,`changed_on`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='تاريخُ الأحكامِ الحاكمة — القديمُ يبقى بتاريخِه وسببِه';
 
 -- ── Table: gov_profile_items ──
 CREATE TABLE `gov_profile_items` (
@@ -7571,6 +7589,13 @@ CREATE TABLE `nav_canonical` (
   `nature` varchar(60) DEFAULT NULL,
   `owner_dept` varchar(120) DEFAULT NULL COMMENT 'الإدارةُ المالكةُ للمفهوم',
   `status` enum('APPROVED','PENDING_OWNER','PENDING_DEDUP','PENDING_OWNER_MERGE','TECHNICAL_ONLY','MERGED','RETIRED') NOT NULL,
+  `decision_state` enum('PENDING_OWNER','OWNER_REVIEW_OVERDUE','APPROVED','REJECTED') DEFAULT NULL COMMENT 'محورُ القرار: هل حُسم ومن حسمه — والصمتُ لا يُرقّيه',
+  `application_state` enum('CURRENT','PROVISIONALLY_APPLIED_NO_OBJECTION','DEPLOYED','ROLLED_BACK') NOT NULL DEFAULT 'CURRENT' COMMENT 'محورُ التطبيق: ما يراه المستخدمُ فعلًا — مستقلٌّ عن محورِ القرار',
+  `decided_by` int(11) DEFAULT NULL COMMENT 'الفاعلُ الحقيقيُّ وحدَه — NULL ما لم يوجد',
+  `decision_source` varchar(190) DEFAULT NULL COMMENT 'مرجعُ القرارِ الوثائقيُّ حين لا فاعلَ بشريّ — أحدُهما إلزاميٌّ للحسم',
+  `decided_at` datetime DEFAULT NULL,
+  `provisional_since` datetime DEFAULT NULL COMMENT 'متى بدأ التطبيقُ المؤقَّت',
+  `provisional_reversible` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'حصرُ النطاق: 1 = تسميةٌ/موضعٌ يُعكسان · 0 يمنع التطبيقَ المؤقَّت',
   `old_names` text DEFAULT NULL COMMENT 'المسمياتُ الملغاة — مرادفاتٌ تاريخية',
   `derivation` varchar(190) DEFAULT NULL COMMENT 'مصدرُ الاشتقاق (بند ٤ — إلزاميّ)',
   `view_of` varchar(255) DEFAULT NULL COMMENT 'علاقةُ المنظر/الارتباط بمسارٍ داخل الـ359',
@@ -7818,6 +7843,13 @@ CREATE TABLE `nav_pending_closure` (
   `sent_at` datetime NOT NULL COMMENT 'بدءُ مهلةِ الثلاثةِ أيام',
   `due_at` datetime NOT NULL,
   `decision` enum('pending','approved','modified','auto_approved_by_silence') NOT NULL DEFAULT 'pending',
+  `decision_state` enum('PENDING_OWNER','OWNER_REVIEW_OVERDUE','APPROVED','REJECTED') NOT NULL DEFAULT 'PENDING_OWNER',
+  `application_state` enum('CURRENT','PROVISIONALLY_APPLIED_NO_OBJECTION','DEPLOYED','ROLLED_BACK') NOT NULL DEFAULT 'CURRENT',
+  `escalated_at` datetime DEFAULT NULL COMMENT 'وقتُ التصعيدِ للنائبِ المختص',
+  `escalated_to_role` int(11) DEFAULT NULL COMMENT 'موضعُ السلطةِ لا اسمُ شخص',
+  `escalation_due_at` datetime DEFAULT NULL COMMENT 'مهلةُ النائبِ: يومان',
+  `provisional_since` datetime DEFAULT NULL,
+  `rolled_back_at` datetime DEFAULT NULL,
   `decided_by` int(11) DEFAULT NULL COMMENT 'users.id — يُقرأ من الجلسةِ لا يُكتب نصًّا',
   `decided_at` datetime DEFAULT NULL,
   `modification_note` varchar(500) DEFAULT NULL,
