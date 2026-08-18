@@ -2,7 +2,7 @@ screen	title	state	buttons	columns	filters	inputs	links	tables	forms	row_buttons
 Portal/ceo_board.php	المركزُ التنفيذيُّ للرئيسِ والنواب	pending	4	16	0	15	21	1	1	0	0	0	31
 Portal/my_tasks.php	مركزُ العمل	pending	11	13	0	0	69	1	0	0	0	0	1
 Operations/sites_board.php	لوحةُ إدارةِ التشغيل	pending	1	0	0	0	182	0	0	0	0	0	0
-Contracts/contracts.php	العقود	pending	15	64	11	37	59	1	3	3	3	1	120
+Contracts/contracts.php	العقود	pending	23	64	11	37	59	1	3	3	3	1	120
 Timesheet/timesheet.php	التايم شيتُ اليوميّ	pending	12	47	7	46	65	2	2	0	0	0	2
 Maintenance/orders.php	أمرُ الصيانة	pending	5	34	7	0	28	1	2	0	4	0	17
 Suppliers/supplier_profile.php	ملفُّ المورد	pending	2	16	0	0	61	2	0	0	1	0	3

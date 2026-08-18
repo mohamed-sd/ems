@@ -31,7 +31,11 @@ if (!function_exists('ems_css_ver')) {
          متصفحات المستخدمين ثلاثين يومًا بعد إصلاحها (وقع فعلًا 2026-08-01). -->
     <script src="/ems/assets/js/csrf.js<?php $__csrfjs=__DIR__.'/assets/js/csrf.js'; echo is_file($__csrfjs)?('?v='.filemtime($__csrfjs)):''; ?>"></script>
     <!-- M-46: المسودةُ التلقائية كل 30 ثانية — تلتقط النماذجَ الطويلة آليًّا (UI-01 §3) -->
-    <script src="/ems/includes/js/ems-autosave.js" defer></script>
+    <?php /* كاسرُ الذاكرةِ إلزاميٌّ كأخواتِه (csrf.js · ems-outbox.js): كان هذا
+             الملفُّ **وحدَه بلا بصمة**، فأيُّ إصلاحٍ فيه يخدمه المتصفحُ من نسختِه
+             القديمةِ حتى يُحدِّث المستخدمُ بالقوة. قِيس حيًّا: تصحيحُ صنفِ زرٍّ في
+             لافتةِ المسودةِ لم يظهر إطلاقًا رغم أن الملفَّ على القرصِ مُصحَّح. */ ?>
+    <script src="/ems/includes/js/ems-autosave.js<?php $__asjs = __DIR__ . '/includes/js/ems-autosave.js'; echo is_file($__asjs) ? ('?v=' . filemtime($__asjs)) : ''; ?>" defer></script>
     <title><?php echo $page_title ; ?></title>
 
     <!-- Font awsome icon link مكتبة الايقونات -->

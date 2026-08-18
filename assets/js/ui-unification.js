@@ -656,6 +656,84 @@
             tableEl.dataset.emsNosourceHidden = '1';
         }
 
+        /* ══ مجموعاتُ الأعمدةِ داخلَ القائمة (ف٩-٣ · سابعًا) ═══════════════════
+           نصُّ المواصفة: «أساسية · تواريخ · ساعات · أطراف · خدمات · تشغيل · حالة»
+           **مجموعاتُ أعمدةٍ وتنتقل إلى قائمةِ «الأعمدة»** — وتُبنى مكانَها مناظرُ
+           عملٍ حقيقية. «ولا يُفقد زرٌّ: المجموعةُ تنتقل ولا تختفي».
+           ◆ والمصدرُ الحيُّ لا قائمةٌ مكتوبة: تُشتقُّ المجموعةُ من الترويسةِ نفسِها
+             — إمّا `data-col-group` أو الصنفُ القائمُ `group-*` الذي تستعمله
+             الشاشاتُ سلفًا. فصفرُ تعديلٍ في وسمِ شاشةٍ واحدة، ويعمل فورًا في
+             كلِّ جدولٍ يعلّم أعمدتَه بأيِّ الصيغتَين.
+           ◆ ويسقط القسمُ كلُّه إن لم توجد مجموعةٌ — فلا يزاحم جدولًا بلا تجميع. */
+        var GROUP_LABELS = {
+            basic: 'أساسية', dates: 'تواريخ', hours: 'ساعات', parties: 'أطراف',
+            services: 'خدمات', operations: 'تشغيل', status: 'حالة'
+        };
+        var groupsMap = {};
+        for (var gi = 0; gi < nCols; gi++) {
+            var gh = null;
+            try { gh = api.column(gi).header(); } catch (e) { gh = null; }
+            if (!gh) { continue; }
+            var gname = (gh.dataset && gh.dataset.colGroup) ? gh.dataset.colGroup : '';
+            if (!gname && gh.className) {
+                var gm = String(gh.className).match(/(?:^|\s)group-([a-z0-9_-]+)/i);
+                if (gm) { gname = gm[1]; }
+            }
+            if (!gname) { continue; }
+            if (!groupsMap[gname]) {
+                var glbl = (gh.dataset && gh.dataset.colGroupLabel) ? gh.dataset.colGroupLabel
+                         : (GROUP_LABELS[gname] || gname);
+                groupsMap[gname] = { cols: [], label: glbl, defHidden: false };
+            }
+            /* ◆ **المنظرُ الافتراضيُّ يُحفظ**: مجموعةٌ كانت مطويةً ابتداءً في الشاشةِ
+                 تبقى كذلك — وإلا فتحَ الترحيلُ الجدولَ أعرضَ مما كان، وذاك تغييرُ
+                 سلوكٍ لا نقلُ قدرة. وتُطوى **مرّةً واحدةً** فاختيارُ المستخدمِ أولى. */
+            if (gh.dataset && gh.dataset.colGroupDefault === 'hidden') { groupsMap[gname].defHidden = true; }
+            groupsMap[gname].cols.push(gi);
+        }
+        /* الطيُّ الافتراضيُّ مرةً واحدةً — دفعةً لا عمودًا عمودًا */
+        if (tableEl.dataset.emsGroupDefaultsApplied !== '1') {
+            var defHide = [];
+            Object.keys(groupsMap).forEach(function (k) {
+                if (groupsMap[k].defHidden) { defHide = defHide.concat(groupsMap[k].cols); }
+            });
+            if (defHide.length) {
+                api.columns(defHide).visible(false, false);
+                try { api.columns.adjust().draw(false); } catch (e) {}
+            }
+            tableEl.dataset.emsGroupDefaultsApplied = '1';
+        }
+        var groupKeys = Object.keys(groupsMap);
+        var groupBoxes = {};
+        if (groupKeys.length) {
+            var gWrap = document.createElement('div');
+            gWrap.style.cssText = 'border-bottom:1px solid var(--ems-line,#ddd);padding-bottom:6px;margin-bottom:6px';
+            var gTitle = document.createElement('div');
+            gTitle.textContent = 'المجموعات';
+            gTitle.style.cssText = 'font-size:.74rem;font-weight:700;opacity:.8;margin-bottom:4px';
+            gWrap.appendChild(gTitle);
+            groupKeys.forEach(function (gk) {
+                var gl = document.createElement('label');
+                gl.style.cssText = 'display:flex;gap:6px;align-items:center;font-size:.82rem;padding:2px 0;cursor:pointer';
+                var gcb = document.createElement('input');
+                gcb.type = 'checkbox';
+                gcb.checked = groupsMap[gk].cols.some(function (c) { return api.column(c).visible(); });
+                gcb.addEventListener('change', function () {
+                    api.columns(groupsMap[gk].cols).visible(gcb.checked, false);
+                    try { api.columns.adjust().draw(false); } catch (e) {}
+                    /* مزامنةُ مربعاتِ الأعمدةِ الأفرادِ مع قرارِ المجموعة */
+                    groupsMap[gk].cols.forEach(function (c) { if (boxes[c]) { boxes[c].checked = gcb.checked; } });
+                });
+                groupBoxes[gk] = gcb;
+                gl.appendChild(gcb);
+                var gs = document.createElement('span');
+                gs.textContent = groupsMap[gk].label + ' (' + groupsMap[gk].cols.length + ')';
+                gl.appendChild(gs);
+                gWrap.appendChild(gl);
+            });
+            panel.appendChild(gWrap);
+        }
+
         var boxes = [];
         for (var i = 0; i < nCols; i++) {
             (function (ci) {

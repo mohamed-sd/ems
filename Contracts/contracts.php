@@ -738,38 +738,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
   <div class="card">
     <div class="card-body">
-      <!-- أزرار التحكم في المجموعات -->
-      <div class="card-body">
-        <div class="contracts-group-toolbar">
-          <span class="contracts-group-toolbar-label">
-            <i class="fas fa-filter"></i> عرض المجموعات:
-          </span>
-          <button class="ems-btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
-            <i class="fas fa-info-circle"></i> أساسية
-          </button>
-          <button class="ems-btn-group-toggle active" data-group="dates" title="التواريخ والمدد">
-            <i class="far fa-calendar"></i> تواريخ
-          </button>
-          <button class="ems-btn-group-toggle active" data-group="hours" title="الساعات والأهداف">
-            <i class="fas fa-clock"></i> ساعات
-          </button>
-          <button class="ems-btn-group-toggle" data-group="parties" title="أطراف العقد">
-            <i class="fas fa-users"></i> أطراف
-          </button>
-          <button class="ems-btn-group-toggle" data-group="services" title="الخدمات المقدمة">
-            <i class="fas fa-hands-helping"></i> خدمات
-          </button>
-          <button class="ems-btn-group-toggle" data-group="operations" title="التشغيل اليومي">
-            <i class="fas fa-cogs"></i> تشغيل
-          </button>
-          <button class="ems-btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
-            <i class="fas fa-check-circle"></i> حالة
-          </button>
-          <button class="ems-btn-group-toggle-all" title="إظهار/إخفاء الكل">
-            <i class="fas fa-eye"></i> الكل
-          </button>
-        </div>
-      </div>
+      <?php /* ف٩-٣ · سابعًا — «المجموعاتُ السبعُ تنتقل إلى قائمةِ الأعمدة»:
+               كان هنا شريطُ أدواتٍ **ثانٍ** فوقَ الجدولِ يحمل مبدِّلاتِ المجموعات،
+               فرسبت الشاشةُ في بوابةِ G20 (شريطانِ متراكبان) — وهو العيبُ الذي
+               رصدته المواصفةُ نصًّا في هذه الشاشةِ بعينِها.
+               والمجموعاتُ السبعُ **انتقلت ولم تختفِ**: قائمةُ «🧩 الأعمدة»
+               المركزيةُ تشتقُّها من أصنافِ الترويسةِ `group-*` نفسِها وتعرضها
+               قسمًا أعلاها بعدَّادِ أعمدةِ كلِّ مجموعة، مع «إظهار كل الأعمدة».
+               فصفرُ قدرةٍ تُفقد — والشريطُ الثاني زال. */ ?>
 
 
 
@@ -797,19 +773,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <th class="group-hours"> إجمالي ساعات متوقعة</th>
 
               <!-- أطراف العقد -->
-              <th class="group-parties"> الطرف الأول</th>
+              <th class="group-parties" data-col-group-default="hidden"> الطرف الأول</th>
               <th class="group-parties"> الطرف الثاني</th>
               <th class="group-parties"> شاهد أول</th>
               <th class="group-parties"> شاهد ثاني</th>
 
               <!-- الخدمات المقدمة -->
-              <th class="group-services"> النقل</th>
+              <th class="group-services" data-col-group-default="hidden"> النقل</th>
               <th class="group-services"> السكن</th>
               <th class="group-services"> مكان المعيشة</th>
               <th class="group-services"> الورشة</th>
 
               <!-- التشغيل اليومي -->
-              <th class="group-operations"> ساعات العمل يومياً</th>
+              <th class="group-operations" data-col-group-default="hidden"> ساعات العمل يومياً</th>
               <th class="group-operations"> عدد المشغلين يومياً</th>
 
               <!-- البيانات المالية -->

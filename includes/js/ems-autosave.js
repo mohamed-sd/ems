@@ -57,7 +57,12 @@
         use.type = 'button'; use.className = 'btn-primary'; use.textContent = 'استرجعها';
         use.onclick = function () { restore(form, data); bar.remove(); };
         var drop = document.createElement('button');
-        drop.type = 'button'; drop.className = 'btn-primary'; drop.textContent = 'تجاهلها';
+        /* ف١٢-٢ · بوابة G17: «رئيسيٌّ — **واحدٌ لا غير**». والاسترجاعُ هو الفعلُ
+           الأرجحُ لمن حُفظت مسودتُه، والتجاهلُ فعلٌ مساندٌ ⇒ ثانويّ. وكانا
+           رئيسيَّين معًا فصارا زرَّين متساويَي الوزنِ في لافتةٍ واحدة — وهو
+           عينُ ما يُلغي معنى الرئيسيّ. (وأثرُه مركزيٌّ: اللافتةُ تظهر في كلِّ
+           شاشةٍ فيها حفظٌ تلقائيّ.) */
+        drop.type = 'button'; drop.className = 'btn-secondary'; drop.textContent = 'تجاهلها';
         drop.onclick = function () { localStorage.removeItem(key); bar.remove(); };
         bar.appendChild(use); bar.appendChild(drop);
         form.parentNode.insertBefore(bar, form);
