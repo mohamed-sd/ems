@@ -202,7 +202,8 @@ $ssdiff = $ROOT . '/.ssdiff';
 if (is_dir($ssdiff)) {
     $pend = glob($ssdiff . '/*.diff.txt') ?: array();
     foreach ($pend as $d) v($violations, '١٠ فرق بصري', basename($d), 'فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح');
-    $report['١٠ ثبات بصري'] = 'لقطاتُ الأساس: ' . count(glob($ssdiff . '/*.png') ?: array()) . ' · فروقٌ معلَّقة: ' . count($pend);
+    /* خطُّ الأساسِ هيكلٌ بنيويٌّ (.skel) لا صورة — والعدُّ بلاحقةٍ خاطئةٍ يُبلّغ صفرًا أبدًا */
+    $report['١٠ ثبات بصري'] = 'لقطاتُ الأساس: ' . count(glob($ssdiff . '/*.skel') ?: array()) . ' · فروقٌ معلَّقة: ' . count($pend);
 } else {
     $report['١٠ ثبات بصري'] = 'لا خطَّ أساسٍ بعدُ (يُبنى مع اعتمادِ الذهبية) — غيرُ مقيسٍ لا مجتاز';
 }

@@ -7,3 +7,8 @@ Finance/ob_due_soon.php	view=ob_due_soon	ob_schedule.php
 Finance/ob_horizon.php	view=ob_horizon	ob_schedule.php
 Finance/ob_overdue.php	view=ob_overdue	ob_schedule.php
 Audit/iaf_reports.php	view=iaf_reports	ceo_audit_reports.php
+# أخواتُ منظرِ ملاحظاتِ المراجعةِ (iaf_findings) — التحويلُ مقصودٌ بعُدَّةِ u13 (سطر 186)
+Audit/iaf_action_plans.php	view=iaf_action_plans	Audit/iaf_findings.php
+Audit/iaf_closure.php	view=iaf_closure	Audit/iaf_findings.php
+Audit/iaf_escalations.php	view=iaf_escalations	Audit/iaf_findings.php
+Audit/iaf_responses.php	view=iaf_responses	Audit/iaf_findings.php

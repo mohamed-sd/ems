@@ -61,3 +61,6 @@ Procurement/wh_transfer.php	أمين المستودع
 Procurement/gov_dept_inv.php	أمين المستودع
 Procurement/consumption_rate.php	أمين المستودع
 admin/org_permits.php	محمد
+Finance/acc_	FIN-CTRL@equipation.sd
+Finance/ctrl_	FIN-CTRL@equipation.sd
+Finance/tre_	FIN-CTRL@equipation.sd
