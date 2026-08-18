@@ -15,7 +15,9 @@ preg_match('~name=["\']csrf_token["\']\s+value=["\']([^"\']+)~', $login, $m);
 $http("$BASE/login.php", array('username' => $user, 'password' => '12345678', 'csrf_token' => $m[1] ?? ''));
 $page = $http("$BASE/$route");
 echo 'طولُ الصفحة: ', strlen($page), "\n";
-echo "«$needle» في الصفحة: ", substr_count($page, $needle), "\n";
+/* PHP 8 يبتلع «»» في اسمِ المتغيّرِ داخلَ السلسلة — فالوسمُ يُطبع بلا قيمة.
+   افصلِ الاسمَ عن علامةِ الاقتباسِ العربيةِ بأقواسٍ معقوفةٍ أو بالوصل. */
+echo '«' . $needle . '» في الصفحة: ', substr_count($page, $needle), "\n";
 /* هل هو داخلَ قيمةِ سمةٍ (مبتلَع) أم وسمًا حقيقيًّا؟ */
 echo 'حقولُ csrf_token وسومًا حقيقية: ', preg_match_all('~<input[^>]*name=["\']csrf_token["\'][^>]*>~i', $page), "\n";
 echo 'سماتُ style غيرُ مُغلَقةٍ تبتلع وسمًا: ', preg_match_all('~style="[^"]*<input~i', $page), "\n";

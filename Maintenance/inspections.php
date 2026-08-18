@@ -564,8 +564,7 @@ function mnt_seg_kind($c) {
         // فورمٌ مصغَّرٌ داخل رأس الصفحة (رمزُ CSRF يُحقن مركزيًّا — لا يُضاف يدويًّا).
         $header_actions[] = array('raw' =>
             '<form method="post" action="" class="mnt-inline-form" '
-            . 'onsubmit="return confirm(\'توليد أمر صيانة من هذا التفتيش (' . $cnt_crit . ' بندًا حرجًا)؟\');">
-        <?= csrf_field() ?>'
+            . 'onsubmit="return confirm(\'توليد أمر صيانة من هذا التفتيش (' . $cnt_crit . ' بندًا حرجًا)؟\');">' . csrf_field() . ''
             . '<input type="hidden" name="action" value="generate_order">'
             . '<input type="hidden" name="inspection_id" value="' . intval($ins['id']) . '">'
             . '<button type="submit" class="add-btn" title="ينشئ أمر صيانةٍ معبَّأً بالمعدة والمشروع والبنود الحرجة">'

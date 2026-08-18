@@ -1293,8 +1293,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                             } else {
                                 echo "<span class='badge-busy' title='كرت مسودة' class='eqf-badge-gap'><i class='fas fa-id-card'></i> مسودة</span>";
                                 if ($can_edit) {
-                                    echo "<form method='post' action='approve_card.php' class='d-inline' onsubmit=\"return confirm('اعتماد كرت هذه المعدة؟');\">
-        <?= csrf_field() ?>"
+                                    echo "<form method='post' action='approve_card.php' class='d-inline' onsubmit=\"return confirm('اعتماد كرت هذه المعدة؟');\">" . csrf_field() . ""
                                         . "<input type='hidden' name='equipment_id' value='" . intval($row['id']) . "'>"
                                         . "<input type='hidden' name='return' value='equipments_fleet.php'>"
                                         . "<button type='submit' class='action-btn eqf-approve' title='اعتماد الكرت'><i class='fas fa-circle-check'></i></button>"

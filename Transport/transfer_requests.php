@@ -249,10 +249,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             echo "<tr>";
             echo "<td><div class='action-btns trs-rq-actgap'>";
             if ($can_edit && $state === 'submitted') {
-                echo "<form method='post' class='trs-rq-inline'>
-        <?= csrf_field() ?><input type='hidden' name='action' value='approve'><input type='hidden' name='request_id' value='" . intval($row['id']) . "'><button class='action-btn trs-rq-ok' title='اعتماد'><i class='fas fa-check'></i></button></form>";
-                echo "<form method='post' class='trs-rq-inline' onsubmit='return confirm(\"رفض الطلب؟\")'>
-        <?= csrf_field() ?><input type='hidden' name='action' value='reject'><input type='hidden' name='request_id' value='" . intval($row['id']) . "'><button class='action-btn delete' title='رفض'><i class='fas fa-times'></i></button></form>";
+                echo "<form method='post' class='trs-rq-inline'>" . csrf_field() . "<input type='hidden' name='action' value='approve'><input type='hidden' name='request_id' value='" . intval($row['id']) . "'><button class='action-btn trs-rq-ok' title='اعتماد'><i class='fas fa-check'></i></button></form>";
+                echo "<form method='post' class='trs-rq-inline' onsubmit='return confirm(\"رفض الطلب؟\")'>" . csrf_field() . "<input type='hidden' name='action' value='reject'><input type='hidden' name='request_id' value='" . intval($row['id']) . "'><button class='action-btn delete' title='رفض'><i class='fas fa-times'></i></button></form>";
             }
             if ($can_edit && $state === 'approved') {
                 echo "<button type='button' class='action-btn edit convertBtn' data-id='" . intval($row['id']) . "' title='تحويل لأمر'><i class='fas fa-right-to-bracket'></i></button>";
