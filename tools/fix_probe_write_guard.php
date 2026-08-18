@@ -29,8 +29,35 @@ $_SERVER['REQUEST_METHOD'] = 'POST';
 
 require_once $ROOT . '/includes/session_bootstrap.php';
 if (session_status() === PHP_SESSION_NONE) { @session_start(); }
+
+/* ── جلسةُ **مستخدمٍ حقيقيٍّ من الدورِ المقيس** لا هُجنةٌ مستحيلة ──────────
+   ◆ العيبُ الذي كان: مُعرِّفٌ مثبَّتٌ (891 · دورُه 17) يُبدَّل دورُه في الجلسةِ
+     إلى الدورِ المقيس. وGOV-AUTH-01 يحكم **بقالبِ المستخدم** لا بدورِ الجلسة
+     (وهو تصميمُه الصحيح: «المغطَّى بقالبٍ نافذٍ يُحكَم بقالبِه حصرًا»)، فكان
+     الفاحصُ يقرأ منعَ قالبِ المستخدمِ 891 وينسبه للدورِ المقيسِ خطأً —
+     فأعلن «الكاتبُ مُنع خطأً» في سطحَين لا عيبَ فيهما.
+   ◆ والطبقاتُ ثلاثٌ لا اثنتان (قرارُ المالك 2026-08-18 ⑥): ① قالبُ الدور ·
+     ② منحُ الدورِ الفعلية · ③ تصييرُ المستخدمِ الحقيقي. وهذا الفاحصُ يقيس ③،
+     فيلزمه مستخدمٌ **دورُه هو الدورُ المقيس** حقًّا. */
+/* اتصالٌ منفصلٌ للاستدلالِ وحدَه ثم يُغلَق — فتحميلُ config.php هنا يصطدم
+   بتحميلِ السطحِ له بعدَ قليلٍ («لا يُعاد إعلانُ دالة»). */
+$__uid = 0;
+require_once $ROOT . '/includes/env.php';
+$__h = ems_env('DB_HOST'); $__p = 3306;
+if (strpos($__h, ':') !== false) { list($__h, $__p) = explode(':', $__h); $__p = (int) $__p; }
+$__lk = @new mysqli($__h, ems_env('DB_USER'), ems_env('DB_PASS'), ems_env('DB_NAME'), $__p);
+if ($__lk && !$__lk->connect_errno) {
+    $__lk->set_charset('utf8mb4');
+    $__rid = (int) $role;
+    $__q = $__lk->query("SELECT id FROM users WHERE company_id = 4 AND CAST(role AS UNSIGNED) = {$__rid} ORDER BY id LIMIT 1");
+    if ($__q && ($__r = $__q->fetch_assoc())) { $__uid = (int) $__r['id']; }
+    $__lk->close();
+}
+if ($__uid === 0) {
+    exit("PW|" . json_encode(array('err' => 'no real user for role ' . $role, 'role' => $role)) . "\n");
+}
 $_SESSION = array('user' => array(
-    'id' => 891, 'role' => $role, 'company_id' => 4, 'name' => 'فاحصُ حارسِ الكتابة',
+    'id' => $__uid, 'role' => $role, 'company_id' => 4, 'name' => 'فاحصُ حارسِ الكتابة',
 ));
 require_once $ROOT . '/includes/security.php';
 // حمولةٌ لا تُطلق معالجًا بعينِه — المقصودُ الحارسُ لا الأثر.

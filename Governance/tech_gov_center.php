@@ -52,6 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ═══ ⑥ معالجُ POST — تسجيلُ قرارِ المالكِ على صفٍّ واحد ═══
+/* AC-F2: حارسُ الكتابةِ المركزيُّ **قبلَ** أولِ عبارةِ كتابة — fail-closed. */
+ems_require_action($conn, $SCREEN, 'edit', array('deny_msg' => 'تسجيلُ القرارِ بيدِ الحوكمةِ حصرًا'));
 $flash = null; $flashKind = 'info';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'record_decision') {
     $oid = (int) ($_POST['orphan_id'] ?? 0);

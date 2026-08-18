@@ -42,6 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // ═══ ⑥ معالجُ POST — سحبُ منحٍ واحدٍ مسبَّبًا ═══
+/* AC-F2: حارسُ الكتابةِ المركزيُّ **قبلَ** أولِ عبارةِ كتابة — يجمع الجلسةَ
+   والرمزَ والصلاحيةَ ويسجّل المنع، ويخرج بـ403 فلا يبلغ التنفيذُ الكتابةَ. */
+ems_require_action($conn, $SCREEN, 'edit', array('deny_msg' => 'السحبُ بيدِ الحوكمةِ حصرًا — اطلبِ المنحة'));
 $flash = null; $flashKind = 'info';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'revoke_grant') {
     $gid = (int) ($_POST['grant_id'] ?? 0);

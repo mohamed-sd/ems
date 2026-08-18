@@ -1231,4 +1231,80 @@ function get_page_permissions($conn, $url = null ) {
         'can_export' => $perms['can_view'],
     ];
 }
-?>
+
+/**
+ * ems_require_action — حارسُ الكتابةِ في صفحةِ سطحٍ (AC-F2 · فِعليٌّ لا وسم)
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ العلّةُ التي يسدُّها: ستةُ أسطحٍ تكتب في القاعدةِ وكلٌّ منها يدحرج حارسَه
+ *   بيدِه (فحصُ can_edit ثم CSRF ثم رسالة) — ستُّ نسخٍ يسهل أن تنسى إحداها
+ *   شرطًا. وهذا حارسٌ واحدٌ **يُنادى قبلَ أولِ كتابةٍ** فيجمع الشروطَ الأربعة:
+ *     ① جلسةٌ قائمة  ② رمزُ الحمايةِ CSRF  ③ صلاحيةُ الفعلِ على الشاشة
+ *     ④ تسجيلُ المنعِ في سجلِّ الحارس.
+ * ◆ fail-closed بالتصميم: أيُّ شرطٍ لم يتحقق ⇒ 403 وتوقُّفٌ فورًا — فلا يبلغ
+ *   التنفيذُ سطرَ الكتابةِ أصلًا. والفعلُ غيرُ المعروفِ لا يُشتقُّ منه سماح.
+ * ◆ لا يُغني عن حارسِ العرضِ (check_page_permissions) بل يليه: ذاك يمنع
+ *   الدخولَ وهذا يمنع **الكتابة**، والفصلُ مقصود.
+ *
+ * @param mysqli $conn
+ * @param string $screen كودُ الشاشةِ كما في modules.code (مثال: Governance/auth_grants.php)
+ * @param string $verb   edit|delete|approve|export — الفعلُ المطلوب
+ * @param array  $opts   ['csrf'=>bool (افتراضيًّا true) · 'deny_msg'=>string]
+ * @return array{allowed:bool, perms:array} ولا يعود إلا مسموحًا (وإلا خرج بـ403)
+ */
+if (!function_exists('ems_require_action')) {
+    function ems_require_action($conn, $screen, $verb = 'edit', array $opts = array())
+    {
+        $isPost = (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST');
+        /* لا فعلَ بلا طلبِ كتابة — القراءةُ تمرُّ لحارسِ العرضِ وحدَه */
+        if (!$isPost) { return array('allowed' => true, 'perms' => array()); }
+
+        $role  = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
+        $super = defined('EMS_ROLE_SUPER_ADMIN') ? EMS_ROLE_SUPER_ADMIN : '-1';
+        $deny  = isset($opts['deny_msg']) ? $opts['deny_msg'] : 'لا صلاحيةَ لهذا الفعلِ على هذه الشاشة';
+
+        /* ① جلسة */
+        if (!isset($_SESSION['user'])) {
+            ems_require_action_log($screen, $verb, 'no_session');
+            http_response_code(403);
+            exit('انتهت الجلسةُ — أعدْ تسجيلَ الدخول');
+        }
+
+        /* ② رمزُ الحماية — قبلَ فحصِ الصلاحية: رمزٌ فاسدٌ يعني طلبًا مزوَّرًا أصلًا */
+        $needCsrf = array_key_exists('csrf', $opts) ? (bool) $opts['csrf'] : true;
+        if ($needCsrf) {
+            $tok = isset($_POST['csrf_token']) ? $_POST['csrf_token'] : '';
+            if (!function_exists('verify_csrf_token') || !verify_csrf_token($tok)) {
+                ems_require_action_log($screen, $verb, 'csrf_failed');
+                http_response_code(403);
+                exit('رمزُ الحمايةِ غيرُ صالح — أعدْ تحميلَ الصفحة');
+            }
+        }
+
+        /* ③ الصلاحيةُ على الفعل — والسوبر يمرُّ بعدَ الرمزِ لا قبلَه */
+        if ($role === $super) {
+            return array('allowed' => true, 'perms' => array('can_edit' => 1, 'can_delete' => 1));
+        }
+        $perms = function_exists('check_page_permissions') ? check_page_permissions($conn, $screen) : array();
+        $key = 'can_' . preg_replace('/[^a-z]/', '', strtolower($verb));
+        $known = array('can_edit', 'can_delete', 'can_approve', 'can_export', 'can_view');
+        $ok = in_array($key, $known, true) && !empty($perms[$key]);
+        if (!$ok) {
+            ems_require_action_log($screen, $verb, 'denied');
+            http_response_code(403);
+            exit($deny);
+        }
+        return array('allowed' => true, 'perms' => $perms);
+    }
+
+    /** تسجيلُ المنع — المعرِّفُ يُقرأ من الجلسةِ ولا يُكتب اسمُ أحدٍ نصًّا */
+    function ems_require_action_log($screen, $verb, $kind)
+    {
+        $uid  = isset($_SESSION['user']['id']) ? (int) $_SESSION['user']['id'] : 0;
+        $role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '-';
+        $line = sprintf("[%s] require_action %s screen=%s verb=%s uid=%d role=%s\n",
+            date('Y-m-d H:i:s'), $kind, $screen, $verb, $uid, $role);
+        $dir = dirname(__DIR__) . '/logs';
+        if (!is_dir($dir)) { @mkdir($dir, 0777, true); }
+        @file_put_contents($dir . '/action_guard.log', $line, FILE_APPEND);
+    }
+}

@@ -36,6 +36,8 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
 ems_shell_axes($__pp);
 
 // ═══ ③-ب التعديل — باعتمادِ المالكِ وحدَه (والقادحُ خلفَ الشاشةِ يفرضه بنيويًّا) ═══
+/* AC-F2: حارسُ الكتابةِ المركزيُّ **قبلَ** أولِ عبارةِ كتابة — fail-closed. */
+ems_require_action($conn, $SCREEN, 'edit', array('deny_msg' => 'تعديلُ السقوفِ بيدِ المالكِ وحدَه'));
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lc     = preg_replace('/[^A-Z0-9-]/', '', (string) ($_POST['ladder_code'] ?? ''));
     $amt    = ($_POST['cap_amount'] ?? '') === '' ? null : (float) $_POST['cap_amount'];
