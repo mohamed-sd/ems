@@ -13,8 +13,12 @@
             "@test",
             "@gate",
             "@gate:negative",
-            "@gate:screens"
-        ]
+            "@gate:screens",
+            "@gate:engines",
+            "@test:engines"
+        ],
+        "gate:engines": "php tools/eng01_checks_gate.php",
+        "test:engines": "php tests/eng01_bus_test.php && php tests/eng01_queue_test.php && php tests/eng01_screens_http_test.php"
     },
     "scripts-descriptions": {
         "test": "حزمةُ الانحدارِ الأساسية — تُرجع 0 إن نجح الكلُّ و1 إن سقط واحدٌ أو مُسَّ ملفٌّ محميّ",
@@ -22,6 +26,8 @@
         "gate": "بوابةُ FIX البنيوية",
         "gate:negative": "البوابةُ السلبية — تُفسد كلَّ مفحوصٍ وتشترط رسوبَ فاحصِه",
         "gate:screens": "جردُ الشاشات — صفرُ فرقٍ بين الأسطحِ الحيةِ وسجلِّ الوحدات",
-        "verify": "الأمرُ الواحدُ لخطِّ التسليم: انحدارٌ + ثلاثُ بوابات، يتوقف عند أولِ سقوط"
+        "verify": "الأمرُ الواحدُ لخطِّ التسليم: انحدارٌ + ثلاثُ بوابات، يتوقف عند أولِ سقوط",
+        "gate:engines": "بوابةُ المحرّكاتِ المشتركة — CK-11..CK-18 وترسبُ افتراضًا",
+        "test:engines": "إثباتاتُ المحرّكاتِ الثلاثة — الناقلُ والطابورُ والشاشاتُ الثماني"
     }
 }

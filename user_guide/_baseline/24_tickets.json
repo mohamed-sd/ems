@@ -1,0 +1,811 @@
+{
+    "role": {
+        "id": "24",
+        "name": "إدارة البلاغات",
+        "parent_role_id": null,
+        "level": "1",
+        "role_scope": "gloable",
+        "status": "1",
+        "oversight_role_id": null
+    },
+    "sub_roles": [],
+    "users": [
+        {
+            "id": "324",
+            "name": "مدير البلاغات (اختبار)",
+            "username": "بلاغات",
+            "status": "active"
+        },
+        {
+            "id": "893",
+            "name": "مشرف البلاغات",
+            "username": "مشرف البلاغات",
+            "status": "active"
+        }
+    ],
+    "stages": [
+        {
+            "id": "3811",
+            "stage_no": "0",
+            "stage_title": "لوحة الإدارة",
+            "name": "مساحتي الشخصية",
+            "display_order": "1",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "3812",
+            "stage_no": "0",
+            "stage_title": "لوحة الإدارة",
+            "name": "برج المراقبة",
+            "display_order": "2",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "3813",
+            "stage_no": "1",
+            "stage_title": "أولًا: الاستقبال",
+            "name": "تسجيل بلاغ",
+            "display_order": "103",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "3814",
+            "stage_no": "1",
+            "stage_title": "أولًا: الاستقبال",
+            "name": "قائمة البلاغات",
+            "display_order": "104",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "3815",
+            "stage_no": "2",
+            "stage_title": "ثانيًا: التصنيف والتوجيه",
+            "name": "التوجيه الآلي",
+            "display_order": "205",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "3816",
+            "stage_no": "3",
+            "stage_title": "ثالثًا: التحويل والتفريع",
+            "name": "التحويل والتفريع",
+            "display_order": "306",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "3817",
+            "stage_no": "4",
+            "stage_title": "رابعًا: المتابعة والتصعيد",
+            "name": "المهل والتصعيد",
+            "display_order": "407",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "3818",
+            "stage_no": "4",
+            "stage_title": "رابعًا: المتابعة والتصعيد",
+            "name": "التكرار والسبب الجذري",
+            "display_order": "408",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "3819",
+            "stage_no": "5",
+            "stage_title": "خامسًا: الإغلاق",
+            "name": "الإغلاق وانضباطه",
+            "display_order": "509",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "3820",
+            "stage_no": "6",
+            "stage_title": "سادسًا: القوالب الدورية",
+            "name": "البلاغات الدورية",
+            "display_order": "610",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "3821",
+            "stage_no": "7",
+            "stage_title": "متابعة وتقارير المركز",
+            "name": "المؤشرات",
+            "display_order": "711",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "3822",
+            "stage_no": "7",
+            "stage_title": "متابعة وتقارير المركز",
+            "name": "الاعتمادات",
+            "display_order": "712",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "3823",
+            "stage_no": "7",
+            "stage_title": "متابعة وتقارير المركز",
+            "name": "الميزانية والإنجاز",
+            "display_order": "713",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "3824",
+            "stage_no": "8",
+            "stage_title": "إعدادات البلاغات",
+            "name": "الأنواع والمهل والتصعيد",
+            "display_order": "814",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "3912",
+            "stage_no": "98",
+            "stage_title": "فريق العمل",
+            "name": "فريق العمل",
+            "display_order": "9800",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "2104",
+            "stage_no": "99",
+            "stage_title": "خارج الوثيقة — بانتظار قرار المالك",
+            "name": "أخرى — للمراجعة",
+            "display_order": "9900",
+            "owner_role_id": "24"
+        },
+        {
+            "id": "194",
+            "stage_no": null,
+            "stage_title": null,
+            "name": "لوحة الإدارة",
+            "display_order": "1",
+            "owner_role_id": "24"
+        }
+    ],
+    "screens": [
+        {
+            "route": "chats\/index.php",
+            "label": "المراسلات",
+            "stage_no": "0",
+            "group": "مساحتي الشخصية",
+            "group_active": 1,
+            "file": "chats\/index.php",
+            "exists": 1,
+            "lines": 935,
+            "sha1": "ce07a4e3984da3909b21465eabc455652697a0a8"
+        },
+        {
+            "route": "emsreports\/index.php",
+            "label": "مركز التقارير",
+            "stage_no": "7",
+            "group": "الميزانية والإنجاز",
+            "group_active": 1,
+            "file": "emsreports\/index.php",
+            "exists": 1,
+            "lines": 318,
+            "sha1": "f220e6b257d0c976a10596c980d1fede7b9c695e"
+        },
+        {
+            "route": "Finance\/approvals_inbox.php",
+            "label": "صندوق ما ينتظر اعتمادي",
+            "stage_no": "7",
+            "group": "الاعتمادات",
+            "group_active": 1,
+            "file": "Finance\/approvals_inbox.php",
+            "exists": 1,
+            "lines": 138,
+            "sha1": "8cb9456e39cfab18fb244ffb251eaa52575ddb53"
+        },
+        {
+            "route": "Finance\/budget_dept.php",
+            "label": "ميزانية إدارتي",
+            "stage_no": "7",
+            "group": "الميزانية والإنجاز",
+            "group_active": 1,
+            "file": "Finance\/budget_dept.php",
+            "exists": 1,
+            "lines": 92,
+            "sha1": "f9c13231e3b2aea1f5654869ccc81ffc74657ed9"
+        },
+        {
+            "route": "Finance\/budget_form_fin.php",
+            "label": "ميزانية إدارتي",
+            "stage_no": "99",
+            "group": "أخرى — للمراجعة",
+            "group_active": 1,
+            "file": "Finance\/budget_form_fin.php",
+            "exists": 1,
+            "lines": 415,
+            "sha1": "404059f23c50044a20427d3de4b27aef648dbb51"
+        },
+        {
+            "route": "FinRequests\/dept_inbox.php",
+            "label": "موافقات إدارتي",
+            "stage_no": null,
+            "group": "العمل اليومي",
+            "group_active": 0,
+            "file": "FinRequests\/dept_inbox.php",
+            "exists": 1,
+            "lines": 135,
+            "sha1": "30ec3c6f61e63159745797d8792fe4061c7cc858"
+        },
+        {
+            "route": "FinRequests\/my_requests.php",
+            "label": "طلباتي",
+            "stage_no": "0",
+            "group": "مساحتي الشخصية",
+            "group_active": 1,
+            "file": "FinRequests\/my_requests.php",
+            "exists": 1,
+            "lines": 103,
+            "sha1": "dfa4f1e6bf245ea151f73cec93f8ba4d4eb049cd"
+        },
+        {
+            "route": "FinRequests\/request_form.php",
+            "label": "طلب مالي جديد",
+            "stage_no": null,
+            "group": "لوحة الإدارة",
+            "group_active": 0,
+            "file": "FinRequests\/request_form.php",
+            "exists": 1,
+            "lines": 504,
+            "sha1": "9088b7c756c8d1feeb7e63f6a034305c21072f57"
+        },
+        {
+            "route": "main\/my_workspace.php",
+            "label": "مساحة عملي",
+            "stage_no": null,
+            "group": "لوحة الإدارة",
+            "group_active": 1,
+            "file": "main\/my_workspace.php",
+            "exists": 1,
+            "lines": 118,
+            "sha1": "029b0880a692fe7a3f499697317593fefdff82f4"
+        },
+        {
+            "route": "main\/project_users.php",
+            "label": "إدارة المعاونين",
+            "stage_no": "98",
+            "group": "فريق العمل",
+            "group_active": 1,
+            "file": "main\/project_users.php",
+            "exists": 1,
+            "lines": 1122,
+            "sha1": "80151a61f81c4ea5c94635bf89b1647e9d060357"
+        },
+        {
+            "route": "main\/role_board.php",
+            "label": "لوحة الإدارة",
+            "stage_no": "99",
+            "group": "أخرى — للمراجعة",
+            "group_active": 1,
+            "file": "main\/role_board.php",
+            "exists": 1,
+            "lines": 126,
+            "sha1": "31aff676bae40af2a797e435be0c0844dbd7fba4"
+        },
+        {
+            "route": "Portal\/dept_achievement.php",
+            "label": "إنجاز الإدارة",
+            "stage_no": "7",
+            "group": "الميزانية والإنجاز",
+            "group_active": 1,
+            "file": "Portal\/dept_achievement.php",
+            "exists": 1,
+            "lines": 141,
+            "sha1": "ba7d2534b7825665f764a22f0180914990b995de"
+        },
+        {
+            "route": "Portal\/my_achievement.php",
+            "label": "إنجازي",
+            "stage_no": "0",
+            "group": "مساحتي الشخصية",
+            "group_active": 1,
+            "file": "Portal\/my_achievement.php",
+            "exists": 1,
+            "lines": 146,
+            "sha1": "f2b5f13a7c11cee10b52274165b1c75dc3ccb4c1"
+        },
+        {
+            "route": "Portal\/my_portal.php",
+            "label": "بوابتي",
+            "stage_no": "0",
+            "group": "مساحتي الشخصية",
+            "group_active": 1,
+            "file": "Portal\/my_portal.php",
+            "exists": 1,
+            "lines": 170,
+            "sha1": "9377d68890fdfbadca0fc5a03806c43695304c0c"
+        },
+        {
+            "route": "Portal\/my_tasks.php",
+            "label": "مهامي",
+            "stage_no": "0",
+            "group": "مساحتي الشخصية",
+            "group_active": 1,
+            "file": "Portal\/my_tasks.php",
+            "exists": 1,
+            "lines": 316,
+            "sha1": "5517cfa81e9b73884b6aa46e8b2812e452b7d12b"
+        },
+        {
+            "route": "Risk\/dept_risk_space.php",
+            "label": "مساحة مخاطر الإدارة",
+            "stage_no": "99",
+            "group": "أخرى — للمراجعة",
+            "group_active": 1,
+            "file": "Risk\/dept_risk_space.php",
+            "exists": 1,
+            "lines": 203,
+            "sha1": "7b04168f82fd8c42e11e52f0154976de82ad3dc4"
+        },
+        {
+            "route": "Risk\/risk_field.php",
+            "label": "مخاطرُ الميدان",
+            "stage_no": "99",
+            "group": "أخرى — للمراجعة",
+            "group_active": 1,
+            "file": "Risk\/risk_field.php",
+            "exists": 1,
+            "lines": 336,
+            "sha1": "c4901c0ab7b680819cfd757aa29156ff23360176"
+        },
+        {
+            "route": "Tickets\/admin_close.php",
+            "label": "إغلاق البلاغ وتأكيده",
+            "stage_no": "5",
+            "group": "الإغلاق وانضباطه",
+            "group_active": 1,
+            "file": "Tickets\/admin_close.php",
+            "exists": 1,
+            "lines": 266,
+            "sha1": "ab1e1ed6fc694848df4cb503857e0ab2ea078848"
+        },
+        {
+            "route": "Tickets\/ticket_categories_config.php",
+            "label": "تصنيفات الأعطال والبلاغات",
+            "stage_no": null,
+            "group": "السجلات والملفات",
+            "group_active": 0,
+            "file": "Tickets\/ticket_categories_config.php",
+            "exists": 1,
+            "lines": 229,
+            "sha1": "af12ce35e72766748605aaefb6347250819ee4ac"
+        },
+        {
+            "route": "Tickets\/ticket_contextual_open.php",
+            "label": "أبلغ عن مشكلة من هذه الشاشة",
+            "stage_no": "1",
+            "group": "تسجيل بلاغ",
+            "group_active": 1,
+            "file": "Tickets\/ticket_contextual_open.php",
+            "exists": 1,
+            "lines": 157,
+            "sha1": "0e6d079adfc872a9c356f533e18c8effcf3e3a6e"
+        },
+        {
+            "route": "Tickets\/ticket_dashboard.php",
+            "label": "مؤشرات البلاغات",
+            "stage_no": "0",
+            "group": "برج المراقبة",
+            "group_active": 1,
+            "file": "Tickets\/ticket_dashboard.php",
+            "exists": 1,
+            "lines": 447,
+            "sha1": "59c50d010f000db962615495c339ef938cc8b727"
+        },
+        {
+            "route": "Tickets\/ticket_dashboard.php#2",
+            "label": "مؤشرات البلاغات",
+            "stage_no": "7",
+            "group": "المؤشرات",
+            "group_active": 1,
+            "file": "Tickets\/ticket_dashboard.php",
+            "exists": 1,
+            "lines": 447,
+            "sha1": "59c50d010f000db962615495c339ef938cc8b727"
+        },
+        {
+            "route": "Tickets\/ticket_escalation_config.php",
+            "label": "مهل البلاغات وتصعيدها",
+            "stage_no": "4",
+            "group": "المهل والتصعيد",
+            "group_active": 1,
+            "file": "Tickets\/ticket_escalation_config.php",
+            "exists": 1,
+            "lines": 189,
+            "sha1": "5a8b2df02eb7dfc61895013980df290e8bb82ca3"
+        },
+        {
+            "route": "Tickets\/ticket_recurrence.php",
+            "label": "البلاغات المتكررة وسببها الجذري",
+            "stage_no": "4",
+            "group": "التكرار والسبب الجذري",
+            "group_active": 1,
+            "file": "Tickets\/ticket_recurrence.php",
+            "exists": 1,
+            "lines": 219,
+            "sha1": "676faa9b6d03aa27b9ee4d6e43a65aa7387d13f6"
+        },
+        {
+            "route": "Tickets\/ticket_recurrence.php#2",
+            "label": "البلاغات الدورية المولَّدة",
+            "stage_no": "6",
+            "group": "البلاغات الدورية",
+            "group_active": 1,
+            "file": "Tickets\/ticket_recurrence.php",
+            "exists": 1,
+            "lines": 219,
+            "sha1": "676faa9b6d03aa27b9ee4d6e43a65aa7387d13f6"
+        },
+        {
+            "route": "Tickets\/ticket_sla_config.php",
+            "label": "أزمنة الاستجابة والإنجاز",
+            "stage_no": "99",
+            "group": "أخرى — للمراجعة",
+            "group_active": 1,
+            "file": "Tickets\/ticket_sla_config.php",
+            "exists": 1,
+            "lines": 205,
+            "sha1": "ff0e45539248ce8e950020e13d48545d159700fd"
+        },
+        {
+            "route": "Tickets\/ticket_types_config.php",
+            "label": "تصنيف البلاغ وتوجيهه آليًّا",
+            "stage_no": "2",
+            "group": "التوجيه الآلي",
+            "group_active": 1,
+            "file": "Tickets\/ticket_types_config.php",
+            "exists": 1,
+            "lines": 305,
+            "sha1": "9b43e25e63ca2b7b53a427c7049bc338142f28ac"
+        },
+        {
+            "route": "Tickets\/ticket_types_config.php#2",
+            "label": "إعدادات البلاغات — الأنواع والمهل والتصعيد",
+            "stage_no": "8",
+            "group": "الأنواع والمهل والتصعيد",
+            "group_active": 1,
+            "file": "Tickets\/ticket_types_config.php",
+            "exists": 1,
+            "lines": 305,
+            "sha1": "9b43e25e63ca2b7b53a427c7049bc338142f28ac"
+        },
+        {
+            "route": "Tickets\/ticket_workstreams_board.php",
+            "label": "تحويل البلاغ وتفريعه لمسارات",
+            "stage_no": "3",
+            "group": "التحويل والتفريع",
+            "group_active": 1,
+            "file": "Tickets\/ticket_workstreams_board.php",
+            "exists": 1,
+            "lines": 176,
+            "sha1": "47602f68d2c94085fbf346198ff0a94240fa9bc0"
+        },
+        {
+            "route": "Tickets\/tickets_list.php",
+            "label": "بلاغات المركز",
+            "stage_no": "1",
+            "group": "قائمة البلاغات",
+            "group_active": 1,
+            "file": "Tickets\/tickets_list.php",
+            "exists": 1,
+            "lines": 292,
+            "sha1": "9afe0baf4f40a2ccd725fafae5938c690ce551a5"
+        },
+        {
+            "route": "Tickets\/watchtower.php",
+            "label": "تقرير من يتأخر ومن لا يستجيب",
+            "stage_no": "99",
+            "group": "أخرى — للمراجعة",
+            "group_active": 1,
+            "file": "Tickets\/watchtower.php",
+            "exists": 1,
+            "lines": 123,
+            "sha1": "053fcd7b02f823ea867257cd9c3cc175f3fdecfe"
+        }
+    ],
+    "permissions": {
+        "Approvals\/requests.php": "1000",
+        "chats\/index.php": "1000",
+        "emsreports\/index.php": "1000",
+        "Finance\/approvals_inbox.php": "1000",
+        "Finance\/budget_dept.php": "1000",
+        "Finance\/budget_form_fin.php": "1110",
+        "FinRequests\/dept_inbox.php": "1000",
+        "FinRequests\/my_requests.php": "1000",
+        "FinRequests\/request_form.php": "1100",
+        "main\/dashboard.php": "1000",
+        "main\/global_search.php": "1000",
+        "main\/my_workspace.php": "1000",
+        "main\/profile.php": "1000",
+        "main\/project_users.php": "1111",
+        "main\/role_board.php": "1000",
+        "main\/soon.php": "1000",
+        "main\/user_profile.php": "1000",
+        "Maintenance\/failure_report.php": "1000",
+        "Portal\/approvals_inbox.php": "1000",
+        "Portal\/dept_achievement.php": "1000",
+        "Portal\/dept_board.php": "1000",
+        "Portal\/my_achievement.php": "1000",
+        "Portal\/my_certificate.php": "1000",
+        "Portal\/my_evaluation.php": "1100",
+        "Portal\/my_kpi.php": "1000",
+        "Portal\/my_portal.php": "1000",
+        "Portal\/my_requests.php": "1000",
+        "Portal\/my_tasks.php": "1000",
+        "Portal\/notifications.php": "1000",
+        "Portal\/workspace.php": "1000",
+        "Risk\/dept_risk_space.php": "1000",
+        "Risk\/risk_dept_crp.php": "1000",
+        "Risk\/risk_field.php": "1100",
+        "Risk\/risk_incidents.php": "1000",
+        "Settings\/change_password.php": "1000",
+        "Tickets\/admin_close.php": "1110",
+        "Tickets\/dept_inbox.php": "1110",
+        "Tickets\/gov_dept_crp.php": "1010",
+        "Tickets\/inquiry.php": "1000",
+        "Tickets\/intake_classify.php": "1000",
+        "Tickets\/my_tickets.php": "1000",
+        "Tickets\/ticket_categories_config.php": "1111",
+        "Tickets\/ticket_close.php": "1010",
+        "Tickets\/ticket_contextual_open.php": "1110",
+        "Tickets\/ticket_dashboard.php": "1000",
+        "Tickets\/ticket_escalation_config.php": "1111",
+        "Tickets\/ticket_form.php": "1111",
+        "Tickets\/ticket_kpi.php": "1000",
+        "Tickets\/ticket_recurrence.php": "1111",
+        "Tickets\/ticket_sla_config.php": "1111",
+        "Tickets\/ticket_types_config.php": "1111",
+        "Tickets\/ticket_workstreams_board.php": "1110",
+        "Tickets\/tickets_list.php": "1111",
+        "Tickets\/watchtower.php": "1110",
+        "user_capacities.php": "1000"
+    },
+    "actions": {
+        "ach.range": {
+            "canonical_code": "ach.range",
+            "label_ar": "اختيارُ مدى الإنجاز",
+            "state": "declared_unbuilt",
+            "write_class": "read_only",
+            "event_name": "—",
+            "canonical_file": "my_achievement.php",
+            "real_path": "Portal\/my_achievement.php"
+        },
+        "approval.grant": {
+            "canonical_code": "approval.grant",
+            "label_ar": "اعتمادٌ في سقفي",
+            "state": "alias",
+            "write_class": "domain_write",
+            "event_name": "ApprovalGranted",
+            "canonical_file": "approvals_inbox.php",
+            "real_path": "Finance\/approvals_inbox.php"
+        },
+        "approval.reject": {
+            "canonical_code": "approval.reject",
+            "label_ar": "رفضٌ بسببٍ محكوم",
+            "state": "bound_page",
+            "write_class": "domain_write",
+            "event_name": "ApprovalRejected",
+            "canonical_file": "approvals_inbox.php",
+            "real_path": "Finance\/approvals_inbox.php"
+        },
+        "approval.return": {
+            "canonical_code": "approval.return",
+            "label_ar": "إعادةٌ للتصحيح",
+            "state": "bound_page",
+            "write_class": "domain_write",
+            "event_name": "ApprovalReturned",
+            "canonical_file": "approvals_inbox.php",
+            "real_path": "Finance\/approvals_inbox.php"
+        },
+        "budget.request": {
+            "canonical_code": "budget.request",
+            "label_ar": "طلبُ تعديل ميزانية",
+            "state": "bound_page",
+            "write_class": "domain_write",
+            "event_name": "BudgetChangeRequested",
+            "canonical_file": "budget_dept.php",
+            "real_path": "Finance\/budget_dept.php"
+        },
+        "esc.auto": {
+            "canonical_code": "esc.auto",
+            "label_ar": "التصعيدُ الآلي",
+            "state": "bound_page",
+            "write_class": "domain_write",
+            "event_name": "TicketEscalated",
+            "canonical_file": "ticket_escalate.php",
+            "real_path": "Tickets\/ticket_escalation_config.php"
+        },
+        "kpi.report": {
+            "canonical_code": "kpi.report",
+            "label_ar": "إصدارُ تقرير التأخر",
+            "state": "declared_unbuilt",
+            "write_class": "domain_write",
+            "event_name": "TicketKPIIssued",
+            "canonical_file": "ticket_kpi.php",
+            "real_path": "Tickets\/ticket_dashboard.php"
+        },
+        "msg.send": {
+            "canonical_code": "msg.send",
+            "label_ar": "إرسالُ مراسلة",
+            "state": "bound_page",
+            "write_class": "external_side_effect",
+            "event_name": "MessageSent",
+            "canonical_file": "messages.php",
+            "real_path": "chats\/index.php"
+        },
+        "portal.render": {
+            "canonical_code": "portal.render",
+            "label_ar": "فتحُ بوابتي",
+            "state": "declared_unbuilt",
+            "write_class": "read_only",
+            "event_name": "—",
+            "canonical_file": "my_portal.php",
+            "real_path": "Portal\/my_portal.php"
+        },
+        "recur.escalate": {
+            "canonical_code": "recur.escalate",
+            "label_ar": "رفعُ التكرار مشكلةً",
+            "state": "bound_page",
+            "write_class": "domain_write",
+            "event_name": "RecurrenceEscalated",
+            "canonical_file": "ticket_recur.php",
+            "real_path": "Tickets\/ticket_recurrence.php"
+        },
+        "route.auto": {
+            "canonical_code": "route.auto",
+            "label_ar": "التوجيهُ الآلي",
+            "state": "bound_page",
+            "write_class": "domain_write",
+            "event_name": "TicketRouted",
+            "canonical_file": "ticket_route.php",
+            "real_path": "Tickets\/ticket_types_config.php"
+        },
+        "rpt.export": {
+            "canonical_code": "rpt.export",
+            "label_ar": "تصديرُ تقرير",
+            "state": "bound_page",
+            "write_class": "governance_write",
+            "event_name": "ReportExported",
+            "canonical_file": "dept_achievement.php",
+            "real_path": "Portal\/dept_achievement.php"
+        },
+        "task.done": {
+            "canonical_code": "task.done",
+            "label_ar": "إنجازُ مهمة",
+            "state": "bound_page",
+            "write_class": "domain_write",
+            "event_name": "TaskCompleted",
+            "canonical_file": "my_tasks.php",
+            "real_path": "Portal\/my_tasks.php"
+        },
+        "tcf.define": {
+            "canonical_code": "tcf.define",
+            "label_ar": "تعريف إعداد بلاغات",
+            "state": "bound_page",
+            "write_class": "domain_write",
+            "event_name": "TicketConfigDefined",
+            "canonical_file": "ticket_config.php",
+            "real_path": "Tickets\/ticket_types_config.php"
+        },
+        "ticket.ack": {
+            "canonical_code": "ticket.ack",
+            "label_ar": "استلامُ البلاغ",
+            "state": "declared_unbuilt",
+            "write_class": "domain_write",
+            "event_name": "TicketAcknowledged",
+            "canonical_file": "tickets_dept.php",
+            "real_path": "Tickets\/dept_inbox.php"
+        },
+        "ticket.admin.close": {
+            "canonical_code": "ticket.admin.close",
+            "label_ar": "إغلاقٌ إداريٌّ للمكرر",
+            "state": "alias",
+            "write_class": "domain_write",
+            "event_name": "TicketAdminClosed",
+            "canonical_file": "ticket_close.php",
+            "real_path": "Tickets\/admin_close.php"
+        },
+        "ticket.branch": {
+            "canonical_code": "ticket.branch",
+            "label_ar": "تفريعُ البلاغ لمساراتٍ متوازية",
+            "state": "bound_page",
+            "write_class": "domain_write",
+            "event_name": "TicketBranched",
+            "canonical_file": "ticket_split.php",
+            "real_path": "Tickets\/ticket_workstreams_board.php"
+        },
+        "ticket.classify": {
+            "canonical_code": "ticket.classify",
+            "label_ar": "تصنيفُ البلاغ",
+            "state": "alias",
+            "write_class": "domain_write",
+            "event_name": "TicketClassified",
+            "canonical_file": "tickets.php",
+            "real_path": "Tickets\/tickets_list.php"
+        },
+        "ticket.confirm": {
+            "canonical_code": "ticket.confirm",
+            "label_ar": "تأكيدُ المبلِّغ للإغلاق",
+            "state": "alias",
+            "write_class": "domain_write",
+            "event_name": "TicketClosed",
+            "canonical_file": "ticket_close.php",
+            "real_path": "Tickets\/admin_close.php"
+        },
+        "ticket.done": {
+            "canonical_code": "ticket.done",
+            "label_ar": "إنجازُ البلاغ",
+            "state": "declared_unbuilt",
+            "write_class": "domain_write",
+            "event_name": "TicketResolved",
+            "canonical_file": "tickets_dept.php",
+            "real_path": "Tickets\/dept_inbox.php"
+        },
+        "ticket.open": {
+            "canonical_code": "ticket.open",
+            "label_ar": "فتحُ بلاغ",
+            "state": "alias",
+            "write_class": "read_only",
+            "event_name": "TicketOpened",
+            "canonical_file": "ticket_open.php",
+            "real_path": "Tickets\/ticket_contextual_open.php"
+        },
+        "ticket.transfer": {
+            "canonical_code": "ticket.transfer",
+            "label_ar": "تحويلُ البلاغ لإدارةٍ أخرى",
+            "state": "bound_page",
+            "write_class": "domain_write",
+            "event_name": "TicketTransferred",
+            "canonical_file": "ticket_split.php",
+            "real_path": "Tickets\/ticket_workstreams_board.php"
+        },
+        "tpl.generate": {
+            "canonical_code": "tpl.generate",
+            "label_ar": "توليد بلاغ دوري",
+            "state": "bound_page",
+            "write_class": "domain_write",
+            "event_name": "PeriodicTicketGenerated",
+            "canonical_file": "ticket_periodic.php",
+            "real_path": "Tickets\/ticket_recurrence.php"
+        },
+        "workspace.request.submit": {
+            "canonical_code": "workspace.request.submit",
+            "label_ar": "تقديمُ طلبٍ شخصي",
+            "state": "declared_unbuilt",
+            "write_class": "domain_write",
+            "event_name": "PersonalRequestRaised",
+            "canonical_file": "my_requests.php",
+            "real_path": "FinRequests\/my_requests.php"
+        }
+    },
+    "tables": {
+        "tickets": 63,
+        "ticket_attachments": 20,
+        "ticket_categories": 20,
+        "ticket_communications": 0,
+        "ticket_effects": 25,
+        "ticket_escalations": 74,
+        "ticket_escalation_rules": 20,
+        "ticket_events": 289,
+        "ticket_holds": 20,
+        "ticket_participants": 35,
+        "ticket_recurrence_templates": 20,
+        "ticket_responses": 9,
+        "ticket_sla_policies": 20,
+        "ticket_transfers": 22,
+        "ticket_types": 20,
+        "ticket_type_workstreams": 27,
+        "ticket_watchers": 35,
+        "ticket_workstreams": 118,
+        "tkt_notifications": 50
+    },
+    "_meta": {
+        "role_id": 24,
+        "slug": "tickets",
+        "commit": "4a47978",
+        "branch": "fix\/remediation-2026-08",
+        "measured_at": "2026-08-17 04:10:48",
+        "db": "equipation_manage"
+    }
+}

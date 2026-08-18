@@ -1,0 +1,533 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مقياسُ الحزمةِ الرباعية</title>
+<style>
+:root{
+  --paper:#F6F7F9; --card:#FFFFFF; --sunk:#EDEFF3;
+  --ink:#131822; --ink-2:#3D4658; --ink-3:#6B7488;
+  --rule:#DCE0E8; --rule-2:#C6CCD8;
+  --accent:#C8860D; --accent-soft:#F6EAD1;
+  --done:#2E6F4E;    --done-soft:#DCEBE2;
+  --part:#C8860D;    --part-soft:#F6EAD1;
+  --todo:#A03A28;    --todo-soft:#F4DFDA;
+  --block:#55607A;   --block-soft:#E3E6EE;
+  --unm:#8A93A6;     --unm-soft:#E9EBF0;
+  --shadow:0 1px 2px rgba(19,24,34,.06), 0 8px 24px -12px rgba(19,24,34,.14);
+  --display:'Sakkal Majalla','Traditional Arabic','Noto Naskh Arabic','Amiri','Times New Roman',serif;
+  --body:'Segoe UI','Noto Sans Arabic','Dubai',Tahoma,'Helvetica Neue',sans-serif;
+  --data:'Cascadia Mono',Consolas,'SF Mono',ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F131B; --card:#181D28; --sunk:#12161F;
+    --ink:#E8EBF1; --ink-2:#AAB3C4; --ink-3:#7A8397;
+    --rule:#2A3140; --rule-2:#3A4356;
+    --accent:#E0A63A; --accent-soft:#332913;
+    --done:#5BB183;  --done-soft:#16281F;
+    --part:#E0A63A;  --part-soft:#332913;
+    --todo:#D9705C;  --todo-soft:#301A16;
+    --block:#93A0BC; --block-soft:#1D2330;
+    --unm:#79839A;   --unm-soft:#1A1F2B;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F131B; --card:#181D28; --sunk:#12161F;
+  --ink:#E8EBF1; --ink-2:#AAB3C4; --ink-3:#7A8397;
+  --rule:#2A3140; --rule-2:#3A4356;
+  --accent:#E0A63A; --accent-soft:#332913;
+  --done:#5BB183;  --done-soft:#16281F;
+  --part:#E0A63A;  --part-soft:#332913;
+  --todo:#D9705C;  --todo-soft:#301A16;
+  --block:#93A0BC; --block-soft:#1D2330;
+  --unm:#79839A;   --unm-soft:#1A1F2B;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -12px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; direction:rtl; background:var(--paper); color:var(--ink);
+  font-family:var(--body); font-size:16px; line-height:1.65;
+  font-variant-numeric:tabular-nums;
+}
+.wrap{max-width:1080px; margin:0 auto; padding:0 24px 96px; display:flex; flex-direction:column; gap:44px}
+h1,h2,h3{font-family:var(--display); font-weight:700; text-wrap:balance; margin:0; line-height:1.3}
+p{margin:0}
+.mono{font-family:var(--data); font-variant-numeric:tabular-nums}
+
+/* ── الترويسة ── */
+.masthead{padding:44px 0 0; display:flex; flex-direction:column; gap:26px}
+.eyebrow{
+  font-family:var(--data); font-size:11.5px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--ink-3); display:flex; flex-wrap:wrap; gap:8px 18px; align-items:center;
+}
+.eyebrow b{color:var(--accent); font-weight:600}
+h1{font-size:clamp(30px,5vw,46px); letter-spacing:-.01em}
+.lede{font-size:17.5px; color:var(--ink-2); max-width:62ch}
+
+/* ── العدّاد الكبير ── */
+.headline{
+  display:grid; grid-template-columns:minmax(0,auto) minmax(0,1fr); gap:32px; align-items:center;
+  background:var(--card); border:1px solid var(--rule); border-radius:3px;
+  box-shadow:var(--shadow); padding:28px 30px;
+}
+.bignum{display:flex; flex-direction:column; gap:2px; border-inline-end:1px solid var(--rule); padding-inline-end:32px}
+.bignum .v{font-family:var(--display); font-size:clamp(52px,9vw,76px); line-height:.94; font-weight:700; letter-spacing:-.02em}
+.bignum .v span{font-size:.44em; color:var(--ink-3); font-weight:400}
+.bignum .k{font-size:13px; color:var(--ink-3); letter-spacing:.02em}
+.hl-body{display:flex; flex-direction:column; gap:14px; min-width:0}
+
+/* ── الشريط المكدَّس ── */
+.stack{display:flex; height:26px; border-radius:2px; overflow:hidden; border:1px solid var(--rule-2)}
+.stack i{display:block; height:100%}
+.stack i.d{background:var(--done)} .stack i.p{background:var(--part)}
+.stack i.t{background:var(--todo)} .stack i.b{background:var(--block)}
+.stack i.u{background:repeating-linear-gradient(135deg,var(--unm) 0 4px,transparent 4px 8px),var(--unm-soft)}
+.legend{display:flex; flex-wrap:wrap; gap:6px 20px; font-size:13.5px; color:var(--ink-2)}
+.legend span{display:inline-flex; align-items:center; gap:7px; white-space:nowrap}
+.dot{width:10px; height:10px; border-radius:2px; flex:none}
+.dot.d{background:var(--done)} .dot.p{background:var(--part)} .dot.t{background:var(--todo)}
+.dot.b{background:var(--block)}
+.dot.u{background:repeating-linear-gradient(135deg,var(--unm) 0 3px,transparent 3px 6px),var(--unm-soft)}
+.legend b{font-family:var(--data); color:var(--ink); font-weight:600}
+
+/* ── أقسام ── */
+section{display:flex; flex-direction:column; gap:18px}
+.sec-head{display:flex; flex-direction:column; gap:5px; border-top:2px solid var(--ink); padding-top:14px}
+h2{font-size:25px}
+.sec-head p{font-size:15px; color:var(--ink-2); max-width:66ch}
+
+/* ── بطاقات الوثائق ── */
+.gauges{display:grid; grid-template-columns:repeat(auto-fit,minmax(232px,1fr)); gap:16px}
+.gauge{
+  background:var(--card); border:1px solid var(--rule); border-radius:3px; padding:18px 18px 16px;
+  display:flex; flex-direction:column; gap:12px; box-shadow:var(--shadow); position:relative;
+}
+.gauge::before{content:""; position:absolute; inset-block:0; inset-inline-start:0; width:3px; background:var(--accent)}
+.g-id{font-family:var(--data); font-size:11px; letter-spacing:.1em; color:var(--ink-3)}
+.g-name{font-family:var(--display); font-size:19px; font-weight:700; line-height:1.25}
+.g-pct{display:flex; align-items:baseline; gap:8px; font-family:var(--display); font-weight:700; font-size:36px; letter-spacing:-.02em}
+.g-pct em{font-family:var(--body); font-style:normal; font-size:12.5px; font-weight:400; color:var(--ink-3)}
+.g-meta{font-size:13px; color:var(--ink-2); display:flex; flex-wrap:wrap; gap:2px 12px}
+.g-meta b{font-family:var(--data); font-weight:600}
+
+/* ── جداول البنود ── */
+.tablecard{background:var(--card); border:1px solid var(--rule); border-radius:3px; box-shadow:var(--shadow); overflow:hidden}
+.tc-head{
+  display:flex; flex-wrap:wrap; gap:8px 16px; align-items:baseline; justify-content:space-between;
+  padding:15px 18px; background:var(--sunk); border-bottom:1px solid var(--rule);
+}
+.tc-head h3{font-size:19px}
+.tc-head .n{font-family:var(--data); font-size:13px; color:var(--ink-2)}
+.tscroll{overflow-x:auto}
+table{width:100%; border-collapse:collapse; font-size:14.5px; min-width:660px}
+th{
+  text-align:start; font-family:var(--data); font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-3); font-weight:600; padding:10px 14px; border-bottom:1px solid var(--rule-2); white-space:nowrap;
+}
+td{padding:11px 14px; border-bottom:1px solid var(--rule); vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+td.id{font-family:var(--data); font-size:12.5px; color:var(--ink-3); white-space:nowrap; width:1%;
+      border-inline-start:4px solid var(--rule-2); padding-inline-start:11px}
+tr.s-done  td.id{border-inline-start-color:var(--done)}
+tr.s-part  td.id{border-inline-start-color:var(--part)}
+tr.s-todo  td.id{border-inline-start-color:var(--todo)}
+tr.s-block td.id{border-inline-start-color:var(--block)}
+tr.s-unm   td.id{border-inline-start-color:var(--unm)}
+td.what{min-width:15rem}
+td.what small{display:block; margin-top:4px; font-size:12.5px; color:var(--ink-3); line-height:1.5}
+td.num{font-family:var(--data); font-size:13px; white-space:nowrap; color:var(--ink-2)}
+td.num strong{color:var(--ink); font-weight:600}
+td.st{width:1%; white-space:nowrap}
+.chip{
+  display:inline-block; font-size:11.5px; font-weight:600; padding:3px 9px; border-radius:2px;
+  border:1px solid currentColor; letter-spacing:.01em;
+}
+.chip.d{color:var(--done); background:var(--done-soft)}
+.chip.p{color:var(--part); background:var(--part-soft)}
+.chip.t{color:var(--todo); background:var(--todo-soft)}
+.chip.b{color:var(--block); background:var(--block-soft)}
+.chip.u{color:var(--unm);  background:var(--unm-soft)}
+
+/* ── قوائم الفجوات ── */
+.gaps{display:flex; flex-direction:column; gap:12px}
+.gap{
+  display:grid; grid-template-columns:auto minmax(0,1fr); gap:0 18px;
+  background:var(--card); border:1px solid var(--rule); border-inline-start:4px solid var(--todo);
+  border-radius:3px; padding:16px 18px; box-shadow:var(--shadow);
+}
+.gap.warn{border-inline-start-color:var(--part)}
+.gap .rank{font-family:var(--display); font-size:27px; font-weight:700; color:var(--ink-3); line-height:1; padding-top:2px}
+.gap .body{display:flex; flex-direction:column; gap:6px; min-width:0}
+.gap h3{font-size:17px}
+.gap p{font-size:14.5px; color:var(--ink-2)}
+.gap .ev{font-family:var(--data); font-size:12.5px; color:var(--ink-3); word-break:break-word}
+.gap .ev b{color:var(--todo); font-weight:600}
+.gap.warn .ev b{color:var(--part)}
+
+/* ── الموقوف ── */
+.held{background:var(--block-soft); border:1px solid var(--rule-2); border-radius:3px; padding:20px 22px;
+      display:flex; flex-direction:column; gap:14px}
+.held h3{font-size:18px}
+.held ul{margin:0; padding-inline-start:1.15rem; display:flex; flex-direction:column; gap:9px; font-size:14.5px; color:var(--ink-2)}
+.held li strong{color:var(--ink)}
+.held .mono{font-size:13px}
+
+/* ── إعادة القياس ── */
+.rerun{background:var(--sunk); border:1px solid var(--rule); border-radius:3px; padding:20px 22px;
+       display:flex; flex-direction:column; gap:12px}
+.rerun h3{font-size:18px}
+.rerun p{font-size:14.5px; color:var(--ink-2)}
+pre{margin:0; background:var(--ink); color:var(--paper); padding:13px 16px; border-radius:2px;
+    overflow-x:auto; font-family:var(--data); font-size:13.5px; direction:ltr; text-align:left}
+:root[data-theme="dark"] pre, :root:not([data-theme="light"]) pre{border:1px solid var(--rule-2)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) pre{background:#080B11; color:#E8EBF1}}
+:root[data-theme="dark"] pre{background:#080B11; color:#E8EBF1}
+
+footer{border-top:1px solid var(--rule); padding-top:18px; font-size:13px; color:var(--ink-3);
+       display:flex; flex-wrap:wrap; gap:6px 20px}
+footer .mono{font-size:12.5px}
+
+@media (max-width:620px){
+  .headline{grid-template-columns:1fr; gap:22px}
+  .bignum{border-inline-end:0; border-bottom:1px solid var(--rule); padding-inline-end:0; padding-bottom:18px}
+  .gap{grid-template-columns:1fr; gap:8px}
+  .gap .rank{font-size:20px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important}}
+</style>
+
+<div class="wrap">
+
+<header class="masthead">
+  <div class="eyebrow">
+    <span>مقياسُ التنفيذِ · الجولةُ <b>٥</b> — إصلاحُ آلةِ القياس</span>
+    <span>٢٠٢٦-٠٨-١٧</span>
+    <span class="mono">4cedc83</span>
+    <span class="mono">equipation_manage · MariaDB 11.4.9</span>
+  </div>
+  <h1>ما نُفِّذ من الحزمةِ الرباعيةِ وما بقي</h1>
+  <p class="lede">
+    قياسٌ حيٌّ لأربعِ وثائقَ حاكمةٍ على النظامِ العامل: أربعةٌ وستون بندًا ذريًّا لكلٍّ منها
+    شاهدٌ من القاعدةِ أو المستودعِ لا من إعلان. وما لم يُقَس وُسم «غيرَ مقيس» ولم يُحسب منفَّذًا.
+  </p>
+
+  <div class="headline">
+    <div class="bignum">
+      <div class="v">٦٤٫٨<span>٪</span></div>
+      <div class="k">المنفَّذُ الكاملُ + نصفُ الجزئيّ</div>
+    </div>
+    <div class="hl-body">
+      <div class="stack" role="img" aria-label="توزّعُ أربعةٍ وستين بندًا: 30 منفَّذًا · 23 جزئيًّا · 8 لم يبدأ · 1 موقوفٌ بقرارِ المالك · 2 غيرُ مقيس">
+        <i class="d" style="width:46.9%"></i><i class="p" style="width:35.9%"></i><i class="t" style="width:12.5%"></i><i class="b" style="width:1.6%"></i><i class="u" style="width:3.1%"></i>
+      </div>
+      <div class="legend">
+        <span><i class="dot d"></i> منفَّذٌ بشاهد <b>٣٠</b></span>
+        <span><i class="dot p"></i> جزئيّ <b>٢٣</b></span>
+        <span><i class="dot t"></i> لم يبدأ <b>٨</b></span>
+        <span><i class="dot b"></i> موقوفٌ بقرارِك <b>١</b></span>
+        <span><i class="dot u"></i> غيرُ مقيس <b>٢</b></span>
+      </div>
+      <div class="legend" style="border-top:1px solid var(--rule); padding-top:12px; margin-top:2px"><span>الخشنة <b>٦٤٫٨٪</b></span><span>التدريجية <b>٦١٫٥٪</b></span><span>الآليّة <b>٦٧٫٨٪</b> على ٥٨ بندًا</span></div>
+
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head">
+    <h2>الوثائقُ الأربعُ بنسبِها</h2>
+    <p>ترتيبُها بالنسبةِ لا بالأهمية. والفارقُ بينها ليس جهدًا مبذولًا بل نوعَ ما بقي: في الصلاحياتِ بقيت قيودٌ معدودة، وفي السلاليمِ بقي ثلثا السجلِّ نفسِه.</p>
+  </div>
+  <div class="gauges">
+    <div class="gauge">
+      <div class="g-id">GOV-AUTH-01</div>
+      <div class="g-name">الصلاحياتُ والتفويضُ والإنابة</div>
+      <div class="g-pct">٨٧٫٥٪ <em>١٦ بندًا</em></div>
+      <div class="g-meta"><span>منفَّذ <b>١٣</b></span><span>جزئيّ <b>١</b></span><span>لم يبدأ <b>٢</b></span><span>▲ +٣٫١</span></div>
+    </div>
+    <div class="gauge">
+      <div class="g-id">TSP-70</div>
+      <div class="g-name">المواصفةُ التقنيةُ للتنفيذ</div>
+      <div class="g-pct">٥٤٫٥٪ <em>١١ بندًا</em></div>
+      <div class="g-meta"><span>منفَّذ <b>٥</b></span><span>جزئيّ <b>٣</b></span><span>لم يبدأ <b>٢</b></span><span>غيرُ مقيس <b>١</b></span><span>= ٠٫٠</span></div>
+    </div>
+    <div class="gauge">
+      <div class="g-id">UXW-01</div>
+      <div class="g-name">موجاتُ الإغلاقِ لتجربةِ المستخدم</div>
+      <div class="g-pct">٦٢٫٠٪ <em>٢٥ بندًا</em></div>
+      <div class="g-meta"><span>منفَّذ <b>١٠</b></span><span>جزئيّ <b>١١</b></span><span>لم يبدأ <b>٣</b></span><span>غيرُ مقيس <b>١</b></span><span>▲ +١٫١</span></div>
+    </div>
+    <div class="gauge">
+      <div class="g-id">LAD-24أ</div>
+      <div class="g-name">سلاليمُ الاعتماد</div>
+      <div class="g-pct">٥٠٫٠٪ <em>١٢ بندًا</em></div>
+      <div class="g-meta"><span>منفَّذ <b>٢</b></span><span>جزئيّ <b>٨</b></span><span>لم يبدأ <b>١</b></span><span>موقوف <b>١</b></span></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <h2>أخطرُ خمسِ فجواتٍ مرتَّبةً بالأثر</h2>
+    <p>لا بعددِ البنودِ بل بما تُبطله كلُّ فجوةٍ من حكمٍ حاكمٍ في وثيقتِها.</p>
+  </div>
+  <div class="gaps">
+
+    <div class="gap">
+      <div class="rank">١</div>
+      <div class="body">
+        <h3>ثلاثةَ عشرَ سلّمًا من العشرينَ لم تُبنَ — والمعاملاتُ فيها بلا سلسلة</h3>
+        <p>السجلُّ يحمل <b>LD-01</b> إلى <b>LD-07</b> فقط: دورةُ الوحداتِ كاملةً وحدَها. أما الشراءُ والترسيةُ وأمرُ الشراءِ والاستلامُ وطلبُ الدفعِ والخزينةُ والتسويةُ والقيدُ اليدويُّ والملحقُ والتجديدُ وتغييرُ المشروعِ وقبولُ الخطرِ وقفلُ الطوارئ فلا سلّمَ لها. وهذا عينُ ما تسمّيه الوثيقةُ <b>RSK-L1</b>: الاحتياطيُّ ذو الخطوةِ الواحدةِ يُبطل فصلَ الواجباتِ كلَّه.</p>
+        <p class="ev">gov_ladders = <b>٧</b>/٢٠ · gov_ladder_steps = ١٤ خطوة · والناقصُ LD-08..LD-20</p>
+      </div>
+    </div>
+
+    <div class="gap">
+      <div class="rank">٢</div>
+      <div class="body">
+        <h3>ثلاثونَ جدولًا يحمل اسمَ المعتمِدِ نصًّا حرًّا</h3>
+        <p>القاعدةُ الثامنةُ صريحة: يُقرأ «من اعتمد» من سجلِّ الخطواتِ لا من حقلٍ نصيّ. والحقلُ النصيُّ يعني أن اسمًا يُكتب بلا سندٍ من سلسلةٍ — فيُقرأ اعتمادًا وليس اعتمادًا. المخالفةُ في <b>exec_*</b> الأربعةِ و<b>scr_*</b> الخمسةِ والعشرينَ و<b>timesheet_approvals</b>.</p>
+        <p class="ev">AC-L8 متوقَّعٌ صفرٌ · فعليٌّ <b>٣٠</b> عمودَ approver_name / approved_by_name</p>
+      </div>
+    </div>
+
+    <div class="gap">
+      <div class="rank">٣</div>
+      <div class="body">
+        <h3>مئةٌ وثمانيةٌ وخمسون فعلًا يعمل خارجَ قاموسِ الأفعال</h3>
+        <p>حكمُ المواصفةِ أن كلَّ فعلٍ يُسجَّل في القاموسِ قبلَ شاشتِه وإلا أُغلقت. والقاموسُ يحمل ٣٩٠ فعلًا، ويكتب سجلُّ النشاطِ <b>١٥٨</b> رمزًا آخرَ لا وجودَ لها فيه — منها <code>approve</code> و<code>activate</code> و<code>amendment_generate</code>. فما لا يُعرَف لا يُحكَم عليه بصلاحيةٍ ولا يُتتبَّع.</p>
+        <p class="ev">CK-07 متوقَّعٌ صفرُ صفٍّ · فعليٌّ <b>١٥٨</b> · وCK-15 جدولةٌ متأخرةٌ واحدة</p>
+      </div>
+    </div>
+
+    <div class="gap warn">
+      <div class="rank">٤</div>
+      <div class="body">
+        <h3>البواباتُ الاثنتا عشرةَ مبنيّةٌ ولا شيءَ يُرسِّبها</h3>
+        <p>الوثيقةُ تشترط أن تُنشأ البواباتُ مع النظامِ التصميميِّ وأن <b>تُرسِّب البناءَ لا تنصح</b>. والدَينُ الموضعيُّ نزل نزولًا كبيرًا بجهدِ الترحيلِ اليدويّ: <b>٦٤٢</b> عن خطِّ أساسِ الوثيقةِ ٣٬٦٧٥ — أي <b>٨٢٫٥٪ من الطريقِ إلى الصفر</b>، ومنها ٢٬٣٣٣ في هذه الجولةِ وحدَها بعدَ بلوغِ النطاقِ المحميِّ ٤٧١ شاشةً. لكنَّ البوابةَ ما تزال خارجَ خطِّ التسليم — وشاهدُ ذلك في هذه الجولةِ نفسِها: <b>UX-G4 ارتفعت ٨ ⇐ ٩</b>، شاشةٌ دخلت خارجَ القشرةِ ولا شيءَ ردَّها. فالبوابةُ التي لا تُرسِّب بناءً ليست بوابة.</p>
+        <p class="ev">٠ ملفَّ CI · الأنماطُ الموضعيةُ <b>٦٤٢</b> في ٤٤ ملفَّ شاشة (كانت ٢٬٩٧٥) · وألوانٌ مثبَّتةٌ <b>١٬٦٢١</b> في ١٧٥ ملفًّا (كانت ٢٬١٨٥) · و<b>UX-G4 ارتدَّت ٨ ⇐ ٩</b></p>
+      </div>
+    </div>
+
+    <div class="gap warn">
+      <div class="rank">٥</div>
+      <div class="body">
+        <h3>بنيةُ الإنابةِ كاملةٌ ولا أحدَ يراها ولا يستعملها</h3>
+        <p>الجداولُ الستةُ والمناظرُ الخمسةُ والقوالبُ الـ١٧١ قائمةٌ كلُّها، والشاشاتُ الثلاثُ مفتوحةٌ ومفعَّلة. لكنَّ شرطَ الوثيقةِ «شريطٌ دائمٌ ظاهر» غيرُ منفَّذٍ في أيٍّ من ملفاتِ القشرةِ الثلاثة، و<b>chk_imp_not_oversight</b> غيرُ موجودٍ فلا مانعَ بنيويًّا من نيابةٍ على رقابيّ. وصفرُ تفويضٍ وصفرُ رفعٍ وصفرُ جلسةٍ منذ البناء.</p>
+        <p class="ev">القيودُ <b>١٠</b>/١٤ · شريطُ الجلسة <b>٠</b> · وauthority_expiry_sweep غيرُ مجدوَلةٍ في ems_job_schedule</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <h2>GOV-AUTH-01 — الصلاحياتُ والتفويضُ والإنابة</h2>
+    <p>أعلى الوثائقِ إنجازًا: البنيةُ التنفيذيةُ كلُّها قائمةٌ وبذرُها كامل، وكلُّ مستخدمٍ نشطٍ صار بقالبٍ نافذ. والمتبقي أربعةُ قيودٍ واثنانِ يُحييانِ البنيةَ المبنيّة.</p>
+  </div>
+  <div class="tablecard">
+    <div class="tc-head"><h3>الفصلُ الثامنُ — الجداولُ والقيودُ والمناظرُ والترحيل</h3><span class="n">١٦ بندًا · ٨٤٫٤٪</span></div>
+    <div class="tscroll"><table>
+      <thead><tr><th>البند</th><th>ما يُفحص</th><th>متوقَّع</th><th>فعليّ</th><th>الحال</th></tr></thead>
+      <tbody>
+        <tr class="s-done"><td class="id">GA-T</td><td class="what">الجداولُ الستةُ بأسمائِها</td><td class="num">٦</td><td class="num"><strong>٦</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">GA-ISO</td><td class="what">عمودُ العزلِ في كلِّ جدول</td><td class="num">٦</td><td class="num"><strong>٦</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">GA-C</td><td class="what">القيودُ الأربعةَ عشرَ النافذة<small>أربعةٌ منها قوادحُ لا يراها information_schema بمستخدمِ التطبيق — أُثبتت بشاهدِ المستودعِ والفحصِ السلبيّ</small></td><td class="num">١٤</td><td class="num"><strong>١٤</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">GA-V</td><td class="what">المناظرُ الخمسةُ الرقابية</td><td class="num">٥</td><td class="num"><strong>٥</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">GA-P171</td><td class="what">قوالبُ المسمياتِ ٩ درجاتٍ × ١٩ إدارة</td><td class="num">١٧١</td><td class="num"><strong>١٧١</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">GA-PI</td><td class="what">بنودُ القوالب</td><td class="num">>0</td><td class="num"><strong>٢٬٥٢٣</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">GA-A5</td><td class="what">أعمدةُ النسبةِ الثلاثةُ في دفترِ الأفعال<small>acted_by · acted_for · impersonation_id على activity_logs</small></td><td class="num">٣</td><td class="num"><strong>٣</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">GA-SCR</td><td class="what">الشاشاتُ الثلاثُ — القوالبُ والمنحُ والنيابة</td><td class="num">٣</td><td class="num"><strong>٣</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">GA-NAV</td><td class="what">الثلاثُ مسجَّلةٌ ومفعَّلةٌ في التنقل</td><td class="num">٣</td><td class="num"><strong>٣</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-todo"><td class="id">GA-A6</td><td class="what">مهمةُ authority_expiry_sweep كلَّ خمسِ دقائق<small>ثمانِ مهامَّ مجدوَلةٍ ولا واحدةَ للانتهاءِ الآليّ — فالمنحُ المؤقَّتُ لا ينتهي بنفسِه</small></td><td class="num">١</td><td class="num"><strong>٠</strong></td><td class="st"><span class="chip t">لم يبدأ</span></td></tr>
+        <tr class="s-done"><td class="id">GA-ND</td><td class="what">ما لا يُفوَّض — الخمسةُ المحصورة</td><td class="num">٥</td><td class="num"><strong>٥</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">GA-DIFF</td><td class="what">تقريرُ الفروقِ قبلَ التبديل</td><td class="num">١</td><td class="num"><strong>١</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">GA-GRANT</td><td class="what">إلحاقُ القالبِ بالموظفين</td><td class="num">٧٥</td><td class="num"><strong>77 مستخدمًا · 77 منحًا</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">GA-A4</td><td class="what">v_hand_conflicts صفرًا — شرطُ إغلاقِ A4</td><td class="num">٠</td><td class="num"><strong>٠</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">GA-IMPBAR</td><td class="what">شريطُ جلسةِ الإنابةِ الدائمُ في القشرة<small><span class="mono">inheader.php</span> — «تعمل الآن موضعَ فلان — بسببِ كذا — تنتهي في كذا» وزرُّ إنهاءٍ بحمايةِ CSRF. <b>في شجرةِ العملِ لا في 73de40d</b></small></td><td class="num">≥1</td><td class="num"><strong>١</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-todo"><td class="id">GA-LIVE</td><td class="what">شاهدُ تشغيلٍ للطرقِ الثلاث<small>تفويضٌ ٠ · رفعٌ ٠ · جلسةُ نيابةٍ ٠ — البنيةُ قائمةٌ بلا حركة</small></td><td class="num">>0</td><td class="num"><strong>تفويض=0 · رفع=0 · نيابة=0</strong></td><td class="st"><span class="chip t">لم يبدأ</span></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <h2>٢٤-أ — سلاليمُ الاعتماد</h2>
+    <p>أدنى الوثائقِ نسبةً. والسببُ واحدٌ يتفرّع: ما بُني بُني جيدًا — دورةُ الوحداتِ السبعُ بعناصرِها وقيدِ سقفِها — وما لم يُبنَ ثلاثةَ عشرَ سلّمًا تحمل الشراءَ والدفعَ والعقودَ والمخاطرَ والطوارئ.</p>
+  </div>
+  <div class="tablecard">
+    <div class="tc-head"><h3>السلاليمُ العشرونَ وقواعدُها الثمانيةُ ومعاييرُ القبولِ التسعة</h3><span class="n">١٢ بندًا · ٥٠٫٠٪</span></div>
+    <div class="tscroll"><table>
+      <thead><tr><th>البند</th><th>ما يُفحص</th><th>متوقَّع</th><th>فعليّ</th><th>الحال</th></tr></thead>
+      <tbody>
+        <tr class="s-part"><td class="id">LD-20</td><td class="what">السلاليمُ العشرونَ مسجَّلةً ومفعَّلة<small>LD-01..LD-07 وحدَها — والناقصُ LD-08 إلى LD-20</small></td><td class="num">٢٠</td><td class="num"><strong>٧</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-part"><td class="id">LD-E7</td><td class="what">العناصرُ السبعةُ كاملةً في كلِّ سلّمٍ مسجَّل<small>«من يراجع» في سلّمٍ واحدٍ من السبعة · و«السقف» و«منعُ الذات» في أربعةٍ — والباقي تامّ</small></td><td class="num">7 × 7</td><td class="num"><strong>5/7 عنصرًا مكتمل</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-part"><td class="id">AC-L3</td><td class="what">صفرُ سلّمٍ مفعَّلٍ ينقصه عنصر<small>اثنتا عشرةَ خانةَ عنصرٍ فارغةً من تسعٍ وأربعين</small></td><td class="num">٠</td><td class="num"><strong>٩</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-part"><td class="id">AC-L1</td><td class="what">صفرُ سلّمٍ يسقط على خطوةٍ واحدةٍ احتياطية<small>LD-04 اعتمادُ وحداتِ المشغّلينَ بخطوةٍ واحدة</small></td><td class="num">٠</td><td class="num"><strong>١</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-done"><td class="id">AC-L9</td><td class="what">قيدُ السقف: الفارغُ يوقف ولا يُمرِّر<small>chk_ld_cap نافذٌ — والفراغُ يمنع كما نصَّت RSK-L2</small></td><td class="num">قيدٌ نافذ</td><td class="num"><strong>chk_ld_cap</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-block"><td class="id">LD-CAP9</td><td class="what">السقوفُ التسعةُ بانتظارِ رقمِ المالك<small>ثلاثةٌ ظهرت في السبعةِ المبنيّة · وستةٌ لم يُبنَ سلّمُها بعد</small></td><td class="num">٩</td><td class="num"><strong>3 محسومًا من 3 مبنيًّا</strong></td><td class="st"><span class="chip b">بقرارِك</span></td></tr>
+        <tr class="s-part"><td class="id">AC-L4</td><td class="what">منعُ اعتمادِ الذاتِ قيدًا لا سياسة<small>ثلاثةُ قيودٍ نافذةٍ — لكنْ على سبعةِ سلاليمَ من العشرين</small></td><td class="num">قيد</td><td class="num"><strong>chk_step_entry_no_approve · chk_no_single_hand · chk_bg_no_self_approval</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-part"><td class="id">AC-L5</td><td class="what">لا يدَ تمشي خطوتين متتاليتين<small>قيودُ يدَين موضعيةٌ في الخصومِ والطوارئ — ولا قيدَ عامٌّ على سجلِّ خطواتِ السلاليم</small></td><td class="num">قيدٌ عامّ</td><td class="num"><strong>قيودٌ موضعيةٌ فقط</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-done"><td class="id">AC-L2</td><td class="what">صفرُ صفٍّ يحمل نصًّا غيرَ قاعدة</td><td class="num">٠</td><td class="num"><strong>٠</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-part"><td class="id">AC-L8</td><td class="what">صفرُ حقلٍ يُكتب فيه اسمُ معتمِدٍ يدويًّا<small>ثلاثونَ جدولًا: exec_* الأربعةُ · scr_* الخمسةُ والعشرونَ · timesheet_approvals</small></td><td class="num">٠</td><td class="num"><strong>٣٠</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-part"><td class="id">LD-BG</td><td class="what">LD-20 قفلُ الطوارئ سلّمًا مسجَّلًا<small>scr_break_glass قائمٌ بقيدَيه — لكنْ خارجَ سجلِّ السلاليمِ فلا يُقرأ منه</small></td><td class="num">١</td><td class="num"><strong>٠</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-todo"><td class="id">LD-227</td><td class="what">سجلُّ تتبعِ المتطلباتِ الذريةِ بحالاتِها<small>لا ملفَّ تتبعٍ يربط كلَّ متطلبٍ بشاهدِه وحالتِه</small></td><td class="num">٢٢٧</td><td class="num"><strong>٠</strong></td><td class="st"><span class="chip t">لم يبدأ</span></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <h2>٧٠ — المواصفةُ التقنيةُ للتنفيذ</h2>
+    <p>المحرّكاتُ المشتركةُ الستةُ منفَّذةٌ بأسمائِها ونافذةٌ بقيودِها. والحاوياتُ مبنيّةٌ بأسماءٍ حيّةٍ أخرى — وهو قرارُ مطابقةٍ مشروعٌ بنصِّ الوثيقةِ نفسِها، لكنَّ فحوصَها العشرةَ كُتبت بالأسماءِ المقترحةِ فلا تُشغَّل كما هي.</p>
+  </div>
+  <div class="tablecard">
+    <div class="tc-head"><h3>الجداولُ والفحوصُ الثمانيةَ عشرَ وترتيبُ التنفيذ</h3><span class="n">١١ بندًا · ٥٩٫١٪</span></div>
+    <div class="tscroll"><table>
+      <thead><tr><th>البند</th><th>ما يُفحص</th><th>متوقَّع</th><th>فعليّ</th><th>الحال</th></tr></thead>
+      <tbody>
+        <tr class="s-todo"><td class="id">TS-CNT</td><td class="what">جداولُ الحاوياتِ بأسماءِ الوثيقة<small>صفرٌ بأسمائِها · وستةُ نظائرَ حيّة: op_containers · container_consumption · container_swaps · supplier_capacity · settlements · settlement_lines</small></td><td class="num">٦</td><td class="num"><strong>٠</strong></td><td class="st"><span class="chip t">لم يبدأ</span></td></tr>
+        <tr class="s-done"><td class="id">TS-ENG</td><td class="what">جداولُ المحرّكاتِ الستةُ بأسمائِها</td><td class="num">٦</td><td class="num"><strong>٦</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">TS-SHIFT</td><td class="what">القيدُ اليوميُّ مبنيًّا ومُشغَّلًا<small>وُسِّع unit_entries و unit_time_log بدلَ إنشاءِ shift_entries — ١٢٬٥٠٠ صفٍّ حيّ</small></td><td class="num">١</td><td class="num"><strong>unit_time_log (12500 صفًّا)</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">TS-6ST</td><td class="what">حالاتُ التسليمِ الستُّ محصورةً في ENUM</td><td class="num">٦</td><td class="num"><strong>٦</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">TS-8JOB</td><td class="what">أنواعُ المهمةِ الثمانيةُ في القيدِ نفسِه<small>chk_job_type نافذٌ وثمانيةُ أنواعٍ مستعمَلةٌ فعلًا</small></td><td class="num">٨</td><td class="num"><strong>chk_job_type نافذ</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-unm"><td class="id">TS-BACK</td><td class="what">التباعدُ المتزايدُ ١·٤·١٦·٦٤·٢٥٦ قادحًا<small>information_schema.TRIGGERS يرجع صفرًا بمستخدمِ التطبيقِ — يلزم جسٌّ وظيفيٌّ ولا يُدَّعى</small></td><td class="num">قادح</td><td class="num"><strong>غيرُ مقيس</strong></td><td class="st"><span class="chip u">غيرُ مقيس</span></td></tr>
+        <tr class="s-part"><td class="id">TS-CK</td><td class="what">الفحوصُ الثمانيةَ عشرَ CK-01..CK-18<small>١٠ ناجحًا · راسبان (CK-07=١٦٠ فعلًا خارجَ القاموس · CK-15=٢) · و٦ متعذِّرةٌ لاختلافِ أسماءِ جداولِ الحاويات</small></td><td class="num">١٨</td><td class="num"><strong>١٠</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-todo"><td class="id">TS-ACT8</td><td class="what">الأفعالُ الثمانيةُ في القاموسِ قبلَ شاشاتِها</td><td class="num">٨</td><td class="num"><strong>٠</strong></td><td class="st"><span class="chip t">لم يبدأ</span></td></tr>
+        <tr class="s-part"><td class="id">TS-NAVORD</td><td class="what">السايدبارُ مرتَّبٌ بالدورةِ المستنديةِ لا بالأبجدية<small>١٬٦٥٠ من ١٬٦٥١ — ورابطٌ واحدٌ بلا ترتيبٍ يمنع الاكتمال</small></td><td class="num">١٬٦٥١</td><td class="num"><strong>١٬٦٥٠</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-part"><td class="id">TS-DESC</td><td class="what">سطرُ شرحٍ واحدٍ لكلِّ مرحلة<small>بيتُه <span class="mono">link_groups.stage_desc</span> — ٢٢ شرحًا مميَّزًا ترثه المجموعاتُ المكررة (المبيعاتُ ٨ · الموردون ٨ · الموقعُ ٦)</small></td><td class="num">٩٠٨</td><td class="num"><strong>٧٠</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-part"><td class="id">TS-STAGEOUT</td><td class="what">المستندُ الرسميُّ الناتجُ لكلِّ مرحلة<small>مئةٌ وتسعُ مراحلَ بلا مستندٍ مُسمًّى</small></td><td class="num">٣٣٦</td><td class="num"><strong>٢٢٧</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <h2>UXW-01 — موجاتُ الإغلاقِ المؤسسيّ</h2>
+    <p>الموجاتُ الثلاثُ الأولى مُجتازةٌ والرابعةُ عالقةٌ على عتبتِها. ورحلةُ الكيانِ (§8-2) اكتملت على الكياناتِ الأحدَ عشرَ كلِّها هذه الجولةَ — ٥٦ شاشةً من ٧٩. والخامسةُ والسادسةُ لم تبدآ.</p>
+  </div>
+  <div class="tablecard">
+    <div class="tc-head"><h3>الموجاتُ الستُّ وبواباتُ المنعِ الاثنتا عشرة</h3><span class="n">٢٥ بندًا · ٦٢٫٠٪</span></div>
+    <div class="tscroll"><table>
+      <thead><tr><th>البند</th><th>ما يُفحص</th><th>متوقَّع</th><th>فعليّ</th><th>الحال</th></tr></thead>
+      <tbody>
+        <tr class="s-done"><td class="id">UX-W1</td><td class="what">الموجةُ ١ — اللغةُ والتصنيفُ الثلاثيّ<small>١٧٩ مرحلةً مُرحَّلةً · ٥٥٠ فعلًا مصنَّفًا · صفرُ مصطلحٍ تطويريٍّ في اسم</small></td><td class="num">مُجتازة</td><td class="num"><strong>مُجتازة</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">UX-W2</td><td class="what">الموجةُ ٢ — دفترُ التدقيقِ الشامل<small>٦٦٣ موضعَ ظهورٍ بقرارٍ ومالك</small></td><td class="num">مُجتازة</td><td class="num"><strong>مُجتازة</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">UX-G12</td><td class="what">الموجةُ ٣ — البواباتُ الاثنتا عشرةَ مبنيّة</td><td class="num">١٢</td><td class="num"><strong>١٢</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-todo"><td class="id">UX-CI</td><td class="what">البواباتُ تُرسِّب البناءَ في خطِّ التسليم<small>صفرُ ملفِّ خطِّ تسليمٍ يستدعي uxw_gates — فالبوابةُ تنصح ولا تُرسِّب</small></td><td class="num">مربوطةٌ بـCI</td><td class="num"><strong>غيرُ مربوطة</strong></td><td class="st"><span class="chip t">لم يبدأ</span></td></tr>
+        <tr class="s-done"><td class="id">UX-DS</td><td class="what">النظامُ التصميميُّ مرجعًا حيًّا من الكود</td><td class="num">١</td><td class="num"><strong>Governance/design_system.php</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-part"><td class="id">UX-G1</td><td class="what">البوابةُ ١ — لونٌ مثبَّتٌ خارجَ الرموز<small>١٧٥ ملفَّ شاشة · نزل ٧٣٩ عن أساسِ الجولةِ ١ (٢٬٣٦٠) = ٣١٫٣٪</small></td><td class="num">٠</td><td class="num"><strong>١٬٦٢١</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-part"><td class="id">UX-G2</td><td class="what">البوابةُ ٢ — نمطٌ موضعيٌّ غيرُ مصرَّحٍ به<small>٤٤ ملفَّ شاشة · نزل <b>٣٬٠٣٣</b> عن خطِّ أساسِ الوثيقةِ ٣٬٦٧٥ = <b>٨٢٫٥٪</b> من الطريقِ إلى الصفر</small></td><td class="num">0 · خطُّ الأساس 3,675</td><td class="num"><strong>٦٤٢</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-part"><td class="id">UX-G4</td><td class="what">البوابةُ ٤ — صفحةٌ خارجَ القشرةِ الموحَّدة<small>ارتفعت ٨ ⇐ ٩ — شاشةٌ جديدةٌ دخلت خارجَ القشرة</small></td><td class="num">٠</td><td class="num"><strong>٩</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-done"><td class="id">UX-G8</td><td class="what">البوابةُ ٨ — مصطلحٌ ممنوعٌ في واجهةٍ حيّة<small>صفرٌ في التنقلِ الحيِّ وصفرٌ في كودِ الشاشات</small></td><td class="num">٠</td><td class="num"><strong>٠</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">UX-G7</td><td class="what">البوابةُ ٧ — رابطُ سايدبارٍ بلا مالك</td><td class="num">٠</td><td class="num"><strong>٠</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-part"><td class="id">UX-G12S</td><td class="what">البوابةُ ١٢ — مرحلةٌ في دورةٍ بلا خطوةٍ تالية</td><td class="num">٠</td><td class="num"><strong>١</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-part"><td class="id">UX-C7</td><td class="what">عناصرُ الدورةِ المستنديةِ السبعةُ لكلِّ شاشة (٧-١)<small><span class="mono">gov_screen_cycle</span> ٦٦٣ صفًّا · ١٨١ مرحلةً · الحالةُ التالية ٦٦٣/٦٦٣ · المستهلكة ٦٠٣/٦٠٣ · الأثرُ الماليّ ٢٠٠/٢٠٠ · إعلانُ الغياب ٩٦/٩٦ — والترويسةُ تقرؤها حيًّا. والناقصُ: <b>مستندٌ مُسمًّى ٧٢ من ٨٥</b></small></td><td class="num">٧</td><td class="num"><strong>٦</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-done"><td class="id">UX-E11</td><td class="what">§8-2 الكياناتُ الأحدَ عشر</td><td class="num">١١</td><td class="num"><strong>١١</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-part"><td class="id">UX-T79</td><td class="what">٧٩ شاشةً تبويبًا</td><td class="num">٧٩</td><td class="num"><strong>٦٣</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-done"><td class="id">UX-G10</td><td class="what">العشرُ الذهبيةُ قائمةً في المستودع</td><td class="num">١٠</td><td class="num"><strong>١٠</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-part"><td class="id">UX-G10A</td><td class="what">الموجةُ ٤ — العشرُ معتمَدةٌ وظيفيًّا <b>وبصريًّا</b><small>بصريًّا ١٠/١٠ بخطِّ أساسٍ بنيويّ · ووظيفيًّا <b>٠/١٠</b> — لا ملفَّ <span class="mono">.ssdiff/GOLDEN_SIGNOFF.md</span> يشهد باعتمادٍ وظيفيّ. والوثيقةُ تشترط الاثنين معًا</small></td><td class="num">١٠</td><td class="num"><strong>٠</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-part"><td class="id">UX-C38</td><td class="what">المكوّناتُ الإلزاميةُ الثمانيةُ والثلاثون<small>قِيس ١٢ فوُجد ١٢ · و<b>٢٦ مكوّنًا لم يُقَس بعدُ ولا يُمنح رصيدًا</b></small></td><td class="num">٣٨</td><td class="num"><strong>١٢</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-part"><td class="id">UX-C3S</td><td class="what">الثلاثةُ الخاصةُ ببيئتِنا<small>مؤشرُ صندوقِ الخروجِ قائمٌ — وشارةُ وضعِ التدريبِ وبطاقةُ السقفِ الموقوفِ غائبتان</small></td><td class="num">٣</td><td class="num"><strong>١</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-unm"><td class="id">UX-9ST</td><td class="what">حالاتُ الشاشةِ التسعُ في كلِّ شاشة<small>يلزم فاحصٌ آليٌّ — ولا يُحسب منفَّذًا بلا قياس</small></td><td class="num">كلُّ شاشة</td><td class="num"><strong>غيرُ مقيس</strong></td><td class="st"><span class="chip u">غيرُ مقيس</span></td></tr>
+        <tr class="s-done"><td class="id">UX-TECHGOV</td><td class="what">مركزُ الحوكمةِ التقنيِّ وعاءً لليتيمة</td><td class="num">≥1</td><td class="num"><strong>١</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-done"><td class="id">UX-ORPH</td><td class="what">الروابطُ اليتيمةُ — قرارُ الإسنادِ صفًّا صفًّا</td><td class="num">١٧٤</td><td class="num"><strong>174/174</strong></td><td class="st"><span class="chip d">منفَّذ</span></td></tr>
+        <tr class="s-todo"><td class="id">UX-W5</td><td class="what">الموجةُ ٥ — الاختبارُ البشريّ<small>ستُّ مهامَّ × سبعُ درجاتٍ × ثمانيةُ مقاييس · و٦٥ جولةَ UAT تصليبٍ قائمةٌ لكنَّها اختبارُ نظامٍ لا اختبارُ استعمالٍ بشريّ</small></td><td class="num">336 قياسًا</td><td class="num"><strong>٠</strong></td><td class="st"><span class="chip t">لم يبدأ</span></td></tr>
+        <tr class="s-todo"><td class="id">UX-A11Y</td><td class="what">فحوصُ الوصولِ الرقميِّ الاثنا عشرَ<small>ولا تُعلَن مطابقةُ WCAG 2.2 AA قبلَ القياس</small></td><td class="num">١٢</td><td class="num"><strong>٠</strong></td><td class="st"><span class="chip t">لم يبدأ</span></td></tr>
+        <tr class="s-part"><td class="id">UX-VIS</td><td class="what">خطواتُ الثباتِ البصريِّ الخمس<small>٢٠٦ خطَّ أساسٍ <b>بنيويٍّ</b> · صفرُ فرقٍ معلَّق · ٣ قبولاتٍ مكتوبةٍ بأسبابِها — والمقارنةُ <b>البكسليةُ</b> على الدقاتِ الأربعِ غائبة</small></td><td class="num">٥</td><td class="num"><strong>٥</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+        <tr class="s-part"><td class="id">UX-W6</td><td class="what">الموجةُ ٦ — أرقامُ التقريرِ السبعةَ عشر<small>يُنتَج بأمرٍ يُعاد تشغيلُه — وهذا التقريرُ مخرَجُه</small></td><td class="num">١٧</td><td class="num"><strong>هذا المسبار</strong></td><td class="st"><span class="chip p">جزئيّ</span></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <h2>موقوفٌ بقرارِك — لا يُنفَّذ اجتهادًا</h2>
+    <p>ما نصَّت الوثائقُ على أنه قرارُ مالكٍ. وهو محسوبٌ خارجَ نسبةِ التنفيذِ ولا يُعَدُّ تأخيرًا.</p>
+  </div>
+  <div class="held">
+    <h3>ثلاثةُ قراراتٍ تنتظر رقمًا أو توقيعًا منك</h3>
+    <ul>
+      <li><strong>السقوفُ التسعةُ الماليةُ</strong> — ثلاثةٌ منها ظاهرةٌ اليومَ في السلاليمِ المبنيّةِ بحالةِ <span class="mono">unresolved</span>، وستةٌ لم يُبنَ سلّمُها بعد. والقيدُ <span class="mono">chk_ld_cap</span> نافذٌ فالمعاملةُ توقَف ولا تمرُّ بسقفٍ غيرِ مقرَّر — وهذا هو السلوكُ الصحيحُ بنصِّ <span class="mono">RSK-L2</span>. ولا يُخترع رقمٌ لتشغيلِ سلّم.</li>
+      <li><strong>ثلاثةُ أدوارٍ بسايدبارٍ نحيف</strong> — المديرُ الماليُّ بثلاثةِ روابطَ، ومنفِّذُ المدفوعاتِ البنكيةِ ومعِدُّ المطابقةِ البنكيةِ برابطين لكلٍّ. استكمالُ قوائمِهم قرارُ منحٍ من تقريرِ فروقِ <span class="mono">GOV-AUTH-01</span> يعتمده المالكُ قبلَ التبديل — ولا تُخمَّن شاشاتُ عملٍ بنكيّ.</li>
+      <li><strong>فرقٌ بصريٌّ واحدٌ معلَّق</strong> — على <span class="mono">Governance/auth_profiles.php</span>. يُقبل بسببٍ مكتوبٍ يُقرأ بعدَ سنةٍ أو يُصلَح، ولا يُعتمد فرقٌ بلا سبب.</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <h2>إعادةُ القياسِ بعدَ كلِّ جولة</h2>
+    <p>كلُّ رقمٍ في هذا التقريرِ مخرَجُ أمرٍ واحدٍ يُعاد تشغيلُه — والمعلَنُ بلا أمرٍ يُعَدُّ غيرَ مقيس.</p>
+  </div>
+  <div class="rerun">
+    <h3>المسبارُ ومخرَجاه</h3>
+    <p>يقرأ ولا يكتب. النصيُّ للقراءةِ المباشرة، وJSON يُحفظ لقطةً تُقارَن بجولةِ ما بعدها.</p>
+    <pre>php tools/pkg4_measure.php text
+php tools/pkg4_measure.php json &gt; storage/reports/pkg4_snapshot.json</pre>
+    <p>ووضعُ <span class="mono">diff</span> يقارن باللقطةِ المحفوظةِ فيُخرج سطرَ الجولةِ جاهزًا وقائمةَ ما تغيّر — ثم تُحفظ اللقطةُ الجديدة. والترتيبُ ملزم: يُقارَن قبلَ أن يُحفظ، فمن حفظ قبلَ أن يقارن محا خطَّ أساسِه.</p>
+    <p>ونسخةُ Markdown من هذا التقريرِ في <span class="mono">docs/PKG4_TRACKER_ar.md</span> وفيها <b>سجلُّ الجولاتِ</b> يُلحَق به بعدَ كلِّ جولةٍ بسطرِ «كانت / صارت».</p>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head">
+    <h2>سجلُّ الجولات</h2>
+    <p>يُلحَق به سطرٌ بعدَ كلِّ جولةِ عمل — والتفصيلُ الكاملُ بندًا بندٍ في نسخةِ Markdown.</p>
+  </div>
+  <div class="tablecard">
+    <div class="tc-head"><h3>الجولاتُ ونسبُها</h3><span class="n">الجولةُ ٤ · التفصيلُ في نسخةِ Markdown</span></div>
+    <div class="tscroll"><table>
+      <thead><tr><th>الجولة</th><th>التاريخ</th><th>النسخة</th><th>GOV-AUTH-01</th><th>24-أ</th><th>70</th><th>UXW-01</th><th>الإجمالي</th><th>الفارق</th></tr></thead>
+      <tbody>
+        <tr class="s-unm"><td class="id">١ — خطُّ الأساس</td><td class="num">٢٠٢٦-٠٨-١٧</td><td class="num">98ca6c9</td><td class="num">٧٥٫٠٪</td><td class="num">٥٠٫٠٪</td><td class="num">٥٤٫٥٪</td><td class="num">٥٩٫١٪</td><td class="num"><strong>٦٠٫٧٪</strong></td><td class="num">—</td></tr>
+        <tr class="s-unm"><td class="id">٢ — المسحُ الشاملُ وNM-05</td><td class="num">٢٠٢٦-٠٨-١٧</td><td class="num">4d16657</td><td class="num">٧٥٫٠٪</td><td class="num">٥٠٫٠٪</td><td class="num">٥٩٫١٪</td><td class="num">٦١٫٤٪</td><td class="num"><strong>٦٢٫٣٪</strong></td><td class="num">▲ +١٫٦</td></tr>
+        <tr class="s-unm"><td class="id">٣ — مصفوفةُ التحقُّقِ وشريطُ الإنابة</td><td class="num">٢٠٢٦-٠٨-١٨</td><td class="num">73de40d+</td><td class="num">٨١٫٣٪</td><td class="num">٥٠٫٠٪</td><td class="num">٥٩٫١٪</td><td class="num">٦٠٫٩٪</td><td class="num"><strong>٦٣٫٧٪</strong></td><td class="num">▲ +١٫٤</td></tr>
+        <tr class="s-unm"><td class="id">٤ — رحلاتُ الكياناتِ §8-2</td><td class="num">٢٠٢٦-٠٨-١٨</td><td class="num">36ac411</td><td class="num">٨٧٫٥٪</td><td class="num">٥٠٫٠٪</td><td class="num">٥٩٫١٪</td><td class="num">٦٢٫٠٪</td><td class="num"><strong>٦٥٫٦٪</strong></td><td class="num">▲ +١٫٩</td></tr>
+        <tr class="s-part"><td class="id">٥ — إصلاحُ آلةِ القياس</td><td class="num">٢٠٢٦-٠٨-١٨</td><td class="num">4cedc83</td><td class="num">٨٧٫٥٪</td><td class="num">٥٠٫٠٪</td><td class="num">٥٤٫٥٪</td><td class="num">٦٢٫٠٪</td><td class="num"><strong>٦٤٫٨٪</strong></td><td class="num">▼ ٠٫٨</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="tablecard">
+    <div class="tc-head"><h3>الجولةُ ٥ — ما تغيّر</h3><span class="n">٨ بنودٍ من ٦٤</span></div>
+    <div class="tscroll"><table>
+      <thead><tr><th>البند</th><th>ما هو</th><th>كانت</th><th>صارت</th><th>أصلُ التغيّر</th></tr></thead>
+      <tbody>
+        <tr class="s-part"><td class="id">UX-G2</td><td class="what">الأنماطُ الموضعية</td><td class="num">٢٬٩٧٥</td><td class="num"><strong>٦٤٢</strong> ▼ ٢٬٣٣٣</td><td class="num">عملٌ حقيقيّ</td></tr>
+        <tr class="s-part"><td class="id">UX-G1</td><td class="what">الألوانُ المثبَّتة</td><td class="num">٢٬١٨٥</td><td class="num"><strong>١٬٦٢١</strong> ▼ ٥٦٤</td><td class="num">عملٌ حقيقيّ</td></tr>
+        <tr class="s-part"><td class="id">UX-T79</td><td class="what">شاشاتٌ تُدمج تبويبًا</td><td class="num">٥٦</td><td class="num"><strong>٦٣</strong> ▲ +٧</td><td class="num">عملٌ حقيقيّ</td></tr>
+        <tr class="s-part"><td class="id">UX-G4</td><td class="what">خارجَ القشرة</td><td class="num">٨</td><td class="num"><strong>٩</strong> ▲ +١</td><td class="num"><b>ارتداد</b></td></tr>
+        <tr class="s-part"><td class="id">UX-G10A</td><td class="what">اعتمادُ العشر</td><td class="num">منفَّذ ١٠</td><td class="num"><strong>٠</strong> جزئيّ</td><td class="num">تصحيحُ مقياس</td></tr>
+        <tr class="s-part"><td class="id">TS-NAVORD</td><td class="what">ترتيبُ السايدبار</td><td class="num">منفَّذ</td><td class="num"><strong>جزئيّ</strong></td><td class="num">تصحيحُ مقياس</td></tr>
+        <tr class="s-part"><td class="id">TS-CK</td><td class="what">الفحوصُ الـ١٨</td><td class="num">نصّ</td><td class="num"><strong>١٠</strong>/١٨</td><td class="num">تصحيحُ مقياس</td></tr>
+        <tr class="s-part"><td class="id">UX-C38</td><td class="what">المكوّنات</td><td class="num">١٢/١٢</td><td class="num"><strong>١٢</strong>/٣٨</td><td class="num">تصحيحُ مقياس</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="held">
+    <h3>لماذا نزلت النسبةُ ٠٫٨ ولم يتراجع النظام</h3>
+    <ul>
+      <li><strong>خطوتان لا خطوة</strong> — العملُ الحقيقيُّ رفعها ٦٥٫٦٪ ⇐ <strong>٦٦٫٤٪</strong> (المسحُ الشاملُ وبلوغُ النطاقِ المحميِّ ٤٧١ شاشةً = ١٠٠٪)، ثم أنزلها إصلاحُ المقياسِ إلى <strong>٦٤٫٨٪</strong> بسحبِ «منفَّذٍ» من بندَين لم يكتملا.</li>
+      <li><strong>ستةُ عيوبٍ أُصلحت في المسبار</strong> — أخطرُها أن <span class="mono">UX-G10A</span> كانت تُعلَن «منفَّذةً» بلقطةٍ بنيويةٍ وحدَها بينما تشترط الوثيقةُ اعتمادًا <b>وظيفيًّا وبصريًّا</b>، وملاحظتُها تعترف بالنقصِ في السطرِ نفسِه. وأوسعُها أثرًا أن <b>١٣ بندًا كان يأخذ ٠٫٥ ثابتةً</b> مهما تغيّر — فانخفاضُ ٢٬٣٣٣ نمطًا موضعيًّا لم يُحرّك رقمًا واحدًا.</li>
+      <li><strong>وثلاثُ نسبٍ تُعلَن معًا</strong> — الخشنةُ ٦٤٫٨٪ للمقارنةِ بين الجولات · والتدريجيةُ <b>٦١٫٥٪</b> وهي أصدقُها لأنها تحتسب الجزئيَّ بنسبتِه الفعليةِ من خطِّ أساسٍ معلَن · والآليّةُ ٦٧٫٨٪ على ما يقدر عليه المبرمجُ وحدَه.</li>
+      <li><strong>وتحققٌ مستقل</strong> — عُدَّت الأنماطُ والألوانُ بـ<span class="mono">find</span>+<span class="mono">grep</span> خارجَ المسبارِ على ٥٢٧ ملفَّ شاشةٍ فجاءت <b>٦٤٢</b> و<b>١٬٦٢١</b> مطابقةً حرفًا — فالهبوطُ حقيقيٌّ لا أثرَ تغييرِ نطاق.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <span>مُقيّد — للاستخدام المؤسسيّ</span>
+  <span class="mono">4cedc83 · fix/remediation-2026-08</span>
+  <span>٦٢ بندًا مقيسًا · ٤ وثائقَ حاكمة</span>
+  <span>٢٠٢٦-٠٨-١٨ · الجولةُ ٥</span>
+</footer>
+
+</div>

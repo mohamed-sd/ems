@@ -553,7 +553,8 @@ if ($mode === 'diff') {
     exit(0);
 }
 
-if ($mode === 'json') { echo json_encode(['summary'=>$sum,'items'=>$R], JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT), PHP_EOL; }
+if ($mode === 'json') { echo json_encode(['summary'=>$sum,'items'=>$R], JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT), "
+"; }
 else {
     $byDoc = []; foreach ($R as $r) $byDoc[$r['doc']][] = $r;
     foreach ($byDoc as $doc=>$items) {

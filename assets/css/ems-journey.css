@@ -171,6 +171,55 @@
 }
 .ems-journey-banner .ems-jb-action:hover { background: var(--brand-orange-bright, var(--c-e67e00)); color: var(--c-surface); }
 
+/* ═══ المؤشِّرُ المُصغَّر — صفُّ قائمةٍ لا شاشةُ معاملة ═══════════════════════
+ * خمسُ نقاطٍ تُضيء حتى المرحلةِ الحالية، فيُقرأ موقعُ البلاغِ من رحلتِه **بلا
+ * فتحِه**. نفسُ حالاتِ الشريطِ الكبير (منجَزة · حالية · لاحقة · متوقفة) وبنفسِ
+ * رموزِ الطقم — فالقارئُ يرى النظامَ نفسَه بحجمين لا مكوّنين مختلفين.
+ * ◆ واللونُ ليس الحاملَ الوحيدَ للمعنى: النصُّ في `title`/`aria-label` والبادجُ
+ *   النصيُّ بجانبِه — فمن لا يميّز الألوانَ يقرأ المرحلةَ بالحروف.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+.ems-jmini-cell { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.ems-jmini {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    vertical-align: middle;
+    line-height: 1;
+}
+.ems-jmini-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--gray-200, var(--c-line-200));
+    border: 1px solid var(--gray-300, var(--c-d6d3d1));
+}
+.ems-jmini-dot.is-done {
+    background: var(--success-600, var(--c-5b7f1e));
+    border-color: var(--success-600, var(--c-5b7f1e));
+}
+.ems-jmini-dot.is-current {
+    background: var(--brand-amber, var(--c-f2aa2a));
+    border-color: var(--brand-orange-bright, var(--c-e67e00));
+    width: 10px;
+    height: 10px;
+    box-shadow: 0 0 0 2px var(--c-rgba24217042022);
+}
+/* وقفةٌ داخلَ «قيد التنفيذ»: حلقةٌ مجوَّفةٌ لا قرصٌ ممتلئ — تقدُّمٌ متوقفٌ لا ماضٍ */
+.ems-jmini-dot.is-current.is-paused { background: var(--white, var(--c-surface)); }
+.ems-jmini-dot.is-current.is-overdue {
+    background: var(--danger-600, var(--c-dc3545));
+    border-color: var(--danger-600, var(--c-dc3545));
+    box-shadow: none;
+}
+.ems-jmini.is-stopped .ems-jmini-dot,
+.ems-jmini-dot.is-off {
+    background: transparent;
+    border-style: dashed;
+    border-color: var(--gray-300, var(--c-d6d3d1));
+}
+
 /* ── الهاتف: المراحل قائمةً رأسيةً والحرجُ مقروء ──────────────────────── */
 @media (max-width: 767.98px) {
     .ems-journey-track { display: block; overflow-x: visible; }
