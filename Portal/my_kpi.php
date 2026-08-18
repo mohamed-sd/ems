@@ -106,19 +106,28 @@ function kpi_card($label, $value, $link, $hint = '')
     include '../includes/page_header.php';
     require_once __DIR__ . '/../includes/screen_contract.php';
     ems_screen_about('مؤشراتي مشتقةٌ آليًّا من عملي — كلُّ رقمٍ يقود لمصدره، وفريقي من الهيكل لا من قوائم.');
-
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مؤشراتِ عملٍ في هذا المدى', 'وسّع المدى بين التاريخين أعلاه — أو ابدأ بمهمةٍ من «مهامي» ليُشتقَّ المؤشر');
     ?>
-    <form method="get" style="display:flex;gap:10px;align-items:end;margin-bottom:12px;flex-wrap:wrap">
-        <div><label style="font-size:.85rem" for="emsf_377_da0ec">من</label><input type="date" name="from" class="form-control" value="<?php echo htmlspecialchars($from); ?>" id="emsf_377_da0ec"></div>
-        <div><label style="font-size:.85rem" for="emsf_378_7cf8e">إلى</label><input type="date" name="to" class="form-control" value="<?php echo htmlspecialchars($to); ?>" id="emsf_378_7cf8e"></div>
-        <?php if ($team): ?><div><label style="font-size:.85rem" for="emsf_379_76884">عمق الفريق</label>
+    <style>
+    .mkpi-filter  { display: flex; gap: 10px; align-items: end; margin-bottom: 12px; flex-wrap: wrap; }
+    .mkpi-lbl     { font-size: .85rem; }
+    .mkpi-cards   { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+    .mkpi-table   { width: 100%; }
+    .mkpi-hint    { font-size: .85rem; }
+    .mkpi-overdue { color: var(--c-b02a37, #b02a37); font-weight: 700; }
+    </style>
+    <form method="get" class="mkpi-filter">
+        <div><label class="mkpi-lbl" for="emsf_377_da0ec">من</label><input type="date" name="from" aria-label="بدايةُ مدى المؤشرات" class="form-control" value="<?php echo htmlspecialchars($from); ?>" id="emsf_377_da0ec"></div>
+        <div><label class="mkpi-lbl" for="emsf_378_7cf8e">إلى</label><input type="date" name="to" aria-label="نهايةُ مدى المؤشرات" class="form-control" value="<?php echo htmlspecialchars($to); ?>" id="emsf_378_7cf8e"></div>
+        <?php if ($team): ?><div><label class="mkpi-lbl" for="emsf_379_76884">عمق الفريق</label>
             <select name="depth" class="form-control" id="emsf_379_76884"><option value="1" <?php echo $depth === 1 ? 'selected' : ''; ?>>مباشر</option>
             <option value="2" <?php echo $depth === 2 ? 'selected' : ''; ?>>مستويان</option></select></div><?php endif; ?>
         <button class="btn btn-primary">تحديث</button>
     </form>
 
     <h6><i class="fas fa-user"></i> مؤشراتي — كل رقمٍ يقود لمصدره</h6>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;">
+    <div class="mkpi-cards">
         <?php
         $t = $mine['tasks'];
         $onTimePct = intval($t['closed_n'] ?? 0) > 0 ? round(100 * intval($t['closed_on_time']) / intval($t['closed_n'])) . '٪' : '—';
@@ -136,7 +145,7 @@ function kpi_card($label, $value, $link, $hint = '')
     <?php if ($teamRows): ?>
     <h6><i class="fas fa-people-group"></i> فريقي — من الهيكل لا من قوائم (WFM-072)</h6>
     <div class="card"><div class="card-body"><div class="table-responsive">
-        <table class="alltables display no-datatable" style="width:100%">
+        <table class="alltables display no-datatable mkpi-table">
             <thead><tr><th>الموظف</th><th>مفتوح</th><th>متأخر</th><th>متعطل</th><th>أُغلق بالمدى</th>
                 <th>الالتزام بالمهلة</th><th>استجابة (س)</th><th>إنجاز حي</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -154,7 +163,7 @@ function kpi_card($label, $value, $link, $hint = '')
                 <tr>
                     <td><?php echo htmlspecialchars((string) $row['u']['name']); ?></td>
                     <td><?php echo intval($t['open_n'] ?? 0); ?></td>
-                    <td style="<?php echo intval($t['overdue_n'] ?? 0) > 0 ? 'color:#b02a37;font-weight:700' : ''; ?>"><?php echo intval($t['overdue_n'] ?? 0); ?></td>
+                    <td class="<?php echo intval($t['overdue_n'] ?? 0) > 0 ? 'mkpi-overdue' : ''; ?>"><?php echo intval($t['overdue_n'] ?? 0); ?></td>
                     <td><?php echo intval($t['blocked_n'] ?? 0); ?></td>
                     <td><?php echo intval($t['closed_n'] ?? 0); ?></td>
                     <td><?php echo $pct; ?></td>
@@ -165,7 +174,7 @@ function kpi_card($label, $value, $link, $hint = '')
         </table>
     </div></div></div>
     <?php else: ?>
-    <div class="text-muted" style="font-size:.85rem"><i class="fas fa-circle-info"></i>
+    <div class="text-muted mkpi-hint"><i class="fas fa-circle-info"></i>
         لا مرؤوسين في الهيكل — لوحة الفريق تظهر للمديرين وحدهم (لا تُعرض صفرًا مضلِّلًا · IAM-024)</div>
     <?php endif; ?>
 </div>

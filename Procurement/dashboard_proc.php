@@ -92,6 +92,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء التفاصيل', 'icon' => 'fas fa-eye', 'label' => 'إظهار التفاصيل', 'label_class' => 'proc-toggle-stats-text');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا قطعَ حرجةً مسجَّلةً بعدُ',
+        'حدِّد الصنفَ «قطعةً حرجة» من شاشة الأصناف ليظهر هنا بحدِّه الأدنى ومدةِ توريده');
     ?>
 
     <div class="stats-section proc-hidden" id="procStatsSection">
@@ -111,21 +114,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     require_once __DIR__ . '/../app/Services/Procurement/MntProcBridgeService.php';
     $waiting_eq = \App\Services\Procurement\MntProcBridgeService::waitingEquipment($conn, $company_id, 8);
     if ($waiting_eq): ?>
-    <div class="card" style="margin-bottom:14px;border-inline-start:4px solid #b3261e">
-        <div class="card-header"><h5><i class="fas fa-triangle-exclamation" style="color:#b3261e"></i>
+    <div class="card proc-dash-alert">
+        <div class="card-header"><h5><i class="fas fa-triangle-exclamation proc-dash-alert-ico"></i>
             معداتٌ بانتظار قطعٍ (<?php echo count($waiting_eq); ?>) — كلُّ يومٍ هنا إيرادُ تأجيرٍ ضائع</h5></div>
         <div class="card-body"><div class="table-container">
-            <table class="alltables display" data-no-dt="1" style="width:100%">
+            <table class="alltables display proc-dash-table" data-no-dt="1">
                 <thead><tr><th>المعدة</th><th>أمر الصيانة</th><th>الانتظار (يوم)</th><th>طلب الشراء</th><th>حالته</th><th>الأولوية</th></tr></thead>
                 <tbody>
                 <?php foreach ($waiting_eq as $we): ?>
-                    <tr<?php echo intval($we['waiting_days']) > 7 ? ' style="background:#fff1f0"' : ''; ?>>
+                    <tr<?php echo intval($we['waiting_days']) > 7 ? ' class="proc-dash-row-late"' : ''; ?>>
                         <td><?php echo htmlspecialchars((string)($we['equipment_name'] ?? '—')); ?></td>
                         <td><?php echo htmlspecialchars((string)$we['mnt_code'] . ' (' . $we['mnt_state'] . ')'); ?></td>
                         <td><strong><?php echo intval($we['waiting_days']); ?></strong></td>
                         <td><?php echo $we['req_code']
                             ? '<a href="requests_proc.php">' . htmlspecialchars((string)$we['req_code']) . '</a>'
-                            : '<span style="color:#b3261e;font-weight:700">بلا طلبٍ بعد — ولّده من شاشة الطلبات</span>'; ?></td>
+                            : '<span class="proc-dash-nolink">بلا طلبٍ بعد — ولّده من شاشة الطلبات</span>'; ?></td>
                         <td><?php echo htmlspecialchars((string)($we['req_state'] ?? '—')); ?></td>
                         <td><?php echo htmlspecialchars((string)($we['priority'] ?? '—')); ?></td>
                     </tr>
@@ -164,7 +167,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <div class="card-header"><h5><i class="fa fa-triangle-exclamation"></i> القطع الحرجة</h5></div>
         <div class="table-container">
-            <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="procTable" class="display nowrap alltables proc-dash-table"
+                   data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>الكود</th><th>الصنف</th><th>الفئة</th><th>الحد الأدنى</th><th>مخزون الأمان</th><th>مدة التوريد (يوم)</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -205,23 +209,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     /* بطاقات الإحصائيات — نفس تصميم شاشة العملاء (Clients/clients.php) */
     .proc-dashboard-main .stats-section {
         border: 1px solid var(--bdr); border-radius: var(--rl);
-        background: linear-gradient(180deg, rgba(255,255,255,.95) 0%, var(--s2) 100%);
+        background: linear-gradient(180deg, var(--c-rgba255255255095, rgba(255,255,255,.95)) 0%, var(--s2) 100%);
         box-shadow: var(--sh); padding: 14px; margin-bottom: 14px;
     }
     .proc-dashboard-main .proc-hidden { display: none; }
     .proc-dashboard-main .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: 12px; }
     .proc-dashboard-main .stats-card {
-        background: #eee; border: 1px solid #aaa; border-radius: 35px; padding: 18px;
-        box-shadow: 0 2px 8px rgba(26,18,8,.07); position: relative; overflow: hidden;
+        background: var(--c-s-eee); border: 1px solid var(--c-s-aaa); border-radius: 35px; padding: 18px;
+        box-shadow: 0 2px 8px var(--c-rgba26188007); position: relative; overflow: hidden;
         text-decoration: none; color: inherit; display: block; transition: all .2s ease;
     }
-    .proc-dashboard-main .stats-card:hover { border-color: #E0AE2E; box-shadow: 0 4px 14px rgba(26,18,8,.14); transform: translateY(-2px); }
+    .proc-dashboard-main .stats-card:hover { border-color: var(--c-nav-active); box-shadow: 0 4px 14px var(--c-rgba26188014, rgba(26,18,8,.14)); transform: translateY(-2px); }
     .proc-dashboard-main .stats-card .stats-icon {
         width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center;
-        font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid #999; background: #fff; color: #000;
+        font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px;
+        border: 1px solid var(--c-ink-400); background: var(--c-s-fff); color: var(--c-s-000);
     }
-    .proc-dashboard-main .stats-card .stats-title { color: #555; font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
-    .proc-dashboard-main .stats-card .stats-value { color: #222; line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 35px; }
+    .proc-dashboard-main .stats-card .stats-title { color: var(--c-s-555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
+    .proc-dashboard-main .stats-card .stats-value { color: var(--c-s-222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 35px; }
+
+    /* UXW-01 ②: أصنافٌ محلَّ الأنماطِ الموضعيةِ التي كانت مبثوثةً في الوسوم */
+    .proc-dash-alert { margin-bottom: 14px; border-inline-start: 4px solid var(--c-b3261e, #b3261e); }
+    .proc-dash-alert-ico { color: var(--c-b3261e, #b3261e); }
+    .proc-dash-nolink { color: var(--c-b3261e, #b3261e); font-weight: 700; }
+    .proc-dash-row-late { background: var(--c-fff1f0, #fff1f0); }
+    .proc-dash-table { width: 100%; }
     @media (max-width: 900px) { .proc-dashboard-main .stats-grid { grid-template-columns: repeat(2, minmax(150px, 1fr)); } }
     @media (max-width: 560px) { .proc-dashboard-main .stats-grid { grid-template-columns: 1fr; } }
 </style>
@@ -231,18 +243,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function () {
-    var procTable = $('#procTable').DataTable({
-        scrollX: true, autoWidth: false, stateSave: false,
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-    });
+    // UXW-01 ⑤: التهيئةُ المحليةُ حُذفت — المكوّنُ المركزيُّ (ui-unification.js) يهيّئ
+    // الجدولَ، والسلوكُ محفوظٌ بسماتِ data-scroll-x و data-state-save على وسمِ الجدول.
+    // ومقبضُ الجدولِ يُطلب لحظةَ الحاجةِ لا وقتَ الجاهزية: كنسُ المكوّنِ يقع بعدَها.
+    function procDT() {
+        if (!$.fn.dataTable || !$.fn.dataTable.isDataTable('#procTable')) { return null; }
+        return $('#procTable').DataTable();
+    }
 
-    // تعبئة خيارات الفلتر من بيانات العمود (نفس أسلوب شاشة العملاء)
+    // تعبئة خيارات الفلتر من خلايا العمود في الوسم (قبل تهيئةِ المكوّنِ المركزي،
+    // فتُقرأ كلُّ الصفوفِ لا صفحةُ العرضِ الأولى وحدَها)
     function fillFilterOptions(columnIndex, selectId) {
         var select = $(selectId);
         var current = select.val();
         var values = [];
-        procTable.column(columnIndex).data().each(function (value) {
-            var text = $('<div>').html(value).text().trim();
+        $('#procTable tbody tr').each(function () {
+            var cell = this.cells[columnIndex];
+            if (!cell) { return; }
+            var text = $(cell).text().trim();
             if (text !== '' && values.indexOf(text) === -1) values.push(text);
         });
         values.sort();
@@ -255,27 +273,31 @@ $(document).ready(function () {
 
     // فلترة حسب الفئة (بحث عمود مطابق تام)
     $('#filterCategory').on('change', function () {
+        var t = procDT(); if (!t) { return; }
         var value = $.fn.dataTable.util.escapeRegex($(this).val());
-        procTable.column(2).search(value ? '^' + value + '$' : '', true, false).draw();
+        t.column(2).search(value ? '^' + value + '$' : '', true, false).draw();
     });
 
     // بحث عام بالكود/الصنف
     $('#filterSearch').on('keyup', function () {
-        procTable.search($(this).val()).draw();
+        var t = procDT(); if (!t) { return; }
+        t.search($(this).val()).draw();
     });
 
     // زر «تطبيق» — يعيد تطبيق الفلاتر الحالية
     $('#filterApply').on('click', function () {
+        var t = procDT(); if (!t) { return; }
         var value = $.fn.dataTable.util.escapeRegex($('#filterCategory').val());
-        procTable.column(2).search(value ? '^' + value + '$' : '', true, false);
-        procTable.search($('#filterSearch').val()).draw();
+        t.column(2).search(value ? '^' + value + '$' : '', true, false);
+        t.search($('#filterSearch').val()).draw();
     });
 
     // زر «إعادة تعيين»
     $('#filterReset').on('click', function () {
         $('#filterCategory').val('');
         $('#filterSearch').val('');
-        procTable.search('').columns().search('').draw();
+        var t = procDT(); if (!t) { return; }
+        t.search('').columns().search('').draw();
     });
 
     // ── إظهار/إخفاء التفاصيل (بطاقات المؤشرات) — بنفس آلية شاشة العملاء ──

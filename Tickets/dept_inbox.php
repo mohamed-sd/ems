@@ -37,15 +37,17 @@ require_once __DIR__ . '/dept_inbox_map.php';
 function dept_unit_of_role($roleId) { return ems_dept_unit_of_role($roleId); }
 
 $unit_id = dept_unit_of_role($current_role_id);
+/* UXW-01 ①: لونُ الشارةِ صنفٌ من طقمِ النظامِ لا لونٌ مثبَّتٌ في الكود —
+   الألوانُ نفسُها معرَّفةٌ رموزًا في كتلةِ أنماطِ الشاشةِ أدناه (tkt-di-badge-*). */
 $states  = array(
-    'new'          => array('جديد', '#0d6efd'),
-    'received'     => array('مستلَم', '#6610f2'),
-    'in_progress'  => array('قيد المعالجة', '#fd7e14'),
-    'on_hold'      => array('معلَّق بسبب', '#6c757d'),
-    'done_pending' => array('منجَز — بانتظار التأكيد', '#20c997'),
-    'closed'       => array('مغلق', '#198754'),
-    'reopened'     => array('أُعيد فتحه', '#dc3545'),
-    'admin_closed' => array('مغلق إداريًّا', '#495057'),
+    'new'          => array('جديد', 'tkt-di-badge-new'),
+    'received'     => array('مستلَم', 'tkt-di-badge-received'),
+    'in_progress'  => array('قيد المعالجة', 'tkt-di-badge-progress'),
+    'on_hold'      => array('معلَّق بسبب', 'tkt-di-badge-hold'),
+    'done_pending' => array('منجَز — بانتظار التأكيد', 'tkt-di-badge-done'),
+    'closed'       => array('مغلق', 'tkt-di-badge-closed'),
+    'reopened'     => array('أُعيد فتحه', 'tkt-di-badge-reopened'),
+    'admin_closed' => array('مغلق إداريًّا', 'tkt-di-badge-adminclosed'),
 );
 
 // المساراتُ المفتوحةُ لوحدة الإدارة — بحالتها ومهلتها ومكلَّفها (فحص المُرجَع: mysqli لا يرمي)
@@ -88,13 +90,31 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 $header_icon = 'fa fa-bell';
 $header_title_html = htmlspecialchars('بلاغاتُ إدارتي', ENT_QUOTES, 'UTF-8');
 ob_start(); ?><div>
-      <span class="badge" style="background:#fd7e14;font-size:.95em">المفتوح: <?= $open ?></span>
-      <span class="badge" style="background:#dc3545;font-size:.95em">المتأخر: <?= $late ?></span>
+      <span class="badge tkt-di-count-open">المفتوح: <?= $open ?></span>
+      <span class="badge tkt-di-count-late">المتأخر: <?= $late ?></span>
     </div><?php
 $header_actions = array(array('raw' => trim((string) ob_get_clean())));
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا مساراتِ بلاغاتٍ موجَّهةً إلى إدارتك', 'راجع تصنيفَ البلاغاتِ مع مركزِ البلاغات إن كنت تتوقع مساراتٍ هنا');
 ?>
+  <style>
+  /* UXW-01 ①②: ألوانُ شاراتِ الحالةِ وأنماطُ «بلاغاتُ إدارتي» — بادئةُ الشاشة tkt-di- */
+  .tkt-di-count-open        { background: var(--c-fd7e14, #fd7e14); font-size: .95em; }
+  .tkt-di-count-late        { background: var(--c-dc3545); font-size: .95em; }
+  .tkt-di-badge-new         { background: var(--c-0d6efd); }
+  .tkt-di-badge-received    { background: var(--c-6610f2, #6610f2); }
+  .tkt-di-badge-progress    { background: var(--c-fd7e14, #fd7e14); }
+  .tkt-di-badge-hold        { background: var(--c-6c757d); }
+  .tkt-di-badge-done        { background: var(--c-20c997); }
+  .tkt-di-badge-closed      { background: var(--c-198754); }
+  .tkt-di-badge-reopened    { background: var(--c-dc3545); }
+  .tkt-di-badge-adminclosed { background: var(--c-495057); }
+  .tkt-di-badge-unknown     { background: var(--c-ink-400); }
+  .tkt-di-badge-late        { background: var(--c-dc3545); }
+  .tkt-di-row-late          { background: var(--c-fff3f3, #fff3f3); }
+  </style>
 
   <?php if ($unit_id === 0): ?>
     <div class="alert alert-warning">دورُك بلا وحدةٍ تنظيميةٍ مربوطة — تُعرض البلاغاتُ الموجَّهةُ لدورك مباشرةً.</div>
@@ -124,16 +144,16 @@ include __DIR__ . '/../includes/page_header.php';
       <tr><td colspan="7" class="text-center text-muted">لا مساراتَ لإدارتك — صفرُ بلاغٍ ينتظر</td></tr>
     <?php endif; ?>
     <?php foreach ($rows as $r):
-        $st = isset($states[$r['state']]) ? $states[$r['state']] : array($r['state'], '#999');
+        $st = isset($states[$r['state']]) ? $states[$r['state']] : array($r['state'], 'tkt-di-badge-unknown');
         $lateMark = !empty($r['is_late']);
     ?>
-      <tr<?= $lateMark ? ' style="background:#fff3f3"' : '' ?>>
+      <tr<?= $lateMark ? ' class="tkt-di-row-late"' : '' ?>>
         <td><a href="tickets_list.php?open=<?= intval($r['tk_id']) ?>"><?= htmlspecialchars($r['ticket_no'], ENT_QUOTES, 'UTF-8') ?></a></td>
         <td><?= htmlspecialchars(function_exists('ems_dept_label') ? ems_dept_label($r['workstream_type']) : $r['workstream_type'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?php $cmpl = trim((string) $r['complaint']);
             echo ($cmpl === '' || $cmpl === '0') ? '<span class="text-muted">—</span>'
                 : htmlspecialchars(mb_substr($cmpl, 0, 70), ENT_QUOTES, 'UTF-8'); ?></td>
-        <td><span class="badge" style="background:<?= $st[1] ?>"><?= $st[0] ?></span><?= $lateMark ? ' <span class="badge" style="background:#dc3545">متأخر</span>' : '' ?></td>
+        <td><span class="badge <?= $st[1] ?>"><?= $st[0] ?></span><?= $lateMark ? ' <span class="badge tkt-di-badge-late">متأخر</span>' : '' ?></td>
         <td><?= $r['assignee_name'] ? htmlspecialchars($r['assignee_name'], ENT_QUOTES, 'UTF-8') : '<span class="text-muted">بلا مكلَّف</span>' ?></td>
         <td><?= $r['resolve_due_at'] ? htmlspecialchars($r['resolve_due_at'], ENT_QUOTES, 'UTF-8') : '—' ?></td>
         <td><?= $r['mandatory'] ? 'إلزامي' : 'اختياري' ?></td>

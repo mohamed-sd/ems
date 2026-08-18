@@ -33,18 +33,32 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ①②: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة — والألوانُ برموزٍ باحتياطٍ حرفيّ */
+.wf-ded-count   { background: var(--c-fd7e14, #fd7e14); }
+.wf-ded-note    { font-size: .9em; }
+.wf-ded-propose { margin-bottom: 14px; padding: 10px 12px; border: 1px solid var(--c-e0d7bd, #e0d7bd);
+                  border-radius: 8px; background: var(--c-fffdf3, #fffdf3); }
+.wf-ded-grid    { margin-top: 8px; }
+.wf-ded-req     { color: var(--c-c00, #c00); }
+.wf-ded-actions { margin-top: 10px; }
+.wf-ded-ok      { color: var(--c-198754, #198754); }
+</style>
 <div class="main" dir="rtl">
   <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-minus-circle';
 $header_title_html = htmlspecialchars('الخصومُ المقترحة — بانتظار السلّم الثلاثي', ENT_QUOTES, 'UTF-8');
-ob_start(); ?><span class="badge" style="background:#fd7e14"><?= count($rows) ?></span><?php
+ob_start(); ?><span class="badge wf-ded-count"><?= count($rows) ?></span><?php
 $header_actions = array(array('raw' => trim((string) ob_get_clean())));
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا خصمَ مقترحًا معلَّقًا في هذه الشركة',
+                       'اقترحْ خصمًا بمستندٍ مؤيدٍ من نموذجِ «اقترحْ خصمًا» — والاعتمادُ من صندوقِ الاعتمادِ الجامع');
 ?>
-  <p class="text-muted" style="font-size:.9em">كلُّ خصمٍ بمصدره (M-11: لا خصمَ بلا مستند) — والاعتمادُ من صندوق الاعتماد الجامع لا من هنا.</p>
+  <p class="text-muted wf-ded-note">كلُّ خصمٍ بمصدره (M-11: لا خصمَ بلا مستند) — والاعتمادُ من صندوق الاعتماد الجامع لا من هنا.</p>
 
   <?php
   /* ══ INJ-0292 · شاشةُ الخصومِ صار لها **فعلُ اقتراح** ═══════════════════════════
@@ -80,15 +94,14 @@ include __DIR__ . '/../includes/page_header.php';
   }
   $__dperm = check_page_permissions($conn, 'Workforce/proposed_deductions.php');
   if (!empty($__dperm['can_add']) || !empty($__dperm['can_edit'])): ?>
-  <form method="post" class="ems-form" style="margin-bottom:14px;padding:10px 12px;
-        border:1px solid #e0d7bd;border-radius:8px;background:#fffdf3">
+  <form method="post" class="ems-form wf-ded-propose">
       <?php if (function_exists('csrf_field')) { echo csrf_field(); } ?>
       <input type="hidden" name="ded_propose" value="1">
       <strong>اقترحْ خصمًا</strong>
-      <div class="form-grid" style="margin-top:8px">
-          <div class="form-group"><label for="dedp">الموظف (المعرّف) <span style="color:#c00">*</span></label>
+      <div class="form-grid wf-ded-grid">
+          <div class="form-group"><label for="dedp">الموظف (المعرّف) <span class="wf-ded-req">*</span></label>
               <input type="number" name="ded_person" id="dedp" min="1" required></div>
-          <div class="form-group"><label for="deda">المبلغ <span style="color:#c00">*</span></label>
+          <div class="form-group"><label for="deda">المبلغ <span class="wf-ded-req">*</span></label>
               <input type="number" name="ded_amount" id="deda" step="0.01" min="0.01" required></div>
           <div class="form-group"><label for="dedk">نوعُ الخصم</label>
               <select name="ded_kind" id="dedk">
@@ -96,13 +109,13 @@ include __DIR__ . '/../includes/page_header.php';
                   <option value="advance">سلفة</option>
                   <option value="discount">حسم</option>
               </select></div>
-          <div class="form-group"><label for="dedd">المستندُ المؤيّد <span style="color:#c00">*</span>
+          <div class="form-group"><label for="dedd">المستندُ المؤيّد <span class="wf-ded-req">*</span>
               <small>— لا خصمَ بلا مستند (M-11)</small></label>
               <input type="text" name="ded_doc" id="dedd" maxlength="160" required></div>
           <div class="form-group"><label for="dedn">ملاحظة</label>
               <input type="text" name="ded_note" id="dedn" maxlength="255"></div>
       </div>
-      <div style="margin-top:10px"><button type="submit" class="btn-primary">
+      <div class="wf-ded-actions"><button type="submit" class="btn btn-primary">
           <i class="fa fa-plus"></i> اقترحْ — ينتظر سلّمَ الموافقات</button></div>
   </form>
   <?php endif; ?>
@@ -140,7 +153,7 @@ include __DIR__ . '/../includes/page_header.php';
               <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead>
     <tbody>
-    <?php if (empty($rows)): ?><tr><td colspan="6" class="text-center" style="color:#198754">✔ صفرُ خصمٍ معلَّقٍ بلا قرار</td></tr><?php endif; ?>
+    <?php if (empty($rows)): ?><tr><td colspan="6" class="text-center wf-ded-ok">✔ صفرُ خصمٍ معلَّقٍ بلا قرار</td></tr><?php endif; ?>
     <?php foreach ($rows as $d): ?>
       <tr>
         <td><?= intval($d['id']) ?></td>

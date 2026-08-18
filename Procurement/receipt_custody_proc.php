@@ -206,7 +206,7 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
     $iname = $line ? htmlspecialchars((string)$line['item_name'], ENT_QUOTES) : '';
     $qty = $line ? htmlspecialchars((string)$line['qty'], ENT_QUOTES) : '1';
     $opts = proc_items_options($conn, $is_super_admin, $company_id, $iid);
-    return '<div class="proc-line form-grid" style="align-items:end;margin-bottom:8px">'
+    return '<div class="proc-line form-grid proc-rc-line">'
         . '<div class="form-group"><label for="emsf_425_33703">الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item" id="emsf_425_33703">' . $opts . '</select></div>'
         . '<div class="form-group"><label for="emsf_426_df271">اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" value="' . $iname . '" required id="emsf_426_df271"></div>'
         . '<div class="form-group"><label for="emsf_427_93e88">الكمية</label><input type="number" step="0.01" name="line_qty[]" value="' . $qty . '" id="emsf_427_93e88"></div>'
@@ -225,6 +225,9 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا عهدَ استلامٍ مؤقتٍ مسجَّلةً بعدُ',
+        'افتح أولَ عهدةٍ بزرِّ «عهدة جديدة» في رأسِ الشاشة، وقيِّد أصنافَها وموقعَ استلامِها');
     ?>
 
     <?php proc_msg_banner(); ?>
@@ -238,11 +241,11 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="emsf_428_f73e2">المستلِم <span class="required">*</span></label>
-                        <input type="text" name="holder_name" value="<?php echo $edit ? htmlspecialchars((string)$edit['holder_name']) : ''; ?>" required id="emsf_428_f73e2">
+                        <input type="text" name="holder_name" id="emsf_428_f73e2" required value="<?php echo $edit ? htmlspecialchars((string)$edit['holder_name']) : ''; ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_429_0803c">تاريخ الاستلام</label>
-                        <input type="date" name="receipt_date" value="<?php echo $edit ? htmlspecialchars((string)$edit['receipt_date']) : ''; ?>" id="emsf_429_0803c">
+                        <input type="date" name="receipt_date" id="emsf_429_0803c" value="<?php echo $edit ? htmlspecialchars((string)$edit['receipt_date']) : ''; ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_430_02608">المورد التشغيلي</label>
@@ -254,7 +257,7 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
                     </div>
                     <div class="form-group">
                         <label for="emsf_432_d4311">موقع الاستلام</label>
-                        <input type="text" name="receipt_location" value="<?php echo $edit ? htmlspecialchars((string)$edit['receipt_location']) : ''; ?>" placeholder="عطبرة / موقع المورد …" id="emsf_432_d4311">
+                        <input type="text" name="receipt_location" id="emsf_432_d4311" placeholder="عطبرة / موقع المورد …" value="<?php echo $edit ? htmlspecialchars((string)$edit['receipt_location']) : ''; ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_433_f6614">مخزن الإدخال <span class="required">*</span> <small>(إلزامي حين الوجهة «مخزن» — يحرّك الرصيد)</small></label>
@@ -276,9 +279,9 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="form-group" style="grid-column:1/-1">
+                    <div class="form-group proc-rc-full">
                         <label for="emsf_436_27cf5">ملاحظات</label>
-                        <input type="text" name="notes" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>" id="emsf_436_27cf5">
+                        <input type="text" name="notes" id="emsf_436_27cf5" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>">
                     </div>
                 </div>
             </div>
@@ -294,7 +297,7 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
                     }
                     ?>
                 </div>
-                <button type="button" id="addLine" class="add-btn" style="margin-top:6px"><i class="fas fa-plus"></i> إضافة سطر</button>
+                <button type="button" id="addLine" class="add-btn proc-rc-addline"><i class="fas fa-plus"></i> إضافة سطر</button>
             </div>
 
             <div class="form-actions">
@@ -310,7 +313,8 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="procTable" class="display nowrap alltables proc-rc-table"
+                   data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>المستلِم</th><th>تاريخ الصرف</th><th>المورد</th>
                     <th>موقع الاستلام</th><th>الوجهة</th><th>الحالة</th><th>عدد الأصناف</th>
@@ -397,26 +401,21 @@ function proc_rc_line_row($conn, $is_super_admin, $company_id, $line = null)
     </div></div>
 </div>
 
+<style>
+    /* UXW-01 ②: أصنافٌ محلَّ الأنماطِ الموضعيةِ التي كانت مبثوثةً في الوسوم */
+    .proc-rc-line { align-items: end; margin-bottom: 8px; }
+    .proc-rc-full { grid-column: 1 / -1; }
+    .proc-rc-addline { margin-top: 6px; }
+    .proc-rc-table { width: 100%; }
+</style>
+
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
-<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
-<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
-<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 <script>
 (function () {
     $(document).ready(function () {
-        $('#procTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
+        // UXW-01 ⑤: التهيئةُ المحليةُ حُذفت — المكوّنُ المركزيُّ (ui-unification.js)
+        // يلتقط الجدولَ آليًّا، والسلوكُ محفوظٌ بسماتِ data-scroll-x و data-state-save.
         var toggleBtn = document.getElementById('toggleForm');
         if (toggleBtn) { toggleBtn.addEventListener('click', function () { $('#procForm').toggleClass('allforms-visible'); }); }
         $('#addLine').on('click', function () {

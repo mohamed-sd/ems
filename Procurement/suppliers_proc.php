@@ -98,6 +98,11 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ②: أنماطُ هذه الشاشةِ الثابتةُ أصنافًا ببادئةِ الشاشة */
+.proc-sup-table    { width: 100%; }
+.proc-sup-fullspan { grid-column: 1 / -1; }
+</style>
 
 <div class="main proc-suppliers-main ems-unified-page-shell">
     <?php
@@ -109,6 +114,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا موردَ مسجَّلًا لهذه الشركة',
+                           'أضفْ أولَ موردٍ بزرِّ «إضافة مورد» — والمورّدُ شرطُ أمرِ الشراءِ وفاتورتِه');
     ?>
 
     <?php proc_msg_banner(); ?>
@@ -145,11 +153,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <label for="p_payment">شروط السداد</label>
                         <input type="text" name="payment_terms" id="p_payment">
                     </div>
-                    <div class="form-group" style="grid-column:1/-1">
+                    <div class="form-group proc-sup-fullspan">
                         <label for="p_address">العنوان</label>
                         <input type="text" name="address" id="p_address">
                     </div>
-                    <div class="form-group" style="grid-column:1/-1">
+                    <div class="form-group proc-sup-fullspan">
                         <label for="p_notes">ملاحظات</label>
                         <input type="text" name="notes" id="p_notes">
                     </div>
@@ -164,7 +172,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="procTable" class="display nowrap alltables proc-sup-table"
+                   data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>طبيعة التعامل</th>
                     <th>الشخص المسؤول</th><th>الهاتف</th><th>شروط السداد</th>
@@ -232,15 +241,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function () {
     $(document).ready(function () {
-        $('#procTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
+        // UXW-01 ⑤: لا تهيئةَ محليةً — المكوّنُ المركزيُّ في assets/js/ui-unification.js
+        // يلتقط الجدولَ ويقرأ سلوكَه من سماتِ data-* على وسمِ <table>.
 
         var toggleBtn = document.getElementById('toggleForm');
         if (toggleBtn) {

@@ -218,6 +218,31 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.fc-flash { margin: 10px 0; }
+.fc-filter { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; }
+.fc-window-note { color: var(--c-s-666); font-size: .9rem; }
+.fc-ok { color: var(--c-2c6749, #2C6749); }
+.fc-warn { color: var(--c-9a3412); }
+.fc-strong { font-weight: 700; }
+.fc-card { margin-top: 14px; }
+.fc-tight { margin: 0 0 10px; }
+.fc-col-pct { width: 34%; }
+.fc-meter { background: var(--c-s-eee); border-radius: 3px; height: 16px; position: relative; }
+.fc-meter-fill { background: var(--c-2c6749, #2C6749); height: 16px; border-radius: 3px; }
+.fc-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.fc-span-all { grid-column: 1 / -1; }
+.fc-form-actions { margin-top: 12px; }
+.fc-inline { display: inline; }
+.fc-note { margin-top: 8px; }
+.fc-t-draft { color: var(--c-8a5712, #8A5712); }
+.fc-t-ok { color: var(--c-2c6749, #2C6749); }
+.fc-t-contract { color: var(--c-2f5d6e, #2F5D6E); }
+.fc-t-done { color: var(--c-6b6355, #6B6355); }
+.fc-t-cancel { color: var(--c-9a3412); }
+.fc-t-default { color: var(--c-s-333); }
+</style>
 <div class="main ems-unified-page-shell">
 <?php
 $header_title = 'تقويمُ الأسطول والحجز';
@@ -237,15 +262,17 @@ if (function_exists('ems_screen_about')) {
         array('حدّد النافذة الزمنية', 'اقرأ سعةَ الفئة قبل الوعد', 'احجز ثم حوّل إلى عقد')
     );
 }
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+echo ems_states_bundle('لا حجوزاتِ أسطولٍ في هذه النافذةِ الزمنية', 'وسّعِ النافذةَ أو اضغط «حجزٌ جديد» لتسجيلِ أولِ حجز');
 ?>
   <?php if (!empty($_GET['msg'])): ?>
-    <div class="alert alert-info" style="margin:10px 0"><?php echo fc_e($_GET['msg']); ?></div>
+    <div class="alert alert-info fc-flash"><?php echo fc_e($_GET['msg']); ?></div>
   <?php endif; ?>
 
   <div class="card"><div class="card-body">
-    <form method="get" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
-      <div><label for="emsf_352_b1438">من</label><input type="date" name="from" value="<?php echo fc_e($from); ?>" class="form-control" id="emsf_352_b1438"></div>
-      <div><label for="emsf_353_96e8a">إلى</label><input type="date" name="to" value="<?php echo fc_e($to); ?>" class="form-control" id="emsf_353_96e8a"></div>
+    <form method="get" class="fc-filter">
+      <div><label for="emsf_352_b1438">من</label><input type="date" name="from" id="emsf_352_b1438" class="form-control" value="<?php echo fc_e($from); ?>"></div>
+      <div><label for="emsf_353_96e8a">إلى</label><input type="date" name="to" id="emsf_353_96e8a" class="form-control" value="<?php echo fc_e($to); ?>"></div>
       <div><label for="emsf_354_2685f">الفئة</label>
         <select name="type" class="form-control" id="emsf_354_2685f">
           <option value="0">— كل الفئات —</option>
@@ -255,27 +282,27 @@ if (function_exists('ems_screen_about')) {
           <?php endforeach; ?>
         </select></div>
       <div><button type="submit" class="btn btn-primary"><i class="fa fa-search"></i> اعرض</button></div>
-      <div style="color:#666;font-size:.9rem">النافذة <b><?php echo (int) $span_days; ?></b> يومًا ·
-        متاحٌ <b style="color:#2C6749"><?php echo (int) $tot_free; ?></b> من <?php echo (int) $tot_all; ?></div>
+      <div class="fc-window-note">النافذة <b><?php echo (int) $span_days; ?></b> يومًا ·
+        متاحٌ <b class="fc-ok"><?php echo (int) $tot_free; ?></b> من <?php echo (int) $tot_all; ?></div>
     </form>
   </div></div>
 
   <!-- ① سعةُ الفئات -->
-  <div class="card" style="margin-top:14px"><div class="card-body">
-    <h5 style="margin:0 0 10px"><i class="fa fa-layer-group"></i> سعةُ الفئات في النافذة</h5>
-    <div class="table-responsive"><table class="table table-sm" data-no-dt="1">
-      <thead><tr><th>الفئة</th><th>الإجمالي</th><th>المتاح</th><th>المشغول</th><th style="width:34%">نسبةُ الإتاحة</th></tr></thead>
+  <div class="card fc-card"><div class="card-body">
+    <h5 class="fc-tight"><i class="fa fa-layer-group"></i> سعةُ الفئات في النافذة</h5>
+    <div class="table-responsive"><table class="table table-sm" data-no-dt="hard">
+      <thead><tr><th>الفئة</th><th>الإجمالي</th><th>المتاح</th><th>المشغول</th><th class="fc-col-pct">نسبةُ الإتاحة</th></tr></thead>
       <tbody>
       <?php foreach ($capacity as $c):
         $pct = $c['total'] > 0 ? round(100 * $c['free'] / $c['total']) : 0; ?>
         <tr>
           <td><?php echo fc_e($c['type_name']); ?></td>
           <td><?php echo (int) $c['total']; ?></td>
-          <td style="color:#2C6749;font-weight:700"><?php echo (int) $c['free']; ?></td>
-          <td style="color:#9A3412"><?php echo (int) $c['busy']; ?></td>
+          <td class="fc-ok fc-strong"><?php echo (int) $c['free']; ?></td>
+          <td class="fc-warn"><?php echo (int) $c['busy']; ?></td>
           <td>
-            <div style="background:#eee;border-radius:3px;height:16px;position:relative">
-              <div style="background:#2C6749;height:16px;border-radius:3px;width:<?php echo (int) $pct; ?>%"></div>
+            <div class="fc-meter">
+              <div class="fc-meter-fill" data-allow-style style="width:<?php echo (int) $pct; ?>%"></div>
             </div>
             <small><?php echo (int) $pct; ?>٪</small>
           </td>
@@ -290,13 +317,13 @@ if (function_exists('ems_screen_about')) {
 
   <!-- ② نموذجُ الحجز -->
   <?php if ($can_add): ?>
-  <div class="card allforms" id="fcFormCard" style="margin-top:14px;display:none"><div class="card-body">
-    <h5 style="margin:0 0 10px"><i class="fa fa-plus"></i> حجزُ نافذة</h5>
+  <div class="card allforms fc-card" id="fcFormCard"><div class="card-body">
+    <h5 class="fc-tight"><i class="fa fa-plus"></i> حجزُ نافذة</h5>
     <form method="post" class="ems-form">
       <input type="hidden" name="csrf_token" value="<?php echo fc_e($fc_csrf); ?>">
       <input type="hidden" name="fc_action" value="save">
       <input type="hidden" name="res_id" id="fc_res_id" value="0">
-      <div class="form-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px">
+      <div class="form-grid fc-form-grid">
         <div><label for="fc_eq">المعدة (حجزٌ بعينها)</label>
           <select name="equipment_id" id="fc_eq" class="form-control">
             <option value="0">— بلا تحديد (احجز فئةً) —</option>
@@ -317,8 +344,8 @@ if (function_exists('ems_screen_about')) {
           </select></div>
         <div><label for="emsf_356_39caa">العدد (عند حجز الفئة)</label>
           <input type="number" name="qty" min="1" value="1" class="form-control" id="emsf_356_39caa"></div>
-        <div><label for="emsf_357_05f5f">من *</label><input type="date" name="start_date" required value="<?php echo fc_e($from); ?>" class="form-control" id="emsf_357_05f5f"></div>
-        <div><label for="emsf_358_9f085">إلى *</label><input type="date" name="end_date" required value="<?php echo fc_e($to); ?>" class="form-control" id="emsf_358_9f085"></div>
+        <div><label for="emsf_357_05f5f">من *</label><input type="date" name="start_date" id="emsf_357_05f5f" class="form-control" required value="<?php echo fc_e($from); ?>"></div>
+        <div><label for="emsf_358_9f085">إلى *</label><input type="date" name="end_date" id="emsf_358_9f085" class="form-control" required value="<?php echo fc_e($to); ?>"></div>
         <div><label for="emsf_359_1ef82">الحالة</label>
           <select name="state" class="form-control" id="emsf_359_1ef82">
             <?php foreach (array('مبدئي', 'مؤكَّد') as $s): ?>
@@ -340,20 +367,20 @@ if (function_exists('ems_screen_about')) {
             <?php endforeach; ?>
           </select></div>
         <div><label for="emsf_362_6e589">الغرض/الموقع</label><input type="text" name="purpose" class="form-control" maxlength="160" id="emsf_362_6e589"></div>
-        <div style="grid-column:1/-1"><label for="emsf_363_9b12c">ملاحظات</label><input type="text" name="note" class="form-control" maxlength="255" id="emsf_363_9b12c"></div>
+        <div class="fc-span-all"><label for="emsf_363_9b12c">ملاحظات</label><input type="text" name="note" class="form-control" maxlength="255" id="emsf_363_9b12c"></div>
       </div>
-      <div style="margin-top:12px">
+      <div class="fc-form-actions">
         <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> احجز</button>
-        <button type="button" class="btn btn-secondary" onclick="document.getElementById('fcFormCard').style.display='none'">إلغاء</button>
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('fcFormCard').classList.remove('allforms-visible')">إلغاء</button>
       </div>
     </form>
   </div></div>
   <?php endif; ?>
 
   <!-- ③ الحجوزات -->
-  <div class="card" style="margin-top:14px"><div class="card-body">
-    <h5 style="margin:0 0 10px"><i class="fa fa-bookmark"></i> حجوزاتُ النافذة</h5>
-    <div class="table-responsive"><table class="table display" id="fcTable">
+  <div class="card fc-card"><div class="card-body">
+    <h5 class="fc-tight"><i class="fa fa-bookmark"></i> حجوزاتُ النافذة</h5>
+    <div class="table-responsive"><table class="table display" id="fcTable" data-order='[[3,"desc"]]' data-page-length="25" data-state-save="false">
       <thead><tr>
         <th>رقم الحجز</th><th>المعدة/الفئة</th><th>العميل</th><th>من</th><th>إلى</th>
         <th>الأيام</th><th>الحالة</th><th>الغرض</th><th>إجراءات</th>
@@ -372,8 +399,8 @@ if (function_exists('ems_screen_about')) {
         $what = $r['eq_code'] !== null && $r['eq_code'] !== ''
             ? $r['eq_code'] . ' — ' . $r['eq_name']
             : (($r['type_name'] ?: 'غير محدد') . ' × ' . (int) $r['qty']);
-        $tone = array('مبدئي' => '#8A5712', 'مؤكَّد' => '#2C6749', 'محوَّل لعقد' => '#2F5D6E',
-                      'منتهٍ' => '#6B6355', 'ملغى' => '#9A3412'); ?>
+        $tone = array('مبدئي' => 'fc-t-draft', 'مؤكَّد' => 'fc-t-ok', 'محوَّل لعقد' => 'fc-t-contract',
+                      'منتهٍ' => 'fc-t-done', 'ملغى' => 'fc-t-cancel'); ?>
         <tr>
           <td><?php echo fc_e($r['reservation_no']); ?></td>
           <td><?php echo fc_e($what); ?></td>
@@ -381,12 +408,12 @@ if (function_exists('ems_screen_about')) {
           <td><?php echo fc_e($r['start_date']); ?></td>
           <td><?php echo fc_e($r['end_date']); ?></td>
           <td><?php echo $days; ?></td>
-          <td><span style="color:<?php echo $tone[$r['state']] ?? '#333'; ?>;font-weight:700">
+          <td><span class="fc-strong <?php echo $tone[$r['state']] ?? 'fc-t-default'; ?>">
               <?php echo fc_e($r['state']); ?></span></td>
           <td><?php echo fc_e($r['purpose'] ?: '—'); ?></td>
           <td>
             <?php if ($can_edit && $r['state'] !== 'ملغى'): ?>
-            <form method="post" style="display:inline" onsubmit="return confirm('إلغاءُ الحجز؟ السجلُّ يبقى.')">
+            <form method="post" class="fc-inline" onsubmit="return confirm('إلغاءُ الحجز؟ السجلُّ يبقى.')">
               <input type="hidden" name="csrf_token" value="<?php echo fc_e($fc_csrf); ?>">
               <input type="hidden" name="fc_action" value="cancel">
               <input type="hidden" name="res_id" value="<?php echo (int) $r['id']; ?>">
@@ -400,7 +427,7 @@ if (function_exists('ems_screen_about')) {
       </tbody>
     </table></div>
     <?php if (!count($reservations)): ?>
-      <p class="text-muted" style="margin-top:8px">لا حجوزاتٍ في هذه النافذة — والحجزُ يمنع الوعدَ بما لا تملك.</p>
+      <p class="text-muted fc-note">لا حجوزاتٍ في هذه النافذة — والحجزُ يمنع الوعدَ بما لا تملك.</p>
     <?php endif; ?>
   </div></div>
 </div>
@@ -412,11 +439,8 @@ $(function () {
     $('#fcToggleForm').on('click', function (e) {
         e.preventDefault();
         var c = document.getElementById('fcFormCard');
-        if (c) { c.style.display = (c.style.display === 'none' ? '' : 'none'); }
+        if (c) { c.classList.toggle('allforms-visible'); }
     });
-    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#fcTable')) {
-        $('#fcTable').DataTable({ stateSave: false, pageLength: 25, order: [[3, 'desc']] });
-    }
 });
 </script>
 

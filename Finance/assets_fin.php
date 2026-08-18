@@ -88,6 +88,12 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك بالكامل', 'disposed' => 'مستبعَد');
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارتْ أصنافًا ببادئةِ الشاشة */
+.fin-ast-note { margin: 0 0 10px; }
+.fin-ast-h5-next { margin: 18px 0 10px; }
+.fin-ast-tbl { width: 100%; }
+</style>
 <div class="main fin-assets-main ems-unified-page-shell">
     <?php
     $header_title = 'الأصول والإهلاك'; $header_icon = 'fa fa-building-flag';
@@ -102,6 +108,8 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أصولَ ثابتةً مسجَّلةً بعدُ', 'أضفْ أصلًا بزرِّ «إضافة أصل» في رأسِ الشاشة ثمّ شغّلْ «استدراك الشهور الفائتة» لبناءِ سجلِّ إهلاكِه');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -113,7 +121,7 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
             <div class="form-group"><label for="emsf_200_b6b52">اسم الأصل <span class="required">*</span></label><input type="text" name="name" required id="emsf_200_b6b52"></div>
             <div class="form-group"><label for="emsf_201_d1522">الفئة</label><input type="text" name="category" placeholder="معدات/مباني/سيارات" id="emsf_201_d1522"></div>
             <div class="form-group"><label for="emsf_202_b8ed1">المعدة المرتبطة</label><select name="equipment_id" id="emsf_202_b8ed1"><?php echo fin_equipment_options($conn, $is_super_admin, $company_id); ?></select></div>
-            <div class="form-group"><label for="emsf_203_c79d2">تاريخ الاقتناء</label><input type="date" name="acquisition_date" value="<?php echo date('Y-m-d'); ?>" id="emsf_203_c79d2"></div>
+            <div class="form-group"><label for="emsf_203_c79d2">تاريخ الاقتناء</label><input type="date" name="acquisition_date" aria-label="تاريخُ اقتناءِ الأصل" id="emsf_203_c79d2" value="<?php echo date('Y-m-d'); ?>"></div>
             <div class="form-group"><label for="emsf_204_98031">تكلفة الاقتناء <span class="required">*</span></label><input type="number" step="0.01" min="0" name="acquisition_cost" required id="emsf_204_98031"></div>
             <div class="form-group"><label for="emsf_205_1a728">القيمة التخريدية</label><input type="number" step="0.01" min="0" name="salvage_value" value="0" id="emsf_205_1a728"></div>
             <div class="form-group"><label for="emsf_206_d25e1">العمر الإنتاجي (شهر)</label><input type="number" min="1" name="useful_life_months" value="60" id="emsf_206_d25e1"></div>
@@ -124,13 +132,13 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
     </form>
 
     <div class="card"><div class="card-body">
-        <p class="text-muted" style="margin:0 0 10px"><i class="fas fa-circle-info"></i>
+        <p class="text-muted fin-ast-note"><i class="fas fa-circle-info"></i>
             الإهلاك بطريقة القسط الثابت: (التكلفة − التخريدية) ÷ العمر الإنتاجي شهريًا —
             <strong>حدثٌ دوريٌّ بمفتاح (الأصل × الفترة)</strong> لا يتكرر، ولا يقع
             <strong>قبل شهر الاقتناء</strong> ولا في <strong>فترةٍ مقفلة</strong>.
             وعمودُ «شهورٌ غير محتسَبة» يُري الفجوةَ — و«الاستدراك» يسدّها من شهر الاقتناء.</p>
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="finTable" class="display nowrap alltables fin-ast-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>كود المعدة</th><th>الأصل</th><th>الفئة</th><th>مركز التكلفة</th><th>مجمّع الإهلاك</th><th>القيمة الدفترية</th><th>العمر(شهر)</th><th>شهورٌ غير محتسَبة</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم القيد</th>
@@ -193,9 +201,9 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
             </table>
         </div>
 
-        <h5 style="margin:18px 0 10px"><i class="fas fa-clock-rotate-left"></i> سجلّ الإهلاك</h5>
+        <h5 class="fin-ast-h5-next"><i class="fas fa-clock-rotate-left"></i> سجلّ الإهلاك</h5>
         <div class="table-container">
-            <table id="depTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="depTable" class="display nowrap alltables fin-ast-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الأصل</th><th>الفترة</th><th>مبلغ الإهلاك</th><th>تاريخ الاحتساب</th></tr></thead>
                 <tbody>
                 <?php
@@ -227,9 +235,7 @@ $state_lbl = array('active' => 'نشط', 'fully_depreciated' => 'مُهلَك ب
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 <script>
 $(document).ready(function () {
-    $('#finTable, #depTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    // جداولُ العرضِ يهيّئُها المكوّنُ المركزيُّ (assets/js/ui-unification.js)
     $('#toggleForm').on('click', function () { $('#finForm').toggleClass('allforms-visible'); });
 });
 </script>

@@ -110,11 +110,23 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+
+<style>
+/* UXW-01 ②: أنماطُ الشاشةِ الموضعيةُ نُقلت أصنافًا — التراخيصُ والكفالات */
+.gov-lic-table { width: 100%; }
+.gov-lic-renew { display: flex; gap: 4px; }
+.gov-lic-doc   { width: 120px; }
+.gov-lic-row   { display: flex; gap: 14px; flex-wrap: wrap; }
+.gov-lic-col   { flex: 1; min-width: 340px; }
+.gov-lic-grid  { display: grid; gap: 8px; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'التراخيص والكفالات'; $header_icon = 'fa fa-certificate';
     $header_actions = array();
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا تراخيصَ ولا كفالاتٍ مسجَّلةً بعدُ', 'سجِّل أولَ ترخيصٍ أو كفالةٍ من نماذجِ التسجيلِ أسفلَ الشاشة');
     ems_screen_about('التراخيص بتواريخ انتهائها ملوَّنة، والكفالات الصادرة (التزام محتمل خارج الميزانية) '
         . 'مفصولة عن الواردة (حق محتمل) — ومفصولة كلتاهما عن المحتجَز النقدي. ترخيص منتهٍ ونحن نعمل '
         . 'به مخالفة لا تُكتشف إلا من الخارج — فالتنبيه قبل الانتهاء بمدة معرَّفة.',
@@ -124,7 +136,7 @@ include '../insidebar.php';
     ?>
     <div class="card"><div class="card-body">
         <h4>التراخيص والسجلات</h4>
-        <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
+        <div class="table-container"><table class="alltables display gov-lic-table" data-no-dt="1">
         <thead><tr><th>الكيان</th><th>نوع المستند</th><th>الجهة المصدِرة</th><th>رقم السجل</th><th>تاريخ الانتهاء</th><th>تجديد</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">الرقم أو المرجع</th>
@@ -155,12 +167,12 @@ include '../insidebar.php';
             <td><?php echo htmlspecialchars($l['expiry_date']) . ' ' . expiry_badge($l['days_left']); ?></td>
             <td>
                 <?php if ($gov_write): ?>
-                <form method="post" style="display:flex;gap:4px">
+                <form method="post" class="gov-lic-renew">
         <?= csrf_field() ?>
                     <input type="hidden" name="op" value="renew">
                     <input type="hidden" name="lic_id" value="<?php echo intval($l['lic_id']); ?>">
-                    <input type="date" name="new_expiry" required>
-                    <input type="text" name="doc_ref" placeholder="مستند التجديد" required style="width:120px" aria-label="مستند التجديد">
+                    <input type="date" name="new_expiry" aria-label="تاريخُ الانتهاءِ الجديدِ بعد التجديد" required>
+                    <input type="text" name="doc_ref" class="gov-lic-doc" placeholder="مستند التجديد" required aria-label="مستند التجديد">
                     <button class="btn-primary" type="submit">تجديد</button>
                 </form>
                 <?php else: ?>—<?php endif; ?>
@@ -172,7 +184,7 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body">
         <h4>الكفالات وخطابات الضمان — الصادرة ثم الواردة</h4>
-        <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
+        <div class="table-container"><table class="alltables display gov-lic-table" data-no-dt="1">
         <thead><tr><th>الاتجاه</th><th>عن/إلى</th><th>الطرف المقابل</th><th>نوع الكفالة</th><th>البنك</th><th>القيمة</th><th>الانتهاء</th><th>الحالة</th></tr></thead><tbody>
         <?php foreach ($gtees as $g): ?>
         <tr>
@@ -190,13 +202,13 @@ include '../insidebar.php';
     </div></div>
 
     <?php if ($gov_write): // القارئ (26) لا تُصيَّر له نماذج التسجيل أصلًا — منع بنيوي لا زر معطَّل ?>
-    <div class="row" style="display:flex;gap:14px;flex-wrap:wrap">
-        <div class="card" style="flex:1;min-width:340px"><div class="card-body">
+    <div class="row gov-lic-row">
+        <div class="card gov-lic-col"><div class="card-body">
             <h4>ترخيص جديد</h4>
-            <form method="post" class="ems-form" style="display:grid;gap:8px">
+            <form method="post" class="ems-form gov-lic-grid">
         <?= csrf_field() ?>
                 <input type="hidden" name="op" value="license">
-                <select name="entity_id" required>
+                <select name="entity_id" aria-label="الكيانُ القانونيُّ صاحبُ الترخيص" required>
                     <option value="">— الكيان *</option>
                     <?php foreach ($entities as $e): ?>
                     <option value="<?php echo intval($e['entity_id']); ?>"><?php echo htmlspecialchars($e['legal_name']); ?></option>
@@ -205,27 +217,27 @@ include '../insidebar.php';
                 <input type="text" name="lic_type" placeholder="النوع (سجل تجاري · رخصة نشاط…) *" required aria-label="النوع (سجل تجاري · رخصة نشاط…)">
                 <input type="text" name="issuer" placeholder="الجهة المصدرة" aria-label="الجهة المصدرة">
                 <input type="text" name="lic_no" placeholder="الرقم" aria-label="الرقم">
-                <input type="date" name="expiry_date" required>
+                <input type="date" name="expiry_date" aria-label="تاريخُ انتهاءِ الترخيص" required>
                 <input type="number" name="alert_days" value="30" title="التنبيه قبل الانتهاء بأيام" aria-label="التنبيه قبل الانتهاء بأيام">
                 <button class="btn-primary" type="submit">تسجيل</button>
             </form>
         </div></div>
-        <div class="card" style="flex:1;min-width:340px"><div class="card-body">
+        <div class="card gov-lic-col"><div class="card-body">
             <h4>كفالة / خطاب ضمان</h4>
-            <form method="post" class="ems-form" style="display:grid;gap:8px">
+            <form method="post" class="ems-form gov-lic-grid">
         <?= csrf_field() ?>
                 <input type="hidden" name="op" value="guarantee">
-                <select name="direction" required>
+                <select name="direction" aria-label="اتجاهُ الكفالة: صادرةٌ منا أو واردةٌ إلينا" required>
                     <option value="issued">صادرة منا (التزام محتمل)</option>
                     <option value="received">واردة إلينا (حق محتمل)</option>
                 </select>
-                <select name="entity_id" required>
+                <select name="entity_id" aria-label="كياننا الضامنُ في الكفالة" required>
                     <option value="">— كياننا *</option>
                     <?php foreach ($entities as $e): ?>
                     <option value="<?php echo intval($e['entity_id']); ?>"><?php echo htmlspecialchars($e['legal_name']); ?></option>
                     <?php endforeach; ?>
                 </select>
-                <select name="counterparty_id">
+                <select name="counterparty_id" aria-label="الطرفُ المقابلُ في الكفالة">
                     <option value="0">— الطرف المقابل</option>
                     <?php foreach ($entities as $e): ?>
                     <option value="<?php echo intval($e['entity_id']); ?>"><?php echo htmlspecialchars($e['legal_name']); ?></option>
@@ -234,8 +246,8 @@ include '../insidebar.php';
                 <input type="text" name="gtee_type" placeholder="النوع (حسن تنفيذ · دفعة مقدمة…)" aria-label="النوع (حسن تنفيذ · دفعة مقدمة…)">
                 <input type="text" name="bank" placeholder="البنك المصدر" aria-label="البنك المصدر">
                 <input type="number" step="0.01" name="amount" placeholder="القيمة *" required aria-label="القيمة">
-                <input type="text" name="currency" value="USD">
-                <input type="date" name="expiry_date" required>
+                <input type="text" name="currency" aria-label="عملةُ قيمةِ الكفالة" value="USD">
+                <input type="date" name="expiry_date" aria-label="تاريخُ انتهاءِ الكفالة" required>
                 <input type="text" name="doc_ref" placeholder="مرجع المستند *" required aria-label="مرجع المستند">
                 <button class="btn-primary" type="submit">تسجيل</button>
             </form>

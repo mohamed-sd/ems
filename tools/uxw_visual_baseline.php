@@ -68,13 +68,21 @@ function skeleton(string $html): string {
     if (!preg_match('~<body[^>]*>(.*)</body>~su', $html, $m)) { $m = array('', $html); }
     $b = $m[1];
     $b = preg_replace('~<script\b.*?</script>~su', '', $b);
+    /* preg_match_all كان يُجسِّد كلَّ وسومِ الصفحةِ ومصفوفاتِها دفعةً واحدة —
+       فصفحةٌ بعشراتِ الآلافِ من العقدِ تستنزف 128م.ب وتُسقط المقارنةَ في
+       منتصفِها بخطأٍ فادح (رُصد على شاشةِ تقاريرَ ضخمةٍ فبقيت ~60 شاشةً بلا
+       مقارنةٍ صامتةً). الكنسُ بردِّ نداءٍ يبني السطرَ ويُهمل المطابقةَ فورًا. */
     $lines = array();
-    if (preg_match_all('~<([a-zA-Z][a-zA-Z0-9-]*)((?:\s+[^<>]*?)?)/?>~su', $b, $tags, PREG_SET_ORDER)) {
-        foreach ($tags as $t) {
-            $cls = preg_match('~class\s*=\s*["\']([^"\']*)~u', $t[2], $cm) ? trim(preg_replace('/\s+/', ' ', $cm[1])) : '';
+    preg_replace_callback(
+        '~<([a-zA-Z][a-zA-Z0-9-]*)((?:\s+[^<>]*?)?)/?>~su',
+        function ($t) use (&$lines) {
+            $cls = preg_match('~class\s*=\s*["\']([^"\']*)~u', $t[2], $cm)
+                 ? trim(preg_replace('/\s+/', ' ', $cm[1])) : '';
             $lines[] = strtolower($t[1]) . ($cls !== '' ? '.' . str_replace(' ', '.', $cls) : '');
-        }
-    }
+            return '';
+        },
+        $b
+    );
     return implode("\n", $lines);
 }
 

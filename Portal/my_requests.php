@@ -134,29 +134,55 @@ include '../insidebar.php';
     ems_screen_about('أقدّم طلبًا من القاموس الحاكم وأتابع أين توقف — والمعالجةُ قرارٌ ثم تنفيذٌ بالرد التسعة لا تغييرُ حالة.');
 
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لم تقدّم طلبًا بعدُ ولا ينتظر قرارَك طلب', 'قدّم طلبًا من نموذجِ «تقديم طلب — من القاموس الحاكم» أعلاه');
     ?>
 
+    <style>
+    .mrq-card         { margin-bottom: 12px; }
+    .mrq-card-explain { margin-bottom: 12px; border-right: 4px solid var(--c-6c5ce7, #6c5ce7); }
+    .mrq-card-inbox   { margin-bottom: 12px; border-right: 4px solid var(--c-d4b06a, #d4b06a); }
+    .mrq-close        { float: left; }
+    .mrq-step         { margin: 4px 0; }
+    .mrq-newform      { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+    .mrq-w280         { min-width: 280px; }
+    .mrq-f1           { flex: 1; min-width: 220px; }
+    .mrq-lbl          { font-size: .85rem; }
+    .mrq-hint         { margin-top: 8px; font-size: .85rem; }
+    .mrq-table        { width: 100%; }
+    .mrq-subj         { white-space: normal; max-width: 240px; }
+    .mrq-actcell      { min-width: 220px; }
+    .mrq-inline-form  { display: inline; }
+    .mrq-ib           { display: inline-block; }
+    .mrq-subform      { margin-top: 4px; }
+    .mrq-subform-wide { margin-top: 4px; max-width: 300px; }
+    .mrq-mb4          { margin-bottom: 4px; }
+    .mrq-why          { font-size: .78rem; }
+    .mrq-reason       { color: var(--c-9a6a00, #9a6a00); font-size: .78rem; }
+    .mrq-resp         { white-space: normal; max-width: 260px; font-size: .85rem; }
+    </style>
+
     <?php if ($explainRq): ?>
-    <div class="card" style="margin-bottom:12px;border-right:4px solid #6c5ce7;">
+    <div class="card mrq-card-explain">
         <div class="card-header"><strong><i class="fas fa-circle-question"></i> لماذا يظهر لي هذا الطلب؟</strong>
-            <a class="btn btn-sm btn-secondary" style="float:left" href="my_requests.php">إغلاق</a></div>
+            <a class="btn btn-sm btn-secondary mrq-close" href="my_requests.php">إغلاق</a></div>
         <div class="card-body">
             <?php foreach ($explainRq['steps'] as $i => $s): ?>
-                <div style="margin:4px 0"><span class="badge <?php echo $s['ok'] ? 'bg-success' : 'bg-danger'; ?>"><?php echo $i + 1; ?></span>
+                <div class="mrq-step"><span class="badge <?php echo $s['ok'] ? 'bg-success' : 'bg-danger'; ?>"><?php echo $i + 1; ?></span>
                     <strong><?php echo htmlspecialchars($s['q']); ?></strong> — <?php echo htmlspecialchars($s['a']); ?></div>
             <?php endforeach; ?>
         </div>
     </div>
     <?php endif; ?>
 
-    <div class="card" style="margin-bottom:12px;">
+    <div class="card mrq-card">
         <div class="card-header"><strong><i class="fas fa-plus-circle"></i> تقديم طلب — من القاموس الحاكم (<?php echo count($types); ?> نوعًا)</strong></div>
         <div class="card-body">
-            <form method="post" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;">
+            <form method="post" class="mrq-newform">
         <?= csrf_field() ?>
                 <input type="hidden" name="action" value="rq_submit">
                 <?php if ($is_super_admin && $company_id <= 0): ?><input type="hidden" name="company_id" value="4"><?php endif; ?>
-                <div style="min-width:280px"><label style="font-size:.85rem" for="emsf_1202_ee646">نوع الطلب</label>
+                <div class="mrq-w280"><label class="mrq-lbl" for="emsf_1202_ee646">نوع الطلب</label>
                     <select name="type_code" class="form-control" required onchange="rqHint(this)" id="emsf_1202_ee646">
                         <option value="">— اختر —</option>
                         <?php foreach ($types as $t): ?>
@@ -165,52 +191,52 @@ include '../insidebar.php';
                             <?php echo htmlspecialchars($t['code'] . ' · ' . $t['name_ar']); ?></option>
                         <?php endforeach; ?>
                     </select></div>
-                <div style="flex:1;min-width:220px"><label style="font-size:.85rem" for="emsf_1203_03af9">الموضوع</label>
+                <div class="mrq-f1"><label class="mrq-lbl" for="emsf_1203_03af9">الموضوع</label>
                     <input name="title" class="form-control" required maxlength="300" id="emsf_1203_03af9"></div>
-                <div style="flex:1;min-width:220px"><label style="font-size:.85rem" for="emsf_1204_8fe54">التفاصيل</label>
+                <div class="mrq-f1"><label class="mrq-lbl" for="emsf_1204_8fe54">التفاصيل</label>
                     <input name="details" class="form-control" maxlength="500" id="emsf_1204_8fe54"></div>
                 <button class="btn btn-primary"><i class="fas fa-paper-plane"></i> تقديم</button>
             </form>
-            <div id="rqHint" class="text-muted" style="margin-top:8px;font-size:.85rem"></div>
+            <div id="rqHint" class="text-muted mrq-hint"></div>
         </div>
     </div>
     <script>function rqHint(s){var o=s.options[s.selectedIndex];document.getElementById('rqHint').textContent=o?o.getAttribute('data-hint')||'':'';}</script>
 
     <?php if ($inboxRows): ?>
-    <div class="card" style="margin-bottom:12px;border-right:4px solid #d4b06a;">
+    <div class="card mrq-card-inbox">
         <div class="card-header"><strong><i class="fas fa-inbox"></i> تنتظر معالجتي</strong>
             <span class="badge bg-warning"><?php echo count($inboxRows); ?></span></div>
         <div class="card-body"><div class="table-responsive">
-            <table class="alltables display no-datatable" style="width:100%">
+            <table class="alltables display no-datatable mrq-table">
                 <thead><tr><th>الرقم</th><th>النوع</th><th>الموضوع</th><th>المقدّم منذ</th><th>مهلته</th><th>الحالة</th><th>المعالجة</th></tr></thead>
                 <tbody><?php foreach ($inboxRows as $q): $id = intval($q['id']); ?>
                 <tr>
                     <td><code><?php echo htmlspecialchars((string) $q['request_no']); ?></code></td>
                     <td><?php echo htmlspecialchars((string) $q['type_name']); ?></td>
-                    <td style="white-space:normal;max-width:240px"><?php echo htmlspecialchars((string) $q['title']); ?></td>
+                    <td class="mrq-subj"><?php echo htmlspecialchars((string) $q['title']); ?></td>
                     <td><?php echo htmlspecialchars((string) $q['submitted_at']); ?></td>
                     <td><?php echo htmlspecialchars((string) $q['sla_due_at']); ?></td>
                     <td><?php echo htmlspecialchars($STATE_AR[$q['status']] ?? $q['status']); ?></td>
-                    <td style="min-width:220px">
+                    <td class="mrq-actcell">
                         <?php if (in_array($q['status'], array('submitted', 'routed', 'in_approval'), true)): ?>
-                            <form method="post" style="display:inline">
+                            <form method="post" class="mrq-inline-form">
         <?= csrf_field() ?><input type="hidden" name="action" value="rq_decide"><input type="hidden" name="req_id" value="<?php echo $id; ?>"><input type="hidden" name="decision" value="approve">
                                 <button class="btn btn-sm btn-primary">اعتماد</button></form>
-                            <details style="display:inline-block"><summary class="btn btn-sm btn-danger" style="display:inline-block">رفض/إعادة</summary>
-                                <form method="post" style="margin-top:4px">
+                            <details class="mrq-ib"><summary class="btn btn-sm btn-danger mrq-ib">رفض/إعادة</summary>
+                                <form method="post" class="mrq-subform">
         <?= csrf_field() ?><input type="hidden" name="action" value="rq_decide"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
-                                    <select name="decision" class="form-control form-control-sm" style="margin-bottom:4px"><option value="return">إعادة لاستكمال</option><option value="reject">رفض</option></select>
-                                    <input name="note" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="السبب (إلزامي)" required aria-label="السبب (إلزامي)">
+                                    <select name="decision" aria-label="نوعُ القرار — إعادةٌ لاستكمالٍ أو رفض" class="form-control form-control-sm mrq-mb4"><option value="return">إعادة لاستكمال</option><option value="reject">رفض</option></select>
+                                    <input name="note" class="form-control form-control-sm mrq-mb4" placeholder="السبب (إلزامي)" required aria-label="السبب (إلزامي)">
                                     <button class="btn btn-sm btn-danger">تأكيد</button></form></details>
                         <?php elseif ($q['status'] === 'approved'): ?>
                             <details><summary class="btn btn-sm btn-primary">تنفيذ وإغلاق (الرد التسعة)</summary>
-                                <form method="post" style="margin-top:4px;max-width:300px">
+                                <form method="post" class="mrq-subform-wide">
         <?= csrf_field() ?><input type="hidden" name="action" value="rq_execute"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
-                                    <input name="result_doc_ref" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑦ المستند الناتج (إلزامي)" required aria-label="?? المستند الناتج (إلزامي)">
-                                    <input name="executed_summary" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑧ التنفيذ الذي تم (إلزامي)" required aria-label="?? التنفيذ الذي تم (إلزامي)">
-                                    <input name="action_required" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑥ ما يجب فعله" aria-label="?? ما يجب فعله">
-                                    <input name="next_step" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑨ الخطوة اللاحقة" aria-label="?? الخطوة اللاحقة">
-                                    <input name="notes" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="⑤ الملاحظات" aria-label="?? الملاحظات">
+                                    <input name="result_doc_ref" aria-label="المستندُ الناتجُ عن التنفيذ (إلزامي)" class="form-control form-control-sm mrq-mb4" placeholder="⑦ المستند الناتج (إلزامي)" required>
+                                    <input name="executed_summary" aria-label="ملخصُ التنفيذِ الذي تم (إلزامي)" class="form-control form-control-sm mrq-mb4" placeholder="⑧ التنفيذ الذي تم (إلزامي)" required>
+                                    <input name="action_required" aria-label="الإجراءُ المطلوبُ فعلُه" class="form-control form-control-sm mrq-mb4" placeholder="⑥ ما يجب فعله">
+                                    <input name="next_step" aria-label="الخطوةُ اللاحقة" class="form-control form-control-sm mrq-mb4" placeholder="⑨ الخطوة اللاحقة">
+                                    <input name="notes" aria-label="ملاحظاتُ الرد" class="form-control form-control-sm mrq-mb4" placeholder="⑤ الملاحظات">
                                     <button class="btn btn-sm btn-primary">إغلاق بالرد الكامل</button></form></details>
                         <?php endif; ?>
                     </td>
@@ -239,15 +265,15 @@ include '../insidebar.php';
             <tbody><?php foreach ($mineRows as $q): $id = intval($q['id']); ?>
             <tr>
                 <td><code><?php echo htmlspecialchars((string) $q['request_no']); ?></code><br>
-                    <a href="my_requests.php?explain=<?php echo $id; ?>" style="font-size:.78rem"
+                    <a href="my_requests.php?explain=<?php echo $id; ?>" class="mrq-why"
                        title="السلسلة الخماسية"><i class="fas fa-circle-question"></i> لماذا؟</a></td>
                 <td><?php echo htmlspecialchars((string) $q['type_name']); ?></td>
-                <td style="white-space:normal;max-width:240px"><?php echo htmlspecialchars((string) $q['title']); ?></td>
+                <td class="mrq-subj"><?php echo htmlspecialchars((string) $q['title']); ?></td>
                 <td><?php echo htmlspecialchars((string) $q['submitted_at']); ?></td>
                 <td><?php echo htmlspecialchars($STATE_AR[$q['status']] ?? $q['status']); ?>
-                    <?php if ($q['status_reason']): ?><div style="color:#9a6a00;font-size:.78rem"><?php echo htmlspecialchars((string) $q['status_reason']); ?></div><?php endif; ?></td>
+                    <?php if ($q['status_reason']): ?><div class="mrq-reason"><?php echo htmlspecialchars((string) $q['status_reason']); ?></div><?php endif; ?></td>
                 <td><?php echo htmlspecialchars((string) ($q['holder_name'] ?: ($q['status'] === 'closed' ? 'أُغلق' : '—'))); ?></td>
-                <td style="white-space:normal;max-width:260px;font-size:.85rem">
+                <td class="mrq-resp">
                     <?php if ($q['resp_decision']): ?>
                         <strong><?php echo htmlspecialchars((string) $q['resp_decision']); ?></strong>
                         · المستند: <?php echo htmlspecialchars((string) $q['result_doc_ref']); ?>
@@ -255,10 +281,10 @@ include '../insidebar.php';
                         <?php if ($q['next_step']): ?>· التالي: <?php echo htmlspecialchars((string) $q['next_step']); ?><?php endif; ?>
                     <?php else: ?>—<?php endif; ?></td>
                 <td><?php if (in_array($q['status'], array('submitted', 'routed', 'returned'), true)): ?>
-                    <details><summary class="btn btn-sm btn-danger" style="display:inline-block">سحب</summary>
-                        <form method="post" style="margin-top:4px">
+                    <details><summary class="btn btn-sm btn-danger mrq-ib">سحب</summary>
+                        <form method="post" class="mrq-subform">
         <?= csrf_field() ?><input type="hidden" name="action" value="rq_cancel"><input type="hidden" name="req_id" value="<?php echo $id; ?>">
-                            <input name="reason" class="form-control form-control-sm" style="margin-bottom:4px" placeholder="السبب" required aria-label="السبب">
+                            <input name="reason" class="form-control form-control-sm mrq-mb4" placeholder="السبب" required aria-label="السبب">
                             <button class="btn btn-sm btn-danger">تأكيد السحب</button></form></details>
                     <?php endif; ?></td>
             </tr>

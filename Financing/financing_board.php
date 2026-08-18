@@ -92,23 +92,33 @@ include '../insidebar.php';
         . 'بكل عملة وأقساط الثلاثين يومًا والانحرافات المفتوحة — قراءة وقفز إلى موضع الفعل. '
         . 'البيانات خلف بوابة المجال المقيَّد: بلا منحة فردية لا يُجلب رقم، وكل فتح بسطر اطّلاع.',
         array('الاستحقاق والأقساط لمن يملك رؤية الشروط', 'الممول الجديد يُنشأ كيانًا في الحوكمة'));
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا عملياتِ تمويلٍ نافذةً ولا أقساطَ مستحقةً في الثلاثين يومًا', 'أنشئ عمليةَ تمويلٍ بنموذجِها من زرِّ «إنشاء عملية تمويل» أسفلَ اللوحة');
     ?>
+    <style>
+      .fin-bd-alert-flush { margin: 0; }
+      .fin-bd-kpis { display: flex; gap: 14px; flex-wrap: wrap; }
+      .fin-bd-kpi { font-size: 15px; padding: 8px 14px; }
+      .fin-bd-kpi-link { text-decoration: none; }
+      .fin-bd-table { width: 100%; }
+      .fin-bd-cta { margin-top: 10px; }
+    </style>
 
     <?php if (!$granted): ?>
     <div class="card"><div class="card-body">
-        <div class="alert alert-warning" style="margin:0">
+        <div class="alert alert-warning fin-bd-alert-flush">
             <strong>باب التمويل خلف بوابة المجال المقيَّد (FIN-01 §1.1).</strong><br>
             لا منحة <code>ownership.*</code> نافذة لحسابك — فلا يُجلب من بيانات الملكية والتمويل شيء
             (fail-closed). المنح فردي بقرار من شاشة «منح المجال المقيَّد» في باب الحوكمة (الأدوار 1 · 19).
         </div>
     </div></div>
     <?php else: ?>
-    <div class="card"><div class="card-body" style="display:flex;gap:14px;flex-wrap:wrap">
-        <a class="badge badge-secondary" style="font-size:15px;padding:8px 14px;text-decoration:none"
+    <div class="card"><div class="card-body fin-bd-kpis">
+        <a class="badge badge-secondary fin-bd-kpi fin-bd-kpi-link"
            href="financiers_registry.php">الممولون النشطون: <strong><?php echo $financiers; ?></strong> ▸</a>
-        <a class="badge badge-secondary" style="font-size:15px;padding:8px 14px;text-decoration:none"
+        <a class="badge badge-secondary fin-bd-kpi fin-bd-kpi-link"
            href="financiers_registry.php">عمليات نافذة: <strong><?php echo $opsActive; ?></strong> ▸</a>
-        <div class="badge <?php echo $devOpen ? 'badge-danger' : 'badge-success'; ?>" style="font-size:15px;padding:8px 14px">
+        <div class="badge fin-bd-kpi <?php echo $devOpen ? 'badge-danger' : 'badge-success'; ?>">
             انحرافات مفتوحة: <strong><?php echo $devOpen; ?></strong></div>
     </div></div>
 
@@ -118,7 +128,7 @@ include '../insidebar.php';
         <?php if (!$canTerms): ?>
             <em>محجوب — يلزم <code>ownership.finance_terms</code> (المنح فردي لا بالعضوية في الإدارة)</em>
         <?php elseif (empty($balances) && empty($due30)): ems_state_empty('لا عمليات نافذة ولا أقساط مستحقة — البنية حية بلا حركة بعد'); else: ?>
-        <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
+        <div class="table-container"><table class="alltables display fin-bd-table" data-no-dt="1">
             <thead><tr><th>العملة</th><th>الرصيد القائم</th><th>أقساط 30 يومًا (عددًا)</th><th>أقساط 30 يومًا (قيمةً)</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">كود العملية</th>
@@ -177,7 +187,7 @@ include '../insidebar.php';
             <?php endforeach; ?>
             </tbody></table></div>
         <?php endif; ?>
-        <p style="margin-top:10px">
+        <p class="fin-bd-cta">
             <a href="financiers_registry.php" class="btn-primary">سجل الممولين ▸</a>
             <a href="financing_operation_new.php" class="btn-primary">+ إنشاء عملية تمويل (النموذج أولًا)</a>
         </p>

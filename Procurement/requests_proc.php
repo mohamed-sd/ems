@@ -302,12 +302,12 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
         $sel = ($c === $cls) ? ' selected' : '';
         $clsopts .= '<option value="' . htmlspecialchars($c) . '"' . $sel . '>' . htmlspecialchars($c) . '</option>';
     }
-    return '<div class="proc-line form-grid" style="align-items:end;margin-bottom:8px">'
-        . '<div class="form-group"><label>الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item">' . $opts . '</select></div>'
-        . '<div class="form-group"><label>اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" value="' . $iname . '" required></div>'
-        . '<div class="form-group"><label>الكمية</label><input type="number" step="0.01" name="line_qty[]" value="' . $qty . '"></div>'
-        . '<div class="form-group"><label>تصنيف السطر</label><select name="line_class[]">' . $clsopts . '</select></div>'
-        . '<div class="form-group"><label>ملاحظة</label><input type="text" name="line_note[]" value="' . $note . '"></div>'
+    return '<div class="proc-line form-grid proc-req-line">'
+        . '<div class="form-group"><label>الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item" aria-label="الصنفُ من كتالوج الأصناف">' . $opts . '</select></div>'
+        . '<div class="form-group"><label>اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" aria-label="اسمُ الصنفِ المطلوب" value="' . $iname . '" required></div>'
+        . '<div class="form-group"><label>الكمية</label><input type="number" step="0.01" name="line_qty[]" aria-label="الكميةُ المطلوبةُ من الصنف" value="' . $qty . '"></div>'
+        . '<div class="form-group"><label>تصنيف السطر</label><select name="line_class[]" aria-label="التصنيفُ التشغيليُّ لسطرِ الطلب">' . $clsopts . '</select></div>'
+        . '<div class="form-group"><label>ملاحظة</label><input type="text" name="line_note[]" aria-label="ملاحظةُ سطرِ الطلب" value="' . $note . '"></div>'
         . '<div class="form-group"><button type="button" class="btn-secondary removeLine"><i class="fas fa-times"></i></button></div>'
         . '</div>';
 }
@@ -323,6 +323,9 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا طلباتِ شراءٍ مطابقةً للفلاترِ الحالية',
+        'أضف طلبًا جديدًا من رأسِ الشاشة، أو ولّد الاحتياجَ آليًّا من الصيانةِ وحدودِ إعادة الطلب');
     ?>
 
     <?php proc_msg_banner(); ?>
@@ -364,10 +367,10 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
     </form>
 
     <?php if ($can_add): ?>
-    <form method="post" style="margin-bottom:12px">
+    <form method="post" class="proc-req-genform">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="generate_needs">
-        <button type="submit" class="add-btn" style="background:#166534"
+        <button type="submit" class="add-btn proc-req-genbtn"
                 title="جسر الصيانة + كناس حدود الطلب — بعطالة فلا ازدواج">
             <i class="fas fa-bolt"></i> توليد الاحتياج الآن (صيانة + حدود الطلب)</button>
     </form>
@@ -396,48 +399,48 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>مصدر الاحتياج <span class="required">*</span></label>
-                        <select name="need_source" required>
+                        <label for="req_need_source">مصدر الاحتياج <span class="required">*</span></label>
+                        <select name="need_source" id="req_need_source" required>
                             <?php foreach ($need_sources as $s): $sel = ($edit && $edit['need_source'] === $s) ? 'selected' : ''; ?>
                                 <option value="<?php echo htmlspecialchars($s); ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($s); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>مرجع المصدر (خطة/أمر/نقطة طلب)</label>
-                        <input type="text" name="source_ref" value="<?php echo $edit ? htmlspecialchars((string)$edit['source_ref']) : ''; ?>">
+                        <label for="req_source_ref">مرجع المصدر (خطة/أمر/نقطة طلب)</label>
+                        <input type="text" name="source_ref" id="req_source_ref" value="<?php echo $edit ? htmlspecialchars((string)$edit['source_ref']) : ''; ?>">
                     </div>
                     <div class="form-group">
-                        <label>التصنيف التشغيلي <span class="required">*</span></label>
-                        <select name="op_classification" required>
+                        <label for="req_op_class">التصنيف التشغيلي <span class="required">*</span></label>
+                        <select name="op_classification" id="req_op_class" required>
                             <?php foreach ($classifications as $c): $sel = ($edit && $edit['op_classification'] === $c) ? 'selected' : ''; ?>
                                 <option value="<?php echo htmlspecialchars($c); ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($c); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>الإدارة الطالبة</label>
-                        <input type="text" name="requesting_dept" value="<?php echo $edit ? htmlspecialchars((string)$edit['requesting_dept']) : ''; ?>">
+                        <label for="req_dept">الإدارة الطالبة</label>
+                        <input type="text" name="requesting_dept" id="req_dept" value="<?php echo $edit ? htmlspecialchars((string)$edit['requesting_dept']) : ''; ?>">
                     </div>
                     <div class="form-group">
-                        <label>المعدة</label>
-                        <select name="equipment_id"><?php echo proc_equipment_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['equipment_id']) : 0); ?></select>
+                        <label for="req_equipment">المعدة</label>
+                        <select name="equipment_id" id="req_equipment"><?php echo proc_equipment_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['equipment_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>المشروع</label>
-                        <select name="project_id"><?php echo proc_project_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['project_id']) : 0); ?></select>
+                        <label for="req_project">المشروع</label>
+                        <select name="project_id" id="req_project"><?php echo proc_project_options($conn, $is_super_admin, $company_id, $edit ? intval($edit['project_id']) : 0); ?></select>
                     </div>
                     <div class="form-group">
-                        <label>الأولوية</label>
-                        <select name="priority">
+                        <label for="req_priority">الأولوية</label>
+                        <select name="priority" id="req_priority">
                             <?php foreach ($priorities as $p): $sel = ($edit && $edit['priority'] === $p) ? 'selected' : ''; ?>
                                 <option value="<?php echo htmlspecialchars($p); ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($p); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>حالة الطلب</label>
-                        <select name="state">
+                        <label for="req_state">حالة الطلب</label>
+                        <select name="state" id="req_state">
                             <?php foreach ($states as $st): $sel = ($edit && $edit['state'] === $st) ? 'selected' : ''; ?>
                                 <option value="<?php echo htmlspecialchars($st); ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($st); ?></option>
                             <?php endforeach; ?>
@@ -447,8 +450,8 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                              يرى حالتَه قراءةً لا قائمةً يختار منها. */ ?>
                     <?php if (ems_proc_may_finance_approve($conn, $current_user_id)): ?>
                     <div class="form-group">
-                        <label>حالة الاعتماد المالي</label>
-                        <select name="fin_approval_state">
+                        <label for="req_fin_state">حالة الاعتماد المالي</label>
+                        <select name="fin_approval_state" id="req_fin_state">
                             <?php foreach ($fin_states as $fs): $sel = ($edit && $edit['fin_approval_state'] === $fs) ? 'selected' : ''; ?>
                                 <option value="<?php echo htmlspecialchars($fs); ?>" <?php echo $sel; ?>><?php echo htmlspecialchars($fs); ?></option>
                             <?php endforeach; ?>
@@ -463,9 +466,9 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                         </div>
                     </div>
                     <?php endif; ?>
-                    <div class="form-group" style="grid-column:1/-1">
-                        <label>ملاحظات</label>
-                        <input type="text" name="notes" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>">
+                    <div class="form-group proc-req-full">
+                        <label for="req_notes">ملاحظات</label>
+                        <input type="text" name="notes" id="req_notes" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>">
                     </div>
                 </div>
             </div>
@@ -481,7 +484,7 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                     }
                     ?>
                 </div>
-                <button type="button" id="addLine" class="add-btn" style="margin-top:6px"><i class="fas fa-plus"></i> إضافة سطر</button>
+                <button type="button" id="addLine" class="add-btn proc-req-addline"><i class="fas fa-plus"></i> إضافة سطر</button>
             </div>
 
             <div class="form-actions">
@@ -497,7 +500,8 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="procTable" class="display nowrap alltables proc-req-table"
+                   data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>مصدر الاحتياج</th><th>التصنيف التشغيلي</th><th>الأولوية</th>
                     <th>الحالة</th><th>الاعتماد المالي</th><th>عدد الأصناف</th><th>أُنشئ</th>
@@ -575,26 +579,29 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
                         // E-21: الثلاثيةُ الموحّدة على «مقدَّم» — والإعادةُ والرفضُ بسبب
                         if ($can_edit && (string)$row['state'] === 'مقدَّم') {
                             $rid = intval($row['id']);
-                            echo "<div style='display:flex;gap:3px;margin-top:4px;flex-wrap:wrap'>"
-                               . "<form method='post' style='display:inline'>
-        <?= csrf_field() ?>"
+                            /* الحقلُ الحامي كان نصًّا حرفيًّا داخلَ سلسلةِ PHP («<?=» لا يُنفَّذ
+                               داخلَ نصٍّ) — فالنماذجُ الثلاثةُ كانت تُرسَل بلا رمزِ حماية.
+                               والنداءُ الآنَ مُوصولٌ بالضمِّ فيخرج حقلًا حقيقيًّا. */
+                            echo "<div class='proc-req-decide'>"
+                               . "<form method='post' class='proc-req-decide-form'>"
+                               . csrf_field()
                                . "<input type='hidden' name='action' value='e21_decide'>"
                                . "<input type='hidden' name='request_id' value='{$rid}'>"
                                . "<input type='hidden' name='decision' value='approve'>"
                                . "<button type='submit' class='btn-primary' title='اعتماد'>✓</button></form>"
-                               . "<form method='post' style='display:inline-flex;gap:2px'>
-        <?= csrf_field() ?>"
+                               . "<form method='post' class='proc-req-decide-form proc-req-decide-reason'>"
+                               . csrf_field()
                                . "<input type='hidden' name='action' value='e21_decide'>"
                                . "<input type='hidden' name='request_id' value='{$rid}'>"
                                . "<input type='hidden' name='decision' value='return'>"
-                               . "<input type='text' name='reason' placeholder='سببُ الإعادة *' required style='width:90px'>"
+                               . "<input type='text' name='reason' placeholder='سببُ الإعادة *' required class='proc-req-reason'>"
                                . "<button type='submit' class='btn-primary' title='إعادةٌ للاستكمال'>↩</button></form>"
-                               . "<form method='post' style='display:inline-flex;gap:2px'>
-        <?= csrf_field() ?>"
+                               . "<form method='post' class='proc-req-decide-form proc-req-decide-reason'>"
+                               . csrf_field()
                                . "<input type='hidden' name='action' value='e21_decide'>"
                                . "<input type='hidden' name='request_id' value='{$rid}'>"
                                . "<input type='hidden' name='decision' value='reject'>"
-                               . "<input type='text' name='reason' placeholder='سببُ الرفض *' required style='width:90px'>"
+                               . "<input type='text' name='reason' placeholder='سببُ الرفض *' required class='proc-req-reason'>"
                                . "<button type='submit' class='btn-primary' title='رفض'>✗</button></form></div>";
                         }
                         echo "</td>";
@@ -621,16 +628,8 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
 <script>
 (function () {
     $(document).ready(function () {
-        $('#procTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
-
+        // UXW-01 ⑤: التهيئةُ المحليةُ حُذفت — المكوّنُ المركزيُّ (ui-unification.js)
+        // يلتقط الجدولَ آليًّا، والسلوكُ محفوظٌ بسماتِ data-scroll-x و data-state-save.
         var toggleBtn = document.getElementById('toggleForm');
         if (toggleBtn) {
             toggleBtn.addEventListener('click', function () { $('#procForm').toggleClass('allforms-visible'); });
@@ -663,5 +662,19 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
     });
 })();
 </script>
+
+<style>
+    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — واللونُ برمزِ اللوحة */
+    .proc-req-line { align-items: end; margin-bottom: 8px; }
+    .proc-req-genform { margin-bottom: 12px; }
+    .proc-req-genbtn { background: var(--c-166534); }
+    .proc-req-full { grid-column: 1 / -1; }
+    .proc-req-addline { margin-top: 6px; }
+    .proc-req-table { width: 100%; }
+    .proc-req-decide { display: flex; gap: 3px; margin-top: 4px; flex-wrap: wrap; }
+    .proc-req-decide-form { display: inline; }
+    .proc-req-decide-reason { display: inline-flex; gap: 2px; }
+    .proc-req-reason { width: 90px; }
+</style>
 </body>
 </html>

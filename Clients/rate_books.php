@@ -236,7 +236,35 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
-<div class="main ems-unified-page-shell">
+<style>
+/* UXW-01 ②: أنماطُ الشاشةِ الثابتةُ نُقلت من سماتِ style الموضعيةِ إلى أصنافٍ ببادئةِ rb- */
+.rb-page .rb-m10y { margin: 10px 0; }
+.rb-page .rb-mt6 { margin-top: 6px; }
+.rb-page .rb-mt8 { margin-top: 8px; }
+.rb-page .rb-mt10 { margin-top: 10px; }
+.rb-page .rb-mt12 { margin-top: 12px; }
+.rb-page .rb-mt14 { margin-top: 14px; }
+.rb-page .rb-h5 { margin: 0 0 10px; }
+.rb-page .rb-calc-form { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; }
+.rb-page .rb-w120 { width: 120px; }
+.rb-page .rb-lead { font-size: 1.1rem; }
+.rb-page .rb-badge-client { background: var(--c-2f5d6e, #2F5D6E); color: var(--c-s-fff); }
+.rb-page .rb-warn-ink { color: var(--c-8a5712, #8A5712); }
+.rb-page .rb-calc-note { margin-top: 4px; font-size: .9rem; color: var(--c-s-555); }
+.rb-page .rb-tier-table { margin-top: 4px; max-width: 640px; }
+.rb-page .rb-tier-active { background: var(--c-e1eee7, #E1EEE7); font-weight: 700; }
+.rb-page .rb-grid-210 { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.rb-page .rb-grid-150 { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.rb-page .rb-col-full { grid-column: 1 / -1; }
+.rb-page .rb-book-sel { background: var(--c-f7eac8, #F7EAC8); }
+.rb-page .rb-state-approved { font-weight: 700; color: var(--c-2c6749, #2C6749); }
+.rb-page .rb-state-draft { font-weight: 700; color: var(--c-8a5712, #8A5712); }
+.rb-page .rb-line-form { margin-bottom: 14px; padding: 12px; background: var(--c-f5f2e9, #F5F2E9); border-radius: 4px; }
+.rb-page .rb-flex-end { display: flex; align-items: end; gap: 14px; }
+.rb-page .rb-check-label { display: flex; align-items: center; gap: 5px; }
+.rb-page .rb-bold { font-weight: 700; }
+</style>
+<div class="main ems-unified-page-shell rb-page">
 <?php
 $header_title = 'دفترُ الأسعار بالشرائح';
 $header_icon = 'fa fa-book-open';
@@ -244,6 +272,8 @@ $header_actions = array();
 if ($can_add) { $header_actions[] = array('id' => 'rbToggleBook', 'class' => 'add-btn', 'icon' => 'fa fa-plus', 'label' => 'دفترٌ جديد'); }
 $header_back = array('href' => '../main/role_board.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
 include('../includes/page_header.php');
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا دفاترَ أسعارٍ مسجَّلةً بعدُ', 'أنشئ دفترًا بزرِّ «دفترٌ جديد» في رأسِ الشاشةِ ثم اعتمدْه ليُستعمل في التسعير');
 if (function_exists('ems_screen_about')) {
     ems_screen_about(
         'السعرُ في التأجير دالّةُ مدةٍ لا رقمٌ واحد: لكل فئةٍ ونموذجِ عملٍ شريحةُ مدةٍ وسعرُها. '
@@ -254,13 +284,13 @@ if (function_exists('ems_screen_about')) {
 }
 ?>
   <?php if (!empty($_GET['msg'])): ?>
-    <div class="alert alert-info" style="margin:10px 0"><?php echo rb_e($_GET['msg']); ?></div>
+    <div class="alert alert-info rb-m10y"><?php echo rb_e($_GET['msg']); ?></div>
   <?php endif; ?>
 
   <!-- ③ حاسبةُ أفضل سعر -->
-  <div class="card" style="margin-top:6px"><div class="card-body">
-    <h5 style="margin:0 0 10px"><i class="fa fa-calculator"></i> حاسبةُ أفضل سعر</h5>
-    <form method="get" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
+  <div class="card rb-mt6"><div class="card-body">
+    <h5 class="rb-h5"><i class="fa fa-calculator"></i> حاسبةُ أفضل سعر</h5>
+    <form method="get" class="rb-calc-form">
       <input type="hidden" name="book" value="<?php echo (int) $sel_book; ?>">
       <div><label for="emsf_2_44625">الفئة</label>
         <select name="c_type" class="form-control" id="emsf_2_44625">
@@ -278,7 +308,7 @@ if (function_exists('ems_screen_about')) {
           <?php endforeach; ?>
         </select></div>
       <div><label for="emsf_4_89926">المدة (أيام)</label>
-        <input type="number" name="c_days" min="1" value="<?php echo $c_days ?: ''; ?>" class="form-control" style="width:120px" id="emsf_4_89926"></div>
+        <input type="number" name="c_days" min="1" id="emsf_4_89926" class="form-control rb-w120" aria-label="المدة بالأيام لحسابِ أفضل سعر" value="<?php echo $c_days ?: ''; ?>"></div>
       <div><label for="emsf_5_9b848">العميل (اختياري)</label>
         <select name="c_client" class="form-control" id="emsf_5_9b848">
           <option value="0">— الدفترُ العام —</option>
@@ -292,26 +322,26 @@ if (function_exists('ems_screen_about')) {
 
     <?php if ($c_type > 0 && $c_days > 0): ?>
       <?php if ($calc === null): ?>
-        <div class="alert alert-warning" style="margin-top:12px">
+        <div class="alert alert-warning rb-mt12">
           لا سعرَ مطابقٌ لهذه الفئة والنموذج والمدة في أي دفترٍ <b>معتمدٍ</b> ساري المفعول —
           فلا سعرَ يُخترع. أضف بندًا في دفترٍ معتمد.
         </div>
       <?php else: ?>
-        <div class="alert alert-success" style="margin-top:12px">
-          <div style="font-size:1.1rem">
+        <div class="alert alert-success rb-mt12">
+          <div class="rb-lead">
             <b><?php echo number_format((float) $calc['unit_price'], 2); ?></b>
             <?php echo rb_e($calc['currency']); ?> /
             <?php echo rb_e(RB::WORK_MODELS[$c_model]); ?>
             &nbsp;·&nbsp; الشريحة: <b><?php echo rb_e(RB::tierLabel($calc['tier_from_days'], $calc['tier_to_days'])); ?></b>
             &nbsp;·&nbsp; الدفتر: <?php echo rb_e($calc['book_code'] . ' — ' . $calc['book_name']); ?>
             <?php if ($calc['client_id'] !== null): ?>
-              <span class="badge" style="background:#2F5D6E;color:#fff">دفترُ عميل</span>
+              <span class="badge rb-badge-client">دفترُ عميل</span>
             <?php endif; ?>
           </div>
-          <div style="margin-top:6px">
+          <div class="rb-mt6">
             الأيامُ المفوترة: <b><?php echo (int) $calc['billable_days']; ?></b>
             <?php if (!empty($calc['min_applied'])): ?>
-              <span style="color:#8A5712">(رُفعت من <?php echo (int) $c_days; ?> بحدٍّ أدنى
+              <span class="rb-warn-ink">(رُفعت من <?php echo (int) $c_days; ?> بحدٍّ أدنى
                 <?php echo (int) $calc['min_hire_days']; ?> يومًا)</span>
             <?php endif; ?>
             &nbsp;·&nbsp; الإجمالي: <b><?php echo number_format((float) $calc['line_total'], 2); ?></b>
@@ -320,19 +350,19 @@ if (function_exists('ems_screen_about')) {
               &nbsp;+&nbsp; ترحيل <?php echo number_format((float) $calc['mobilization_fee'], 2); ?>
             <?php endif; ?>
           </div>
-          <div style="margin-top:4px;font-size:.9rem;color:#555">
+          <div class="rb-calc-note">
             المشغّل: <?php echo !empty($calc['operator_included']) ? 'ضمن السعر' : 'خارج السعر'; ?>
             &nbsp;·&nbsp; الوقود: <?php echo !empty($calc['fuel_included']) ? 'ضمن السعر' : 'خارج السعر'; ?>
           </div>
         </div>
         <?php if (!empty($calc_tiers) && count($calc_tiers) > 1): ?>
-          <div style="margin-top:8px">
+          <div class="rb-mt8">
             <small class="text-muted">كلُّ الشرائح لهذه الفئة — «الأطولُ أرخص» يُرى لا يُقال:</small>
-            <table class="table table-sm" data-no-dt="1" style="margin-top:4px;max-width:640px">
+            <table class="table table-sm rb-tier-table" data-no-dt="hard">
               <thead><tr><th>الشريحة</th><th>سعرُ الوحدة</th><th>الحدُّ الأدنى</th></tr></thead>
               <tbody>
               <?php foreach ($calc_tiers as $tr): ?>
-                <tr<?php echo ((int) $tr['tier_from_days'] === (int) $calc['tier_from_days']) ? ' style="background:#E1EEE7;font-weight:700"' : ''; ?>>
+                <tr<?php echo ((int) $tr['tier_from_days'] === (int) $calc['tier_from_days']) ? ' class="rb-tier-active"' : ''; ?>>
                   <td><?php echo rb_e(RB::tierLabel($tr['tier_from_days'], $tr['tier_to_days'])); ?></td>
                   <td><?php echo number_format((float) $tr['unit_price'], 2) . ' ' . rb_e($tr['currency']); ?></td>
                   <td><?php echo (int) $tr['min_hire_days']; ?> يومًا</td>
@@ -348,19 +378,19 @@ if (function_exists('ems_screen_about')) {
 
   <!-- ① الدفاتر -->
   <?php if ($can_add): ?>
-  <div class="card allforms" id="rbBookCard" style="margin-top:14px;display:none"><div class="card-body">
-    <h5 style="margin:0 0 10px"><i class="fa fa-plus"></i> دفترٌ جديد</h5>
+  <div class="card allforms rb-mt14 is-hidden" id="rbBookCard"><div class="card-body">
+    <h5 class="rb-h5"><i class="fa fa-plus"></i> دفترٌ جديد</h5>
     <form method="post" class="ems-form">
       <input type="hidden" name="csrf_token" value="<?php echo rb_e($rb_csrf); ?>">
       <input type="hidden" name="rb_action" value="save_book">
       <input type="hidden" name="book_id" value="0">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px">
+      <div class="rb-grid-210">
         <div><label for="emsf_6_e1a0e">اسمُ الدفتر *</label><input type="text" name="name" required maxlength="160" class="form-control"
              placeholder="تسعيرة 2026 — تعدين" id="emsf_6_e1a0e"></div>
         <div><label for="emsf_7_afaa9">العملة</label><select name="currency" class="form-control" id="emsf_7_afaa9">
             <?php foreach ($RB_CURR as $c): ?><option value="<?php echo $c; ?>"><?php echo $c; ?></option><?php endforeach; ?>
           </select></div>
-        <div><label for="emsf_8_1f145">يسري من *</label><input type="date" name="valid_from" required value="<?php echo date('Y-m-d'); ?>" class="form-control" id="emsf_8_1f145"></div>
+        <div><label for="emsf_8_1f145">يسري من *</label><input type="date" name="valid_from" required id="emsf_8_1f145" class="form-control" value="<?php echo date('Y-m-d'); ?>"></div>
         <div><label for="emsf_9_eacd5">إلى (اتركه فارغًا = مفتوح)</label><input type="date" name="valid_to" class="form-control" id="emsf_9_eacd5"></div>
         <div><label for="emsf_10_d59c8">الحالة</label><select name="state" class="form-control" id="emsf_10_d59c8">
             <?php foreach ($RB_STATES as $s): ?><option value="<?php echo rb_e($s); ?>"><?php echo rb_e($s); ?></option><?php endforeach; ?>
@@ -371,29 +401,29 @@ if (function_exists('ems_screen_about')) {
               <option value="<?php echo (int) $c['id']; ?>"><?php echo rb_e($c['client_name']); ?></option>
             <?php endforeach; ?>
           </select></div>
-        <div style="grid-column:1/-1"><label for="emsf_12_80c07">ملاحظات</label><input type="text" name="note" maxlength="255" class="form-control" id="emsf_12_80c07"></div>
+        <div class="rb-col-full"><label for="emsf_12_80c07">ملاحظات</label><input type="text" name="note" maxlength="255" class="form-control" id="emsf_12_80c07"></div>
       </div>
-      <div style="margin-top:12px">
+      <div class="rb-mt12">
         <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> احفظ</button>
-        <button type="button" class="btn btn-secondary" onclick="document.getElementById('rbBookCard').style.display='none'">إلغاء</button>
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('rbBookCard').classList.add('is-hidden')">إلغاء</button>
       </div>
     </form>
   </div></div>
   <?php endif; ?>
 
-  <div class="card" style="margin-top:14px"><div class="card-body">
-    <h5 style="margin:0 0 10px"><i class="fa fa-book"></i> الدفاتر</h5>
-    <div class="table-responsive"><table class="table table-sm" data-no-dt="1">
+  <div class="card rb-mt14"><div class="card-body">
+    <h5 class="rb-h5"><i class="fa fa-book"></i> الدفاتر</h5>
+    <div class="table-responsive"><table class="table table-sm" data-no-dt="hard">
       <thead><tr><th>الكود</th><th>الاسم</th><th>العملة</th><th>العميل</th><th>السريان</th><th>الحالة</th><th>البنود</th><th></th></tr></thead>
       <tbody>
       <?php foreach ($books as $b): ?>
-        <tr<?php echo ((int) $b['id'] === $sel_book) ? ' style="background:#F7EAC8"' : ''; ?>>
+        <tr<?php echo ((int) $b['id'] === $sel_book) ? ' class="rb-book-sel"' : ''; ?>>
           <td><?php echo rb_e($b['book_code']); ?></td>
           <td><?php echo rb_e($b['name']); ?></td>
           <td><?php echo rb_e($b['currency']); ?></td>
           <td><?php echo rb_e($b['client_name'] ?: 'عام'); ?></td>
           <td><?php echo rb_e($b['valid_from'] . ' → ' . ($b['valid_to'] ?: 'مفتوح')); ?></td>
-          <td><span style="font-weight:700;color:<?php echo $b['state'] === 'معتمد' ? '#2C6749' : '#8A5712'; ?>">
+          <td><span class="<?php echo $b['state'] === 'معتمد' ? 'rb-state-approved' : 'rb-state-draft'; ?>">
               <?php echo rb_e($b['state']); ?></span></td>
           <td><?php echo (int) $b['lines_n']; ?></td>
           <td><a class="btn btn-sm btn-secondary" href="rate_books.php?book=<?php echo (int) $b['id']; ?>">
@@ -409,15 +439,15 @@ if (function_exists('ems_screen_about')) {
 
   <!-- ② البنود -->
   <?php if ($sel_book > 0): ?>
-  <div class="card" style="margin-top:14px"><div class="card-body">
-    <h5 style="margin:0 0 10px"><i class="fa fa-layer-group"></i> بنودُ الدفتر المحدَّد</h5>
+  <div class="card rb-mt14"><div class="card-body">
+    <h5 class="rb-h5"><i class="fa fa-layer-group"></i> بنودُ الدفتر المحدَّد</h5>
     <?php if ($can_add): ?>
-    <form method="post" class="ems-form" style="margin-bottom:14px;padding:12px;background:#F5F2E9;border-radius:4px">
+    <form method="post" class="ems-form rb-line-form">
       <input type="hidden" name="csrf_token" value="<?php echo rb_e($rb_csrf); ?>">
       <input type="hidden" name="rb_action" value="save_line">
       <input type="hidden" name="book_id" value="<?php echo (int) $sel_book; ?>">
       <input type="hidden" name="line_id" value="0">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px">
+      <div class="rb-grid-150">
         <div><label for="emsf_13_f6970">الفئة *</label><select name="equipment_type_id" required class="form-control" id="emsf_13_f6970">
             <option value="">— اختر —</option>
             <?php foreach ($types as $t): ?>
@@ -435,16 +465,16 @@ if (function_exists('ems_screen_about')) {
         <div><label for="emsf_18_60077">حدٌّ أدنى (أيام)</label><input type="number" name="min_hire_days" min="1" value="1" class="form-control" id="emsf_18_60077"></div>
         <div><label for="emsf_19_8846f">حدٌّ أدنى ساعات/يوم</label><input type="number" step="0.5" min="0" name="min_hours_per_day" class="form-control" id="emsf_19_8846f"></div>
         <div><label for="emsf_20_68ffe">رسمُ الترحيل</label><input type="number" step="0.01" min="0" name="mobilization_fee" value="0" class="form-control" id="emsf_20_68ffe"></div>
-        <div style="display:flex;align-items:end;gap:14px">
-          <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" name="operator_included" value="1" checked> بمشغّل</label>
-          <label style="display:flex;align-items:center;gap:5px"><input type="checkbox" name="fuel_included" value="1"> بوقود</label>
+        <div class="rb-flex-end">
+          <label class="rb-check-label"><input type="checkbox" name="operator_included" value="1" aria-label="السعرُ يشمل المشغّل" checked> بمشغّل</label>
+          <label class="rb-check-label"><input type="checkbox" name="fuel_included" value="1" aria-label="السعرُ يشمل الوقود"> بوقود</label>
         </div>
       </div>
-      <div style="margin-top:10px"><button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> أضف بندًا</button></div>
+      <div class="rb-mt10"><button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-plus"></i> أضف بندًا</button></div>
     </form>
     <?php endif; ?>
 
-    <div class="table-responsive"><table class="table display" id="rbLines">
+    <div class="table-responsive"><table class="table display" id="rbLines" data-state-save="false" data-page-length="50" data-order='[]'>
       <thead><tr><th>الفئة</th><th>نموذجُ العمل</th><th>الشريحة</th><th>سعرُ الوحدة</th>
         <th>حدٌّ أدنى (أيام)</th><th>ساعات/يوم</th><th>ترحيل</th><th>مشغّل</th><th>وقود</th>
         <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -463,7 +493,7 @@ if (function_exists('ems_screen_about')) {
           <td><?php echo rb_e($l['type_name'] ?: '—'); ?></td>
           <td><?php echo rb_e(RB::WORK_MODELS[$l['work_model']] ?? $l['work_model']); ?></td>
           <td><?php echo rb_e(RB::tierLabel($l['tier_from_days'], $l['tier_to_days'])); ?></td>
-          <td style="font-weight:700"><?php echo number_format((float) $l['unit_price'], 2); ?></td>
+          <td class="rb-bold"><?php echo number_format((float) $l['unit_price'], 2); ?></td>
           <td><?php echo (int) $l['min_hire_days']; ?></td>
           <td><?php echo $l['min_hours_per_day'] === null ? '—' : (float) $l['min_hours_per_day']; ?></td>
           <td><?php echo number_format((float) $l['mobilization_fee'], 2); ?></td>
@@ -474,7 +504,7 @@ if (function_exists('ems_screen_about')) {
       </tbody>
     </table></div>
     <?php if (!count($lines)): ?>
-      <p class="text-muted" style="margin-top:8px">لا بنودَ في هذا الدفتر — والدفترُ بلا بنودٍ لا يُسعّر شيئًا.</p>
+      <p class="text-muted rb-mt8">لا بنودَ في هذا الدفتر — والدفترُ بلا بنودٍ لا يُسعّر شيئًا.</p>
     <?php endif; ?>
   </div></div>
   <?php endif; ?>
@@ -487,10 +517,7 @@ $(function () {
     $('#rbToggleBook').on('click', function (e) {
         e.preventDefault();
         var c = document.getElementById('rbBookCard');
-        if (c) { c.style.display = (c.style.display === 'none' ? '' : 'none'); }
+        if (c) { c.classList.toggle('is-hidden'); }
     });
-    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#rbLines')) {
-        $('#rbLines').DataTable({ stateSave: false, pageLength: 50, order: [] });
-    }
 });
 </script>

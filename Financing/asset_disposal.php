@@ -120,9 +120,16 @@ $header_title_html = htmlspecialchars('التصرفُ في الأصل — نقل
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا حصصَ ملكيةٍ ساريةً قابلةً للنقل', 'سجِّلْ حصةَ ملكيةٍ ساريةً للعينِ أولًا ثم عُدْ لنقلِها بمرجعِ قرار');
 ?>
+  <style>
+    .fin-ad-form { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; max-width: 900px; }
+    .fin-ad-pct { max-width: 110px; }
+    .fin-ad-note { font-size: .85em; margin-top: 10px; }
+  </style>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
-  <form method="post" class="ems-form" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;max-width:900px">
+  <form method="post" class="ems-form fin-ad-form">
         <?= csrf_field() ?>
     <div><label for="emsf_443_7b91c">الحصةُ السارية</label>
       <select name="share_id" class="form-control" required id="emsf_443_7b91c"><option value="">—</option>
@@ -133,9 +140,9 @@ include __DIR__ . '/../includes/page_header.php';
     <div><label for="emsf_444_3e542">إلى الكيان</label>
       <select name="to_entity" class="form-control" required id="emsf_444_3e542"><option value="">—</option>
         <?php foreach ($ents as $e2): ?><option value="<?= intval($e2['entity_id']) ?>"><?= htmlspecialchars($e2['legal_name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?></select></div>
-    <div><label for="emsf_445_45aeb">النسبةُ المنقولة ٪</label><input type="number" step="0.01" min="0.01" max="100" name="percent" class="form-control" required style="max-width:110px" id="emsf_445_45aeb"></div>
+    <div><label for="emsf_445_45aeb">النسبةُ المنقولة ٪</label><input type="number" step="0.01" min="0.01" max="100" name="percent" class="form-control fin-ad-pct" required id="emsf_445_45aeb"></div>
     <div><label for="emsf_446_1045d">مرجعُ القرار — إلزامي</label><input type="text" name="doc_ref" class="form-control" required id="emsf_446_1045d"></div>
     <button class="btn btn-primary">انقل الحصة</button>
   </form>
-  <p class="text-muted" style="font-size:.85em;margin-top:10px">القديمةُ تُغلق بتاريخٍ والجديدةُ صفٌّ — لا تعديلَ بأثرٍ رجعيٍّ وΣ لكل أصلٍ محفوظٌ في كل لحظة.</p>
+  <p class="text-muted fin-ad-note">القديمةُ تُغلق بتاريخٍ والجديدةُ صفٌّ — لا تعديلَ بأثرٍ رجعيٍّ وΣ لكل أصلٍ محفوظٌ في كل لحظة.</p>
 </div>

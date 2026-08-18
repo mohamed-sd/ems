@@ -24,23 +24,24 @@ $my_name    = htmlspecialchars($my_name_raw);
 $my_role    = strval($_SESSION['user']['role']);
 $company_id = intval($_SESSION['user']['company_id']);
 
-// ألوان ثابتة للأدوار (تُعاد دورياً حسب رقم الدور)
+// أصنافُ لونٍ ثابتةٌ للأدوار (تُعاد دورياً حسب رقم الدور) — الأصنافُ معرَّفةٌ
+// في كتلةِ أنماطِ الشاشةِ أدناه من رموزِ التصميم، فلا قيمةَ لونٍ مثبَّتةً هنا.
 $role_palette = [
-    '#1b2f6e', '#28a745', '#fd7e14', '#6f42c1',
-    '#20c997', '#17a2b8', '#e83e8c', '#f59e0b',
-    '#343a40', '#dc3545', '#0c1c3e', '#6c757d',
+    'chat-role-c1',  'chat-role-c2',  'chat-role-c3',  'chat-role-c4',
+    'chat-role-c5',  'chat-role-c6',  'chat-role-c7',  'chat-role-c8',
+    'chat-role-c9',  'chat-role-c10', 'chat-role-c11', 'chat-role-c12',
 ];
 
 // جلب جميع الأدوار النشطة من جدول roles
 $safe_company = intval($company_id);
-$roles_map   = []; // role_id => ['name'=>..., 'color'=>...]
+$roles_map   = []; // role_id => ['name'=>..., 'color_class'=>...]
 $roles_res   = mysqli_query($conn, "SELECT id, name FROM roles WHERE status = '1' ORDER BY level ASC, id ASC");
 if ($roles_res) {
     $palette_idx = 0;
     while ($r = mysqli_fetch_assoc($roles_res)) {
         $roles_map[strval($r['id'])] = [
             'name'  => $r['name'],
-            'color' => $role_palette[$palette_idx % count($role_palette)],
+            'color_class' => $role_palette[$palette_idx % count($role_palette)],
         ];
         $palette_idx++;
     }
@@ -55,7 +56,7 @@ function getRoleInfo($role, $roles_map, $role_palette) {
     $fallback_names = ['-1' => 'إدارة عليا', '0' => 'مدير عام'];
     return [
         'name'  => isset($fallback_names[$role]) ? $fallback_names[$role] : 'مستخدم',
-        'color' => $role_palette[abs(intval($role)) % count($role_palette)],
+        'color_class' => $role_palette[abs(intval($role)) % count($role_palette)],
     ];
 }
 
@@ -114,7 +115,7 @@ if ($contacts_result) {
     while ($row = mysqli_fetch_assoc($contacts_result)) {
         $info              = getRoleInfo($row['role'], $roles_map, $role_palette);
         $row['role_name']  = $info['name'];
-        $row['role_color'] = $info['color'];
+        $row['role_color_class'] = $info['color_class'];
         $row['avatar']     = mb_substr($row['name'], 0, 1);
         $contacts[]        = $row;
         $dept_key = $row['role'];
@@ -132,6 +133,10 @@ include '../inheader.php';
 include '../insidebar.php';
 ?>
 <div class="main chat-main-page">
+<?php
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا مراسلاتٍ بعد', 'اختر زميلًا من قائمةِ جهاتِ الاتصالِ على اليمينِ لبدءِ محادثة');
+?>
 <style>
 /* إصلاح رأس المراسلات: نظام «التوحيد» العام يجعل .contacts-header شبكة (grid) بثلاثة
    أعمدة مع overflow:hidden، فيتداخل صندوق البحث ويتحوّل زر البثّ لدائرة. نُعيده هنا
@@ -145,6 +150,35 @@ body.ems-site .main #contactsPanel .contacts-header {
 body.ems-site .main #contactsPanel .contacts-header > * { width: auto !important; justify-self: auto !important; }
 body.ems-site .main #contactsPanel .contacts-header .search-box { display: block !important; width: 100% !important; margin-top: 10px !important; }
 body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 100% !important; box-sizing: border-box !important; }
+
+/* UXW-01 ①②: أصنافُ الشاشةِ بدلَ الأنماطِ الموضعيةِ والقيمِ المثبَّتة — البادئةُ chat- */
+.chat-role-c1  { background: var(--c-1b2f6e); }
+.chat-role-c2  { background: var(--c-28a745, #28a745); }
+.chat-role-c3  { background: var(--c-fd7e14, #fd7e14); }
+.chat-role-c4  { background: var(--c-6f42c1); }
+.chat-role-c5  { background: var(--c-20c997); }
+.chat-role-c6  { background: var(--c-17a2b8, #17a2b8); }
+.chat-role-c7  { background: var(--c-e83e8c, #e83e8c); }
+.chat-role-c8  { background: var(--c-f59e0b); }
+.chat-role-c9  { background: var(--c-343a40); }
+.chat-role-c10 { background: var(--c-dc3545); }
+.chat-role-c11 { background: var(--c-0c1c3e); }
+.chat-role-c12 { background: var(--c-6c757d); }
+
+.chat-contacts-titlebar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.chat-contacts-title { margin: 0; }
+.chat-nocontacts-icon { font-size: 2rem; margin-bottom: 8px; display: block; }
+.chat-contact-account { font-size: .72rem; color: var(--c-999999); }
+.chat-broadcast-msg-label { margin-top: 20px; }
+.chat-active-pane { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+
+.chat-msgs-error { text-align: center; padding: 40px; color: var(--c-ef4444); }
+.chat-msgs-error-icon { font-size: 2rem; display: block; margin-bottom: 10px; }
+.chat-retry-btn { padding: 8px 16px; background: var(--c-3b82f6); color: var(--c-surface); border: none; border-radius: 4px; cursor: pointer; }
+.chat-msgs-empty { text-align: center; padding: 40px; color: var(--c-94a3b8); font-size: 0.85rem; }
+
+/* يُبدَّل بجافاسكربت — ويأتي أخيرًا ليغلبَ display الخاصَّ بالمكوّنات أعلاه */
+.is-hidden { display: none; }
 </style>
 <div class="chat-wrapper">
 
@@ -153,8 +187,8 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
 
         <!-- Header -->
         <div class="contacts-header">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <h5 style="margin: 0;"><i class="fas fa-comments"></i> المراسلات الداخلية</h5>
+            <div class="chat-contacts-titlebar">
+                <h5 class="chat-contacts-title"><i class="fas fa-comments"></i> المراسلات الداخلية</h5>
                 <button class="broadcast-btn" onclick="openBroadcastModal()" title="إرسال رسالة للجميع">
                     <i class="fas fa-bullhorn"></i>
                 </button>
@@ -179,7 +213,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
         <div class="contacts-list" id="contactsList">
             <?php if (empty($contacts)): ?>
                 <div class="no-contacts">
-                    <i class="fas fa-user-slash" style="font-size:2rem; margin-bottom:8px; display:block;"></i>
+                    <i class="fas fa-user-slash chat-nocontacts-icon"></i>
                     لا يوجد مستخدمون آخرون في شركتك
                 </div>
             <?php else: ?>
@@ -195,16 +229,16 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
                          data-role="<?php echo htmlspecialchars($contact['role']); ?>"
                          data-name="<?php echo htmlspecialchars($contact['name']); ?>"
                          data-role-name="<?php echo htmlspecialchars($contact['role_name']); ?>"
-                         data-color="<?php echo htmlspecialchars($contact['role_color']); ?>"
+                         data-avatar-class="<?php echo htmlspecialchars($contact['role_color_class']); ?>"
                          data-avatar="<?php echo htmlspecialchars($contact['avatar']); ?>"
                          onclick="openConversation(this)">
-                        <div class="contact-avatar" style="background:<?php echo htmlspecialchars($contact['role_color']); ?>">
+                        <div class="contact-avatar <?php echo htmlspecialchars($contact['role_color_class']); ?>">
                             <?php echo htmlspecialchars($contact['avatar']); ?>
                         </div>
                         <div class="contact-info">
                             <div class="contact-name"><?php echo htmlspecialchars($contact['name']); ?></div>
                             <?php if (!empty($contact['account_name']) && trim((string)$contact['account_name']) !== trim((string)$contact['name'])): ?>
-                                <div class="contact-account" style="font-size:.72rem;color:#999;"><i class="fas fa-user-circle"></i> <?php echo htmlspecialchars($contact['account_name']); ?></div>
+                                <div class="contact-account chat-contact-account"><i class="fas fa-user-circle"></i> <?php echo htmlspecialchars($contact['account_name']); ?></div>
                             <?php endif; ?>
                             <div class="contact-role"><?php echo htmlspecialchars($contact['role_name']); ?></div>
                             <?php if ($last): ?>
@@ -220,7 +254,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
                                     <?php echo $unread > 99 ? '99+' : $unread; ?>
                                 </span>
                             <?php else: ?>
-                                <span class="unread-badge" data-unread="<?php echo intval($contact['id']); ?>" style="display:none;"></span>
+                                <span class="unread-badge is-hidden" data-unread="<?php echo intval($contact['id']); ?>"></span>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -240,7 +274,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
         </div>
 
         <!-- Chat Active Area (مخفية في البداية) -->
-        <div id="chatActive" style="display:none; flex-direction:column; height:100%; overflow:hidden; display:none;">
+        <div id="chatActive" class="chat-active-pane is-hidden">
 
             <!-- Chat Header -->
             <div class="chat-header">
@@ -317,8 +351,8 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
                 <div id="recipientsContainer">
                     <?php foreach ($contacts as $contact): ?>
                         <div class="recipient-item" data-name="<?php echo htmlspecialchars($contact['name']); ?>" data-role="<?php echo htmlspecialchars($contact['role_name']); ?>" onclick="toggleRecipient(<?php echo $contact['id']; ?>)">
-                            <input type="checkbox" value="<?php echo $contact['id']; ?>" class="recipient-checkbox" onclick="event.stopPropagation();">
-                            <div class="recipient-avatar" style="background: <?php echo htmlspecialchars($contact['role_color']); ?>">
+                            <input type="checkbox" aria-label="تحديدُ هذا المستلمِ للرسالةِ الجماعية" value="<?php echo $contact['id']; ?>" class="recipient-checkbox" onclick="event.stopPropagation();">
+                            <div class="recipient-avatar <?php echo htmlspecialchars($contact['role_color_class']); ?>">
                                 <?php echo htmlspecialchars($contact['avatar']); ?>
                             </div>
                             <div class="recipient-info">
@@ -332,7 +366,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
             </div>
 
             <!-- الرسالة -->
-            <label style="margin-top: 20px;">
+            <label class="chat-broadcast-msg-label">
                 <i class="fas fa-envelope"></i>
                 الرسالة
             </label>
@@ -366,7 +400,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
         var userId    = parseInt(el.getAttribute('data-id'));
         var name      = el.getAttribute('data-name');
         var roleName  = el.getAttribute('data-role-name');
-        var color     = el.getAttribute('data-color');
+        var colorClass = el.getAttribute('data-avatar-class') || '';
         var avatar    = el.getAttribute('data-avatar');
 
         // تمييز جهة الاتصال المحددة
@@ -378,18 +412,16 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
         lastMessageId   = 0;
 
         // تحديث header المحادثة
-        document.getElementById('chatAvatar').textContent        = avatar;
-        document.getElementById('chatAvatar').style.background   = color;
+        var avatarEl = document.getElementById('chatAvatar');
+        avatarEl.textContent = avatar;
+        avatarEl.className = 'avatar' + (colorClass ? ' ' + colorClass : '');
         document.getElementById('chatUserName').textContent      = name;
         document.getElementById('chatUserRole').textContent      = roleName;
 
         // إظهار لوحة المحادثة
-        document.getElementById('chatEmpty').style.display  = 'none';
+        document.getElementById('chatEmpty').classList.add('is-hidden');
         var chatActive = document.getElementById('chatActive');
-        chatActive.style.display = 'flex';
-        chatActive.style.flexDirection = 'column';
-        chatActive.style.height = '100%';
-        chatActive.style.overflow = 'hidden';
+        chatActive.classList.remove('is-hidden');
 
         // Mobile
         document.getElementById('contactsPanel').classList.remove('mobile-show');
@@ -404,7 +436,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
 
         // إخفاء شارة الرسائل غير المقروءة
         var badge = el.querySelector('[data-unread="' + userId + '"]');
-        if (badge) badge.style.display = 'none';
+        if (badge) badge.classList.add('is-hidden');
 
         // إعادة تشغيل التحديث التلقائي
         clearInterval(pollTimer);
@@ -463,10 +495,10 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     // ===== إظهار رسالة خطأ في منطقة الرسائل =====
     function showErrorInChat(message) {
         var area = document.getElementById('messagesArea');
-        area.innerHTML = '<div style="text-align:center; padding:40px; color:#ef4444;">' +
-                        '<i class="fas fa-exclamation-triangle" style="font-size:2rem; display:block; margin-bottom:10px;"></i>' +
+        area.innerHTML = '<div class="chat-msgs-error">' +
+                        '<i class="fas fa-exclamation-triangle chat-msgs-error-icon"></i>' +
                         '<strong>' + escapeHtml(message) + '</strong><br><br>' +
-                        '<button onclick="loadMessages(' + activeContactId + ', false)" style="padding:8px 16px; background:#3b82f6; color:white; border:none; border-radius:4px; cursor:pointer;">' +
+                        '<button onclick="loadMessages(' + activeContactId + ', false)" class="chat-retry-btn">' +
                         '<i class="fas fa-redo"></i> إعادة المحاولة</button>' +
                         '</div>';
     }
@@ -476,7 +508,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
         var area = document.getElementById('messagesArea');
         area.innerHTML = '';
         if (messages.length === 0) {
-            area.innerHTML = '<div style="text-align:center; padding:40px; color:#94a3b8; font-size:0.85rem;">لا توجد رسائل بعد... ابدأ المحادثة!</div>';
+            area.innerHTML = '<div class="chat-msgs-empty">لا توجد رسائل بعد... ابدأ المحادثة!</div>';
             return;
         }
         var lastDate = '';
@@ -588,8 +620,8 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
                     };
                     var area = document.getElementById('messagesArea');
                     // إزالة رسالة "لا توجد رسائل"
-                    var empty = area.querySelector('div[style]');
-                    if (empty && empty.textContent.indexOf('ابدأ') !== -1) area.removeChild(empty);
+                    var empty = area.querySelector('.chat-msgs-empty');
+                    if (empty && empty.parentNode === area) area.removeChild(empty);
                     appendMessages([fakeMsg]);
                     if (data.message_id > lastMessageId) lastMessageId = data.message_id;
                     // تحديث آخر رسالة في قائمة جهات الاتصال
@@ -650,7 +682,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#039;');
+            .replace(/'/g, '&#x27;');
     }
 
     // ===== تحديث شارة Nav =====

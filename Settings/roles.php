@@ -131,6 +131,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
+<style>
+/* UXW-01 ②: أنماطُ شاشةِ الأدوار — ثابتةٌ منقولةٌ من السماتِ الموضعية */
+.rls-save-btn { grid-column: 1 / -1; justify-self: center; }
+.rls-role-link { color: var(--navy); text-decoration: none; font-weight: 600; transition: all var(--ease); }
+.rls-role-link:hover { color: var(--gold); text-decoration: underline; }
+.rls-root-note { color: var(--gold); font-weight: 600; }
+.rls-parent-link { color: var(--blue); text-decoration: none; font-weight: 600; transition: all var(--ease); }
+.rls-parent-link:hover { color: var(--navy); text-decoration: underline; }
+.rls-muted { color: var(--sub); }
+.rls-level-badge { background: var(--c-rgba3799235012, rgba(37,99,235,.12)); color: var(--blue); }
+.rls-edit-btn { background: var(--blue-soft); color: var(--blue); border: 1.5px solid var(--c-rgba379923518, rgba(37,99,235,.18)); }
+.rls-del-btn { background: var(--red-soft); color: var(--red); border: 1.5px solid var(--c-s-rgba220383818, rgba(220,38,38,.18)); }
+</style>
+
 <div class="main">
     <!-- Unified header: pre-built final structure (data-ems-unified-header skips the JS rebuild). Styling: ems.main.all.style.css (.header) -->
     <?php
@@ -147,6 +161,8 @@ ob_start(); ?><a href="settings.php" class="back-btn">
             </a><?php
 $header_back = array('raw' => trim((string) ob_get_clean()));
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا أدوارَ وظيفيةً معرَّفةً بعدُ', 'أضف أولَ دورٍ بزرِّ «إضافة صلاحية جديدة» في رأسِ الشاشة');
 ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -166,7 +182,7 @@ include __DIR__ . '/../includes/page_header.php';
     <?php endif; ?>
 
     <!-- فورم إضافة / تعديل -->
-    <form id="roleForm" action="" method="post" class="ems-form" style="display:<?= !empty($editData) ? 'block' : 'none'; ?>">
+    <form id="roleForm" action="" method="post" class="ems-form<?= !empty($editData) ? '' : ' is-hidden'; ?>">
         <?= csrf_field() ?>
         <div class="card">
             <div class="card-header">
@@ -212,7 +228,7 @@ include __DIR__ . '/../includes/page_header.php';
                         </select>
                     </div>
 
-                    <button type="submit" style="grid-column: 1 / -1; justify-self: center;">
+                    <button type="submit" class="rls-save-btn">
                         <i class="fas fa-save"></i> حفظ الصلاحية
                     </button>
                 </div>
@@ -227,7 +243,7 @@ include __DIR__ . '/../includes/page_header.php';
         </div>
         <div class="card-body">
             <div class="table-container">
-                <table id="rolesTable" class="display">
+                <table id="rolesTable" class="display" data-column-defs='[{"orderable":false,"targets":[6]}]'>
                     <thead>
                         <tr>
                             <th width="80"><i class="fas fa-barcode"></i> #</th>
@@ -286,49 +302,40 @@ include __DIR__ . '/../includes/page_header.php';
                                 <tr>
                                     <td><strong><?= $i++; ?></strong></td>
                                     <td>
-                                        <a href="modules.php?role_id=<?= $row['id']; ?>"
-                                            style="color: var(--navy); text-decoration: none; font-weight: 600; transition: all var(--ease);"
-                                            onmouseover="this.style.color='var(--gold)'; this.style.textDecoration='underline';"
-                                            onmouseout="this.style.color='var(--navy)'; this.style.textDecoration='none';">
+                                        <a href="modules.php?role_id=<?= $row['id']; ?>" class="rls-role-link">
                                             <strong><?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?></strong>
                                         </a>
                                         <?php if ($row['parent_role_id'] === null): ?>
-                                            <br><small style="color: var(--gold); font-weight: 600;">ðŸ”µ مدير رئيسي</small>
+                                            <br><small class="rls-root-note">ðŸ”µ مدير رئيسي</small>
                                         <?php endif; ?>
                                     </td>
                                     <td>
                                         <?php if (!empty($row['parent_name'])): ?>
-                                            <a href="modules.php?role_id=<?= $row['parent_role_id']; ?>"
-                                                style="color: var(--blue); text-decoration: none; font-weight: 600; transition: all var(--ease);"
-                                                onmouseover="this.style.color='var(--navy)'; this.style.textDecoration='underline';"
-                                                onmouseout="this.style.color='var(--blue)'; this.style.textDecoration='none';">
+                                            <a href="modules.php?role_id=<?= $row['parent_role_id']; ?>" class="rls-parent-link">
                                                 <i class="fas fa-link"></i>
                                                 <?= htmlspecialchars($row['parent_name'], ENT_QUOTES, 'UTF-8'); ?>
                                             </a>
                                         <?php else: ?>
-                                            <span style="color: var(--sub);">-</span>
+                                            <span class="rls-muted">-</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td><span class="status-active"
-                                            style="background: rgba(37,99,235,.12); color: var(--blue);"><i
+                                    <td><span class="status-active rls-level-badge"><i
                                                 class="fas fa-layer-group"></i> <?= (int) $row['level']; ?></span></td>
                                     <td><?= $status_badge; ?></td>
                                     <td>
-                                        <small style="color: var(--sub);">
+                                        <small class="rls-muted">
                                             <?= date('Y-m-d', strtotime($row['created_at'])); ?>
                                         </small>
                                     </td>
                                     <td class="text-center">
                                         <a href="javascript:void(0);"
                                             onclick="editRole(<?= htmlspecialchars(json_encode($row), ENT_QUOTES, 'UTF-8'); ?>)"
-                                            class="btn btn-sm btn-primary" title="تعديل"
-                                            style="background: var(--blue-soft); color: var(--blue); border: 1.5px solid rgba(37,99,235,.18);">
+                                            class="btn btn-sm btn-primary rls-edit-btn" title="تعديل">
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         <a href="javascript:void(0);"
                                             onclick="confirmDelete(<?= $row['id']; ?>, '<?= htmlspecialchars($row['name'], ENT_QUOTES, 'UTF-8'); ?>')"
-                                            class="btn btn-sm btn-danger" title="حذف"
-                                            style="background: var(--red-soft); color: var(--red); border: 1.5px solid rgba(220,38,38,.18);">
+                                            class="btn btn-sm btn-danger rls-del-btn" title="حذف">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </td>
@@ -350,15 +357,8 @@ include __DIR__ . '/../includes/page_header.php';
 
 
 <script>
-    // تهيئة DataTable
-    $('#rolesTable').DataTable({
-        language: {
-            url: "/ems/assets/i18n/datatables/ar.json"
-        },
-        columnDefs: [
-            { "orderable": false, "targets": [6] }
-        ]
-    });
+    // UXW-01 ⑤: التهيئةُ اليدويةُ رُفعت — المكوّنُ المركزيُّ في ui-unification.js
+    // يلتقط الجدولَ ويقرأ data-column-defs من وسمِ <table> نفسِه.
 
     $(document).ready(function () {
         // إظهار/إخفاء النموذج
@@ -372,6 +372,7 @@ include __DIR__ . '/../includes/page_header.php';
 
     // دالة تعديل البيانات
     function editRole(data) {
+        document.getElementById('roleForm').classList.remove('is-hidden');
         document.getElementById('roleForm').style.display = 'block';
         document.getElementById('edit_id').value = data.id;
         document.getElementById('name').value = data.name;

@@ -47,16 +47,18 @@ include '../insidebar.php';
     include('../includes/page_header.php');
     ems_screen_about('بطاقةُ المورد الواحدة بتبويباتها السبعة — بدل الجدول المسطّح: '
         . 'كلُّ تبويبٍ قراءةٌ حيةٌ من جدول مالكه برابط أصله.', array());
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بياناتٍ في هذا التبويبِ لهذا المورد',
+        'انتقل إلى تبويبٍ آخرَ من شريطِ التبويبات، أو اختر موردًا آخرَ من شاشة الموردين');
     ?>
 
     <?php if (!$sup): ems_state_empty('اختر موردًا من القائمة', 'إلى الموردين', 'suppliers_proc.php'); ?>
     <?php else: ?>
-    <div class="card"><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-        <strong style="font-size:1.1rem"><?php echo htmlspecialchars((string)$sup['name']); ?></strong>
-        <span style="margin-inline-start:auto">
+    <div class="card"><div class="card-body proc-sc-head">
+        <strong class="proc-sc-name"><?php echo htmlspecialchars((string)$sup['name']); ?></strong>
+        <span class="proc-sc-tabs">
         <?php foreach ($TABS as $tk => $tl): ?>
-            <a class="btn btn-sm" style="border:1px solid #ddd;border-radius:6px;padding:4px 10px;margin:0 2px;<?php
-                echo $tk === $tab ? 'background:#e2b93b;font-weight:800' : ''; ?>"
+            <a class="btn btn-sm proc-sc-tab<?php echo $tk === $tab ? ' proc-sc-tab-on' : ''; ?>"
                href="?id=<?php echo $sid; ?>&tab=<?php echo $tk; ?>"><?php echo $tl; ?></a>
         <?php endforeach; ?></span>
     </div></div>
@@ -65,7 +67,7 @@ include '../insidebar.php';
     <?php
     switch ($tab) {
         case '1':
-            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%"><tbody>';
+            echo '<div class="table-container"><table class="alltables display proc-sc-table" data-no-dt="1"><tbody>';
             foreach (array('name' => 'الاسم', 'phone' => 'الهاتف', 'email' => 'البريد',
                            'address' => 'العنوان', 'tax_number' => 'الرقم الضريبي',
                            'commercial_registration' => 'السجل التجاري') as $k => $lbl) {
@@ -83,7 +85,7 @@ include '../insidebar.php';
                                   AND COALESCE(is_deleted,0)=0 ORDER BY id DESC LIMIT 100");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
             if (!$rows) { ems_state_empty('لا أوامرَ لهذا المورد', 'أمرٌ جديد', 'orders_proc.php'); break; }
-            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+            echo '<div class="table-container"><table class="alltables display proc-sc-table" data-no-dt="1">'
                . '<thead><tr><th>الكود</th><th>الحالة</th><th>الإجمالي</th><th>استلم٪</th><th>موعد التسليم</th><th></th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -113,7 +115,7 @@ include '../insidebar.php';
                                 ORDER BY rl.id DESC LIMIT 100");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
             if (!$rows) { ems_state_empty('لا استلاماتٍ بعدُ'); break; }
-            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+            echo '<div class="table-container"><table class="alltables display proc-sc-table" data-no-dt="1">'
                . '<thead><tr><th>عهدة الاستلام</th><th>الصنف</th><th>الكمية</th><th>التاريخ</th></tr></thead><tbody>';
             foreach ($rows as $x) {
                 echo '<tr><td>' . htmlspecialchars((string)$x['code']) . '</td>'
@@ -131,7 +133,7 @@ include '../insidebar.php';
                                   AND invoice_no IS NOT NULL ORDER BY id DESC LIMIT 100");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
             if (!$rows) { ems_state_empty('لا فواتيرَ مسجَّلةً بعدُ'); break; }
-            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+            echo '<div class="table-container"><table class="alltables display proc-sc-table" data-no-dt="1">'
                . '<thead><tr><th>الأمر</th><th>الفاتورة</th><th>مبلغها</th><th>الفرق</th><th>المطابقة</th></tr></thead><tbody>';
             foreach ($rows as $x) {
                 echo '<tr><td>' . htmlspecialchars((string)$x['code']) . '</td>'
@@ -152,7 +154,7 @@ include '../insidebar.php';
                                 ORDER BY rc.id DESC LIMIT 100");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
             if (!$rows) { ems_state_empty('لا عهدَ استلامٍ لهذا المورد'); break; }
-            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+            echo '<div class="table-container"><table class="alltables display proc-sc-table" data-no-dt="1">'
                . '<thead><tr><th>الكود</th><th>المستلم</th><th>التاريخ</th><th>الموقع</th><th>الحالة</th></tr></thead><tbody>';
             foreach ($rows as $x) {
                 echo '<tr><td>' . htmlspecialchars((string)$x['code']) . '</td>'
@@ -171,7 +173,7 @@ include '../insidebar.php';
                                 GROUP BY ol.item_name ORDER BY n DESC LIMIT 100");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
             if (!$rows) { ems_state_empty('لا أصنافَ مورَّدةً بعدُ'); break; }
-            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+            echo '<div class="table-container"><table class="alltables display proc-sc-table" data-no-dt="1">'
                . '<thead><tr><th>الصنف</th><th>مرات التوريد</th><th>إجمالي الكمية</th></tr></thead><tbody>';
             foreach ($rows as $x) {
                 echo '<tr><td>' . htmlspecialchars((string)$x['item_name']) . '</td>'
@@ -200,10 +202,10 @@ include '../insidebar.php';
                     $tot[$cur] = ($tot[$cur] ?? 0) + (float) $x['amount'];
                 }
             }
-            echo '<p style="font-weight:800">الرصيدُ المفتوح (بانتظار التسوية): '
+            echo '<p class="proc-sc-total">الرصيدُ المفتوح (بانتظار التسوية): '
                . ($tot ? implode(' · ', array_map(function ($c, $v) { return number_format($v, 2) . ' ' . $c; }, array_keys($tot), $tot)) : 'صفر')
                . '</p>';
-            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+            echo '<div class="table-container"><table class="alltables display proc-sc-table" data-no-dt="1">'
                . '<thead><tr><th>الذمّة</th><th>المرجع</th><th>المبلغ</th><th>الاتجاه</th><th>حالة التسوية</th><th>تاريخ القيد</th></tr></thead><tbody>';
             foreach ($rows as $x) {
                 $oid_ref = (strpos((string) $x['period_ref'], 'PO-') === 0) ? intval(substr((string) $x['period_ref'], 3)) : 0;
@@ -236,6 +238,17 @@ include '../insidebar.php';
     </div></div>
     <?php endif; ?>
 </div>
+
+<style>
+    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — والألوانُ برموزِ اللوحةِ بقيمِها الاحتياطية */
+    .proc-sc-head { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .proc-sc-name { font-size: 1.1rem; }
+    .proc-sc-tabs { margin-inline-start: auto; }
+    .proc-sc-tab { border: 1px solid var(--c-s-ddd); border-radius: 6px; padding: 4px 10px; margin: 0 2px; }
+    .proc-sc-tab-on { background: var(--c-e2b93b, #e2b93b); font-weight: 800; }
+    .proc-sc-table { width: 100%; }
+    .proc-sc-total { font-weight: 800; }
+</style>
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 </body>

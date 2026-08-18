@@ -124,11 +124,22 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+
+<style>
+/* UXW-01 ②: أنماطُ الشاشةِ الموضعيةُ نُقلت أصنافًا — منحُ المجالِ المقيَّد */
+.gov-og-form   { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+.gov-og-reason { width: 220px; }
+.gov-og-table  { width: 100%; }
+.gov-og-revoke { display: flex; gap: 6px; }
+.gov-og-why    { width: 150px; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'منح المجال المقيَّد'; $header_icon = 'fa fa-user-lock';
     $header_actions = array();
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا منحَ مجالٍ مقيَّدٍ مسجَّلةً لهذه الشركة', 'امنحْ أولَ صلاحيةٍ فرديةٍ من نموذجِ «منح صلاحية فردية» أعلى الشاشة');
     ems_screen_about('بيانات ملّاك المعدات وشروط تمويلها ليست بيانًا تشغيليًّا (FIN-01 §1.1): الاطّلاع '
         . 'بصلاحية فردية بأكوادها الثلاثة لا بالعضوية في إدارة — تُمنح وتُلغى هنا بقرار موثَّق '
         . 'بتوقيعه، وقيمة الشراء (الأشد) لا تُمنح إلا بسبب ومدة، وكل قراءة لاحقة بسطر اطّلاع.',
@@ -139,28 +150,28 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-plus"></i> منح صلاحية فردية</h5></div>
     <div class="card-body">
-        <form method="post" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end"
+        <form method="post" class="gov-og-form"
               onsubmit="return confirm('المنح قرار حوكمة موثَّق بتوقيعه — أتؤكد؟');">
         <?= csrf_field() ?>
             <input type="hidden" name="op" value="grant">
-            <div><label>المستخدم</label><br>
-                <select name="person_id" required>
+            <div><label for="og_person">المستخدم</label><br>
+                <select id="og_person" name="person_id" required>
                     <option value="">— اختر —</option>
                     <?php foreach ($users as $u): ?>
                     <option value="<?php echo intval($u['id']); ?>">
                         <?php echo htmlspecialchars($u['name'] . ' (' . $u['username'] . ' · دور ' . $u['role'] . ')'); ?></option>
                     <?php endforeach; ?>
                 </select></div>
-            <div><label>الكود</label><br>
-                <select name="permission_code" required>
+            <div><label for="og_code">الكود</label><br>
+                <select id="og_code" name="permission_code" required>
                     <?php foreach ($PERM_AR as $ck => $cl): ?>
                     <option value="<?php echo htmlspecialchars($ck); ?>"><?php echo htmlspecialchars($cl); ?></option>
                     <?php endforeach; ?>
                 </select></div>
             <div><label>السبب (إلزامي لقيمة الشراء)</label><br>
-                <input type="text" name="reason" style="width:220px" placeholder="قرار المنح وسنده" aria-label="قرار المنح وسنده"></div>
-            <div><label>من</label><br><input type="date" name="valid_from"></div>
-            <div><label>إلى</label><br><input type="date" name="valid_to"></div>
+                <input type="text" name="reason" class="gov-og-reason" placeholder="قرار المنح وسنده" aria-label="قرار المنح وسنده"></div>
+            <div><label for="og_from">من</label><br><input type="date" id="og_from" name="valid_from"></div>
+            <div><label for="og_to">إلى</label><br><input type="date" id="og_to" name="valid_to"></div>
             <button class="btn-primary" type="submit">منح</button>
         </form>
     </div></div>
@@ -168,7 +179,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-header"><h5><i class="fa fa-user-lock"></i> المنح — النافذة أولًا</h5></div>
     <div class="card-body">
         <?php if (empty($grants)): ems_state_empty('لا منح بعد — باب التمويل محجوب عن الجميع حتى أول منحة فردية'); else: ?>
-        <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
+        <div class="table-container"><table class="alltables display gov-og-table" data-no-dt="1">
         <thead><tr><th>#</th><th>المستخدم</th><th>الكود</th><th>المدة</th><th>السبب</th><th>مانحها</th><th>الحالة</th><th>إلغاء (بسبب)</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -194,12 +205,12 @@ include '../insidebar.php';
                 <?php echo $g['state'] === 'active' ? 'نافذة' : 'ملغاة'; ?></span></td>
             <td>
                 <?php if ($g['state'] === 'active'): ?>
-                <form method="post" style="display:flex;gap:6px"
+                <form method="post" class="gov-og-revoke"
                       onsubmit="return confirm('إلغاء المنحة يحجب الباب عن صاحبها فورًا — أتؤكد بقرار موثَّق؟');">
         <?= csrf_field() ?>
                     <input type="hidden" name="op" value="revoke">
                     <input type="hidden" name="grant_id" value="<?php echo intval($g['grant_id']); ?>">
-                    <input type="text" name="revoke_reason" placeholder="سبب الإلغاء — إلزامي" style="width:150px" aria-label="سبب الإلغاء — إلزامي">
+                    <input type="text" name="revoke_reason" class="gov-og-why" placeholder="سبب الإلغاء — إلزامي" aria-label="سبب الإلغاء — إلزامي">
                     <button class="btn-primary" type="submit">إلغاء</button>
                 </form>
                 <?php else: ?>—<?php endif; ?>

@@ -93,6 +93,8 @@ $header_title_html = htmlspecialchars('العودةُ للخدمة', ENT_QUOTES,
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا أوامرَ صيانةٍ منجَزةً بانتظارِ العودةِ للخدمة', 'أنجِزْ أمرَ الصيانةِ من شاشةِ أوامرِ الصيانةِ ليظهر هنا لإصدارِ شهادةِ الجاهزية');
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>

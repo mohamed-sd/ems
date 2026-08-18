@@ -136,44 +136,59 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array(array('href' => 'finance_gateway.php', 'class' => 'add-btn', 'icon' => 'fa fa-building-columns', 'label' => 'بوابة المالية'));
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا انتقالاتِ دورةٍ مسجَّلةً بعدُ ليُقاسَ زمنُها', 'افتحْ «بوابة المالية» من رأسِ الشاشةِ وسيِّرْ طلبًا ليبدأ سجلُّ الانتقالاتِ بالتراكم');
     ?>
+    <style>
+    .fcb-mb14        { margin-bottom: 14px; }
+    .fcb-stat-sm     { font-size: 1.05rem; }
+    .fcb-danger      { color: var(--c-state-danger); }
+    .fcb-warn        { color: var(--c-b45309); }
+    .fcb-ok          { color: var(--c-state-ok); }
+    .fcb-note        { font-size: .8em; color: var(--c-6b4e2a); }
+    .fcb-card-warn   { margin-bottom: 14px; border-right: 4px solid var(--c-b45309); }
+    .fcb-card-danger { border-right: 4px solid var(--c-state-danger); }
+    .fcb-lead        { font-weight: 700; color: var(--c-92400e); }
+    .fcb-row         { padding: 6px 0; border-bottom: 1px dashed var(--c-e3d9c6, #e3d9c6); }
+    .fcb-link        { margin-right: 8px; }
+    </style>
 
-    <div class="stats-grid" style="margin-bottom:14px;">
+    <div class="stats-grid fcb-mb14">
         <div class="stat-card"><div class="stat-label">الالتزام بـSLA (النشط الآن)</div>
-            <div class="stat-value" style="<?php echo $compliance < 80 ? 'color:#dc2626;' : ''; ?>"><?php echo $compliance; ?>%</div></div>
+            <div class="stat-value<?php echo $compliance < 80 ? ' fcb-danger' : ''; ?>"><?php echo $compliance; ?>%</div></div>
         <div class="stat-card"><div class="stat-label">ضمن المدة / متجاوز</div>
-            <div class="stat-value"><?php echo $on_time; ?> / <span style="color:#dc2626;"><?php echo $overdue; ?></span></div></div>
+            <div class="stat-value"><?php echo $on_time; ?> / <span class="fcb-danger"><?php echo $overdue; ?></span></div></div>
         <div class="stat-card"><div class="stat-label">تصعيداتٌ مفتوحة</div>
             <div class="stat-value"><?php echo count($escalated); ?></div></div>
         <div class="stat-card"><div class="stat-label">أعلى اختناق</div>
-            <div class="stat-value" style="font-size:1.05rem;"><?php echo $bottleneck !== null ? htmlspecialchars($stage_labels[$bottleneck] ?? $bottleneck) : '—'; ?></div></div>
+            <div class="stat-value fcb-stat-sm"><?php echo $bottleneck !== null ? htmlspecialchars($stage_labels[$bottleneck] ?? $bottleneck) : '—'; ?></div></div>
     </div>
 
-    <div class="card" style="margin-bottom:14px;">
+    <div class="card fcb-mb14">
         <div class="card-header"><h5><i class="fa fa-gauge-high"></i> مؤشرات الأداء (§12.3)</h5></div>
         <div class="card-body">
             <div class="stats-grid">
                 <div class="stat-card"><div class="stat-label">⑥ زمن الدورة (إنشاء←إقفال) — متوسط</div>
                     <div class="stat-value"><?php echo $cycle_avg !== null ? $cycle_avg . ' <small>ساعة</small>' : '—'; ?></div>
-                    <?php if ($cycle_min !== null): ?><div style="font-size:.8em;color:#6b4e2a;">أسرع <?php echo $cycle_min; ?> · أبطأ <?php echo $cycle_max; ?> ساعة (<?php echo count($cycle_hours); ?> مقفلًا)</div><?php endif; ?>
+                    <?php if ($cycle_min !== null): ?><div class="fcb-note">أسرع <?php echo $cycle_min; ?> · أبطأ <?php echo $cycle_max; ?> ساعة (<?php echo count($cycle_hours); ?> مقفلًا)</div><?php endif; ?>
                 </div>
                 <div class="stat-card"><div class="stat-label">⑦ نسبة الإعادة (من السجل)</div>
-                    <div class="stat-value" style="<?php echo $return_pct > 20 ? 'color:#b45309;' : ''; ?>"><?php echo $return_pct; ?>%</div>
-                    <div style="font-size:.8em;color:#6b4e2a;"><?php echo $returned_n; ?> أُعيد من <?php echo $submitted_n; ?> مُرسَل</div>
+                    <div class="stat-value<?php echo $return_pct > 20 ? ' fcb-warn' : ''; ?>"><?php echo $return_pct; ?>%</div>
+                    <div class="fcb-note"><?php echo $returned_n; ?> أُعيد من <?php echo $submitted_n; ?> مُرسَل</div>
                 </div>
                 <div class="stat-card"><div class="stat-label">⑦ نسبة الرفض (من السجل)</div>
-                    <div class="stat-value" style="<?php echo $reject_pct > 15 ? 'color:#dc2626;' : ''; ?>"><?php echo $reject_pct; ?>%</div>
-                    <div style="font-size:.8em;color:#6b4e2a;"><?php echo $rejected_n; ?> رُفض من <?php echo $submitted_n; ?> مُرسَل</div>
+                    <div class="stat-value<?php echo $reject_pct > 15 ? ' fcb-danger' : ''; ?>"><?php echo $reject_pct; ?>%</div>
+                    <div class="fcb-note"><?php echo $rejected_n; ?> رُفض من <?php echo $submitted_n; ?> مُرسَل</div>
                 </div>
                 <div class="stat-card"><div class="stat-label">⑧ اكتمال المستندات من أول إرسال</div>
-                    <div class="stat-value" style="color:#16a34a;"><?php echo $docs_complete_pct; ?>%</div>
-                    <div style="font-size:.8em;color:#6b4e2a;">البوابة تمنع الإرسال الناقص بنيويًا (§3.1)<?php echo $rej_docs > 0 ? ' · ' . $rej_docs . ' رُفض لنقص مستند' : ''; ?></div>
+                    <div class="stat-value fcb-ok"><?php echo $docs_complete_pct; ?>%</div>
+                    <div class="fcb-note">البوابة تمنع الإرسال الناقص بنيويًا (§3.1)<?php echo $rej_docs > 0 ? ' · ' . $rej_docs . ' رُفض لنقص مستند' : ''; ?></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="card" style="margin-bottom:14px;">
+    <div class="card fcb-mb14">
         <div class="card-header"><h5><i class="fa fa-hourglass-half"></i> زمن كل مرحلة (من سجل الانتقالات — بالدقائق)</h5></div>
         <div class="card-body">
             <?php if ($timings): ?>
@@ -195,7 +210,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     </div>
 
-    <div class="card" style="margin-bottom:14px;">
+    <div class="card fcb-mb14">
         <div class="card-header"><h5><i class="fa fa-arrow-trend-up"></i> التصعيدات المفتوحة (§8.2)</h5></div>
         <div class="card-body">
             <?php if ($escalated): ?>
@@ -238,17 +253,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     </div>
 
-    <div class="card" style="margin-bottom:14px;border-right:4px solid #b45309;">
+    <div class="card fcb-card-warn">
         <div class="card-header"><h5><i class="fa fa-gavel"></i> قائمة المساءلة الأسبوعية — المستوى ④ (§8.2)</h5></div>
         <div class="card-body">
             <?php if ($level3): ?>
-                <p style="font-weight:700;color:#92400e;">كل ما بلغ المستوى الثالث يخضع لمراجعةٍ أسبوعيةٍ إلزامية (المدير المالي + مدير الإدارة المعنية):</p>
+                <p class="fcb-lead">كل ما بلغ المستوى الثالث يخضع لمراجعةٍ أسبوعيةٍ إلزامية (المدير المالي + مدير الإدارة المعنية):</p>
                 <?php foreach ($level3 as $e): ?>
-                    <div style="padding:6px 0;border-bottom:1px dashed #e3d9c6;">
+                    <div class="fcb-row">
                         ⚖️ <strong><?php echo htmlspecialchars($e['request_no']); ?></strong>
                         — <?php echo htmlspecialchars($e['source_module']); ?> · <?php echo finreq_state_badge($e['state']); ?>
                         · استحقاقه <?php echo htmlspecialchars($e['sla_due_at'] ?? '—'); ?>
-                        <a href="request_form.php?id=<?php echo intval($e['id']); ?>" style="margin-right:8px;">سجله الكامل ↗</a>
+                        <a href="request_form.php?id=<?php echo intval($e['id']); ?>" class="fcb-link">سجله الكامل ↗</a>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>✅ لا شيء بلغ المستوى الثالث<?php endif; ?>
@@ -256,14 +271,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <?php if ($exc_breaches): ?>
-    <div class="card" style="border-right:4px solid #dc2626;">
+    <div class="card fcb-card-danger">
         <div class="card-header"><h5><i class="fa fa-bolt"></i> خروقات مهلة الطارئ — 72 ساعة (§8.3)</h5></div>
         <div class="card-body">
             <?php foreach ($exc_breaches as $b): ?>
-                <div style="padding:6px 0;border-bottom:1px dashed #e3d9c6;">
+                <div class="fcb-row">
                     🚨 <strong><?php echo htmlspecialchars($b['request_no']); ?></strong>
                     — استثناءٌ معتمدٌ لم تُستكمل دورته رجعيًّا خلال 72 ساعة · <?php echo finreq_state_badge($b['state']); ?>
-                    <a href="request_form.php?id=<?php echo intval($b['id']); ?>" style="margin-right:8px;">فتح ↗</a>
+                    <a href="request_form.php?id=<?php echo intval($b['id']); ?>" class="fcb-link">فتح ↗</a>
                 </div>
             <?php endforeach; ?>
         </div>

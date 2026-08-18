@@ -61,16 +61,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-hand-holding-usd';
 $header_title_html = htmlspecialchars('عملية ' . (htmlspecialchars($op['op_code'], ENT_QUOTES, 'UTF-8')) . ' — ' . (htmlspecialchars($op['financier'] ?: 'ممول #' . $op['financier_entity_id'], ENT_QUOTES, 'UTF-8')), ENT_QUOTES, 'UTF-8');
-ob_start(); ?><span class="badge" style="background:#6610f2"><?= htmlspecialchars($op['state'], ENT_QUOTES, 'UTF-8') ?></span><?php
+ob_start(); ?><span class="badge fin-op-badge-state"><?= htmlspecialchars($op['state'], ENT_QUOTES, 'UTF-8') ?></span><?php
 $header_actions = array(array('raw' => trim((string) ob_get_clean())));
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا بياناتٍ في هذا التبويبِ من ملفِّ العملية', 'انتقلْ إلى تبويبٍ آخرَ أو سجِّلْ أعيانَ العمليةِ وأقساطَها لتظهرَ هنا');
 ?>
+  <style>
+    .fin-op-badge-state { background: var(--c-6610f2, #6610f2); }
+    .fin-op-facts { max-width: 720px; }
+    .fin-op-docs { max-width: 640px; }
+    .fin-op-inst-paid { background: var(--c-198754); }
+    .fin-op-inst-overdue { background: var(--c-dc3545); }
+    .fin-op-inst-due { background: var(--c-fd7e14, #fd7e14); }
+    .fin-op-inst-other { background: var(--c-6c757d); }
+  </style>
   <?php $ff_op_id = $op_id; $ff_active = $tab === 'terms' ? 'terms' : $tab;
         include __DIR__ . '/../includes/financing_file_tabs.php'; ?>
 
   <?php if ($tab === 'terms'): ?>
-    <table class="table table-sm" data-no-dt style="max-width:720px">
+    <table class="table table-sm fin-op-facts" data-no-dt>
       <tr><th>النموذج</th><td><?= htmlspecialchars($op['model_code'], ENT_QUOTES, 'UTF-8') ?></td>
           <th>العملة</th><td><?= htmlspecialchars($op['currency'], ENT_QUOTES, 'UTF-8') ?></td></tr>
       <tr><th>رأسُ المال</th><td><?= number_format(floatval($op['capital']), 2) ?></td>
@@ -139,14 +150,14 @@ include __DIR__ . '/../includes/page_header.php';
                                        FROM financing_installments WHERE op_id = $op_id ORDER BY seq_no");
       $any = false;
       if ($r2) while ($x = mysqli_fetch_assoc($r2)) { $any = true;
-          $clr = array('paid' => '#198754', 'overdue' => '#dc3545', 'due' => '#fd7e14');
+          $clr = array('paid' => 'fin-op-inst-paid', 'overdue' => 'fin-op-inst-overdue', 'due' => 'fin-op-inst-due');
       ?>
         <tr><td><?= intval($x['seq_no']) ?></td>
             <td><?= htmlspecialchars($x['due_date'], ENT_QUOTES, 'UTF-8') ?></td>
             <td><?= number_format(floatval($x['amount_principal']), 2) ?></td>
             <td><?= number_format(floatval($x['amount_profit']), 2) ?></td>
             <td><strong><?= number_format(floatval($x['amount_total']), 2) ?></strong> <?= htmlspecialchars($x['currency'], ENT_QUOTES, 'UTF-8') ?></td>
-            <td><span class="badge" style="background:<?= $clr[$x['state']] ?? '#6c757d' ?>"><?= htmlspecialchars($x['state'], ENT_QUOTES, 'UTF-8') ?></span></td>
+            <td><span class="badge <?= $clr[$x['state']] ?? 'fin-op-inst-other' ?>"><?= htmlspecialchars($x['state'], ENT_QUOTES, 'UTF-8') ?></span></td>
             <td><?= htmlspecialchars($x['paid_date'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
             <td><?= htmlspecialchars($x['payment_ref'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
       <?php } if (!$any) echo '<tr><td colspan="8" class="text-center text-muted">لا أقساطَ بعد</td></tr>'; ?>
@@ -175,7 +186,7 @@ include __DIR__ . '/../includes/page_header.php';
     </table>
 
   <?php else: /* docs */ ?>
-    <table class="table table-sm" data-no-dt style="max-width:640px">
+    <table class="table table-sm fin-op-docs" data-no-dt>
       <tr><th>مرجعُ العقد</th><td><?= htmlspecialchars($op['contract_ref'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
       <tr><th>تاريخُ التوقيع</th><td><?= htmlspecialchars($op['signed_date'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td></tr>
       <tr><th>أُنشئت</th><td><?= htmlspecialchars($op['created_at'], ENT_QUOTES, 'UTF-8') ?> · بواسطة #<?= intval($op['created_by']) ?></td></tr>

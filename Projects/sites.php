@@ -179,7 +179,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا موقعَ تنفيذٍ مسجَّلًا في هذا الترشيح',
+        'أضف موقعًا بزرِّ «موقع جديد» في رأسِ الشاشة أو أعِدْ مرشِّحَ المشروعِ إلى «الكل»');
     ?>
+
+    <style>
+    .prj-st-req        { color:var(--c-state-danger-strong); }
+    .prj-st-save       { margin-top:12px; }
+    .prj-st-filter     { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+    .prj-st-filter-sel { min-width:220px; }
+    .prj-st-table      { width:100%; }
+    </style>
 
     <?php if ($can_add || $can_edit): ?>
     <form method="post" class="allforms" id="siteForm">
@@ -188,7 +199,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-body"><div class="form-grid">
             <input type="hidden" name="site_id" id="f_site_id" value="">
             <div class="form-group">
-                <label for="f_project_id">المشروع <span style="color:#c00">*</span></label>
+                <label for="f_project_id">المشروع <span class="prj-st-req">*</span></label>
                 <select name="project_id" id="f_project_id" required>
                     <option value="">— اختر المشروع —</option>
                     <?php foreach ($projects_options as $p): ?>
@@ -197,7 +208,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </select>
             </div>
             <div class="form-group">
-                <label for="f_site_name">اسم الموقع <span style="color:#c00">*</span></label>
+                <label for="f_site_name">اسم الموقع <span class="prj-st-req">*</span></label>
                 <input type="text" name="site_name" id="f_site_name" required maxlength="190" placeholder="مثال: منجم أ — الواجهة الشمالية">
             </div>
             <div class="form-group">
@@ -229,7 +240,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </select>
             </div>
         </div>
-        <div style="margin-top:12px">
+        <div class="prj-st-save">
             <button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button>
         </div>
         </div></div>
@@ -237,9 +248,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+        <form method="get" class="prj-st-filter">
             <strong>المشروع:</strong>
-            <select name="project_id" onchange="this.form.submit()" style="min-width:220px">
+            <select name="project_id" aria-label="ترشيحُ المواقعِ بالمشروع" class="prj-st-filter-sel" onchange="this.form.submit()">
                 <option value="0">الكل</option>
                 <?php foreach ($projects_options as $p): ?>
                     <option value="<?php echo intval($p['id']); ?>" <?php echo $filter_project === intval($p['id']) ? 'selected' : ''; ?>>
@@ -249,7 +260,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </select>
         </form>
         <div class="table-container">
-            <table class="alltables display nowrap" id="sitesTable" style="width:100%">
+            <table class="alltables display nowrap prj-st-table" id="sitesTable">
                 <thead><tr>
                     <th>الإجراءات</th><th>الموقع</th><th>النوع</th><th>المشروع</th>
                     <th>المسؤول</th><th>العقود</th><th>الحالة</th>

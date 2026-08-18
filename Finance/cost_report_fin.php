@@ -110,6 +110,12 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارتْ أصنافًا ببادئةِ الشاشة */
+.fin-cost-h5 { margin: 0 0 10px; }
+.fin-cost-h5-next { margin: 18px 0 10px; }
+.fin-cost-tbl { width: 100%; }
+</style>
 <div class="main fin-cost-main ems-unified-page-shell">
     <?php
     $header_title = 'التكاليف والربحية'; $header_icon = 'fa fa-coins';
@@ -117,6 +123,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'سجلّ تكلفة'); }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا سجلَّاتِ تكلفةٍ ضمنَ نطاقِ التصفيةِ الحالي', 'أضفْ سجلَّ تكلفةٍ بزرِّ «سجلّ تكلفة» في رأسِ الشاشة أو وسّعْ نطاقَ التصفية');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -163,9 +171,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-chart-line"></i> ربحية المشاريع (تجميع)</h5>
+        <h5 class="fin-cost-h5"><i class="fas fa-chart-line"></i> ربحية المشاريع (تجميع)</h5>
         <div class="table-container">
-            <table id="profTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="profTable" class="display nowrap alltables fin-cost-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>المشروع</th><th>إجمالي التكلفة</th><th>إجمالي الإيراد</th><th>الربحية</th><th>الهامش</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">الفترة</th>
@@ -225,9 +233,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
 
-        <h5 style="margin:18px 0 10px"><i class="fas fa-coins"></i> سجلّ التكاليف</h5>
+        <h5 class="fin-cost-h5-next"><i class="fas fa-coins"></i> سجلّ التكاليف</h5>
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="finTable" class="display nowrap alltables fin-cost-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>النوع</th><th>المشروع</th><th>الكمية</th><th>تكلفة الوحدة</th><th>إجمالي التكلفة</th><th>الإيراد المنسوب</th><th>الربحية</th></tr></thead>
                 <tbody>
                 <?php
@@ -270,9 +278,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 <script>
 $(document).ready(function () {
-    $('#finTable, #profTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    // جداولُ العرضِ يهيّئُها المكوّنُ المركزيُّ (assets/js/ui-unification.js)
     $('#toggleForm').on('click', function () { $('#finForm').toggleClass('allforms-visible'); });
 });
 </script>

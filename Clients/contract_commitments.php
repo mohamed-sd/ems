@@ -503,6 +503,8 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'cmt-toggle-stats-text');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا التزاماتِ تعاقديةً مسجَّلةً بعدُ', 'أضف أولَ التزامٍ تعاقديٍّ بزرِّ «إضافة» في رأسِ الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -731,7 +733,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card">
         <div class="card-body">
             <div class="table-container">
-                <table id="cmtTable" class="display cmt-table-nowrap no-datatable">
+                <table id="cmtTable" class="display cmt-table-nowrap no-datatable" data-state-save="false">
                     <thead>
                         <tr>
                             <th>إجراءات</th>
@@ -853,19 +855,25 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
 <script>
     $(document).ready(function () {
-        const cmtTable = $('#cmtTable').DataTable({
-            autoWidth: false,
-            stateSave: false,
-            language: { url: '/ems/assets/i18n/datatables/ar.json' }
-        });
-
+        // UXW-01 ⑤: تهيئةُ الجدولِ للمكوّنِ المركزيِّ وحدَه (ui-unification.js) —
+        // وما كانت تضبطه التهيئةُ المحليةُ صار سماتٍ على وسمِ الجدول.
         function fillFilterOptions(columnIndex, selectId) {
             const select = $(selectId);
             const values = [];
-            cmtTable.column(columnIndex).data().each(function (value) {
-                const text = $('<div>').html(value).text().trim();
+            const addValue = function (raw) {
+                const text = String(raw).trim();
                 if (text !== '' && text !== '—' && values.indexOf(text) === -1) values.push(text);
-            });
+            };
+            if ($.fn.dataTable && $.fn.dataTable.isDataTable('#cmtTable')) {
+                $('#cmtTable').DataTable().column(columnIndex).data().each(function (value) {
+                    addValue($('<div>').html(value).text());
+                });
+            } else {
+                $('#cmtTable tbody tr').each(function () {
+                    const cell = this.cells[columnIndex];
+                    if (cell) addValue($(cell).text());
+                });
+            }
             values.sort();
             values.forEach(function (val) {
                 select.append('<option value="' + val.replace(/"/g, '&quot;') + '">' + val + '</option>');
@@ -875,12 +883,14 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         fillFilterOptions(4, '#filterType');
 
         $('#filterParty').on('change', function () {
+            if (!$.fn.dataTable || !$.fn.dataTable.isDataTable('#cmtTable')) { return; }
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
-            cmtTable.column(3).search(value ? '^' + value + '$' : '', true, false).draw();
+            $('#cmtTable').DataTable().column(3).search(value ? '^' + value + '$' : '', true, false).draw();
         });
         $('#filterType').on('change', function () {
+            if (!$.fn.dataTable || !$.fn.dataTable.isDataTable('#cmtTable')) { return; }
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
-            cmtTable.column(4).search(value ? '^' + value + '$' : '', true, false).draw();
+            $('#cmtTable').DataTable().column(4).search(value ? '^' + value + '$' : '', true, false).draw();
         });
     });
 
@@ -1029,21 +1039,21 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         background: linear-gradient(180deg, rgba(255,255,255,.95) 0%, var(--s2) 100%);
         box-shadow: var(--sh); padding: 14px; margin-bottom: 14px;
     }
-    .cmt-main .stats-card { background: #eee; border: 1px solid #aaa; border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px rgba(26,18,8,.07); position: relative; overflow: hidden; }
-    .cmt-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid #999; background:#fff; color:#000; }
-    .cmt-main .stats-card .stats-title { color: #555; font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
-    .cmt-main .stats-card .stats-value { color: #222; line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
+    .cmt-main .stats-card { background: var(--c-s-eee); border: 1px solid var(--c-s-aaa); border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px var(--c-rgba26188007); position: relative; overflow: hidden; }
+    .cmt-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-s-fff); color:var(--c-s-000); }
+    .cmt-main .stats-card .stats-title { color: var(--c-s-555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
+    .cmt-main .stats-card .stats-value { color: var(--c-s-222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
     @media (max-width: 900px) { .cmt-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
     @media (max-width: 560px) { .cmt-main .stats-grid { grid-template-columns: 1fr; } }
 
     .cmt-main .cmt-hidden { display: none; }
     .cmt-main .cmt-col-full { grid-column: 1 / -1; }
-    .cmt-main .cmt-section-title { border-top: 1px dashed var(--bdr, #bbb); padding-top: 10px; margin-top: 4px; font-weight: 800; color: #6b5200; }
+    .cmt-main .cmt-section-title { border-top: 1px dashed var(--bdr, #bbb); padding-top: 10px; margin-top: 4px; font-weight: 800; color: var(--c-brand-gold-ink-deep); }
     .cmt-main .table-container { overflow-x: auto; }
     #cmtTable.cmt-table-nowrap, #cmtTable.cmt-table-nowrap th, #cmtTable.cmt-table-nowrap td { white-space: nowrap; }
     #cmtTable .action-btns { flex-wrap: nowrap; white-space: nowrap; }
     .cmt-main .cmt-num { font-variant-numeric: tabular-nums; font-weight: 700; }
-    .cmt-main .cmt-muted { color: #999; }
+    .cmt-main .cmt-muted { color: var(--c-ink-400); }
 </style>
 
 </body>

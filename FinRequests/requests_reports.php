@@ -111,12 +111,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا طلباتٍ ماليةً مسجَّلةً بعدُ لتُبنى منها التقارير', 'سيِّرْ طلبًا من «بوابة المالية» في رأسِ الشاشةِ ليظهرَ في التجميعِ والأعمارِ والسجل');
     ?>
+    <style>
+    .frr-mb14        { margin-bottom: 14px; }
+    .frr-mb12        { margin-bottom: 12px; }
+    .frr-cols        { display: flex; gap: 24px; flex-wrap: wrap; }
+    .frr-col         { flex: 1; min-width: 260px; }
+    .frr-col-wide    { flex: 1; min-width: 320px; }
+    .frr-warn        { color: var(--c-b45309); }
+    .frr-danger      { color: var(--c-state-danger); }
+    .frr-row         { padding: 6px 0; border-bottom: 1px dashed var(--c-e3d9c6, #e3d9c6); }
+    .frr-reason      { color: var(--c-6b4e2a); font-size: .9em; }
+    .frr-search-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 12px; }
+    .frr-field       { min-width: 260px; }
+    .frr-summary     { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 10px; }
+    </style>
 
-    <div class="card" style="margin-bottom:14px;">
+    <div class="card frr-mb14">
         <div class="card-header"><h5><i class="fa fa-layer-group"></i> ① الطلبات بالحالة والنوع والإدارة</h5></div>
-        <div class="card-body" style="display:flex;gap:24px;flex-wrap:wrap;">
-            <div style="flex:1;min-width:260px;">
+        <div class="card-body frr-cols">
+            <div class="frr-col">
                 <h6>بالحالة</h6>
                 <table class="table table-bordered no-datatable" data-no-dt="1">
                     <thead><tr><th>الحالة</th><th>العدد</th><th>المبلغ</th></tr></thead>
@@ -129,7 +145,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </tbody>
                 </table>
             </div>
-            <div style="flex:1;min-width:260px;">
+            <div class="frr-col">
                 <h6>بالنوع</h6>
                 <table class="table table-bordered no-datatable" data-no-dt="1">
                     <thead><tr><th>النوع</th><th>العدد</th><th>المبلغ</th></tr></thead>
@@ -142,7 +158,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </tbody>
                 </table>
             </div>
-            <div style="flex:1;min-width:260px;">
+            <div class="frr-col">
                 <h6>بالإدارة</h6>
                 <table class="table table-bordered no-datatable" data-no-dt="1">
                     <thead><tr><th>الإدارة</th><th>العدد</th><th>المبلغ</th></tr></thead>
@@ -158,14 +174,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     </div>
 
-    <div class="card" style="margin-bottom:14px;">
+    <div class="card frr-mb14">
         <div class="card-header"><h5><i class="fa fa-hourglass-half"></i> ② أعمار الطلبات المفتوحة</h5></div>
         <div class="card-body">
-            <div class="stats-grid" style="margin-bottom:12px;">
+            <div class="stats-grid frr-mb12">
                 <div class="stat-card"><div class="stat-label">0-2 يوم</div><div class="stat-value"><?php echo $ages['0-2']; ?></div></div>
                 <div class="stat-card"><div class="stat-label">3-7 أيام</div><div class="stat-value"><?php echo $ages['3-7']; ?></div></div>
-                <div class="stat-card"><div class="stat-label">8-30 يومًا</div><div class="stat-value" style="<?php echo $ages['8-30'] > 0 ? 'color:#b45309;' : ''; ?>"><?php echo $ages['8-30']; ?></div></div>
-                <div class="stat-card"><div class="stat-label">أكثر من 30</div><div class="stat-value" style="<?php echo $ages['31+'] > 0 ? 'color:#dc2626;' : ''; ?>"><?php echo $ages['31+']; ?></div></div>
+                <div class="stat-card"><div class="stat-label">8-30 يومًا</div><div class="stat-value<?php echo $ages["8-30"] > 0 ? " frr-warn" : ""; ?>"><?php echo $ages['8-30']; ?></div></div>
+                <div class="stat-card"><div class="stat-label">أكثر من 30</div><div class="stat-value<?php echo $ages["31+"] > 0 ? " frr-danger" : ""; ?>"><?php echo $ages['31+']; ?></div></div>
             </div>
             <?php if ($oldest): ?>
             <h6>الأقدم عمرًا (أعلى 10)</h6>
@@ -195,28 +211,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     </div>
 
-    <div class="card" style="margin-bottom:14px;">
+    <div class="card frr-mb14">
         <div class="card-header"><h5><i class="fa fa-rotate-left"></i> ③ المعاد والمرفوض بأسبابه</h5></div>
-        <div class="card-body" style="display:flex;gap:24px;flex-wrap:wrap;">
-            <div style="flex:1;min-width:320px;">
+        <div class="card-body frr-cols">
+            <div class="frr-col-wide">
                 <h6>المرفوض (<?php echo count($rejected); ?>) — نهايةٌ موثقةٌ لا حذف</h6>
                 <?php foreach ($rejected as $rj): ?>
-                    <div style="padding:6px 0;border-bottom:1px dashed #e3d9c6;">
+                    <div class="frr-row">
                         ⛔ <strong><?php echo htmlspecialchars($rj['request_no']); ?></strong>
                         · <span class="badge bg-danger"><?php echo htmlspecialchars($rej_classes[$rj['rejection_class']] ?? ($rj['rejection_class'] ?: 'بلا تصنيف')); ?></span>
                         · <?php echo number_format(floatval($rj['amount']), 0); ?>
-                        <div style="color:#6b4e2a;font-size:.9em;">السبب: <?php echo htmlspecialchars(rr_last_reason($gate, $rj['id'], array('reject'))); ?></div>
+                        <div class="frr-reason">السبب: <?php echo htmlspecialchars(rr_last_reason($gate, $rj['id'], array('reject'))); ?></div>
                     </div>
                 <?php endforeach; if (!$rejected): ?><div>لا مرفوضات</div><?php endif; ?>
             </div>
-            <div style="flex:1;min-width:320px;">
+            <div class="frr-col-wide">
                 <h6>المعاد للاستكمال (<?php echo count($returned); ?>) — يعود لمنشئه بالسبب كاملًا</h6>
                 <?php foreach ($returned as $rt): ?>
-                    <div style="padding:6px 0;border-bottom:1px dashed #e3d9c6;">
+                    <div class="frr-row">
                         ↩️ <strong><?php echo htmlspecialchars($rt['request_no']); ?></strong>
                         · <?php echo htmlspecialchars($rt['source_module']); ?>
                         · <?php echo number_format(floatval($rt['amount']), 0); ?>
-                        <div style="color:#6b4e2a;font-size:.9em;">السبب: <?php echo htmlspecialchars(rr_last_reason($gate, $rt['id'], array('return'))); ?></div>
+                        <div class="frr-reason">السبب: <?php echo htmlspecialchars(rr_last_reason($gate, $rt['id'], array('return'))); ?></div>
                     </div>
                 <?php endforeach; if (!$returned): ?><div>لا مُعادات</div><?php endif; ?>
             </div>
@@ -226,17 +242,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card">
         <div class="card-header"><h5><i class="fa fa-magnifying-glass"></i> ④ سجلّ طلبٍ كامل — إعادة بناء القصة (§8.6)</h5></div>
         <div class="card-body">
-            <form method="get" class="allforms allforms-visible" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:12px;">
-                <div style="min-width:260px;">
+            <form method="get" class="allforms allforms-visible frr-search-form">
+                <div class="frr-field">
                     <label for="emsf_198_cce17">رقم الطلب (FR-…)</label>
-                    <input type="text" name="q" value="<?php echo htmlspecialchars($q); ?>" placeholder="FR-2026-0001" id="emsf_198_cce17">
+                    <input type="text" name="q" id="emsf_198_cce17" placeholder="FR-2026-0001" value="<?php echo htmlspecialchars($q); ?>">
                 </div>
                 <button type="submit" class="btn btn-primary"><i class="fa fa-book-open"></i> افرد القصة</button>
             </form>
             <?php if ($q !== '' && !$audit_req): ?>
                 <div>🔍 لا طلب بهذا الرقم ضمن نطاق شركتك</div>
             <?php elseif ($audit_req): ?>
-                <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="frr-summary">
                     <div><strong><?php echo htmlspecialchars($audit_req['request_no']); ?></strong></div>
                     <div><?php echo htmlspecialchars($catalog[$audit_req['request_type']]['label'] ?? $audit_req['request_type']); ?></div>
                     <div><?php echo finreq_state_badge($audit_req['state']); ?></div>

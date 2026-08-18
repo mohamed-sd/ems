@@ -96,6 +96,10 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارتْ أصنافًا ببادئةِ الشاشة */
+.fin-acc-tbl { width: 100%; }
+</style>
 
 <div class="main fin-accounts-main ems-unified-page-shell">
     <?php
@@ -107,6 +111,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا حساباتٍ في دليلِ الحساباتِ بعدُ', 'أضفْ أوّلَ حسابٍ بزرِّ «إضافة حساب» في رأسِ الشاشة ثمّ اربطْه بحسابٍ أبٍ لبناءِ الشجرة');
     ?>
 
     <?php fin_msg_banner(); ?>
@@ -139,7 +145,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </div>
                     <div class="form-group">
                         <label>يقبل القيد المباشر</label>
-                        <label class="switch-inline"><input type="checkbox" name="is_postable" id="a_postable" value="1" checked> نعم</label>
+                        <label class="switch-inline"><input type="checkbox" name="is_postable" aria-label="يقبلُ الحسابُ القيدَ المباشر" id="a_postable" value="1" checked> نعم</label>
                     </div>
                 </div>
             </div>
@@ -152,7 +158,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="finTable" class="display nowrap alltables fin-acc-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>اسم الحساب</th><th>نوع الحركة</th><th>الحساب الأب</th><th>يقبل القيد</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -240,16 +246,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function () {
     $(document).ready(function () {
-        $('#finTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
-
+        // جدولُ العرضِ يهيّئُه المكوّنُ المركزيُّ (assets/js/ui-unification.js)
         var toggleBtn = document.getElementById('toggleForm');
         if (toggleBtn) {
             toggleBtn.addEventListener('click', function () {

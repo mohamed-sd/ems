@@ -121,7 +121,7 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 
-function wz_step($n, $title) { echo '<h5 style="margin-top:14px"><span class="badge badge-warning">' . $n . '</span> ' . htmlspecialchars($title) . '</h5>'; }
+function wz_step($n, $title) { echo '<h5 class="sec-wz-step"><span class="badge badge-warning">' . $n . '</span> ' . htmlspecialchars($title) . '</h5>'; }
 ?>
 <div class="main ems-unified-page-shell">
     <?php
@@ -135,12 +135,27 @@ function wz_step($n, $title) { echo '<h5 style="margin-top:14px"><span class="ba
               'المعاينة (⑨) تُظهر ما سيُمنح ومن أي مصدر قبل الإرسال',
               'التفعيل (⑪) آليٌّ بعد الموافقات — لا نقرة صلاحية واحدة'));
     if ($msg !== '') { echo '<div class="alert alert-info">' . htmlspecialchars($msg) . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا معاينةَ صلاحياتٍ بعد',
+        'املأ الخطواتِ ① إلى ⑧ ثم اضغطْ «⑨ معاينة الصلاحيات بمصادرها» لعرضِ ما سيُمنح');
     ?>
+
+    <style>
+    .sec-wz-step    { margin-top:14px; }
+    .sec-wz-g3      { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .sec-wz-g2      { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+    .sec-wz-mb4     { margin-bottom:4px; }
+    .sec-wz-hint    { color:var(--c-s-888); }
+    .sec-wz-actions { display:flex; gap:10px; margin-top:14px; }
+    .sec-wz-submit  { background:var(--c-27ae60, #27ae60); }
+    .sec-wz-table   { width:100%; }
+    .sec-wz-deny    { color:var(--c-c0392b, #c0392b); }
+    </style>
 
     <form method="post" class="allforms allforms-visible" id="wzForm">
         <input type="hidden" name="wz_action" value="preview" id="wzAction">
         <?php wz_step('①', 'هوية الشخص ونوع العلاقة'); ?>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div class="sec-wz-g3">
             <div class="form-group"><label for="emsf_1991_7a2c4">شخص قائم (أو اتركه واكتب اسمًا)</label>
                 <select name="person_id" id="emsf_1991_7a2c4"><option value="0">— جديد —</option>
                     <?php foreach ($personsList as $p) { echo '<option value="' . intval($p['person_id']) . '">' . htmlspecialchars($p['full_name']) . '</option>'; } ?></select></div>
@@ -149,7 +164,7 @@ function wz_step($n, $title) { echo '<h5 style="margin-top:14px"><span class="ba
                 <select name="relation_code" required id="emsf_1993_4bb1a"><?php foreach ($relations as $x) { echo '<option value="' . htmlspecialchars($x['code']) . '">' . htmlspecialchars($x['name_ar']) . '</option>'; } ?></select></div>
         </div>
         <?php wz_step('②–④', 'العائلة الوظيفية · المستوى · المسمى'); ?>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div class="sec-wz-g3">
             <div class="form-group"><label for="emsf_1994_bed48">العائلة * (لا موظف بلا عائلة)</label>
                 <select name="family_code" required id="emsf_1994_bed48"><?php foreach ($families as $x) { echo '<option value="' . htmlspecialchars($x['code']) . '">' . htmlspecialchars($x['name_ar']) . '</option>'; } ?></select></div>
             <div class="form-group"><label for="emsf_1995_1ba1c">المستوى *</label>
@@ -158,14 +173,14 @@ function wz_step($n, $title) { echo '<h5 style="margin-top:14px"><span class="ba
                 <select name="title_code" required id="emsf_1996_bf6bd"><?php foreach ($titles as $x) { echo '<option value="' . htmlspecialchars($x['title_code']) . '">' . htmlspecialchars($x['name']) . '</option>'; } ?></select></div>
         </div>
         <?php wz_step('⑤–⑥', 'الجهة · المدير والتبعيتان'); ?>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
+        <div class="sec-wz-g2">
             <div class="form-group"><label for="emsf_1997_c7c5f">الوحدة التنظيمية</label>
                 <select name="org_unit_id" id="emsf_1997_c7c5f"><option value="0">—</option><?php foreach ($units as $x) { echo '<option value="' . intval($x['unit_id']) . '">' . htmlspecialchars($x['name_ar']) . '</option>'; } ?></select></div>
             <div class="form-group"><label for="emsf_1998_8bed3">المدير المباشر</label>
                 <select name="manager_person_id" id="emsf_1998_8bed3"><option value="0">—</option><?php foreach ($usersList as $x) { echo '<option value="' . intval($x['id']) . '">' . htmlspecialchars($x['name']) . '</option>'; } ?></select></div>
         </div>
         <?php wz_step('⑦', 'النطاق التشغيلي — إلزامي'); ?>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div class="sec-wz-g3">
             <div class="form-group"><label for="emsf_1999_1cc51">نوع النطاق *</label>
                 <select name="scope_type" required id="emsf_1999_1cc51">
                     <option value="site">موقع</option><option value="project">مشروع</option>
@@ -176,19 +191,18 @@ function wz_step($n, $title) { echo '<h5 style="margin-top:14px"><span class="ba
                 <select name="scope_id" required id="emsf_2000_8e88c"><option value="0">0 (شركة/عام)</option>
                     <?php foreach ($sitesList as $s) { echo '<option value="' . intval($s['id']) . '">' . htmlspecialchars($s['name']) . '</option>'; } ?></select></div>
             <div class="form-group"><label for="emsf_2001_1f175">من * / إلى</label>
-                <input type="date" name="valid_from" required style="margin-bottom:4px" id="emsf_2001_1f175"><input type="date" name="valid_to"></div>
+                <input type="date" name="valid_from" required class="sec-wz-mb4" id="emsf_2001_1f175"><input type="date" name="valid_to" aria-label="نهايةُ سريانِ النطاق (اتركه فارغًا لسريانٍ مفتوح)"></div>
         </div>
         <?php wz_step('⑧', 'التكليف (اختياري — بيته ORG-01)'); ?>
         <div class="form-group"><label for="emsf_2002_0f1ee">تكليف نافذ مرتبط</label>
             <select name="linked_asg" id="emsf_2002_0f1ee"><option value="">— بلا —</option>
                 <?php foreach ($assignments as $a) { echo '<option value="' . intval($a['asg_id']) . '">#' . intval($a['asg_id']) . ' ' . htmlspecialchars($a['name_ar']) . '</option>'; } ?></select>
-            <small style="color:#888">التكليف يُنشأ ويُدار من شاشة التكليفات — وهنا إحالة قراءة.</small></div>
+            <small class="sec-wz-hint">التكليف يُنشأ ويُدار من شاشة التكليفات — وهنا إحالة قراءة.</small></div>
 
-        <div style="display:flex;gap:10px;margin-top:14px">
+        <div class="sec-wz-actions">
             <button type="submit" class="btn-primary" onclick="document.getElementById('wzAction').value='preview'">⑨ معاينة الصلاحيات بمصادرها</button>
             <?php if ($can_add): ?>
-            <button type="submit" class="btn-primary" onclick="document.getElementById('wzAction').value='submit'"
-                    style="background:#27ae60">⑩ إرسال للموافقة (والتفعيل ⑪ آلي بعدها)</button>
+            <button type="submit" class="btn-primary sec-wz-submit" onclick="document.getElementById('wzAction').value='submit'">⑩ إرسال للموافقة (والتفعيل ⑪ آلي بعدها)</button>
             <?php endif; ?>
         </div>
     </form>
@@ -197,7 +211,7 @@ function wz_step($n, $title) { echo '<h5 style="margin-top:14px"><span class="ba
     <div class="card"><div class="card-header"><h5>⑨ الصلاحيات المقترحة بمصادرها (<?php echo intval($preview['count']); ?>)</h5></div>
     <div class="card-body">
         <?php if (!$preview['proposed']) { ems_state_empty('لا محتوى منشورًا لقوالب هذه الطبقات بعد — تُبنى في شاشة القوالب'); } else { ?>
-        <div class="table-container"><table class="alltables" style="width:100%" data-no-dt="1">
+        <div class="table-container"><table class="alltables sec-wz-table" data-no-dt="1">
             <thead><tr><th>المصدر</th><th>المرجع</th><th>الصلاحية</th><th>الحكم</th><th>النطاق</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -212,7 +226,7 @@ function wz_step($n, $title) { echo '<h5 style="margin-top:14px"><span class="ba
             <tbody><?php foreach ($preview['proposed'] as $p) {
                 echo '<tr><td>' . htmlspecialchars($p['kind']) . '</td><td>' . htmlspecialchars($p['ref'])
                     . '</td><td>' . htmlspecialchars($p['permission']) . '</td><td>'
-                    . ($p['effect'] === 'deny' ? '<span style="color:#c0392b">منع</span>' : 'منح')
+                    . ($p['effect'] === 'deny' ? '<span class="sec-wz-deny">منع</span>' : 'منح')
                     . '</td><td>' . htmlspecialchars((string) $p['scope']) . '</td></tr>';
             } ?></tbody></table></div>
         <?php } ?>

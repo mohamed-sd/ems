@@ -30,6 +30,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   $header_actions  = array();
   $header_back     = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
   include('../includes/page_header.php');
+  // UXW-01 (9): حالاتُ الشاشةِ الدنيا (تحميل / فراغ / خطأ) — مخفيةٌ افتراضيًّا
+  echo ems_states_bundle('لا تصنيفاتِ آلياتٍ متاحةً لإدخالِ الساعات', 'اختر تصنيفَ الآليةِ من البطاقاتِ أعلاه لبدءِ إدخالِ ساعاتِ التشغيل');
   ?>
 
 

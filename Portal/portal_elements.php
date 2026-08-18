@@ -84,9 +84,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا عناصرَ مسجَّلةً في قاموسِ البوابة', 'يُسجَّل العنصرُ بكودِه ووثيقتِه المالكةِ قبلَ أن يُصيَّر في أيِّ شاشة');
     ?>
 
-    <div class="card"><div class="card-body"><p style="color:#666">
+    <style>
+    .pel-note   { color: var(--c-s-666); }
+    .pel-table  { width: 100%; }
+    .pel-inline { display: inline; }
+    </style>
+
+    <div class="card"><div class="card-body"><p class="pel-note">
         <strong>كلُّ ما يمكن إظهارُه له كودٌ واحدٌ في قاموسٍ واحد — وما ليس في القاموس
         لا يُصيَّر أصلًا.</strong> هذه الشاشةُ للقاموس وحدَه <strong>بلا أي بياناتٍ شخصية</strong>؛
         وفتحُ العناصر وإغلاقُها بيتُه <a href="visibility_keys.php">مفاتيحُ الظهور</a>
@@ -95,7 +103,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-book"></i> القاموس (<?php echo count($elements); ?> عنصرًا)</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap pel-table">
             <thead><tr><th>الكود</th><th>الاسم</th><th>الوثيقة المالكة</th>
                 <th>الحساسية</th><th>الافتراض</th><th>الحال</th><th></th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -124,7 +132,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         ? "<span class='badge badge-success'>فعّال</span>"
                         : "<span class='badge badge-secondary'>موقوف — لا يُصيَّر</span>"; ?></td>
                     <td><?php if ($can_edit): ?>
-                        <form method="post" style="display:inline">
+                        <form method="post" class="pel-inline">
         <?= csrf_field() ?>
                             <input type="hidden" name="pe_action" value="toggle">
                             <input type="hidden" name="element_code" value="<?php echo htmlspecialchars((string)$e['element_code']); ?>">

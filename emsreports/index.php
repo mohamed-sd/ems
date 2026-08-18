@@ -27,25 +27,25 @@ include __DIR__ . '/../inheader.php';
 ?>
     <style>
         :root {
-            --navy: #1a1208;
-            --navy-m: #2d200a;
-            --navy-l: #3a2a12;
-            --gold: #f7931a;
-            --gold-l: #ffb347;
-            --gold-d: rgba(232, 184, 0, .12);
-            --blue: #f7931a;
-            --blue-l: #e67e00;
-            --teal: #6b4e2a;
-            --bg: #f5f0e8;
-            --card: #ffffff;
-            --line: rgba(26, 18, 8, .12);
-            --txt: #1a1208;
-            --muted: #6b4e2a;
+            --navy: var(--c-1a1208, #1a1208);
+            --navy-m: var(--c-2d200a, #2d200a);
+            --navy-l: var(--c-3a2a12, #3a2a12);
+            --gold: var(--c-f7931a, #f7931a);
+            --gold-l: var(--c-ffb347, #ffb347);
+            --gold-d: var(--c-rgba232184012, rgba(232, 184, 0, .12));
+            --blue: var(--c-f7931a, #f7931a);
+            --blue-l: var(--c-e67e00, #e67e00);
+            --teal: var(--c-6b4e2a, #6b4e2a);
+            --bg: var(--c-f5f0e8, #f5f0e8);
+            --card: var(--c-surface, #ffffff);
+            --line: var(--c-rgba2618812, rgba(26, 18, 8, .12));
+            --txt: var(--c-1a1208, #1a1208);
+            --muted: var(--c-6b4e2a, #6b4e2a);
             --r: 14px;
             --rl: 20px;
-            --s1: 0 2px 8px rgba(12, 28, 62, .08);
-            --s2: 0 10px 24px rgba(12, 28, 62, .12);
-            --s3: 0 14px 40px rgba(0, 0, 34, .34);
+            --s1: 0 2px 8px var(--c-rgba122862008, rgba(12, 28, 62, .08));
+            --s2: 0 10px 24px var(--c-rgba122862012, rgba(12, 28, 62, .12));
+            --s3: 0 14px 40px var(--c-rgba0034034, rgba(0, 0, 34, .34));
         }
 
         @keyframes pageFade {
@@ -72,21 +72,21 @@ include __DIR__ . '/../inheader.php';
             padding: 5px;
             border-radius: 15px;
             box-shadow: var(--s1);
-            background-color: #eee;
-            border: 1px solid #555;
+            background-color: var(--c-eeeeee, #eee);
+            border: 1px solid var(--c-s-555, #555);
         }
 
         .category-header .cat-icon {
             width: 35px;
             height: 35px;
-            background: #fff;
+            background: var(--c-s-fff, #fff);
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.2rem;
-            color: #000;
-            border: 1px solid #555;
+            color: var(--c-ink-max, #000);
+            border: 1px solid var(--c-s-555, #555);
         }
 
         .category-header h2 {
@@ -97,7 +97,7 @@ include __DIR__ . '/../inheader.php';
 
         .category-header .badge {
             background: linear-gradient(120deg, var(--gold), var(--gold-l)) !important;
-            color: #1f2937;
+            color: var(--c-1f2937, #1f2937);
             font-size: .72rem;
             font-weight: 900;
             border-radius: 10px;
@@ -105,7 +105,7 @@ include __DIR__ . '/../inheader.php';
         }
 
         .report-card {
-            background: #eee;
+            background: var(--c-eeeeee, #eee);
             border-radius: 20px;
             height: auto;
             transition: box-shadow .2s, transform .2s, border-color .2s;
@@ -120,7 +120,7 @@ include __DIR__ . '/../inheader.php';
         .report-card:hover {
             box-shadow: var(--s2);
             transform: translateY(-4px);
-            border-color: rgba(37, 99, 235, .26);
+            border-color: var(--c-rgba379923526, rgba(37, 99, 235, .26));
         }
 
         .report-card .card-inner {
@@ -131,8 +131,8 @@ include __DIR__ . '/../inheader.php';
             width: 60px;
             height: 60px;
             border-radius: 15px;
-            background: #fff;
-            color: #000;
+            background: var(--c-s-fff, #fff);
+            color: var(--c-ink-max, #000);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -157,7 +157,7 @@ include __DIR__ . '/../inheader.php';
 
         .report-card p {
             font-size: .82rem;
-            color: #888;
+            color: var(--c-s-888, #888);
             flex: 1;
             margin-bottom: 10px;
         }
@@ -166,8 +166,8 @@ include __DIR__ . '/../inheader.php';
             width: 60px;
             height: 60px;
             border-radius: 15px;
-            background: #fff;
-            color: #000;
+            background: var(--c-s-fff, #fff);
+            color: var(--c-ink-max, #000);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -183,7 +183,7 @@ include __DIR__ . '/../inheader.php';
         .report-card a.btn:hover {
             background: linear-gradient(120deg, var(--navy), var(--navy-l));
             border-color: transparent;
-            color: #fff;
+            color: var(--c-s-fff, #fff);
         }
 
         .no-reports {
@@ -257,6 +257,12 @@ include __DIR__ . '/../includes/page_header.php';
                 </a>
             </div>
         </div>
+
+        <?php
+        // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+        echo ems_states_bundle('لا تقريرَ متاحًا لدورِك في مركزِ التقارير',
+            'الإتاحةُ تُمنح بصلاحيةِ التقريرِ — راجعْ مديرَ الصلاحياتِ لإسنادِ التقاريرِ التي يلزمها عملُك');
+        ?>
 
         <?php if (empty($byCategory)): ?>
             <div class="no-reports">

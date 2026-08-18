@@ -74,9 +74,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مفاتيحَ ظهورٍ مضبوطةً بعدُ', 'اضبط أولَ مفتاحٍ من نموذجِ «ضبطُ مفتاح» أعلاه — ويُعلَن عددُ المتأثرين قبلَ الحفظ');
     ?>
 
-    <div class="card"><div class="card-body"><p style="color:#666">
+    <style>
+    .vkey-note      { color: var(--c-s-666); }
+    .vkey-table     { width: 100%; }
+    .vkey-form-foot { margin-top: 10px; }
+    </style>
+
+    <div class="card"><div class="card-body"><p class="vkey-note">
         المفاتيحُ <strong>تمنح ظهورًا لا صلاحيةَ عمل</strong> — بستة نطاقاتٍ وأولويةٍ محسومة:
         <strong>الحسابُ يغلب الفئةَ</strong> والفئةُ تغلب الإدارة/المشروع وهذه تغلب المورد/العميل،
         وما لم يُضبط <strong>موروثٌ</strong> وما لا سياسةَ له على <strong>افتراض عنصره</strong>
@@ -121,7 +129,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_1254_03a5c">ينتهي في <span class="mnt-req-hint">(إلزاميٌّ لفتح الحساس)</span></label>
                     <input type="datetime-local" name="expires_at" id="emsf_1254_03a5c"></div>
             </div>
-            <div style="margin-top:10px"><button type="submit" class="btn-primary">
+            <div class="vkey-form-foot"><button type="submit" class="btn-primary">
                 <i class="fa fa-check"></i> احفظ — وسيُعلَن عددُ المتأثرين</button></div>
         </form>
     </div></div>
@@ -129,7 +137,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> المفاتيحُ المضبوطة (<?php echo count($keys); ?>)</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap vkey-table">
             <thead><tr><th>العنصر</th><th>النطاق</th><th>الوضع</th><th>السبب</th>
                 <th>الفاعل</th><th>ينتهي</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->

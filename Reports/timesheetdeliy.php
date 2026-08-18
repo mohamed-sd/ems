@@ -103,6 +103,12 @@ include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ①②: أنماطُ تقريرِ الوحداتِ اليومية — rpt-tsd */
+.rpt-tsd-exec{color:var(--c-0d9488, #0d9488);font-weight:700}
+.rpt-tsd-fault{color:var(--c-dc2626, #dc2626);font-weight:700}
+.rpt-tsd-standby{color:var(--c-e8b800, #e8b800);font-weight:700}
+</style>
 
 <div class="main ems-unified-page-shell reports-main timesheet-daily-main">
 
@@ -113,6 +119,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back    = array('href' => 'reports.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا سجلاتِ وردياتٍ مطابقةً لهذه الفلاتر', 'غيّر التاريخَ أو اختر «الكل» في المشروعِ والموردِ ثمّ اضغط بحث');
     ?>
 
     <div class="card mb-4">
@@ -123,7 +131,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <form method="GET" class="fc-filter-bar">
                 <div>
                     <label class="fc-filter-label" for="emsf_465_8d756"><i class="fas fa-calendar-day"></i> التاريخ:</label>
-                    <input type="date" class="form-control" name="date" value="<?php echo $date_filter; ?>" id="emsf_465_8d756">
+                    <input type="date" class="form-control" name="date" id="emsf_465_8d756" value="<?php echo $date_filter; ?>">
                 </div>
 
                 <div>
@@ -237,9 +245,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <td><?php echo htmlspecialchars($row['equipment_code']); ?></td>
                             <td><?php echo htmlspecialchars($row['driver_name']); ?></td>
                             <td><?php echo ($row['shift'] === 'D') ? 'صباحية' : (($row['shift'] === 'N') ? 'مسائية' : htmlspecialchars($row['shift'])); ?></td>
-                            <td style="color:#0d9488; font-weight:700;"><?php echo $row['executed_hours']; ?></td>
-                            <td style="color:#dc2626; font-weight:700;"><?php echo $row['total_fault_hours']; ?></td>
-                            <td style="color:#e8b800; font-weight:700;"><?php echo $row['standby_hours']; ?></td>
+                            <td class="rpt-tsd-exec"><?php echo $row['executed_hours']; ?></td>
+                            <td class="rpt-tsd-fault"><?php echo $row['total_fault_hours']; ?></td>
+                            <td class="rpt-tsd-standby"><?php echo $row['standby_hours']; ?></td>
                             <td><?php echo htmlspecialchars($row['work_notes']); ?></td>
                             <td><?php echo htmlspecialchars($row['fault_notes']); ?></td>
                         </tr>
@@ -265,22 +273,5 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
     <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
 
-    <script>
-        $(document).ready(function () {
-            $('#projectsTable').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    { extend: 'copy',  text: 'نسخ' },
-                    { extend: 'excel', text: 'تصدير Excel' },
-                    { extend: 'csv',   text: 'تصدير CSV' },
-                    { extend: 'pdf',   text: 'تصدير PDF' },
-                    { extend: 'print', text: 'طباعة' }
-                ],
-                language: {
-                    url: '/ems/assets/i18n/datatables/ar.json'
-                }
-            });
-        });
-    </script>
 </body>
 </html>

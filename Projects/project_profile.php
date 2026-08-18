@@ -114,9 +114,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <style>
 .project-profile-page .profile-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:14px; }
-.project-profile-page .profile-card { background:#fff; border:1px solid #ece6d8; border-radius:12px; padding:12px; }
-.project-profile-page .kpi { font-weight:800; font-size:1.4rem; color:#0f766e; }
-.project-profile-page .label { color:#6b7280; font-size:.9rem; }
+.project-profile-page .profile-card { background:var(--c-surface); border:1px solid var(--c-ece6d8, #ece6d8); border-radius:12px; padding:12px; }
+.project-profile-page .kpi { font-weight:800; font-size:1.4rem; color:var(--c-0f766e); }
+.project-profile-page .label { color:var(--c-ink-500); font-size:.9rem; }
+.project-profile-page .pp-head-card { margin-bottom:12px; }
+.project-profile-page .pp-head-name { margin:0 0 8px 0; }
+.project-profile-page .pp-head-line2 { margin-top:6px; }
+.project-profile-page .pp-suppliers-table { width:100%; }
 </style>
 
 <div class="main project-profile-page ems-unified-page-shell">
@@ -130,18 +134,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = array('href' => 'projects.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا موردَ مرتبطًا بهذا المشروعِ بعد',
+        'يظهر المورّدُ هنا حالَ إسنادِ معدةٍ من معداتِه إلى تشغيلٍ في هذا المشروع');
     ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('project', 'نظرةٌ عامة'); ?>
 
-    <div class="profile-card" style="margin-bottom:12px;">
-        <h2 style="margin:0 0 8px 0;"><?php echo htmlspecialchars($project['name']); ?></h2>
+    <div class="profile-card pp-head-card">
+        <h2 class="pp-head-name"><?php echo htmlspecialchars($project['name']); ?></h2>
         <div class="label">
             العميل: <?php echo htmlspecialchars($project['client_name'] ?: $project['client']); ?> |
             كود المشروع: <?php echo htmlspecialchars($project['project_code'] ?: '-'); ?> |
             كود المنجم: <?php echo htmlspecialchars($project['mine_code'] ?: '-'); ?> |
             الحالة: <?php echo intval($project['status']) === 1 ? 'نشط' : 'غير نشط'; ?>
         </div>
-        <div class="label" style="margin-top:6px;">
+        <div class="label pp-head-line2">
             الموقع: <?php echo htmlspecialchars($project['location'] ?: '-'); ?> |
             الولاية: <?php echo htmlspecialchars($project['state'] ?: '-'); ?> |
             المنطقة: <?php echo htmlspecialchars($project['region'] ?: '-'); ?>
@@ -161,7 +168,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card">
         <div class="card-header"><h5><i class="fas fa-truck-loading"></i> الموردون المرتبطون بالمشروع</h5></div>
         <div class="card-body">
-            <table id="projectSuppliersTable" class="display" style="width:100%;">
+            <table id="projectSuppliersTable" class="display pp-suppliers-table">
                 <thead><tr><th>المورد</th><th>عدد المعدات</th><th>الساعات</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -189,11 +196,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script>
-$(function () {
-    $('#projectSuppliersTable').DataTable({ language: { url: '/ems/assets/i18n/datatables/ar.json' } });
-});
-</script>
+<?php /* UXW-01 ⑤: التهيئةُ المحليةُ حُذفت — المكوّنُ المركزيُّ في assets/js/ui-unification.js
+         يلتقط الجدولَ ويضبط لغةَ ar.json نفسَها. ولا سمةَ سلوكٍ لازمةٌ هنا: التهيئةُ
+         المحذوفةُ لم تكن تضبط ترتيبًا ولا طولَ صفحةٍ ولا أعمدةً غيرَ قابلةٍ للفرز. */ ?>
 
 <?php // NAV-01 §5-④ (update0006 B-03): البلاغاتُ المتصلة بالموقع/المشروع
 $rt_kind = 'site'; $rt_ref = $project_id;

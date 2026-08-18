@@ -18,3 +18,12 @@ Employees/employee_equipment_history.php	id=1
 Equipments/equipment_profile.php	id=1
 Contracts/contract_coverage.php	contract_id=1
 movement/add_drivers.php	equipment_id=1
+Clients/client_profile.php	id=1
+Projects/project_profile.php	id=1
+# شاشتانِ مُحوَّلتانِ عمدًا (INJ-0534 · M-27) — الوجهةُ هي المقيسة
+Oprators/oprators.php		Operations/operations_room.php
+Oprators/select_project.php		Operations/operations_room.php
+main/user_profile.php	id=4
+Timesheet/aprovment.php	type=1&id=1
+# تحويلةٌ مقصودةٌ: الشاشةُ القديمةُ تُحوّل إلى الكنسيةِ بعدَّادِ legacy_hit
+Reports/timesheetdeliy.php		Reports/daily_units_report.php

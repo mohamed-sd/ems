@@ -388,16 +388,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <style>
     :root {
-        --navy: #0c1c3e;
-        --navy-m: #132050;
-        --gold: #e8b800;
-        --gold-l: #ffd740;
-        --blue: #2563eb;
-        --teal: #0d9488;
+        --navy: var(--c-0c1c3e, #0c1c3e);
+        --navy-m: var(--c-132050, #132050);
+        --gold: var(--c-e8b800, #e8b800);
+        --gold-l: var(--c-ffd740, #ffd740);
+        --blue: var(--c-state-info, #2563eb);
+        --teal: var(--c-0d9488, #0d9488);
     }
 
     .main {
-        background: linear-gradient(135deg, #f5f7fa 0%, #f0f2f5 100%);
+        background: linear-gradient(135deg, var(--c-f5f7fa, #f5f7fa) 0%, var(--c-f0f2f5, #f0f2f5) 100%);
         min-height: 100vh;
         padding: 2rem;
     }
@@ -413,7 +413,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         background: white;
         border: none;
         border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(12, 28, 62, 0.08);
+        box-shadow: 0 2px 8px var(--c-rgba122862008, rgba(12, 28, 62, 0.08));
         margin-bottom: 2rem;
     }
 
@@ -431,7 +431,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .filters-section {
-        background: linear-gradient(135deg, #dcf0ff 0%, #e0f0ff 100%);
+        background: linear-gradient(135deg, var(--c-dcf0ff, #dcf0ff) 0%, var(--c-e0f0ff, #e0f0ff) 100%);
         padding: 1.5rem;
         border-radius: 8px;
         margin-bottom: 2rem;
@@ -445,7 +445,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .form-select {
-        border: 2px solid #e0e0e0;
+        border: 2px solid var(--c-e0e0e0, #e0e0e0);
         border-radius: 6px;
         padding: 0.75rem;
         transition: all 0.3s ease;
@@ -468,7 +468,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         padding: 1.5rem;
         border-radius: 8px;
         border-right: 4px solid var(--gold);
-        box-shadow: 0 2px 8px rgba(12, 28, 62, 0.08);
+        box-shadow: 0 2px 8px var(--c-rgba122862008, rgba(12, 28, 62, 0.08));
     }
 
     .stat-card.blue {
@@ -481,7 +481,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     .stat-label {
         font-size: 0.85rem;
-        color: #666;
+        color: var(--c-s-666, #666);
         margin-bottom: 0.5rem;
         font-weight: 600;
     }
@@ -501,7 +501,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     .permission-card {
         background: white;
-        border: 2px solid #e0e0e0;
+        border: 2px solid var(--c-e0e0e0, #e0e0e0);
         border-radius: 8px;
         padding: 1.5rem;
         transition: all 0.3s ease;
@@ -521,10 +521,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     .permission-code {
         font-size: 0.8rem;
-        color: #999;
+        color: var(--c-ink-400, #999);
         margin-bottom: 1rem;
         font-family: monospace;
-        background: #f5f5f5;
+        background: var(--c-f5f5f5, #f5f5f5);
         padding: 0.25rem 0.5rem;
         border-radius: 4px;
         display: inline-block;
@@ -551,7 +551,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .btn-primary {
-        background: linear-gradient(135deg, var(--blue) 0%, #1d4ed8 100%);
+        background: linear-gradient(135deg, var(--blue) 0%, var(--c-state-info-deep, #1d4ed8) 100%);
         color: white;
         border: none;
         border-radius: 6px;
@@ -564,11 +564,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        box-shadow: 0 4px 12px var(--c-rgba379923503, rgba(37, 99, 235, 0.3));
     }
 
     .action-bar {
-        background: linear-gradient(135deg, #e8f4fd 0%, #e0f0ff 100%);
+        background: linear-gradient(135deg, var(--c-e8f4fd, #e8f4fd) 0%, var(--c-e0f0ff, #e0f0ff) 100%);
         padding: 1.5rem;
         border-radius: 8px;
         margin-bottom: 1.5rem;
@@ -600,19 +600,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .alert-success {
-        background: linear-gradient(135deg, #d1f3d1 0%, #c8f0c8 100%);
+        background: linear-gradient(135deg, var(--c-d1f3d1, #d1f3d1) 0%, var(--c-c8f0c8, #c8f0c8) 100%);
         color: var(--teal);
         border-right-color: var(--teal);
     }
 
     .alert-danger {
-        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-        color: #dc2626;
-        border-right-color: #ef4444;
+        background: linear-gradient(135deg, var(--c-fee2e2, #fee2e2) 0%, var(--c-fecaca, #fecaca) 100%);
+        color: var(--c-badge-danger-a, #dc2626);
+        border-right-color: var(--c-ef4444, #ef4444);
     }
 
     .alert-info {
-        background: linear-gradient(135deg, #e0f2fe 0%, #dcf0ff 100%);
+        background: linear-gradient(135deg, var(--c-e0f2fe, #e0f2fe) 0%, var(--c-dcf0ff, #dcf0ff) 100%);
         color: var(--blue);
         border-right-color: var(--blue);
     }
@@ -620,7 +620,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     .empty-state {
         text-align: center;
         padding: 3rem 1rem;
-        color: #999;
+        color: var(--c-ink-400, #999);
     }
 
     .table-custom thead th {
@@ -632,11 +632,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .table-custom tbody tr {
-        border-bottom: 1px solid #e0e0e0;
+        border-bottom: 1px solid var(--c-e0e0e0, #e0e0e0);
     }
 
     .table-custom tbody tr:hover {
-        background-color: #f8f9fa;
+        background-color: var(--c-f8f9fa, #f8f9fa);
     }
 
     .status-badge {
@@ -651,13 +651,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .status-badge.active {
-        background-color: #d1f3d1;
+        background-color: var(--c-d1f3d1, #d1f3d1);
         color: var(--teal);
     }
 
     .status-badge.inactive {
-        background-color: #f0f0f0;
-        color: #999;
+        background-color: var(--c-f0f0f0, #f0f0f0);
+        color: var(--c-ink-400, #999);
     }
 
     .nav-link {
@@ -677,6 +677,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         color: var(--blue);
         border-bottom-color: var(--blue);
     }
+
+    /* UXW-01 ②: أنماطٌ ثابتةٌ منقولةٌ من السماتِ الموضعيةِ إلى أصنافٍ بادئتُها rp- */
+    .rp-header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .rp-tabs { border-bottom: 2px solid var(--c-e0e0e0, #e0e0e0); }
+    .rp-inline-form { margin: 0; }
+    .rp-inline-block-form { display: inline; }
+    .rp-btn-grant { background: linear-gradient(135deg, var(--teal) 0%, var(--c-badge-success-a, #059669) 100%); color: white; border: none; }
+    .rp-btn-revoke { background: linear-gradient(135deg, var(--c-ef4444, #ef4444) 0%, var(--c-badge-danger-a, #dc2626) 100%); color: white; border: none; }
+    .rp-btn-del { background: linear-gradient(135deg, var(--c-ef4444, #ef4444) 0%, var(--c-badge-danger-a, #dc2626) 100%); color: white; border: none; padding: 0.3rem 0.8rem; }
+    .rp-head-grant { background: linear-gradient(135deg, var(--teal) 0%, var(--c-badge-success-a, #059669) 100%); }
+    .rp-head-revoke { background: linear-gradient(135deg, var(--c-ef4444, #ef4444) 0%, var(--c-badge-danger-a, #dc2626) 100%); }
+    .rp-btn-grant-lg { background: linear-gradient(135deg, var(--teal) 0%, var(--c-badge-success-a, #059669) 100%); margin-top: 0.5rem; }
+    .rp-btn-revoke-lg { background: linear-gradient(135deg, var(--c-ef4444, #ef4444) 0%, var(--c-badge-danger-a, #dc2626) 100%); margin-top: 0.5rem; }
 
     @media (max-width: 768px) {
         .permissions-grid {
@@ -701,12 +714,14 @@ $header_title_html = htmlspecialchars('صلاحيات الأدوار', ENT_QUOTE
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا صلاحياتٍ مسجَّلةً لهذا الدورِ بعدُ', 'اختر الدورَ من القائمةِ ثم امنحْ صلاحياتِ شاشاتِه واحفظْ');
 ?>
 
     <!-- الرأس -->
     <div class="header-title">
         <i class="fas fa-lock-open"></i> إدارة صلاحيات الأدوار
-     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+     <div class="rp-header-actions">
             <a href="settings.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
@@ -743,7 +758,7 @@ include __DIR__ . '/../includes/page_header.php';
     </div>
 
     <!-- التبويبات -->
-    <ul class="nav nav-tabs" role="tablist" style="border-bottom: 2px solid #e0e0e0;">
+    <ul class="nav nav-tabs rp-tabs" role="tablist">
         <li class="nav-item">
             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#grid-view">
                 <i class="fas fa-th"></i> عرض الشبكة
@@ -801,19 +816,19 @@ include __DIR__ . '/../includes/page_header.php';
                                 <i class="fas fa-cog"></i> إدارة صلاحيات: <strong><?php echo htmlspecialchars($selected_role_name); ?></strong>
                             </div>
                             <div class="action-buttons">
-                                <form method="POST" style="margin: 0;">
+                                <form method="POST" class="rp-inline-form">
         <?= csrf_field() ?>
                                     <input type="hidden" name="action" value="grant_all">
                                     <input type="hidden" name="role_id" value="<?php echo $selected_role_id; ?>">
-                                    <button type="submit" class="btn btn-sm btn-primary" style="background: linear-gradient(135deg, var(--teal) 0%, #059669 100%); color: white; border: none;">
+                                    <button type="submit" class="btn btn-sm btn-primary rp-btn-grant">
                                         <i class="fas fa-check-circle"></i> منح الكل
                                     </button>
                                 </form>
-                                <form method="POST" style="margin: 0;">
+                                <form method="POST" class="rp-inline-form">
         <?= csrf_field() ?>
                                     <input type="hidden" name="action" value="revoke_all">
                                     <input type="hidden" name="role_id" value="<?php echo $selected_role_id; ?>">
-                                    <button type="submit" class="btn btn-sm btn-danger" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none;">
+                                    <button type="submit" class="btn btn-sm btn-danger rp-btn-revoke">
                                         <i class="fas fa-ban"></i> سحب الكل
                                     </button>
                                 </form>
@@ -840,7 +855,7 @@ include __DIR__ . '/../includes/page_header.php';
 
                                             <div class="permission-checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="can_view"
+                                                    <input type="checkbox" name="can_view" aria-label="صلاحيةُ عرضِ هذه الشاشة"
                                                         <?php echo ($perm && $perm['can_view']) ? 'checked' : ''; ?>>
                                                     ðŸ‘️ عرض
                                                 </label>
@@ -848,7 +863,7 @@ include __DIR__ . '/../includes/page_header.php';
 
                                             <div class="permission-checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="can_add"
+                                                    <input type="checkbox" name="can_add" aria-label="صلاحيةُ الإضافةِ في هذه الشاشة"
                                                         <?php echo ($perm && $perm['can_add']) ? 'checked' : ''; ?>>
                                                     ➕ إضافة
                                                 </label>
@@ -856,7 +871,7 @@ include __DIR__ . '/../includes/page_header.php';
 
                                             <div class="permission-checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="can_edit"
+                                                    <input type="checkbox" name="can_edit" aria-label="صلاحيةُ التعديلِ في هذه الشاشة"
                                                         <?php echo ($perm && $perm['can_edit']) ? 'checked' : ''; ?>>
                                                     ✏️ تعديل
                                                 </label>
@@ -864,7 +879,7 @@ include __DIR__ . '/../includes/page_header.php';
 
                                             <div class="permission-checkbox">
                                                 <label>
-                                                    <input type="checkbox" name="can_delete"
+                                                    <input type="checkbox" name="can_delete" aria-label="صلاحيةُ الحذفِ في هذه الشاشة"
                                                         <?php echo ($perm && $perm['can_delete']) ? 'checked' : ''; ?>>
                                                     ðŸ—‘️ حذف
                                                 </label>
@@ -938,11 +953,11 @@ include __DIR__ . '/../includes/page_header.php';
                                             <?php echo $perm['can_delete'] ? '✓' : '✗'; ?>
                                         </span></td>
                                         <td>
-                                            <form method="POST" style="display: inline;">
+                                            <form method="POST" class="rp-inline-block-form">
         <?= csrf_field() ?>
                                                 <input type="hidden" name="action" value="delete_permission">
                                                 <input type="hidden" name="id" value="<?php echo $perm['id']; ?>">
-                                                <button type="submit" class="btn btn-sm btn-danger" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; border: none; padding: 0.3rem 0.8rem;">
+                                                <button type="submit" class="btn btn-sm btn-danger rp-btn-del">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
@@ -961,7 +976,7 @@ include __DIR__ . '/../includes/page_header.php';
             <div class="row">
                 <div class="col-md-6">
                     <div class="card-main">
-                        <div class="card-header-custom" style="background: linear-gradient(135deg, var(--teal) 0%, #059669 100%);">
+                        <div class="card-header-custom rp-head-grant">
                             <i class="fas fa-check-circle"></i> منح جميع الصلاحيات
                         </div>
                         <div class="card-body-custom">
@@ -969,8 +984,8 @@ include __DIR__ . '/../includes/page_header.php';
         <?= csrf_field() ?>
                                 <input type="hidden" name="action" value="grant_all">
                                 <div class="mb-3">
-                                    <label class="form-label">اختر الدور</label>
-                                    <select name="role_id" class="form-select" required>
+                                    <label class="form-label" for="rp_grant_role_id">اختر الدور</label>
+                                    <select name="role_id" class="form-select" required id="rp_grant_role_id">
                                         <option value="">-- اختر الدور --</option>
                                         <?php foreach ($roles as $role): ?>
                                             <option value="<?php echo $role['id']; ?>">
@@ -979,7 +994,7 @@ include __DIR__ . '/../includes/page_header.php';
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, var(--teal) 0%, #059669 100%); margin-top: 0.5rem;"
+                                <button type="submit" class="btn btn-primary rp-btn-grant-lg"
                                     onclick="return confirm('سيتم منح جميع الصلاحيات. هل أنت متأكد؟')">
                                     <i class="fas fa-check-circle"></i> منح الكل
                                 </button>
@@ -990,7 +1005,7 @@ include __DIR__ . '/../includes/page_header.php';
 
                 <div class="col-md-6">
                     <div class="card-main">
-                        <div class="card-header-custom" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">
+                        <div class="card-header-custom rp-head-revoke">
                             <i class="fas fa-ban"></i> سحب جميع الصلاحيات
                         </div>
                         <div class="card-body-custom">
@@ -1008,7 +1023,7 @@ include __DIR__ . '/../includes/page_header.php';
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                                <button type="submit" class="btn btn-primary" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); margin-top: 0.5rem;"
+                                <button type="submit" class="btn btn-primary rp-btn-revoke-lg"
                                     onclick="return confirm('سيتم سحب جميع الصلاحيات. هل أنت متأكد؟')">
                                     <i class="fas fa-ban"></i> سحب الكل
                                 </button>

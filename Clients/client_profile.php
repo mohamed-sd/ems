@@ -145,18 +145,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     margin-bottom: 14px;
 }
 .client-profile-page .profile-card {
-    background: #fff;
-    border: 1px solid #ece6d8;
+    background: var(--c-s-fff);
+    border: 1px solid var(--c-ece6d8, #ece6d8);
     border-radius: 12px;
     padding: 12px;
 }
 .client-profile-page .kpi {
     font-weight: 800;
     font-size: 1.4rem;
-    color: #0f766e;
+    color: var(--c-0f766e);
 }
 .client-profile-page .label {
-    color: #6b7280;
+    color: var(--c-ink-500);
     font-size: .9rem;
 }
 .client-profile-page .identity-head {
@@ -169,12 +169,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     padding: 6px 12px;
     border-radius: 999px;
     font-weight: 700;
-    background: #d1fae5;
-    color: #065f46;
+    background: var(--c-d1fae5);
+    color: var(--c-065f46);
 }
+.client-profile-page .cp-mb12 { margin-bottom: 12px; }
+.client-profile-page .cp-mt10 { margin-top: 10px; }
+.client-profile-page .cp-w100 { width: 100%; }
+.client-profile-page .cp-id-name { margin: 0 0 6px 0; }
 .client-profile-page .state-badge.off {
-    background: #fee2e2;
-    color: #991b1b;
+    background: var(--c-fee2e2);
+    color: var(--c-991b1b);
 }
 </style>
 
@@ -188,18 +192,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = array('href' => 'clients.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مشاريعَ مسجَّلةً لهذا العميلِ بعدُ', 'افتح «مشاريعَ العميل» من رأسِ الشاشةِ وأضف أولَ مشروعٍ له');
     ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('client', 'نظرةٌ عامة'); ?>
 
-    <div class="profile-card" style="margin-bottom:12px;">
+    <div class="profile-card cp-mb12">
         <div class="identity-head">
             <div>
-                <h2 style="margin:0 0 6px 0;"><?php echo htmlspecialchars($client['client_name']); ?></h2>
+                <h2 class="cp-id-name"><?php echo htmlspecialchars($client['client_name']); ?></h2>
                 <div class="label">الكود: <?php echo htmlspecialchars($client['client_code']); ?> | النوع: <?php echo htmlspecialchars($client['entity_type'] ?: 'غير محدد'); ?></div>
             </div>
             <span class="state-badge <?php echo ($client['status'] === 'نشط') ? '' : 'off'; ?>"><?php echo htmlspecialchars($client['status']); ?></span>
         </div>
-        <div style="margin-top:10px;" class="label">
+        <div class="label cp-mt10">
             القطاع: <?php echo htmlspecialchars($client['sector_category'] ?: 'غير محدد'); ?> |
             الهاتف: <?php echo htmlspecialchars($client['phone'] ?: '-'); ?> |
             البريد: <?php echo htmlspecialchars($client['email'] ?: '-'); ?> |
@@ -221,7 +227,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card-header"><h5><i class="fas fa-list"></i> ملخص مشاريع العميل</h5></div>
         <div class="card-body">
             <div class="table-container">
-                <table class="display" id="clientProjectsTable" style="width:100%;">
+                <table class="display cp-w100" id="clientProjectsTable">
                     <thead>
                         <tr>
                             <th>المشروع</th>
@@ -259,10 +265,4 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script>
-$(function () {
-    $('#clientProjectsTable').DataTable({
-        language: { url: '/ems/assets/i18n/datatables/ar.json' }
-    });
-});
-</script>
+

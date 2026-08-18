@@ -84,6 +84,13 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارتْ أصنافًا ببادئةِ الشاشة */
+.fin-acct-wide { grid-column: 1 / -1; }
+.fin-acct-h5 { margin: 0 0 10px; }
+.fin-acct-h5-next { margin: 18px 0 10px; }
+.fin-acct-tbl { width: 100%; }
+</style>
 <div class="main fin-acct-main ems-unified-page-shell">
     <?php
     $header_title = 'المحاسبون والوحدات المالية'; $header_icon = 'fa fa-users-gear';
@@ -94,6 +101,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا وحداتٍ ماليةً ولا محاسبي إداراتٍ مسجَّلين بعدُ', 'أنشئْ وحدةً بزرِّ «وحدة مالية» ثمّ اربطْ بها محاسبًا بزرِّ «محاسب إدارة»');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -103,7 +112,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
             <div class="form-group"><label for="emsf_320_a5811">الكود <span class="required">*</span></label><input type="text" name="unit_code" required placeholder="gl / ar / ap / treasury" id="emsf_320_a5811"></div>
             <div class="form-group"><label for="emsf_321_37a48">الاسم <span class="required">*</span></label><input type="text" name="unit_name" required id="emsf_321_37a48"></div>
-            <div class="form-group" style="grid-column:1/-1"><label for="emsf_322_9e127">دور الوحدة</label><input type="text" name="role_note" id="emsf_322_9e127"></div>
+            <div class="form-group fin-acct-wide"><label for="emsf_322_9e127">دور الوحدة</label><input type="text" name="role_note" id="emsf_322_9e127"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-secondary" onclick="$('#unitForm').removeClass('allforms-visible')">إلغاء</button></div>
@@ -126,9 +135,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-building-columns"></i> الوحدات المالية الداخلية</h5>
+        <h5 class="fin-acct-h5"><i class="fas fa-building-columns"></i> الوحدات المالية الداخلية</h5>
         <div class="table-container">
-            <table id="uTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="uTable" class="display nowrap alltables fin-acct-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>الدور</th></tr></thead>
                 <tbody>
                 <?php
@@ -147,9 +156,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
 
-        <h5 style="margin:18px 0 10px"><i class="fas fa-user-tie"></i> محاسبو الإدارات (النموذج الموزّع)</h5>
+        <h5 class="fin-acct-h5-next"><i class="fas fa-user-tie"></i> محاسبو الإدارات (النموذج الموزّع)</h5>
         <div class="table-container">
-            <table id="aTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="aTable" class="display nowrap alltables fin-acct-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>المحاسب</th><th>الإدارة المتبوعة</th><th>الوحدة المالية</th><th>التخصص</th><th>حد المراجعة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -200,9 +209,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 <script>
 $(document).ready(function () {
-    $('#uTable, #aTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    // جداولُ العرضِ يهيّئُها المكوّنُ المركزيُّ (assets/js/ui-unification.js)
     $('#toggleUnit').on('click', function () { $('#unitForm').toggleClass('allforms-visible'); });
     $('#toggleAcct').on('click', function () { $('#acctForm').toggleClass('allforms-visible'); });
 });

@@ -79,11 +79,21 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+
+<style>
+/* UXW-01 ②: أنماطُ الشاشةِ الموضعيةُ نُقلت أصنافًا — أنماطُ التفعيل */
+.gov-act-table { width: 100%; }
+.gov-act-grid  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.gov-act-span2 { grid-column: span 2; }
+.gov-act-span3 { grid-column: span 3; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'أنماط التفعيل'; $header_icon = 'fa fa-toggle-on';
     $header_actions = array();
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أعلامَ تفعيلٍ مضبوطةً — النظامُ كلُّه على النمط ① (داخليٌّ محض)', 'اضبطْ أولَ علمٍ من نموذجِ «ضبط علم» أسفلَ الشاشةِ بمعاينةِ أثرِه');
     ems_screen_about('النظام يوفّر البنية كاملة وأنت تقرر ما تفعّله: الافتراض النمط ① (داخلي محض — '
         . 'كله مطفأ)، وكل عنصر بعلَم مستقل على الكيان والعقد معًا والعقد يغلب. عقد بالنمط ① وآخر '
         . 'بالنمط ④ في الشركة نفسها — والعناصر غير المفعَّلة لا تُصيَّر ولا تُطلب ولا تعطِّل.',
@@ -93,7 +103,7 @@ include '../insidebar.php';
     ?>
     <div class="card"><div class="card-body">
         <h4>الأعلام النافذة (ما لم يُضبط فالافتراض: مطفأ — النمط ①)</h4>
-        <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
+        <div class="table-container"><table class="alltables display gov-act-table" data-no-dt="1">
         <thead><tr><th>العنصر</th><th>النطاق</th><th>الحالة</th><th>سبب النمط</th><th>آخر ضبط</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">كود النمط</th>
@@ -130,28 +140,28 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body">
         <h4>ضبط علم — بمعاينة الأثر قبل الحفظ</h4>
-        <form method="post" class="ems-form" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"
+        <form method="post" class="ems-form gov-act-grid"
               onsubmit="var el=this.element_code.value, en=this.enable.value==='1';
                         var fx={<?php foreach ($ELEMENTS as $k => $v) { echo "'" . $k . "':'" . htmlspecialchars($v[1], ENT_QUOTES) . "',"; } ?>};
                         return confirm('معاينة الأثر قبل الحفظ:\n' + (fx[el]||'') + '\n\n' + (en?'تفعيل':'تعطيل — بسبب موثَّق') + '. أتؤكد؟');">
             <?= csrf_field() ?>
-            <select name="element_code" required>
+            <select name="element_code" aria-label="العنصرُ الحاكمُ المرادُ ضبطُ علمِه" required>
                 <?php foreach ($ELEMENTS as $k => $v): ?>
                 <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v[0]); ?></option>
                 <?php endforeach; ?>
             </select>
-            <select name="scope_type" required>
+            <select name="scope_type" aria-label="نطاقُ العلم: على كيانٍ أو على عقد" required>
                 <option value="entity">على كيان</option>
                 <option value="contract">على عقد (يغلب الكيان)</option>
             </select>
             <input type="number" name="scope_id" placeholder="رقم الكيان أو العقد *" required
                    title="الكيانات: <?php foreach (array_slice($entities, 0, 6) as $e) { echo '#' . intval($e['entity_id']) . ' ' . htmlspecialchars($e['legal_name']) . ' · '; } ?>" aria-label="رقم الكيان أو العقد">
-            <select name="enable">
+            <select name="enable" aria-label="الإجراء: تفعيلُ العنصرِ أو تعطيلُه بسبب">
                 <option value="1">تفعيل</option>
                 <option value="0">تعطيل (بسبب)</option>
             </select>
-            <input type="text" name="reason" placeholder="السبب — إلزامي للتعطيل" style="grid-column:span 2" aria-label="السبب — إلزامي للتعطيل">
-            <button class="btn-primary" type="submit" style="grid-column:span 3">حفظ العلم</button>
+            <input type="text" name="reason" class="gov-act-span2" placeholder="السبب — إلزامي للتعطيل" aria-label="السبب — إلزامي للتعطيل">
+            <button class="btn-primary gov-act-span3" type="submit">حفظ العلم</button>
         </form>
     </div></div>
 </div>

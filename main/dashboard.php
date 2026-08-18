@@ -483,10 +483,10 @@ $analyticsPayload = [
 ];
 
 $AC = [
-  'or' => ['bg' => '#F7931A', 'soft' => '#FFF4E6', 'text' => '#B45309', 'ico' => '#F7931A'],
-  'ok' => ['bg' => '#16A34A', 'soft' => '#F0FDF4', 'text' => '#15803D', 'ico' => '#16A34A'],
-  'warn' => ['bg' => '#D97706', 'soft' => '#FFFBEB', 'text' => '#B45309', 'ico' => '#D97706'],
-  'err' => ['bg' => '#DC2626', 'soft' => '#FEF2F2', 'text' => '#B91C1C', 'ico' => '#DC2626'],
+  'or' => ['bg' => 'var(--dash-tone-or-bg)', 'soft' => 'var(--dash-tone-or-soft)', 'text' => 'var(--dash-tone-or-text)', 'ico' => 'var(--dash-tone-or-bg)'],
+  'ok' => ['bg' => 'var(--dash-tone-ok-bg)', 'soft' => 'var(--dash-tone-ok-soft)', 'text' => 'var(--dash-tone-ok-text)', 'ico' => 'var(--dash-tone-ok-bg)'],
+  'warn' => ['bg' => 'var(--dash-tone-warn-bg)', 'soft' => 'var(--dash-tone-warn-soft)', 'text' => 'var(--dash-tone-or-text)', 'ico' => 'var(--dash-tone-warn-bg)'],
+  'err' => ['bg' => 'var(--dash-tone-err-bg)', 'soft' => 'var(--dash-tone-err-soft)', 'text' => 'var(--dash-tone-err-text)', 'ico' => 'var(--dash-tone-err-bg)'],
 ];
 
 $page_title = 'Equipation | الرئيسية';
@@ -507,7 +507,38 @@ $header_title_html = htmlspecialchars('Dashboard', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا أرقامَ تشغيليةً محسوبةً لهذا الدورِ اليوم', 'افتح شاشةَ العملياتِ أو القيدِ اليوميِّ — والمؤشراتُ تُحسب مع أولِ حركةٍ مسجَّلة');
 ?>
+<style>
+/* UXW-01 ①: لوحةُ ألوانِ رسومِ اللوحةِ صارت رموزًا تُقرأ من CSS لا قيمًا مثبَّتةً
+   في جافاسكربت — والاحتياطيُّ الحرفيُّ لكلِّ رمزٍ يضمن صفرَ تغييرٍ مرئيّ.
+   (نمطُ Employees/employee_profile.php المقيس — البادئةُ هنا --dash-*) */
+:root {
+  --dash-tick:            var(--c-rgba252525070, rgba(25,25,25,.70));
+  --dash-font-ink:        var(--c-rgba252525075, rgba(25,25,25,.75));
+  --dash-grid:            var(--c-rgba000008, rgba(0,0,0,.08));
+  --dash-eq-active:       var(--c-22c55e, #22c55e);
+  --dash-eq-stopped:      var(--c-ef4444, #ef4444);
+  --dash-bar-work:        var(--c-rgba2471472607, rgba(247,147,26,.70));
+  --dash-bar-fault:       var(--c-rgba239686806, rgba(239,68,68,.60));
+  --dash-line-work:       var(--c-f7931a, #f7931a);
+  --dash-line-work-fill:  var(--c-rgba24714726008, rgba(247,147,26,.08));
+  --dash-line-fault:      var(--c-ef4444, #ef4444);
+  --dash-line-fault-fill: var(--c-rgba2396868006, rgba(239,68,68,.06));
+  --dash-tone-or-bg:   var(--c-f7931a, #F7931A);
+  --dash-tone-or-soft: var(--c-fff4e6, #FFF4E6);
+  --dash-tone-or-text: var(--c-b45309, #B45309);
+  --dash-tone-ok-bg:   var(--c-16a34a, #16A34A);
+  --dash-tone-ok-soft: var(--c-f0fdf4, #F0FDF4);
+  --dash-tone-ok-text: var(--c-15803d, #15803D);
+  --dash-tone-warn-bg:   var(--c-d97706, #D97706);
+  --dash-tone-warn-soft: var(--c-fffbeb, #FFFBEB);
+  --dash-tone-err-bg:   var(--c-dc2626, #DC2626);
+  --dash-tone-err-soft: var(--c-fef2f2, #FEF2F2);
+  --dash-tone-err-text: var(--c-b91c1c, #B91C1C);
+}
+</style>
 
 
   <!-- التوببار المشترك يُعرض الآن من insidebar.php (includes/topbar.php) -->
@@ -535,7 +566,7 @@ include __DIR__ . '/../includes/page_header.php';
         ? ' data-quick-group="' . htmlspecialchars($groupKey, ENT_QUOTES, 'UTF-8') . '"'
         : '';
       ?>
-      <div class="shot-hex-grid <?= $gridClass ?>"<?= $attrs ?>
+      <div class="shot-hex-grid <?= $gridClass ?>"<?= $attrs ?> data-allow-style
            style="--last-span-desktop: <?= $spanFor($gridClass === 'cols-3' ? 3 : 4) ?>; --last-span-mid: <?= $spanFor(2) ?>;">
         <?php foreach ($tiles as $lk): ?>
         <a href="<?= htmlspecialchars($lk[0]) ?>" class="shot-hex-link">
@@ -734,14 +765,20 @@ include __DIR__ . '/../includes/page_header.php';
   document.querySelectorAll('[data-count]').forEach(countUp);
 
   /* ── Chart defaults ── */
-  Chart.defaults.color = 'rgba(25,25,25,.75)';
-  Chart.defaults.font.family = getComputedStyle(document.documentElement)
+  /* UXW-01 ①: ألوانُ الرسومِ تُقرأ من رموزِ CSS المعرَّفةِ في كتلةِ الأنماطِ
+     أعلاه (‎--dash-*‎) بدلَ قيمٍ مثبَّتةٍ هنا — والقيمُ نفسُها لم تتغير. */
+  const emsPalette = getComputedStyle(document.documentElement);
+  const dashColor = function (name) {
+    return (emsPalette.getPropertyValue('--dash-' + name) || '').trim();
+  };
+  Chart.defaults.color = dashColor('font-ink');
+  Chart.defaults.font.family = emsPalette
     .getPropertyValue('--font-ar')
     .trim() || "'IBM Plex Sans Arabic','Tajawal','Cairo',sans-serif";
   Chart.defaults.plugins.legend.display = false;
 
-  const gridColor = 'rgba(0,0,0,.08)';
-  const tickColor = 'rgba(25,25,25,.70)';
+  const gridColor = dashColor('grid');
+  const tickColor = dashColor('tick');
 
   /* UI-DEF-07 (سلّم الإغلاق L3): لا رسمَ بلا بياناتٍ يعرض محاورَ افتراضية —
      حالةٌ فارغةٌ مفسَّرةٌ بدلَه (UXR-0084 · chartGuard على الشاشة المصابة نفسها).
@@ -773,7 +810,7 @@ include __DIR__ . '/../includes/page_header.php';
         labels: ['نشطة', 'متوقفة'],
         datasets: [{
           data: AP.equipmentStatus,
-          backgroundColor: ['#22c55e', '#ef4444'],
+          backgroundColor: [dashColor('eq-active'), dashColor('eq-stopped')],
           borderColor: 'transparent',
           borderWidth: 0,
           hoverOffset: 6
@@ -803,8 +840,8 @@ include __DIR__ . '/../includes/page_header.php';
         labels: ['ساعات العمل', 'ساعات التعطل'],
         datasets: [{
           data: [parseFloat(AP.kpis[1]), parseFloat(AP.monthBreakdownHours)],
-          backgroundColor: ['rgba(247,147,26,.70)', 'rgba(239,68,68,.60)'],
-          borderColor: ['#f7931a', '#ef4444'],
+          backgroundColor: [dashColor('bar-work'), dashColor('bar-fault')],
+          borderColor: [dashColor('line-work'), dashColor('line-fault')],
           borderWidth: 1,
           borderRadius: 6
         }]
@@ -837,8 +874,8 @@ include __DIR__ . '/../includes/page_header.php';
           {
             label: 'ساعات العمل',
             data: AP.trendWork,
-            borderColor: '#f7931a',
-            backgroundColor: 'rgba(247,147,26,.08)',
+            borderColor: dashColor('line-work'),
+            backgroundColor: dashColor('line-work-fill'),
             fill: true,
             tension: .35,
             pointRadius: 2,
@@ -848,8 +885,8 @@ include __DIR__ . '/../includes/page_header.php';
           {
             label: 'ساعات التعطل',
             data: AP.trendFault,
-            borderColor: '#ef4444',
-            backgroundColor: 'rgba(239,68,68,.06)',
+            borderColor: dashColor('line-fault'),
+            backgroundColor: dashColor('line-fault-fill'),
             fill: true,
             tension: .35,
             pointRadius: 2,

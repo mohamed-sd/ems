@@ -112,11 +112,27 @@ include '../insidebar.php';
     ems_screen_about('إحاطاتي — وما يتطلب فعلًا أحوّله مهمةً بزرٍّ صريح فلا يضيع في الزحام.');
 
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars((string) $_GET['msg'], ENT_QUOTES, 'UTF-8') . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا تنبيهاتِ خلالَ التسعين يومًا الأخيرة', 'تصلك الإحاطاتُ آليًّا من الشاشاتِ التي تخصُّك — ولا يلزمك إنشاؤها');
     ?>
+    <style>
+    .ntf-bar        { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .ntf-bar-h      { margin: 0; }
+    .ntf-note       { font-size: .8rem; }
+    .ntf-table      { width: 100%; }
+    .ntf-th-ico     { width: 36px; }
+    .ntf-unread     { font-weight: 600; background: var(--c-fffdf4); }
+    .ntf-read       { color: var(--c-s-777); }
+    .ntf-ico-action { color: var(--c-d4870a, #d4870a); }
+    .ntf-ico-info   { color: var(--c-s-aaa); }
+    .ntf-title-cell { white-space: normal; max-width: 420px; }
+    .ntf-body       { font-size: .85rem; }
+    .ntf-inline     { display: inline; }
+    </style>
     <div class="card"><div class="card-body">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-            <h6 style="margin:0"><i class="fas fa-envelope"></i> غير المقروء: <span class="badge bg-danger"><?php echo $unread; ?></span>
-                <span class="text-muted" style="font-size:.8rem">— الاحتفاظ 90 يومًا (قرار 8)</span></h6>
+        <div class="ntf-bar">
+            <h6 class="ntf-bar-h"><i class="fas fa-envelope"></i> غير المقروء: <span class="badge bg-danger"><?php echo $unread; ?></span>
+                <span class="text-muted ntf-note">— الاحتفاظ 90 يومًا (قرار 8)</span></h6>
             <?php if ($unread): ?>
             <form method="post">
         <?= csrf_field() ?><input type="hidden" name="action" value="ntf_read_all">
@@ -124,8 +140,8 @@ include '../insidebar.php';
             <?php endif; ?>
         </div>
         <div class="table-responsive">
-        <table class="alltables display no-datatable" style="width:100%">
-            <thead><tr><th style="width:36px"></th><th>التنبيه</th><th>وقته</th><th>رابط الأصل</th><th>الإجراء</th>
+        <table class="alltables display no-datatable ntf-table">
+            <thead><tr><th class="ntf-th-ico"></th><th>التنبيه</th><th>وقته</th><th>رابط الأصل</th><th>الإجراء</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
@@ -140,16 +156,16 @@ include '../insidebar.php';
             <?php if (!$rows): ?>
                 <tr><td colspan="5" class="text-center text-muted">لا تنبيهات</td></tr>
             <?php else: foreach ($rows as $n): $nid = intval($n['id']); $isUnread = ($n['read_at'] === null); ?>
-                <tr style="<?php echo $isUnread ? 'font-weight:600;background:#fffdf4;' : 'color:#777;'; ?>">
-                    <td><?php echo $n['requires_action'] ? '<i class="fas fa-bolt" style="color:#d4870a" title="يتطلب فعلًا"></i>'
-                                                        : '<i class="far fa-circle" style="color:#aaa" title="إحاطة"></i>'; ?></td>
-                    <td style="white-space:normal;max-width:420px"><strong><?php echo htmlspecialchars((string) $n['title']); ?></strong>
-                        <?php if ($n['body']): ?><div style="font-size:.85rem"><?php echo htmlspecialchars((string) $n['body']); ?></div><?php endif; ?></td>
+                <tr class="<?php echo $isUnread ? 'ntf-unread' : 'ntf-read'; ?>">
+                    <td><?php echo $n['requires_action'] ? '<i class="fas fa-bolt ntf-ico-action" title="يتطلب فعلًا"></i>'
+                                                        : '<i class="far fa-circle ntf-ico-info" title="إحاطة"></i>'; ?></td>
+                    <td class="ntf-title-cell"><strong><?php echo htmlspecialchars((string) $n['title']); ?></strong>
+                        <?php if ($n['body']): ?><div class="ntf-body"><?php echo htmlspecialchars((string) $n['body']); ?></div><?php endif; ?></td>
                     <td><?php echo htmlspecialchars((string) $n['created_at']); ?></td>
                     <td><?php if ($n['link']): ?><a href="../<?php echo htmlspecialchars(ltrim((string) $n['link'], '/')); ?>">فتح الأصل</a><?php else: ?>—<?php endif; ?></td>
                     <td>
                         <?php if ($isUnread): ?>
-                        <form method="post" style="display:inline">
+                        <form method="post" class="ntf-inline">
         <?= csrf_field() ?><input type="hidden" name="action" value="ntf_read"><input type="hidden" name="notif_id" value="<?php echo $nid; ?>">
                             <button class="btn btn-sm btn-secondary">قُرئ</button></form>
                         <?php endif; ?>
@@ -157,7 +173,7 @@ include '../insidebar.php';
                             <?php if (!empty($n['task_item_id'])): ?>
                                 <a class="btn btn-sm btn-secondary" href="my_tasks.php?view=today">WI-<?php echo intval($n['task_item_id']); ?></a>
                             <?php else: ?>
-                            <form method="post" style="display:inline">
+                            <form method="post" class="ntf-inline">
         <?= csrf_field() ?><input type="hidden" name="action" value="ntf_to_task"><input type="hidden" name="notif_id" value="<?php echo $nid; ?>">
                                 <button class="btn btn-sm btn-primary" title="WF-06: التنبيه ذو الفعل يتحول مهمة">تحويل لمهمة</button></form>
                             <?php endif; ?>

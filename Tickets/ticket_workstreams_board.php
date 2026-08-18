@@ -83,11 +83,21 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+<style>
+/* UXW-01 ①②: أنماطُ هذه الشاشةِ الثابتةُ أصنافًا ببادئةِ الشاشة — والألوانُ برموزٍ باحتياطٍ حرفيّ */
+.tkt-wsb-table       { width: 100%; }
+.tkt-wsb-cond        { color: var(--c-e67e22, #e67e22); }
+.tkt-wsb-skip        { color: var(--c-888, #888); }
+.tkt-wsb-inline-form { display: inline; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'المسارات المتوازية — رأس واحد وخمس أيادٍ'; $header_icon = 'fa fa-code-branch';
     $header_actions = array();
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا رأسَ بلاغٍ مفتوحًا ولا مسارَ قائمًا الآن',
+                           'افتحْ بلاغًا من صندوقِ الإدارة أو أزلْ مرشِّحَ رقمِ البلاغِ من الرابط');
     ems_screen_about(
         'الواقعة واحدة ورقمها واحد وقد تعنيها خمس إدارات — لكل مسار مكلفه ومهلته ومانعه، '
         . 'وتأخر المشتريات لا يبرئ الصيانة، ولا يُغلق الرأس قبل الإلزامية كلها.',
@@ -106,7 +116,7 @@ include '../insidebar.php';
         · الرأس: <strong><?php echo $h['head_state'] === 'open' ? 'مفتوح' : 'مغلق'; ?></strong> (مشتق)
     </h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <table class="alltables display nowrap tkt-wsb-table" data-no-dt="1">
             <thead><tr><th>رقم المسار</th><th>الإدارة المالكة</th><th>المكلف</th><th>مسار إلزامي؟</th><th>الحالة</th>
                 <th>المانع</th><th>مهلة الإنجاز</th><th>الأثر</th><th>إعادات</th><th>إجراء</th>
                 <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -132,8 +142,8 @@ include '../insidebar.php';
             <?php foreach ($streams as $w): ?>
                 <tr>
                     <td><?php echo htmlspecialchars($w['workstream_type'] . ($w['seq_no'] > 1 ? ' #' . $w['seq_no'] : '')); ?>
-                        <?php if ($w['activation_state'] === 'pending') { echo ' <small style="color:#e67e22">(شرطي بانتظار حدثه)</small>'; }
-                              elseif ($w['activation_state'] === 'skipped') { echo ' <small style="color:#888">(انتفى شرطه)</small>'; } ?></td>
+                        <?php if ($w['activation_state'] === 'pending') { echo ' <small class="tkt-wsb-cond">(شرطي بانتظار حدثه)</small>'; }
+                              elseif ($w['activation_state'] === 'skipped') { echo ' <small class="tkt-wsb-skip">(انتفى شرطه)</small>'; } ?></td>
                     <td><?php echo htmlspecialchars($w['unit_name'] ?: '—'); ?></td>
                     <td><?php echo htmlspecialchars($w['assignee_name'] ?: ($w['assignee_person_id'] ? '#' . $w['assignee_person_id'] : '—')); ?></td>
                     <td><?php echo intval($w['mandatory']) === 1 ? 'نعم' : 'لا'; ?></td>
@@ -144,7 +154,7 @@ include '../insidebar.php';
                     <td><?php echo intval($w['reopen_count']); ?></td>
                     <td>
                     <?php if ($can_edit && $w['activation_state'] === 'opened' && !in_array($w['ws_state'], array('closed', 'admin_closed'), true)): ?>
-                        <form method="post" style="display:inline">
+                        <form method="post" class="tkt-wsb-inline-form">
         <?php echo csrf_field(); ?>
                             <input type="hidden" name="tk" value="<?php echo $tk; ?>">
                             <input type="hidden" name="ws_id" value="<?php echo intval($w['ws_id']); ?>">

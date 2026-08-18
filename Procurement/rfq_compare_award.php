@@ -116,10 +116,13 @@ $header_title_html = htmlspecialchars('مقارنةُ العروض والترس�
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا عروضَ مقدَّمةً لطلبِ العروضِ المختار',
+    'اختر طلبَ عروضٍ آخرَ من القائمةِ أعلاه، أو انتظر ورودَ عروضِ الموردين قبل الترسية');
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
-  <form method="get" class="ems-form" style="margin-bottom:14px">
-    <select name="rfq" class="form-control" style="max-width:420px" onchange="this.form.submit()">
+  <form method="get" class="ems-form proc-rfq-filter">
+    <select name="rfq" aria-label="طلبُ العروضِ المرادُ مقارنةُ عروضِه" class="form-control proc-rfq-select" onchange="this.form.submit()">
       <option value="">— اختر طلبَ عروض —</option>
       <?php foreach ($rfqs as $f): ?>
         <option value="<?= intval($f['id']) ?>" <?= $f['id'] == $rfq ? 'selected' : '' ?>>
@@ -196,17 +199,17 @@ include __DIR__ . '/../includes/page_header.php';
     foreach ($quotes as $q):
         list($eq, $eqOk) = $eqOf($q);
         $isBest = ($bestId !== null && $q['id'] === $bestId); ?>
-      <tr<?= $isBest ? ' style="background:#f0fff4"' : '' ?>>
-        <td><?= htmlspecialchars($q['supplier'], ENT_QUOTES, 'UTF-8') ?><?= $isBest ? ' <span class="badge" style="background:#198754">الأدنى</span>' : '' ?></td>
+      <tr<?= $isBest ? ' class="proc-rfq-best"' : '' ?>>
+        <td><?= htmlspecialchars($q['supplier'], ENT_QUOTES, 'UTF-8') ?><?= $isBest ? ' <span class="badge proc-rfq-best-badge">الأدنى</span>' : '' ?></td>
         <td><?= number_format(floatval($q['unit_price']), 2) ?> <?= htmlspecialchars($q['currency'], ENT_QUOTES, 'UTF-8') ?>
             <?php if ((string) $q['currency'] !== (string) $baseCur): ?>
               <?php if ($eqOk): ?>
-              <div class="ems-eq-base" style="font-size:.76rem;opacity:.75"
+              <div class="ems-eq-base proc-rfq-eq"
                    title="المعادلُ بعملةِ الدفاترِ — وعليه تُحسب «الأدنى»">
                 ≈ <?= number_format($eq, 2) ?> <?= htmlspecialchars((string) $baseCur, ENT_QUOTES, 'UTF-8') ?>
               </div>
               <?php else: ?>
-              <div class="ems-eq-none" style="font-size:.76rem;color:#b58900"
+              <div class="ems-eq-none proc-rfq-eq-warn"
                    title="لا سعرَ صرفٍ مسجَّلٌ لهذه العملةِ في تاريخِ اليوم — فالمقارنةُ على السعرِ الخامّ">
                 ⚠ بلا سعرِ صرف — قُورن خامًّا
               </div>
@@ -218,11 +221,11 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars($q['record_rating'] ?? '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars(mb_substr($q['note'] ?? '', 0, 40), ENT_QUOTES, 'UTF-8') ?></td>
         <td>
-          <form method="post" style="display:flex;gap:6px">
+          <form method="post" class="proc-rfq-award-form">
         <?= csrf_field() ?>
             <input type="hidden" name="rfq" value="<?= $rfq ?>">
             <input type="hidden" name="award_quote" value="<?= intval($q['id']) ?>">
-            <input type="text" name="award_reason" class="form-control form-control-sm" placeholder="سببُ الترسية" style="max-width:160px" required aria-label="سببُ الترسية">
+            <input type="text" name="award_reason" class="form-control form-control-sm proc-rfq-reason" placeholder="سببُ الترسية" required aria-label="سببُ الترسية">
             <button class="action-btn" type="submit">رسِّ</button>
           </form>
         </td>
@@ -232,3 +235,15 @@ include __DIR__ . '/../includes/page_header.php';
   </table>
   <?php endif; ?>
 </div>
+
+<style>
+    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — والألوانُ برموزِ اللوحةِ بقيمِها الاحتياطية */
+    .proc-rfq-filter { margin-bottom: 14px; }
+    .proc-rfq-select { max-width: 420px; }
+    .proc-rfq-best { background: var(--c-f0fff4, #f0fff4); }
+    .proc-rfq-best-badge { background: var(--c-198754); }
+    .proc-rfq-eq { font-size: .76rem; opacity: .75; }
+    .proc-rfq-eq-warn { font-size: .76rem; color: var(--c-b58900, #b58900); }
+    .proc-rfq-award-form { display: flex; gap: 6px; }
+    .proc-rfq-reason { max-width: 160px; }
+</style>

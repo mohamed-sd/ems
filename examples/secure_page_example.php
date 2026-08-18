@@ -206,6 +206,11 @@ if (isset($_GET['edit'])) {
 
 <div class="content">
     <div class="container-fluid">
+        <?php
+        // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+        echo ems_states_bundle('لا سجلَّ في جدولِ المثالِ بعد',
+            'أضف سجلًّا من نموذجِ «إضافة سجل جديد» أعلاه — هذه صفحةُ قالبٍ مرجعيةٌ لبناءِ الشاشاتِ الآمنة');
+        ?>
         
         <!-- ══════════════════════════════════════════════════════════════ -->
         <!-- Header Section -->
@@ -270,8 +275,10 @@ if (isset($_GET['edit'])) {
                             <input type="text" 
                                    name="name" 
                                    class="form-control" 
-                                   value="<?php echo $edit_record ? e($edit_record['name']) : ''; ?>"
-                                   required id="emsf_715_994b8">
+                                   id="emsf_715_994b8"
+                                   aria-label="الاسم"
+                                   required
+                                   value="<?php echo $edit_record ? e($edit_record['name']) : ''; ?>">
                         </div>
                         
                         <!-- البريد الإلكتروني -->
@@ -280,7 +287,9 @@ if (isset($_GET['edit'])) {
                             <input type="email" 
                                    name="email" 
                                    class="form-control"
-                                   value="<?php echo $edit_record ? e($edit_record['email']) : ''; ?>" id="emsf_716_e14c9">
+                                   id="emsf_716_e14c9"
+                                   aria-label="البريد الإلكتروني"
+                                   value="<?php echo $edit_record ? e($edit_record['email']) : ''; ?>">
                         </div>
                         
                         <!-- رقم الهاتف -->
@@ -289,7 +298,9 @@ if (isset($_GET['edit'])) {
                             <input type="text" 
                                    name="phone" 
                                    class="form-control"
-                                   value="<?php echo $edit_record ? e($edit_record['phone']) : ''; ?>" id="emsf_717_0717d">
+                                   id="emsf_717_0717d"
+                                   aria-label="رقم الهاتف"
+                                   value="<?php echo $edit_record ? e($edit_record['phone']) : ''; ?>">
                         </div>
                         
                         <!-- العمر -->
@@ -300,7 +311,9 @@ if (isset($_GET['edit'])) {
                                    class="form-control" 
                                    min="18" 
                                    max="100"
-                                   value="<?php echo $edit_record ? e($edit_record['age']) : ''; ?>" id="emsf_718_30d9a">
+                                   id="emsf_718_30d9a"
+                                   aria-label="العمر بالسنوات"
+                                   value="<?php echo $edit_record ? e($edit_record['age']) : ''; ?>">
                         </div>
                         
                         <!-- السعر -->
@@ -310,7 +323,9 @@ if (isset($_GET['edit'])) {
                                    name="price" 
                                    class="form-control" 
                                    step="0.01"
-                                   value="<?php echo $edit_record ? e($edit_record['price']) : ''; ?>" id="emsf_719_67ff4">
+                                   id="emsf_719_67ff4"
+                                   aria-label="السعر"
+                                   value="<?php echo $edit_record ? e($edit_record['price']) : ''; ?>">
                         </div>
                         
                         <!-- الفئة -->
@@ -330,7 +345,9 @@ if (isset($_GET['edit'])) {
                             <input type="date" 
                                    name="start_date" 
                                    class="form-control"
-                                   value="<?php echo $edit_record ? e($edit_record['start_date']) : ''; ?>" id="emsf_721_cc189">
+                                   id="emsf_721_cc189"
+                                   aria-label="تاريخ البدء"
+                                   value="<?php echo $edit_record ? e($edit_record['start_date']) : ''; ?>">
                         </div>
                         
                         <!-- الحالة -->
@@ -382,7 +399,8 @@ if (isset($_GET['edit'])) {
             </div>
             <div class="card-body">
                 
-                <table id="dataTable" class="table table-striped table-hover">
+                <table id="dataTable" class="table table-striped table-hover"
+                       data-page-length="10" data-order='[[0,"desc"]]'>
                     <thead>
                         <tr>
                             <th>#</th>
@@ -440,18 +458,9 @@ if (isset($_GET['edit'])) {
     </div>
 </div>
 
-<!-- DataTables Script -->
-<script>
-$(document).ready(function() {
-    $('#dataTable').DataTable({
-        language: {
-            url: '/ems/assets/i18n/datatables/ar.json'
-        },
-        pageLength: 10,
-        order: [[0, 'desc']]
-    });
-});
-</script>
+<?php /* UXW-01 ⑤: التهيئةُ المحليةُ حُذفت — المكوّنُ المركزيُّ في assets/js/ui-unification.js
+         يلتقط الجدولَ ويضبط لغةَ ar.json نفسَها. وسلوكُها محفوظٌ بسمتَين على وسمِ الجدول:
+         data-page-length="10" و data-order='[[0,"desc"]]'. */ ?>
 
 </body>
 </html>

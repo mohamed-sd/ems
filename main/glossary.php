@@ -44,20 +44,32 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="content-wrapper" dir="rtl">
+<style>
+  .gls-lead { color: var(--c-666666); margin: 4px 0 0; }
+  .gls-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 10px; }
+  .gls-card { border: 1px solid var(--c-e3e3e3, #e3e3e3); border-radius: 8px; padding: 10px 12px; background: var(--c-surface); }
+  .gls-term { color: var(--c-1f3a5f, #1f3a5f); }
+  .gls-def { margin: 6px 0 0; color: var(--c-444, #444); }
+  .gls-rules { margin: 0; padding-right: 20px; line-height: 2; }
+</style>
+<?php
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا مصطلحاتِ قاموسٍ معروضةً الآن', 'حدِّثِ الصفحةَ — والقاموسُ يُوسَّع من دليلِ المصطلحاتِ الحاكم');
+?>
   <section class="content-header"><h1>قاموسُ المبتدئ</h1>
-    <p style="color:#666;margin:4px 0 0">ستةَ عشرَ مصطلحًا بلغةِ أولِ يومٍ — لا تسأل زميلَك «ما هذه؟».</p>
+    <p class="gls-lead">ستةَ عشرَ مصطلحًا بلغةِ أولِ يومٍ — لا تسأل زميلَك «ما هذه؟».</p>
   </section>
   <section class="content">
-    <div class="box"><div class="box-body" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:10px">
+    <div class="box"><div class="box-body gls-grid">
       <?php foreach ($TERMS as $i => [$t, $d]): ?>
-        <div style="border:1px solid #e3e3e3;border-radius:8px;padding:10px 12px;background:#fff">
-          <strong style="color:#1f3a5f"><?= ($i + 1) . '. ' . htmlspecialchars($t, ENT_QUOTES, 'UTF-8') ?></strong>
-          <p style="margin:6px 0 0;color:#444"><?= htmlspecialchars($d, ENT_QUOTES, 'UTF-8') ?></p>
+        <div class="gls-card">
+          <strong class="gls-term"><?= ($i + 1) . '. ' . htmlspecialchars($t, ENT_QUOTES, 'UTF-8') ?></strong>
+          <p class="gls-def"><?= htmlspecialchars($d, ENT_QUOTES, 'UTF-8') ?></p>
         </div>
       <?php endforeach; ?>
     </div></div>
     <div class="box box-warning"><div class="box-header with-border"><h3 class="box-title">لغةُ الشاشةِ الستُّ — تُطبَّق في كلِّ شاشةٍ جديدة</h3></div>
-      <div class="box-body"><ol style="margin:0;padding-right:20px;line-height:2">
+      <div class="box-body"><ol class="gls-rules">
         <?php foreach ($RULES as $r): ?><li><?= htmlspecialchars($r, ENT_QUOTES, 'UTF-8') ?></li><?php endforeach; ?>
       </ol></div></div>
   </section>

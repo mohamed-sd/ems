@@ -98,13 +98,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا طلباتٍ ماليةً واردةً بهذا المرشِّح', 'أزِلْ مرشِّحَ الحالةِ من قائمةِ «كل الحالات» أو انتظرْ ورودَ طلبٍ من الإدارات');
     ?>
+    <style>
+    .fgw-mb14        { margin-bottom: 14px; }
+    .fgw-alert       { margin-bottom: 14px; font-weight: 700; }
+    .fgw-danger      { color: var(--c-state-danger); }
+    .fgw-card-danger { margin-bottom: 14px; border-right: 4px solid var(--c-state-danger); }
+    .fgw-exc-row     { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--c-e3d9c6, #e3d9c6); }
+    .fgw-reason      { color: var(--c-6b4e2a); }
+    .fgw-inline-form { display: flex; gap: 6px; }
+    .fgw-card-head   { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+    .fgw-filter-form { display: flex; gap: 8px; }
+    .fgw-table       { width: 100%; }
+    .fgw-actions     { white-space: nowrap; }
+    .fgw-form-inline { display: inline; }
+    .fgw-icon-btn    { border: none; background: none; }
+    .fgw-icon-warn   { color: var(--c-c96a00); }
+    .fgw-icon-ok     { color: var(--c-state-ok); }
+    .fgw-icon-danger { color: var(--c-state-danger); }
+    </style>
 
     <?php if (isset($_GET['msg']) && trim($_GET['msg']) !== ''): ?>
-        <div class="alert alert-info" style="margin-bottom:14px;font-weight:700;"><?php echo htmlspecialchars($_GET['msg']); ?></div>
+        <div class="alert alert-info fgw-alert"><?php echo htmlspecialchars($_GET['msg']); ?></div>
     <?php endif; ?>
 
-    <div class="stats-grid" style="margin-bottom:14px;">
+    <div class="stats-grid fgw-mb14">
         <div class="stat-card"><div class="stat-label">تحت المراجعة</div><div class="stat-value"><?php echo $counts['under_review'] ?? 0; ?></div></div>
         <div class="stat-card"><div class="stat-label">بانتظار الاعتماد</div><div class="stat-value"><?php echo $counts['pending_approval'] ?? 0; ?></div></div>
         <div class="stat-card"><div class="stat-label">معتمد/مقيد</div><div class="stat-value"><?php echo ($counts['approved'] ?? 0) + ($counts['posted'] ?? 0); ?></div></div>
@@ -117,7 +137,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <div class="stat-card">
             <div class="stat-label">الاستثناءات الشهرية (§8.3 — الحدّ 5%)</div>
-            <div class="stat-value" style="<?php echo $exc_pct > 5 ? 'color:#dc2626;' : ''; ?>">
+            <div class="stat-value<?php echo $exc_pct > 5 ? " fgw-danger" : ""; ?>">
                 <?php echo $exc_month; ?> / <?php echo $req_month; ?> <small>(<?php echo $exc_pct; ?>%)</small>
                 <?php if ($exc_pct > 5): ?><small>⚠️ تجاوزٌ يستوجب مراجعة سببٍ جذري</small><?php endif; ?>
             </div>
@@ -125,8 +145,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <?php if ($exception_queue): ?>
-    <div class="card" style="margin-bottom:14px;border-right:4px solid #dc2626;">
-        <div class="card-header"><h5><i class="fa fa-bolt" style="color:#dc2626;"></i> طلبات الاستثناء الطارئ — قرارك حصرًا (§8.3)</h5></div>
+    <div class="card fgw-card-danger">
+        <div class="card-header"><h5><i class="fa fa-bolt fgw-danger"></i> طلبات الاستثناء الطارئ — قرارك حصرًا (§8.3)</h5></div>
         <div class="card-body">
             <?php foreach ($exception_queue as $xq):
                 $last_reason = '';
@@ -139,12 +159,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     $last_reason = $lr ? strval($lr[0]['body']) : '';
                 } catch (\Throwable $t) { /* عرض */ }
             ?>
-            <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;padding:8px 0;border-bottom:1px dashed #e3d9c6;">
+            <div class="fgw-exc-row">
                 <strong><?php echo htmlspecialchars($xq['request_no']); ?></strong>
                 <span><?php echo htmlspecialchars($catalog[$xq['request_type']]['label'] ?? $xq['request_type']); ?></span>
                 <span><?php echo number_format(floatval($xq['amount']), 2) . ' ' . htmlspecialchars($xq['currency']); ?></span>
-                <span style="color:#6b4e2a;"><?php echo htmlspecialchars($last_reason); ?></span>
-                <form action="request_actions.php" method="post" style="display:flex;gap:6px;"
+                <span class="fgw-reason"><?php echo htmlspecialchars($last_reason); ?></span>
+                <form action="request_actions.php" method="post" class="fgw-inline-form"
                       onsubmit="var x=prompt('سبب الاعتماد (للتدقيق):');if(!x)return false;this.reason.value=x;">
         <?php echo csrf_field(); ?>
                     <input type="hidden" name="action" value="exception_decide">
@@ -153,7 +173,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="hidden" name="reason" value="">
                     <button type="submit" class="btn btn-sm btn-danger"><i class="fa fa-bolt"></i> اعتماد الطارئ</button>
                 </form>
-                <form action="request_actions.php" method="post" style="display:flex;gap:6px;"
+                <form action="request_actions.php" method="post" class="fgw-inline-form"
                       onsubmit="var x=prompt('سبب الرفض:');if(!x)return false;this.reason.value=x;">
         <?php echo csrf_field(); ?>
                     <input type="hidden" name="action" value="exception_decide">
@@ -170,10 +190,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <div class="card">
-        <div class="card-header" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div class="card-header fgw-card-head">
             <h5><i class="fas fa-table"></i> كل الطلبات</h5>
-            <form method="get" style="display:flex;gap:8px;">
-                <select name="state" onchange="this.form.submit()">
+            <form method="get" class="fgw-filter-form">
+                <select name="state" aria-label="ترشيحُ الطلباتِ بالحالة" onchange="this.form.submit()">
                     <option value="">— كل الحالات —</option>
                     <?php foreach ($states as $k => $s): ?>
                         <option value="<?php echo $k; ?>" <?php echo $state_filter === $k ? 'selected' : ''; ?>><?php echo $s['label']; ?></option>
@@ -182,7 +202,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </form>
         </div>
         <div class="card-body table-container">
-            <table class="display" style="width:100%">
+            <table class="display fgw-table">
                 <thead>
                     <tr>
                         <th>الرقم</th><th>الإدارة</th><th>النوع</th><th>المستفيد</th>
@@ -209,37 +229,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <td><?php echo $r['event_id'] ? ('#' . intval($r['event_id'])) : '—'; ?></td>
                         <td><?php echo intval($r['created_by']); ?></td>
                         <td><?php echo htmlspecialchars(substr($r['created_at'], 0, 10)); ?></td>
-                        <td style="white-space:nowrap;">
+                        <td class="fgw-actions">
                             <a href="request_form.php?id=<?php echo intval($r['id']); ?>" class="action-btn view" title="فتح"><i class="fa fa-eye"></i></a>
                             <a href="effect_map.php?q=<?php echo urlencode($r['request_no']); ?>" class="action-btn" title="خريطة الأثر"><i class="fa fa-diagram-project"></i></a>
                             <?php if ($is_super || $role === '17'): ?>
                                 <?php if (in_array($r['state'], array('under_review', 'pending_approval'), true)): ?>
-                                <form action="request_actions.php" method="post" style="display:inline;" onsubmit="var x=prompt('سبب التعليق (إلزامي):');if(!x)return false;this.reason.value=x;">
+                                <form action="request_actions.php" method="post" class="fgw-form-inline" onsubmit="var x=prompt('سبب التعليق (إلزامي):');if(!x)return false;this.reason.value=x;">
         <?php echo csrf_field(); ?>
                                     <input type="hidden" name="action" value="suspend">
                                     <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                                     <input type="hidden" name="back" value="finance_gateway.php">
                                     <input type="hidden" name="reason" value="">
-                                    <button type="submit" class="action-btn" title="تعليق" style="border:none;background:none;color:#c96a00;"><i class="fa fa-pause-circle"></i></button>
+                                    <button type="submit" class="action-btn fgw-icon-btn fgw-icon-warn" title="تعليق"><i class="fa fa-pause-circle"></i></button>
                                 </form>
                                 <?php endif; ?>
                                 <?php if ($r['state'] === 'suspended'): ?>
-                                <form action="request_actions.php" method="post" style="display:inline;">
+                                <form action="request_actions.php" method="post" class="fgw-form-inline">
         <?php echo csrf_field(); ?>
                                     <input type="hidden" name="action" value="resume">
                                     <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                                     <input type="hidden" name="back" value="finance_gateway.php">
-                                    <button type="submit" class="action-btn" title="استئناف" style="border:none;background:none;color:#16a34a;"><i class="fa fa-play-circle"></i></button>
+                                    <button type="submit" class="action-btn fgw-icon-btn fgw-icon-ok" title="استئناف"><i class="fa fa-play-circle"></i></button>
                                 </form>
                                 <?php endif; ?>
                                 <?php if ($r['state'] === 'pending_approval'): ?>
-                                <form action="request_actions.php" method="post" style="display:inline;" onsubmit="var x=prompt('سبب الإلغاء (إلزامي — وبعد الولادة تُعالَج آثاره في D04):');if(!x)return false;this.reason.value=x;">
+                                <form action="request_actions.php" method="post" class="fgw-form-inline" onsubmit="var x=prompt('سبب الإلغاء (إلزامي — وبعد الولادة تُعالَج آثاره في D04):');if(!x)return false;this.reason.value=x;">
         <?php echo csrf_field(); ?>
                                     <input type="hidden" name="action" value="cancel">
                                     <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                                     <input type="hidden" name="back" value="finance_gateway.php">
                                     <input type="hidden" name="reason" value="">
-                                    <button type="submit" class="action-btn" title="إلغاء" style="border:none;background:none;color:#dc2626;"><i class="fa fa-ban"></i></button>
+                                    <button type="submit" class="action-btn fgw-icon-btn fgw-icon-danger" title="إلغاء"><i class="fa fa-ban"></i></button>
                                 </form>
                                 <?php endif; ?>
                             <?php endif; ?>

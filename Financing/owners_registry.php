@@ -69,11 +69,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-user-shield';
 $header_title_html = htmlspecialchars('الملكيةُ والمُلّاك — سجلٌّ مقيَّد', ENT_QUOTES, 'UTF-8');
-ob_start(); ?><span class="badge" style="background:#dc3545">كلُّ اطّلاعٍ مسجَّل</span><?php
+ob_start(); ?><span class="badge fin-own-badge-audit">كلُّ اطّلاعٍ مسجَّل</span><?php
 $header_actions = array(array('raw' => trim((string) ob_get_clean())));
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا معداتٍ مسجَّلةً في سجلِّ المُلّاكِ والحصص', 'سجِّلْ ملكيةَ المعدةِ وحصةَ مموِّلِها لتظهرَ في هذا السجلّ');
 ?>
+  <style>
+    .fin-own-badge-audit { background: var(--c-dc3545); }
+  </style>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>كود المعدة</th><th>نوعُ المالك</th><th>مرجع التفويض</th><th>الممولُ الحالي</th><th>حصتُه ٪</th><th>سريانُها</th><th>ملاحظة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->

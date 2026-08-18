@@ -83,9 +83,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <style>
 .user-profile-page .profile-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-bottom:14px; }
-.user-profile-page .profile-card { background:#fff; border:1px solid #ece6d8; border-radius:12px; padding:12px; }
-.user-profile-page .kpi { font-weight:800; font-size:1.4rem; color:#0f766e; }
-.user-profile-page .label { color:#6b7280; font-size:.9rem; }
+.user-profile-page .profile-card { background:var(--c-surface); border:1px solid var(--c-ece6d8, #ece6d8); border-radius:12px; padding:12px; }
+.user-profile-page .kpi { font-weight:800; font-size:1.4rem; color:var(--c-0f766e); }
+.user-profile-page .label { color:var(--c-6b7280, #6b7280); font-size:.9rem; }
+.user-profile-page .profile-head { margin-bottom:12px; }
+.user-profile-page .profile-head h2 { margin:0 0 8px 0; }
+.user-profile-page .profile-head-meta { margin-top:6px; }
+.user-profile-page .profile-table { width:100%; }
 </style>
 
 <div class="main user-profile-page ems-unified-page-shell">
@@ -96,16 +100,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back    = array('href' => 'users.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مشروعَ مكلَّفًا بهذا المستخدم', 'كلِّفه بمشروعٍ من شاشةِ المستخدمين ثم عُدْ إلى بطاقته');
     ?>
 
-    <div class="profile-card" style="margin-bottom:12px;">
-        <h2 style="margin:0 0 8px 0;"><?php echo htmlspecialchars($user_data['name']); ?></h2>
+    <div class="profile-card profile-head">
+        <h2><?php echo htmlspecialchars($user_data['name']); ?></h2>
         <div class="label">
             اسم المستخدم: <?php echo htmlspecialchars($user_data['username']); ?> |
             الدور: <?php echo htmlspecialchars($user_data['role_name'] ?: $user_data['role']); ?> |
             الهاتف: <?php echo htmlspecialchars($user_data['phone'] ?: '-'); ?>
         </div>
-        <div class="label" style="margin-top:6px;">
+        <div class="label profile-head-meta">
             الحالة: <?php echo htmlspecialchars($user_data['status']); ?> |
             آخر دخول: <?php echo htmlspecialchars($last_login); ?> |
             تاريخ الإنشاء: <?php echo htmlspecialchars($user_data['created_at']); ?>
@@ -123,7 +129,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card">
         <div class="card-header"><h5><i class="fas fa-project-diagram"></i> المشروع المكلّف به</h5></div>
         <div class="card-body">
-            <table id="userProjectTable" class="display" style="width:100%;">
+            <table id="userProjectTable" class="display profile-table">
                 <thead><tr><th>اسم المشروع</th><th>كود المشروع</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -152,8 +158,4 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script>
-$(function () {
-    $('#userProjectTable').DataTable({ language: { url: '/ems/assets/i18n/datatables/ar.json' } });
-});
-</script>
+

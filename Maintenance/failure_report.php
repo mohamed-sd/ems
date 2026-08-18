@@ -62,12 +62,14 @@ include '../insidebar.php';
         . 'محور main_category واحدٍ — فلا يفسد التقريرَ جدولان متوازيان. '
         . 'وما لا وصلةَ له يُعلَن «موروثًا» ولا يُخفى.',
         array('حدّد الفترة', 'اقرأ الأكثرَ تكرارًا وكلفةً أولًا'));
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أعطالَ مصنَّفةً في هذه الفترة', 'وسّع الفترةَ أو تحقق من ربطِ أوامرِ الصيانةِ بأكوادِ الأعطال');
     ?>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <label for="emsf_278_59478">من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>" id="emsf_278_59478">
-            <label for="emsf_279_abf93">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>" id="emsf_279_abf93">
+        <form method="get" class="mnt-fr-filter">
+            <label for="emsf_278_59478">من</label><input type="date" name="from" id="emsf_278_59478" value="<?php echo htmlspecialchars($from); ?>">
+            <label for="emsf_279_abf93">إلى</label><input type="date" name="to" id="emsf_279_abf93" value="<?php echo htmlspecialchars($to); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اعرض</button>
         </form>
     </div></div>
@@ -76,7 +78,7 @@ include '../insidebar.php';
         التكرارُ بالفئة الرئيسية — <?php echo count($orders); ?> فئة</h5></div>
     <div class="card-body">
         <?php if (!$orders): ems_state_empty('لا أوامرَ في الفترة', 'وسّع المدة', '?from=' . date('Y-01-01', strtotime('-1 year'))); else: ?>
-        <div class="table-container"><table class="alltables display nowrap" style="width:100%">
+        <div class="table-container"><table class="alltables display nowrap mnt-fr-w100">
             <thead><tr><th>الفئة (الموحّدة)</th><th>أوامرُ الصيانة</th><th>بلاغاتُها</th>
                 <th>التكلفة</th><th>ساعات التوقف</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -93,7 +95,7 @@ include '../insidebar.php';
             <?php foreach ($orders as $o): ?>
                 <tr>
                     <td><strong><?php echo htmlspecialchars((string)$o['name']); ?></strong>
-                        <small style="color:#888"><?php echo htmlspecialchars((string)$o['code']); ?></small></td>
+                        <small class="mnt-fr-code"><?php echo htmlspecialchars((string)$o['code']); ?></small></td>
                     <td><?php echo intval($o['n']); ?></td>
                     <td><?php echo intval($tix[(string)$o['code']] ?? 0); ?></td>
                     <td><?php echo htmlspecialchars((string)$o['cost']); ?></td>
@@ -105,12 +107,19 @@ include '../insidebar.php';
         <?php $orphanTix = 0;
         foreach ($tix as $code => $n) { if (strpos((string)$code, 'موروث') !== false) { $orphanTix = $n; } }
         if ($orphanTix > 0): ?>
-            <p style="color:#a15c00;margin-top:8px">⚠ <?php echo $orphanTix; ?> بلاغًا بتصنيفٍ
+            <p class="mnt-fr-warn">⚠ <?php echo $orphanTix; ?> بلاغًا بتصنيفٍ
                 **بلا وصلةٍ للموحّد** — موروثٌ يُعلَن ولا يُمحى (M-31)</p>
         <?php endif; ?>
     </div></div>
 </div>
 
+<style>
+    /* UXW-01 ①②: أنماطُ التقريرِ أصنافًا، وألوانُه برموزِ اللوحة */
+    .mnt-fr-filter { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .mnt-fr-w100 { width:100%; }
+    .mnt-fr-code { color:var(--c-s-888); }
+    .mnt-fr-warn { color:var(--c-a15c00, #a15c00); margin-top:8px; }
+</style>
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 </body>
 </html>

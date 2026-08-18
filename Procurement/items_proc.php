@@ -121,6 +121,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أصنافَ في الكتالوجِ بعدُ',
+        'أضف أولَ صنفٍ بزرِّ «إضافة صنف» في رأسِ الشاشة، أو وسّع الفلاترَ إن كانت مضبوطة');
     ?>
 
     <?php proc_msg_banner(); ?>
@@ -189,15 +192,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <input type="text" name="served_category" id="p_served_cat">
                     </div>
                     <div class="form-group">
-                        <label for="p_notes">قطعة حرجة؟</label>
+                        <label for="p_critical">قطعة حرجة؟</label>
                         <label class="switch-inline"><input type="checkbox" name="is_critical" id="p_critical" value="1"> نعم، قطعة حرجة</label>
                     </div>
-                    <div class="form-group" style="grid-column:1/-1">
-                        <label>ملاحظات</label>
-                        <label class="switch-inline"><input type="checkbox" name="is_critical" id="p_critical" value="1"> نعم، قطعة حرجة</label>
-                    </div>
-                    <div class="form-group" style="grid-column:1/-1">
-                        <label>ملاحظات</label>
+                    <div class="form-group proc-itm-full">
+                        <label for="p_notes">ملاحظات</label>
                         <input type="text" name="notes" id="p_notes">
                     </div>
                 </div>
@@ -243,7 +242,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="procTable" class="display nowrap alltables proc-itm-table"
+                   data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>اسم الصنف</th><th>الفئة</th><th>طبيعة المادة</th>
                     <th>وحدة القياس</th><th>قطعة حرجة؟</th><th title="Min">الحدّ الأدنى</th><th title="Max">الحدّ الأقصى</th><th>مخزون الأمان</th><th>مدة التوريد بالأيام</th>
@@ -303,7 +303,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td>" . htmlspecialchars((string)($row['category'] ?? '')) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['material_nature']) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['uom']) . "</td>";
-                        echo "<td>" . ((int)$row['is_critical'] === 1 ? "<span class='action-btn' style='color:#c0392b'>حرجة</span>" : "—") . "</td>";
+                        echo "<td>" . ((int)$row['is_critical'] === 1 ? "<span class='action-btn proc-itm-crit'>حرجة</span>" : "—") . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['min_qty']) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['max_qty']) . "</td>";
                         echo "<td>" . htmlspecialchars((string)$row['safety_stock']) . "</td>";
@@ -325,26 +325,34 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
 <script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
+<style>
+    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — واللونُ برمزِ اللوحة */
+    .proc-itm-full { grid-column: 1 / -1; }
+    .proc-itm-table { width: 100%; }
+    .proc-itm-crit { color: var(--c-c0392b); }
+</style>
+
 <script>
 (function () {
     $(document).ready(function () {
-        var procTable = $('#procTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
+        // UXW-01 ⑤: التهيئةُ المحليةُ حُذفت — المكوّنُ المركزيُّ (ui-unification.js) يهيّئ
+        // الجدولَ، والسلوكُ محفوظٌ بسماتِ data-scroll-x و data-state-save على وسمِ الجدول.
+        // ومقبضُ الجدولِ يُطلب لحظةَ الحاجةِ لا وقتَ الجاهزية: كنسُ المكوّنِ يقع بعدَها.
+        function procDT() {
+            if (!$.fn.dataTable || !$.fn.dataTable.isDataTable('#procTable')) { return null; }
+            return $('#procTable').DataTable();
+        }
 
-        // ── فلاتر البحث (نفس منطق شاشة العملاء) ──
+        // ── فلاتر البحث — تُملأ من خلايا الوسمِ قبلَ تهيئةِ المكوّنِ المركزي،
+        //    فتُقرأ كلُّ الصفوفِ لا صفحةُ العرضِ الأولى وحدَها ──
         function fillFilterOptions(columnIndex, selectId) {
             var select = $(selectId);
             var currentValue = select.val();
             var values = [];
-            procTable.column(columnIndex).data().each(function (value) {
-                var text = $('<div>').html(value).text().trim();
+            $('#procTable tbody tr').each(function () {
+                var cell = this.cells[columnIndex];
+                if (!cell) { return; }
+                var text = $(cell).text().trim();
                 if (text !== '' && values.indexOf(text) === -1) {
                     values.push(text);
                 }
@@ -361,25 +369,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         fillFilterOptions(6, '#filterCritical'); // حرجة
 
         $('#filterCategory').on('change', function () {
+            var t = procDT(); if (!t) { return; }
             var value = $.fn.dataTable.util.escapeRegex($(this).val());
-            procTable.column(3).search(value ? '^' + value + '$' : '', true, false).draw();
+            t.column(3).search(value ? '^' + value + '$' : '', true, false).draw();
         });
         $('#filterNature').on('change', function () {
+            var t = procDT(); if (!t) { return; }
             var value = $.fn.dataTable.util.escapeRegex($(this).val());
-            procTable.column(4).search(value ? '^' + value + '$' : '', true, false).draw();
+            t.column(4).search(value ? '^' + value + '$' : '', true, false).draw();
         });
         $('#filterCritical').on('change', function () {
+            var t = procDT(); if (!t) { return; }
             var value = $.fn.dataTable.util.escapeRegex($(this).val());
-            procTable.column(6).search(value ? '^' + value + '$' : '', true, false).draw();
+            t.column(6).search(value ? '^' + value + '$' : '', true, false).draw();
         });
 
         // زر «تطبيق» (البحث فوري عند التغيير؛ يعيد الرسم فقط)
-        $('.filter .btn-primary').on('click', function () { procTable.draw(); });
+        $('.filter .btn-primary').on('click', function () { var t = procDT(); if (t) { t.draw(); } });
 
         // زر «إعادة تعيين»
         $('.filter .btn-secondary').on('click', function () {
             $('#filterCategory, #filterNature, #filterCritical').val('');
-            procTable.column(3).search('').column(4).search('').column(6).search('').draw();
+            var t = procDT(); if (!t) { return; }
+            t.column(3).search('').column(4).search('').column(6).search('').draw();
         });
 
         var toggleBtn = document.getElementById('toggleForm');

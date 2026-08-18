@@ -215,7 +215,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
     $pending = $derived && ($n['origin_ack_by'] === null);
     ?>
     <tr class="<?php echo $pending ? 'cnt-derived' : ''; ?>">
-        <td style="padding-right:<?php echo 6 + $depth * 22; ?>px">
+        <td data-allow-style style="padding-right:<?php echo 6 + $depth * 22; ?>px">
             <?php if ($depth > 0): ?><span class="cnt-branch">└</span> <?php endif; ?>
             <strong><?php echo cnt_e($n['level']); ?></strong>
             <code class="cnt-no"><?php echo cnt_e($n['container_no']); ?></code>
@@ -235,12 +235,12 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
         <td class="cnt-num"><?php echo cnt_n($n['allocated_qty']); ?></td>
         <td class="cnt-num"><strong><?php echo cnt_n($free); ?></strong></td>
         <td class="cnt-num"><?php echo cnt_n($n['consumed_qty']); ?></td>
-        <td class="cnt-num"><strong style="color:<?php echo $rem > 0 ? '#15803d' : '#b91c1c'; ?>">
+        <td class="cnt-num"><strong class="<?php echo $rem > 0 ? 'cnt-rem-ok' : 'cnt-rem-low'; ?>">
             <?php echo cnt_n($rem); ?></strong></td>
         <td class="cnt-small"><?php echo cnt_e($n['unit_type']); ?></td>
-        <td style="white-space:nowrap">
+        <td class="cnt-nowrap">
             <?php if ($can_manage && $pending): ?>
-            <form method="post" style="display:inline">
+            <form method="post" class="cnt-inline">
         <?= csrf_field() ?>
                 <input type="hidden" name="cnt_action" value="acknowledge">
                 <input type="hidden" name="container_id" value="<?php echo $id; ?>">
@@ -263,18 +263,18 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
             <?php endif; ?>
             <?php if ($can_manage && (string) $n['level'] === 'مشغّل'): ?>
             <!-- H-01-③: مقبضُ الدورات — شرطُ بوابة الحصص الثالث (كان طريقًا مسدودًا) -->
-            <details style="display:inline-block">
-                <summary class="btn btn-sm btn-secondary" style="cursor:pointer">دورة</summary>
-                <form method="post" style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
+            <details class="cnt-inline-block">
+                <summary class="btn btn-sm btn-secondary cnt-pointer">دورة</summary>
+                <form method="post" class="cnt-rot-form">
         <?= csrf_field() ?>
                     <input type="hidden" name="cnt_action" value="rotation">
                     <input type="hidden" name="container_id" value="<?php echo $id; ?>">
                     <input type="hidden" name="contract_id" value="<?php echo (int) $contract; ?>">
                     <input type="hidden" name="cnt_csrf" value="<?php echo cnt_e($CSRF); ?>">
-                    <input type="number" name="cycle_on_days" min="1" placeholder="أيام عمل" style="width:80px" required aria-label="أيام عمل">
-                    <input type="number" name="cycle_off_days" min="0" placeholder="أيام راحة" style="width:80px" required aria-label="أيام راحة">
-                    <input type="date" name="cycle_start" required>
-                    <input type="text" name="note" placeholder="ملاحظة" style="width:100px" aria-label="ملاحظة">
+                    <input type="number" name="cycle_on_days" min="1" placeholder="أيام عمل" class="cnt-w80" required aria-label="أيام عمل">
+                    <input type="number" name="cycle_off_days" min="0" placeholder="أيام راحة" class="cnt-w80" required aria-label="أيام راحة">
+                    <input type="date" name="cycle_start" aria-label="تاريخُ بدءِ دورةِ التناوب" required>
+                    <input type="text" name="note" placeholder="ملاحظة" class="cnt-w100" aria-label="ملاحظة">
                     <button class="btn btn-sm btn-secondary">سجّل الدورة</button>
                 </form>
             </details>
@@ -296,15 +296,17 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+    echo ems_states_bundle('لا حاوياتِ عقدٍ مسجَّلةً في هذا النطاقِ بعدُ', 'اختر عقدًا من القائمةِ ثمَّ ولّدِ الحاوياتِ الرئيسيةَ من بنودِه');
     ?>
 
     <?php if (isset($_GET['msg'])): ?>
-    <div class="card"><div class="card-body" style="padding:12px 16px">
+    <div class="card"><div class="card-body cnt-msg-body">
         <?php echo cnt_e($_GET['msg']); ?></div></div>
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <p class="text-muted" style="margin:0 0 10px;line-height:1.9">
+        <p class="text-muted cnt-intro">
             <i class="fa fa-circle-info"></i>
             الحاويةُ **سقفُ كميةٍ** ينزل من العقد إلى المورد إلى المعدة إلى المشغّل.
             و<strong>Σ حصص الأبناء لا تتجاوز سقفَ الأم</strong> — يحرسه المحرّكُ نفسُه لا الشاشة.
@@ -313,8 +315,8 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
             <span class="badge bg-warning text-dark">مشتقّة</span> بملاحظته حتى تُقرّه الإدارة —
             ولا يُقدَّم رقمٌ مشتقٌّ كأنه متفقٌ عليه.
         </p>
-        <form method="get" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
-            <div class="form-group" style="min-width:280px">
+        <form method="get" class="cnt-filter">
+            <div class="form-group cnt-contract-group">
                 <label for="emsf_799_342fc">العقد</label>
                 <select name="contract" onchange="this.form.submit()" id="emsf_799_342fc">
                     <option value="">— اختر عقدًا —</option>
@@ -333,10 +335,10 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
 
     <?php if ($contract > 0): ?>
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fa fa-sitemap"></i> شجرةُ الحاويات</h5>
+        <h5 class="cnt-tight"><i class="fa fa-sitemap"></i> شجرةُ الحاويات</h5>
         <?php if ($can_manage): ?>
-        <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap">
-            <form method="post" style="display:inline">
+        <div class="cnt-gen-actions">
+            <form method="post" class="cnt-inline">
         <?= csrf_field() ?>
                 <input type="hidden" name="cnt_action" value="generate_main">
                 <input type="hidden" name="contract_id" value="<?php echo $contract; ?>">
@@ -344,7 +346,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
                 <button class="btn btn-sm btn-primary"><i class="fa fa-wand-magic-sparkles"></i>
                     ولّد الرئيسيات من بنود العقد</button>
             </form>
-            <form method="post" style="display:inline"
+            <form method="post" class="cnt-inline"
                   onsubmit="return confirm('التوليدُ الرجعيُّ يستنتج الحصصَ من صفوف التشغيل، ويوسمها «مشتقّة» حتى تُقرّها الإدارة. متابعة؟');">
         <?= csrf_field() ?>
                 <input type="hidden" name="cnt_action" value="derive">
@@ -359,8 +361,8 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
         <?php if (!$mains): ?>
             <p class="text-muted">لا حاوياتٍ لهذا العقد بعد — ابدأ بتوليد الرئيسيات من بنوده.</p>
         <?php else: ?>
-        <div class="table-container" style="overflow-x:auto">
-        <table class="display cnt-table no-datatable" style="width:100%">
+        <div class="table-container cnt-scroll-x">
+        <table class="display cnt-table no-datatable cnt-table-full">
             <thead><tr>
                 <th>الحاوية</th><th>السقف</th><th>الموزَّع</th><th>المتاح للتوزيع</th>
                 <th>المستهلَك</th><th>المتبقي</th><th>رقم الوحدة</th><th></th>
@@ -378,14 +380,14 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
 
     <?php /* ── تقريرُ المطابقة — يُعلن ولا يُصلح ─────────────────────────── */ ?>
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fa fa-scale-balanced"></i> تقريرُ المطابقة</h5>
-        <p class="text-muted" style="margin:0 0 10px">
+        <h5 class="cnt-tight"><i class="fa fa-scale-balanced"></i> تقريرُ المطابقة</h5>
+        <p class="text-muted cnt-tight">
             يُعلن ما ينتظر قرارًا ولا يُصلحه — ويبقى ظاهرًا حتى يُقفل.
         </p>
         <h6 class="fw-bold">حصصٌ مشتقّةٌ تنتظر الإقرار: <?php echo count($recon['derived_pending']); ?></h6>
         <?php if ($recon['derived_pending']): ?>
-        <div class="table-container" style="overflow-x:auto;margin-bottom:14px">
-        <table class="display no-datatable" style="width:100%">
+        <div class="table-container cnt-scroll-x cnt-mb14">
+        <table class="display no-datatable cnt-table-full">
             <thead><tr><th>الحاوية</th><th>المستوى</th><th>العقد</th><th>السقف</th><th>من أين اشتُقّت</th></tr></thead>
             <tbody>
             <?php foreach ($recon['derived_pending'] as $d): ?>
@@ -404,8 +406,8 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
 
         <h6 class="fw-bold">وقائعُ بوحدةٍ لا حاويةَ رئيسيةً لها: <?php echo count($recon['unmatched_units']); ?></h6>
         <?php if ($recon['unmatched_units']): ?>
-        <div class="table-container" style="overflow-x:auto">
-        <table class="display no-datatable" style="width:100%">
+        <div class="table-container cnt-scroll-x">
+        <table class="display no-datatable cnt-table-full">
             <thead><tr><th>العقد</th><th>الوحدة التعاقدية</th><th>الوقائع</th><th>الكمية</th><th>الحكم</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">نوع المعدة</th>
@@ -464,11 +466,11 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
     </div></div>
 
     <?php if ($can_manage && $contract > 0): ?>
-    <div class="card" id="allocCard" style="display:none"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fa fa-share-nodes"></i>
+    <div class="card is-hidden" id="allocCard"><div class="card-body">
+        <h5 class="cnt-tight"><i class="fa fa-share-nodes"></i>
             توزيعُ حصةٍ من <span id="allocParentNo"></span></h5>
-        <p class="text-muted" style="margin:0 0 10px">المتاحُ للتوزيع: <strong id="allocFree">—</strong></p>
-        <form method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0">
+        <p class="text-muted cnt-tight">المتاحُ للتوزيع: <strong id="allocFree">—</strong></p>
+        <form method="post" class="allforms allforms-visible cnt-form-plain">
         <?= csrf_field() ?>
             <input type="hidden" name="cnt_action" value="allocate">
             <input type="hidden" name="contract_id" value="<?php echo $contract; ?>">
@@ -488,17 +490,17 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
                 <div class="form-group"><label for="emsf_802_82d58">النوبة</label>
                     <input type="number" min="1" max="3" name="shift_no" id="emsf_802_82d58"></div>
             </div></div>
-            <div style="margin-top:10px">
+            <div class="cnt-form-actions">
                 <button class="btn btn-primary"><i class="fa fa-check"></i> وزّع</button>
                 <button type="button" class="btn btn-secondary"
-                        onclick="document.getElementById('allocCard').style.display='none'">إلغاء</button>
+                        onclick="document.getElementById('allocCard').classList.add('is-hidden')">إلغاء</button>
             </div>
         </form>
     </div></div>
 
-    <div class="card" id="swapCard" style="display:none"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fa fa-right-left"></i> تبديل</h5>
-        <form method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0">
+    <div class="card is-hidden" id="swapCard"><div class="card-body">
+        <h5 class="cnt-tight"><i class="fa fa-right-left"></i> تبديل</h5>
+        <form method="post" class="allforms allforms-visible cnt-form-plain">
         <?= csrf_field() ?>
             <input type="hidden" name="cnt_action" value="swap">
             <input type="hidden" name="contract_id" value="<?php echo $contract; ?>">
@@ -518,10 +520,10 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
                 <div class="form-group"><label for="emsf_807_86c6c">مرجعُ المستند</label>
                     <input type="text" name="doc_ref" maxlength="120" id="emsf_807_86c6c"></div>
             </div></div>
-            <div style="margin-top:10px">
+            <div class="cnt-form-actions">
                 <button class="btn btn-primary"><i class="fa fa-check"></i> سجّل التبديل</button>
                 <button type="button" class="btn btn-secondary"
-                        onclick="document.getElementById('swapCard').style.display='none'">إلغاء</button>
+                        onclick="document.getElementById('swapCard').classList.add('is-hidden')">إلغاء</button>
             </div>
         </form>
     </div></div>
@@ -529,14 +531,36 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
 </div>
 
 <style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
     .cnt-main .cnt-table td { vertical-align: middle; }
     .cnt-main .cnt-num { text-align: left; direction: ltr; font-variant-numeric: tabular-nums; }
-    .cnt-main .cnt-small { font-size: 12px; color: #6b7280; }
-    .cnt-main .cnt-no { font-size: 11px; color: #6b7280; margin: 0 6px; }
+    .cnt-main .cnt-small { font-size: 12px; color: var(--c-ink-500); }
+    .cnt-main .cnt-no { font-size: 11px; color: var(--c-ink-500); margin: 0 6px; }
     .cnt-main .cnt-party { font-weight: 600; margin-inline-end: 6px; }
-    .cnt-main .cnt-branch { color: #9ca3af; }
-    .cnt-main .cnt-derived { background: #fffbeb; }
-    .cnt-main .cnt-note { font-size: 12px; color: #78350f; margin-top: 3px; }
+    .cnt-main .cnt-branch { color: var(--c-9ca3af); }
+    .cnt-main .cnt-derived { background: var(--c-note-bg); }
+    .cnt-main .cnt-note { font-size: 12px; color: var(--c-note-ink); margin-top: 3px; }
+    .cnt-main .is-hidden { display: none; }
+    .cnt-main .cnt-rem-ok { color: var(--c-state-ok-deep); }
+    .cnt-main .cnt-rem-low { color: var(--c-badge-danger-b); }
+    .cnt-main .cnt-nowrap { white-space: nowrap; }
+    .cnt-main .cnt-inline { display: inline; }
+    .cnt-main .cnt-inline-block { display: inline-block; }
+    .cnt-main .cnt-pointer { cursor: pointer; }
+    .cnt-main .cnt-rot-form { margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap; }
+    .cnt-main .cnt-w80 { width: 80px; }
+    .cnt-main .cnt-w100 { width: 100px; }
+    .cnt-main .cnt-msg-body { padding: 12px 16px; }
+    .cnt-main .cnt-intro { margin: 0 0 10px; line-height: 1.9; }
+    .cnt-main .cnt-filter { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+    .cnt-main .cnt-contract-group { min-width: 280px; }
+    .cnt-main .cnt-tight { margin: 0 0 10px; }
+    .cnt-main .cnt-gen-actions { margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .cnt-main .cnt-scroll-x { overflow-x: auto; }
+    .cnt-main .cnt-mb14 { margin-bottom: 14px; }
+    .cnt-main .cnt-table-full { width: 100%; }
+    .cnt-main .cnt-form-plain { box-shadow: none; padding: 0; }
+    .cnt-main .cnt-form-actions { margin-top: 10px; }
 </style>
 
 <script>
@@ -558,7 +582,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
             (ROLES[lvl] || []).forEach(function (r) {
                 var o = document.createElement('option'); o.value = r; o.textContent = r; sel.appendChild(o);
             });
-            card.style.display = ''; card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            card.classList.remove('is-hidden'); card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
     }
     var sw = document.getElementById('swapCard');
@@ -567,7 +591,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
         sbtns[j].addEventListener('click', function () {
             document.getElementById('swapContainer').value = this.getAttribute('data-container');
             document.getElementById('swapKind').value = this.getAttribute('data-kind');
-            sw.style.display = ''; sw.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            sw.classList.remove('is-hidden'); sw.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
     }
 })();

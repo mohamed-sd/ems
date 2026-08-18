@@ -169,13 +169,28 @@ include '../insidebar.php';
 
 function rpt_head($n, $title, $who, $cadence, $src)
 {
-    echo '<div class="card" style="margin-bottom:14px"><div class="card-header"><strong>'
+    echo '<div class="card gov-rpt-card"><div class="card-header"><strong>'
        . $n . ' · ' . htmlspecialchars($title) . '</strong> '
        . '<span class="badge bg-secondary">' . htmlspecialchars($cadence) . '</span> '
        . '<small class="text-muted">المستفيد: ' . htmlspecialchars($who) . ' · المصدر: ' . htmlspecialchars($src) . '</small>'
-       . '</div><div class="card-body" style="padding:10px 14px">';
+       . '</div><div class="card-body gov-rpt-body">';
 }
 ?>
+
+<style>
+/* UXW-01 ②: أنماطُ الشاشةِ الموضعيةُ نُقلت أصنافًا — تقاريرُ الحوكمةِ التسعة */
+.gov-rpt-card   { margin-bottom: 14px; }
+.gov-rpt-body   { padding: 10px 14px; }
+.gov-rpt-table  { width: 100%; }
+.gov-rpt-sample { max-width: 320px; white-space: normal; font-size: .8rem; }
+.gov-rpt-wrap   { white-space: normal; }
+.gov-rpt-note   { font-size: .8rem; margin-top: 6px; }
+.gov-rpt-hint   { font-size: .8rem; }
+.gov-rpt-conflict { padding: 6px 10px; margin: 6px 0; }
+.gov-rpt-doc    { font-size: .85rem; margin-top: 4px; }
+.gov-rpt-detail { font-size: .82rem; }
+.gov-rpt-chip   { margin: 2px; }
+</style>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
     $header_title = 'تقارير الحوكمة التسعة';
@@ -183,6 +198,8 @@ function rpt_head($n, $title, $who, $cadence, $src)
     $header_actions = array();
     $header_back = false;
     include '../includes/page_header.php';
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بياناتٍ في مصادرِ تقاريرِ الحوكمةِ التسعةِ لهذه الفترة', 'راجِعْ سجلَّ الأمنِ وشاشاتِ الاستثناءاتِ والتراخيصِ فمنها تُغذّى هذه التقارير');
     require_once __DIR__ . '/../includes/screen_contract.php';
     ems_screen_about('تقارير الحوكمة التسعة بدورياتها من مصادرها الحية — أقرأ ما مُنع وما استُثني ومن اطّلع على الحساس.');
 
@@ -192,7 +209,7 @@ function rpt_head($n, $title, $who, $cadence, $src)
 
     <?php rpt_head('①', 'المحاولات الممنوعة', 'الحوكمة والإدارة العليا', 'أسبوعي', 'سجل الأمن — آخر 7 أيام'); ?>
         <?php if (!$denials): ?><span class="text-muted">صفر محاولة مرفوضة في الأسبوع</span>
-        <?php else: ?><table class="alltables display no-datatable" style="width:100%"><thead>
+        <?php else: ?><table class="alltables display no-datatable gov-rpt-table"><thead>
             <tr><th>المستخدم</th><th>الحماية/الحدث</th><th>التكرار</th><th>آخرها</th><th>عيّنة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -208,63 +225,63 @@ function rpt_head($n, $title, $who, $cadence, $src)
                 <tr><td><?php echo htmlspecialchars($d['user']); ?></td><td><code><?php echo htmlspecialchars($d['type']); ?></code></td>
                 <td><strong><?php echo intval($d['n']); ?></strong><?php echo $d['n'] >= 5 ? ' <span class="badge bg-danger">متكرر — يُصعَّد</span>' : ''; ?></td>
                 <td><?php echo htmlspecialchars($d['last']); ?></td>
-                <td style="max-width:320px;white-space:normal;font-size:.8rem"><?php echo htmlspecialchars(mb_substr($d['sample'], 0, 90)); ?></td></tr>
+                <td class="gov-rpt-sample"><?php echo htmlspecialchars(mb_substr($d['sample'], 0, 90)); ?></td></tr>
             <?php endforeach; ?></tbody></table><?php endif; ?>
     </div></div>
 
     <?php rpt_head('②', 'الاستثناءات القائمة', 'الحوكمة', 'أسبوعي', 'شاشة الاستثناءات (بيني حتى اللحاق)'); ?>
         <strong><?php echo count($exceptions); ?></strong> استثناءً نافذًا
-        <?php if ($exceptions): ?><table class="alltables display no-datatable" style="width:100%"><thead>
+        <?php if ($exceptions): ?><table class="alltables display no-datatable gov-rpt-table"><thead>
             <tr><th>الطلب</th><th>الحماية</th><th>المدة إلى</th><th>الحالة</th></tr></thead><tbody>
             <?php foreach (array_slice($exceptions, 0, 10) as $x): ?>
                 <tr><td><?php echo htmlspecialchars((string) ($x['p']['رقم الطلب'] ?? $x['id'])); ?></td>
-                <td style="white-space:normal"><?php echo htmlspecialchars((string) ($x['p']['الحماية المستثناة'] ?? '—')); ?></td>
+                <td class="gov-rpt-wrap"><?php echo htmlspecialchars((string) ($x['p']['الحماية المستثناة'] ?? '—')); ?></td>
                 <td><?php echo htmlspecialchars((string) ($x['p']['المدة إلى'] ?? '—')); ?></td>
                 <td><?php echo htmlspecialchars((string) $x['status']); ?></td></tr>
             <?php endforeach; ?></tbody></table><?php endif; ?>
-        <div class="text-muted" style="font-size:.8rem;margin-top:6px">الانقضاء آليٌّ بالنبض الساعي (BR-GOV-05) — لا يمتد بالسكوت.</div>
+        <div class="text-muted gov-rpt-note">الانقضاء آليٌّ بالنبض الساعي (BR-GOV-05) — لا يمتد بالسكوت.</div>
     </div></div>
 
     <?php rpt_head('③', 'تعارضات الواجبات', 'الحوكمة والمراجع', 'شهري', 'sod_conflicts + الخريطة — حسابٌ حي'); ?>
         الأزواج: <?php echo intval($sod['pairs']); ?> · المقيسة: <?php echo intval($sod['measurable']); ?> ·
         <?php if (!$sod['conflicted']): ?><span class="badge bg-success">صفرُ دورٍ يجمع طرفي زوجٍ مقيس</span>
         <?php else: foreach ($sod['conflicted'] as $cf): ?>
-            <div class="alert alert-danger" style="padding:6px 10px;margin:6px 0">⛔ <?php echo htmlspecialchars($cf['role'] . ' — ' . $cf['pair'] . ' (' . $cf['sev'] . ')'); ?></div>
+            <div class="alert alert-danger gov-rpt-conflict">⛔ <?php echo htmlspecialchars($cf['role'] . ' — ' . $cf['pair'] . ' (' . $cf['sev'] . ')'); ?></div>
         <?php endforeach; endif; ?>
-        <div class="text-muted" style="font-size:.8rem;margin-top:6px">والحارس القبلي في مسار المنح (sod_guard) يمنع الدقيق ويبلّغ التقريبي.</div>
+        <div class="text-muted gov-rpt-note">والحارس القبلي في مسار المنح (sod_guard) يمنع الدقيق ويبلّغ التقريبي.</div>
     </div></div>
 
     <?php rpt_head('④', 'دورة المراجعة الدورية', 'الحوكمة', 'ربع سنوي', 'شاشة المراجعة (بيني حتى اللحاق)'); ?>
         صفوف الدورة: <strong><?php echo count($review); ?></strong>
-        <div class="text-muted" style="font-size:.8rem">القالب الدوري GOV-Q-ACCESS يولّد مهمتها — «والصمتُ سحبٌ لا إبقاء».</div>
+        <div class="text-muted gov-rpt-hint">القالب الدوري GOV-Q-ACCESS يولّد مهمتها — «والصمتُ سحبٌ لا إبقاء».</div>
     </div></div>
 
     <?php rpt_head('⑤', 'الوثائق النظامية المنتهية', 'الحوكمة والمالية', 'أسبوعي', 'التراخيص والكفالات (بيني حتى اللحاق)'); ?>
         <span class="badge bg-danger">منتهية: <?php echo count($licenses['expired']); ?></span>
         <span class="badge bg-warning text-dark">تنتهي خلال 30 يومًا: <?php echo count($licenses['soon']); ?></span>
         <?php foreach (array_slice(array_merge($licenses['expired'], $licenses['soon']), 0, 10) as $lx): ?>
-            <div style="font-size:.85rem;margin-top:4px">· <?php echo htmlspecialchars((string) ($lx[0]['p']['اسم المستند'] ?? $lx[0]['p']['النوع'] ?? ('صف ' . $lx[0]['id'])) . ' — حتى ' . $lx[1]); ?></div>
+            <div class="gov-rpt-doc">· <?php echo htmlspecialchars((string) ($lx[0]['p']['اسم المستند'] ?? $lx[0]['p']['النوع'] ?? ('صف ' . $lx[0]['id'])) . ' — حتى ' . $lx[1]); ?></div>
         <?php endforeach; ?>
     </div></div>
 
     <?php rpt_head('⑥', 'سجل الاطّلاع الحساس', 'الحوكمة والإدارة العليا', 'شهري', 'سجل الأمن SENSITIVE_READ — آخر 30 يومًا'); ?>
         <?php if (!$sensitive): ?><span class="text-muted">صفر اطّلاعٍ حساسٍ مسجَّلٍ في الثلاثين يومًا</span>
-        <?php else: ?><table class="alltables display no-datatable" style="width:100%"><thead>
+        <?php else: ?><table class="alltables display no-datatable gov-rpt-table"><thead>
             <tr><th>القارئ</th><th>متى</th><th>ماذا قرأ</th></tr></thead><tbody>
             <?php foreach (array_slice($sensitive, -15) as $s): ?>
                 <tr><td><?php echo htmlspecialchars($s['user'] . ' (' . $s['uid'] . ')'); ?></td>
                 <td><?php echo htmlspecialchars($s['ts']); ?></td>
-                <td style="font-size:.82rem"><code><?php echo htmlspecialchars(mb_substr($s['details'], 0, 100)); ?></code></td></tr>
+                <td class="gov-rpt-detail"><code><?php echo htmlspecialchars(mb_substr($s['details'], 0, 100)); ?></code></td></tr>
             <?php endforeach; ?></tbody></table><?php endif; ?>
-        <div class="text-muted" style="font-size:.8rem;margin-top:6px">«القراءةُ على السرِّ فعلٌ يُساءل عنه» (BR-GOV-07) — القناة ems_log_sensitive_read.</div>
+        <div class="text-muted gov-rpt-note">«القراءةُ على السرِّ فعلٌ يُساءل عنه» (BR-GOV-07) — القناة ems_log_sensitive_read.</div>
     </div></div>
 
     <?php rpt_head('⑦', 'حالة الحمايات', 'الحوكمة', 'شهري', 'تصنيف قواعد المنع (بيني حتى اللحاق)'); ?>
         <?php if (!$guardStats): ?><span class="text-muted">لا صفوفَ بعد</span>
         <?php else: foreach ($guardStats as $k => $n): ?>
-            <span class="badge bg-secondary" style="margin:2px"><?php echo htmlspecialchars($k . ': ' . $n); ?></span>
+            <span class="badge bg-secondary gov-rpt-chip"><?php echo htmlspecialchars($k . ': ' . $n); ?></span>
         <?php endforeach; endif; ?>
-        <div class="text-muted" style="font-size:.8rem;margin-top:6px">الأصناف الثلاثة: منعٌ مطلق · منعٌ باستثناء · تنبيهٌ مسجَّل — «لا حمايةَ بلا صنفٍ معلن».</div>
+        <div class="text-muted gov-rpt-note">الأصناف الثلاثة: منعٌ مطلق · منعٌ باستثناء · تنبيهٌ مسجَّل — «لا حمايةَ بلا صنفٍ معلن».</div>
     </div></div>
 
     <?php rpt_head('⑧', 'بصمات الإصدارات', 'الحوكمة والتقنية', 'لكل إصدار', 'شاشة البصمة + شهادة البوابات'); ?>
@@ -273,7 +290,7 @@ function rpt_head($n, $title, $who, $cadence, $src)
                 <small class="text-muted">(<?php echo htmlspecialchars($gateInfo['at']); ?> · docs/RELEASE_GATE_LAST_ar.md)</small></div>
         <?php endif; ?>
         <div>صفوف البصمات: <strong><?php echo count($stamps); ?></strong> (آخر 5)</div>
-        <div class="text-muted" style="font-size:.8rem">«لا نشرَ بلا بصمةٍ وتقريرِ اكتمال» (BR-GOV-08).</div>
+        <div class="text-muted gov-rpt-hint">«لا نشرَ بلا بصمةٍ وتقريرِ اكتمال» (BR-GOV-08).</div>
     </div></div>
 
     <?php rpt_head('⑨', 'الالتزام التعاقدي', 'الحوكمة والمالية', 'شهري', 'سجل توقيع العقود (بيني حتى اللحاق)'); ?>
@@ -283,6 +300,6 @@ function rpt_head($n, $title, $who, $cadence, $src)
         <?php if ($contractStats['signed'] > $contractStats['registered']): ?>
             <span class="badge bg-warning text-dark">فجوة قيدٍ في السجل الموحَّد: <?php echo $contractStats['signed'] - $contractStats['registered']; ?></span>
         <?php endif; ?>
-        <div class="text-muted" style="font-size:.8rem">وحارس BR-CEO-02 يمنع التوقيع بملاحظةٍ حرجةٍ مفتوحة.</div>
+        <div class="text-muted gov-rpt-hint">وحارس BR-CEO-02 يمنع التوقيع بملاحظةٍ حرجةٍ مفتوحة.</div>
     </div></div>
 </div>

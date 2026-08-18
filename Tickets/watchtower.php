@@ -50,6 +50,17 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+<style>
+/* UXW-01 ②: أنماطُ برجِ المراقبةِ الثابتةُ — بادئةُ الشاشة tkt-wt- */
+.tkt-wt-tiles        { display: flex; gap: 12px; flex-wrap: wrap; }
+.tkt-wt-tile         { border: 1px solid var(--c-s-ddd); border-radius: 8px; padding: 10px 14px; min-width: 170px; flex: 1; }
+.tkt-wt-tile-label   { color: var(--c-s-666); font-size: 12px; }
+.tkt-wt-tile-value   { font-size: 22px; font-weight: bold; }
+.tkt-wt-tile-target  { color: var(--c-s-888); }
+.tkt-wt-inline-form  { display: inline; }
+.tkt-wt-table        { width: 100%; }
+.tkt-wt-noresponse   { color: var(--c-c0392b); font-weight: bold; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'برج المراقبة — يقيس المركز ولا يعمل'; $header_icon = 'fa fa-broadcast-tower';
@@ -61,11 +72,13 @@ include '../insidebar.php';
         array('التقرير الدوري يُرفع لمدير التشغيل والإدارة العامة',
               'عدم الاستجابة مؤشر إهمال لا تأخير — مستهدفه صفر'));
     if ($msg !== '') { echo '<div class="alert alert-info">' . htmlspecialchars($msg) . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مؤشراتِ مراقبةٍ في النافذةِ المقيسة', 'وسّع نافذةَ القياسِ أو تحقق من تسجيلِ مساراتِ البلاغات');
     ?>
 
     <div class="card"><div class="card-header"><h5>المؤشرات الثمانية — نافذة <?php echo intval($ind['window_days']); ?> يومًا
         (<?php echo intval($ind['workstreams_measured']); ?> مسارًا)</h5></div>
-    <div class="card-body" style="display:flex;gap:12px;flex-wrap:wrap">
+    <div class="card-body tkt-wt-tiles">
         <?php
         $tiles = array(
             array('① الاستجابة داخل المهلة', $ind['①_response_compliance_pct'] . '%', $ind['①_target']),
@@ -78,20 +91,20 @@ include '../insidebar.php';
             array('⑧ المتأخرون بالاسم', count($late), 'أساس التقرير الدوري'),
         );
         foreach ($tiles as $t) {
-            echo '<div style="border:1px solid #ddd;border-radius:8px;padding:10px 14px;min-width:170px;flex:1">'
-                . '<div style="color:#666;font-size:12px">' . htmlspecialchars($t[0]) . '</div>'
-                . '<div style="font-size:22px;font-weight:bold">' . htmlspecialchars((string) $t[1]) . '</div>'
-                . '<small style="color:#888">المستهدف: ' . htmlspecialchars((string) $t[2]) . '</small></div>';
+            echo '<div class="tkt-wt-tile">'
+                . '<div class="tkt-wt-tile-label">' . htmlspecialchars($t[0]) . '</div>'
+                . '<div class="tkt-wt-tile-value">' . htmlspecialchars((string) $t[1]) . '</div>'
+                . '<small class="tkt-wt-tile-target">المستهدف: ' . htmlspecialchars((string) $t[2]) . '</small></div>';
         } ?>
     </div></div>
 
     <div class="card"><div class="card-header"><h5>⑧ من يتأخر ومن لا يستجيب — بالاسم والإدارة</h5>
-        <form method="post" style="display:inline">
+        <form method="post" class="tkt-wt-inline-form">
         <?php echo csrf_field(); ?><button type="submit" name="issue_report" value="1" class="btn-primary">أصدر التقرير الدوري</button></form>
     </div>
     <div class="card-body">
         <?php if (!$late) { ems_state_empty('لا متأخر ولا غير مستجيب في النافذة — نظيف ✨'); } else { ?>
-        <div class="table-container"><table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <div class="table-container"><table class="alltables display nowrap tkt-wt-table" data-no-dt="1">
             <thead><tr><th>المكلف</th><th>الإدارة</th><th>مسند إليه</th><th>لم يستجب</th><th>استجاب متأخرًا</th><th>متوسط التأخير (دقيقة)</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -108,7 +121,7 @@ include '../insidebar.php';
                 <tr><td><?php echo htmlspecialchars($x['person_name'] ?: ('#' . $x['assignee_person_id'])); ?></td>
                     <td><?php echo htmlspecialchars($x['unit_name'] ?: '—'); ?></td>
                     <td><?php echo intval($x['assigned']); ?></td>
-                    <td style="color:#c0392b;font-weight:bold"><?php echo intval($x['no_response']); ?></td>
+                    <td class="tkt-wt-noresponse"><?php echo intval($x['no_response']); ?></td>
                     <td><?php echo intval($x['late_response']); ?></td>
                     <td><?php echo intval($x['avg_delay_min']); ?></td></tr>
             <?php endforeach; ?>

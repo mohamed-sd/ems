@@ -29,29 +29,32 @@ include __DIR__ . '/../inheader.php';
         .main { font-family: 'Cairo', sans-serif; }
 
         .report-table thead th {
-            background: #f8fafc;
-            color: #0c1c3e;
+            background: var(--c-f8fafc, #f8fafc);
+            color: var(--c-0c1c3e, #0c1c3e);
             font-weight: 800;
-            border-color: rgba(12, 28, 62, 0.1);
+            border-color: var(--c-rgba12286201, rgba(12, 28, 62, 0.1));
         }
 
         .report-table td {
-            border-color: rgba(12, 28, 62, 0.08);
-            color: #0c1c3e;
+            border-color: var(--c-rgba122862008, rgba(12, 28, 62, 0.08));
+            color: var(--c-0c1c3e, #0c1c3e);
             font-weight: 600;
         }
 
         .total-hours-box {
-            background: linear-gradient(135deg, rgba(13, 148, 136, 0.12), rgba(13, 148, 136, 0.06));
-            border: 1px solid rgba(13, 148, 136, 0.25);
+            background: linear-gradient(135deg, var(--c-rgba13148136012, rgba(13, 148, 136, 0.12)), var(--c-rgba13148136006, rgba(13, 148, 136, 0.06)));
+            border: 1px solid var(--c-rgba13148136025, rgba(13, 148, 136, 0.25));
             border-radius: 14px;
             padding: 14px 16px;
-            color: #0f766e;
+            color: var(--c-0f766e, #0f766e);
             font-weight: 800;
-            box-shadow: 0 4px 14px rgba(15, 118, 110, 0.12);
+            box-shadow: 0 4px 14px var(--c-rgba15118110012, rgba(15, 118, 110, 0.12));
         }
 
         .form-grid { align-items: end; }
+
+        /* UXW-01 ②: نمطٌ كان موضعيًا — rpt-dsc */
+        .rpt-dsc-actions { display: flex; gap: 10px; flex-wrap: wrap; }
     </style>
 
 
@@ -126,8 +129,10 @@ $header_title_html = htmlspecialchars('تقرير ساعات عمل السائق
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا ساعاتِ عملِ سائقين مطابقةً لهذه الفلاتر', 'وسّع مدى التاريخِ أو اختر «الكل» في المشروعِ والسائقِ ثمّ اضغط بحث');
 ?>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div class="rpt-dsc-actions">
             <a href="reports.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
@@ -176,12 +181,12 @@ include __DIR__ . '/../includes/page_header.php';
 
                 <div>
                     <label for="emsf_460_b5a51"><i class="fas fa-calendar-day"></i> من</label>
-                    <input type="date" name="start_date" value="<?php echo $start_date; ?>" id="emsf_460_b5a51">
+                    <input type="date" name="start_date" id="emsf_460_b5a51" value="<?php echo $start_date; ?>">
                 </div>
 
                 <div>
                     <label for="emsf_461_a0061"><i class="fas fa-calendar-check"></i> إلى</label>
-                    <input type="date" name="end_date" value="<?php echo $end_date; ?>" id="emsf_461_a0061">
+                    <input type="date" name="end_date" id="emsf_461_a0061" value="<?php echo $end_date; ?>">
                 </div>
 
                 <button type="submit"><i class="fa fa-search"></i> بحث</button>

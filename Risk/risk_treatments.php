@@ -36,6 +36,23 @@ include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* ══ UXW-01 ②: أنماطٌ ثابتةٌ نُقِلت من سماتِ style إلى أصنافٍ ببادئةِ الشاشة ══ */
+.rtr-table { width: 100%; }
+.rtr-ref { font-size: .8rem; }
+.rtr-dialog {
+  max-width: 520px;
+  width: 92%;
+  border: 1px solid var(--c-e5e7eb, #e5e7eb);
+  border-radius: 10px;
+  padding: 18px;
+}
+.rtr-dialog-title { margin: 0 0 4px; }
+.rtr-dialog-lead { font-size: .85rem; margin: 0 0 12px; }
+.rtr-field-label { display: block; margin-bottom: 8px; }
+.rtr-dialog-err { color: var(--danger-deep, #7F1D1D); font-size: .85rem; min-height: 1.2em; }
+.rtr-dialog-actions { display: flex; gap: 8px; justify-content: flex-start; margin-top: 10px; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'إجراءات معالجة المخاطر';
@@ -44,11 +61,13 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_back = array();
     $header_context = array('المعروض' => count($rows) . ' إجراء', 'متأخرة' => $overdueN, 'تنتظر قبول المتحقق' => $doneN);
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا إجراءاتِ معالجةٍ مسندةً إليك أو إلى نطاقِك', 'أسنِدْ معالجةً من ملفِّ الخطرِ في «سجل المخاطر» ثمّ عُدْ إلى هذه الشاشة');
     ems_screen_about('المعالجة تقع في الإدارة المالكة وبمواردها — وإدارة المخاطر تتحقق ولا تنفذ (RK-02).',
         array('الإجراء المتأخر يظهر في مهام المسؤول ويُصعَّد لمديره'));
     ?>
     <div class="card"><div class="card-body table-responsive">
-        <table class="table table-striped" style="width:100%">
+        <table class="table table-striped rtr-table">
             <thead><tr><th>الخطر</th><th>النوع</th><th>الخطة</th><th>المسؤول</th><th>المهلة</th><th>الحالة</th><th>دليل الإنجاز</th><th>إجراء</th></tr></thead>
             <tbody><?php foreach ($rows as $t): ?>
             <tr>
@@ -64,7 +83,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <?php $__ev = trim((string) ($t['done_evidence'] ?? '')); ?>
                     <?php echo $__ev !== '' ? htmlspecialchars(mb_substr($__ev, 0, 50)) : '—'; ?>
                     <?php if (!empty($t['done_ref'])): ?>
-                        <div class="text-muted" style="font-size:.8rem">مرجع:
+                        <div class="text-muted rtr-ref">مرجع:
                             <?php echo htmlspecialchars((string) $t['done_ref']); ?></div>
                     <?php endif; ?>
                     <?php if (!empty($t['done_attachment'])): ?>
@@ -87,22 +106,22 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
 </div>
 
 <?php /* INJ-0576: موضعُ إدخالِ دليلِ الإنجاز — عنوانٌ وثلاثةُ حقولٍ وردٌّ في موضعِه */ ?>
-<dialog id="treatDoneDlg" style="max-width:520px;width:92%;border:1px solid var(--c-e5e7eb,#e5e7eb);border-radius:10px;padding:18px">
-    <h3 style="margin:0 0 4px">إنجازُ المعالجةِ بدليل</h3>
-    <p class="text-muted" style="font-size:.85rem;margin:0 0 12px">
+<dialog id="treatDoneDlg" class="rtr-dialog">
+    <h3 class="rtr-dialog-title">إنجازُ المعالجةِ بدليل</h3>
+    <p class="text-muted rtr-dialog-lead">
         الإغلاقُ بقبولِ المتحقِّق لا بالتنفيذ. أدخل دليلًا مقروءًا (عشرةُ محارفَ فأكثر)
         أو مرفقًا ومرجعًا يدلّان على المستند.</p>
-    <label style="display:block;margin-bottom:8px">دليلُ التنفيذ
+    <label class="rtr-field-label">دليلُ التنفيذ
         <textarea name="done_evidence" class="form-control" rows="3"
                   placeholder="ما الذي نُفِّذ ومتى وأين"></textarea></label>
-    <label style="display:block;margin-bottom:8px">رابطُ المرفق
+    <label class="rtr-field-label">رابطُ المرفق
         <input type="text" name="done_attachment" class="form-control"
                placeholder="../uploads/… أو رابطُ مستند"></label>
-    <label style="display:block;margin-bottom:8px">المرجع
+    <label class="rtr-field-label">المرجع
         <input type="text" name="done_ref" class="form-control"
                placeholder="رقمُ مستندٍ أو أمرِ عمل"></label>
-    <div id="treatDoneErr" style="color:var(--danger-deep,#7F1D1D);font-size:.85rem;min-height:1.2em"></div>
-    <div style="display:flex;gap:8px;justify-content:flex-start;margin-top:10px">
+    <div id="treatDoneErr" class="rtr-dialog-err"></div>
+    <div class="rtr-dialog-actions">
         <button type="button" id="treatDoneSend" class="btn btn-primary">حفظُ الدليل</button>
         <button type="button" id="treatDoneCancel" class="btn btn-secondary">إلغاء</button>
     </div>

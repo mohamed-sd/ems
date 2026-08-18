@@ -117,7 +117,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بلاغاتِ في هذا التبويب', 'بدّل التبويبَ أو أزل الفلاترَ — أو افتح بلاغًا بزرِّ «بلاغ جديد»');
     ?>
+    <style>
+    /* UXW-01 ①②: أنماطُ قائمةِ البلاغاتِ الثابتة — بادئةُ الشاشة tkt-list- */
+    .tkt-list-glance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 14px; }
+    .tkt-list-glance-link { text-decoration: none; color: inherit; }
+    .tkt-list-tone-open   { --tkt-list-tone: var(--c-fd7e14, #fd7e14); }
+    .tkt-list-tone-late   { --tkt-list-tone: var(--c-dc3545); }
+    .tkt-list-tone-crit   { --tkt-list-tone: var(--c-b58900, #b58900); }
+    .tkt-list-glance      { border-top: 3px solid var(--tkt-list-tone); }
+    .tkt-list-glance-body { padding: 12px; }
+    .tkt-list-glance-row  { display: flex; align-items: center; gap: 10px; }
+    .tkt-list-glance-icon { font-size: 20px; color: var(--tkt-list-tone); }
+    .tkt-list-glance-num  { font-size: 20px; font-weight: 800; line-height: 1; }
+    .tkt-list-glance-cap  { font-size: 12px; color: var(--c-6c757d); margin-top: 3px; }
+    .tkt-list-tabs        { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tkt-list-tab         { border: 1px solid var(--c-s-ddd); border-radius: 8px; padding: 6px 14px; text-decoration: none; }
+    .tkt-list-tab.is-active { background: var(--c-e2b93b, #e2b93b); font-weight: 800; }
+    .tkt-list-table       { width: 100%; }
+    </style>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('ticket', 'نظرةٌ عامة'); ?>
 
     <?php tkt_msg_banner(); ?>
@@ -134,23 +154,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
          FROM tickets t WHERE {TENANT_SCOPE}" . $scope_sql);
     $g = !empty($glance) ? $glance[0] : array('open_cnt' => 0, 'late_cnt' => 0, 'crit_cnt' => 0);
     $glance_cards = array(
-        array('مفتوحة الآن', (int)$g['open_cnt'], 'fa-folder-open', '#fd7e14'),
-        array('متأخّرة', (int)$g['late_cnt'], 'fa-triangle-exclamation', '#dc3545'),
-        array('حرِجة للإنتاج', (int)$g['crit_cnt'], 'fa-bolt', '#b58900'),
+        array('مفتوحة الآن', (int)$g['open_cnt'], 'fa-folder-open', 'tkt-list-tone-open'),
+        array('متأخّرة', (int)$g['late_cnt'], 'fa-triangle-exclamation', 'tkt-list-tone-late'),
+        array('حرِجة للإنتاج', (int)$g['crit_cnt'], 'fa-bolt', 'tkt-list-tone-crit'),
     );
     ?>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:14px">
+    <div class="tkt-list-glance-grid">
         <?php foreach ($glance_cards as $c): ?>
             <?php // الرقمُ يُعرض للجميع — والوصلةُ لمن يملك منحةَ اللوحةِ وحدَه.
                   if ($__tkt_can_dash): ?>
-            <a href="ticket_dashboard.php" style="text-decoration:none;color:inherit" title="افتح لوحة المتابعة">
+            <a href="ticket_dashboard.php" class="tkt-list-glance-link" title="افتح لوحة المتابعة">
             <?php endif; ?>
-                <div class="card" style="border-top:3px solid <?php echo $c[3]; ?>"><div class="card-body" style="padding:12px">
-                    <div style="display:flex;align-items:center;gap:10px">
-                        <i class="fa <?php echo $c[2]; ?>" style="font-size:20px;color:<?php echo $c[3]; ?>"></i>
+                <div class="card tkt-list-glance <?php echo $c[3]; ?>"><div class="card-body tkt-list-glance-body">
+                    <div class="tkt-list-glance-row">
+                        <i class="fa <?php echo $c[2]; ?> tkt-list-glance-icon"></i>
                         <div>
-                            <div style="font-size:20px;font-weight:800;line-height:1"><?php echo $c[1]; ?></div>
-                            <div style="font-size:12px;color:#6c757d;margin-top:3px"><?php echo htmlspecialchars($c[0]); ?></div>
+                            <div class="tkt-list-glance-num"><?php echo $c[1]; ?></div>
+                            <div class="tkt-list-glance-cap"><?php echo htmlspecialchars($c[0]); ?></div>
                         </div>
                     </div>
                 </div></div>
@@ -158,7 +178,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php endforeach; ?>
     </div>
 
-    <div class="card"><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap">
+    <div class="card"><div class="card-body tkt-list-tabs">
         <?php // E-13: التبويباتُ الأربعة — كلٌّ بعدّاده الحي
         foreach ($TABS as $tk => $tv):
             // نطاقُ الرؤية من مصدرٍ واحد ($scope_sql) لا مُعادًا بناؤه هنا —
@@ -168,9 +188,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 "SELECT COUNT(*) n FROM tickets t WHERE {TENANT_SCOPE}" . $scope_sql . $tv[1]);
             $cnt = $cnt_row ? intval($cnt_row[0]['n']) : 0;
         ?>
-            <a href="?tab=<?php echo $tk; ?>" class="btn btn-sm"
-               style="border:1px solid #ddd;border-radius:8px;padding:6px 14px;text-decoration:none;<?php
-                   echo $tk === $tab ? 'background:#e2b93b;font-weight:800' : ''; ?>">
+            <a href="?tab=<?php echo $tk; ?>" class="btn btn-sm tkt-list-tab<?php echo $tk === $tab ? ' is-active' : ''; ?>">
                 <?php echo htmlspecialchars($tv[0]); ?>
                 <span class="badge badge-secondary"><?php echo $cnt; ?></span></a>
         <?php endforeach; ?>
@@ -199,7 +217,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="tktTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="tktTable" class="display nowrap alltables tkt-list-table" data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>تاريخ الفتح</th><th>رقم التذكرة</th><th>النوع</th><th>الطبيعة</th><th>المرحلة</th><th>الإدارة المالكة</th>
                     <th>المُبلِّغ</th><th>المعدة</th><th>المشروع</th><th>الوصف</th><th>تاريخ البلاغ</th><th>موعد الإنجاز</th><th>متأخّر</th>
@@ -274,27 +292,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function () {
     $(document).ready(function () {
-        // stateSave:false إلزامي مع الفلاتر الخارجية، وإلا استُرجعت فلترةٌ
-        // محفوظةٌ من جلسةٍ سابقة فيظهر الجدول فارغًا بلا سبب ظاهر.
-        var dt = $('#tktTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
-
-        // فلترة أعمدة (بعد عمود «فتح»): الطبيعة(3) · المرحلة(4) · الإدارة(5)
+        /* UXW-01 ⑤: التهيئةُ اليدويةُ حُذفت — المكوّنُ المركزيُّ (ui-unification.js)
+           يهيّئ الجدولَ ويقرأ data-scroll-x و data-state-save من وسمِه. والفلاترُ
+           الخارجيةُ تُوصَل بواجهةِ الجدولِ الجاهزةِ لا بتهيئةٍ ثانيةٍ تتصادم معها.
+           stateSave:false إلزامي مع الفلاتر الخارجية، وإلا استُرجعت فلترةٌ محفوظةٌ
+           من جلسةٍ سابقة فيظهر الجدول فارغًا بلا سبب ظاهر — ومعلَنٌ الآن سمةً. */
         function esc(s) { return $.fn.dataTable.util.escapeRegex(String(s)); }
-        $('#fStage').on('change', function () { var v = this.value; dt.column(4).search(v ? esc(v) : '', true, false).draw(); });
-        $('#fOwner').on('change', function () { var v = this.value; dt.column(5).search(v ? '^' + esc(v) + '$' : '', true, false).draw(); });
-        $('#fNature').on('change', function () { var v = this.value; dt.column(3).search(v ? '^' + esc(v) + '$' : '', true, false).draw(); });
-        $('#fReset').on('click', function () {
-            $('#fStage,#fOwner,#fNature').val('');
-            dt.columns().search('').draw();
-        });
+        // فلترة أعمدة (بعد عمود «فتح»): الطبيعة(3) · المرحلة(4) · الإدارة(5)
+        function tktWireFilters(dt) {
+            $('#fStage').on('change', function () { var v = this.value; dt.column(4).search(v ? esc(v) : '', true, false).draw(); });
+            $('#fOwner').on('change', function () { var v = this.value; dt.column(5).search(v ? '^' + esc(v) + '$' : '', true, false).draw(); });
+            $('#fNature').on('change', function () { var v = this.value; dt.column(3).search(v ? '^' + esc(v) + '$' : '', true, false).draw(); });
+            $('#fReset').on('click', function () {
+                $('#fStage,#fOwner,#fNature').val('');
+                dt.columns().search('').draw();
+            });
+        }
+        // الوصلُ يعمل في الترتيبين: إن سبقَنا المكوّنُ المركزيُّ أخذنا واجهتَه،
+        // وإلا انتظرنا حدثَ تهيئتِه — فلا فلترَ ميّتٌ ولا تهيئةٌ ثانية.
+        var tktEl = document.getElementById('tktTable');
+        if (tktEl && $.fn.dataTable) {
+            if ($.fn.dataTable.isDataTable(tktEl)) { tktWireFilters($(tktEl).DataTable()); }
+            else { $(tktEl).one('init.dt', function () { tktWireFilters($(tktEl).DataTable()); }); }
+        }
     });
 })();
 </script>

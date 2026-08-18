@@ -119,6 +119,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         'أحداث منشورة' => $auditCounts['أحداث منشورة (الأثر العابر)'],
     );
     include __DIR__ . '/page_header.php';
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا — تُمرَّر من الشاشةِ الحاملةِ بنصِّها الخاصّ
+    if (!empty($GOV_DEPT_STATES)) { echo $GOV_DEPT_STATES; }
     ems_screen_about(
         'قراءةٌ لا كتابة: الحساباتُ التابعةُ وصلاحياتُها وفصلُ الواجباتِ وسجلاتُ التدقيق. '
         . 'وفعلُها الوحيدُ الكاتبُ تصديقُ مراجعةِ الوصول (' . $GOV_DEPT['attest_code'] . ') — يشهد ولا يمنح.',

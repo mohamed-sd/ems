@@ -295,7 +295,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
         $sel = ($c === $cls) ? ' selected' : '';
         $clsopts .= '<option value="' . htmlspecialchars($c) . '"' . $sel . '>' . htmlspecialchars($c) . '</option>';
     }
-    return '<div class="proc-line form-grid" style="align-items:end;margin-bottom:8px">'
+    return '<div class="proc-line form-grid proc-ord-line">'
         . '<div class="form-group"><label for="emsf_395_abccb">الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item" id="emsf_395_abccb">' . $opts . '</select></div>'
         . '<div class="form-group"><label for="emsf_396_383f8">اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" value="' . $iname . '" required id="emsf_396_383f8"></div>'
         . '<div class="form-group"><label for="emsf_397_095f6">الكمية</label><input type="number" step="0.01" name="line_qty[]" class="line-qty" value="' . $qty . '" id="emsf_397_095f6"></div>'
@@ -316,6 +316,9 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أوامرَ شراءٍ مطابقةً للفلاترِ الحالية',
+        'أصدر أمرًا جديدًا من رأسِ الشاشة بمرجعِ طلبٍ معتمدٍ ومرجعِ اعتمادٍ ماليّ');
     ?>
 
     <?php proc_msg_banner(); ?>
@@ -324,21 +327,22 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
         $__gated  = in_array((string)$edit['state'], proc_order_expense_states(), true);
         $__ms     = (string)($edit['match_state'] ?? 'unmatched');
         $__tol    = round(proc_match_tolerance((float)$edit['total_amount']), 2);
-        $__tone   = ($__ms === 'matched') ? '#166534' : (($__ms === 'var_pending') ? '#991b1b' : '#78716c');
+        /* UXW-01 ①: نبرةُ الحالةِ صنفٌ لا لونٌ مثبَّتٌ في الوسم */
+        $__tone   = ($__ms === 'matched') ? 'proc-ord-tone-ok' : (($__ms === 'var_pending') ? 'proc-ord-tone-bad' : 'proc-ord-tone-mute');
         $__label  = array('unmatched' => 'لم تُطابَق', 'matched' => 'مطابَقة', 'var_pending' => 'فرقٌ ينتظر قرارًا', 'rejected' => 'مرفوضة');
     ?>
-    <div class="card" style="margin-bottom:14px">
+    <div class="card proc-ord-block">
         <div class="card-header"><h5><i class="fas fa-file-invoice"></i> فاتورة المورد والمطابقة الثلاثية</h5></div>
         <div class="card-body">
-            <p class="text-muted" style="margin:0 0 10px">
+            <p class="text-muted proc-ord-lead">
                 تُقارن الفاتورةُ بأمر الشراء (السعر المتفق) وبسند الاستلام (ما وصل فعلًا).
                 ضمن السماح <strong><?php echo number_format($__tol, 2); ?></strong>
                 <?php echo htmlspecialchars((string)$edit['currency']); ?> (±2٪ أو 100 أيُّهما أصغر)
                 يُفتح استحقاقُ المورد — وفوقه تقف بفرقها حتى قرارٍ موثَّق.
             </p>
-            <div style="margin-bottom:10px">
+            <div class="proc-ord-status">
                 <strong>الحالة:</strong>
-                <span style="color:<?php echo $__tone; ?>;font-weight:800">
+                <span class="proc-ord-tone <?php echo $__tone; ?>">
                     <?php echo htmlspecialchars($__label[$__ms] ?? $__ms); ?></span>
                 <?php if (!empty($edit['invoice_no'])): ?>
                     · فاتورة <strong><?php echo htmlspecialchars((string)$edit['invoice_no']); ?></strong>
@@ -349,24 +353,24 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                 <?php endif; ?>
             </div>
             <?php if (!$__gated): ?>
-                <div class="alert alert-info" style="margin:0">
+                <div class="alert alert-info proc-ord-note">
                     لا مطابقةَ قبل الاستلام النهائي — حالةُ الأمر الآن:
                     <strong><?php echo htmlspecialchars((string)$edit['state']); ?></strong>.
                 </div>
             <?php elseif ($can_edit): ?>
-                <form action="orders_proc.php" method="post" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+                <form action="orders_proc.php" method="post" class="proc-ord-inline-form">
         <?= csrf_field() ?>
                     <input type="hidden" name="action" value="match_invoice">
                     <input type="hidden" name="id" value="<?php echo intval($edit['id']); ?>">
                     <div class="form-group"><label for="emsf_400_90de2">رقم الفاتورة</label>
-                        <input type="text" name="invoice_no" required
-                               value="<?php echo htmlspecialchars((string)($edit['invoice_no'] ?? '')); ?>" id="emsf_400_90de2"></div>
+                        <input type="text" name="invoice_no" id="emsf_400_90de2" required
+                               value="<?php echo htmlspecialchars((string)($edit['invoice_no'] ?? '')); ?>"></div>
                     <div class="form-group"><label for="emsf_401_d5a4a">تاريخها</label>
-                        <input type="date" name="invoice_date"
-                               value="<?php echo htmlspecialchars((string)($edit['invoice_date'] ?? '')); ?>" id="emsf_401_d5a4a"></div>
+                        <input type="date" name="invoice_date" id="emsf_401_d5a4a"
+                               value="<?php echo htmlspecialchars((string)($edit['invoice_date'] ?? '')); ?>"></div>
                     <div class="form-group"><label for="emsf_402_52f9c">قيمتها</label>
-                        <input type="number" step="0.01" name="invoice_amount" required
-                               value="<?php echo htmlspecialchars((string)($edit['invoice_amount'] ?? $edit['total_amount'])); ?>" id="emsf_402_52f9c"></div>
+                        <input type="number" step="0.01" name="invoice_amount" id="emsf_402_52f9c" required
+                               value="<?php echo htmlspecialchars((string)($edit['invoice_amount'] ?? $edit['total_amount'])); ?>"></div>
                     <button type="submit" class="btn-primary"><i class="fas fa-scale-balanced"></i> طابِق</button>
                 </form>
             <?php endif; ?>
@@ -381,17 +385,17 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
             foreach ($__landed as $__l) { $__landed_sum += (float) $__l['base_amount']; }
         } catch (\Throwable $__t) { $__landed = array(); }
     ?>
-    <div class="card" style="margin-bottom:14px">
+    <div class="card proc-ord-block">
         <div class="card-header"><h5><i class="fas fa-ship"></i> التكلفة الوصولية (Landed Cost)
             <?php if ($__landed_sum > 0): ?> — الإجمالي المرسمَل <strong><?php echo number_format($__landed_sum, 2); ?></strong> (معادل)<?php endif; ?></h5></div>
         <div class="card-body">
-            <p class="text-muted" style="margin:0 0 10px">
+            <p class="text-muted proc-ord-lead">
                 شحنٌ وجمارك وتخليصٌ تُرسمَل على تكلفة استلام هذا الأمر توزيعًا بقيمة بنوده —
                 فيصير متوسطُ تكلفة القطعة سعرَها **الحقيقي** لا سعرَ فاتورتها فقط.
             </p>
             <?php if ($__landed): ?>
-            <div class="table-container" style="margin-bottom:10px">
-                <table class="alltables display" data-no-dt="1" style="width:100%">
+            <div class="table-container proc-ord-tablewrap">
+                <table class="alltables display proc-ord-table" data-no-dt="1">
                     <thead><tr><th>المستند</th><th>النوع</th><th>المبلغ</th><th>المعادل</th><th>أُدخلت</th><th></th></tr></thead>
                     <tbody>
                     <?php foreach ($__landed as $__l): ?>
@@ -412,12 +416,12 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                             <td><small><?php echo htmlspecialchars((string)$__l['created_at']); ?></small></td>
                             <td>
                                 <?php if ($can_edit): ?>
-                                <form method="post" style="display:inline" onsubmit="return confirm('أرشفةُ المصروف وإخراجُ نصيبه من التكلفة؟')">
+                                <form method="post" class="proc-ord-inline" onsubmit="return confirm('أرشفةُ المصروف وإخراجُ نصيبه من التكلفة؟')">
         <?= csrf_field() ?>
                                     <input type="hidden" name="action" value="archive_landed_cost">
                                     <input type="hidden" name="id" value="<?php echo intval($edit['id']); ?>">
                                     <input type="hidden" name="landed_id" value="<?php echo intval($__l['id']); ?>">
-                                    <button type="submit" class="btn-secondary" style="padding:2px 8px" title="أرشفة"><i class="fas fa-box-archive"></i></button>
+                                    <button type="submit" class="btn-secondary proc-ord-btn-xs" title="أرشفة"><i class="fas fa-box-archive"></i></button>
                                 </form>
                                 <?php endif; ?>
                             </td>
@@ -428,7 +432,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
             </div>
             <?php endif; ?>
             <?php if ($can_edit && $__gated): ?>
-            <form action="orders_proc.php" method="post" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end">
+            <form action="orders_proc.php" method="post" class="proc-ord-inline-form">
         <?= csrf_field() ?>
                 <input type="hidden" name="action" value="add_landed_cost">
                 <input type="hidden" name="id" value="<?php echo intval($edit['id']); ?>">
@@ -439,15 +443,15 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                 <div class="form-group"><label for="emsf_405_8adff">المبلغ <span class="required">*</span></label>
                     <input type="number" step="0.01" min="0.01" name="lc_amount" required id="emsf_405_8adff"></div>
                 <div class="form-group"><label for="emsf_406_624e4">العملة</label>
-                    <input type="text" name="lc_currency" value="<?php echo htmlspecialchars((string)$edit['currency']); ?>" maxlength="8" id="emsf_406_624e4"></div>
+                    <input type="text" name="lc_currency" id="emsf_406_624e4" maxlength="8" value="<?php echo htmlspecialchars((string)$edit['currency']); ?>"></div>
                 <div class="form-group"><label for="emsf_407_2ec27">سعر الصرف (للمعادل)</label>
-                    <input type="number" step="0.0001" min="0.0001" name="lc_fx" value="<?php echo htmlspecialchars((string)$edit['fx_rate']); ?>" id="emsf_407_2ec27"></div>
+                    <input type="number" step="0.0001" min="0.0001" name="lc_fx" id="emsf_407_2ec27" value="<?php echo htmlspecialchars((string)$edit['fx_rate']); ?>"></div>
                 <div class="form-group"><label for="emsf_408_b1808">مقدم الخدمة</label>
                     <select name="lc_supplier_id" id="emsf_408_b1808"><?php echo proc_suppliers_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
                 <button type="submit" class="btn-primary"><i class="fas fa-ship"></i> رسملة</button>
             </form>
             <?php elseif (!$__gated): ?>
-                <div class="alert alert-info" style="margin:0">تُرسمَل بعد بلوغ الأمر الاستلامَ النهائي — المصاريفُ تُعرف عند الوصول.</div>
+                <div class="alert alert-info proc-ord-note">تُرسمَل بعد بلوغ الأمر الاستلامَ النهائي — المصاريفُ تُعرف عند الوصول.</div>
             <?php endif; ?>
         </div>
     </div>
@@ -470,7 +474,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     </div>
                     <div class="form-group">
                         <label for="emsf_411_ccb3f">مرجع الاعتماد المالي <span class="required">*</span> <small>(شرط الإصدار)</small></label>
-                        <input type="text" name="fin_approval_ref" value="<?php echo $edit ? htmlspecialchars((string)$edit['fin_approval_ref']) : ''; ?>" id="emsf_411_ccb3f">
+                        <input type="text" name="fin_approval_ref" id="emsf_411_ccb3f" value="<?php echo $edit ? htmlspecialchars((string)$edit['fin_approval_ref']) : ''; ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_412_f5bab">التصنيف التشغيلي</label>
@@ -490,7 +494,7 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     </div>
                     <div class="form-group">
                         <label for="emsf_414_ca3d0">سعر الصرف</label>
-                        <input type="number" step="0.0001" name="fx_rate" value="<?php echo $edit ? htmlspecialchars((string)$edit['fx_rate']) : '1'; ?>" id="emsf_414_ca3d0">
+                        <input type="number" step="0.0001" name="fx_rate" id="emsf_414_ca3d0" value="<?php echo $edit ? htmlspecialchars((string)$edit['fx_rate']) : '1'; ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_415_4133d">وقت الدفع</label>
@@ -516,9 +520,9 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="form-group" style="grid-column:1/-1">
+                    <div class="form-group proc-ord-full">
                         <label for="emsf_418_4c0b7">ملاحظات</label>
-                        <input type="text" name="notes" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>" id="emsf_418_4c0b7">
+                        <input type="text" name="notes" id="emsf_418_4c0b7" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>">
                     </div>
                 </div>
             </div>
@@ -534,8 +538,8 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
                     }
                     ?>
                 </div>
-                <button type="button" id="addLine" class="add-btn" style="margin-top:6px"><i class="fas fa-plus"></i> إضافة سطر</button>
-                <div style="margin-top:10px;font-weight:700">الإجمالي: <span id="ordTotal">0.00</span></div>
+                <button type="button" id="addLine" class="add-btn proc-ord-addline"><i class="fas fa-plus"></i> إضافة سطر</button>
+                <div class="proc-ord-total">الإجمالي: <span id="ordTotal">0.00</span></div>
             </div>
 
             <div class="form-actions">
@@ -551,7 +555,8 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="procTable" class="display nowrap alltables proc-ord-maintable"
+                   data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>المورد</th><th>التصنيف</th><th>العملة</th>
                     <th>الإجمالي</th><th>الحالة</th><th>الاستلام/التأخر</th><th>مرجع الاعتماد المالي</th><th>أُنشئ</th>
@@ -671,16 +676,8 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
         $('#ordTotal').text(t.toFixed(2));
     }
     $(document).ready(function () {
-        $('#procTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
-
+        // UXW-01 ⑤: التهيئةُ المحليةُ حُذفت — المكوّنُ المركزيُّ (ui-unification.js)
+        // يلتقط الجدولَ آليًّا، والسلوكُ محفوظٌ بسماتِ data-scroll-x و data-state-save.
         var toggleBtn = document.getElementById('toggleForm');
         if (toggleBtn) { toggleBtn.addEventListener('click', function () { $('#procForm').toggleClass('allforms-visible'); }); }
 
@@ -707,5 +704,27 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
     });
 })();
 </script>
+
+<style>
+    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — والألوانُ برموزِ اللوحة */
+    .proc-ord-line { align-items: end; margin-bottom: 8px; }
+    .proc-ord-block { margin-bottom: 14px; }
+    .proc-ord-lead { margin: 0 0 10px; }
+    .proc-ord-status { margin-bottom: 10px; }
+    .proc-ord-tone { font-weight: 800; }
+    .proc-ord-tone-ok { color: var(--c-166534); }
+    .proc-ord-tone-bad { color: var(--c-991b1b); }
+    .proc-ord-tone-mute { color: var(--c-78716c); }
+    .proc-ord-note { margin: 0; }
+    .proc-ord-inline-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
+    .proc-ord-inline { display: inline; }
+    .proc-ord-tablewrap { margin-bottom: 10px; }
+    .proc-ord-table { width: 100%; }
+    .proc-ord-btn-xs { padding: 2px 8px; }
+    .proc-ord-full { grid-column: 1 / -1; }
+    .proc-ord-addline { margin-top: 6px; }
+    .proc-ord-total { margin-top: 10px; font-weight: 700; }
+    .proc-ord-maintable { width: 100%; }
+</style>
 </body>
 </html>

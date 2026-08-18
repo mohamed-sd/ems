@@ -97,11 +97,20 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+
+<style>
+/* UXW-01 ②: أنماطُ الشاشةِ الموضعيةُ نُقلت أصنافًا — التفويضُ بالتوقيع */
+.gov-sig-table { width: 100%; }
+.gov-sig-grid  { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.gov-sig-span4 { grid-column: span 4; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'التفويض بالتوقيع'; $header_icon = 'fa fa-file-signature';
     $header_actions = array();
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا تفويضَ بالتوقيعِ مسجَّلٌ لهذا الكيان', 'أنشئْ أولَ تفويضٍ من نموذجِ «تفويضٌ عام» أو عيِّنْ مديرَ الحركةِ أسفلَ الشاشة');
     ems_screen_about('لا اعتماد بلا تفويض نافذ ساري — والتفويض بالصفة والكيان معًا لا بالشخص وحده، '
         . 'وينتهي بانتهاء مدته آليًّا. تفويض الحركة (DEC-01 ①) سقفه نطاقي لا نقدي: مواقع لا مبالغ، '
         . 'لأنه يعتمد وقوع الواقعة لا قيمتها — والنائب بمرجع أصيله وبمدة مكتوبة إلزامًا.',
@@ -110,7 +119,7 @@ include '../insidebar.php';
     if ($err !== '') { echo '<div class="alert alert-danger">' . htmlspecialchars($err) . '</div>'; }
     ?>
     <div class="card"><div class="card-body">
-        <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
+        <div class="table-container"><table class="alltables display gov-sig-table" data-no-dt="1">
         <thead><tr><th>#</th><th>المفوَّض</th><th>الكيان المفوِّض</th><th>نوع التفويض</th><th>السقف المالي</th><th>نطاق التفويض</th><th>نيابة عن</th><th>المدة</th><th>مستند التفويض</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم التفويض</th>
@@ -154,24 +163,24 @@ include '../insidebar.php';
     <?php if ($gov_write): // القارئ (26) لا تُصيَّر له نماذج التعيين والتفويض أصلًا — منع بنيوي لا زر معطَّل ?>
     <div class="card"><div class="card-body">
         <h4>تعيين مدير الحركة والتشغيل أو نائبه (DEC-01 ① — سقف نطاقي)</h4>
-        <form method="post" class="ems-form" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <form method="post" class="ems-form gov-sig-grid">
         <?= csrf_field() ?>
             <input type="hidden" name="op" value="movement">
             <input type="number" name="person_id" placeholder="users.id للمعيَّن *" required aria-label="users.id للمعيَّن">
-            <select name="entity_id" required>
+            <select name="entity_id" aria-label="الكيانُ المفوِّضُ لمدير الحركة" required>
                 <option value="">— الكيان المفوِّض *</option>
                 <?php foreach ($entities as $e): ?>
                 <option value="<?php echo intval($e['entity_id']); ?>"><?php echo htmlspecialchars($e['legal_name']); ?></option>
                 <?php endforeach; ?>
             </select>
-            <select name="site_id">
+            <select name="site_id" aria-label="نطاقُ التفويض: موقعٌ بعينه أو كلُّ المواقع">
                 <option value="">كل المواقع (الأصيل)</option>
                 <?php foreach ($sites as $s): ?>
                 <option value="<?php echo intval($s['id']); ?>"><?php echo htmlspecialchars($s['name']); ?></option>
                 <?php endforeach; ?>
             </select>
             <input type="number" name="delegated_from" placeholder="نيابة عن تفويض # (للنائب)" aria-label="نيابة عن تفويض # (للنائب)">
-            <input type="date" name="valid_from" value="<?php echo date('Y-m-d'); ?>" required>
+            <input type="date" name="valid_from" aria-label="بدايةُ سريانِ التفويض" value="<?php echo date('Y-m-d'); ?>" required>
             <input type="date" name="valid_to" title="إلزامي للنائب — لا نيابة مفتوحة المدة" aria-label="إلزامي للنائب — لا نيابة مفتوحة المدة">
             <input type="text" name="doc_ref" placeholder="مستند التعيين *" required aria-label="مستند التعيين">
             <button class="btn-primary" type="submit">تعيين — والسلسلة لا تتوقف بغيابه</button>
@@ -180,26 +189,26 @@ include '../insidebar.php';
 
     <div class="card"><div class="card-body">
         <h4>تفويض عام (مالي · تعاقدي · بنكي) — بسقفه النقدي</h4>
-        <form method="post" class="ems-form" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <form method="post" class="ems-form gov-sig-grid">
         <?= csrf_field() ?>
             <input type="hidden" name="op" value="general">
             <input type="number" name="person_id" placeholder="users.id للمفوَّض *" required aria-label="users.id للمفوَّض">
-            <select name="entity_id" required>
+            <select name="entity_id" aria-label="الكيانُ المفوِّضُ في التفويضِ العام" required>
                 <option value="">— الكيان المفوِّض *</option>
                 <?php foreach ($entities as $e): ?>
                 <option value="<?php echo intval($e['entity_id']); ?>"><?php echo htmlspecialchars($e['legal_name']); ?></option>
                 <?php endforeach; ?>
             </select>
-            <select name="auth_type">
+            <select name="auth_type" aria-label="نوعُ التفويض: ماليٌّ أو تعاقديٌّ أو بنكيٌّ أو عام">
                 <option value="financial">مالي</option><option value="contractual">تعاقدي</option>
                 <option value="banking">بنكي</option><option value="general">عام</option>
             </select>
             <input type="number" step="0.01" name="amount_cap" placeholder="السقف المالي" aria-label="السقف المالي">
             <input type="text" name="currency" placeholder="العملة (USD…)" aria-label="العملة (USD…)">
-            <input type="date" name="valid_from" value="<?php echo date('Y-m-d'); ?>" required>
-            <input type="date" name="valid_to">
+            <input type="date" name="valid_from" aria-label="بدايةُ سريانِ التفويض" value="<?php echo date('Y-m-d'); ?>" required>
+            <input type="date" name="valid_to" aria-label="نهايةُ سريانِ التفويض — يُترك خاليًا للمفتوح">
             <input type="text" name="doc_ref" placeholder="مستند التفويض *" required aria-label="مستند التفويض">
-            <button class="btn-primary" type="submit" style="grid-column:span 4">إنشاء التفويض</button>
+            <button class="btn-primary gov-sig-span4" type="submit">إنشاء التفويض</button>
         </form>
     </div></div>
     <?php endif; ?>

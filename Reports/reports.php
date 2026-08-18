@@ -54,6 +54,10 @@ include("../inheader.php");
 include('../insidebar.php');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ②: نمطٌ ثابتٌ نُقِل من سمةِ style إلى صنفٍ ببادئةِ الشاشة */
+.rep-results-table { width: 100%; }
+</style>
     <div class="main ems-unified-page-shell reports-main">
         <?php
         // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
@@ -82,6 +86,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         }
         $header_back = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
         include('../includes/page_header.php');
+        // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+        echo ems_states_bundle('لا ساعاتِ تشغيلٍ مطابقةً للفلاترِ المختارة', 'وسِّعْ نطاقَ الفلاترِ أو أعِدْ تعيينَها من زرِّ إعادةِ التعيينِ في شريطِ الفلاتر');
         ?>
 
         <form method="GET" class="filter">
@@ -157,7 +163,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <div class="card-body">
                 <div id="projectsTable" class="table-container">
-                    <table class="display" style="width:100%">
+                    <table class="display rep-results-table">
                         <thead>
                             <tr>
                                 <th><i class="fas fa-hashtag"></i> #</th>
@@ -206,20 +212,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <script>
         (function () {
             $(document).ready(function () {
-                $('#projectsTable table').DataTable({
-                    dom: 'Bfrtip',
-                    buttons: [
-                        { extend: 'copy', text: 'نسخ' },
-                        { extend: 'excel', text: 'تصدير Excel' },
-                        { extend: 'csv', text: 'تصدير CSV' },
-                        { extend: 'pdf', text: 'تصدير PDF' },
-                        { extend: 'print', text: 'طباعة' }
-                    ],
-                    "language": {
-                        "url": "/ems/assets/i18n/datatables/ar.json"
-                    }
-                });
-
                 // تحميل العقود عند تغيير المشروع
                 $('#projectSelect').on('change', function() {
                     const projectId = $(this).val();

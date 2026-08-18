@@ -37,6 +37,9 @@ $header_actions = array();
 ob_start(); ?><a href="../main/dashboard.php" class="back-btn"><i class="fas fa-arrow-right"></i> رجوع</a><?php
 $header_back = array('raw' => trim((string) ob_get_clean()));
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا طلباتِ موافقاتٍ في هذا التبويب',
+                       'بدّلْ التبويبَ (معلقة · معتمدة · مرفوضة · الكل) أو انتظرْ ورودَ طلبٍ يخصُّ دورَك');
 ?>
 
     <?php
@@ -142,17 +145,19 @@ include __DIR__ . '/../includes/page_header.php';
         </div>
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table id="approvalsTable" class="display table table-hover mb-0" style="width:100%;">
+                <table id="approvalsTable" class="display table table-hover mb-0 apr-req-table"
+                       data-page-length="25" data-order="[[0,&quot;desc&quot;]]"
+                       data-column-defs="[{&quot;orderable&quot;:false,&quot;targets&quot;:[7]}]">
                     <thead class="table-light">
                     <tr>
-                        <th style="width: 5%;">م</th>
-                        <th style="width: 12%;">الكيان</th>
-                        <th style="width: 12%;">الإجراء</th>
-                        <th style="width: 12%;">الطالب</th>
-                        <th style="width: 15%;">المرحلة الحالية</th>
-                        <th style="width: 10%;">الحالة</th>
-                        <th style="width: 18%;">تاريخ الإنشاء</th>
-                        <th style="width: 16%;">إجراءات</th>
+                        <th class="apr-req-w5">م</th>
+                        <th class="apr-req-w12">الكيان</th>
+                        <th class="apr-req-w12">الإجراء</th>
+                        <th class="apr-req-w12">الطالب</th>
+                        <th class="apr-req-w15">المرحلة الحالية</th>
+                        <th class="apr-req-w10">الحالة</th>
+                        <th class="apr-req-w18">تاريخ الإنشاء</th>
+                        <th class="apr-req-w16">إجراءات</th>
                         <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
                         <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
                         <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمِد — الاسم والصفة</th>
@@ -296,7 +301,7 @@ include __DIR__ . '/../includes/page_header.php';
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <pre id="payloadText" class="bg-light p-3 rounded" style="white-space: pre-wrap; word-break: break-word; max-height: 400px; overflow-y: auto;"></pre>
+                <pre id="payloadText" class="bg-light p-3 rounded apr-req-payload"></pre>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
@@ -344,53 +349,63 @@ include __DIR__ . '/../includes/page_header.php';
 
 <!-- CSS للإحصائيات -->
 <style>
+/* UXW-01 ①②: الألوانُ برموزٍ باحتياطٍ حرفيّ، والأنماطُ الموضعيةُ صارت أصنافًا ببادئةِ الشاشة */
+.apr-req-table   { width: 100%; }
+.apr-req-w5      { width: 5%; }
+.apr-req-w10     { width: 10%; }
+.apr-req-w12     { width: 12%; }
+.apr-req-w15     { width: 15%; }
+.apr-req-w16     { width: 16%; }
+.apr-req-w18     { width: 18%; }
+.apr-req-payload { white-space: pre-wrap; word-break: break-word; max-height: 400px; overflow-y: auto; }
+
 .stats-card {
     transition: all 0.3s ease;
     border: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 4px var(--c-shadow-10, rgba(0, 0, 0, 0.1));
 }
 
 .stats-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 8px var(--c-shadow-15, rgba(0, 0, 0, 0.15));
 }
 
 .border-left-warning {
-    border-left: 4px solid #ffc107 !important;
+    border-left: 4px solid var(--c-ffc107, #ffc107) !important;
 }
 
 .border-left-success {
-    border-left: 4px solid #28a745 !important;
+    border-left: 4px solid var(--c-28a745, #28a745) !important;
 }
 
 .border-left-danger {
-    border-left: 4px solid #dc3545 !important;
+    border-left: 4px solid var(--c-dc3545, #dc3545) !important;
 }
 
 .border-left-info {
-    border-left: 4px solid #17a2b8 !important;
+    border-left: 4px solid var(--c-17a2b8, #17a2b8) !important;
 }
 
 .table-hover tbody tr:hover {
-    background-color: #f8f9fa;
+    background-color: var(--c-f8f9fa, #f8f9fa);
 }
 
 .nav-tabs .nav-link {
     border: none;
     border-bottom: 3px solid transparent;
-    color: #555;
+    color: var(--c-555, #555);
     font-weight: 500;
     margin-left: 0.5rem;
 }
 
 .nav-tabs .nav-link:hover {
-    border-bottom-color: #ddd;
-    color: #333;
+    border-bottom-color: var(--c-ddd, #ddd);
+    color: var(--c-333, #333);
 }
 
 .nav-tabs .nav-link.active {
-    border-bottom-color: #007bff;
-    color: #007bff;
+    border-bottom-color: var(--c-007bff, #007bff);
+    color: var(--c-007bff, #007bff);
     background: none;
 }
 
@@ -405,15 +420,8 @@ include __DIR__ . '/../includes/page_header.php';
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <script>
 $(function () {
-    // تهيئة DataTable
-    const table = $('#approvalsTable').DataTable({
-        pageLength: 25,
-        order: [[0, 'desc']],
-        language: { url: '/ems/assets/i18n/datatables/ar.json' },
-        columnDefs: [
-            { orderable: false, targets: [7] }
-        ]
-    });
+    // UXW-01 ⑤: لا تهيئةَ محليةً — المكوّنُ المركزيُّ في assets/js/ui-unification.js
+    // يلتقط الجدولَ ويقرأ سلوكَه من سماتِ data-* على وسمِ <table>.
 
     let payloadModal = null;
     let decisionModal = null;

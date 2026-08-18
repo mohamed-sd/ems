@@ -21,6 +21,13 @@ include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* ══ UXW-01 ②: أنماطٌ ثابتةٌ نُقِلت من سماتِ style إلى أصنافٍ ببادئةِ الشاشة ══ */
+.kri-table { width: 100%; }
+.kri-update-cell { min-width: 230px; }
+.kri-val-input { display: inline-block; width: 90px; }
+.kri-state-select { display: inline-block; width: 80px; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'مؤشرات الخطر الرئيسة (KRI)';
@@ -29,11 +36,13 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_back = array();
     $header_context = array('المقام' => count($rows) . ' مؤشرًا (ورقة 26)', 'حرجة' => $critN, 'إنذار' => $warnN);
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مؤشراتِ خطرٍ نشطةً في نطاقِك', 'فعِّلْ مؤشراتِ الورقةِ 26 لإدارتِك مع إدارةِ المخاطرِ ثمّ أعِدْ فتحَ الشاشة');
     ems_screen_about('المؤشر يُقرأ من النظام وينذر باقتراب الخطر قبل وقوعه — وبلوغ الحد الحرج يولد إشارة SG-15 وتصعيدًا بمهلته.',
         array('فشل مؤشر الضابط (KCI) يرفع الخطر المتبقي فورًا'));
     ?>
     <div class="card"><div class="card-body table-responsive">
-        <table class="table table-striped" style="width:100%">
+        <table class="table table-striped kri-table">
             <thead><tr><th>الإدارة</th><th>المؤشر</th><th>حد الإنذار</th><th>الحد الحرج</th>
                 <th>المصدر</th><th>الوحدة</th><th>القيمة الحالية</th><th>الحالة</th><th>آخر قراءة</th>
                 <?php if ($canWrite): ?><th>تحديث القراءة</th><?php endif; ?></tr></thead>
@@ -52,9 +61,9 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                     <span class="badge badge-<?php echo $mm[0]; ?>"><?php echo $mm[1]; ?></span></td>
                 <td><?php echo htmlspecialchars((string) $k['last_read_at'] ?: '—'); ?></td>
                 <?php if ($canWrite): ?>
-                <td style="min-width:230px">
-                    <input class="kriVal form-control form-control-sm" style="display:inline-block;width:90px" placeholder="القيمة" aria-label="القيمة">
-                    <select class="kriState form-control form-control-sm" style="display:inline-block;width:80px" aria-label="حالة المؤشر">
+                <td class="kri-update-cell">
+                    <input class="kriVal form-control form-control-sm kri-val-input" placeholder="القيمة" aria-label="القيمةُ المقروءةُ للمؤشر">
+                    <select class="kriState form-control form-control-sm kri-state-select" aria-label="حالةُ المؤشرِ بعدَ القراءة">
                         <option value="ok">سليم</option><option value="warn">إنذار</option><option value="critical">حرج</option>
                     </select>
                     <button class="btn btn-sm btn-secondary kriGo" data-id="<?php echo (int) $k['id']; ?>">حفظ</button>

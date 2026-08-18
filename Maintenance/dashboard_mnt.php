@@ -103,18 +103,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => '../Maintenance/orders.php', 'class' => '', 'icon' => 'fas fa-screwdriver-wrench', 'label' => 'أوامر الصيانة');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مؤشراتِ صيانةٍ لهذا اليوم في نطاقك', 'افتح أوامرَ الصيانةِ أو الخططَ الوقائيةَ لتسجيلِ أولِ حركةٍ تظهر هنا');
     ?>
-    <p class="text-muted" style="margin:4px 2px 10px"><i class="fas fa-mug-hot"></i> أسئلة أول اليوم: أي معدةٍ متوقفة؟ ما المفتوح فوق مدته؟ ما الوقائية المستحقة؟ — اضغط أي رقمٍ لفتح مصدره. (<?php echo $today; ?>)</p>
+    <p class="text-muted mnt-bd-intro"><i class="fas fa-mug-hot"></i> أسئلة أول اليوم: أي معدةٍ متوقفة؟ ما المفتوح فوق مدته؟ ما الوقائية المستحقة؟ — اضغط أي رقمٍ لفتح مصدره. (<?php echo $today; ?>)</p>
 
     <!-- ① مؤشرات اليوم -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:12px">
+    <div class="mnt-bd-kpis">
         <?php foreach ($cards as $c): list($icon, $val, $lbl, $tone, $href) = $c;
-            $color = $tone === 'ok' ? '#166534' : ($tone === 'err' ? '#991b1b' : '#92400e'); ?>
-        <a href="<?php echo $href; ?>" style="text-decoration:none;color:inherit">
-            <div class="card" style="height:100%"><div class="card-body" style="text-align:center">
-                <i class="fas <?php echo $icon; ?>" style="font-size:20px;opacity:.65"></i>
-                <div style="font-size:22px;font-weight:800;margin:6px 0;color:<?php echo $color; ?>"><?php echo htmlspecialchars((string)$val); ?></div>
-                <div class="text-muted" style="font-size:13px"><?php echo htmlspecialchars($lbl); ?></div>
+            $toneCls = $tone === 'ok' ? 'mnt-bd-num--ok' : ($tone === 'err' ? 'mnt-bd-num--err' : 'mnt-bd-num--or'); ?>
+        <a href="<?php echo $href; ?>" class="mnt-bd-kpi-link">
+            <div class="card mnt-bd-kpi-card"><div class="card-body mnt-bd-kpi-body">
+                <i class="fas <?php echo $icon; ?> mnt-bd-kpi-icon"></i>
+                <div class="mnt-bd-num <?php echo $toneCls; ?>"><?php echo htmlspecialchars((string)$val); ?></div>
+                <div class="text-muted mnt-bd-kpi-lbl"><?php echo htmlspecialchars($lbl); ?></div>
             </div></div>
         </a>
         <?php endforeach; ?>
@@ -122,6 +124,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php include __DIR__ . '/../includes/role_board_widgets.php'; ?>
 </div>
+<style>
+    /* UXW-01 ①②: أنماطُ بطاقاتِ المؤشراتِ أصنافًا، وألوانُ النبرةِ برموزِ اللوحة */
+    .mnt-board-main .mnt-bd-intro { margin:4px 2px 10px; }
+    .mnt-board-main .mnt-bd-kpis { display:grid; grid-template-columns:repeat(auto-fill,minmax(215px,1fr)); gap:12px; }
+    .mnt-board-main .mnt-bd-kpi-link { text-decoration:none; color:inherit; }
+    .mnt-board-main .mnt-bd-kpi-card { height:100%; }
+    .mnt-board-main .mnt-bd-kpi-body { text-align:center; }
+    .mnt-board-main .mnt-bd-kpi-icon { font-size:20px; opacity:.65; }
+    .mnt-board-main .mnt-bd-num { font-size:22px; font-weight:800; margin:6px 0; }
+    .mnt-board-main .mnt-bd-num--ok { color:var(--c-166534); }
+    .mnt-board-main .mnt-bd-num--err { color:var(--c-991b1b); }
+    .mnt-board-main .mnt-bd-num--or { color:var(--c-92400e); }
+    .mnt-board-main .mnt-bd-kpi-lbl { font-size:13px; }
+</style>
 <script src="/ems/assets/vendor/chartjs/chart.umd.min.js"></script>
 </body>
 </html>

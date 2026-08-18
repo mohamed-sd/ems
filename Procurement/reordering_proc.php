@@ -117,6 +117,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا قواعدَ إعادةِ طلبٍ مسجَّلةً بعدُ',
+        'أضف أولَ قاعدةٍ بزرِّ «إضافة قاعدة» في رأسِ الشاشة: صنفٌ وحدٌّ أدنى ونقطةُ إعادةِ طلب');
     ?>
 
     <?php proc_msg_banner(); ?>
@@ -136,11 +139,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-rotate"></i>
         التوليدُ الآلي لطلبات الشراء (M-43) — بمفتاح (صنف × دورة)</h5></div>
     <div class="card-body">
-        <p style="color:#666">لكل نقطةِ طلبٍ بلغ رصيدُها الحيُّ حدَّها: يولَّد طلبُ شراءٍ واحدٌ
+        <p class="proc-rop-note">لكل نقطةِ طلبٍ بلغ رصيدُها الحيُّ حدَّها: يولَّد طلبُ شراءٍ واحدٌ
             بكمية (الحدُّ الأعلى − الرصيد) — <strong>والدورةُ الجاريةُ تمنع توليدًا ثانيًا</strong>
             حتى تُقفل. والمتوسطُ اليوميُّ (آخر 90 يومًا) يُعرض <strong>مصدرًا مقترحًا للحد</strong> (M-51).</p>
         <?php if ($can_add): ?>
-        <div style="display:flex;gap:8px">
+        <div class="proc-rop-actions">
             <form method="post">
         <?= csrf_field() ?><input type="hidden" name="reorder_action" value="dry">
                 <button type="submit" class="btn-primary"><i class="fa fa-flask"></i> جرّب (بلا كتابة)</button></form>
@@ -150,18 +153,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <?php endif; ?>
         <?php if ($reorderResult !== null): ?>
-            <div style="margin-top:10px">
+            <div class="proc-rop-result">
                 <strong><?php echo $reorderResult['dry'] ? 'تجريب:' : 'توليد:'; ?></strong>
                 <?php echo count($reorderResult['generated']); ?> مرشحًا ·
                 <?php echo count($reorderResult['skipped']); ?> متجاوَزًا
                 <?php foreach ($reorderResult['generated'] as $g): ?>
-                    <div class="alert alert-success" style="margin:4px 0">
+                    <div class="alert alert-success proc-rop-line">
                         <?php echo htmlspecialchars($g['item'] . ' — الرصيد ' . $g['balance']
                             . ' ≤ الحد ' . $g['trigger'] . ' ⇒ كمية ' . $g['qty']
                             . (isset($g['request_id']) ? (' · طلب #' . $g['request_id']) : '')); ?></div>
                 <?php endforeach; ?>
                 <?php foreach ($reorderResult['skipped'] as $s): ?>
-                    <div class="alert alert-info" style="margin:4px 0">
+                    <div class="alert alert-info proc-rop-line">
                         <?php echo htmlspecialchars($s['item'] . ' — ' . $s['reason']); ?></div>
                 <?php endforeach; ?>
             </div>
@@ -213,7 +216,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                 </div>
-                <p class="form-hint" style="grid-column:1/-1;color:#666;font-size:13px;margin-top:8px;">
+                <p class="form-hint proc-rop-hint">
                     <i class="fas fa-info-circle"></i>
                     نقطة إعادة الطلب ≈ (متوسط الاستهلاك اليومي × مدة التوريد) + مخزون الأمان
                 </p>
@@ -227,7 +230,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="procTable" class="display nowrap alltables proc-rop-table"
+                   data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>الإجراءات</th><th>الصنف</th><th>المخزن</th><th title="Min">الحدّ الأدنى</th><th title="Max">الحدّ الأقصى</th>
                     <th title="ROP — Re-Order Point">نقطة إعادة الطلب</th><th>مخزون الأمان</th><th>الوضع</th>
@@ -283,27 +287,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div></div>
 </div>
 
+<style>
+    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — والألوانُ برموزِ اللوحة */
+    .proc-rop-note { color: var(--c-s-666); }
+    .proc-rop-actions { display: flex; gap: 8px; }
+    .proc-rop-result { margin-top: 10px; }
+    .proc-rop-line { margin: 4px 0; }
+    .proc-rop-hint { grid-column: 1 / -1; color: var(--c-s-666); font-size: 13px; margin-top: 8px; }
+    .proc-rop-table { width: 100%; }
+</style>
+
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
-<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
-<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
-<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 <script>
 (function () {
     $(document).ready(function () {
-        $('#procTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
-
+        // UXW-01 ⑤: التهيئةُ المحليةُ حُذفت — المكوّنُ المركزيُّ (ui-unification.js)
+        // يلتقط الجدولَ آليًّا، والسلوكُ محفوظٌ بسماتِ data-scroll-x و data-state-save.
         var toggleBtn = document.getElementById('toggleForm');
         if (toggleBtn) {
             toggleBtn.addEventListener('click', function () {

@@ -370,6 +370,15 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارتْ أصنافًا ببادئةِ الشاشة */
+.fin-ev-wide { grid-column: 1 / -1; }
+.fin-ev-filterbar { padding-bottom: 6px; }
+.fin-ev-filterrow { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.fin-ev-filterlbl { margin-inline-end: 6px; }
+.fin-ev-chip { text-decoration: none; }
+.fin-ev-tbl { width: 100%; }
+</style>
 
 <div class="main fin-events-main ems-unified-page-shell">
     <?php
@@ -381,6 +390,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أحداثَ ماليةً ضمنَ التصفيةِ المختارة', 'أنشئْ حدثًا بزرِّ «إضافة حدث مالي» أو اضغطْ «الكل» في شريطِ التصفيةِ لرفعِ القيد');
     ?>
 
     <?php fin_msg_banner(); ?>
@@ -438,7 +449,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <label for="f_equipment_id">المعدة (بُعد تكلفة)</label>
                         <select name="equipment_id" id="f_equipment_id"><?php echo fin_equipment_options($conn, $is_super_admin, $company_id); ?></select>
                     </div>
-                    <div class="form-group" style="grid-column:1/-1">
+                    <div class="form-group fin-ev-wide">
                         <label for="f_notes">ملاحظات</label>
                         <input type="text" name="notes" id="f_notes">
                     </div>
@@ -452,19 +463,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <?php $cur_f = (isset($_GET['fstate']) && isset($event_states[$_GET['fstate']])) ? $_GET['fstate'] : ''; ?>
-    <div class="card"><div class="card-body" style="padding-bottom:6px">
-        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-            <strong style="margin-inline-end:6px"><i class="fas fa-filter"></i> تصفية:</strong>
-            <a href="events_list_fin.php" class="badge badge-<?php echo $cur_f === '' ? 'primary' : 'secondary'; ?>" style="text-decoration:none">الكل</a>
+    <div class="card"><div class="card-body fin-ev-filterbar">
+        <div class="fin-ev-filterrow">
+            <strong class="fin-ev-filterlbl"><i class="fas fa-filter"></i> تصفية:</strong>
+            <a href="events_list_fin.php" class="badge fin-ev-chip badge-<?php echo $cur_f === '' ? 'primary' : 'secondary'; ?>">الكل</a>
             <?php foreach (array('draft','dept_review','fin_review','audited','approved','rejected') as $fs): ?>
-                <a href="?fstate=<?php echo $fs; ?>" class="badge badge-<?php echo $cur_f === $fs ? 'primary' : 'secondary'; ?>" style="text-decoration:none"><?php echo htmlspecialchars($event_states[$fs]); ?></a>
+                <a href="?fstate=<?php echo $fs; ?>" class="badge fin-ev-chip badge-<?php echo $cur_f === $fs ? 'primary' : 'secondary'; ?>"><?php echo htmlspecialchars($event_states[$fs]); ?></a>
             <?php endforeach; ?>
         </div>
     </div></div>
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <!-- UXW-01 ⑤: السلوكُ محفوظٌ بالسمات — معالجةٌ خادميةٌ (H-22) بصفحةِ ٥٠
+                 ونقطةُ جلبٍ واحدةٍ تحمل التصفيةَ، وثمانيةُ أعمدةٍ في الحمولةِ ومازاد
+                 في الترويسةِ أعمدةُ حوكمةٍ مؤجَّلة. لا تهيئةَ محليةً في الصفحة. -->
+            <table id="finTable" class="display nowrap alltables fin-ev-tbl"
+                   data-ajax-url="events_list_fin.php?ajax=dt&amp;fstate=<?php echo rawurlencode($cur_f); ?>"
+                   data-ajax-columns="8"
+                   data-search-delay="400"
+                   data-page-length="50"
+                   data-order='[]'
+                   data-column-defs='[{"targets":[0,6],"orderable":false}]'
+                   data-scroll-x="1"
+                   data-state-save="false">
                 <thead><tr>
                     <th>الإجراءات</th><th>رقم الحدث</th><th>النوع</th><th>المصدر</th><th>المرجع</th>
                     <th>المبلغ</th><th>المشروع/المورد</th><th>الحالة</th>
@@ -497,34 +519,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function () {
     $(document).ready(function () {
-        $('#finTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            // ── H-22 (UI-01 §4/§9): معالجةٌ خادمية — الدفترُ لا يُحمَّل كاملًا
-            //    في المتصفح؛ صفحةُ 50 وبحثٌ مؤخَّر 400ms من الخادم.
-            serverSide: true,
-            processing: true,
-            searchDelay: 400,
-            deferRender: true,
-            pageLength: 50,
-            ajax: {
-                url: 'events_list_fin.php',
-                data: function (d) {
-                    d.ajax = 'dt';
-                    d.fstate = <?php echo json_encode($filter_state); ?>;
-                }
-            },
-            // الأحدثُ أولًا: الترتيبُ من الخادم (ORDER BY e.id DESC) — نمنع فرزَ
-            // DataTables الافتراضيَّ على عمود «الإجراءات» الذي كان يبعثره
-            order: [],
-            columnDefs: [{ targets: [0, 6], orderable: false }],
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
-
+        // جدولُ العرضِ يهيّئُه المكوّنُ المركزيُّ (assets/js/ui-unification.js)
+        // من سماتِ وسمِ الجدول: المعالجةُ الخادميةُ ونقطةُ الجلبِ والترتيبُ والصفحة.
         var toggleBtn = document.getElementById('toggleForm');
         if (toggleBtn) {
             toggleBtn.addEventListener('click', function () {

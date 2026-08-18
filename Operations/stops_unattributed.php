@@ -86,16 +86,25 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.stu-badge-count { background: var(--c-dc3545); }
+.stu-ok { color: var(--c-198754); }
+.stu-assign-form { display: flex; gap: 6px; }
+.stu-dept-select { max-width: 130px; }
+</style>
 <div class="main" dir="rtl">
   <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-user-slash';
 $header_title_html = htmlspecialchars('التوقفاتُ بلا مسؤول', ENT_QUOTES, 'UTF-8');
-ob_start(); ?><span class="badge" style="background:#dc3545"><?= count($rows) ?> — ولا يُقفل يومٌ وفيها واحد</span><?php
+ob_start(); ?><span class="badge stu-badge-count"><?= count($rows) ?> — ولا يُقفل يومٌ وفيها واحد</span><?php
 $header_actions = array(array('raw' => trim((string) ob_get_clean())));
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+echo ems_states_bundle('لا توقفاتٍ بلا جهةٍ مسؤولةٍ في هذا الكيان', 'راجعِ التوقفاتِ المسنَدةَ في سجلِّ الوردياتِ إن كنت تبحث عن واقعةٍ بعينها');
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
@@ -133,7 +142,7 @@ include __DIR__ . '/../includes/page_header.php';
               <th class="ems-gov-th none" data-gov="fx_rate_source" data-slice="3" title="ما خالف عملة الدفاتر يحمل السعر ومصدره">سعر الصرف ومصدره</th>
               </tr></thead>
     <tbody>
-    <?php if (empty($rows)): ?><tr><td colspan="7" class="text-center" style="color:#198754">✔ صفرُ توقفٍ بلا مسؤول</td></tr><?php endif; ?>
+    <?php if (empty($rows)): ?><tr><td colspan="7" class="text-center stu-ok">✔ صفرُ توقفٍ بلا مسؤول</td></tr><?php endif; ?>
     <?php foreach ($rows as $t): ?>
       <tr>
         <td><?= intval($t['id']) ?></td>
@@ -143,10 +152,10 @@ include __DIR__ . '/../includes/page_header.php';
         <td><strong><?= floatval($t['total_fault_hours']) ?></strong></td>
         <td><?= htmlspecialchars($t['fault_type'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td>
-          <form method="post" style="display:flex;gap:6px">
+          <form method="post" class="stu-assign-form">
         <?= csrf_field() ?>
             <input type="hidden" name="assign_ts" value="<?= intval($t['id']) ?>">
-            <select name="fault_department" class="form-control form-control-sm" required style="max-width:130px">
+            <select name="fault_department" aria-label="الجهةُ المسؤولةُ عن التوقف" class="form-control form-control-sm stu-dept-select" required>
               <option value="">— الجهة —</option>
               <?php foreach ($depts as $d): ?><option><?= $d ?></option><?php endforeach; ?>
             </select>

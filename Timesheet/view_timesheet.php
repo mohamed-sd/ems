@@ -453,20 +453,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 /* Shadow classes */
 .shadow-sm {
-  box-shadow: 0 1px 3px rgba(26, 18, 8, 0.08), 0 4px 12px rgba(26, 18, 8, 0.06);
+  box-shadow: 0 1px 3px var(--c-rgba26188008, rgba(26, 18, 8, 0.08)), 0 4px 12px var(--c-rgba26188006, rgba(26, 18, 8, 0.06));
 }
 
 /* Card styling */
 .card {
-  background: #fff;
-  border: 1px solid #e8dcc8;
+  background: var(--c-fff, #fff);
+  border: 1px solid var(--c-e8dcc8, #e8dcc8);
   border-radius: 12px;
   overflow: hidden;
 }
 
 .card-header {
-  background: #f8f9fa;
-  border-bottom: 1px solid #e8dcc8;
+  background: var(--c-f8f9fa, #f8f9fa);
+  border-bottom: 1px solid var(--c-e8dcc8, #e8dcc8);
   padding: 14px 16px;
   display: flex;
   align-items: center;
@@ -476,7 +476,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 .card-header h5 {
   margin: 0;
-  color: #1a1208;
+  color: var(--c-1a1208, #1a1208);
   font-weight: 800;
   font-size: 1.05rem;
   display: flex;
@@ -486,19 +486,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 }
 
 .card-header h5 i {
-  color: #f7931a;
+  color: var(--c-f7931a, #f7931a);
   font-size: 1.15rem;
 }
 
 .card-body {
-  background: linear-gradient(180deg, #fff 0%, #fffbf5 100%);
+  background: linear-gradient(180deg, var(--c-fff, #fff) 0%, var(--c-fffbf5, #fffbf5) 100%);
   padding: 18px;
 }
 
 /* Form card styling */
 .pu-form-card {
-  background: #fff;
-  border: 1px solid #e8dcc8;
+  background: var(--c-fff, #fff);
+  border: 1px solid var(--c-e8dcc8, #e8dcc8);
   border-radius: 12px;
 }
 
@@ -520,19 +520,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   padding: 12px 24px;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #1a1208, #2d200a);
-  color: #fff;
-  border-left: 3px solid #f7931a;
+  background: linear-gradient(135deg, var(--c-1a1208, #1a1208), var(--c-2d200a, #2d200a));
+  color: var(--c-fff, #fff);
+  border-left: 3px solid var(--c-f7931a, #f7931a);
   font-weight: 800;
   font-size: 0.92rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(247, 147, 26, 0.25);
+  box-shadow: 0 4px 12px var(--c-rgba24714726025, rgba(247, 147, 26, 0.25));
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(247, 147, 26, 0.35);
+  box-shadow: 0 6px 18px var(--c-rgba24714726035, rgba(247, 147, 26, 0.35));
 }
 
 .btn-secondary {
@@ -541,10 +541,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   gap: 8px;
   min-width: 120px;
   padding: 12px 20px;
-  border: 1.5px solid #e8dcc8;
+  border: 1.5px solid var(--c-e8dcc8, #e8dcc8);
   border-radius: 10px;
-  background: #fff;
-  color: #6b4e2a;
+  background: var(--c-fff, #fff);
+  color: var(--c-6b4e2a, #6b4e2a);
   font-weight: 800;
   font-size: 0.92rem;
   cursor: pointer;
@@ -553,9 +553,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 }
 
 .btn-secondary:hover {
-  border-color: #a07848;
-  background: #fdf8f0;
-  color: #1a1208;
+  border-color: var(--c-a07848, #a07848);
+  background: var(--c-fdf8f0, #fdf8f0);
+  color: var(--c-1a1208, #1a1208);
 }
 
 /* Form grid styling */
@@ -596,23 +596,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   gap: 4px;
   font-weight: 800;
   font-size: 0.88rem;
-  color: #6b4e2a;
+  color: var(--c-6b4e2a, #6b4e2a);
   margin-bottom: 6px;
   line-height: 1.3;
 }
 
 .form-group label i {
-  color: #f7931a;
+  color: var(--c-f7931a, #f7931a);
   font-size: 0.8rem;
 }
 
 .form-group input,
 .form-group select {
   width: 100%;
-  border: 1.4px solid #dacdb8;
+  border: 1.4px solid var(--c-dacdb8, #dacdb8);
   border-radius: 10px;
-  background: #fffdfa;
-  color: #1a1208;
+  background: var(--c-fffdfa, #fffdfa);
+  color: var(--c-1a1208, #1a1208);
   padding: 10px 14px;
   min-height: 42px;
   font-size: 0.9rem;
@@ -623,23 +623,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 .form-group input:hover,
 .form-group select:hover {
-  border-color: rgba(247, 147, 26, 0.5);
+  border-color: var(--c-rgba2471472605, rgba(247, 147, 26, 0.5));
 }
 
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #f7931a;
-  background: #fff;
-  box-shadow: 0 0 0 3px rgba(247, 147, 26, 0.14), 0 3px 10px rgba(26, 18, 8, 0.07);
+  border-color: var(--c-f7931a, #f7931a);
+  background: var(--c-fff, #fff);
+  box-shadow: 0 0 0 3px var(--c-rgba24714726014, rgba(247, 147, 26, 0.14)), 0 3px 10px var(--c-rgba26188007, rgba(26, 18, 8, 0.07));
 }
 
 /* Group panel */
 .group-panel {
-  border: 1px solid rgba(12, 28, 62, 0.1);
+  border: 1px solid var(--c-rgba12286201, rgba(12, 28, 62, 0.1));
   border-radius: 12px;
   padding: 12px;
-  background: #f8fafc;
+  background: var(--c-f8fafc, #f8fafc);
 }
 
 .group-grid {
@@ -653,13 +653,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   align-items: center;
   gap: 8px;
   font-size: 14px;
-  color: #6b4e2a;
+  color: var(--c-6b4e2a, #6b4e2a);
 }
 
 .group-item input {
   width: 16px;
   height: 16px;
-  accent-color: #f7931a;
+  accent-color: var(--c-f7931a, #f7931a);
   cursor: pointer;
 }
 
@@ -671,9 +671,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   margin-bottom: 16px;
   padding: 10px 14px;
   border-radius: 10px;
-  border: 1px solid rgba(232, 184, 0, 0.3);
-  background: rgba(232, 184, 0, 0.1);
-  color: #7a5a00;
+  border: 1px solid var(--c-rgba232184003, rgba(232, 184, 0, 0.3));
+  background: var(--c-rgba232184001, rgba(232, 184, 0, 0.1));
+  color: var(--c-7a5a00, #7a5a00);
   font-size: 14px;
 }
 
@@ -692,11 +692,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 }
 
 .stats-card {
-  background: #eee;
-  border: 1px solid #aaa;
+  background: var(--c-eee, #eee);
+  border: 1px solid var(--c-aaa, #aaa);
   border-radius: 35px;
   padding: 18px;
-  box-shadow: 0 2px 8px rgba(26, 18, 8, 0.07);
+  box-shadow: 0 2px 8px var(--c-rgba26188007, rgba(26, 18, 8, 0.07));
   position: relative;
   overflow: hidden;
 }
@@ -723,11 +723,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   float:left;
   vertical-align:middle;
   margin-top: 15px ;
-  border: 1px solid #999;
+  border: 1px solid var(--c-999, #999);
 }
 
 .stats-card .stats-title {
-  color: #555;
+  color: var(--c-555, #555);
   font-size: 0.92rem;
   font-weight: 700;
   margin-top: 5px;
@@ -736,7 +736,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 }
 
 .stats-card .stats-value {
-  color: #222;
+  color: var(--c-222, #222);
   font-size: 1.8rem;
   line-height: 1;
   font-weight: 900;
@@ -748,7 +748,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   font-size: 1.8rem;
 }
 .stats-card .stats-empty {
-  color: #6b7280;
+  color: var(--c-6b7280, #6b7280);
   font-size: 0.95rem;
   font-weight: 700;
   line-height: 1.35;
@@ -757,39 +757,39 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 /* Color variants */
 .ts-stats-executed::before {
-  /* background: linear-gradient(90deg, #1d4ed8, #2563eb); */
+  /* background: linear-gradient(90deg, var(--c-1d4ed8, #1d4ed8), var(--c-2563eb, #2563eb)); */
 }
 
 .ts-stats-executed .stats-icon {
-  background: #fff;
-  color: #000;
+  background: var(--c-fff, #fff);
+  color: var(--c-000, #000);
 }
 
 .ts-stats-standby::before {
-  /* background: linear-gradient(90deg, #15803d, #16a34a); */
+  /* background: linear-gradient(90deg, var(--c-15803d, #15803d), var(--c-16a34a, #16a34a)); */
 }
 
 .ts-stats-standby .stats-icon {
-   background: #fff;
-  color: #000;
+   background: var(--c-fff, #fff);
+  color: var(--c-000, #000);
 }
 
 .ts-stats-fault::before {
-  /* background: linear-gradient(90deg, #b91c1c, #dc2626); */
+  /* background: linear-gradient(90deg, var(--c-b91c1c, #b91c1c), var(--c-dc2626, #dc2626)); */
 }
 
 .ts-stats-fault .stats-icon {
-  background: #fff;
-  color: #000;
+  background: var(--c-fff, #fff);
+  color: var(--c-000, #000);
 }
 
 .ts-stats-total::before {
-  /* background: linear-gradient(90deg, #b45309, #d97706); */
+  /* background: linear-gradient(90deg, var(--c-b45309, #b45309), var(--c-d97706, #d97706)); */
 }
 
 .ts-stats-total .stats-icon {
-  background: #fff;
-  color: #000;
+  background: var(--c-fff, #fff);
+  color: var(--c-000, #000);
 }
 
 /* Hover effect */
@@ -799,7 +799,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 .stats-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(26, 18, 8, 0.12);
+  box-shadow: 0 6px 16px var(--c-rgba26188012, rgba(26, 18, 8, 0.12));
 }
 
 /* Horizontal scroll support for wide timesheet table */
@@ -818,6 +818,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     min-width: 1500px;
 }
 
+/* UXW-01 (2): أنماطُ الجدولِ الثابتةُ منقولةٌ من الوسومِ إلى أصنافٍ ببادئةِ الشاشة */
+.tsv-table { width: 100%; }
+.timesheet-view-page td.tsv-cell-center { text-align: center; }
+.status-pill.tsv-status-pending { background: var(--c-rgba232184013, rgba(232,184,0,.13)); color: var(--gold); border: 1px solid var(--c-rgba232184022, rgba(232,184,0,.22)); }
+.timesheet-view-page button.tsv-fault-btn { background: none; border: none; cursor: pointer; padding: 2px 6px; }
+.tsv-fault-icon { color: var(--c-dc3545, #dc3545); font-size: .85rem; }
+.badge.tsv-fault-badge { background: var(--c-dc3545, #dc3545); color: var(--c-fff, #fff); font-size: .68rem; }
+.tsv-ok-icon { color: var(--c-059669, #059669); font-size: .9rem; }
+.badge.tsv-notes-badge { background: var(--c-0f2444, #0f2444); color: var(--c-fff, #fff); font-size: .68rem; }
+.tsv-dash { color: var(--c-adb5bd, #adb5bd); font-size: .75rem; }
+
 </style>
 
 <div class="main timesheet-view-page ems-unified-page-shell">
@@ -832,6 +843,8 @@ $header_actions = array(
 );
 $header_back = array('href' => 'timesheet_type.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
 include('../includes/page_header.php');
+// UXW-01 (9): حالاتُ الشاشةِ الدنيا (تحميل / فراغ / خطأ) — مخفيةٌ افتراضيًّا
+echo ems_states_bundle('لا سطورَ ساعاتٍ يوميةً مطابقةً للفلاتر المختارة', 'وسّعِ المدى الزمنيَّ أو امسحِ الفلاتر بزرِّ «مسح الفلاتر»');
 ?>
 
 
@@ -930,19 +943,19 @@ include('../includes/page_header.php');
                 </div>
                 <div class="form-group">
                     <label for="emsf_525_44920"><i class="fas fa-calendar-day"></i> تاريخ محدد</label>
-                    <input type="date" name="filter_date" value="<?= htmlspecialchars($filter_date) ?>" / id="emsf_525_44920">
+                    <input type="date" name="filter_date" id="emsf_525_44920" aria-label="تاريخٌ محدَّدٌ لسجلِّ الساعات" value="<?= htmlspecialchars($filter_date) ?>">
                 </div>
                 <div class="form-group">
                     <label for="emsf_526_90bf6"><i class="fas fa-calendar"></i> من تاريخ</label>
-                    <input type="date" name="start_date" value="<?= htmlspecialchars($start_date) ?>" / id="emsf_526_90bf6">
+                    <input type="date" name="start_date" id="emsf_526_90bf6" aria-label="بدايةُ المدى الزمني" value="<?= htmlspecialchars($start_date) ?>">
                 </div>
                 <div class="form-group">
                     <label for="emsf_527_24253"><i class="fas fa-calendar"></i> إلى تاريخ</label>
-                    <input type="date" name="end_date" value="<?= htmlspecialchars($end_date) ?>" / id="emsf_527_24253">
+                    <input type="date" name="end_date" id="emsf_527_24253" aria-label="نهايةُ المدى الزمني" value="<?= htmlspecialchars($end_date) ?>">
                 </div>
                 <div class="form-group">
                     <label for="emsf_528_b119d"><i class="fas fa-calendar-alt"></i> الشهر</label>
-                    <input type="month" name="month" value="<?= htmlspecialchars($month_filter) ?>" / id="emsf_528_b119d">
+                    <input type="month" name="month" id="emsf_528_b119d" aria-label="شهرُ سجلِّ الساعات" value="<?= htmlspecialchars($month_filter) ?>">
                 </div>
                 <div class="form-group">
                     <label for="emsf_529_4b5c6"><i class="fas fa-toggle-on"></i> حالة السجل</label>
@@ -971,14 +984,14 @@ include('../includes/page_header.php');
         </div>
         <div class="card-body">
             <div class="column-groups-toggle">
-                <button type="button" class="btn-group-toggle active" data-group="basic"><i class="fas fa-info-circle"></i> المعلومات العامة</button>
-                <button type="button" class="btn-group-toggle active" data-group="work"><i class="fas fa-clock"></i> ساعات العمل</button>
-                <button type="button" class="btn-group-toggle active" data-group="fault_hours"><i class="fas fa-tools"></i> ساعات الأعطال</button>
-                <button type="button" class="btn-group-toggle active" data-group="counter"><i class="fas fa-tachometer-alt"></i> عداد الساعات</button>
-                <button type="button" class="btn-group-toggle active" data-group="fault_details"><i class="fas fa-exclamation-triangle"></i> تفاصيل الأعطال</button>
-                <button type="button" class="btn-group-toggle active" data-group="operator"><i class="fas fa-user-cog"></i> ساعات المشغل</button>
-                <button type="button" class="btn-group-toggle active" data-group="notes"><i class="fas fa-sticky-note"></i> الملاحظات</button>
-                <button type="button" class="btn-group-toggle-all active"><i class="fas fa-eye"></i> الكل</button>
+                <button type="button" class="ems-btn-group-toggle active" data-group="basic"><i class="fas fa-info-circle"></i> المعلومات العامة</button>
+                <button type="button" class="ems-btn-group-toggle active" data-group="work"><i class="fas fa-clock"></i> ساعات العمل</button>
+                <button type="button" class="ems-btn-group-toggle active" data-group="fault_hours"><i class="fas fa-tools"></i> ساعات الأعطال</button>
+                <button type="button" class="ems-btn-group-toggle active" data-group="counter"><i class="fas fa-tachometer-alt"></i> عداد الساعات</button>
+                <button type="button" class="ems-btn-group-toggle active" data-group="fault_details"><i class="fas fa-exclamation-triangle"></i> تفاصيل الأعطال</button>
+                <button type="button" class="ems-btn-group-toggle active" data-group="operator"><i class="fas fa-user-cog"></i> ساعات المشغل</button>
+                <button type="button" class="ems-btn-group-toggle active" data-group="notes"><i class="fas fa-sticky-note"></i> الملاحظات</button>
+                <button type="button" class="ems-btn-group-toggle-all active"><i class="fas fa-eye"></i> الكل</button>
             </div>
         </div>
     </div>
@@ -989,7 +1002,7 @@ include('../includes/page_header.php');
         </div>
         <div class="card-body">
             <div class="table-scroll-wrap">
-            <table id="timesheetTable" class="display nowrap" style="width:100%">
+            <table id="timesheetTable" class="display nowrap tsv-table" data-page-length="25" data-scroll-x="1">
                 <thead>
                     <tr>
                         <th data-group="basic">#</th>
@@ -1055,7 +1068,7 @@ include('../includes/page_header.php');
                         foreach ($all_rows as $row) {
                             $status_badge = '';
                             if ($row['status'] === '1') {
-                                $status_badge = '<span class="status-pill" style="background: rgba(232,184,0,.13); color: var(--gold); border: 1px solid rgba(232,184,0,.22);">قيد المراجعة</span>';
+                                $status_badge = '<span class="status-pill tsv-status-pending">قيد المراجعة</span>';
                             } elseif ($row['status'] === '2') {
                                 $status_badge = '<span class="status-pill status-active">معتمد</span>';
                             } elseif ($row['status'] === '3') {
@@ -1106,16 +1119,16 @@ include('../includes/page_header.php');
                             $_legacy_has = !empty($row['fault_type']) || !empty($row['fault_part']);
                             $_badge_cnt = $_fc_cnt > 0 ? $_fc_cnt : ($_legacy_has ? 1 : 0);
                             if ($_badge_cnt > 0) {
-                                echo '<td style="text-align:center;"><button class="btn-ghost" data-ts-id="' . intval($row['id']) . '" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;"><i class="fas fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i> <span class="badge rounded-pill" style="background:#dc3545;color:#fff;font-size:.68rem;">' . $_badge_cnt . '</span></button></td>';
+                                echo '<td class="tsv-cell-center"><button class="btn-ghost tsv-fault-btn" data-ts-id="' . intval($row['id']) . '" title="عرض الأعطال"><i class="fas fa-exclamation-triangle tsv-fault-icon"></i> <span class="badge rounded-pill tsv-fault-badge">' . $_badge_cnt . '</span></button></td>';
                             } else {
-                                echo '<td style="text-align:center;" title="لا توجد أعطال"><i class="fas fa-check-circle" style="color:#059669;font-size:.9rem;"></i></td>';
+                                echo '<td class="tsv-cell-center" title="لا توجد أعطال"><i class="fas fa-check-circle tsv-ok-icon"></i></td>';
                             }
 
                             $_notes_cnt = intval($notes_map[$row['id']] ?? 0);
                             if ($_notes_cnt > 0) {
-                                echo '<td style="text-align:center;"><span class="badge rounded-pill" style="background:#0f2444;color:#fff;font-size:.68rem;"><i class="fas fa-clipboard-check"></i> ' . $_notes_cnt . '</span></td>';
+                                echo '<td class="tsv-cell-center"><span class="badge rounded-pill tsv-notes-badge"><i class="fas fa-clipboard-check"></i> ' . $_notes_cnt . '</span></td>';
                             } else {
-                                echo '<td style="text-align:center;"><span style="color:#adb5bd;font-size:.75rem;">—</span></td>';
+                                echo '<td class="tsv-cell-center"><span class="tsv-dash">—</span></td>';
                             }
 
                             echo '<td>' . htmlspecialchars($row['operator_hours']) . '</td>';
@@ -1204,33 +1217,28 @@ $(document).ready(function () {
         });
     });
 
-    var table = $('#timesheetTable').DataTable({
-        scrollX: true,
-        scrollCollapse: true,
-        autoWidth: false,
-        deferRender: true,
-        pageLength: 25,
-        lengthMenu: [[25, 50, 100], [25, 50, 100]],
-        dom: 'Bfrtip',
-        buttons: [
-            { extend: 'copy', text: 'نسخ الظاهر', exportOptions: { modifier: { page: 'current' } } },
-            { extend: 'excel', text: 'تصدير الظاهر Excel', exportOptions: { modifier: { page: 'current' } } },
-            { extend: 'csv', text: 'تصدير الظاهر CSV', exportOptions: { modifier: { page: 'current' } } },
-            { extend: 'print', text: 'طباعة الظاهر', exportOptions: { modifier: { page: 'current' } } }
-        ],
-        language: {
-            url: '/ems/assets/i18n/datatables/ar.json'
-        }
-    });
+    // UXW-01 (5): لا تهيئةَ جدولٍ محليةً — المكوّنُ المركزيُّ assets/js/ui-unification.js
+    // يهيّئ الجدولَ ويقرأ سلوكَه من سماتِ وسمِ الجدول (data-page-length / data-scroll-x).
+    function bindTimesheetTable() {
+        var table = $('#timesheetTable').DataTable();
 
-    // إظهار/إخفاء المجموعات — موحّد عبر assets/js/column-groups.js
-    // (تُشتق فهارس الأعمدة من سمة data-group على الرؤوس).
-    if (window.EmsColumnGroups) {
-        EmsColumnGroups.init({
-            storageKey: 'timesheetGroupStates',
-            mode: 'datatable',
-            table: table
-        });
+        // إظهار/إخفاء المجموعات — موحّد عبر assets/js/column-groups.js
+        // (تُشتق فهارس الأعمدة من سمة data-group على الرؤوس · والمحدِّدان يمرَّران صراحةً).
+        if (window.EmsColumnGroups) {
+            EmsColumnGroups.init({
+                storageKey: 'timesheetGroupStates',
+                mode: 'datatable',
+                table: table,
+                buttons: '.ems-btn-group-toggle[data-group]',
+                allButton: '.ems-btn-group-toggle-all'
+            });
+        }
+    }
+
+    if ($.fn.dataTable && $.fn.dataTable.isDataTable('#timesheetTable')) {
+        bindTimesheetTable();
+    } else {
+        $('#timesheetTable').one('init.dt', bindTimesheetTable);
     }
 });
 </script>

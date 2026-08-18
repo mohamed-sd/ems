@@ -90,6 +90,8 @@ include('../insidebar.php'); ?>
 		$header_actions = array();
 		$header_back    = array('href' => 'reports.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
 		include('../includes/page_header.php');
+		// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+		echo ems_states_bundle('لا ساعاتِ عملٍ مسجَّلةً في اليومِ والآليةِ والمشروعِ المختارة', 'غيِّرِ التاريخَ أو الآليةَ أو المشروعَ في شريطِ الفلاترِ ثمّ اضغطْ «بحث»');
 		?>
 
 	<div class="card mb-4 fc-filter-body">
@@ -100,7 +102,7 @@ include('../insidebar.php'); ?>
 			<form method="GET" class="form-grid fc-filter-grid">
 				<div>
 					<label class="fc-filter-label" for="emsf_455_dd138"><i class="fas fa-calendar-day"></i> التاريخ</label>
-					<input type="date" name="date" value="<?php echo $date_filter; ?>" id="emsf_455_dd138">
+					<input type="date" name="date" id="emsf_455_dd138" aria-label="تاريخُ يومِ التقرير" value="<?php echo $date_filter; ?>">
 				</div>
 
 				<div>

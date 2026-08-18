@@ -182,6 +182,11 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.swr-form { max-width: 640px; }
+.swr-note { font-size: .85em; margin-top: 10px; }
+</style>
 <div class="main" dir="rtl">
   <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
@@ -191,10 +196,12 @@ $header_title_html = htmlspecialchars('طلبُ تبديلٍ — بموافقت�
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+echo ems_states_bundle('لا بدائلَ احتياطيةً مسجَّلةً في هذا الموقع', 'سجّلِ المعداتِ الاحتياطيةَ في حاوياتِ الموقعِ أو اختر مشغّلًا بديلًا');
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
 
-  <form method="post" class="ems-form" style="max-width:640px">
+  <form method="post" class="ems-form swr-form">
         <?= csrf_field() ?>
     <input type="hidden" name="site" value="<?= $site ?>">
     <input type="hidden" name="equipment" value="<?= $equipment ?>">
@@ -223,7 +230,7 @@ include __DIR__ . '/../includes/page_header.php';
       <input type="number" step="0.5" name="estimated_hours" class="form-control" value="0" id="emsf_1002_98ab4"></div>
     <button type="submit" class="btn btn-primary">إرسالُ الطلب لصندوق الاعتماد</button>
   </form>
-  <p class="text-muted" style="font-size:.85em;margin-top:10px">
+  <p class="text-muted swr-note">
     لا يغيّر التبديلُ الحصةَ التعاقديةَ ولا يصفّر عجزَ المتعطل (CAP-01 §7) —
     والموافقتان: القوى التشغيلية (تأهيلُ البديل) ثم الإدارةُ المعنية.</p>
 </div>

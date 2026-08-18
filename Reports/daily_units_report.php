@@ -32,6 +32,15 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+<style>
+/* UXW-01 ①②: أنماطُ سجلِّ الوحداتِ اليومية — rpt-du */
+.rpt-du-filter{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.rpt-du-prj{width:100px}
+.rpt-du-totals{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px}
+.rpt-du-total-badge{font-size:15px;padding:8px 14px}
+.rpt-du-unit-note{color:var(--c-a15c00, #a15c00);align-self:center}
+.rpt-du-table{width:100%}
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'سجل الوحدات اليومية'; $header_icon = 'fa fa-table-list';
@@ -40,23 +49,26 @@ include '../insidebar.php';
     ems_screen_about('السجلُّ التحليليُّ الواحد لوحدات العمل بوحداتها المنفصلة — يستوعب '
         . 'تقاريرَ الساعات القديمة الثلاثة. قراءةٌ واشتقاقٌ بلا أثر — ولا تُجمع وحدتان في رقم.',
         array('حدّد الفترةَ والمشروع', 'اقرأ المجاميعَ بوحدةٍ وحدة'));
+    // UXW-01 ⑨: حالتا التحميلِ والخطأِ (حالةُ الفراغِ قائمةٌ أسفلُ) — مخفيتانِ افتراضًا
+    echo ems_state('loading', 'جارٍ تحميلُ سجلِّ الوحداتِ اليومية', '', '', true);
+    echo ems_state('error', 'تعذّر عرضُ سجلِّ الوحدات', 'أعد المحاولةَ — وإن استمر الخللُ أبلغ عن مشكلةٍ من هذه الشاشة', '', true);
     ?>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <label for="emsf_452_2098b">من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>" id="emsf_452_2098b">
-            <label for="emsf_453_8f10a">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>" id="emsf_453_8f10a">
-            <label for="emsf_454_5931c">المشروع</label><input type="number" name="project_id" min="0"
-                value="<?php echo $prj ?: ''; ?>" placeholder="الكل" style="width:100px" id="emsf_454_5931c">
+        <form method="get" class="rpt-du-filter">
+            <label for="emsf_452_2098b">من</label><input type="date" name="from" id="emsf_452_2098b" value="<?php echo htmlspecialchars($from); ?>">
+            <label for="emsf_453_8f10a">إلى</label><input type="date" name="to" id="emsf_453_8f10a" value="<?php echo htmlspecialchars($to); ?>">
+            <label for="emsf_454_5931c">المشروع</label><input type="number" name="project_id" min="0" id="emsf_454_5931c" placeholder="الكل" class="rpt-du-prj"
+                value="<?php echo $prj ?: ''; ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اعرض</button>
         </form>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px">
+        <div class="rpt-du-totals">
             <?php foreach ($rep['totals_by_unit'] as $ut => $q): ?>
-                <div class="badge badge-secondary" style="font-size:15px;padding:8px 14px">
+                <div class="badge badge-secondary rpt-du-total-badge">
                     <?php echo htmlspecialchars($ut); ?>: <strong><?php echo htmlspecialchars((string)$q); ?></strong></div>
             <?php endforeach; ?>
             <?php if (count($rep['totals_by_unit']) > 1): ?>
-                <small style="color:#a15c00;align-self:center">⚠ المجاميعُ بوحدةٍ وحدة — ولا تُجمع وحدتان في رقم</small>
+                <small class="rpt-du-unit-note">⚠ المجاميعُ بوحدةٍ وحدة — ولا تُجمع وحدتان في رقم</small>
             <?php endif; ?>
         </div>
     </div></div>
@@ -64,7 +76,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <?php if (!$rep['rows']): ems_state_empty('لا وحداتٍ في هذه الفترة', 'وسّع المدة',
             '?from=' . date('Y-01-01') . '&to=' . $to); else: ?>
-        <div class="table-container"><table class="alltables display nowrap" style="width:100%">
+        <div class="table-container"><table class="alltables display nowrap rpt-du-table">
             <thead><tr><th>التاريخ</th><th>المشروع</th><th>المعدة</th><th>المورد</th>
                 <th>المشغّل</th><th>الوحدة</th><th>الكمية</th><th>الحالة</th></tr></thead>
             <tbody>

@@ -75,3 +75,26 @@ Workforce/worker_settlement.php	مشرف الموارد
 movement/	موقع
 Equipments/equipments_drivers.php	اروينا
 Equipments/fleet_failures.php	يسن
+FinRequests/cycle_time_board.php	مشرف المالية
+FinRequests/finance_gateway.php	مشرف المالية
+FinRequests/requests_reports.php	مشرف المالية
+FinRequests/dept_inbox.php	مشرف المالية
+Governance/activation_patterns.php	محمد
+Governance/entities_registry.php	محمد
+Governance/licenses_guarantees.php	محمد
+Governance/ownership_grants.php	محمد
+Governance/signing_authority.php	محمد
+Governance/gov_dept.php	يسن
+Operations/fleet_calendar.php	مبيعات
+Operations/fleet_utilization.php	مبيعات
+Portal/portal_elements.php	مشرف الموارد
+Portal/visibility_audit.php	مشرف الموارد
+Portal/visibility_keys.php	مشرف الموارد
+Portal/visibility_simulator.php	مشرف الموارد
+Procurement/wh_returns.php	أمين المستودع
+Fleet/readiness_cert.php	مشرف الأسطول
+Settings/settings.php	محمد
+Settings/guard_classification.php	محمد
+admin/ops_manager_board.php	محمد
+main/all_assistants.php	مشرف الصلاحيات
+main/dashboard.php	تنفيذ

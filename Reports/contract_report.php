@@ -33,27 +33,27 @@ include __DIR__ . '/../inheader.php';
             margin-bottom: 18px;
         }
         .summary-item {
-            background: rgba(12, 28, 62, 0.03);
-            border: 1px solid rgba(12, 28, 62, 0.08);
+            background: var(--c-rgba122862003, rgba(12, 28, 62, 0.03));
+            border: 1px solid var(--c-rgba122862008, rgba(12, 28, 62, 0.08));
             border-radius: 12px;
             padding: 12px 14px;
         }
         .summary-item .label {
             font-size: 13px;
-            color: #64748b;
+            color: var(--c-64748b, #64748b);
             font-weight: 600;
             margin-bottom: 4px;
         }
         .summary-item .value {
             font-size: 16px;
-            color: #0c1c3e;
+            color: var(--c-0c1c3e, #0c1c3e);
             font-weight: 800;
         }
         .report-progress .progress,
         .progress.report-progress {
             height: 20px;
             border-radius: 999px;
-            background: #eef2f7;
+            background: var(--c-eef2f7, #eef2f7);
         }
         .report-progress .progress-bar {
             font-weight: 700;
@@ -61,9 +61,21 @@ include __DIR__ . '/../inheader.php';
         }
         .card-header h5 { margin: 0; }
         .table thead th {
-            background: #f8fafc;
-            color: #0c1c3e;
+            background: var(--c-f8fafc, #f8fafc);
+            color: var(--c-0c1c3e, #0c1c3e);
             font-weight: 800;
+        }
+        /* UXW-01 ②: أنماطٌ كانت موضعيةً — بادئةُ الشاشةِ rpt-con */
+        .rpt-con-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .rpt-con-filter { align-items: end; }
+        .rpt-con-progress-title { font-weight: 700; margin-bottom: 8px; color: var(--c-0c1c3e, #0c1c3e); }
+        .rpt-con-progress-wrap { max-width: 480px; }
+        .rpt-con-chart-empty { padding: 24px; text-align: center; opacity: .75; font-size: .85rem; }
+        /* ألوانُ سلاسلِ الرسمِ — تُقرأ في جافاسكربت لأن اللوحةَ لا تحلُّ var() بنفسِها */
+        #chart {
+            --rpt-con-series-total:  var(--c-rgba3799235075, rgba(37, 99, 235, 0.75));
+            --rpt-con-series-target: var(--c-rgba2321840075, rgba(232, 184, 0, 0.75));
+            --rpt-con-series-pct:    var(--c-0c1c3e, #0c1c3e);
         }
     </style>
 
@@ -154,8 +166,10 @@ $header_title_html = htmlspecialchars('تقرير إحصائية العقود', 
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+echo ems_states_bundle('لا ساعاتِ تنفيذٍ مسجلةً لهذا العقد', 'اختر عقدًا من القائمةِ أعلاه أو سجّل ساعاتِ الوردياتِ أولًا');
 ?>
-        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <div class="rpt-con-actions">
             <a href="reports.php" class="back-btn">
                 <i class="fas fa-arrow-right"></i> رجوع
             </a>
@@ -167,7 +181,7 @@ include __DIR__ . '/../includes/page_header.php';
             <h5><i class="fas fa-filter"></i> اختيار العقد</h5>
         </div>
         <div class="card-body">
-            <form method="GET" class="form-grid" style="align-items:end;">
+            <form method="GET" class="form-grid rpt-con-filter">
                 <div>
                     <label for="emsf_1354_a59d4"><i class="fas fa-file-signature"></i> اختر العقد</label>
                     <select name="contract" id="emsf_1354_a59d4">
@@ -200,7 +214,7 @@ include __DIR__ . '/../includes/page_header.php';
                     <div class="summary-item"><div class="label">المتبقي</div><div class="value"><?php echo $contract_data['remaining_hours']; ?></div></div>
                 </div>
                 <div class="report-progress">
-                    <div style="font-weight:700; margin-bottom:8px; color:#0c1c3e;">نسبة الإنجاز الكلية</div>
+                    <div class="rpt-con-progress-title">نسبة الإنجاز الكلية</div>
                         <?php
                         $overall_percent = ($contract_data['forecasted_contracted_hours'] > 0)
                             ? round(($contract_data['actual_hours'] / $contract_data['forecasted_contracted_hours']) * 100, 2)
@@ -213,9 +227,9 @@ include __DIR__ . '/../includes/page_header.php';
                             $color = "bg-warning";
                         }
                         ?>
-                        <div class="progress" style="max-width:480px;">
+                        <div class="progress rpt-con-progress-wrap">
                             <div class="progress-bar <?php echo $color; ?>"
-                                 role="progressbar" style="width: <?php echo $overall_percent; ?>%;">
+                                 role="progressbar" data-allow-style style="width: <?php echo $overall_percent; ?>%;">
                                 <?php echo $overall_percent; ?> %
                             </div>
                         </div>
@@ -276,7 +290,7 @@ include __DIR__ . '/../includes/page_header.php';
                             <td>
                                 <div class="progress report-progress">
                                     <div class="progress-bar <?php echo $color; ?>" role="progressbar"
-                                         style="width: <?php echo $percent; ?>%;">
+                                         data-allow-style style="width: <?php echo $percent; ?>%;">
                                         <?php echo $percent; ?> %
                                     </div>
                                 </div>
@@ -301,6 +315,11 @@ include __DIR__ . '/../includes/page_header.php';
 
         <script>
         const ctx = document.getElementById('chart');
+        /* UXW-01 ①: ألوانُ السلاسلِ من الرموزِ المعلَنةِ على #chart — لا قيمةَ لونٍ مثبَّتةً هنا */
+        const emsSeriesCss = ctx ? getComputedStyle(ctx) : null;
+        const emsSeriesColor = function (name) {
+            return emsSeriesCss ? emsSeriesCss.getPropertyValue(name).trim() : '';
+        };
         /* UI-DEF-07 (L4): لا رسمَ بلا بياناتٍ بمحاورَ افتراضية — حالةٌ مفسَّرة */
         function emsChartGuard(c, seriesArrays, renderFn) {
             var t = 0;
@@ -308,7 +327,7 @@ include __DIR__ . '/../includes/page_header.php';
             if (t > 0) { return renderFn(); }
             var host = c && c.parentNode ? c.parentNode : null;
             if (host) {
-                host.innerHTML = '<div style="padding:24px;text-align:center;opacity:.75;font-size:.85rem">'
+                host.innerHTML = '<div class="rpt-con-chart-empty">'
                     + 'لا بيانات في الفترة المعروضة — الرسم لا يُعرض بمحاور افتراضية</div>';
             }
             return null;
@@ -322,18 +341,18 @@ include __DIR__ . '/../includes/page_header.php';
                     {
                         label: 'الإجمالي',
                         data: <?php echo json_encode($actual); ?>,
-                        backgroundColor: 'rgba(37, 99, 235, 0.75)'
+                        backgroundColor: emsSeriesColor('--rpt-con-series-total')
                     },
                     {
                         label: 'الهدف الشهري',
                         data: <?php echo json_encode($target); ?>,
-                        backgroundColor: 'rgba(232, 184, 0, 0.75)'
+                        backgroundColor: emsSeriesColor('--rpt-con-series-target')
                     },
                     {
                         label: 'نسبة الإنجاز (%)',
                         data: <?php echo json_encode($percentages); ?>,
                         type: 'line',
-                        borderColor: '#0c1c3e',
+                        borderColor: emsSeriesColor('--rpt-con-series-pct'),
                         backgroundColor: 'transparent',
                         yAxisID: 'percentage'
                     }

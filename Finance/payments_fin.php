@@ -201,6 +201,11 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارتْ أصنافًا ببادئةِ الشاشة */
+.fin-pay-wide { grid-column: 1 / -1; }
+.fin-pay-tbl { width: 100%; }
+</style>
 <div class="main fin-pay-main ems-unified-page-shell">
     <?php
     $header_title = 'المدفوعات والخزينة'; $header_icon = 'fa fa-money-bill-transfer';
@@ -208,6 +213,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'حركة خزينة'); }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا حركاتِ صرفٍ أو تحصيلٍ مسجَّلةً بعدُ', 'سجّلْ أوّلَ حركةِ خزينةٍ بزرِّ «حركة خزينة» في رأسِ الشاشة');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -231,7 +238,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                      FROM fin_receivables r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding>0 ORDER BY r.id DESC");
                 foreach ($recv_opts as $x) { echo "<option value='" . intval($x['id']) . "'>" . htmlspecialchars($x['label']) . "</option>"; }
                 ?></select></div>
-            <div class="form-group" style="grid-column:1/-1"><label for="emsf_420_78aa0">بيان</label><input type="text" name="memo" id="emsf_420_78aa0"></div>
+            <div class="form-group fin-pay-wide"><label for="emsf_420_78aa0">بيان</label><input type="text" name="memo" id="emsf_420_78aa0"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-secondary" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>
@@ -240,7 +247,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="finTable" class="display nowrap alltables fin-pay-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>رقم الطلب</th><th>الاتجاه</th><th>الطرف</th><th>الطريقة</th><th>المبلغ</th><th>البيان</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">تاريخ الطلب</th>
@@ -327,9 +334,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 <script>
 $(document).ready(function () {
-    $('#finTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    // جدولُ العرضِ يهيّئُه المكوّنُ المركزيُّ (assets/js/ui-unification.js)
     $('#toggleForm').on('click', function () { $('#finForm').toggleClass('allforms-visible'); });
 });
 </script>

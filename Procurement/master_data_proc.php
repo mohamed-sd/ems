@@ -131,6 +131,11 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ②: أنماطُ هذه الشاشةِ الثابتةُ أصنافًا ببادئةِ الشاشة */
+.proc-md-table    { width: 100%; }
+.proc-md-fullspan { grid-column: 1 / -1; }
+</style>
 
 <div class="main proc-master-main ems-unified-page-shell">
     <?php
@@ -143,6 +148,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا قيمَ مرجعيةً ولا مخازنَ مسجَّلةً لهذه الشركة',
+                           'أضفْ قيمةً مرجعيةً أو مخزنًا بزرَّي الرأسِ — وبها تُبنى بقيةُ شاشاتِ المشتريات');
     ?>
 
     <?php proc_msg_banner(); ?>
@@ -194,7 +202,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
         </div>
         <div class="table-container">
-            <table id="lookupTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="lookupTable" class="display nowrap alltables proc-md-table"
+                   data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>الإجراءات</th><th>نوع المخزن</th><th>اسم المخزن</th><th>وصف / تفصيل</th><th>مفعّل</th>
                 </tr></thead>
@@ -255,7 +264,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <label for="wh_location">الموقع</label>
                     <input type="text" name="location" id="wh_location">
                 </div>
-                <div class="form-group" style="grid-column:1/-1">
+                <div class="form-group proc-md-fullspan">
                     <label for="wh_notes">ملاحظات</label>
                     <input type="text" name="notes" id="wh_notes">
                 </div>
@@ -270,7 +279,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-body">
         <div class="card-header"><h5><i class="fas fa-warehouse"></i> المخازن</h5></div>
         <div class="table-container">
-            <table id="whTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="whTable" class="display nowrap alltables proc-md-table"
+                   data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>الإجراءات</th><th>كود المخزن</th><th>الاسم</th><th>النوع</th><th>الموقع الجغرافي</th><th>ملاحظات</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -341,30 +351,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function () {
     $(document).ready(function () {
-        var lookupTable = $('#lookupTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
-
-        $('#whTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
+        // UXW-01 ⑤: لا تهيئةَ محليةً — المكوّنُ المركزيُّ في assets/js/ui-unification.js
+        // يلتقط الجدولين ويقرأ سلوكَهما من سماتِ data-* على وسمَي <table>.
 
         // فلترة القيم المرجعية حسب النوع (العمود 1)
         $('#filterLookupType').on('change', function () {
             var v = this.value ? '^' + $.fn.dataTable.util.escapeRegex(this.value) + '$' : '';
-            lookupTable.column(1).search(v, true, false).draw();
+            // النسخةُ من المكوّنِ المركزيِّ — ولا تُنشأ هنا إن لم يكن قد هيّأها بعد
+            if (!$.fn.dataTable.isDataTable('#lookupTable')) { return; }
+            $('#lookupTable').DataTable().column(1).search(v, true, false).draw();
         });
 
         // أزرار إظهار الفورمين

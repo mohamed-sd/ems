@@ -55,6 +55,22 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.fu-filter { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; }
+.fu-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-top: 14px; }
+.fu-kpi-body { text-align: center; }
+.fu-kpi-num { font-size: 1.8rem; font-weight: 700; }
+.fu-kpi-num-sm { font-size: 1.5rem; font-weight: 700; }
+.fu-ok { color: var(--c-2c6749, #2C6749); }
+.fu-warn { color: var(--c-9a3412); }
+.fu-alert { margin-top: 12px; }
+.fu-card { margin-top: 14px; }
+.fu-tight { margin: 0 0 10px; }
+.fu-strong { font-weight: 700; }
+.fu-row-neg { background: var(--c-fff3f0, #fff3f0); }
+.fu-note { margin-top: 8px; }
+</style>
 <div class="main ems-unified-page-shell">
 <?php
 $header_title = 'استغلالُ الأسطول ومردودُه';
@@ -70,11 +86,13 @@ if (function_exists('ems_screen_about')) {
         array('حدّد المدة', 'اقرأ الأدنى استغلالًا أولًا', 'قارن الفئات — لا الآلات وحدها')
     );
 }
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+echo ems_states_bundle('لا معداتِ أسطولٍ بوقائعَ في هذه المدة', 'وسّعِ المدةَ أو أزِلْ مرشِّحَ الفئةِ ثمَّ اضغط «اقِس»');
 ?>
   <div class="card"><div class="card-body">
-    <form method="get" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap">
-      <div><label for="emsf_364_d11dc">من</label><input type="date" name="from" value="<?php echo fu_e($from); ?>" class="form-control" id="emsf_364_d11dc"></div>
-      <div><label for="emsf_365_be9da">إلى</label><input type="date" name="to" value="<?php echo fu_e($to); ?>" class="form-control" id="emsf_365_be9da"></div>
+    <form method="get" class="fu-filter">
+      <div><label for="emsf_364_d11dc">من</label><input type="date" name="from" id="emsf_364_d11dc" class="form-control" value="<?php echo fu_e($from); ?>"></div>
+      <div><label for="emsf_365_be9da">إلى</label><input type="date" name="to" id="emsf_365_be9da" class="form-control" value="<?php echo fu_e($to); ?>"></div>
       <div><label for="emsf_366_1e7d1">الفئة</label>
         <select name="type" class="form-control" id="emsf_366_1e7d1">
           <option value="0">— كل الفئات —</option>
@@ -88,26 +106,26 @@ if (function_exists('ems_screen_about')) {
   </div></div>
 
   <!-- المؤشراتُ العليا -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:14px">
-    <div class="card"><div class="card-body" style="text-align:center">
-      <div style="font-size:1.8rem;font-weight:700"><?php echo (int) $summary['fleet']; ?></div>
+  <div class="fu-kpis">
+    <div class="card"><div class="card-body fu-kpi-body">
+      <div class="fu-kpi-num"><?php echo (int) $summary['fleet']; ?></div>
       <div class="text-muted">معدةً في الأسطول</div></div></div>
-    <div class="card"><div class="card-body" style="text-align:center">
-      <div style="font-size:1.8rem;font-weight:700;color:#2C6749"><?php echo (int) $summary['rented']; ?></div>
+    <div class="card"><div class="card-body fu-kpi-body">
+      <div class="fu-kpi-num fu-ok"><?php echo (int) $summary['rented']; ?></div>
       <div class="text-muted">عملت في المدة</div></div></div>
-    <div class="card"><div class="card-body" style="text-align:center">
-      <div style="font-size:1.8rem;font-weight:700;color:#9A3412"><?php echo (int) $summary['idle']; ?></div>
+    <div class="card"><div class="card-body fu-kpi-body">
+      <div class="fu-kpi-num fu-warn"><?php echo (int) $summary['idle']; ?></div>
       <div class="text-muted">لم تعمل إطلاقًا</div></div></div>
-    <div class="card"><div class="card-body" style="text-align:center">
-      <div style="font-size:1.8rem;font-weight:700"><?php echo fu_n($summary['avg_util'], 1); ?>٪</div>
+    <div class="card"><div class="card-body fu-kpi-body">
+      <div class="fu-kpi-num"><?php echo fu_n($summary['avg_util'], 1); ?>٪</div>
       <div class="text-muted">متوسطُ الاستغلال</div></div></div>
-    <div class="card"><div class="card-body" style="text-align:center">
-      <div style="font-size:1.5rem;font-weight:700;color:#2C6749"><?php echo fu_n($summary['margin']); ?></div>
+    <div class="card"><div class="card-body fu-kpi-body">
+      <div class="fu-kpi-num-sm fu-ok"><?php echo fu_n($summary['margin']); ?></div>
       <div class="text-muted">الهامش<?php echo $summary['margin_pct'] !== null ? ' (' . fu_n($summary['margin_pct'], 1) . '٪)' : ''; ?></div></div></div>
   </div>
 
   <?php if ($summary['mixed_currency'] > 0 || $summary['with_oec'] < $summary['fleet']): ?>
-  <div class="alert alert-warning" style="margin-top:12px">
+  <div class="alert alert-warning fu-alert">
     <?php if ($summary['with_oec'] < $summary['fleet']): ?>
       <div><i class="fa fa-circle-info"></i> مردودُ رأس المال محسوبٌ لـ<b><?php echo (int) $summary['with_oec']; ?></b>
         معدةً فقط من <?php echo (int) $summary['fleet']; ?> — الباقي بلا تكلفةِ اقتناءٍ مسجَّلة.
@@ -125,9 +143,9 @@ if (function_exists('ems_screen_about')) {
   <?php endif; ?>
 
   <!-- بالفئة -->
-  <div class="card" style="margin-top:14px"><div class="card-body">
-    <h5 style="margin:0 0 10px"><i class="fa fa-layer-group"></i> بالفئة — أيُّ فئةٍ تُطعم؟</h5>
-    <div class="table-responsive"><table class="table table-sm" data-no-dt="1">
+  <div class="card fu-card"><div class="card-body">
+    <h5 class="fu-tight"><i class="fa fa-layer-group"></i> بالفئة — أيُّ فئةٍ تُطعم؟</h5>
+    <div class="table-responsive"><table class="table table-sm" data-no-dt="hard">
       <thead><tr><th>الفئة</th><th>الأسطول</th><th>عملت</th><th>الاستغلال</th><th>الإيراد</th><th>التكلفة</th><th>الهامش</th><th>نسبة الهامش</th></tr></thead>
       <tbody>
       <?php foreach ($byType as $t): ?>
@@ -135,11 +153,11 @@ if (function_exists('ems_screen_about')) {
           <td><?php echo fu_e($t['type_name']); ?></td>
           <td><?php echo (int) $t['fleet']; ?></td>
           <td><?php echo (int) $t['rented']; ?></td>
-          <td><b style="color:<?php echo $t['util_pct'] < 20 ? '#9A3412' : '#2C6749'; ?>">
+          <td><b class="<?php echo $t['util_pct'] < 20 ? 'fu-warn' : 'fu-ok'; ?>">
               <?php echo fu_n($t['util_pct'], 1); ?>٪</b></td>
           <td><?php echo fu_n($t['revenue']); ?></td>
           <td><?php echo fu_n($t['cost']); ?></td>
-          <td style="font-weight:700;color:<?php echo $t['margin'] < 0 ? '#9A3412' : '#2C6749'; ?>">
+          <td class="fu-strong <?php echo $t['margin'] < 0 ? 'fu-warn' : 'fu-ok'; ?>">
               <?php echo fu_n($t['margin']); ?></td>
           <td><?php echo $t['margin_pct'] === null ? '—' : fu_n($t['margin_pct'], 1) . '٪'; ?></td>
         </tr>
@@ -150,9 +168,9 @@ if (function_exists('ems_screen_about')) {
   </div></div>
 
   <!-- لكل معدة -->
-  <div class="card" style="margin-top:14px"><div class="card-body">
-    <h5 style="margin:0 0 10px"><i class="fa fa-truck"></i> لكل معدة — الأدنى استغلالًا أولًا</h5>
-    <div class="table-responsive"><table class="table display" id="fuTable">
+  <div class="card fu-card"><div class="card-body">
+    <h5 class="fu-tight"><i class="fa fa-truck"></i> لكل معدة — الأدنى استغلالًا أولًا</h5>
+    <div class="table-responsive"><table class="table display" id="fuTable" data-order='[]' data-page-length="25" data-state-save="false">
       <thead><tr>
         <th>الكود</th><th>المعدة</th><th>الفئة</th><th>أيامُ التأجير</th><th>الاستغلال</th>
         <th>الإيراد</th><th>تكلفةُ المورد</th><th>الهامش</th><th>نسبةُ الهامش</th>
@@ -169,16 +187,16 @@ if (function_exists('ems_screen_about')) {
         </tr></thead>
       <tbody>
       <?php foreach ($rows as $r): ?>
-        <tr<?php echo $r['margin'] < 0 ? ' style="background:#fff3f0"' : ''; ?>>
+        <tr<?php echo $r['margin'] < 0 ? ' class="fu-row-neg"' : ''; ?>>
           <td><?php echo fu_e($r['code']); ?></td>
           <td><?php echo fu_e($r['name']); ?></td>
           <td><?php echo fu_e($r['type_name']); ?></td>
           <td><?php echo (int) $r['rented_days']; ?> / <?php echo (int) $r['span_days']; ?></td>
-          <td><b style="color:<?php echo $r['util_pct'] < 20 ? '#9A3412' : '#2C6749'; ?>">
+          <td><b class="<?php echo $r['util_pct'] < 20 ? 'fu-warn' : 'fu-ok'; ?>">
               <?php echo fu_n($r['util_pct'], 1); ?>٪</b></td>
           <td><?php echo fu_n($r['revenue']); ?></td>
           <td><?php echo fu_n($r['supplier_cost']); ?></td>
-          <td style="font-weight:700;color:<?php echo $r['margin'] < 0 ? '#9A3412' : '#2C6749'; ?>">
+          <td class="fu-strong <?php echo $r['margin'] < 0 ? 'fu-warn' : 'fu-ok'; ?>">
               <?php echo fu_n($r['margin']); ?></td>
           <td><?php echo $r['margin_pct'] === null ? '—' : fu_n($r['margin_pct'], 1) . '٪'; ?></td>
           <td><?php echo $r['oec'] === null ? '<span class="text-muted">غير مسجَّلة</span>' : fu_n($r['oec']); ?></td>
@@ -188,7 +206,7 @@ if (function_exists('ems_screen_about')) {
       <?php endforeach; ?>
       </tbody>
     </table></div>
-    <p class="text-muted" style="margin-top:8px">
+    <p class="text-muted fu-note">
       الهامشُ هنا من الوقائع المالية المنسوبة للمعدة (<code>equipment_id</code>) — وهو المقياسُ الصادق لأسطولٍ
       جُلُّه مورَّدٌ لا مملوك. ومردودُ رأس المال مقياسُ الأسطول المملوك، فيظهر حيث تُسجَّل تكلفةُ الاقتناء.
     </p>
@@ -197,10 +215,4 @@ if (function_exists('ems_screen_about')) {
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script src="../includes/js/jquery.dataTables.main.js"></script>
-<script>
-$(function () {
-    if ($.fn.DataTable && !$.fn.DataTable.isDataTable('#fuTable')) {
-        $('#fuTable').DataTable({ stateSave: false, pageLength: 25, order: [] });
-    }
-});
-</script>
+

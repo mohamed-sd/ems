@@ -419,7 +419,7 @@ if ($users_has_employee_id) {
 }
 
 /* الأدوارُ التابعةُ لدور الجلسة — مصدرٌ واحدٌ تقرأ منه القائمةُ المنسدلةُ
-   ولافتةُ «لا أدوارَ تابعة» معًا. كانت تُجلب داخلَ الـ<select> فلا يعرف بقيةُ
+   ولافتةُ «لا أدوارَ تابعة» معًا. كانت تُجلب داخلَ القائمةِ المنسدلةِ فلا يعرف بقيةُ
    الصفحةِ أفارغةٌ هي أم لا، فتُعرض شاشةُ إضافةٍ لا تستطيع أن تُضيف شيئًا. */
 $pu_child_roles = array();
 try {
@@ -498,6 +498,8 @@ ems_screen_about(
     // زرُّ «عن الشاشة» يزرعه المكوِّنُ الموحَّد في `.head_actions` — لا يُكتب هنا
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا معاونين مسجَّلين تحت إدارتك بعدُ', 'أضف أولَ معاونٍ بزرِّ الإضافةِ في رأسِ الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -645,7 +647,7 @@ ems_screen_about(
 
     <div class="card">
         <div class="card-body">
-            <table id="usersTable" class="display nowrap">
+            <table id="usersTable" class="display nowrap" data-order='[[1,"asc"]]' data-column-defs='[{"targets":0,"orderable":false,"searchable":false,"className":"pu-col-actions"}]'>
                 <thead>
                     <tr>
                         <!-- الإجراءاتُ أولًا (قرارُ المالك 2026-08-09): الفعلُ يُطلب قبل
@@ -774,38 +776,6 @@ ems_screen_about(
 <script>
     (function () {
 
-        // تشغيل DataTable بالعربية
-        $(document).ready(function () {
-            $('#usersTable').DataTable({
-                dom: 'Bfrtip', // أزرار + بحث + ترقيم الصفحات
-                order: [[1, 'asc']],   // العمود 0 صار الإجراءات — الترتيب على المسلسل
-                columnDefs: [
-                    // الإجراءاتُ لا تُرتَّب ولا تُبحث ولا تُصدَّر (أزرارٌ لا بيانات)
-                    { targets: 0, orderable: false, searchable: false, className: 'pu-col-actions' }
-                ],
-                buttons: [
-                    { extend: 'copy',  text: 'نسخ',          exportOptions: { columns: ':visible:not(.pu-col-actions)' } },
-                    { extend: 'excel', text: 'تصدير Excel',  exportOptions: { columns: ':visible:not(.pu-col-actions)' } },
-                    { extend: 'csv',   text: 'تصدير CSV',    exportOptions: { columns: ':visible:not(.pu-col-actions)' } },
-                    { extend: 'pdf',   text: 'تصدير PDF',    exportOptions: { columns: ':visible:not(.pu-col-actions)' } },
-                    { extend: 'print', text: 'طباعة',        exportOptions: { columns: ':visible:not(.pu-col-actions)' } }
-                ],
-                // گوتشا tn/18: performance-boost.js يفعّل stateSave عمومياً — وقد
-                // تغيّر عددُ أعمدة هذا الجدول (نُقلت الإجراءاتُ وأُضيف عمودان)،
-                // فالحالةُ المحفوظةُ من زيارةٍ سابقةٍ ترمي «Incorrect column count».
-                // نرفض المحفوظَ إن خالف عددُ أعمدته الجدولَ الحالي (نفسُ حارس
-                // ui-unification.js — لأن هذا الجدول يهيّئ نفسَه فلا يمرّ عليه).
-                stateLoadParams: function (settings, data) {
-                    if (data && data.columns && settings.aoColumns &&
-                        data.columns.length !== settings.aoColumns.length) {
-                        return false;
-                    }
-                },
-                "language": {
-                    "url": "/ems/assets/i18n/datatables/ar.json"
-                }
-            });
-        });
 
 
         // التحكم في إظهار وإخفاء الفورم

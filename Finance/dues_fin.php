@@ -156,6 +156,13 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارتْ أصنافًا ببادئةِ الشاشة */
+.fin-dues-srcnote { color: var(--c-note-ink); display: block; margin-top: 4px; }
+.fin-dues-h5 { margin: 0 0 10px; }
+.fin-dues-h5-next { margin: 18px 0 10px; }
+.fin-dues-tbl { width: 100%; }
+</style>
 <div class="main fin-dues-main ems-unified-page-shell">
     <?php
     $header_title = 'الذمم والتحصيل'; $header_icon = 'fa fa-hand-holding-dollar';
@@ -166,6 +173,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مستحقاتٍ ولا ذممًا مسجَّلةً في هذا النطاق', 'أضفْ مستحقًّا بزرِّ «إضافة مستحق» أو ذمّةَ عميلٍ بزرِّ «إضافة ذمّة عميل»');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -178,14 +187,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <select name="party_type" id="d_ptype"><option value="supplier">مورد</option><option value="employee">موظف</option></select></div>
             <div class="form-group" id="d_supwrap"><label for="d_sup">المورد</label>
                 <select name="supplier_ref" id="d_sup"><?php echo fin_supplier_options($conn, $is_super_admin, $company_id); ?></select></div>
-            <div class="form-group" id="d_empwrap" style="display:none"><label for="d_emp">الموظف</label>
+            <div class="form-group is-hidden" id="d_empwrap"><label for="d_emp">الموظف</label>
                 <select name="employee_ref" id="d_emp"><?php echo fin_employee_options($conn, $is_super_admin, $company_id); ?></select></div>
             <div class="form-group"><label for="emsf_374_337c4">نوع المستحق <span class="required">*</span></label>
                 <select name="due_type" id="emsf_374_337c4"><?php foreach ($due_types as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
             <div class="form-group"><label for="d_dir">الاتجاه</label>
                 <select name="direction" id="d_dir"><option value="credit">له (دائن)</option><option value="debit">عليه (مدين)</option></select></div>
             <?php /* M-11: مصدرُ الخصم — يظهر مع «عليه» وحدَه، فالاستحقاقُ مصدرُه حدثُ المروحة */ ?>
-            <div class="form-group" id="d_srcwrap" style="display:none">
+            <div class="form-group is-hidden" id="d_srcwrap">
                 <label for="d_srctype">مستندُ الخصم <span class="required">*</span>
                     <span class="mnt-req-hint">(كلُّ خصمٍ ينقر إلى أصله)</span></label>
                 <select name="source_doc_type" id="d_srctype">
@@ -197,11 +206,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <option value="settlement">تسوية</option>
                     <option value="pending_source">بلا مصدرٍ بعد — سلفةٌ أو خصمٌ (فجوةٌ معلَنة)</option>
                 </select>
-                <small style="color:#78350f;display:block;margin-top:4px">
+                <small class="fin-dues-srcnote">
                     «بلا مصدرٍ بعد» للسلف والخصومات وحدَها: لا جدولَ مستنديًّا لها حتى الآن،
                     فتُعلَن الفجوةُ ولا تُخبَّأ. وما له مستندٌ مبنيٌّ يُرفض بدونه.
                 </small></div>
-            <div class="form-group" id="d_srcidwrap" style="display:none">
+            <div class="form-group is-hidden" id="d_srcidwrap">
                 <label for="d_srcid">رقمُ المستند <span class="required">*</span></label>
                 <input type="number" min="1" name="source_doc_id" id="d_srcid"></div>
             <div class="form-group"><label for="emsf_375_f6091">المبلغ <span class="required">*</span></label>
@@ -242,9 +251,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-hand-holding-dollar"></i> مستحقات الموردين والموظفين</h5>
+        <h5 class="fin-dues-h5"><i class="fas fa-hand-holding-dollar"></i> مستحقات الموردين والموظفين</h5>
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="finTable" class="display nowrap alltables fin-dues-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>الطرف</th><th>المُنشئ — الاسم والصفة</th><th>نوع المستفيد</th><th>الاتجاه</th><th>المبلغ</th><th>التسوية</th></tr></thead>
                 <tbody>
                 <?php
@@ -288,9 +297,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
 
         <?php if ($party_scope === null): // ذمم العملاء شأن المالية — لا تُعرض للأدوار المنطَّقة بطرف ?>
-        <h5 style="margin:18px 0 10px"><i class="fas fa-file-invoice"></i> الذمم المدينة (العملاء)</h5>
+        <h5 class="fin-dues-h5-next"><i class="fas fa-file-invoice"></i> الذمم المدينة (العملاء)</h5>
         <div class="table-container">
-            <table id="recvTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="recvTable" class="display nowrap alltables fin-dues-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>العميل</th><th>المستند</th><th>المرجع</th><th>المبلغ</th><th>المحصّل</th><th>المتبقّي</th><th>تاريخ الاستحقاق</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">المستفيد</th>
@@ -383,20 +392,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 <script>
 $(document).ready(function () {
-    $('#finTable, #recvTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    // جداولُ العرضِ يهيّئُها المكوّنُ المركزيُّ (assets/js/ui-unification.js)
     $('#toggleDue').on('click', function () { $('#dueForm').toggleClass('allforms-visible'); });
     $('#toggleRecv').on('click', function () { $('#recvForm').toggleClass('allforms-visible'); });
     $('#d_ptype').on('change', function () {
         var emp = this.value === 'employee';
-        $('#d_empwrap').toggle(emp); $('#d_supwrap').toggle(!emp);
+        // UXW-01 ٢: الإخفاءُ بصنفِ is-hidden لا بنمطٍ موضعيٍّ يُكتب لحظيًّا
+        $('#d_empwrap').toggleClass('is-hidden', !emp); $('#d_supwrap').toggleClass('is-hidden', emp);
     });
     // M-11: حقلا المصدر يظهران مع «عليه (مدين)» وحدَه ويصيران إلزامًا معه —
     // والاستحقاقُ لا يُطالَب بمستند (مصدرُه حدثُ المروحة).
     $('#d_dir').on('change', function () {
         var deb = this.value === 'debit';
-        $('#d_srcwrap').toggle(deb);
+        $('#d_srcwrap').toggleClass('is-hidden', !deb);
         $('#d_srctype').prop('required', deb);
         if (!deb) { $('#d_srctype').val(''); $('#d_srcid').val(''); }
         $('#d_srctype').trigger('change');
@@ -405,7 +413,7 @@ $(document).ready(function () {
     $('#d_srctype').on('change', function () {
         var deb = $('#d_dir').val() === 'debit';
         var needsId = deb && this.value !== '' && this.value !== 'pending_source';
-        $('#d_srcidwrap').toggle(needsId);
+        $('#d_srcidwrap').toggleClass('is-hidden', !needsId);
         $('#d_srcid').prop('required', needsId);
         if (!needsId) { $('#d_srcid').val(''); }
     });

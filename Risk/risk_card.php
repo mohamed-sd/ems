@@ -57,6 +57,18 @@ include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* ══ UXW-01 ②: أنماطٌ ثابتةٌ نُقِلت من سماتِ style إلى أصنافٍ ببادئةِ الشاشة ══ */
+.rsk-mt-6  { margin-top: 6px; }
+.rsk-mt-8  { margin-top: 8px; }
+.rsk-mt-16 { margin-top: 16px; }
+.rsk-dedup-key { font-family: monospace; font-size: .72rem; }
+.rsk-esc-item { font-size: .8rem; padding: 4px 0; border-bottom: 1px dashed var(--c-eeeeee); }
+.rsk-list-item { padding: 6px 0; border-bottom: 1px dashed var(--c-eeeeee); font-size: .84rem; }
+.rsk-form-divider { border-top: 1px solid var(--c-eeeeee); padding-top: 12px; }
+.rsk-impact-label { font-size: .75rem; }
+.rsk-control-id-input { max-width: 140px; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'ملف الخطر ' . $risk['risk_code'];
@@ -72,6 +84,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         'المنظر' => $view === 'all' ? 'كل الأقسام' : 'الملخص',
     );
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا تقييماتِ ولا ضوابطَ ولا معالجاتٍ مسجَّلةً على هذا الخطرِ بعد', 'ابدأْ بتسجيلِ التقييمِ المتأصلِ من نموذجِ «تسجيل التقييم» أدناه');
     ems_screen_about(
         'ملفُّ الخطرِ الواحد: تقييماتُه نسخًا تاريخيةً وضوابطُه بخريطتها وأدلتها ومعالجتُه بمهلةٍ '
         . 'ومسؤولٍ وقبولُه بالسقفِ وإغلاقُه بحارسِ الدليلِ الثلاثي.',
@@ -91,7 +105,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <span>السبب الجذري: <b><?php echo htmlspecialchars($risk['root_cause']); ?></b></span>
             </div>
             <?php if ($view === 'all'): ?>
-            <div class="ems-page-context" style="margin-top:6px">
+            <div class="ems-page-context rsk-mt-6">
                 <span>المستهدف: <b><?php echo htmlspecialchars((string) ($risk['target_level'] ?? '') ?: '—'); ?></b></span>
                 <span>فعالية الضوابط: <b><?php echo htmlspecialchars((string) ($risk['control_effectiveness'] ?? '') ?: 'غير مثبت'); ?></b></span>
                 <span>الثقة: <b><?php echo htmlspecialchars((string) ($risk['confidence'] ?? '') ?: '—'); ?></b></span>
@@ -100,7 +114,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 <span>التعرض المقدَّر: <b><?php echo $risk['exposure_amount'] === null ? '—'
                     : htmlspecialchars(number_format((float) $risk['exposure_amount'], 2) . ' ' . (string) $risk['exposure_currency']); ?></b>
                     <small>(تقديرٌ لا قيد — RK-06)</small></span>
-                <span>مفتاح التكرار: <b style="font-family:monospace;font-size:.72rem"><?php echo htmlspecialchars(mb_substr((string) $risk['dedup_key'], 0, 12)); ?></b></span>
+                <span>مفتاح التكرار: <b class="rsk-dedup-key"><?php echo htmlspecialchars(mb_substr((string) $risk['dedup_key'], 0, 12)); ?></b></span>
                 <span>المُنشئ وتاريخه: <b><?php echo htmlspecialchars((string) $risk['created_at']); ?></b></span>
             </div>
             <?php endif; ?>
@@ -109,7 +123,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <h6>التصعيدات (RK-08 — لا تُخفى)</h6>
             <?php if (empty($escalations)): ?><small class="text-muted">لا تصعيدات</small>
             <?php else: foreach ($escalations as $e): ?>
-                <div style="font-size:.8rem;padding:4px 0;border-bottom:1px dashed #eee">
+                <div class="rsk-esc-item">
                     <b><?php echo htmlspecialchars($e['to_authority']); ?></b> · <?php echo htmlspecialchars($e['reason_ar']); ?>
                     <span class="text-muted"><?php echo $e['acknowledged_at'] ? '✔ استُلم' : '⏳ ينتظر'; ?></span>
                 </div>
@@ -117,7 +131,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         </div>
     </div>
 
-    <div class="card" style="margin-top:16px"><div class="card-body">
+    <div class="card rsk-mt-16"><div class="card-body">
         <h6>التقييمات — نسخ تاريخية لا تُمحى (RK-03)</h6>
         <div class="table-responsive"><table class="table table-sm">
             <thead><tr><th>النوع</th><th>الاحتمال</th><th>أقصى أثر</th><th>الدرجة</th><th>المستوى</th><th>الثقة</th><th>التقنية</th><th>المقيِّم</th><th>المتحدي</th><th>التاريخ</th></tr></thead>
@@ -135,23 +149,23 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         </table></div>
 
         <?php if ($canWrite): ?>
-        <form id="rskAssessForm" class="allforms" style="border-top:1px solid #eee;padding-top:12px">
+        <form id="rskAssessForm" class="allforms rsk-form-divider">
             <div class="row">
-                <div class="col-md-2"><label>النوع<select name="assess_type" class="form-control">
+                <div class="col-md-2"><label>النوع<select name="assess_type" class="form-control" aria-label="نوعُ التقييم">
                     <option value="inherent">متأصل</option><option value="residual">متبقٍّ</option><option value="target">مستهدف</option>
                 </select></label></div>
-                <div class="col-md-2"><label>الاحتمال (1-5)<input type="number" name="likelihood" min="1" max="5" class="form-control" required></label></div>
+                <div class="col-md-2"><label>الاحتمال (1-5)<input type="number" name="likelihood" min="1" max="5" class="form-control" aria-label="الاحتمالُ من 1 إلى 5" required></label></div>
                 <?php foreach ($RISK_IMPACT_DIMS as $k => $v): ?>
-                <div class="col-md-2"><label style="font-size:.75rem"><?php echo $v; ?> (0-5)<input type="number" name="impact_<?php echo $k; ?>" min="0" max="5" class="form-control"></label></div>
+                <div class="col-md-2"><label class="rsk-impact-label"><?php echo $v; ?> (0-5)<input type="number" aria-label="درجةُ الأثرِ في هذا البُعدِ من 0 إلى 5" name="impact_<?php echo $k; ?>" min="0" max="5" class="form-control"></label></div>
                 <?php endforeach; ?>
-                <div class="col-md-2"><label>الثقة<select name="confidence" class="form-control"><option>متوسطة</option><option>عالية</option><option>منخفضة</option></select></label></div>
-                <div class="col-md-3"><label>التقنية<select name="technique" class="form-control">
+                <div class="col-md-2"><label>الثقة<select name="confidence" class="form-control" aria-label="درجةُ الثقةِ في التقييم"><option>متوسطة</option><option>عالية</option><option>منخفضة</option></select></label></div>
+                <div class="col-md-3"><label>التقنية<select name="technique" class="form-control" aria-label="تقنيةُ التقييمِ المستعملة">
                     <option>مصفوفة الخطر</option><option>ربطة العنق Bow-Tie</option><option>تحليل الضوابط الحرجة</option>
                     <option>FMEA / FMECA</option><option>تحليل السيناريوهات</option><option>ماذا لو What-if</option>
                     <option>تحليل السبب الجذري</option><option>قائمة فحص مخاطر العقد</option>
                     <option>تحليل الحساسية والضغط</option><option>تحليل التركز</option><option>تحليل أثر الأعمال</option>
                 </select></label></div>
-                <div class="col-md-5"><label>ملاحظة<input name="note" class="form-control"></label></div>
+                <div class="col-md-5"><label>ملاحظة<input name="note" class="form-control" aria-label="ملاحظةٌ على التقييم"></label></div>
             </div>
             <button class="ems-btn-primary" type="submit">تسجيل التقييم (نسخة جديدة)</button>
             <span id="rskAssessMsg"></span>
@@ -159,19 +173,19 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         <?php endif; ?>
     </div></div>
 
-    <div class="ems-grid" style="margin-top:16px">
+    <div class="ems-grid rsk-mt-16">
         <div class="ems-card ems-col-6">
             <h6>خريطة الضوابط (المرحلة 6) — لا يُحتسب ضابط بلا دليل (RK-07)</h6>
             <?php foreach ($controls as $c): ?>
-                <div style="padding:6px 0;border-bottom:1px dashed #eee;font-size:.84rem">
+                <div class="rsk-list-item">
                     <b><?php echo htmlspecialchars($c['control_code']); ?></b> <?php echo htmlspecialchars($c['name_ar']); ?>
                     · <?php echo $c['ctype']; ?><?php echo (int) $c['is_critical'] === 1 ? ' · <span class="badge badge-danger">حرج</span>' : ''; ?>
                     · الفعالية: <b><?php echo $c['effectiveness']; ?></b>
                 </div>
             <?php endforeach; if (empty($controls)): ?><small class="text-muted">لا ضوابط مربوطة — الدرجة لا تنخفض بلا ضابط مثبَت</small><?php endif; ?>
             <?php if ($canWrite): ?>
-            <form id="rskLinkForm" class="ems-toolbar" style="margin-top:8px">
-                <input type="number" name="control_id" class="form-control" placeholder="رقم الضابط" style="max-width:140px" required aria-label="رقم الضاب?">
+            <form id="rskLinkForm" class="ems-toolbar rsk-mt-8">
+                <input type="number" name="control_id" class="form-control rsk-control-id-input" placeholder="رقم الضابط" required aria-label="رقم الضابط">
                 <button class="ems-btn-secondary" type="submit">ربط ضابط</button>
                 <a class="ems-btn-ghost" href="risk_controls.php">سجل الضوابط ↗</a>
             </form>
@@ -180,7 +194,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         <div class="ems-card ems-col-6">
             <h6>المعالجة (المرحلة 10) — بخطة ومسؤول وموعد</h6>
             <?php foreach ($treatments as $t): ?>
-                <div style="padding:6px 0;border-bottom:1px dashed #eee;font-size:.84rem">
+                <div class="rsk-list-item">
                     <b><?php echo $t['ttype']; ?></b> · <?php echo htmlspecialchars(mb_substr($t['plan_ar'], 0, 60)); ?>
                     · <?php echo htmlspecialchars($t['action_owner'] ?: ''); ?> · قبل <?php echo $t['due_date']; ?>
                     · <span class="badge badge-<?php echo $t['state'] === 'verified' ? 'success' : 'secondary'; ?>"><?php echo $t['state']; ?></span>
@@ -190,12 +204,12 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
                 </div>
             <?php endforeach; ?>
             <?php if ($canWrite): ?>
-            <form id="rskTreatForm" class="allforms" style="margin-top:8px">
+            <form id="rskTreatForm" class="allforms rsk-mt-8">
                 <div class="row">
-                    <div class="col-md-3"><select name="ttype" class="form-control"><option>تقليل</option><option>تجنب</option><option>نقل</option><option>قبول</option></select></div>
+                    <div class="col-md-3"><select name="ttype" class="form-control" aria-label="نوعُ المعالجة"><option>تقليل</option><option>تجنب</option><option>نقل</option><option>قبول</option></select></div>
                     <div class="col-md-4"><input name="plan_ar" class="form-control" placeholder="الخطة" required aria-label="الخطة"></div>
                     <div class="col-md-2"><input name="action_owner_user_id" type="number" class="form-control" placeholder="مسؤول (user)" required aria-label="مسؤول (user)"></div>
-                    <div class="col-md-3"><input name="due_date" type="date" class="form-control" required></div>
+                    <div class="col-md-3"><input name="due_date" type="date" class="form-control" aria-label="موعدُ إنجازِ المعالجة" required></div>
                 </div>
                 <button class="ems-btn-secondary" type="submit">إسناد معالجة</button>
             </form>
@@ -203,7 +217,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         </div>
     </div>
 
-    <div class="card" style="margin-top:16px"><div class="card-body">
+    <div class="card rsk-mt-16"><div class="card-body">
         <h6>القبول والإغلاق — مصفوفة السلطة (RK-04) وحارس الدليل (RK-03)</h6>
         <div class="table-responsive"><table class="table table-sm">
             <thead><tr><th>المستوى عند القبول</th><th>السلطة</th><th>القابل</th><th>مراجعة قبل</th><th>ملاحظة</th><th>التاريخ</th></tr></thead>

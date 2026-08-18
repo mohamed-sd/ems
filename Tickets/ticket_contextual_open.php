@@ -80,6 +80,14 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+<style>
+/* UXW-01 ①②: أنماطُ شاشةِ الفتحِ السياقيِّ الثابتة — بادئةُ الشاشة tkt-tco- */
+.tkt-tco-dup-form { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+.tkt-tco-ctx      { display: flex; gap: 12px; flex-wrap: wrap; }
+.tkt-tco-noctx    { color: var(--c-s-888); }
+.tkt-tco-chip     { font-size: 13px; padding: 6px 10px; }
+.tkt-tco-grid3    { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'بلاغ جديد — السياق محمول من ' . htmlspecialchars($ctx['screen'] ?? 'الشاشة');
@@ -92,13 +100,15 @@ include '../insidebar.php';
         array('السياق أدناه محمول للقراءة — ومن أدخل رقم معدة يدويًّا فقد فُقد السياق',
               'إن وُجد بلاغ مفتوح مشابه يُعرض قبل الحفظ: تابِعه ولا تفتح ثانيًا'));
     if ($msg !== '') { echo '<div class="alert alert-danger">' . htmlspecialchars($msg) . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أنواعَ بلاغاتٍ مفعَّلةً للاختيار', 'راجع إعدادَ أنواعِ البلاغاتِ مع مركزِ البلاغاتِ قبلَ الرفع');
     ?>
 
     <?php if ($dupFound): ?>
     <div class="card"><div class="card-header"><h5>يوجد بلاغ مفتوح مشابه — أتتابعه أم تفتح جديدًا؟ (T16)</h5></div>
     <div class="card-body">
         <?php foreach ($dupFound as $d): ?>
-        <form method="post" style="display:flex;gap:10px;align-items:center;margin-bottom:8px">
+        <form method="post" class="tkt-tco-dup-form">
         <?php echo csrf_field(); ?>
             <?php foreach ($ctx as $k => $v) { echo '<input type="hidden" name="ctx_' . htmlspecialchars($k) . '" value="' . htmlspecialchars((string) $v) . '">'; } ?>
             <input type="hidden" name="tk_save" value="1">
@@ -122,10 +132,10 @@ include '../insidebar.php';
     <?php endif; ?>
 
     <div class="card"><div class="card-header"><h5>السياق المحمول (للقراءة)</h5></div>
-    <div class="card-body" style="display:flex;gap:12px;flex-wrap:wrap">
-        <?php if (!$ctx) { echo '<span style="color:#888">فُتح من القائمة — بلا سياق شاشة (النوع «نظام» متاح)</span>'; }
+    <div class="card-body tkt-tco-ctx">
+        <?php if (!$ctx) { echo '<span class="tkt-tco-noctx">فُتح من القائمة — بلا سياق شاشة (النوع «نظام» متاح)</span>'; }
         foreach ($ctx as $k => $v) {
-            echo '<span class="badge badge-secondary" style="font-size:13px;padding:6px 10px">' . htmlspecialchars($k) . ': ' . htmlspecialchars((string) $v) . '</span>';
+            echo '<span class="badge badge-secondary tkt-tco-chip">' . htmlspecialchars($k) . ': ' . htmlspecialchars((string) $v) . '</span>';
         } ?>
     </div></div>
 
@@ -133,20 +143,20 @@ include '../insidebar.php';
         <?php echo csrf_field(); ?>
         <input type="hidden" name="tk_save" value="1">
         <?php foreach ($ctx as $k => $v) { echo '<input type="hidden" name="ctx_' . htmlspecialchars($k) . '" value="' . htmlspecialchars((string) $v) . '">'; } ?>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-            <div class="form-group"><label>النوع * (الفئة ← النوع)</label>
-                <select name="type_code" required><option value="">— اختر —</option>
+        <div class="tkt-tco-grid3">
+            <div class="form-group"><label for="tkoTypeCode">النوع * (الفئة ← النوع)</label>
+                <select name="type_code" id="tkoTypeCode" required><option value="">— اختر —</option>
                 <?php foreach ($types as $t) {
                     echo '<option value="' . htmlspecialchars($t['code']) . '">'
                         . htmlspecialchars($t['category'] . ' / ' . $t['name']) . '</option>';
                 } ?></select></div>
-            <div class="form-group"><label>الأولوية (ترفعها ولا تخفضها)</label>
-                <select name="priority"><option value="">اقتراح النظام</option>
+            <div class="form-group"><label for="tkoPriority">الأولوية (ترفعها ولا تخفضها)</label>
+                <select name="priority" id="tkoPriority"><option value="">اقتراح النظام</option>
                     <option value="high">عالٍ</option><option value="critical">حرج</option></select></div>
-            <div class="form-group"><label><input type="checkbox" name="is_anonymous" value="1"> بلا كشف هوية (للأنواع التي تقبله)</label></div>
+            <div class="form-group"><label><input type="checkbox" name="is_anonymous" aria-label="رفعُ البلاغِ بلا كشفِ هوية" value="1"> بلا كشف هوية (للأنواع التي تقبله)</label></div>
         </div>
-        <div class="form-group"><label>الوصف * — الحقل الحر الوحيد</label>
-            <textarea name="description" rows="3" required></textarea></div>
+        <div class="form-group"><label for="tkoDescription">الوصف * — الحقل الحر الوحيد</label>
+            <textarea name="description" id="tkoDescription" rows="3" required></textarea></div>
         <button type="submit" class="btn-primary">رفع البلاغ — يوجَّه آليًّا خلال ثانية</button>
     </form>
 </div>

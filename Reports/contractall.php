@@ -36,56 +36,60 @@ include __DIR__ . '/../inheader.php';
 
         .report-tabs .nav-link {
             border-radius: 999px;
-            border: 1px solid rgba(12, 28, 62, 0.12);
-            color: #0c1c3e;
-            background: #fff;
+            border: 1px solid var(--c-rgba122862012, rgba(12, 28, 62, 0.12));
+            color: var(--c-0c1c3e, #0c1c3e);
+            background: var(--c-fff, #fff);
             font-weight: 700;
             padding: 8px 14px;
             transition: all 0.2s ease;
         }
 
         .report-tabs .nav-link:hover {
-            border-color: rgba(232, 184, 0, 0.45);
-            background: rgba(232, 184, 0, 0.12);
-            color: #0c1c3e;
+            border-color: var(--c-rgba2321840045, rgba(232, 184, 0, 0.45));
+            background: var(--c-rgba2321840012, rgba(232, 184, 0, 0.12));
+            color: var(--c-0c1c3e, #0c1c3e);
         }
 
         .report-tabs .nav-link.active {
-            background: linear-gradient(135deg, #0c1c3e, #1b2f6e);
+            background: linear-gradient(135deg, var(--c-0c1c3e, #0c1c3e), var(--c-1b2f6e, #1b2f6e));
             border-color: transparent;
-            color: #fff;
-            box-shadow: 0 8px 22px rgba(12, 28, 62, 0.22);
+            color: var(--c-fff, #fff);
+            box-shadow: 0 8px 22px var(--c-rgba122862022, rgba(12, 28, 62, 0.22));
         }
 
         .tab-card {
-            border: 1px solid rgba(12, 28, 62, 0.08);
+            border: 1px solid var(--c-rgba122862008, rgba(12, 28, 62, 0.08));
             border-radius: 14px;
-            background: #fff;
-            box-shadow: 0 4px 14px rgba(12, 28, 62, 0.08);
+            background: var(--c-fff, #fff);
+            box-shadow: 0 4px 14px var(--c-rgba122862008, rgba(12, 28, 62, 0.08));
             padding: 18px;
         }
 
         .report-table thead th {
-            background: #f8fafc;
-            color: #0c1c3e;
+            background: var(--c-f8fafc, #f8fafc);
+            color: var(--c-0c1c3e, #0c1c3e);
             font-weight: 800;
         }
 
         .summary-list .list-group-item {
-            border-color: rgba(12, 28, 62, 0.08);
+            border-color: var(--c-rgba122862008, rgba(12, 28, 62, 0.08));
             font-weight: 600;
-            color: #0c1c3e;
+            color: var(--c-0c1c3e, #0c1c3e);
         }
 
         .metric-box {
-            border: 1px solid rgba(12, 28, 62, 0.09);
-            background: rgba(12, 28, 62, 0.03);
+            border: 1px solid var(--c-rgba122862009, rgba(12, 28, 62, 0.09));
+            background: var(--c-rgba122862003, rgba(12, 28, 62, 0.03));
             border-radius: 12px;
             padding: 12px 14px;
-            color: #0c1c3e;
+            color: var(--c-0c1c3e, #0c1c3e);
             font-weight: 700;
             margin-bottom: 10px;
         }
+
+        /* UXW-01 ②: أنماطٌ كانت موضعيةً — rpt-ca */
+        .rpt-ca-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+        .rpt-ca-filter { align-items: end; }
     </style>
 
     <?php 
@@ -263,8 +267,10 @@ $header_title_html = htmlspecialchars('تقارير تفصيلية للعقد', 
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا تفاصيلَ تنفيذٍ مسجلةً لهذا العقد', 'اختر عقدًا من القائمةِ أعلاه أو سجّل ساعاتِ الوردياتِ أولًا');
 ?>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div class="rpt-ca-actions">
                 <a href="reports.php" class="back-btn">
                     <i class="fas fa-arrow-right"></i> رجوع
                 </a>
@@ -276,7 +282,7 @@ include __DIR__ . '/../includes/page_header.php';
                 <h5><i class="fas fa-filter"></i> اختيار العقد</h5>
             </div>
             <div class="card-body">
-                <form method="GET" class="form-grid" style="align-items:end;">
+                <form method="GET" class="form-grid rpt-ca-filter">
                     <div>
                         <label for="emsf_1355_a3b4f"><i class="fas fa-file-contract"></i> اختر العقد</label>
                         <select name="contract" id="emsf_1355_a3b4f">

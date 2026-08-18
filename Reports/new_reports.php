@@ -51,22 +51,22 @@ include __DIR__ . '/../inheader.php';
       margin: 20px 0;
       font-weight: bold;
       font-size: 30px;
-      color: #333;
+      color: var(--c-333, #333);
     }
     .report-card {
       position: relative;
       border-radius: 15px;
       padding: 10px;
-      color: #ffcc00;
+      color: var(--c-ffcc00, #ffcc00);
       transition: all 0.3s ease;
       cursor: pointer;
       text-align: center;
     }
     .report-card:hover {
-      background: #ffcc00 !important;
-      color: #000022 !important;
+      background: var(--c-ffcc00, #ffcc00) !important;
+      color: var(--c-000022, #000022) !important;
       transform: translateY(-5px);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.2);
+      box-shadow: 0 6px 18px var(--c-rgba00002, rgba(0,0,0,0.2));
     }
     .report-icon-wrapper {
       width: 60px;
@@ -76,13 +76,13 @@ include __DIR__ . '/../inheader.php';
       align-items: center;
       justify-content: center;
       margin: 0 auto 15px auto;
-      background: rgba(204, 199, 199, 0.36);
+      background: var(--c-rgba204199199036, rgba(204, 199, 199, 0.36));
       font-size: 20px;
       float: right
     }
     .report-card:hover .report-icon-wrapper {
-      background: #d7d7cdff;
-      color: #000;
+      background: var(--c-d7d7cdff, #d7d7cdff);
+      color: var(--c-000, #000);
     }
     .report-title {
       font-size: 18px;
@@ -94,12 +94,12 @@ include __DIR__ . '/../inheader.php';
       font-weight: bold;
     }
     /* ألوان مختلفة لكل كارد */
-    .bg-projects   { background: #000022; }
-    .bg-suppliers  { background: #000022; }
-    .bg-equipments { background: #000022; }
-    .bg-operators  { background: #000022; }
-    .bg-users      { background: #000022; }
-    .bg-workhours  { background: #000022; }
+    .bg-projects   { background: var(--c-000022, #000022); }
+    .bg-suppliers  { background: var(--c-000022, #000022); }
+    .bg-equipments { background: var(--c-000022, #000022); }
+    .bg-operators  { background: var(--c-000022, #000022); }
+    .bg-users      { background: var(--c-000022, #000022); }
+    .bg-workhours  { background: var(--c-000022, #000022); }
 
     /* Back Button (زر الرجوع) */
     .back-btn {
@@ -107,22 +107,25 @@ include __DIR__ . '/../inheader.php';
       align-items: center;
       gap: 8px;
       padding: 10px 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, var(--c-667eea, #667eea) 0%, var(--c-764ba2, #764ba2) 100%);
       color: white;
       text-decoration: none;
       border-radius: 12px;
       font-weight: 600;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 4px 15px var(--c-rgba10212623403, rgba(102, 126, 234, 0.3));
       font-size: 14px;
     }
 
     .back-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+      box-shadow: 0 6px 20px var(--c-rgba10212623405, rgba(102, 126, 234, 0.5));
       color: white;
-      background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+      background: linear-gradient(135deg, var(--c-764ba2, #764ba2) 0%, var(--c-667eea, #667eea) 100%);
     }
+
+    /* UXW-01 ②: نمطٌ كان موضعيًا */
+    .rpt-nr-back-wrap { text-align: left; margin-bottom: 1.5rem; }
 
     .back-btn i {
       font-size: 14px;
@@ -150,11 +153,13 @@ $header_title_html = htmlspecialchars('New Reports', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا سجلاتِ مشاريعَ ولا آلياتٍ ولا ساعاتٍ لهذا الكيان', 'ابدأ بتسجيلِ مشروعٍ أو آليةٍ ثمّ عاود فتح هذه اللوحة');
 ?>
 
 
   <div class="container py-4">
-    <div style="text-align: left; margin-bottom: 1.5rem;">
+    <div class="rpt-nr-back-wrap">
       <a href="../main/dashboard.php" class="back-btn">
         <i class="fas fa-arrow-right"></i> رجوع للرئيسية
       </a>

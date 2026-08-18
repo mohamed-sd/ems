@@ -156,6 +156,24 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
+/* UXW-01 ②: أنماطُ الشاشةِ أصنافٌ صفحيةٌ ببادئةِ الشاشةِ — والألوانُ من الرموز.
+   وتُخرَج مرةً واحدةً قبلَ الفروعِ الثلاثةِ فيشترك فيها الفرعُ الذي يُصيَّر. */
+echo '<style>
+.dpb-note        { color: var(--c-s-666); }
+.dpb-alert       { color: var(--c-c0392b); font-weight: bold; }
+.dpb-assign      { margin-bottom: 14px; }
+.dpb-assign-sum  { cursor: pointer; font-weight: bold; }
+.dpb-assign-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; margin-top: 10px; }
+.dpb-f2          { flex: 2; min-width: 220px; }
+.dpb-f1          { flex: 1; min-width: 160px; }
+.dpb-tiles       { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.dpb-tile        { flex: 1; min-width: 150px; background: var(--c-s-fff); border: 1px solid var(--c-e5e5e5); border-radius: 8px; padding: 14px; text-align: center; }
+.dpb-tile-val    { font-size: 26px; font-weight: bold; }
+.dpb-tile-lbl    { color: var(--c-s-777); }
+.dpb-sec         { margin-top: 22px; }
+.dpb-sec-late    { margin-top: 22px; color: var(--c-c0392b); }
+</style>';
+
 /* ═══ الوضع الجامع: لوحة اكتمال الإدارات (التنفيذي 9 · الحوكمة 15 · السوبر) ═══ */
 if ($unit <= 0 && $isUmbrella): ?>
 <div class="main" dir="rtl">
@@ -167,8 +185,10 @@ $header_title_html = htmlspecialchars('لوحة الإدارات — الاكت�
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا إدارةَ في خريطةِ السبعَ عشرةَ لها أرقامٌ بعدُ', 'تُشتقُّ أرقامُ كلِّ إدارةٍ من المحرّك حالَ إسنادِ أولِ مهمةٍ أو طلبٍ لأحدِ أعضائها');
 ?>
-  <p style="color:#666">كل صفٍّ إدارةٌ من خريطة الـ17 — أرقامها حيةٌ من المحرّك (مهام · طلبات · إنجاز 30ي). تعمّق بنقرة الاسم.</p>
+  <p class="dpb-note">كل صفٍّ إدارةٌ من خريطة الـ17 — أرقامها حيةٌ من المحرّك (مهام · طلبات · إنجاز 30ي). تعمّق بنقرة الاسم.</p>
   <table class="table table-striped">
     <thead><tr>
       <th>الإدارة</th><th>الأعضاء</th><th>مهام مفتوحة</th><th>متأخرات</th>
@@ -184,9 +204,9 @@ include __DIR__ . '/../includes/page_header.php';
         <td><a href="dept_board.php?unit=<?= $u ?>"><?= htmlspecialchars($nm) ?></a></td>
         <td><?= $k['members'] ?></td>
         <td><?= $k['open_tasks'] ?></td>
-        <td style="<?= $k['overdue_tasks'] > 0 ? 'color:#c0392b;font-weight:bold' : '' ?>"><?= $k['overdue_tasks'] ?></td>
+        <td class="<?= $k['overdue_tasks'] > 0 ? 'dpb-alert' : '' ?>"><?= $k['overdue_tasks'] ?></td>
         <td><?= $k['live_requests'] ?></td>
-        <td style="<?= $k['late_requests'] > 0 ? 'color:#c0392b;font-weight:bold' : '' ?>"><?= $k['late_requests'] ?></td>
+        <td class="<?= $k['late_requests'] > 0 ? 'dpb-alert' : '' ?>"><?= $k['late_requests'] ?></td>
         <td><?= $k['ach_30d'] ?></td>
       </tr>
     <?php endfor; ?>
@@ -305,11 +325,13 @@ $header_title_html = htmlspecialchars('ورقة الإدارة — ' . ($deptNam
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا مهامَ ولا طلباتٍ ولا إنجازاتٍ لهذه الإدارةِ في المدى', 'كلِّف عضوًا من نموذجِ «تكليف عضوٍ من إدارتي» أعلاه — أو انتظر أولَ طلبٍ يصل الإدارة');
 ?>
   <?php if ($isUmbrella): ?>
     <p><a href="dept_board.php" class="btn btn-sm btn-secondary">↩ لوحة الإدارات كلها</a></p>
   <?php endif; ?>
-  <p style="color:#666" title="لماذا أرى هذا؟">
+  <p class="dpb-note" title="لماذا أرى هذا؟">
     العضوية من الهيكل لا من قوائم: أدوار الوحدة «<?= htmlspecialchars($deptOwner) ?>» في خريطة الـ17
     + نطاقك الإداري من الهرم (<?= count($members) ?> عضوًا).
   </p>
@@ -320,9 +342,9 @@ include __DIR__ . '/../includes/page_header.php';
   /* تكليف SRC-01: لمن له مرؤوسون في الهيكل (المدير) وفي إدارته هو لا في تعمق الأدوار الجامعة */
   $iAmManager = (count(ems_manager_scope_user_ids($conn, $uid, 1)) > 0) && ($unit === $myUnit);
   if ($iAmManager && $members): ?>
-  <details style="margin-bottom:14px"><summary style="cursor:pointer;font-weight:bold">
+  <details class="dpb-assign"><summary class="dpb-assign-sum">
     <i class="fa fa-user-plus"></i> تكليف عضوٍ من إدارتي (SRC-01)</summary>
-    <form method="post" class="ems-form" style="display:flex;gap:8px;flex-wrap:wrap;align-items:end;margin-top:10px">
+    <form method="post" class="ems-form dpb-assign-form">
         <?= csrf_field() ?>
       <input type="hidden" name="action" value="dept_assign">
       <div><label for="emsf_1170_47df2">المكلَّف</label>
@@ -332,9 +354,9 @@ include __DIR__ . '/../includes/page_header.php';
             <option value="<?= intval($u['id']) ?>"><?= htmlspecialchars($u['name']) ?></option>
           <?php endwhile; ?>
         </select></div>
-      <div style="flex:2;min-width:220px"><label for="emsf_1171_6a5e4">المهمة</label>
+      <div class="dpb-f2"><label for="emsf_1171_6a5e4">المهمة</label>
         <input type="text" name="title" class="form-control" required maxlength="300" id="emsf_1171_6a5e4"></div>
-      <div style="flex:1;min-width:160px"><label for="emsf_1172_eff16">المخرج المطلوب</label>
+      <div class="dpb-f1"><label for="emsf_1172_eff16">المخرج المطلوب</label>
         <input type="text" name="deliverable" class="form-control" maxlength="300" id="emsf_1172_eff16"></div>
       <div><label for="emsf_1173_5ada4">المهلة</label><input type="date" name="due_date" class="form-control" id="emsf_1173_5ada4"></div>
       <div><label for="emsf_1174_bb9ed">الأولوية</label>
@@ -346,19 +368,19 @@ include __DIR__ . '/../includes/page_header.php';
   </details>
   <?php endif; ?>
 
-  <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px">
+  <div class="dpb-tiles">
     <?php $tiles = array(
         array('أعضاء الإدارة', $kpi['members'], ''),
         array('مهام مفتوحة', $kpi['open_tasks'], ''),
-        array('مهام متأخرة', $kpi['overdue_tasks'], $kpi['overdue_tasks'] > 0 ? '#c0392b' : ''),
+        array('مهام متأخرة', $kpi['overdue_tasks'], $kpi['overdue_tasks'] > 0 ? 'dpb-alert' : ''),
         array('طلبات بيد الإدارة', $kpi['live_requests'], ''),
-        array('طلبات كسرت مهلتها', $kpi['late_requests'], $kpi['late_requests'] > 0 ? '#c0392b' : ''),
+        array('طلبات كسرت مهلتها', $kpi['late_requests'], $kpi['late_requests'] > 0 ? 'dpb-alert' : ''),
         array('إنجازات 30 يومًا', $kpi['ach_30d'], ''),
     );
     foreach ($tiles as $t): ?>
-      <div style="flex:1;min-width:150px;background:#fff;border:1px solid #e5e5e5;border-radius:8px;padding:14px;text-align:center">
-        <div style="font-size:26px;font-weight:bold;<?= $t[2] ? 'color:' . $t[2] : '' ?>"><?= number_format((float) $t[1]) ?></div>
-        <div style="color:#777"><?= htmlspecialchars($t[0]) ?></div>
+      <div class="dpb-tile">
+        <div class="dpb-tile-val <?= htmlspecialchars((string) $t[2]) ?>"><?= number_format((float) $t[1]) ?></div>
+        <div class="dpb-tile-lbl"><?= htmlspecialchars($t[0]) ?></div>
       </div>
     <?php endforeach; ?>
   </div>
@@ -391,7 +413,7 @@ include __DIR__ . '/../includes/page_header.php';
     </tbody>
   </table>
 
-  <h5 style="margin-top:22px;color:#c0392b"><i class="fa fa-triangle-exclamation"></i> المتأخرات (<?= count($lateTasks) ?>)</h5>
+  <h5 class="dpb-sec-late"><i class="fa fa-triangle-exclamation"></i> المتأخرات (<?= count($lateTasks) ?>)</h5>
   <table class="table table-striped">
     <thead><tr><th>#</th><th>العنوان</th><th>المنفذ</th><th>الأولوية</th><th>الحالة</th><th>المهلة الفائتة</th><th>درجة التصعيد</th></tr></thead>
     <tbody>
@@ -409,7 +431,7 @@ include __DIR__ . '/../includes/page_header.php';
     </tbody>
   </table>
 
-  <h5 style="margin-top:22px"><i class="fa fa-envelope-open-text"></i> طلبات بيد الإدارة (<?= count($reqs) ?>)</h5>
+  <h5 class="dpb-sec"><i class="fa fa-envelope-open-text"></i> طلبات بيد الإدارة (<?= count($reqs) ?>)</h5>
   <table class="table table-striped">
     <thead><tr><th>الرقم</th><th>النوع</th><th>العنوان</th><th>مقدِّمه</th><th>بيد من الآن</th><th>الحالة</th><th>مهلة الرد</th><th>قُدِّم في</th></tr></thead>
     <tbody>
@@ -428,7 +450,7 @@ include __DIR__ . '/../includes/page_header.php';
     </tbody>
   </table>
 
-  <h5 style="margin-top:22px"><i class="fa fa-medal"></i> إنجازات الإدارة — 30 يومًا (<?= count($achs) ?>)</h5>
+  <h5 class="dpb-sec"><i class="fa fa-medal"></i> إنجازات الإدارة — 30 يومًا (<?= count($achs) ?>)</h5>
   <table class="table table-striped">
     <thead><tr><th>#</th><th>العنوان</th><th>صاحبه</th><th>الصفة</th><th>الوزن ٪</th><th>المصدر</th><th>تاريخ الاعتراف</th></tr></thead>
     <tbody>

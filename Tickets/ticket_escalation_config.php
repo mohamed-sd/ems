@@ -77,10 +77,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة مستوى'); }
     $header_back = array('href' => 'tickets_list.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مستوياتِ تصعيدٍ معرَّفةً بعدُ', 'أضف أولَ مستوًى بزرِّ «إضافة مستوى» في رأسِ الشاشة');
     ?>
     <?php tkt_msg_banner(); ?>
+    <style>
+    /* UXW-01 ①②: أنماطُ الشاشةِ الثابتةُ — بادئةُ الشاشة tkt-esc- */
+    .tkt-esc-note  { background: var(--c-f7f3e6, #f7f3e6); color: var(--c-6b5a1e, #6b5a1e); }
+    .tkt-esc-table { width: 100%; }
+    </style>
 
-    <div class="success-message is-success" style="background:#f7f3e6;color:#6b5a1e;">
+    <div class="success-message is-success tkt-esc-note">
         <i class="fas fa-circle-info"></i>
         يعمل السلّم عبر <strong>دورة البلاغات المجدوَلة</strong>: عند تجاوز موعد الإنجاز بالساعات المحدَّدة يُرسَل إشعارٌ للدور الهدف (يُحسب من شجرة الأدوار الحيّة) ويُقيَّد حدثُ تصعيدٍ على التذكرة.
     </div>
@@ -102,7 +109,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <select name="notify_channel" id="e_channel">
                         <?php foreach ($channels as $k => $v): ?><option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label>مفعّلة؟</label><label class="switch-inline"><input type="checkbox" name="active" id="e_active" value="1" checked> نعم</label></div>
+                <div class="form-group"><label>مفعّلة؟</label><label class="switch-inline"><input type="checkbox" name="active" id="e_active" aria-label="تفعيلُ قاعدةِ التصعيد" value="1" checked> نعم</label></div>
             </div></div>
             <div class="form-actions">
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
@@ -112,7 +119,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <div class="card"><div class="card-body"><div class="table-container">
-        <table id="tktTable" class="display nowrap alltables no-datatable" style="width:100%;">
+        <table id="tktTable" class="display nowrap alltables tkt-esc-table" data-scroll-x="1" data-state-save="false">
             <thead><tr><th>الإجراءات</th><th>المستوى قبل</th><th>الاسم</th><th>بعد (ساعات)</th><th>الجهة</th><th>القناة</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم التصعيد</th>
@@ -161,8 +168,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function () {
     $(document).ready(function () {
-        $('#tktTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false,
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+        /* UXW-01 ⑤: التهيئةُ اليدويةُ حُذفت — المكوّنُ المركزيُّ (ui-unification.js)
+           يلتقط الجدولَ ويقرأ data-scroll-x و data-state-save من وسمِه. */
         var b = document.getElementById('toggleForm');
         if (b) { b.addEventListener('click', function () {
             document.getElementById('tktForm').reset(); $('#e_id').val('');

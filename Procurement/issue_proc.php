@@ -264,7 +264,7 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
     /* ◆ وحقلُ الإدخالِ نفسُه لا يحمل القيمةَ لمن لا يراها */
     $cost = ($line && $__maySeeCost) ? htmlspecialchars((string)$line['unit_cost'], ENT_QUOTES) : '0';
     $opts = proc_items_options($conn, $is_super_admin, $company_id, $iid);
-    return '<div class="proc-line form-grid" style="align-items:end;margin-bottom:8px">'
+    return '<div class="proc-line form-grid proc-iss-line">'
         . '<div class="form-group"><label for="emsf_380_a0417">الصنف (كتالوج)</label><select name="line_item_id[]" class="line-item" id="emsf_380_a0417">' . $opts . '</select></div>'
         . '<div class="form-group"><label for="emsf_381_fafc5">اسم الصنف <span class="required">*</span></label><input type="text" name="line_item_name[]" class="line-name" value="' . $iname . '" required id="emsf_381_fafc5"></div>'
         . '<div class="form-group"><label for="emsf_382_16b8d">الكمية</label><input type="number" step="0.01" name="line_qty[]" class="line-qty" value="' . $qty . '" id="emsf_382_16b8d"></div>'
@@ -284,6 +284,9 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا عملياتِ صرفٍ مسجَّلةً بعدُ',
+        'سجّل أولَ صرفٍ بزرِّ «صرف جديد» في رأسِ الشاشة: مستلِمٌ وبُعدُ تحميلٍ واحدٌ على الأقل');
     ?>
 
     <?php proc_msg_banner(); ?>
@@ -294,11 +297,11 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
         $psf = $_SESSION['proc_shortage_flash'];
         unset($_SESSION['proc_shortage_flash']);
     ?>
-    <div class="card" style="border-inline-start:4px solid #c62828"><div class="card-body">
+    <div class="card proc-iss-shortage"><div class="card-body">
         <strong><i class="fa fa-triangle-exclamation"></i> نقصُ مخزونٍ بعد الصرف
             (<?php echo htmlspecialchars((string)$psf['issue_ref']); ?>):</strong>
         <?php foreach ($psf['items'] as $sh): ?>
-            <a class="btn-primary" style="margin:0 4px"
+            <a class="btn-primary proc-iss-shortage-btn"
                href="requests_proc.php?prefill_item=<?php echo intval($sh['item_id']); ?>&need_source=<?php
                    echo rawurlencode('نقص مخزون'); ?>&source_ref=<?php echo rawurlencode((string)$psf['issue_ref']); ?>">
                 <i class="fa fa-cart-plus"></i> طلبُ شراءٍ بمرجع الأمر —
@@ -320,11 +323,11 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
                     </div>
                     <div class="form-group">
                         <label for="emsf_385_945c4">المستلِم <span class="required">*</span></label>
-                        <input type="text" name="holder_name" value="<?php echo $edit ? htmlspecialchars((string)$edit['holder_name']) : ''; ?>" required id="emsf_385_945c4">
+                        <input type="text" name="holder_name" id="emsf_385_945c4" required value="<?php echo $edit ? htmlspecialchars((string)$edit['holder_name']) : ''; ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_386_49337">تاريخ الصرف</label>
-                        <input type="date" name="issue_date" value="<?php echo $edit ? htmlspecialchars((string)$edit['issue_date']) : ''; ?>" id="emsf_386_49337">
+                        <input type="date" name="issue_date" id="emsf_386_49337" value="<?php echo $edit ? htmlspecialchars((string)$edit['issue_date']) : ''; ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_387_0ed6d">المعدة <small>(بُعد تكلفة)</small></label>
@@ -353,7 +356,7 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
                     </div>
                     <div class="form-group">
                         <label for="emsf_392_9d977">معرّف العقد (اختياري)</label>
-                        <input type="number" name="contract_id" value="<?php echo $edit && $edit['contract_id'] !== null ? intval($edit['contract_id']) : ''; ?>" id="emsf_392_9d977">
+                        <input type="number" name="contract_id" id="emsf_392_9d977" value="<?php echo $edit && $edit['contract_id'] !== null ? intval($edit['contract_id']) : ''; ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_393_baf02">الحالة</label>
@@ -363,9 +366,9 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="form-group" style="grid-column:1/-1">
+                    <div class="form-group proc-iss-full">
                         <label for="emsf_394_01563">ملاحظات</label>
-                        <input type="text" name="notes" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>" id="emsf_394_01563">
+                        <input type="text" name="notes" id="emsf_394_01563" value="<?php echo $edit ? htmlspecialchars((string)$edit['notes']) : ''; ?>">
                     </div>
                 </div>
             </div>
@@ -381,9 +384,9 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
                     }
                     ?>
                 </div>
-                <button type="button" id="addLine" class="add-btn" style="margin-top:6px"><i class="fas fa-plus"></i> إضافة سطر</button>
-                <div style="margin-top:10px;font-weight:700">إجمالي التكلفة: <span id="issTotal">0.00</span></div>
-                <p style="margin-top:6px;color:#666">القاعدة: لا يُصرف صنفٌ دون مستلِمٍ وبُعد تحميلٍ واحدٍ على الأقل (معدة/مشروع/أمر صيانة).</p>
+                <button type="button" id="addLine" class="add-btn proc-iss-addline"><i class="fas fa-plus"></i> إضافة سطر</button>
+                <div class="proc-iss-total">إجمالي التكلفة: <span id="issTotal">0.00</span></div>
+                <p class="proc-iss-rule">القاعدة: لا يُصرف صنفٌ دون مستلِمٍ وبُعد تحميلٍ واحدٍ على الأقل (معدة/مشروع/أمر صيانة).</p>
             </div>
 
             <div class="form-actions">
@@ -399,7 +402,8 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="procTable" class="display nowrap alltables proc-iss-table"
+                   data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>الإجراءات</th><th>كود المعدة</th><th>المستلِم</th><th>تاريخ الصرف</th><th>المعدة</th>
                     <th>نوع الصيانة</th><th>إجمالي التكلفة</th><th>الحالة</th><th>عدد الأصناف</th>
@@ -516,15 +520,8 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
         $('#issTotal').text(t.toFixed(2));
     }
     $(document).ready(function () {
-        $('#procTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
+        // UXW-01 ⑤: التهيئةُ المحليةُ حُذفت — المكوّنُ المركزيُّ (ui-unification.js)
+        // يلتقط الجدولَ آليًّا، والسلوكُ محفوظٌ بسماتِ data-scroll-x و data-state-save.
         var toggleBtn = document.getElementById('toggleForm');
         if (toggleBtn) { toggleBtn.addEventListener('click', function () { $('#procForm').toggleClass('allforms-visible'); }); }
         $('#addLine').on('click', function () {
@@ -550,5 +547,17 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
     });
 })();
 </script>
+
+<style>
+    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — والألوانُ برموزِ اللوحة */
+    .proc-iss-line { align-items: end; margin-bottom: 8px; }
+    .proc-iss-shortage { border-inline-start: 4px solid var(--c-c62828); }
+    .proc-iss-shortage-btn { margin: 0 4px; }
+    .proc-iss-full { grid-column: 1 / -1; }
+    .proc-iss-addline { margin-top: 6px; }
+    .proc-iss-total { margin-top: 10px; font-weight: 700; }
+    .proc-iss-rule { margin-top: 6px; color: var(--c-s-666); }
+    .proc-iss-table { width: 100%; }
+</style>
 </body>
 </html>

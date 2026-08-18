@@ -114,6 +114,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions[] = array('tag' => 'a', 'href' => '../Equipments/manage_failure_codes.php', 'class' => 'suppliers-header-link', 'icon' => 'fa fa-screwdriver-wrench', 'label' => 'تصنيف الأعطال');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا عناصرَ كتالوجِ صيانةٍ مسجَّلةً بعدُ', 'أضف أولَ عنصرٍ بزرِّ «إضافة عنصر» في رأسِ الشاشة — سببَ عطلٍ أو توقّفٍ أو نوعَ مهمةٍ أو ورشة');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -178,7 +180,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
 
             <div class="table-container">
-                <table id="mntTable" class="display nowrap alltables no-datatable" style="width:100%;">
+                <table id="mntTable" class="display nowrap alltables no-datatable mnt-md-w100" data-state-save="false" data-scroll-x="1">
                     <thead>
                         <tr>
                             <th>الإجراءات</th>
@@ -245,23 +247,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function () {
     $(document).ready(function () {
-        var table = $('#mntTable').DataTable({
-            scrollX: true,
-            autoWidth: false,
-            stateSave: false, // فلتر خارجي ⇒ لا نحفظ الحالة (يمنع إخفاء صفوف بحالة محفوظة قديمة)
-            dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
+        // UXW-01 ⑤: تهيئةُ الجدولِ للمكوّنِ المركزيِّ وحدَه (ui-unification.js) —
+        // والتمريرُ الأفقيُّ وعدمُ حفظِ الحالةِ معلَنانِ سمتَين على وسمِ الجدول.
 
         // فلترة حسب النوع (العمود 1)
         $('#filterType').on('change', function () {
+            if (!$.fn.dataTable || !$.fn.dataTable.isDataTable('#mntTable')) { return; }
             var v = this.value ? '^' + $.fn.dataTable.util.escapeRegex(this.value) + '$' : '';
-            table.column(1).search(v, true, false).draw();
+            $('#mntTable').DataTable().column(1).search(v, true, false).draw();
         });
 
         // إظهار/إخفاء الفورم
@@ -296,5 +289,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     };
 })();
 </script>
+<style>
+    /* UXW-01 ②: عرضُ الجدولِ صنفًا لا نمطًا موضعيًّا في الوسم */
+    .mnt-master-main .mnt-md-w100 { width:100%; }
+</style>
 </body>
 </html>

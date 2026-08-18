@@ -145,6 +145,12 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارتْ أصنافًا ببادئةِ الشاشة */
+.fin-cash-wide { grid-column: 1 / -1; }
+.fin-cash-h5 { margin: 0 0 10px; }
+.fin-cash-tbl { width: 100%; }
+</style>
 <div class="main fin-cash-main ems-unified-page-shell">
     <?php
     $header_title = 'السيولة والتنبؤ النقدي'; $header_icon = 'fa fa-water';
@@ -155,6 +161,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا تنبؤاتِ نقديةً مسجَّلةً بعدُ', 'أضفْ تنبؤًا بزرِّ «تنبؤ يدوي» أو اضغطْ «توليد من البيانات» لبناءِ الأفقِ الشهري');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -162,13 +170,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-edit"></i> تنبؤ نقدي يدوي</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label for="emsf_223_28a4f">التاريخ</label><input type="date" name="forecast_date" value="<?php echo date('Y-m-d'); ?>" id="emsf_223_28a4f"></div>
+            <div class="form-group"><label for="emsf_223_28a4f">التاريخ</label><input type="date" name="forecast_date" aria-label="تاريخُ التنبؤِ النقدي" id="emsf_223_28a4f" value="<?php echo date('Y-m-d'); ?>"></div>
             <div class="form-group"><label for="emsf_224_7bd28">الأفق</label><select name="horizon_type" id="emsf_224_7bd28"><?php foreach ($horizons as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
             <div class="form-group"><label for="emsf_225_57965">النقد الافتتاحي</label><input type="number" step="0.01" name="opening_cash" value="0" id="emsf_225_57965"></div>
             <div class="form-group"><label for="emsf_226_cea84">التدفّق الداخل</label><input type="number" step="0.01" name="expected_inflow" value="0" id="emsf_226_cea84"></div>
             <div class="form-group"><label for="emsf_227_48b1e">التدفّق الخارج</label><input type="number" step="0.01" name="expected_outflow" value="0" id="emsf_227_48b1e"></div>
             <div class="form-group"><label for="emsf_228_23bf9">الحد الأدنى المطلوب</label><input type="number" step="0.01" name="min_required" value="5000000" id="emsf_228_23bf9"></div>
-            <div class="form-group" style="grid-column:1/-1"><label for="emsf_229_75dfb">ملاحظة</label><input type="text" name="note" id="emsf_229_75dfb"></div>
+            <div class="form-group fin-cash-wide"><label for="emsf_229_75dfb">ملاحظة</label><input type="text" name="note" id="emsf_229_75dfb"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-secondary" onclick="$('#finForm').removeClass('allforms-visible')">إلغاء</button></div>
@@ -176,9 +184,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-water"></i> التنبؤات النقدية</h5>
+        <h5 class="fin-cash-h5"><i class="fas fa-water"></i> التنبؤات النقدية</h5>
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="finTable" class="display nowrap alltables fin-cash-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>التاريخ</th><th>الأفق</th><th>الرصيد الافتتاحي</th><th>إجمالي الداخل</th><th>إجمالي الخارج</th><th>الوضع المتوقّع</th><th>فجوة التمويل</th><th>الأولوية</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">الفترة</th>
@@ -240,9 +248,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 <script>
 $(document).ready(function () {
-    $('#finTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    // جدولُ العرضِ يهيّئُه المكوّنُ المركزيُّ (assets/js/ui-unification.js)
     $('#toggleForm').on('click', function () { $('#finForm').toggleClass('allforms-visible'); });
 });
 </script>

@@ -109,20 +109,29 @@ $header_title_html = htmlspecialchars('Aprovment', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 (9): حالاتُ الشاشةِ الدنيا (تحميل / فراغ / خطأ) — مخفيةٌ افتراضيًّا
+echo ems_states_bundle('لا طلبَ اعتمادٍ مفتوحٌ لهذه الوحدةِ اليومية', 'افتحِ الاعتمادَ من سجلِّ الوحداتِ اليوميةِ بزرِّ «تأكيد» أو «رفض»');
 ?>
 
-    <h2 style="text-align:center;"><?= $typetext; ?></h2>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ منقولةٌ من الوسومِ إلى أصنافٍ ببادئةِ الشاشة */
+.tsapv-title { text-align: center; }
+.tsapv-form { margin-top: 40px; text-align: center; max-width: 600px; margin-left: auto; margin-right: auto; }
+.tsapv-notes { width: 100%; height: 150px; padding: 10px; font-size: 16px; border-radius: 8px; }
+.tsapv-actions { margin-top: 20px; }
+.tsapv-submit { padding: 10px 30px; font-size: 18px; border: none; border-radius: 8px; background: var(--c-000022); color: var(--c-s-fff); cursor: pointer; }
+</style>
 
-    <form id="timesheetForm" action="" method="post" style="margin-top:40px; text-align:center; max-width:600px; margin-left:auto; margin-right:auto;">
+    <h2 class="tsapv-title"><?= $typetext; ?></h2>
+
+    <form id="timesheetForm" action="" method="post" class="tsapv-form">
         <?= csrf_field() ?>
         <div>
             <input name="t" type="hidden" value="<?= $_GET['t']; ?>"/>
-            <textarea name="time_notes" required placeholder="أدخل ملاحظاتك هنا" 
-                      style="width:100%; height:150px; padding:10px; font-size:16px; border-radius:8px;" aria-label="أدخل ملاحظاتك هنا"></textarea>
+            <textarea name="time_notes" required placeholder="أدخل ملاحظاتك هنا" aria-label="ملاحظاتُ قرارِ الاعتماد" class="tsapv-notes"></textarea>
         </div>
-        <div style="margin-top:20px;">
-            <button type="submit" 
-                    style="padding:10px 30px; font-size:18px; border:none; border-radius:8px; background:#000022; color:white; cursor:pointer;">
+        <div class="tsapv-actions">
+            <button type="submit" class="tsapv-submit">
                 <?= $typetext; ?>
             </button>
         </div>

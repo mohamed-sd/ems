@@ -159,17 +159,20 @@ if ($selectedRoleId > 0) {
 $selectedRoleName = htmlspecialchars($currentRoleCard['role_name'] ?? 'جميع الإدارات', ENT_QUOTES, 'UTF-8');
 $selectedRoleCount = number_format(intval($currentRoleCard['total_logs'] ?? 0));
 
+// أيقونةُ كلِّ دورٍ فحسب — مفتاحا اللونِ والخلفيةِ كانا معرَّفَين ولا يقرؤهما
+// مُصيِّرٌ واحد (البطاقةُ تلوّنها أصنافُ .activity-role-icon في كتلةِ الأنماط)،
+// فحُذفا: قيمةُ لونٍ لا تصل شاشةً ليست تصميمًا بل مصدرُ تضاربٍ صامت.
 $roleIconMap = [
-    '-1' => ['icon' => 'fa-user-shield', 'color' => '#c84a0c', 'bg' => '#fff3ee'],
-    '1' => ['icon' => 'fa-briefcase', 'color' => '#1255a8', 'bg' => '#eef4ff'],
-    '2' => ['icon' => 'fa-truck', 'color' => '#16a34a', 'bg' => '#f0fdf4'],
-    '3' => ['icon' => 'fa-hard-hat', 'color' => '#9333ea', 'bg' => '#faf5ff'],
-    '4' => ['icon' => 'fa-cogs', 'color' => '#0891b2', 'bg' => '#f0f9ff'],
-    '5' => ['icon' => 'fa-user', 'color' => '#ca8a04', 'bg' => '#fefce8'],
-    '6' => ['icon' => 'fa-clock', 'color' => '#7c3aed', 'bg' => '#f5f3ff'],
-    '7' => ['icon' => 'fa-eye', 'color' => '#0d9488', 'bg' => '#f0fdfa'],
-    '8' => ['icon' => 'fa-eye', 'color' => '#be185d', 'bg' => '#fdf2f8'],
-    '9' => ['icon' => 'fa-exclamation', 'color' => '#b45309', 'bg' => '#fffbeb'],
+    '-1' => ['icon' => 'fa-user-shield'],
+    '1' => ['icon' => 'fa-briefcase'],
+    '2' => ['icon' => 'fa-truck'],
+    '3' => ['icon' => 'fa-hard-hat'],
+    '4' => ['icon' => 'fa-cogs'],
+    '5' => ['icon' => 'fa-user'],
+    '6' => ['icon' => 'fa-clock'],
+    '7' => ['icon' => 'fa-eye'],
+    '8' => ['icon' => 'fa-eye'],
+    '9' => ['icon' => 'fa-exclamation'],
 ];
 
 $actionLabels = [
@@ -233,7 +236,7 @@ function renderLogCells(array $row, array $actionLabels): array
         /* 3 */ '<span class="small">' . $e($row['module_name'] ?? '—') . '</span>',
         /* 4 */ '<span class="small">' . $e($row['screen_name'] ?? '—') . '</span>',
         /* 5 */ '<span data-action="' . $e($actionType) . '">' . $badge . '</span>',
-        /* 6 */ '<span class="small text-truncate d-inline-block" style="max-width:100px" title="' . $e($row['button_name'] ?? '') . '">' . $buttonDisplay . '</span>',
+        /* 6 */ '<span class="small text-truncate d-inline-block activity-cell-w100" title="' . $e($row['button_name'] ?? '') . '">' . $buttonDisplay . '</span>',
         /* 7 */ '<span class="small">' . $recordDisplay . '</span>',
         /* 8 */ '<span class="small ' . $statusClass . '">' . $statusDisplay . '</span>',
         /* 9 */ '<button class="action-btn view detail-btn" data-id="' . intval($row['id']) . '" title="تفاصيل"><i class="fa fa-eye"></i></button>',
@@ -256,10 +259,10 @@ function renderLogCells(array $row, array $actionLabels): array
         /* 24 الإدارة */               '<span class="small">' . $e($row['role_name'] ?? '—') . '</span>',
         /* 25 نوع العملية */           '<span class="small">' . $e($info['label']) . '</span>',
         /* 26 السجل المتأثر */         '<span class="small">' . $e(($row['module_name'] ?? '') !== '' ? ($row['module_name'] . ($recordDisplay !== '—' ? ' #' . strip_tags($recordDisplay) : '')) : '—') . '</span>',
-        /* 27 القيمة قبل */            '<span class="small text-truncate d-inline-block" style="max-width:140px">' . (($row['old_value_brief'] ?? '') !== '' ? $e($row['old_value_brief']) : '—') . '</span>',
-        /* 28 القيمة بعد */            '<span class="small text-truncate d-inline-block" style="max-width:140px">' . (($row['new_value_brief'] ?? '') !== '' ? $e($row['new_value_brief']) : '—') . '</span>',
+        /* 27 القيمة قبل */            '<span class="small text-truncate d-inline-block activity-cell-w140">' . (($row['old_value_brief'] ?? '') !== '' ? $e($row['old_value_brief']) : '—') . '</span>',
+        /* 28 القيمة بعد */            '<span class="small text-truncate d-inline-block activity-cell-w140">' . (($row['new_value_brief'] ?? '') !== '' ? $e($row['new_value_brief']) : '—') . '</span>',
         /* 29 عنوان IP */              '<span class="small">' . (($row['ip_address'] ?? '') !== '' ? $e($row['ip_address']) : '—') . '</span>',
-        /* 30 الجلسة */                '<span class="small text-truncate d-inline-block" style="max-width:100px">' . (($row['session_id'] ?? '') !== '' ? $e($row['session_id']) : '—') . '</span>',
+        /* 30 الجلسة */                '<span class="small text-truncate d-inline-block activity-cell-w100">' . (($row['session_id'] ?? '') !== '' ? $e($row['session_id']) : '—') . '</span>',
         /* 31 درجة حساسية البيان */    $govDash,
         /* 32 نوع التسجيل */           $govDash,
     ];
@@ -339,7 +342,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
         // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
         $header_icon       = 'fa fa-history';
         $header_title_html = 'سجل النشاطات
-                <p class="small mb-0" style="color: #fff;">تتبع جميع عمليات المستخدمين في النظام</p>';
+                <p class="small mb-0 activity-hero-sub">تتبع جميع عمليات المستخدمين في النظام</p>';
         $header_actions = array();
         // ── نظام Excel الموحّد (تصدير فقط — سجل تدقيق) ──
         require_once __DIR__ . '/../includes/excel_ui.php';
@@ -348,6 +351,8 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
             ? array('href' => 'activity_logs.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع')
             : false;
         include(__DIR__ . '/../includes/page_header.php');
+        // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+        echo ems_states_bundle('لا سجلاتِ نشاطٍ مطابقةً لهذه الفلاتر', 'وسِّعِ المدى الزمنيَّ أو أعِدْ ضبطَ الفلاتر بزرِّ «إعادة»');
         ?>
 
 
@@ -365,7 +370,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
                 <div id="roleCardsGrid" class="mb-4 role-cards-flex">
                     <?php foreach ($roleSummary as $card):
                         $rid = strval($card['role_id'] ?? '');
-                        $ico = $roleIconMap[$rid] ?? ['icon' => 'fa-user', 'color' => '#6b7280', 'bg' => '#f9fafb'];
+                        $ico = $roleIconMap[$rid] ?? ['icon' => 'fa-user'];
                         $name = htmlspecialchars($card['role_name'] ?? 'دور #' . $rid, ENT_QUOTES, 'UTF-8');
                         $total = number_format(intval($card['total_logs']));
                         $lastAt = $card['last_activity'] ? date('Y-m-d H:i', strtotime($card['last_activity'])) : '—';
@@ -401,7 +406,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
         ═══════════════════════════════════════════ -->
         <?php if ($selectedRoleId > 0):
             $rid = strval($selectedRoleId);
-            $ico = $roleIconMap[$rid] ?? ['icon' => 'fa-user', 'color' => '#6b7280', 'bg' => '#f9fafb'];
+            $ico = $roleIconMap[$rid] ?? ['icon' => 'fa-user'];
             ?>
 
 
@@ -470,10 +475,23 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
             <div class="card">
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="alltables display nowrap" id="logsTable">
+                        <!-- UXW-01 ⑤: سلوكُ الجدولِ مُعلَنٌ سماتٍ يقرؤها المكوّنُ المركزيُّ
+                             (assets/js/ui-unification.js) بدلَ تهيئةٍ محليةٍ:
+                             معالجةٌ خادميةٌ من ?ajax=dt · صفحةُ 50 · تأخيرُ بحثٍ 400ms ·
+                             بلا stateSave (فلاترُ خارجية) · الأحدثُ أولًا ·
+                             العمودُ 9 زرٌّ لا يُفرز، و10 مخبوءٌ يُبحث فيه،
+                             وأعمدةُ الحوكمةِ 11-21 والوظيفيةُ 22-32 بلا فرزٍ
+                             (خارجَ قائمةِ سماحِ الفرزِ الخادمية). -->
+                        <table class="alltables display nowrap" id="logsTable"
+                               data-ajax-url="activity_logs.php"
+                               data-search-delay="400"
+                               data-page-length="50"
+                               data-state-save="false"
+                               data-order='[[0,"desc"]]'
+                               data-column-defs='[{"targets":0,"className":"px-3"},{"targets":9,"orderable":false,"searchable":false,"className":"text-center"},{"targets":10,"visible":false,"searchable":true},{"targets":[11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32],"orderable":false}]'>
                             <thead>
                                 <tr>
-                                    <th class="px-3" style="min-width:140px">التاريخ والوقت</th><!-- col 0 -->
+                                    <th class="px-3 activity-th-datetime">التاريخ والوقت</th><!-- col 0 -->
                                     <th>الموظف / الحساب</th><!-- col 1 -->
                                     <th>الدور</th><!-- col 2 -->
                                     <th>الوحدة</th><!-- col 3 -->
@@ -533,14 +551,14 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
 
     /* ── خلفية الشاشة بيضاء + كل الكاردات رمادي فاتح ── */
     body:has(.activity-logs-main) {
-        background: #fff !important;
+        background: var(--c-surface) !important;
     }
 
     .ems-site .main.activity-logs-main {
-        background: #fff !important;
+        background: var(--c-surface) !important;
     }
 
-    /* خصوصية أعلى من قاعدة النظام العامة 'body.ems-site .main .card { background:#fff }' */
+    /* خصوصية أعلى من قاعدة النظام العامة التي تجعل خلفية كل بطاقة داخل .main بيضاء */
     body.ems-site .main.activity-logs-main .card {
         background: var(--light-gray) !important;
     }
@@ -555,7 +573,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
         background: linear-gradient(135deg, var(--or), var(--or2)) !important;
         color: #1f1f1f !important;
         font-size: 1.2rem !important;
-        box-shadow: 0 4px 12px rgba(244, 197, 66, .4) !important;
+        box-shadow: 0 4px 12px var(--c-rgba2441976604) !important;
         flex-shrink: 0 !important;
     }
 
@@ -588,7 +606,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
         color: #1f1f1f !important;
         font-weight: 800 !important;
         font-size: .85rem !important;
-        box-shadow: 0 4px 12px rgba(244, 197, 66, .35) !important;
+        box-shadow: 0 4px 12px var(--c-rgba24419766035) !important;
         white-space: nowrap !important;
     }
 
@@ -616,7 +634,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
        حتى يظهر الرمادي الفاتح + الحدّ الذهبي. */
     body.ems-site .main.activity-logs-main .role-card {
         height: 100% !important;
-        border: 1px solid #888 !important;
+        border: 1px solid var(--c-888888, #888) !important;
         border-radius: 25px !important;
         box-shadow: var(--sh) !important;
         background: var(--light-gray) !important;
@@ -633,13 +651,13 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
     .activity-logs-main .role-card,
     .activity-logs-main .role-card *,
     .activity-logs-main .role-card i {
-        color: #000 !important;
+        color: var(--c-000000, #000) !important;
     }
 
     .activity-logs-main .activity-role-icon {
         width: 46px !important;
         height: 46px !important;
-        background: rgba(0, 0, 0, .06) !important;
+        background: var(--c-rgba000006) !important;
         flex-shrink: 0 !important;
     }
 
@@ -688,16 +706,16 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
     /* "تفريغ السجلات" إجراء حذف → لون تحذيري مميّز عن زر الحفظ */
     .activity-logs-main .allforms .activity-clear-btn {
         background: var(--err) !important;
-        box-shadow: 0 6px 15px rgba(220, 38, 38, .32) !important;
-        color: #fff !important;
+        box-shadow: 0 6px 15px var(--c-rgba2203838032, rgba(220, 38, 38, .32)) !important;
+        color: var(--c-surface) !important;
     }
 
     .activity-logs-main .allforms .activity-clear-btn:hover {
-        background: #b91c1c !important;
+        background: var(--c-b91c1c) !important;
     }
 
     .activity-logs-main .allforms .activity-clear-btn i {
-        color: #fff !important;
+        color: var(--c-surface) !important;
     }
 
     /* ── استجابة الشاشات ── */
@@ -724,6 +742,41 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
             margin-inline-start: 0 !important;
         }
     }
+
+    /* ── UXW-01 ①②: أصنافُ الشاشةِ بدلَ الأنماطِ الموضعيةِ والقيمِ المثبَّتة ── */
+    .activity-hero-sub { color: var(--c-surface) !important; }
+
+    .activity-cell-w100 { max-width: 100px; }
+    .activity-cell-w140 { max-width: 140px; }
+    .activity-th-datetime { min-width: 140px; }
+    .activity-th-field { width: 220px; }
+    .activity-pre-json { max-height: 300px; overflow: auto; white-space: pre-wrap; }
+    .activity-pre-inline { white-space: pre-wrap; max-height: 220px; overflow: auto; }
+
+    /* إشعارٌ عائمٌ — كان يُبنى بـcssText فيه قيمُ لونٍ مثبَّتةٌ في جافاسكربت */
+    .activity-toast {
+        position: fixed;
+        bottom: 24px;
+        left: 24px;
+        z-index: 9999;
+        padding: 12px 20px;
+        border-radius: 8px;
+        color: var(--c-surface);
+        font-size: .9rem;
+        box-shadow: 0 4px 16px var(--c-rgba00002);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        max-width: 360px;
+        animation: slideInToast .25s ease;
+        background: var(--c-1255a8, #1255a8);
+    }
+    .activity-toast-success { background: var(--c-16a34a, #16a34a); }
+    .activity-toast-danger { background: var(--c-dc2626, #dc2626); }
+    .activity-toast-warning { background: var(--c-ca8a04, #ca8a04); }
+
+    /* يُبدَّل بجافاسكربت — ويأتي أخيرًا ليغلبَ display الخاصَّ بالمكوّنات أعلاه */
+    .is-hidden { display: none !important; }
 </style>
 
 <!-- ══════════════════════════════════════════
@@ -742,7 +795,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
                 <div class="text-center py-4 text-muted" id="detailLoading">
                     <i class="fa fa-spinner fa-spin fa-2x"></i>
                 </div>
-                <div id="detailContent" style="display:none">
+                <div id="detailContent" class="is-hidden">
                     <div class="row g-3" id="detailMeta"></div>
                     <hr>
                     <div class="card border-0 bg-light-subtle">
@@ -752,7 +805,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
                                 <table class="table table-sm align-middle mb-0">
                                     <thead class="table-light">
                                         <tr>
-                                            <th style="width:220px">الحقل</th>
+                                            <th class="activity-th-field">الحقل</th>
                                             <th>القيمة</th><!-- جدول تفاصيل المودال — «القيمة قبل/بعد» عمودا الجدول الرئيس (CMP-03 ⑤) --><!-- جدول تفاصيل المودال — «القيمة قبل/بعد» عمودا الجدول الرئيس (CMP-03 ⑤) -->
                                         </tr>
                                     </thead>
@@ -765,19 +818,16 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
                     <div class="row g-3">
                         <div class="col-md-4">
                             <label class="form-label fw-semibold small text-muted">القيمة القديمة (old_value)</label>
-                            <pre id="detailOldValue" class="bg-light rounded p-3 small"
-                                style="max-height:300px;overflow:auto;white-space:pre-wrap"></pre>
+                            <pre id="detailOldValue" class="bg-light rounded p-3 small activity-pre-json"></pre>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold small text-muted">القيمة الجديدة (new_value)</label>
-                            <pre id="detailNewValue" class="bg-light rounded p-3 small"
-                                style="max-height:300px;overflow:auto;white-space:pre-wrap"></pre>
+                            <pre id="detailNewValue" class="bg-light rounded p-3 small activity-pre-json"></pre>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label fw-semibold small text-muted">بيانات الطلب
                                 (request_payload)</label>
-                            <pre id="detailPayload" class="bg-light rounded p-3 small"
-                                style="max-height:300px;overflow:auto;white-space:pre-wrap"></pre>
+                            <pre id="detailPayload" class="bg-light rounded p-3 small activity-pre-json"></pre>
                         </div>
                     </div>
                 </div>
@@ -815,51 +865,22 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
 
 <script>
     // ──────────────────────────────────────────────────────────────────────────
-    // Loader: ينتظر jQuery ثم DataTables ثم يشغّل الكود مرة واحدة فقط.
-    // Guard يمنع التهيئة المزدوجة حتى لو استُدعيت الدالة مرتين.
+    // Loader: ينتظر jQuery فحسب ثم يربط سلوكَ الشاشة مرة واحدة.
+    // UXW-01 ⑤: لا تحميلَ لـDataTables ولا تهيئةَ لها هنا — المكوّنُ المركزيُّ
+    // (assets/js/ui-unification.js) يتولّاهما، والشاشةُ تُعلن سلوكَها سماتٍ على
+    // وسمِ <table> وتصل إليه بأحداثِ DataTables القياسية. والربطُ يجري فورَ
+    // توفّرِ jQuery — قبلَ تهيئةِ المكوّنِ عند DOMContentLoaded — كي لا يفوتَ
+    // أولُ طلبِ جلبٍ ولا أولُ رسم.
+    // Guard يمنع الربط المزدوج حتى لو استُدعيت الدالة مرتين.
     // ──────────────────────────────────────────────────────────────────────────
     (function () {
-        var DT_BASE = '/ems/assets/vendor/datatables/js/';
-        var DT_SCRIPTS = [
-            DT_BASE + 'jquery.dataTables.min.js',
-            DT_BASE + 'dataTables.buttons.min.js',
-            DT_BASE + 'buttons.html5.min.js',
-            DT_BASE + 'buttons.print.min.js'
-        ];
-
-
-        function loadScript(src, cb) {
-            // إذا كان محملاً بالفعل استدع cb مباشرة بدون إنشاء tag جديد
-            if (document.querySelector('script[src="' + src + '"]')) { return cb(); }
-            var s = document.createElement('script');
-            s.src = src;
-            s.onload = cb;
-            s.onerror = function () { console.error('Failed: ' + src); cb(); };
-            document.head.appendChild(s);
-        }
-
-        function loadSequential(list, done) {
-            if (!list.length) return done();
-            loadScript(list[0], function () { loadSequential(list.slice(1), done); });
-        }
-
         function waitForJQuery(cb) {
             if (typeof window.jQuery !== 'undefined') return cb(window.jQuery);
             setTimeout(function () { waitForJQuery(cb); }, 30);
         }
 
         // ── الدخول الوحيد لتشغيل الكود ──────────────────────────────────────
-        waitForJQuery(function ($) {
-            // انتظر DataTables — سواء محملة مسبقاً أو ستُحمَّل الآن
-            function waitForDT(cb) {
-                if ($.fn && $.fn.dataTable) return cb();
-                loadSequential(DT_SCRIPTS, cb);
-            }
-
-            waitForDT(function () {
-                $(function () { initActivityLogs($); });
-            });
-        });
+        waitForJQuery(function ($) { initActivityLogs($); });
     })();
 
     function initActivityLogs($) {
@@ -875,91 +896,50 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
         if (!IS_PHASE2) return;
 
         // ══════════════════════════════════════════════════════════════════════
-        // DataTables init
+        // UXW-01 ⑤: المكوّنُ المركزيُّ يهيّئ الجدول — والشاشةُ تصل إليه بحدثين
         // ══════════════════════════════════════════════════════════════════════
-        // إذا كان الجدول مهيَّأً مسبقاً بـ DataTables (حالة نادرة) أزله أولاً
-        if ($.fn.dataTable.isDataTable('#logsTable')) {
-            $('#logsTable').DataTable().destroy();
-        }
+        // معالجةٌ خادمية (H-22 · UI-01 §4/§9)، صفحةُ 50، تأخيرُ بحثٍ 400ms، وبلا
+        // stateSave مع الفلاتر الخارجية: كلُّ ذلك مُعلَنٌ سماتٍ على وسمِ <table>
+        // (data-ajax-url · data-page-length · data-search-delay · data-state-save
+        //  · data-order · data-column-defs) ويقرؤها ui-unification.js.
+        var $logs = $('#logsTable');
+        if (!$logs.length) return;
 
-        var logsTable = $('#logsTable').DataTable({
-            language: { url: '/ems/assets/i18n/datatables/ar.json' },
-            autoWidth: false,
-            // ── H-22 (UI-01 §4/§9): معالجةٌ خادمية — الترقيمُ والفرزُ والبحثُ
-            //    في الخادم، صفحةُ 50، تأخيرُ البحث 400ms، ولا stateSave مع
-            //    الفلاتر الخارجية (درسُ الأعمدة المخبوءة المقيس).
-            serverSide: true,
-            processing: true,
-            searchDelay: 400,
-            stateSave: false,
-            deferRender: true,
-            pageLength: 50,
-            lengthMenu: [10, 25, 50, 100, 250],
-            order: [[0, 'desc']], // newest first
-            ajax: {
-                url: 'activity_logs.php',
-                data: function (d) {
-                    d.ajax = 'dt';
-                    d.role_id = ROLE_ID;
-                    d.f_action_type = $('#f_action_type').val() || '';
-                    d.f_date_from = $('#f_date_from').val() || '';
-                    d.f_date_to = $('#f_date_to').val() || '';
-                    d.f_http_method = $('#f_http_method').val() || '';
-                }
-            },
-            // Column 9 (details button) is not sortable
-            columnDefs: [
-                { targets: 0, className: 'px-3' },
-                { targets: 9, orderable: false, searchable: false, className: 'text-center' },
-                { targets: 10, visible: false, searchable: true },   // http_method hidden col
-                // CMP-03 ②+⑤: أعمدة الحوكمة 11-21 والوظيفي 22-32 — بلا فرزٍ (خارج قائمة سماح الفرز الخادمية)
-                { targets: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32], orderable: false }
-            ],
-            dom: '<"row align-items-center mb-2"<"col-sm-4"l><"col-sm-4 text-center" B><"col-sm-4"f>>rtip',
-            buttons: {
-                dom: {
-                    button: { tag: 'button', className: 'btn btn-sm' }
-                },
-                buttons: [
-                    {
-                        // CSV يعمل بدون JSZip ويُفتح مباشرة في Excel
-                        extend: 'csvHtml5',
-                        text: '<i class="fa fa-file-excel-o me-1"></i> تصدير CSV',
-                        className: 'btn-primary',
-                        title: 'سجل_النشاطات',
-                        fieldSeparator: ',',
-                        charset: 'utf-8',
-                        bom: true,          // BOM يجعل Excel يقرأ العربية صح
-                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 8] }
-                    },
-                    {
-                        extend: 'print',
-                        text: '<i class="fa fa-print me-1"></i> طباعة',
-                        className: 'btn-secondary',
-                        title: 'سجل النشاطات',
-                        exportOptions: { columns: [0, 1, 2, 3, 4, 5, 6, 7, 8] }
-                    }
-                ]
-            },
-            // Rebind detail buttons after every draw (paging, search, sort)
-            drawCallback: function () {
-                bindDetailBtns();
-            }
+        // الفلاتر الخادمية تُلحق بكلِّ طلبِ جلبٍ عبر حدثِ preXhr القياسي
+        $logs.on('preXhr.dt', function (e, settings, data) {
+            data.ajax = 'dt';
+            data.role_id = ROLE_ID;
+            data.f_action_type = $('#f_action_type').val() || '';
+            data.f_date_from = $('#f_date_from').val() || '';
+            data.f_date_to = $('#f_date_to').val() || '';
+            data.f_http_method = $('#f_http_method').val() || '';
         });
+
+        // إعادةُ ربطِ أزرارِ التفاصيل بعد كلِّ رسم (ترقيم · بحث · فرز)
+        $logs.on('draw.dt', function () { bindDetailBtns(); });
+
+        function logsApi() {
+            if (!$.fn.dataTable || !$.fn.dataTable.isDataTable('#logsTable')) return null;
+            return $logs.DataTable();
+        }
+        function reloadLogs() {
+            var api = logsApi();
+            if (api) { api.ajax.reload(); }
+        }
 
         // ══════════════════════════════════════════════════════════════════════
         // H-22: الفلاتر خادمية — تُرسل مع كل طلب (دالة ajax.data أعلاه)،
         // فتغييرُها إعادةُ تحميلٍ من الخادم لا تصفيةً في المتصفح.
         // ══════════════════════════════════════════════════════════════════════
         $('#f_action_type, #f_http_method, #f_date_from, #f_date_to').on('change', function () {
-            logsTable.ajax.reload();
+            reloadLogs();
         });
 
         // زر إعادة الفلاتر
         $('#resetFiltersBtn').on('click', function () {
             $('#f_action_type, #f_http_method').val('');
             $('#f_date_from, #f_date_to').val('');
-            logsTable.ajax.reload();
+            reloadLogs();
         });
 
         // ══════════════════════════════════════════════════════════════════════
@@ -991,7 +971,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
                     getModal('clearConfirmModal').hide();
                     if (data.success) {
                         // H-22 serverSide: أعد التحميل من الخادم (clear لا يكفي)
-                        logsTable.ajax.reload();
+                        reloadLogs();
                         // حدّث عداد البادج
                         $('#roleLogCount').text('0 سجل');
                         $('#heroLogCount').text('0 سجل');
@@ -1030,7 +1010,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
             var content = document.getElementById('detailContent');
 
             loading.style.display = '';
-            content.style.display = 'none';
+            content.classList.add('is-hidden');
             modal.show();
 
             fetch('activity_logs.php?ajax=detail&id=' + parseInt(id))
@@ -1039,7 +1019,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
                     loading.style.display = 'none';
                     if (!data.success) {
                         content.innerHTML = '<p class="text-danger">' + escHtml(data.message || 'خطأ') + '</p>';
-                        content.style.display = '';
+                        content.classList.remove('is-hidden');
                         return;
                     }
                     var r = data.row;
@@ -1066,7 +1046,7 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
                         var val = jsonFields.indexOf(k) !== -1 ? prettyJson(raw)
                             : (raw === null || raw === undefined || raw === '' ? '—' : String(raw));
                         var cell = val.indexOf('\n') !== -1
-                            ? '<pre class="mb-0 small" style="white-space:pre-wrap;max-height:220px;overflow:auto">' + escHtml(val) + '</pre>'
+                            ? '<pre class="mb-0 small activity-pre-inline">' + escHtml(val) + '</pre>'
                             : '<span class="small">' + escHtml(val) + '</span>';
                         return '<tr><td class="small fw-semibold text-muted">' + escHtml(k) + '</td><td>' + cell + '</td></tr>';
                     }).join('');
@@ -1074,14 +1054,14 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
                     document.getElementById('detailOldValue').textContent = prettyJson(r.old_value);
                     document.getElementById('detailNewValue').textContent = prettyJson(r.new_value);
                     document.getElementById('detailPayload').textContent = prettyJson(r.request_payload);
-                    content.style.display = '';
+                    content.classList.remove('is-hidden');
                 })
                 .catch(function (err) {
                     console.error('Detail fetch error', err);
                     loading.style.display = 'none';
                     document.getElementById('detailContent').innerHTML =
                         '<p class="text-danger"><i class="fa fa-exclamation-triangle me-1"></i>حدث خطأ أثناء التحميل</p>';
-                    document.getElementById('detailContent').style.display = '';
+                    document.getElementById('detailContent').classList.remove('is-hidden');
                 });
         }
 
@@ -1135,13 +1115,10 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
 
         // Simple toast notification
         function showToast(type, msg) {
-            var colors = { success: '#16a34a', danger: '#dc2626', warning: '#ca8a04' };
-            var color = colors[type] || '#1255a8';
+            // UXW-01 ①: الشكلُ في أصنافِ الشاشةِ (.activity-toast) لا في cssText
+            var known = { success: 1, danger: 1, warning: 1 };
             var toast = document.createElement('div');
-            toast.style.cssText =
-                'position:fixed;bottom:24px;left:24px;z-index:9999;padding:12px 20px;border-radius:8px;' +
-                'background:' + color + ';color:#fff;font-size:.9rem;box-shadow:0 4px 16px rgba(0,0,0,.2);' +
-                'display:flex;align-items:center;gap:8px;max-width:360px;animation:slideInToast .25s ease';
+            toast.className = 'activity-toast' + (known[type] ? ' activity-toast-' + type : '');
             toast.innerHTML = '<i class="fa fa-' + (type === 'success' ? 'check-circle' : 'exclamation-circle') + '"></i>' + escHtml(msg);
             document.body.appendChild(toast);
             setTimeout(function () {

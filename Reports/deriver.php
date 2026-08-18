@@ -62,6 +62,11 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include('../insidebar.php'); ?>
 <?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>
+<style>
+/* UXW-01 ②: أنماطُ شاشةِ تقريرِ السائقين — بادئةُ الشاشةِ rpt-drv */
+.rpt-drv-ico{margin-left:5px}
+.rpt-drv-table{width:100%}
+</style>
 
 <div class="main reports-main driver-report-main">
 
@@ -72,6 +77,9 @@ include('../insidebar.php'); ?>
         $header_actions = array();
         $header_back    = array('href' => 'reports.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
         include('../includes/page_header.php');
+        // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+        echo ems_states_bundle('لا ساعاتِ عملِ سائقين مطابقةً لهذه الفلاتر',
+            'وسّع مدى التاريخِ أو اختر «الكل» في المشروعِ والسائقِ والوردية ثم اضغط بحث');
         ?>
 
     <div class="card">
@@ -85,8 +93,8 @@ include('../insidebar.php'); ?>
             <!-- فورم الفلاتر -->
             <form method="GET" class="form-grid fc-filter-bar">
                 <div class="field md-3 sm-6">
-                    <label class="fc-filter-label"><i class="fas fa-project-diagram" style="margin-left: 5px;"></i> المشروع</label>
-                    <div class="control"><select name="project">
+                    <label class="fc-filter-label"><i class="fas fa-project-diagram rpt-drv-ico"></i> المشروع</label>
+                    <div class="control"><select name="project" aria-label="تصفيةُ التقريرِ بالمشروع">
                         <option value="">-- الكل --</option>
                         <?php
                         $prj = array();
@@ -102,8 +110,8 @@ include('../insidebar.php'); ?>
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label class="fc-filter-label"><i class="fas fa-user-tie" style="margin-left: 5px;"></i> السائق</label>
-                    <div class="control"><select name="driver">
+                    <label class="fc-filter-label"><i class="fas fa-user-tie rpt-drv-ico"></i> السائق</label>
+                    <div class="control"><select name="driver" aria-label="تصفيةُ التقريرِ بالسائق">
                         <option value="">-- الكل --</option>
                         <?php
                         $drv = array();
@@ -119,18 +127,18 @@ include('../insidebar.php'); ?>
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label class="fc-filter-label"><i class="fas fa-calendar-day" style="margin-left: 5px;"></i> من تاريخ</label>
-                    <div class="control"><input type="date" name="start_date" value="<?php echo $start_date; ?>"></div>
+                    <label class="fc-filter-label"><i class="fas fa-calendar-day rpt-drv-ico"></i> من تاريخ</label>
+                    <div class="control"><input type="date" name="start_date" aria-label="تاريخُ بدايةِ الفترة" value="<?php echo $start_date; ?>"></div>
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label class="fc-filter-label"><i class="fas fa-calendar-day" style="margin-left: 5px;"></i> إلى تاريخ</label>
-                    <div class="control"><input type="date" name="end_date" value="<?php echo $end_date; ?>"></div>
+                    <label class="fc-filter-label"><i class="fas fa-calendar-day rpt-drv-ico"></i> إلى تاريخ</label>
+                    <div class="control"><input type="date" name="end_date" aria-label="تاريخُ نهايةِ الفترة" value="<?php echo $end_date; ?>"></div>
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label class="fc-filter-label"><i class="fas fa-moon" style="margin-left: 5px;"></i> الوردية</label>
-                    <div class="control"><select name="shift">
+                    <label class="fc-filter-label"><i class="fas fa-moon rpt-drv-ico"></i> الوردية</label>
+                    <div class="control"><select name="shift" aria-label="تصفيةُ التقريرِ بالوردية">
                         <option value="">-- الكل --</option>
                         <option value="D" <?php if ($shift_filter == "D") echo "selected"; ?>>صباحية</option>
                         <option value="N" <?php if ($shift_filter == "N") echo "selected"; ?>>مسائية</option>
@@ -138,8 +146,8 @@ include('../insidebar.php'); ?>
                 </div>
 
                 <div class="field md-3 sm-6">
-                    <label class="fc-filter-label"><i class="fas fa-cogs" style="margin-left: 5px;"></i> الآلية</label>
-                    <div class="control"><select name="equipment_id">
+                    <label class="fc-filter-label"><i class="fas fa-cogs rpt-drv-ico"></i> الآلية</label>
+                    <div class="control"><select name="equipment_id" aria-label="تصفيةُ التقريرِ بالآلية">
                         <option value="">-- الكل --</option>
                         <?php
                         $res = array();
@@ -177,7 +185,7 @@ include('../insidebar.php'); ?>
             </h5>
         </div>
         <div class="card-body table-container driver-table-wrap">
-            <table id="projectsTable" class="display nowrap" style="width:100%;">
+            <table id="projectsTable" class="display nowrap rpt-drv-table">
                 <thead>
                     <tr>
                         <th><i class="fas fa-calendar"></i> التاريخ</th>

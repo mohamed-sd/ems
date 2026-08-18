@@ -83,43 +83,63 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_title = 'مساحة العمل'; $header_icon = 'fa fa-table-columns';
     $header_actions = array(array('href' => 'my_portal.php', 'icon' => 'fa fa-id-card', 'label' => 'بوابتي (ماذا يخصّني؟)'));
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بطاقاتِ عملٍ في هذه المساحةِ للفترةِ المختارة', 'بدّل الطبقةَ أو وسّع الفترةَ من شريطِ فتاتِ الطريق أعلاه');
     ?>
 
-    <div class="card"><div class="card-body" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <style>
+    .wsp-crumbs     { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .wsp-layers     { margin-inline-start: auto; }
+    .wsp-layer-btn  { border: 1px solid var(--c-s-ddd); border-radius: 6px; padding: 2px 8px; margin: 0 2px; }
+    .wsp-period-on  { font-weight: 800; }
+    .wsp-grid       { display: grid; grid-template-columns: 260px 1fr; gap: 14px; }
+    .wsp-team-row   { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed var(--c-s-eee); }
+    .wsp-team-time  { color: var(--c-ink-400); }
+    .wsp-team-note  { color: var(--c-s-888); margin-top: 8px; }
+    .wsp-cards      { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+    .wsp-card       { border: 1px solid var(--c-e5e0d5, #e5e0d5); border-radius: 10px; padding: 12px; background: var(--c-fffdf7); }
+    .wsp-card-title { color: var(--c-s-888); font-size: .85rem; }
+    .wsp-card-na    { color: var(--c-a15c00, #a15c00); margin: 6px 0; }
+    .wsp-card-val   { font-size: 1.1rem; font-weight: 800; margin: 6px 0; }
+    .wsp-sec-head   { margin-top: 14px; }
+    .wsp-sec-note   { color: var(--c-s-888); }
+    </style>
+
+    <div class="card"><div class="card-body wsp-crumbs">
         <strong>فتاتُ الطريق:</strong>
         <?php if ($feed['ok']): foreach ($feed['breadcrumb'] as $i => $b): ?>
             <?php if ($i > 0): ?><span>←</span><?php endif; ?>
             <a href="?type=<?php echo htmlspecialchars($b['entity_type']); ?>&id=<?php echo intval($b['entity_id']); ?>&from=<?php echo htmlspecialchars($etype . ':' . $eid); ?>">
                 <?php echo htmlspecialchars($b['label']); ?></a>
         <?php endforeach; endif; ?>
-        <span style="margin-inline-start:auto"><strong>مبدّلُ الطبقات:</strong>
+        <span class="wsp-layers"><strong>مبدّلُ الطبقات:</strong>
         <?php foreach ($layers as $l): ?>
-            <a class="btn btn-sm" style="border:1px solid #ddd;border-radius:6px;padding:2px 8px;margin:0 2px"
+            <a class="btn btn-sm wsp-layer-btn"
                href="?type=<?php echo htmlspecialchars($l['entity_type']); ?>&id=<?php echo intval($l['entity_id']); ?>&from=<?php echo htmlspecialchars($etype . ':' . $eid); ?>">
                 <?php echo htmlspecialchars($l['label']); ?></a>
         <?php endforeach; ?></span>
         <span><strong>الفترة:</strong>
             <?php foreach (array('today' => 'اليوم', 'week' => 'أسبوع', 'month' => 'شهر') as $p => $lbl): ?>
                 <a href="?type=<?php echo htmlspecialchars($etype); ?>&id=<?php echo $eid; ?>&period=<?php echo $p; ?>"
-                   <?php echo $p === $period ? 'style="font-weight:800"' : ''; ?>><?php echo $lbl; ?></a>
+                   <?php echo $p === $period ? 'class="wsp-period-on"' : ''; ?>><?php echo $lbl; ?></a>
             <?php endforeach; ?></span>
     </div></div>
 
-    <div style="display:grid;grid-template-columns:260px 1fr;gap:14px">
+    <div class="wsp-grid">
         <div class="card"><div class="card-header"><h5><i class="fa fa-users"></i> جناحُ الفريق</h5></div>
         <div class="card-body">
             <?php if (!$team): ?>
                 <p class="text-muted">لا أعضاءَ في نطاقك المباشر</p>
             <?php endif; ?>
             <?php foreach ($team as $t): ?>
-                <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed #eee">
+                <div class="wsp-team-row">
                     <a href="?type=person&id=<?php echo intval($t['account_id']); ?>&from=<?php echo htmlspecialchars($etype . ':' . $eid); ?>">
                         <?php echo (string)$t['status'] === 'active' ? '●' : '○'; ?>
                         <?php echo htmlspecialchars($t['name']); ?></a>
-                    <small style="color:#999"><?php echo htmlspecialchars($t['last_activity']); ?></small>
+                    <small class="wsp-team-time"><?php echo htmlspecialchars($t['last_activity']); ?></small>
                 </div>
             <?php endforeach; ?>
-            <p style="color:#888;margin-top:8px"><small>اختيارُ عضوٍ يحوّل المساحةَ إلى مساحته —
+            <p class="wsp-team-note"><small>اختيارُ عضوٍ يحوّل المساحةَ إلى مساحته —
                 بحسب صلاحيتك (حارس USR-01 §4)</small></p>
         </div></div>
 
@@ -132,16 +152,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php if (intval($feed['entity']['id']) > 0): ?>#<?php echo intval($feed['entity']['id']); ?><?php endif; ?>
                 — <?php echo htmlspecialchars($period); ?></h5></div>
             <div class="card-body">
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px">
+                <div class="wsp-cards">
                 <?php foreach ($feed['cards'] as $c): ?>
-                    <div style="border:1px solid #e5e0d5;border-radius:10px;padding:12px;background:#fffdf7">
-                        <div style="color:#888;font-size:.85rem"><?php echo htmlspecialchars($c['title']); ?>
+                    <div class="wsp-card">
+                        <div class="wsp-card-title"><?php echo htmlspecialchars($c['title']); ?>
                             <?php if ($c['live']): ?><span title="حيٌّ بلا كاش">⚡</span><?php endif; ?></div>
                         <?php if ($c['unavailable'] !== null): ?>
-                            <div style="color:#a15c00;margin:6px 0"><small>
+                            <div class="wsp-card-na"><small>
                                 <?php echo htmlspecialchars($c['unavailable']); ?></small></div>
                         <?php else: ?>
-                            <div style="font-size:1.1rem;font-weight:800;margin:6px 0">
+                            <div class="wsp-card-val">
                                 <?php echo htmlspecialchars((string)$c['value']); ?></div>
                         <?php endif; ?>
                         <?php if ($c['source_link'] !== null): ?>
@@ -152,8 +172,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
 
                 <?php if ($feed['decisions']): ?>
-                <h6 style="margin-top:14px"><i class="fa fa-gavel"></i> ما يحتاج قرارًا
-                    <small style="color:#888">(القرارُ في صندوق مالكه لا هنا)</small></h6>
+                <h6 class="wsp-sec-head"><i class="fa fa-gavel"></i> ما يحتاج قرارًا
+                    <small class="wsp-sec-note">(القرارُ في صندوق مالكه لا هنا)</small></h6>
                 <?php foreach ($feed['decisions'] as $d): ?>
                     <a class="btn-primary" href="../<?php echo htmlspecialchars($d['link']); ?>">
                         <?php echo htmlspecialchars($d['box']); ?> — <?php echo intval($d['count']); ?></a>
@@ -161,7 +181,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php endif; ?>
 
                 <?php if ($feed['pulse']): ?>
-                <h6 style="margin-top:14px"><i class="fa fa-heart-pulse"></i> نبضُ الأحداث</h6>
+                <h6 class="wsp-sec-head"><i class="fa fa-heart-pulse"></i> نبضُ الأحداث</h6>
                 <ul><?php foreach ($feed['pulse'] as $p): ?>
                     <li><small><?php echo htmlspecialchars($p); ?></small></li>
                 <?php endforeach; ?></ul>

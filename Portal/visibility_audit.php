@@ -50,9 +50,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_title = 'سجل تدقيق الظهور'; $header_icon = 'fa fa-clipboard-list';
     $header_actions = array();
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أحداثَ تدقيقِ ظهورٍ مسجَّلةً بعدُ', 'يُكتَب السجلُّ آليًّا عند أولِ تغييرِ ظهورٍ من شاشةِ مفاتيحِ الظهور');
     ?>
 
-    <div class="card"><div class="card-body"><p style="color:#666">
+    <style>
+    .vaud-note  { color: var(--c-s-666); }
+    .vaud-table { width: 100%; }
+    </style>
+
+    <div class="card"><div class="card-body"><p class="vaud-note">
         <strong>لا تغييرَ صامتٌ على خصوصية أحد</strong> — كلُّ فتحٍ وإغلاقٍ حدثٌ موثَّقٌ
         بفاعله وسببه ومدته وعدد المتأثرين به. السجلُّ <strong>Insert-only</strong>:
         لا زرَّ تعديلٍ ولا حذفٍ في هذه الشاشة ولا في غيرها.
@@ -60,7 +67,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> آخرُ 300 حدث</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap vaud-table">
             <thead><tr><th>#</th><th>الوقت</th><th>العنصر</th><th>النطاق</th>
                 <th>من → إلى</th><th>الفاعل</th><th>السبب</th><th>المدة</th><th>المتأثرون</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->

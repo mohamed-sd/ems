@@ -81,6 +81,12 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+<style>
+/* UXW-01 ②: أنماطُ شاشةِ تصنيفِ الحمايات — ثابتةٌ منقولةٌ من السمةِ الموضعية */
+.gcl-table { width: 100%; }
+.gcl-form { display: flex; gap: 6px; align-items: center; }
+.gcl-reason { width: 180px; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'تصنيف الحمايات'; $header_icon = 'fa fa-shield';
@@ -89,11 +95,13 @@ include '../insidebar.php';
     ems_screen_about('صنف كل حماية ودرجتها وموافقوها وعلم بيئتها — لا حماية بلا صنف معلن، '
         . 'ولا يُقلب علم حماية إلى الإنفاذ قبل تصنيفها، والصنف يتغير بقرار موثَّق بسببه.',
         array('راجع الصنف والدرجة', 'أي تغيير صنف يلزمه سبب'));
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا حماياتٍ مصنَّفةً في سجلِّ السياسات بعدُ', 'اطلب من الحوكمةِ تسجيلَ الحمايةِ وصنفَها قبل قلبِ علمِ بيئتِها');
     if ($msg !== '') { echo '<div class="alert alert-success">' . htmlspecialchars($msg) . '</div>'; }
     if ($err !== '') { echo '<div class="alert alert-danger">' . htmlspecialchars($err) . '</div>'; }
     ?>
     <div class="card"><div class="card-body">
-        <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
+        <div class="table-container"><table class="alltables display gcl-table" data-no-dt="1">
         <thead><tr><th>الحماية</th><th>البيت</th><th>الصنف</th><th>الدرجة</th><th>علم البيئة</th><th>آخر سبب</th><th>تغيير الصنف (بقرار)</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -115,16 +123,16 @@ include '../insidebar.php';
             <td><code><?php echo htmlspecialchars((string) $g['env_flag_name']); ?></code></td>
             <td><small><?php echo htmlspecialchars(mb_substr((string) $g['reason'], 0, 60)); ?></small></td>
             <td>
-                <form method="post" style="display:flex;gap:6px;align-items:center"
+                <form method="post" class="gcl-form"
                       onsubmit="return confirm('تحذير الأثر: تغيير صنف «<?php echo htmlspecialchars($g['name_ar']); ?>» يغيّر سلوك الحارس الحي (منع/استثناء/تنبيه). أتؤكد بقرار موثَّق؟');">
                     <?= csrf_field() ?>
                     <input type="hidden" name="guard_code" value="<?php echo htmlspecialchars($g['guard_code']); ?>">
-                    <select name="guard_class">
+                    <select name="guard_class" aria-label="صنفُ الحمايةِ الجديد">
                         <?php foreach ($CLASS_AR as $ck => $cl): ?>
                         <option value="<?php echo $ck; ?>" <?php echo $ck === $g['guard_class'] ? 'selected' : ''; ?>><?php echo $cl; ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <input type="text" name="reason" placeholder="سبب التغيير — إلزامي" style="width:180px" aria-label="سبب التغيير — إلزامي">
+                    <input type="text" name="reason" class="gcl-reason" placeholder="سبب التغيير — إلزامي" aria-label="سبب التغيير — إلزامي">
                     <button class="btn-primary" type="submit">حفظ</button>
                 </form>
             </td>

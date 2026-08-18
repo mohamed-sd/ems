@@ -89,22 +89,33 @@ include '../insidebar.php';
         'ما يخصك أنت لا إدارتك: ثمانية عناصر تُفتح من أي موضع وتحل عشر روابط مكررة '
         . 'في أربع عشرة قائمة (NAV-01 §3) — حاوية تنقل تقفز بك إلى موضع الفعل.',
         array('البلاغ والموافقة والطلب تخص الشخص — فمكانها هنا لا في قائمة كل إدارة'));
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بلاطاتِ مساحةِ عملٍ معروضةً لهذا الحساب', 'اختر كيانَ العملِ أولًا — ثم تظهر موافقاتُك ومهامُّك وطلباتُك');
     ?>
+    <style>
+      .mws-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+      .mws-link { text-decoration: none; color: inherit; }
+      .mws-tile { border: 1px solid var(--c-ddd, #ddd); border-radius: 10px; padding: 16px; height: 100%; position: relative; }
+      .mws-badge { position: absolute; top: 10px; inset-inline-end: 10px; font-size: 13px; }
+      .mws-icon { font-size: 26px; color: var(--c-b8860b, #b8860b); }
+      .mws-title { font-weight: bold; margin-top: 8px; }
+      .mws-desc { color: var(--c-666666); }
+    </style>
     <?php if ($__needsPick): ?>
         <!-- INJ-0425 · «السوبر بلا كيانٍ يرى منتقيَ كيانٍ **لا أرقامًا**»:
              فلا تُصيَّر البلاطاتُ أصلًا — رقمٌ بلا كيانٍ مُعلَنٍ يُقرأ خطأً. -->
         <?php echo ems_company_picker($conn, $company_id); ?>
     <?php else: ?>
-    <div class="card"><div class="card-body" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+    <div class="card"><div class="card-body mws-grid">
         <?php foreach ($tiles as $t): ?>
-        <a href="<?php echo htmlspecialchars($t[3]); ?>" style="text-decoration:none;color:inherit">
-            <div style="border:1px solid #ddd;border-radius:10px;padding:16px;height:100%;position:relative">
+        <a class="mws-link" href="<?php echo htmlspecialchars($t[3]); ?>">
+            <div class="mws-tile">
                 <?php if ($t[4] !== null && $t[4] > 0): ?>
-                    <span class="badge badge-danger" style="position:absolute;top:10px;inset-inline-end:10px;font-size:13px"><?php echo intval($t[4]); ?></span>
+                    <span class="badge badge-danger mws-badge"><?php echo intval($t[4]); ?></span>
                 <?php endif; ?>
-                <div style="font-size:26px;color:#b8860b"><i class="<?php echo htmlspecialchars($t[2]); ?>"></i></div>
-                <div style="font-weight:bold;margin-top:8px"><?php echo htmlspecialchars($t[0]); ?></div>
-                <small style="color:#666"><?php echo htmlspecialchars($t[1]); ?></small>
+                <div class="mws-icon"><i class="<?php echo htmlspecialchars($t[2]); ?>"></i></div>
+                <div class="mws-title"><?php echo htmlspecialchars($t[0]); ?></div>
+                <small class="mws-desc"><?php echo htmlspecialchars($t[1]); ?></small>
             </div>
         </a>
         <?php endforeach; ?>

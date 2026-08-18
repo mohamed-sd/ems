@@ -193,12 +193,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <div class="main project-users-main ems-unified-page-shell">
     <?php
     $header_icon   = 'fas fa-users-cog';
-    $header_title_html = 'المعاونون <p class="small mb-0" style="color:#fff;">كل الحسابات الفرعية في الشركة عبر جميع المدراء</p>';
+    $header_title_html = 'المعاونون <p class="small mb-0 aas-head-sub">كل الحسابات الفرعية في الشركة عبر جميع المدراء</p>';
     $header_actions = array();
     if ($can_add) { $header_actions[] = array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'إضافة معاون'); }
     $header_back = array('href'=>'../main/dashboard.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا معاونين مسجَّلين في الشركة بعدُ', 'أضف أولَ معاونٍ بزرِّ «إضافة معاون» في رأسِ الشاشة');
     ?>
+    <style>
+      .aas-head-sub { color: var(--c-surface); }
+    </style>
     <?php if (!empty($_GET['msg'])): $ok = strpos($_GET['msg'], '✅') !== false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
@@ -377,7 +382,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     });
 
     document.addEventListener('DOMContentLoaded', function(){
-        if (window.jQuery) $('#aTable').DataTable({ language:{ url:'/ems/assets/i18n/datatables/ar.json' } });
         const tgl = document.getElementById('toggleForm');
         if (tgl) tgl.addEventListener('click', function(){ resetForm(); form.classList.toggle('allforms-visible'); });
 

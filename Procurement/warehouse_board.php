@@ -65,17 +65,20 @@ include '../insidebar.php';
     ems_screen_about('لوحةُ الدور المستقل (25): الأصنافُ تحت الحد بمتوسط استهلاكها والحدِّ '
         . 'المقترح · استلاماتُ وصرفياتُ اليوم · العهدُ المفتوحة — قراءةٌ وقفزٌ إلى موضع الفعل.',
         array('اقرأ الأصنافَ تحت الحد أولًا', 'ولّد طلباتِ الشراء من قواعد إعادة الطلب'));
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أصنافَ تحت الحد ولا حركةَ مستودعٍ اليوم',
+        'اضبط الحدودَ الدنيا من قواعد إعادة الطلب، أو سجّل استلامًا أو صرفًا من الشاشتين المرتبطتين');
     ?>
 
-    <div class="card"><div class="card-body" style="display:flex;gap:14px;flex-wrap:wrap">
-        <div class="badge <?php echo $lowItems ? 'badge-danger' : 'badge-success'; ?>" style="font-size:15px;padding:8px 14px">
+    <div class="card"><div class="card-body proc-wb-chips">
+        <div class="badge proc-wb-chip <?php echo $lowItems ? 'badge-danger' : 'badge-success'; ?>">
             أصنافٌ تحت الحد: <strong><?php echo count($lowItems); ?></strong></div>
-        <a class="badge badge-secondary" style="font-size:15px;padding:8px 14px;text-decoration:none"
+        <a class="badge badge-secondary proc-wb-chip proc-wb-chip-link"
            href="receipt_custody_proc.php">استلاماتُ اليوم: <strong><?php echo intval($rcv['n']); ?></strong> ▸</a>
-        <a class="badge badge-secondary" style="font-size:15px;padding:8px 14px;text-decoration:none"
+        <a class="badge badge-secondary proc-wb-chip proc-wb-chip-link"
            href="issue_proc.php">صرفياتُ اليوم: <strong><?php echo intval($iss['n']); ?></strong>
             (<?php echo htmlspecialchars((string)$iss['v']); ?>) ▸</a>
-        <a class="badge badge-warning" style="font-size:15px;padding:8px 14px;text-decoration:none"
+        <a class="badge badge-warning proc-wb-chip proc-wb-chip-link"
            href="receipt_custody_proc.php">عهدٌ مفتوحة: <strong><?php echo intval($cust['n']); ?></strong> ▸</a>
     </div></div>
 
@@ -83,7 +86,7 @@ include '../insidebar.php';
         الأصنافُ تحت الحد — بمتوسط الاستهلاك والحدِّ المقترح (M-51)</h5></div>
     <div class="card-body">
         <?php if (!$lowItems): ems_state_empty('لا أصنافَ تحت الحد — المخزونُ سليم ✨'); else: ?>
-        <div class="table-container"><table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <div class="table-container"><table class="alltables display nowrap proc-wb-table" data-no-dt="1">
             <thead><tr><th>الصنف</th><th>الرصيد الحي</th><th>الحد الأدنى</th>
                 <th>متوسط الاستهلاك/يوم (90ي)</th><th>الحد المقترح (M-51)</th><th></th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -98,13 +101,13 @@ include '../insidebar.php';
                 </tr></thead>
             <tbody>
             <?php foreach ($lowItems as $li): ?>
-                <tr style="background:#fff3f0">
+                <tr class="proc-wb-row-low">
                     <td><strong><?php echo htmlspecialchars($li['name']); ?></strong></td>
                     <td><?php echo htmlspecialchars((string)$li['balance']); ?></td>
                     <td><?php echo htmlspecialchars((string)$li['min']); ?></td>
                     <td><?php echo htmlspecialchars((string)$li['avg_daily']); ?></td>
                     <td><strong><?php echo htmlspecialchars((string)$li['suggested']); ?></strong>
-                        <small style="color:#888">(متوسط×مهلة+أمان)</small></td>
+                        <small class="proc-wb-hint">(متوسط×مهلة+أمان)</small></td>
                     <td><a class="btn-primary" href="reordering_proc.php">قواعدُ إعادة الطلب ▸</a></td>
                 </tr>
             <?php endforeach; ?>
@@ -112,6 +115,16 @@ include '../insidebar.php';
         <?php endif; ?>
     </div></div>
 </div>
+
+<style>
+    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — والألوانُ برموزِ اللوحةِ بقيمِها الاحتياطية */
+    .proc-wb-chips { display: flex; gap: 14px; flex-wrap: wrap; }
+    .proc-wb-chip { font-size: 15px; padding: 8px 14px; }
+    .proc-wb-chip-link { text-decoration: none; }
+    .proc-wb-table { width: 100%; }
+    .proc-wb-row-low { background: var(--c-fff3f0, #fff3f0); }
+    .proc-wb-hint { color: var(--c-s-888); }
+</style>
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 </body>

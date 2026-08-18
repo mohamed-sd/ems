@@ -23,7 +23,8 @@ $prj  = intval($_GET['project_id'] ?? 0);
 $type = strval($_GET['type'] ?? '');
 $grid = OBS::readinessGrid($conn, $company_id, $prj, $type);
 
-$COLORS = array('working' => '#1a7f37', 'idle' => '#b58a00', 'stopped' => '#c62828', 'maintenance' => '#6a4fb3');
+$COLORS = array('working' => 'var(--c-1a7f37, #1a7f37)', 'idle' => 'var(--c-b58a00, #b58a00)',
+                'stopped' => 'var(--c-c62828, #c62828)', 'maintenance' => 'var(--c-6a4fb3, #6a4fb3)');
 $LABELS = array('working' => 'تعمل', 'idle' => 'استعداد', 'stopped' => 'متوقفة', 'maintenance' => 'صيانة/بلاغ');
 
 $page_title = 'إيكوبيشن | لوحة الجاهزية';
@@ -42,45 +43,60 @@ include '../insidebar.php';
         . 'من مصادرها (وحداتُ اليوم · البلاغاتُ المفتوحة · حالُ الإتاحة) لا حقولًا محلية. '
         . 'كلُّ خليةٍ تنقر إلى بطاقة معدتها — لا طريقَ مسدودًا.',
         array('رشّح بالمشروع أو النوع', 'انقر الخليةَ لبطاقتها'));
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا معدةَ في شبكةِ الجاهزيةِ بهذا الترشيح',
+        'وسّعِ الترشيحَ بحقلَي المشروعِ والنوعِ أعلاه أو اتركهما فارغَين لإظهارِ الكل');
     ?>
 
-    <div class="card"><div class="card-body" style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-        <form method="get" style="display:flex;gap:8px;align-items:center">
-            <label for="emsf_276_15f26">المشروع</label><input type="number" name="project_id" min="0" style="width:90px"
-                value="<?php echo $prj ?: ''; ?>" placeholder="الكل" id="emsf_276_15f26">
-            <label for="emsf_277_43fd1">النوع</label><input type="text" name="type" style="width:120px"
-                value="<?php echo htmlspecialchars($type); ?>" placeholder="الكل" id="emsf_277_43fd1">
+    <style>
+    .fl-rb-bar    { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .fl-rb-filter { display:flex; gap:8px;  align-items:center; }
+    .fl-rb-w90    { width:90px; }
+    .fl-rb-w120   { width:120px; }
+    .fl-rb-pct    { font-size:16px; padding:8px 16px; }
+    .fl-rb-legend { margin-inline-start:auto; }
+    .fl-rb-swatch { display:inline-block; width:12px; height:12px; border-radius:3px; }
+    .fl-rb-grid   { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; }
+    .fl-rb-cell   { display:block; border-radius:10px; padding:12px; color:var(--c-surface); text-decoration:none; }
+    .fl-rb-name   { font-weight:800; }
+    .fl-rb-cert   { margin-top:-6px; margin-bottom:6px; font-size:11px; color:var(--c-555555); }
+    </style>
+
+    <div class="card"><div class="card-body fl-rb-bar">
+        <form method="get" class="fl-rb-filter">
+            <label for="emsf_276_15f26">المشروع</label><input type="number" name="project_id" min="0" class="fl-rb-w90" id="emsf_276_15f26" placeholder="الكل" aria-label="رقمُ المشروعِ للترشيح"
+                value="<?php echo $prj ?: ''; ?>">
+            <label for="emsf_277_43fd1">النوع</label><input type="text" name="type" class="fl-rb-w120" id="emsf_277_43fd1" placeholder="الكل" aria-label="نوعُ المعدةِ للترشيح"
+                value="<?php echo htmlspecialchars($type); ?>">
             <button type="submit" class="btn-primary">رشّح</button>
         </form>
-        <div class="badge <?php echo ($grid['readiness_pct'] ?? 0) >= 70 ? 'badge-success' : 'badge-danger'; ?>"
-             style="font-size:16px;padding:8px 16px">
+        <div class="fl-rb-pct badge <?php echo ($grid['readiness_pct'] ?? 0) >= 70 ? 'badge-success' : 'badge-danger'; ?>">
             جاهزيةُ الآن: <strong><?php echo $grid['readiness_pct'] !== null
                 ? ($grid['readiness_pct'] . '٪') : '—'; ?></strong>
             (<?php echo intval($grid['total']); ?> معدة)</div>
-        <span style="margin-inline-start:auto">
+        <span class="fl-rb-legend">
         <?php foreach ($LABELS as $k => $lbl): ?>
-            <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:<?php echo $COLORS[$k]; ?>"></span>
+            <span class="fl-rb-swatch" data-allow-style style="background:<?php echo $COLORS[$k]; ?>"></span>
             <small><?php echo $lbl; ?></small>&nbsp;
         <?php endforeach; ?></span>
     </div></div>
 
     <div class="card"><div class="card-body">
         <?php if (!$grid['cells']): ems_state_empty('لا معداتٍ بهذا الترشيح', 'أظهر الكل', 'readiness_board.php'); else: ?>
-        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">
+        <div class="fl-rb-grid">
             <?php foreach ($grid['cells'] as $c): ?>
-                <a href="../<?php echo htmlspecialchars($c['link']); ?>"
-                   style="display:block;border-radius:10px;padding:12px;color:#fff;text-decoration:none;
-                          background:<?php echo $COLORS[$c['status']]; ?>"
+                <a href="../<?php echo htmlspecialchars($c['link']); ?>" class="fl-rb-cell"
+                   data-allow-style style="background:<?php echo $COLORS[$c['status']]; ?>"
                    title="<?php echo htmlspecialchars($LABELS[$c['status']]
                         . ($c['open_tickets'] > 0 ? (' · ' . $c['open_tickets'] . ' بلاغ') : '')); ?>">
-                    <div style="font-weight:800"><?php echo htmlspecialchars($c['name']); ?></div>
+                    <div class="fl-rb-name"><?php echo htmlspecialchars($c['name']); ?></div>
                     <small><?php echo htmlspecialchars($c['type']); ?> · <?php echo $LABELS[$c['status']]; ?>
                         <?php if ($c['open_tickets'] > 0): ?> · <?php echo intval($c['open_tickets']); ?> ⚠<?php endif; ?></small>
                 </a>
                 <?php /* ⇐ INJ-0074 · «كلُّ معدةٍ تعرض **مرجعَ آخر شهادةِ جاهزيةٍ
                          وتاريخَها ومُصدرَها**، والنقرُ عليه **يفتح الأمرَ الذي أصدرها**».
                          و«لا شهادةَ بعد» تُقال صراحةً — فالسكوتُ يُقرأ سلامةً. */ ?>
-                <div class="ems-readiness-cert" style="margin-top:-6px;margin-bottom:6px;font-size:11px;color:#555">
+                <div class="ems-readiness-cert fl-rb-cert">
                     <?php if ($c['cert_ref'] !== '' && $c['cert_link'] !== ''): ?>
                         شهادةُ جاهزية:
                         <a href="../<?php echo htmlspecialchars($c['cert_link'], ENT_QUOTES, 'UTF-8'); ?>"

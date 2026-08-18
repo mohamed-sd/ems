@@ -379,7 +379,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   width: 100%;
   height: 100%;
   overflow: auto;
-  background-color: rgba(0, 0, 0, 0.35);
+  background-color: var(--c-rgba-000-035, rgba(0, 0, 0, 0.35));
   animation: fadeIn 0.3s ease;
 }
 
@@ -409,10 +409,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 .modal-content.movement-view-modal-content {
   width: min(900px, 95vw);
   max-height: 85vh;
-  border: 1px solid #e8dcc8;
+  border: 1px solid var(--c-e8dcc8);
   border-radius: 14px;
-  background: linear-gradient(180deg, #fff 0%, #fdf8f0 100%);
-  box-shadow: 0 22px 42px rgba(26, 18, 8, 0.25);
+  background: linear-gradient(180deg, var(--white) 0%, var(--c-fdf8f0) 100%);
+  box-shadow: 0 22px 42px var(--c-rgba-1a1208-025, rgba(26, 18, 8, 0.25));
   overflow: hidden;
   animation: slideIn 0.35s cubic-bezier(0.4, 0, 0.2, 1) both;
   display: flex;
@@ -421,9 +421,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 /* Modal header */
 .modal-header.movement-view-modal-header {
-  background: linear-gradient(135deg, #1a1208, #2a1b0c);
-  color: #fff;
-  border-bottom: 1px solid rgba(255, 207, 144, 0.22);
+  background: linear-gradient(135deg, var(--c-1a1208, #1a1208), var(--c-2a1b0c));
+  color: var(--white);
+  border-bottom: 1px solid var(--c-rgba-ffcf90-022, rgba(255, 207, 144, 0.22));
   padding: 14px 16px;
   display: flex;
   align-items: center;
@@ -439,19 +439,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #fff;
+  color: var(--white);
 }
 
 .modal-header.movement-view-modal-header i {
-  color: #f7931a;
+  color: var(--c-f7931a);
   font-size: 1.1rem;
 }
 
 /* Close button */
 .movement-view-modal-close {
   border: 0;
-  background: rgba(255, 255, 255, 0.14);
-  color: #fff;
+  background: var(--c-rgba-fff-014, rgba(255, 255, 255, 0.14));
+  color: var(--white);
   width: 36px;
   height: 36px;
   border-radius: 8px;
@@ -466,7 +466,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 }
 
 .movement-view-modal-close:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: var(--c-rgba-fff-025, rgba(255, 255, 255, 0.25));
   transform: rotate(90deg);
 }
 
@@ -475,7 +475,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   overflow-y: auto;
   padding: 16px;
   flex: 1;
-  background: linear-gradient(180deg, #fff 0%, #fffbf5 100%);
+  background: linear-gradient(180deg, var(--white) 0%, var(--c-fffbf5) 100%);
 }
 
 /* Grid layout */
@@ -487,17 +487,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 /* Item card */
 .movement-view-modal-item {
-  border: 1px solid #e8dcc8;
+  border: 1px solid var(--c-e8dcc8);
   border-radius: 11px;
   padding: 12px;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(26, 18, 8, 0.05);
+  background: var(--white);
+  box-shadow: 0 1px 3px var(--c-rgba-1a1208-005, rgba(26, 18, 8, 0.05));
   transition: all 0.2s ease;
 }
 
 .movement-view-modal-item:hover {
-  border-color: #f7931a;
-  box-shadow: 0 4px 12px rgba(247, 147, 26, 0.12);
+  border-color: var(--c-f7931a);
+  box-shadow: 0 4px 12px var(--c-rgba-f7931a-012, rgba(247, 147, 26, 0.12));
 }
 
 /* Wide items (full width) */
@@ -507,7 +507,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 /* Label */
 .movement-view-modal-label {
-  color: #6b4e2a;
+  color: var(--c-6b4e2a);
   font-size: 0.81rem;
   font-weight: 800;
   margin-bottom: 6px;
@@ -517,13 +517,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 }
 
 .movement-view-modal-label i {
-  color: #f7931a;
+  color: var(--c-f7931a);
   font-size: 0.9rem;
 }
 
 /* Value */
 .movement-view-modal-value {
-  color: #1a1208;
+  color: var(--c-1a1208, #1a1208);
   font-weight: 800;
   font-size: 0.92rem;
   word-break: break-word;
@@ -532,12 +532,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 /* Reason section */
 .movement-view-modal-reason {
-  background: linear-gradient(135deg, rgba(247, 147, 26, 0.08), rgba(247, 147, 26, 0.03));
-  border: 1.5px solid rgba(247, 147, 26, 0.2);
+  background: linear-gradient(135deg, var(--c-rgba-f7931a-008, rgba(247, 147, 26, 0.08)), var(--c-rgba-f7931a-003, rgba(247, 147, 26, 0.03)));
+  border: 1.5px solid var(--c-rgba-f7931a-020, rgba(247, 147, 26, 0.2));
 }
 
 .movement-view-modal-reason-label {
-  color: #b45309;
+  color: var(--c-b45309);
   font-size: 0.81rem;
   font-weight: 800;
   margin-bottom: 6px;
@@ -547,12 +547,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 }
 
 .movement-view-modal-reason-label i {
-  color: #b45309;
+  color: var(--c-b45309);
   font-size: 0.9rem;
 }
 
 .movement-view-modal-reason-value {
-  color: #6b4e2a;
+  color: var(--c-6b4e2a);
   font-weight: 700;
   font-size: 0.88rem;
   line-height: 1.5;
@@ -560,8 +560,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 /* Modal footer */
 .modal-footer.movement-view-modal-footer {
-  border-top: 1px solid #e8dcc8;
-  background: #fff;
+  border-top: 1px solid var(--c-e8dcc8);
+  background: var(--white);
   display: flex;
   gap: 8px;
   justify-content: flex-end;
@@ -585,27 +585,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 }
 
 .movement-view-modal-btn-primary {
-  background: linear-gradient(135deg, #1a1208, #2d200a);
-  color: #fff;
-  border-left: 3px solid #f7931a;
-  box-shadow: 0 4px 12px rgba(247, 147, 26, 0.25);
+  background: linear-gradient(135deg, var(--c-1a1208, #1a1208), var(--c-2d200a, #2d200a));
+  color: var(--white);
+  border-left: 3px solid var(--c-f7931a);
+  box-shadow: 0 4px 12px var(--c-rgba-f7931a-025, rgba(247, 147, 26, 0.25));
 }
 
 .movement-view-modal-btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(247, 147, 26, 0.35);
+  box-shadow: 0 6px 18px var(--c-rgba-f7931a-035, rgba(247, 147, 26, 0.35));
 }
 
 .movement-view-modal-btn-secondary {
-  background: #fff;
-  color: #6b4e2a;
-  border: 1.5px solid #e8dcc8;
+  background: var(--white);
+  color: var(--c-6b4e2a);
+  border: 1.5px solid var(--c-e8dcc8);
 }
 
 .movement-view-modal-btn-secondary:hover {
-  border-color: #a07848;
-  background: #fdf8f0;
-  color: #1a1208;
+  border-color: var(--c-a07848);
+  background: var(--c-fdf8f0);
+  color: var(--c-1a1208, #1a1208);
 }
 
 /* Responsive */
@@ -620,9 +620,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   }
 }
 
-/* ── خلفية main العامة بيضاء (#fff) ── */
+/* خلفية main العامة بيضاء */
 .main.movement-ops-page {
-  background: #fff;
+  background: var(--white);
 }
 
 /* ── عنوان الفورم (التبويب الذهبي) خلف كارد الفورم تماماً كصفحة المشاريع ──
@@ -633,6 +633,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   animation: none !important;
   transform: none !important;
 }
+
+/* ══ UXW-01 ②: أنماطٌ ثابتةٌ نُقِلت من سماتِ style إلى أصنافٍ ببادئةِ الشاشة ══ */
+.ops-hint-muted { color: var(--c-888888, #888); }
+.ops-group-title {
+  margin: 18px 14px 8px;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--c-1a1208, #1a1208);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ops-group-title-first { margin: 6px 14px 8px; }
+.legend-dot-fault { color: var(--c-c0392b); }
+.legend-dot-ended { color: var(--c-9aa0a6); }
+.ops-empty-cell { text-align: center; color: var(--c-999999); padding: 16px; }
+.breakdown-tag-out { background: var(--c-fdeaea); color: var(--c-b91c1c); font-weight: 700; }
+.breakdown-item-out { border-right: 3px solid var(--c-b91c1c); padding-right: 6px; }
 </style>
 
 <div class="main movement-page movement-ops-page">
@@ -654,6 +672,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     foreach (ems_excel_header_actions('operations', 'حركات التشغيل', $can_add) as $__xlAction) { $header_actions[] = $__xlAction; }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا تشغيلاتِ معدّاتٍ مسجَّلةً في هذا المشروع', 'أضفْ أولَ تشغيلٍ بزرِّ «إضافة تشغيل جديد» في رأسِ الشاشة');
     // TKT-15 · زر الإبلاغ السياقي — المشغلون والقوى (§2-⑤)
     require_once __DIR__ . '/../includes/report_button.php';
     ems_report_button(array('screen' => 'operators', 'project_id' => $selected_project_id ?? null));
@@ -768,7 +788,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </div>
 
                             <div>
-                                <label for="target_daily_hours"><i class="fa fa-bullseye"></i> الساعات اليومية المستهدفة <small style="color:#888">(تلقائي ويمكن تعديله)</small></label>
+                                <label for="target_daily_hours"><i class="fa fa-bullseye"></i> الساعات اليومية المستهدفة <small class="ops-hint-muted">(تلقائي ويمكن تعديله)</small></label>
                                 <input type="number" name="target_daily_hours" id="target_daily_hours" step="0.01"
                                     placeholder="الهدف اليومي للآلية" value="0" />
                             </div>
@@ -887,7 +907,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card">
             <div class="card-body">
                 <!-- ===== جدول المعدات الأساسية ===== -->
-                <h6 style="margin:6px 14px 8px;font-size:15px;font-weight:800;color:#1a1208;display:flex;align-items:center;gap:8px;"><span class="legend-dot legend-basic">■</span> المعدات الأساسية</h6>
+                <h6 class="ops-group-title ops-group-title-first"><span class="legend-dot legend-basic">■</span> المعدات الأساسية</h6>
                 <div class="tbl-scroll-wrap tbl-scroll-zero">
                     <table id="primaryTable" class="display nowrap table-full-width">
                         <thead>
@@ -1087,8 +1107,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 if ($status_value === 1 && $_SESSION['user']['role'] != "10" && $can_edit) {
                                     $action_buttons .= "<a href='#' class='end-service-btn btn btn-sm btn-secondary' data-bs-toggle='modal' data-bs-target='#endServiceModal' data-id='" . $row['id'] . "'> إنهاء خدمة </a> ";
                                 } elseif ($status_value === 0 && $can_edit) {
-                                    $action_buttons .= "<form method='post' class='operation-inline-form'>
-        <?= csrf_field() ?>
+                                    $action_buttons .= "<form method='post' class='operation-inline-form'>" . csrf_field() . "
                                     <input type='hidden' name='action' value='change_status'>
                                     <input type='hidden' name='operation_id' value='" . $row['id'] . "'>
                                     <input type='hidden' name='new_status' value='1'>
@@ -1152,7 +1171,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             };
                             // عرض صفوف الجدول الأول: المعدات الأساسية
                             if (empty($primary_rows)) {
-                                echo "<tr><td colspan='9' style='text-align:center;color:#999;padding:16px;'>لا توجد معدات أساسية</td></tr>";
+                                echo "<tr><td colspan='9' class='ops-empty-cell'>لا توجد معدات أساسية</td></tr>";
                             } else {
                                 $i = 1;
                                 foreach ($primary_rows as $r) { $render_op_row($r, $i++); }
@@ -1163,7 +1182,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
 
                 <!-- ===== جدول المعدات الاحتياطية ===== -->
-                <h6 style="margin:18px 14px 8px;font-size:15px;font-weight:800;color:#1a1208;display:flex;align-items:center;gap:8px;"><span class="legend-dot legend-backup">■</span> المعدات الاحتياطية</h6>
+                <h6 class="ops-group-title"><span class="legend-dot legend-backup">■</span> المعدات الاحتياطية</h6>
                 <div class="tbl-scroll-wrap tbl-scroll-zero">
                     <table id="reserveTable" class="display nowrap table-full-width">
                         <thead>
@@ -1181,7 +1200,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php
                             // عرض صفوف الجدول الثاني: المعدات الاحتياطية
                             if (empty($reserve_rows)) {
-                                echo "<tr><td colspan='9' style='text-align:center;color:#999;padding:16px;'>لا توجد معدات احتياطية</td></tr>";
+                                echo "<tr><td colspan='9' class='ops-empty-cell'>لا توجد معدات احتياطية</td></tr>";
                             } else {
                                 $i = 1;
                                 foreach ($reserve_rows as $r) { $render_op_row($r, $i++); }
@@ -1192,7 +1211,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
 
                 <!-- ===== جدول المعدات المتعطلة ===== -->
-                <h6 style="margin:18px 14px 8px;font-size:15px;font-weight:800;color:#1a1208;display:flex;align-items:center;gap:8px;"><span class="legend-dot" style="color:#c0392b;">■</span> المعدات المتعطلة</h6>
+                <h6 class="ops-group-title"><span class="legend-dot legend-dot-fault">■</span> المعدات المتعطلة</h6>
                 <div class="tbl-scroll-wrap tbl-scroll-zero">
                     <table id="brokenTable" class="display nowrap table-full-width">
                         <thead>
@@ -1212,7 +1231,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php
                             // عرض صفوف الجدول الثالث: المعدات المتعطلة
                             if (empty($broken_rows)) {
-                                echo "<tr><td colspan='9' style='text-align:center;color:#999;padding:16px;'>لا توجد معدات متعطلة</td></tr>";
+                                echo "<tr><td colspan='9' class='ops-empty-cell'>لا توجد معدات متعطلة</td></tr>";
                             } else {
                                 $i = 1;
                                 foreach ($broken_rows as $r) { $render_op_row($r, $i++); }
@@ -1223,7 +1242,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
 
                 <!-- ===== جدول التشغيلات المنتهية ===== -->
-                <h6 style="margin:18px 14px 8px;font-size:15px;font-weight:800;color:#1a1208;display:flex;align-items:center;gap:8px;"><span class="legend-dot" style="color:#9aa0a6;">■</span> التشغيلات المنتهية</h6>
+                <h6 class="ops-group-title"><span class="legend-dot legend-dot-ended">■</span> التشغيلات المنتهية</h6>
                 <div class="tbl-scroll-wrap tbl-scroll-zero">
                     <table id="endedTable" class="display nowrap table-full-width">
                         <thead>
@@ -1243,7 +1262,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php
                             // عرض الجدول الثالث: التشغيلات المنتهية (status=0)
                             if (empty($ended_rows)) {
-                                echo "<tr><td colspan='9' style='text-align:center;color:#999;padding:16px;'>لا توجد تشغيلات منتهية</td></tr>";
+                                echo "<tr><td colspan='9' class='ops-empty-cell'>لا توجد تشغيلات منتهية</td></tr>";
                             } else {
                                 $i = 1;
                                 foreach ($ended_rows as $r) { $render_op_row($r, $i++); }
@@ -1268,7 +1287,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <style>
         /* الحل الأمتن: لا backdrop منفصل (data-bs-backdrop="false")؛ المودال نفسه يُعتّم
            الخلفية. الـbackdrop المنفصل لبوتستراب كان يُرسَم فوق المحتوى فيمنع الكتابة. */
-        #endServiceModal.modal { background: rgba(15,23,42,.55) !important; -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
+        #endServiceModal.modal { background: var(--c-rgba-0f172a-055, rgba(15,23,42,.55)) !important; -webkit-backdrop-filter: blur(3px); backdrop-filter: blur(3px); }
         #endServiceModal .modal-dialog { pointer-events: auto; }
         #endServiceModal .modal-content { pointer-events: auto; position: relative; }
         </style>
@@ -1493,9 +1512,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     var statusClass = remaining === 0 ? 'is-active' : (addedCount > 0 ? 'is-warning' : 'is-muted');
                                     var basicInfo = item.count_basic > 0 ? '<span class="breakdown-tag is-basic">أساسي:' + item.count_basic + '</span>' : '';
                                     var backupInfo = item.count_backup > 0 ? '<span class="breakdown-tag is-backup">احتياطي:' + item.count_backup + '</span>' : '';
-                                    var outTag = item.out_of_contract ? ' <span class="breakdown-tag" style="background:#fdeaea;color:#b91c1c;font-weight:700;">⚠ خارج العقد</span>' : '';
+                                    var outTag = item.out_of_contract ? ' <span class="breakdown-tag breakdown-tag-out">⚠ خارج العقد</span>' : '';
 
-                                    return '<div class="breakdown-item"' + (item.out_of_contract ? ' style="border-right:3px solid #b91c1c;padding-right:6px;"' : '') + '>' +
+                                    return '<div class="breakdown-item' + (item.out_of_contract ? ' breakdown-item-out' : '') + '">' +
                                         '<i class="fas fa-tools"></i> <strong>' + (item.type || 'غير محدد') + '</strong>' + outTag + ': ' +
                                         item.count + ' متعاقد ' + basicInfo + ' ' + backupInfo + ' | ' +
                                         '<span class="breakdown-count ' + statusClass + '">' + addedCount + ' مضاف</span> | ' +

@@ -39,6 +39,11 @@ include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* ══ UXW-01 ②: أنماطٌ ثابتةٌ نُقِلت من سماتِ style إلى أصنافٍ ببادئةِ الشاشة ══ */
+.drs-sig-title { max-width: 280px; }
+.drs-sig-cause { max-width: 200px; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'مساحة مخاطر الإدارة' . ($unitName !== '' ? ' — ' . $unitName : '');
@@ -47,6 +52,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_back = array();
     $header_context = array('الزاوية' => $unitName !== '' ? $unitName : 'كل النطاق', 'الحكم' => 'قراءة — والتعديل بطلب لإدارة المخاطر');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بياناتِ مخاطرَ في زاويةِ إدارتِك ضمنَ هذا التبويب', 'انتقلْ إلى تبويبٍ آخرَ من شريطِ التبويباتِ أو أبلغْ عن إشارةٍ من تبويبِ «الإشارات والحوادث»');
     ems_screen_about('مكوّن نطاقي واحد على السجل المركزي — الإدارة ترى زاويتها ولا سجل موازيًا لها (RK-02). '
         . 'حقاك الفعليان هنا: الإبلاغ عن إشارة، وتسجيل دليل ضابط تملكه.',
         array('تعديل التصنيف أو الدرجة أو الإغلاق: بطلب لإدارة المخاطر — والقبول ضمن سقفك فقط'));
@@ -134,8 +141,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         $r = $conn->query("SELECT id, title, source, state, created_at FROM risk_signals
                             WHERE company_id={$company_id} AND created_by = {$uid} ORDER BY created_at DESC LIMIT 100");
         echo '<h6>إشاراتك المبلَّغة (الإبلاغ حقك — والفرز لإدارة المخاطر)</h6>';
-        echo '<form id="deptSigForm" class="ems-toolbar"><input name="title" class="form-control" placeholder="عنوان الإشارة *" style="max-width:280px" required aria-label="عنوان الإشارة">'
-           . '<input name="root_cause" class="form-control" placeholder="السبب الجذري" style="max-width:200px" aria-label="السبب الجذري">'
+        echo '<form id="deptSigForm" class="ems-toolbar"><input name="title" class="form-control drs-sig-title" placeholder="عنوان الإشارة *" required aria-label="عنوان الإشارة">'
+           . '<input name="root_cause" class="form-control drs-sig-cause" placeholder="السبب الجذري" aria-label="السبب الجذري">'
            . '<button class="ems-btn-primary" type="submit">إبلاغ</button><span id="deptSigMsg"></span></form>';
         echo '<table class="table table-sm table-striped"><thead><tr><th>#</th><th>العنوان</th><th>المصدر</th><th>الحالة</th><th>التاريخ</th></tr></thead><tbody>';
         $n = 0;

@@ -88,11 +88,21 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+
+<style>
+/* UXW-01 ②: أنماطُ الشاشةِ الموضعيةُ نُقلت أصنافًا — سجلُّ الكيانات */
+.gov-ent-filter { margin-bottom: 10px; }
+.gov-ent-table  { width: 100%; }
+.gov-ent-grid   { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.gov-ent-span4  { grid-column: span 4; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'سجل الكيانات'; $header_icon = 'fa fa-building-columns';
     $header_actions = array();
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا كياناتٍ قانونيةً مسجَّلةً بهذا المرشِّح', 'بدِّلْ مرشِّحَ «الكل» أعلى الجدولِ أو أنشئْ كيانًا جديدًا بثلاثيتِه أسفلَ الشاشة');
     ems_screen_about('كل كيان قانوني بسجله وصفاته وتراخيصه — سجل واحد لا يتكرر (الفرادة: البلد × جهة '
         . 'التسجيل × رقم السجل)، والعقد بلا كيان معرَّف ورقة لا حجة فيها. الكيان ليس مستأجرًا '
         . 'بالضرورة: is_tenant لكيانات المجموعة وحدها.',
@@ -101,10 +111,10 @@ include '../insidebar.php';
     if ($err !== '') { echo '<div class="alert alert-danger">' . htmlspecialchars($err) . '</div>'; }
     ?>
     <div class="card"><div class="card-body">
-        <div style="margin-bottom:10px">
+        <div class="gov-ent-filter">
             فلتر: <a href="?f=all">الكل</a> · <a href="?f=internal">كياناتنا (المستأجرة)</a> · <a href="?f=external">الأطراف الخارجية</a>
         </div>
-        <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
+        <div class="table-container"><table class="alltables display gov-ent-table" data-no-dt="1">
         <thead><tr><th>الكيان</th><th>الثلاثية (بلد · جهة · سجل)</th><th>الصفات</th><th>العملة الأساسية</th><th>داخلي؟</th><th>أقرب انتهاء ترخيص</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">كود الكيان</th>
@@ -151,7 +161,7 @@ include '../insidebar.php';
     <?php if ($gov_write): // القارئ (26) لا يُصيَّر له نموذج الإنشاء أصلًا — منع بنيوي لا زر معطَّل ?>
     <div class="card"><div class="card-body">
         <h4>كيان جديد — ابحث بالثلاثية أولًا فالسجل واحد لا يتكرر</h4>
-        <form method="post" class="ems-form" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+        <form method="post" class="ems-form gov-ent-grid">
         <?= csrf_field() ?>
             <input type="hidden" name="op" value="create">
             <input type="text" name="legal_name" placeholder="الاسم القانوني الكامل *" required aria-label="الاسم القانوني الكامل">
@@ -161,14 +171,14 @@ include '../insidebar.php';
             <input type="text" name="commercial_reg" placeholder="رقم السجل التجاري *" required aria-label="رقم السجل التجاري">
             <input type="text" name="tax_no" placeholder="الرقم الضريبي" aria-label="الرقم الضريبي">
             <input type="text" name="base_currency" placeholder="العملة الأساسية" value="SDG" aria-label="العملة الأساسية">
-            <select name="entity_role" required>
+            <select name="entity_role" aria-label="صفةُ الكيان: عميلٌ أو موردٌ أو ممولٌ أو غيرُها" required>
                 <option value="">— الصفة *</option>
                 <option value="client">عميل</option><option value="supplier">مورد</option>
                 <option value="financier">ممول</option><option value="operating">تشغيلية</option>
                 <option value="holding">قابضة</option><option value="project">مشروعية</option>
                 <option value="government">جهة حكومية</option>
             </select>
-            <button class="btn-primary" type="submit" style="grid-column:span 4">إنشاء الكيان بصفته</button>
+            <button class="btn-primary gov-ent-span4" type="submit">إنشاء الكيان بصفته</button>
         </form>
     </div></div>
     <?php endif; ?>

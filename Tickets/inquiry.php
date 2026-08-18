@@ -53,8 +53,17 @@ $header_title_html = htmlspecialchars('الاستفسارُ عن بلاغٍ مت
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا بلاغَ يطابق رقمَ البحث', 'اكتب رقمَ البلاغِ كاملًا (TK-…) أو رقمَه المتسلسلَ في حقلِ البحثِ أعلاه');
 ?>
-  <form method="get" class="ems-form" style="display:flex;gap:8px;max-width:440px;margin-bottom:16px">
+  <style>
+  /* UXW-01 ②: أنماطُ شاشةِ الاستفسارِ الثابتةُ — بادئةُ الشاشة tkt-inq- */
+  .tkt-inq-search { display: flex; gap: 8px; max-width: 440px; margin-bottom: 16px; }
+  .tkt-inq-card   { border: 1px solid var(--c-dee2e6); border-radius: 8px; padding: 14px; max-width: 820px; background: var(--c-f8f9fa); }
+  .tkt-inq-stage  { background: var(--c-0d6efd); }
+  .tkt-inq-late   { background: var(--c-fff3f3, #fff3f3); }
+  </style>
+  <form method="get" class="ems-form tkt-inq-search">
     <input type="text" name="q" class="form-control" placeholder="رقمُ البلاغ (TK-… أو #)" value="<?= htmlspecialchars($q, ENT_QUOTES, 'UTF-8') ?>" required aria-label="رقمُ البلاغ (TK-… أو #)">
     <button class="btn btn-primary">أين وقف؟</button>
   </form>
@@ -62,9 +71,9 @@ include __DIR__ . '/../includes/page_header.php';
   <?php if ($q !== '' && !$ticket): ?>
     <div class="alert alert-warning">لا بلاغَ بهذا الرقم</div>
   <?php elseif ($ticket): ?>
-    <div style="border:1px solid #dee2e6;border-radius:8px;padding:14px;max-width:820px;background:#f8f9fa">
+    <div class="tkt-inq-card">
       <h5><?= htmlspecialchars($ticket['ticket_no'], ENT_QUOTES, 'UTF-8') ?>
-          <span class="badge" style="background:#0d6efd"><?= htmlspecialchars($ticket['stage'], ENT_QUOTES, 'UTF-8') ?></span></h5>
+          <span class="badge tkt-inq-stage"><?= htmlspecialchars($ticket['stage'], ENT_QUOTES, 'UTF-8') ?></span></h5>
       <p><?= htmlspecialchars($ticket['complaint'], ENT_QUOTES, 'UTF-8') ?></p>
       <p class="text-muted">المبلِّغ: <?= htmlspecialchars($ticket['reporter'] !== null ? $ticket['reporter'] : $ticket['reporting_person'], ENT_QUOTES, 'UTF-8') ?>
          · منذ <?= htmlspecialchars(substr($ticket['created_at'], 0, 16), ENT_QUOTES, 'UTF-8') ?></p>
@@ -85,7 +94,7 @@ include __DIR__ . '/../includes/page_header.php';
         <?php foreach ($streams as $s):
             $open = !in_array($s['state'], array('closed', 'admin_closed'), true);
             $late = $open && $s['resolve_due_at'] !== null && strtotime($s['resolve_due_at']) < time(); ?>
-          <tr<?= $late ? ' style="background:#fff3f3"' : '' ?>>
+          <tr<?= $late ? ' class="tkt-inq-late"' : '' ?>>
             <td><?= htmlspecialchars($s['workstream_type'], ENT_QUOTES, 'UTF-8') ?></td>
             <td><?= htmlspecialchars($s['unit_name'] !== null ? $s['unit_name'] : '—', ENT_QUOTES, 'UTF-8') ?></td>
             <td><?= htmlspecialchars($s['assignee'] !== null ? $s['assignee'] : 'بلا مكلَّف', ENT_QUOTES, 'UTF-8') ?></td>

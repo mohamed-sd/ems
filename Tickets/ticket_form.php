@@ -485,7 +485,15 @@ if ($ticket) {
     }
     $header_back = array('href' => 'tickets_list.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بلاغَ بهذا الرقم — أو لم يُسجَّل بعدُ', 'ارجع إلى قائمةِ البلاغاتِ واختر بلاغًا، أو سجّل بلاغًا جديدًا من هذه الشاشة');
     ?>
+    <style>
+    /* UXW-01 ②: أنماطُ شاشةِ البلاغِ الثابتة — بادئةُ الشاشة tkt-frm- */
+    .tkt-frm-desc-group { margin-top: 10px; }
+    .tkt-frm-op-head    { margin: 14px 0 8px; }
+    .tkt-frm-subtable   { width: 100%; }
+    </style>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('ticket', 'السياقُ والمصدر'); ?>
 
     <?php tkt_msg_banner(); ?>
@@ -511,11 +519,11 @@ endif; ?>
                     </div>
                     <div class="form-group">
                         <label for="emsf_511_b950d">اسم المُبلِّغ <span class="required">*</span></label>
-                        <input type="text" name="reporting_person" required value="<?php echo htmlspecialchars((string)($_SESSION['user']['name'] ?? '')); ?>" id="emsf_511_b950d">
+                        <input type="text" name="reporting_person" id="emsf_511_b950d" required value="<?php echo htmlspecialchars((string)($_SESSION['user']['name'] ?? '')); ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_512_b0d62">رقم التواصل</label>
-                        <input type="text" name="reporter_contact" value="<?php echo htmlspecialchars((string)($_SESSION['user']['phone'] ?? '')); ?>" id="emsf_512_b0d62">
+                        <input type="text" name="reporter_contact" id="emsf_512_b0d62" value="<?php echo htmlspecialchars((string)($_SESSION['user']['phone'] ?? '')); ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_513_f69dc">المعدة (اختياري)</label>
@@ -537,7 +545,7 @@ endif; ?>
                         <input type="number" step="0.01" min="0" name="meter_reading" placeholder="مثال: 12450.5" id="emsf_516_8c811">
                     </div>
                 </div>
-                <div class="form-group" style="margin-top:10px;">
+                <div class="form-group tkt-frm-desc-group">
                     <label for="emsf_517_77a94">وصف المشكلة / الطلب كما ورد <span class="required">*</span></label>
                     <textarea name="complaint" rows="4" required placeholder="صف المشكلة أو الطلب بوضوح..." id="emsf_517_77a94"></textarea>
                 </div>
@@ -599,7 +607,7 @@ endif; ?>
             <div class="tkt-panel__body">
                 <div class="tkt-quote"><?php echo htmlspecialchars($ticket['complaint']); ?></div>
                 <?php if ($ticket['issue_status']): ?>
-                    <div class="tkt-op__k" style="margin:14px 0 8px"><i class="fa fa-screwdriver-wrench" aria-hidden="true"></i> حالة المعالجة — تُقرأ من الإدارة المنفِّذة</div>
+                    <div class="tkt-op__k tkt-frm-op-head"><i class="fa fa-screwdriver-wrench" aria-hidden="true"></i> حالة المعالجة — تُقرأ من الإدارة المنفِّذة</div>
                     <div class="tkt-quote tkt-quote--status"><?php echo htmlspecialchars($ticket['issue_status']); ?></div>
                 <?php endif; ?>
             </div>
@@ -619,8 +627,8 @@ endif; ?>
         <input type="hidden" name="ticket_id" value="<?php echo $ticket_id; ?>">
         <div class="tkt-panel__body">
             <div class="form-grid">
-                <div class="form-group"><label>التصنيف الفني</label>
-                    <select name="category_id">
+                <div class="form-group"><label for="tkfCategory">التصنيف الفني</label>
+                    <select name="category_id" id="tkfCategory">
                         <option value="">— بلا تصنيف —</option>
                         <?php
                         $cats = tkt_gate(false)->select('ticket_categories', array('columns' => array('id', 'name'), 'where' => array('active' => 1), 'orderBy' => 'id ASC'));
@@ -635,9 +643,9 @@ endif; ?>
                 <div class="form-group"><label for="emsf_519_4395b">الوزن التشغيلي</label>
                     <select name="business_impact" id="emsf_519_4395b"><?php foreach ($impacts as $k => $v): ?><option value="<?php echo $k; ?>"<?php echo $ticket['business_impact'] === $k ? ' selected' : ''; ?>><?php echo htmlspecialchars($v); ?></option><?php endforeach; ?></select></div>
                 <div class="form-group"><label>يوقف الإنتاج؟</label>
-                    <label class="switch-inline"><input type="checkbox" name="production_critical" value="1"<?php echo intval($ticket['production_critical']) === 1 ? ' checked' : ''; ?>> نعم</label></div>
-                <div class="form-group"><label>المسؤول المُسنَد</label>
-                    <select name="assigned_user_id"><?php echo tkt_user_options(intval($ticket['assigned_user_id'])); ?></select></div>
+                    <label class="switch-inline"><input type="checkbox" name="production_critical" aria-label="البلاغُ يوقف الإنتاج" value="1"<?php echo intval($ticket['production_critical']) === 1 ? ' checked' : ''; ?>> نعم</label></div>
+                <div class="form-group"><label for="tkfAssigned">المسؤول المُسنَد</label>
+                    <select name="assigned_user_id" id="tkfAssigned"><?php echo tkt_user_options(intval($ticket['assigned_user_id'])); ?></select></div>
                 <div class="form-group"><label for="emsf_520_70558">فريق المعالجة</label>
                     <select name="service_team" id="emsf_520_70558">
                         <option value="">— غير محدد —</option>
@@ -791,7 +799,7 @@ endif; ?>
                 : "<span class='tkt-chip is-ok'><i class='fa fa-circle-check' aria-hidden='true'></i> كلها مغلقة</span>"; ?>
       </div>
       <div class="tkt-panel__body tkt-scroll">
-        <table class="alltables no-datatable" style="width:100%;">
+        <table class="alltables no-datatable tkt-frm-subtable">
             <thead><tr><th>فتح</th><th>رقم الفرع</th><th>المرحلة</th><th>الإدارة المالكة</th><th>الوصف</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -828,7 +836,7 @@ endif; ?>
         <span class="tkt-chip"><i class="fa fa-shield-halved" aria-hidden="true"></i> قيدٌ دائم</span>
       </div>
       <div class="tkt-panel__body tkt-scroll">
-        <table class="alltables no-datatable" style="width:100%;">
+        <table class="alltables no-datatable tkt-frm-subtable">
             <thead><tr><th>من</th><th>إلى</th><th>الوقت</th><th>السبب</th></tr></thead>
             <tbody>
             <?php foreach ($transfers as $tf): ?>

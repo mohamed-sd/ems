@@ -256,7 +256,7 @@ function mnt_opt($value, $label, $selected) {
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
-        <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>" style="margin-bottom:12px;">
+        <div class="success-message mnt-pl-mb12 <?= $isSuccess ? 'is-success' : 'is-error' ?>">
             <i class="fas <?= $isSuccess ? 'fa-check-circle' : 'fa-exclamation-circle' ?>"></i>
             <?php echo htmlspecialchars($_GET['msg']); ?>
         </div>
@@ -282,6 +282,8 @@ function mnt_opt($value, $label, $selected) {
         array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع'),
     );
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مهامَّ في هذه الخطةِ الوقائيةِ بعدُ', 'أضف أولَ مهمةٍ بزرِّ «إضافة مهمة» في لوحةِ مهامِّ الخطة');
     ?>
     <form method="post" action="" class="allforms allforms-visible" id="planForm">
         <?= csrf_field() ?>
@@ -290,7 +292,7 @@ function mnt_opt($value, $label, $selected) {
         <div class="card-header"><h5><i class="fas fa-calendar-check"></i> بيانات الخطة</h5></div>
         <div class="card"><div class="card-body">
             <div class="form-section"><div class="form-grid">
-                <div class="form-group"><label for="emsf_330_c7181">اسم الخطة</label><input type="text" name="name" value="<?php echo htmlspecialchars((string) $plan['name']); ?>" id="emsf_330_c7181"></div>
+                <div class="form-group"><label for="emsf_330_c7181">اسم الخطة</label><input type="text" name="name" id="emsf_330_c7181" value="<?php echo htmlspecialchars((string) $plan['name']); ?>"></div>
                 <div class="form-group"><label for="emsf_331_020f7">النطاق</label>
                     <select name="scope" id="emsf_331_020f7"><option value="">-- اختر --</option>
                         <?php foreach (array('معدة', 'فئة') as $sc) echo mnt_opt($sc, $sc, $plan['scope'] === $sc); ?>
@@ -309,12 +311,12 @@ function mnt_opt($value, $label, $selected) {
                 <div class="form-group"><label for="emsf_334_e64bd">أساس التكرار</label>
                     <select name="trigger_basis" id="emsf_334_e64bd"><?php foreach ($trigger_bases as $tb) echo mnt_opt($tb, $tb, $plan['trigger_basis'] === $tb); ?></select>
                 </div>
-                <div class="form-group"><label for="emsf_335_3578a">الفاصل (ساعات أو أيام)</label><input type="number" name="interval_value" value="<?php echo htmlspecialchars((string) $plan['interval_value']); ?>" id="emsf_335_3578a"></div>
-                <div class="form-group"><label for="emsf_336_4795a">هامش السماح</label><input type="number" name="tolerance" value="<?php echo htmlspecialchars((string) $plan['tolerance']); ?>" id="emsf_336_4795a"></div>
-                <div class="form-group"><label for="emsf_337_1ddc7">آخر تنفيذ (تاريخ)</label><input type="date" name="last_done_date" value="<?php echo htmlspecialchars((string) $plan['last_done_date']); ?>" id="emsf_337_1ddc7"></div>
-                <div class="form-group"><label for="emsf_338_2a157">عدّاد آخر تنفيذ</label><input type="number" step="0.01" name="last_done_meter" value="<?php echo htmlspecialchars((string) $plan['last_done_meter']); ?>" id="emsf_338_2a157"></div>
-                <div class="form-group"><label for="emsf_339_44363">الاستحقاق القادم (تاريخ)</label><input type="date" name="next_due_date" value="<?php echo htmlspecialchars((string) $plan['next_due_date']); ?>" id="emsf_339_44363"></div>
-                <div class="form-group"><label for="emsf_340_40caf">الاستحقاق القادم (عدّاد)</label><input type="number" step="0.01" name="next_due_meter" value="<?php echo htmlspecialchars((string) $plan['next_due_meter']); ?>" id="emsf_340_40caf"></div>
+                <div class="form-group"><label for="emsf_335_3578a">الفاصل (ساعات أو أيام)</label><input type="number" name="interval_value" id="emsf_335_3578a" value="<?php echo htmlspecialchars((string) $plan['interval_value']); ?>"></div>
+                <div class="form-group"><label for="emsf_336_4795a">هامش السماح</label><input type="number" name="tolerance" id="emsf_336_4795a" value="<?php echo htmlspecialchars((string) $plan['tolerance']); ?>"></div>
+                <div class="form-group"><label for="emsf_337_1ddc7">آخر تنفيذ (تاريخ)</label><input type="date" name="last_done_date" id="emsf_337_1ddc7" value="<?php echo htmlspecialchars((string) $plan['last_done_date']); ?>"></div>
+                <div class="form-group"><label for="emsf_338_2a157">عدّاد آخر تنفيذ</label><input type="number" step="0.01" name="last_done_meter" id="emsf_338_2a157" value="<?php echo htmlspecialchars((string) $plan['last_done_meter']); ?>"></div>
+                <div class="form-group"><label for="emsf_339_44363">الاستحقاق القادم (تاريخ)</label><input type="date" name="next_due_date" id="emsf_339_44363" value="<?php echo htmlspecialchars((string) $plan['next_due_date']); ?>"></div>
+                <div class="form-group"><label for="emsf_340_40caf">الاستحقاق القادم (عدّاد)</label><input type="number" step="0.01" name="next_due_meter" id="emsf_340_40caf" value="<?php echo htmlspecialchars((string) $plan['next_due_meter']); ?>"></div>
                 <div class="form-group"><label for="emsf_341_330e5">الحالة</label>
                     <select name="state" id="emsf_341_330e5"><?php foreach ($states as $s) echo mnt_opt($s, $s, $plan['state'] === $s); ?></select>
                 </div>
@@ -342,7 +344,7 @@ function mnt_opt($value, $label, $selected) {
         </div>
         <div class="card-body">
             <?php if ($can_edit): ?>
-            <form class="mnt-line-form" id="taskForm" onsubmit="return false;" style="display:none;">
+            <form class="mnt-line-form is-hidden" id="taskForm" onsubmit="return false;">
                 <input type="hidden" name="action" value="add_task">
                 <input type="hidden" name="plan_id" value="<?php echo intval($plan['id']); ?>">
                 <div class="mnt-line-grid">
@@ -357,7 +359,7 @@ function mnt_opt($value, $label, $selected) {
                 </div>
             </form>
             <?php endif; ?>
-            <div class="table-container"><table class="alltables no-datatable mnt-line-table" id="taskTable" style="width:100%">
+            <div class="table-container"><table class="alltables no-datatable mnt-line-table mnt-pl-w100" id="taskTable" data-no-dt="hard">
                 <thead><tr><th>المهمة</th><th>نوع المعدة</th><th>المكوّن</th><th>ساعات تقديرية</th><?php if ($can_edit) echo '<th></th>'; ?></tr></thead>
                 <tbody>
                     <?php foreach ($tasks as $t): ?>
@@ -371,7 +373,7 @@ function mnt_opt($value, $label, $selected) {
                     <?php endforeach; ?>
                 </tbody>
             </table></div>
-            <div class="mnt-empty-line" id="taskEmpty" style="<?php echo empty($tasks) ? '' : 'display:none'; ?>"><i class="fas fa-list-check"></i><span>لا توجد مهام بعد</span></div>
+            <div class="mnt-empty-line<?php echo empty($tasks) ? '' : ' is-hidden'; ?>" id="taskEmpty"><i class="fas fa-list-check"></i><span>لا توجد مهام بعد</span></div>
         </div>
     </div>
 
@@ -384,6 +386,8 @@ function mnt_opt($value, $label, $selected) {
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا خططَ صيانةٍ وقائيةٍ مسجَّلةً بعدُ', 'أنشئ أولَ خطةٍ بزرِّ «خطة جديدة» في رأسِ الشاشة، وحدِّد أساسَ تكرارِها ساعاتٍ أو زمنًا');
 ?>
     <?php if ($can_add): ?>
     <!-- فورم إنشاء خطة (نمط العملاء/المشاريع: يُفتح بزر «خطة جديدة»، ولا يُحفظ شيء إلا عند الإرسال) -->
@@ -464,20 +468,19 @@ function mnt_opt($value, $label, $selected) {
 ?>
     <?php if (!empty($due_rows) || $e16_filter !== 'all'): ?>
     <div class="card"><div class="card-header"><h5><i class="fas fa-bell"></i> خطط مستحقة الآن (<?php echo count($due_rows); ?>)
-        <span style="margin-inline-start:12px">
+        <span class="mnt-pl-filters">
         <?php foreach (array('all' => 'الكل', 'late' => 'متأخرة', 'week' => 'هذا الأسبوع') as $fk => $fl): ?>
-            <a href="?due_filter=<?php echo $fk; ?>" class="btn btn-sm"
-               style="border:1px solid #ddd;border-radius:6px;padding:2px 8px;<?php
-                   echo $fk === $e16_filter ? 'background:#e2b93b;font-weight:800' : ''; ?>"><?php echo $fl; ?></a>
+            <a href="?due_filter=<?php echo $fk; ?>" class="btn btn-sm mnt-pl-chip<?php
+                   echo $fk === $e16_filter ? ' is-active' : ''; ?>"><?php echo $fl; ?></a>
         <?php endforeach; ?></span></h5></div><div class="card-body">
-        <div class="table-container"><table class="display nowrap alltables no-datatable" style="width:100%">
+        <div class="table-container"><table class="display nowrap alltables no-datatable mnt-pl-w100" data-order='[]'>
             <thead><tr><th>توليد أمر</th><th>مرجع التفويض</th><th>رقم الخطة</th><th>كود المعدة</th><th>الأساس</th><th>تاريخ الاستحقاق المتوقع</th></tr></thead>
             <tbody>
                 <?php foreach ($due_rows as $r): ?>
                 <tr>
                     <td>
                         <?php if ($can_add): ?>
-                        <form method="post" action="" style="display:inline" onsubmit="return confirm('توليد أمر صيانة وقائي من هذه الخطة؟')">
+                        <form method="post" action="" class="mnt-pl-inline" onsubmit="return confirm('توليد أمر صيانة وقائي من هذه الخطة؟')">
         <?= csrf_field() ?>
                             <input type="hidden" name="action" value="generate_order">
                             <input type="hidden" name="plan_id" value="<?php echo intval($r['id']); ?>">
@@ -493,13 +496,13 @@ function mnt_opt($value, $label, $selected) {
                     <td><?php echo htmlspecialchars((string) $r['trigger_basis']); ?></td>
                     <td><?php echo $r['trigger_basis'] === 'ساعات' ? ('عدّاد: ' . htmlspecialchars((string) $r['next_due_meter'])) : ('تاريخ: ' . htmlspecialchars((string) $r['next_due_date'])); ?>
                         <?php if ($can_edit && $r['trigger_basis'] === 'زمن'): ?>
-                        <form method="post" style="display:inline-flex;gap:4px;margin-inline-start:6px"
+                        <form method="post" class="mnt-pl-postpone"
                               onsubmit="return this.reason.value.trim() !== '' || (alert('السببُ إلزامي'), false)">
         <?= csrf_field() ?>
                             <input type="hidden" name="action" value="postpone_plan">
                             <input type="hidden" name="plan_id" value="<?php echo intval($r['id']); ?>">
-                            <input type="number" name="days" min="1" max="90" value="7" style="width:56px" title="أيام التأجيل" aria-label="أيام التأجيل">
-                            <input type="text" name="reason" placeholder="سببُ التأجيل *" style="width:130px" required aria-label="سببُ التأجيل">
+                            <input type="number" name="days" min="1" max="90" value="7" class="mnt-pl-w56" title="أيام التأجيل" aria-label="أيام التأجيل">
+                            <input type="text" name="reason" placeholder="سببُ التأجيل *" class="mnt-pl-w130" required aria-label="سببُ التأجيل">
                             <button type="submit" class="btn-primary" title="تأجيلٌ بسبب (E-16)"><i class="fas fa-clock"></i></button>
                         </form>
                         <?php endif; ?></td>
@@ -512,7 +515,7 @@ function mnt_opt($value, $label, $selected) {
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="mntTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="mntTable" class="display nowrap alltables no-datatable mnt-pl-w100" data-order='[[1, "desc"]]' data-state-save="false" data-scroll-x="1">
                 <thead><tr><th>الإجراءات</th><th>المرجع</th><th>الخطة</th><th>المعدة</th><th>الأساس</th><th>الفاصل</th><th>الاستحقاق القادم</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">نوع الخدمة</th>
@@ -587,14 +590,8 @@ function mnt_opt($value, $label, $selected) {
 <script>
 (function () {
     $(document).ready(function () {
-        if ($('#mntTable').length) {
-            $('#mntTable').DataTable({
-                scrollX: true, autoWidth: false, stateSave: false, order: [[1, 'desc']],
-                dom: 'Bfrtip',
-                buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-                "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-            });
-        }
+        // UXW-01 ⑤: تهيئةُ الجدولِ للمكوّنِ المركزيِّ وحدَه (ui-unification.js) —
+        // والترتيبُ والتمريرُ وحفظُ الحالةِ معلَنةٌ سماتٍ على وسمِ الجدول.
 
         // ════════ نافذة العرض الموحّدة ════════
         $(document).on('click', '.viewBtn', function () {
@@ -638,7 +635,7 @@ function mnt_opt($value, $label, $selected) {
                     + '<td class="mnt-num">'+esc(t.est_hours)+'</td>'
                     + '<td><button type="button" class="action-btn delete mnt-del-line" data-line="'+t.id+'" title="حذف"><i class="fas fa-trash-alt"></i></button></td></tr>';
                 $('#taskTable tbody').append(row);
-                $('#taskEmpty').hide();
+                document.getElementById('taskEmpty').classList.add('is-hidden');
                 $('#taskCount').text(res.count);
                 $taskForm[0].reset();
             }).catch(function(){ alert('خطأ في الاتصال'); });
@@ -654,7 +651,7 @@ function mnt_opt($value, $label, $selected) {
             if(!res.success){ alert(res.message || 'تعذّر الحذف'); return; }
             var $tbody = $btn.closest('tbody'); $btn.closest('tr').remove();
             $('#taskCount').text(res.count);
-            if ($tbody.find('tr').length === 0) { $('#taskEmpty').show(); }
+            if ($tbody.find('tr').length === 0) { document.getElementById('taskEmpty').classList.remove('is-hidden'); }
         }).catch(function(){ alert('خطأ في الاتصال'); });
     });
 
@@ -671,11 +668,16 @@ function mnt_opt($value, $label, $selected) {
     // فتح/إغلاق فورم إضافة مهمة
     $(document).on('click', '.mnt-add-toggle', function(){
         var $f = $('#' + $(this).data('target'));
-        if ($f.is(':visible')) { $f.stop(true, true).slideUp(180); }
-        else { $f.stop(true, true).slideDown(180); $f.find('select, input').not('[type=hidden]').first().trigger('focus'); }
+        if (!$f.hasClass('is-hidden') && $f.is(':visible')) {
+            $f.stop(true, true).slideUp(180, function () { $f.addClass('is-hidden'); });
+        } else {
+            $f.removeClass('is-hidden').hide().stop(true, true).slideDown(180);
+            $f.find('select, input').not('[type=hidden]').first().trigger('focus');
+        }
     });
     $(document).on('click', '.mnt-line-cancel', function(){
-        $('#' + $(this).data('target')).stop(true, true).slideUp(180);
+        var $f = $('#' + $(this).data('target'));
+        $f.stop(true, true).slideUp(180, function () { $f.addClass('is-hidden'); });
     });
 
     // قائمة الخطط: فتح/إغلاق فورم الإنشاء (بلا حفظ سجل فارغ)
@@ -689,9 +691,23 @@ function mnt_opt($value, $label, $selected) {
 })();
 </script>
 <style>
+    /* UXW-01 ①: الألوانُ كلُّها برموزِ اللوحة — وما لا رمزَ له بعدُ يُعلَن باسمِ
+       قيمتِه مع قيمتِه الاحتياطيةِ حرفًا بحرفٍ فلا يتغيّر بكسلٌ واحد. */
+
+    /* UXW-01 ②: أصنافٌ محلَّ الأنماطِ الموضعيةِ التي كانت مبثوثةً في الوسوم */
+    .mnt-plans-main .mnt-pl-mb12 { margin-bottom:12px; }
+    .mnt-plans-main .mnt-pl-w100 { width:100%; }
+    .mnt-plans-main .mnt-pl-w56 { width:56px; }
+    .mnt-plans-main .mnt-pl-w130 { width:130px; }
+    .mnt-plans-main .mnt-pl-inline { display:inline; }
+    .mnt-plans-main .mnt-pl-filters { margin-inline-start:12px; }
+    .mnt-plans-main .mnt-pl-postpone { display:inline-flex; gap:4px; margin-inline-start:6px; }
+    .mnt-plans-main .mnt-pl-chip { border:1px solid var(--c-s-ddd); border-radius:6px; padding:2px 8px; }
+    .mnt-plans-main .mnt-pl-chip.is-active { background:var(--c-e2b93b, #e2b93b); font-weight:800; }
+
     /* ملخص العدّادات */
     .mnt-plans-main .mnt-cost-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-    .mnt-plans-main .mnt-cost-box { background:var(--s1,#fff); border:1px solid var(--bdr,#ece6d8); border-radius:14px; padding:14px; text-align:center; box-shadow:0 2px 8px rgba(26,18,8,.06); }
+    .mnt-plans-main .mnt-cost-box { background:var(--s1,#fff); border:1px solid var(--bdr,#ece6d8); border-radius:14px; padding:14px; text-align:center; box-shadow:0 2px 8px var(--c-rgba26188006); }
     .mnt-plans-main .mnt-cost-box span { display:block; color:var(--t2,#8a7a5c); font-size:.8rem; font-weight:700; margin-bottom:7px; }
     .mnt-plans-main .mnt-cost-box strong { font-size:1.4rem; font-variant-numeric:tabular-nums; color:var(--t1,#1a1208); }
 
@@ -699,18 +715,18 @@ function mnt_opt($value, $label, $selected) {
     .mnt-plans-main .mnt-lines-card { overflow:hidden; }
     .mnt-plans-main .mnt-lines-card > .card-header.mnt-lines-head {
         display:flex; align-items:center; justify-content:space-between; gap:10px;
-        background:linear-gradient(135deg,#1f4f7a,#2f6fa5); color:#fff; padding:13px 16px; border:none;
+        background:linear-gradient(135deg,var(--c-1f4f7a),var(--c-2f6fa5)); color:var(--c-s-fff); padding:13px 16px; border:none;
     }
-    .mnt-plans-main .mnt-lines-head h5 { display:flex; align-items:center; gap:8px; margin:0; color:#fff; font-weight:800; font-size:1rem; }
-    .mnt-plans-main .mnt-lines-head h5 i { color:#ffd98a; }
-    .mnt-plans-main .mnt-count { display:inline-flex; align-items:center; justify-content:center; min-width:24px; height:24px; padding:0 8px; border-radius:999px; background:rgba(255,255,255,.22); color:#fff; font-size:.76rem; font-weight:800; }
+    .mnt-plans-main .mnt-lines-head h5 { display:flex; align-items:center; gap:8px; margin:0; color:var(--c-s-fff); font-weight:800; font-size:1rem; }
+    .mnt-plans-main .mnt-lines-head h5 i { color:var(--c-ffd98a, #ffd98a); }
+    .mnt-plans-main .mnt-count { display:inline-flex; align-items:center; justify-content:center; min-width:24px; height:24px; padding:0 8px; border-radius:999px; background:var(--c-rgba255255255022); color:var(--c-s-fff); font-size:.76rem; font-weight:800; }
     .mnt-plans-main .mnt-add-toggle {
         display:inline-flex; align-items:center; gap:6px; border:none; cursor:pointer;
-        padding:7px 15px; border-radius:999px; font-weight:800; font-size:.82rem; color:#1a1208;
-        background:linear-gradient(135deg,#E0AE2E,#f5d27e); box-shadow:0 2px 8px rgba(224,174,46,.4); transition:transform .15s, box-shadow .15s;
+        padding:7px 15px; border-radius:999px; font-weight:800; font-size:.82rem; color:var(--c-1a1208, #1a1208);
+        background:linear-gradient(135deg,var(--c-e0ae2e),var(--c-f5d27e, #f5d27e)); box-shadow:0 2px 8px var(--c-rgba2241744604, rgba(224,174,46,.4)); transition:transform .15s, box-shadow .15s;
     }
-    .mnt-plans-main .mnt-add-toggle:hover { transform:translateY(-1px); box-shadow:0 6px 16px rgba(224,174,46,.5); }
-    .mnt-plans-main .mnt-line-form { background:linear-gradient(180deg,#fffdf7,#fbf6ea); border:1px solid var(--bdr,#e7dcc4); border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:inset 0 1px 0 #fff, 0 2px 8px rgba(26,18,8,.05); }
+    .mnt-plans-main .mnt-add-toggle:hover { transform:translateY(-1px); box-shadow:0 6px 16px var(--c-rgba2241744605, rgba(224,174,46,.5)); }
+    .mnt-plans-main .mnt-line-form { background:linear-gradient(180deg,var(--c-fffdf7),var(--c-fbf6ea, #fbf6ea)); border:1px solid var(--bdr,#e7dcc4); border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:inset 0 1px 0 var(--c-s-fff), 0 2px 8px var(--c-rgba26188005, rgba(26,18,8,.05)); }
     .mnt-plans-main .mnt-line-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; align-items:end; }
     .mnt-plans-main .mnt-line-grid .form-group { margin:0; }
     .mnt-plans-main .mnt-line-actions { display:flex; align-items:center; gap:10px; margin-top:14px; flex-wrap:wrap; padding-top:12px; border-top:1px dashed var(--bdr,#e7dcc4); }
@@ -718,12 +734,12 @@ function mnt_opt($value, $label, $selected) {
 
     /* جدول المهام */
     .mnt-plans-main .mnt-line-table { width:100%; border-collapse:separate; border-spacing:0; }
-    .mnt-plans-main .mnt-line-table thead th { background:#f3ede0; color:#6b5d3e; font-weight:800; font-size:.82rem; padding:10px 12px; border-bottom:2px solid #e7dcc4; }
-    .mnt-plans-main .mnt-line-table tbody td { font-size:.88rem; padding:10px 12px; border-bottom:1px solid #f0e9da; }
-    .mnt-plans-main .mnt-line-table tbody tr:hover { background:rgba(224,174,46,.07); }
+    .mnt-plans-main .mnt-line-table thead th { background:var(--c-f3ede0, #f3ede0); color:var(--c-6b5d3e, #6b5d3e); font-weight:800; font-size:.82rem; padding:10px 12px; border-bottom:2px solid var(--c-e7dcc4, #e7dcc4); }
+    .mnt-plans-main .mnt-line-table tbody td { font-size:.88rem; padding:10px 12px; border-bottom:1px solid var(--c-f0e9da, #f0e9da); }
+    .mnt-plans-main .mnt-line-table tbody tr:hover { background:var(--c-rgba22417446007, rgba(224,174,46,.07)); }
     .mnt-plans-main .mnt-line-table .mnt-num { font-variant-numeric:tabular-nums; font-weight:700; }
     .mnt-plans-main .mnt-line-table td:last-child, .mnt-plans-main .mnt-line-table th:last-child { text-align:center; }
-    .mnt-plans-main .mnt-empty-line { display:flex; flex-direction:column; align-items:center; gap:8px; color:#b0a489; padding:24px 10px; }
+    .mnt-plans-main .mnt-empty-line { display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--c-b0a489, #b0a489); padding:24px 10px; }
     .mnt-plans-main .mnt-empty-line i { font-size:1.9rem; opacity:.5; }
     .mnt-plans-main .mnt-empty-line span { font-size:.9rem; font-weight:600; }
 

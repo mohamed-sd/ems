@@ -178,6 +178,12 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ①②: أنماطُ هذه الشاشةِ الثابتةُ أصنافًا ببادئةِ الشاشة — واللونُ برمزٍ باحتياطٍ حرفيّ */
+.tkt-ac-dup     { max-width: 110px; }
+.tkt-ac-danger  { color: var(--c-dc3545, #dc3545); }
+.tkt-ac-subhead { margin-top: 18px; }
+</style>
 <div class="main" dir="rtl">
   <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
@@ -187,6 +193,9 @@ $header_title_html = htmlspecialchars('الإغلاقُ الإداري — لل�
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا بلاغَ مفتوحًا يقبل الإغلاقَ الإداريَّ الآن',
+                       'الإغلاقُ الإداريُّ للمكررِ والملغى وحدَهما — والمنجَزُ يُغلق بمسارِه من صندوقِ الإدارة');
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
@@ -219,12 +228,12 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars(mb_substr($t['complaint'], 0, 50), ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($t['stage'], ENT_QUOTES, 'UTF-8') ?></td>
         <td>
-          <form method="post" style="display:flex;gap:6px">
+          <form method="post" class="ems-inline-flex-form">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="aclose_tk" value="<?= intval($t['id']) ?>">
-            <input type="text" name="reason" class="form-control form-control-sm" placeholder="السببُ المكتوب" style="max-width:170px" required aria-label="السببُ المكتوب">
-            <input type="number" name="duplicate_of" class="form-control form-control-sm" placeholder="مكررٌ من #" style="max-width:110px" aria-label="مكررٌ من #">
-            <button class="action-btn" type="submit" style="color:#dc3545">أغلق إداريًّا</button>
+            <input type="text" name="reason" class="form-control form-control-sm ems-reason-inline" placeholder="السببُ المكتوب" required aria-label="السببُ المكتوب">
+            <input type="number" name="duplicate_of" class="form-control form-control-sm tkt-ac-dup" placeholder="مكررٌ من #" aria-label="مكررٌ من #">
+            <button class="action-btn tkt-ac-danger" type="submit">أغلق إداريًّا</button>
           </form>
         </td>
       </tr>
@@ -237,7 +246,7 @@ include __DIR__ . '/../includes/page_header.php';
        «والإغلاقُ الإداريُّ الخاطئ **يُعكَس بزرٍّ** ينتج حركةً مرتبطةً بالأصل».
        فالبابُ ظاهرٌ لا مخبوءٌ في نقطةِ ردٍّ — ومن أغلق خطأً يجد سبيلَه. */
   if (!empty($closed_rows)): ?>
-  <h5 style="margin-top:18px">المُغلَقُ إداريًّا — ولكلٍّ بابُ نقضٍ بحركةٍ مرتبطة</h5>
+  <h5 class="tkt-ac-subhead">المُغلَقُ إداريًّا — ولكلٍّ بابُ نقضٍ بحركةٍ مرتبطة</h5>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>رقم البلاغ</th><th>الموضوع</th><th>نقضُ الإغلاق</th></tr></thead>
     <tbody>

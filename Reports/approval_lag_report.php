@@ -111,6 +111,16 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+<style>
+/* UXW-01 ①②: أنماطُ شاشةِ الاعتماداتِ المتأخرة — بادئةُ الشاشةِ rpt-lag */
+.rpt-lag-row{display:flex;gap:14px;flex-wrap:wrap}
+.rpt-lag-card{flex:1;min-width:220px}
+.rpt-lag-body{text-align:center}
+.rpt-lag-num{font-size:34px;font-weight:bold}
+.rpt-lag-bad{color:var(--c-c0392b, #c0392b)}
+.rpt-lag-ok{color:var(--c-27ae60, #27ae60)}
+.rpt-lag-table{width:100%}
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'الاعتمادات المتأخرة والوثائق المنتهية (DEC-01)'; $header_icon = 'fa fa-hourglass-half';
@@ -120,35 +130,38 @@ include '../insidebar.php';
         . 'تصعيد فوق 7 أيام · مستهدف الاعتماد 95٪) — وعدد الوثائق المنتهية (ينخفض لا يثبت · '
         . 'وصفر منتهية بلا استثناء نافذ). المحرك الصحيح ببيانات غير معتمدة يُخرج أصفارًا.',
         array('راجع الأقدم أولًا', 'كل رقم ينقر لمصدره'));
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا وحداتٍ معلَّقةً ولا وثائقَ منتهيةً في هذه الفترة',
+        'وسّع الفترةَ أو تحقق من ترحيلِ سجلاتِ الورديات وتواريخِ انتهاءِ الوثائق');
     ?>
-    <div class="row" style="display:flex;gap:14px;flex-wrap:wrap">
-        <div class="card" style="flex:1;min-width:220px"><div class="card-body" style="text-align:center">
-            <div style="font-size:34px;font-weight:bold"><?php echo $pending; ?></div>
+    <div class="row rpt-lag-row">
+        <div class="card rpt-lag-card"><div class="card-body rpt-lag-body">
+            <div class="rpt-lag-num"><?php echo $pending; ?></div>
             <div>وحدة غير معتمدة</div>
         </div></div>
-        <div class="card" style="flex:1;min-width:220px"><div class="card-body" style="text-align:center">
-            <div style="font-size:34px;font-weight:bold;color:<?php echo $oldest > 7 ? '#c0392b' : '#27ae60'; ?>"><?php echo $oldest; ?></div>
+        <div class="card rpt-lag-card"><div class="card-body rpt-lag-body">
+            <div class="rpt-lag-num <?php echo $oldest > 7 ? 'rpt-lag-bad' : 'rpt-lag-ok'; ?>"><?php echo $oldest; ?></div>
             <div>أقدمها بالأيام — <?php echo $oldest > 7 ? 'تجاوز 7: صُعّد للإدارة العامة' : 'ضمن المستهدف (≤7)'; ?></div>
         </div></div>
-        <div class="card" style="flex:1;min-width:220px"><div class="card-body" style="text-align:center">
-            <div style="font-size:34px;font-weight:bold;color:<?php echo $weekRate < 95 ? '#c0392b' : '#27ae60'; ?>"><?php echo $weekRate; ?>٪</div>
+        <div class="card rpt-lag-card"><div class="card-body rpt-lag-body">
+            <div class="rpt-lag-num <?php echo $weekRate < 95 ? 'rpt-lag-bad' : 'rpt-lag-ok'; ?>"><?php echo $weekRate; ?>٪</div>
             <div>نسبة اعتماد الأسبوع (مستهدف ≥95٪ · <?php echo $weekApproved; ?>/<?php echo $weekTotal; ?>)</div>
         </div></div>
-        <div class="card" style="flex:1;min-width:220px"><div class="card-body" style="text-align:center">
-            <div style="font-size:34px;font-weight:bold;color:<?php echo $uncovered > 0 ? '#c0392b' : '#27ae60'; ?>"><?php echo $expired; ?></div>
+        <div class="card rpt-lag-card"><div class="card-body rpt-lag-body">
+            <div class="rpt-lag-num <?php echo $uncovered > 0 ? 'rpt-lag-bad' : 'rpt-lag-ok'; ?>"><?php echo $expired; ?></div>
             <div>وثيقة منتهية — منها <strong><?php echo $uncovered; ?></strong> بلا استثناء نافذ (المستهدف: صفر)</div>
         </div></div>
     </div>
 
     <div class="card"><div class="card-body">
         <h4>أقدم الوحدات المعلَّقة (⑦ — يبدأ التأخير عند مدير الحركة غالبًا)</h4>
-        <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
+        <div class="table-container"><table class="alltables display rpt-lag-table" data-no-dt="1">
         <thead><tr><th>#</th><th>تاريخ العمل</th><th>العمر (يوم)</th><th>المعدة</th><th>وردية/فترة</th><th>مزامَن متأخر؟</th></tr></thead><tbody>
         <?php foreach ($oldestRows as $r): ?>
         <tr>
             <td><a href="../Reports/units_daily_report.php?log_id=<?php echo intval($r['log_id']); ?>"><?php echo intval($r['log_id']); ?></a></td>
             <td><?php echo htmlspecialchars($r['work_date']); ?></td>
-            <td style="color:<?php echo intval($r['age_days']) > 7 ? '#c0392b' : 'inherit'; ?>"><?php echo intval($r['age_days']); ?></td>
+            <td class="<?php echo intval($r['age_days']) > 7 ? 'rpt-lag-bad' : ''; ?>"><?php echo intval($r['age_days']); ?></td>
             <td><?php echo intval($r['equipment_id']); ?></td>
             <td><?php echo intval($r['shift_no']) . '/' . intval($r['period_no']); ?></td>
             <td><?php echo intval($r['synced_late']) === 1 ? 'نعم (DEC-01 ⑨)' : '—'; ?></td>

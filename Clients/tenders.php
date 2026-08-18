@@ -392,6 +392,8 @@ function tnd_result_tone($result)
     // ح-09 · نموذج + تصدير + استيراد (الإطار الموحّد)
     foreach (ems_excel_header_actions('tenders', 'المناقصات', $can_add) as $__xl) { $header_actions[] = $__xl; }
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مناقصاتِ مسجَّلةً بعدُ', 'أضف أولَ مناقصةٍ بزرِّ «إضافة» في رأسِ الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -534,7 +536,7 @@ function tnd_result_tone($result)
     <div class="card">
         <div class="card-body">
             <div class="table-container">
-                <table id="tndTable" class="display tnd-table-nowrap no-datatable">
+                <table id="tndTable" class="display tnd-table-nowrap no-datatable" data-state-save="false">
                     <thead>
                         <tr>
                             <th>إجراءات</th>
@@ -618,19 +620,25 @@ function tnd_result_tone($result)
 
 <script>
     $(document).ready(function () {
-        const tndTable = $('#tndTable').DataTable({
-            autoWidth: false,
-            stateSave: false,
-            language: { url: '/ems/assets/i18n/datatables/ar.json' }
-        });
-
+        // UXW-01 ⑤: تهيئةُ الجدولِ للمكوّنِ المركزيِّ وحدَه (ui-unification.js) —
+        // وما كانت تضبطه التهيئةُ المحليةُ صار سماتٍ على وسمِ الجدول.
         function fillFilterOptions(columnIndex, selectId) {
             const select = $(selectId);
             const values = [];
-            tndTable.column(columnIndex).data().each(function (value) {
-                const text = $('<div>').html(value).text().trim();
+            const addValue = function (raw) {
+                const text = String(raw).trim();
                 if (text !== '' && values.indexOf(text) === -1) values.push(text);
-            });
+            };
+            if ($.fn.dataTable && $.fn.dataTable.isDataTable('#tndTable')) {
+                $('#tndTable').DataTable().column(columnIndex).data().each(function (value) {
+                    addValue($('<div>').html(value).text());
+                });
+            } else {
+                $('#tndTable tbody tr').each(function () {
+                    const cell = this.cells[columnIndex];
+                    if (cell) addValue($(cell).text());
+                });
+            }
             values.sort();
             values.forEach(function (val) {
                 select.append('<option value="' + val.replace(/"/g, '&quot;') + '">' + val + '</option>');
@@ -640,12 +648,14 @@ function tnd_result_tone($result)
         fillFilterOptions(6, '#filterResult');
 
         $('#filterParticipation').on('change', function () {
+            if (!$.fn.dataTable || !$.fn.dataTable.isDataTable('#tndTable')) { return; }
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
-            tndTable.column(5).search(value ? '^' + value + '$' : '', true, false).draw();
+            $('#tndTable').DataTable().column(5).search(value ? '^' + value + '$' : '', true, false).draw();
         });
         $('#filterResult').on('change', function () {
+            if (!$.fn.dataTable || !$.fn.dataTable.isDataTable('#tndTable')) { return; }
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
-            tndTable.column(6).search(value ? value : '', true, false).draw();
+            $('#tndTable').DataTable().column(6).search(value ? value : '', true, false).draw();
         });
     });
 
@@ -779,10 +789,10 @@ function tnd_result_tone($result)
         background: linear-gradient(180deg, rgba(255,255,255,.95) 0%, var(--s2) 100%);
         box-shadow: var(--sh); padding: 14px; margin-bottom: 14px;
     }
-    .tnd-main .stats-card { background: #eee; border: 1px solid #aaa; border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px rgba(26,18,8,.07); position: relative; overflow: hidden; }
-    .tnd-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid #999; background:#fff; color:#000; }
-    .tnd-main .stats-card .stats-title { color: #555; font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
-    .tnd-main .stats-card .stats-value { color: #222; line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
+    .tnd-main .stats-card { background: var(--c-s-eee); border: 1px solid var(--c-s-aaa); border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px var(--c-rgba26188007); position: relative; overflow: hidden; }
+    .tnd-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-s-fff); color:var(--c-s-000); }
+    .tnd-main .stats-card .stats-title { color: var(--c-s-555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
+    .tnd-main .stats-card .stats-value { color: var(--c-s-222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
     @media (max-width: 900px) { .tnd-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
     @media (max-width: 560px) { .tnd-main .stats-grid { grid-template-columns: 1fr; } }
 
@@ -792,12 +802,12 @@ function tnd_result_tone($result)
     #tndTable.tnd-table-nowrap, #tndTable.tnd-table-nowrap th, #tndTable.tnd-table-nowrap td { white-space: nowrap; }
     #tndTable .action-btns { flex-wrap: nowrap; white-space: nowrap; }
     .tnd-main .tnd-num { font-variant-numeric: tabular-nums; font-weight: 700; }
-    .tnd-main .tnd-muted { color: #999; }
+    .tnd-main .tnd-muted { color: var(--c-ink-400); }
     .tnd-main .tnd-badge { display:inline-block; padding:2px 10px; border-radius:999px; font-size:.75rem; font-weight:800; border:1px solid transparent; }
-    .tnd-main .tnd-badge-win { background:rgba(34,197,94,.14); color:#15803d; border-color:rgba(34,197,94,.3); }
-    .tnd-main .tnd-badge-lose { background:rgba(239,68,68,.14); color:#b91c1c; border-color:rgba(239,68,68,.3); }
-    .tnd-main .tnd-badge-cancel { background:rgba(107,114,128,.14); color:#4b5563; border-color:rgba(107,114,128,.3); }
-    .tnd-main .tnd-badge-eval { background:rgba(245,158,11,.14); color:#b45309; border-color:rgba(245,158,11,.3); }
+    .tnd-main .tnd-badge-win { background:var(--c-rgba3419794014, rgba(34,197,94,.14)); color:var(--c-state-ok-deep); border-color:var(--c-rgba341979403, rgba(34,197,94,.3)); }
+    .tnd-main .tnd-badge-lose { background:var(--c-rgba2396868014, rgba(239,68,68,.14)); color:var(--c-badge-danger-b); border-color:var(--c-rgba239686803); }
+    .tnd-main .tnd-badge-cancel { background:var(--c-rgba10711412814, rgba(107,114,128,.14)); color:var(--c-4b5563); border-color:var(--c-rgba1071141283, rgba(107,114,128,.3)); }
+    .tnd-main .tnd-badge-eval { background:var(--c-rgba2451581114, rgba(245,158,11,.14)); color:var(--c-badge-warning-b); border-color:var(--c-rgba245158113, rgba(245,158,11,.3)); }
 </style>
 
 </body>

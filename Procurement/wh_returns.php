@@ -94,6 +94,11 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ②: أنماطُ هذه الشاشةِ الثابتةُ أصنافًا ببادئةِ الشاشة */
+.proc-wr-form { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; margin-bottom: 16px; }
+.proc-wr-qty  { max-width: 110px; }
+</style>
 <div class="main" dir="rtl">
   <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
@@ -103,9 +108,12 @@ $header_title_html = htmlspecialchars('المرتجعات', ENT_QUOTES, 'UTF-8')
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا مرتجعَ مسجَّلًا بعدُ',
+                       'اختر سطرَ سندِ صرفٍ من القائمةِ أعلاه وسجّلْ كميةَ الإرجاعِ وسببَها');
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
-  <form method="post" class="ems-form" style="display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin-bottom:16px">
+  <form method="post" class="ems-form proc-wr-form">
         <?= csrf_field() ?>
     <div><label for="wr_issue_line">سطرُ سندِ الصرف الأصلي</label>
       <select id="wr_issue_line" name="issue_line" class="form-control" required><option value="">—</option>
@@ -116,7 +124,7 @@ include __DIR__ . '/../includes/page_header.php';
             . ' · أُرجع ' . (float) $i['returned']
             . ' · المتاح ' . (float) $i['available'], ENT_QUOTES, 'UTF-8') ?></option>
       <?php endforeach; ?></select></div>
-    <div><label for="wr_qty">الكميةُ المرتجعة</label><input id="wr_qty" type="number" step="0.01" min="0.01" name="qty" class="form-control" required style="max-width:110px"></div>
+    <div><label for="wr_qty">الكميةُ المرتجعة</label><input id="wr_qty" type="number" step="0.01" min="0.01" name="qty" class="form-control proc-wr-qty" required></div>
     <div><label for="wr_reason">السبب</label><input id="wr_reason" type="text" name="reason" class="form-control" required></div>
     <button class="btn btn-primary">أرجع</button>
   </form>

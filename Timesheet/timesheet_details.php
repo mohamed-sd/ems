@@ -17,30 +17,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <style>
         :root {
-            --primary: #161008;
-            --primary-light: #2a1b0c;
-            --accent: #f7931a;
-            --surface: #fffaf2;
-            --surface-2: #ffffff;
-            --text-primary: #1f1509;
-            --text-secondary: #7a4a12;
-            --text-muted: #c4a57b;
-            --border: #ede5d8;
-            --success: #059669;
-            --success-bg: #ecfdf5;
-            --success-border: #a7f3d0;
-            --warning: #d97706;
-            --warning-bg: #fffbeb;
-            --warning-border: #fde68a;
-            --danger: #dc2626;
-            --danger-bg: #fef2f2;
-            --danger-border: #fca5a5;
-            --info: #0369a1;
-            --info-bg: #eff6ff;
-            --info-border: #bae6fd;
-            --shadow-sm: 0 1px 3px rgba(22,16,8,0.07), 0 1px 2px rgba(22,16,8,0.04);
-            --shadow-md: 0 4px 16px rgba(22,16,8,0.09), 0 2px 6px rgba(22,16,8,0.05);
-            --shadow-lg: 0 10px 40px rgba(22,16,8,0.13), 0 4px 12px rgba(22,16,8,0.07);
+            --primary: var(--c-161008, #161008);
+            --primary-light: var(--c-2a1b0c, #2a1b0c);
+            --accent: var(--c-f7931a, #f7931a);
+            --surface: var(--c-fffaf2, #fffaf2);
+            --surface-2: var(--c-ffffff, #ffffff);
+            --text-primary: var(--c-1f1509, #1f1509);
+            --text-secondary: var(--c-7a4a12, #7a4a12);
+            --text-muted: var(--c-c4a57b, #c4a57b);
+            --border: var(--c-ede5d8, #ede5d8);
+            --success: var(--c-059669, #059669);
+            --success-bg: var(--c-ecfdf5, #ecfdf5);
+            --success-border: var(--c-a7f3d0, #a7f3d0);
+            --warning: var(--c-d97706, #d97706);
+            --warning-bg: var(--c-fffbeb, #fffbeb);
+            --warning-border: var(--c-fde68a, #fde68a);
+            --danger: var(--c-dc2626, #dc2626);
+            --danger-bg: var(--c-fef2f2, #fef2f2);
+            --danger-border: var(--c-fca5a5, #fca5a5);
+            --info: var(--c-0369a1, #0369a1);
+            --info-bg: var(--c-eff6ff, #eff6ff);
+            --info-border: var(--c-bae6fd, #bae6fd);
+            --shadow-sm: 0 1px 3px var(--c-rgba22168007, rgba(22,16,8,0.07)), 0 1px 2px var(--c-rgba22168004, rgba(22,16,8,0.04));
+            --shadow-md: 0 4px 16px var(--c-rgba22168009, rgba(22,16,8,0.09)), 0 2px 6px var(--c-rgba22168005, rgba(22,16,8,0.05));
+            --shadow-lg: 0 10px 40px var(--c-rgba22168013, rgba(22,16,8,0.13)), 0 4px 12px var(--c-rgba22168007, rgba(22,16,8,0.07));
             --radius-sm: 10px;
             --radius-md: 16px;
             --radius-lg: 24px;
@@ -67,7 +67,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
         /* ========== PAGE HERO ========== */
         .page-hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 60%, #3d2817 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 60%, var(--c-3d2817, #3d2817) 100%);
             border-radius: var(--radius-lg);
             padding: 32px 40px;
             margin-bottom: 28px;
@@ -81,7 +81,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             position: absolute;
             top: -60px; left: -60px;
             width: 220px; height: 220px;
-            background: rgba(232,184,75,0.10);
+            background: var(--c-rgba23218475010, rgba(232,184,75,0.10));
             border-radius: 50%;
             pointer-events: none;
         }
@@ -91,7 +91,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             position: absolute;
             bottom: -80px; left: 120px;
             width: 300px; height: 300px;
-            background: rgba(255,255,255,0.04);
+            background: var(--c-rgba255255255004, rgba(255,255,255,0.04));
             border-radius: 50%;
             pointer-events: none;
         }
@@ -109,9 +109,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            background: rgba(255,255,255,0.12);
-            color: #fff;
-            border: 1.5px solid rgba(255,255,255,0.28);
+            background: var(--c-rgba255255255012, rgba(255,255,255,0.12));
+            color: var(--c-fff, #fff);
+            border: 1.5px solid var(--c-rgba255255255028, rgba(255,255,255,0.28));
             border-radius: 12px;
             padding: 9px 20px;
             font-family: 'Tajawal', sans-serif;
@@ -125,15 +125,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         }
 
         .btn-secondary:hover {
-            background: rgba(232,184,75,0.22);
-            border-color: rgba(232,184,75,0.55);
-            color: #fff;
+            background: var(--c-rgba23218475022, rgba(232,184,75,0.22));
+            border-color: var(--c-rgba23218475055, rgba(232,184,75,0.55));
+            color: var(--c-fff, #fff);
         }
 
         .hero-icon {
             width: 64px; height: 64px;
-            background: rgba(232,184,75,0.18);
-            border: 2px solid rgba(232,184,75,0.38);
+            background: var(--c-rgba23218475018, rgba(232,184,75,0.18));
+            border: 2px solid var(--c-rgba23218475038, rgba(232,184,75,0.38));
             border-radius: var(--radius-md);
             display: flex; align-items: center; justify-content: center;
             font-size: 26px;
@@ -142,14 +142,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         }
 
         .hero-title {
-            color: #fff;
+            color: var(--c-fff, #fff);
             font-size: 26px;
             font-weight: 800;
             line-height: 1.2;
         }
 
         .hero-subtitle {
-            color: rgba(255,255,255,0.6);
+            color: var(--c-rgba25525525506, rgba(255,255,255,0.6));
             font-size: 14px;
             margin-top: 4px;
             font-weight: 400;
@@ -175,8 +175,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
         .section-header-icon {
             width: 38px; height: 38px;
-            background: rgba(232,184,75,0.18);
-            border: 1.5px solid rgba(232,184,75,0.38);
+            background: var(--c-rgba23218475018, rgba(232,184,75,0.18));
+            border: 1.5px solid var(--c-rgba23218475038, rgba(232,184,75,0.38));
             border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
             color: var(--accent);
@@ -185,7 +185,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         }
 
         .section-header h4 {
-            color: #fff;
+            color: var(--c-fff, #fff);
             font-size: 16px;
             font-weight: 800;
             margin: 0;
@@ -229,7 +229,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             flex-shrink: 0;
         }
 
-        .detail-card-icon.primary  { background: #eef2ff; color: var(--primary); }
+        .detail-card-icon.primary  { background: var(--c-eef2ff, #eef2ff); color: var(--primary); }
         .detail-card-icon.success  { background: var(--success-bg); color: var(--success); }
         .detail-card-icon.warning  { background: var(--warning-bg); color: var(--warning); }
         .detail-card-icon.danger   { background: var(--danger-bg); color: var(--danger); }
@@ -295,7 +295,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             align-items: center;
             gap: 6px;
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
-            color: #fff;
+            color: var(--c-fff, #fff);
             padding: 4px 14px;
             border-radius: 50px;
             font-size: 13px;
@@ -347,9 +347,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         }
 
         .chip-secondary {
-            background: #f3f4f6;
-            color: #6b7280;
-            border: 1.5px solid #d1d5db;
+            background: var(--c-f3f4f6, #f3f4f6);
+            color: var(--c-6b7280, #6b7280);
+            border: 1.5px solid var(--c-d1d5db, #d1d5db);
             padding: 4px 12px;
             border-radius: 50px;
             font-size: 13px;
@@ -369,15 +369,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         }
 
         .shift-badge.day {
-            background: #fef9c3;
-            color: #854d0e;
-            border: 1.5px solid #fde047;
+            background: var(--c-fef9c3, #fef9c3);
+            color: var(--c-854d0e, #854d0e);
+            border: 1.5px solid var(--c-fde047, #fde047);
         }
 
         .shift-badge.night {
-            background: #eef2ff;
+            background: var(--c-eef2ff, #eef2ff);
             color: var(--primary);
-            border: 1.5px solid #c7d2fe;
+            border: 1.5px solid var(--c-c7d2fe, #c7d2fe);
         }
 
         /* Counter display */
@@ -391,7 +391,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
         .counter-seg {
             background: var(--primary);
-            color: #fff;
+            color: var(--c-fff, #fff);
             padding: 6px 12px;
             border-radius: 8px;
             font-size: 18px;
@@ -445,8 +445,35 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         /* ========== SCROLLBAR ========== */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: var(--surface); }
-        ::-webkit-scrollbar-thumb { background: #c1cfe0; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        ::-webkit-scrollbar-thumb { background: var(--c-c1cfe0, #c1cfe0); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--c-94a3b8, #94a3b8); }
+
+        /* UXW-01 (2): أنماطُ الشاشةِ الثابتةُ منقولةٌ من الوسومِ إلى أصنافٍ ببادئةِ الشاشة */
+        .tsd-hero-left { display: flex; align-items: center; gap: 20px; }
+        .detail-row.tsd-row-center { padding-top: 10px; padding-bottom: 10px; justify-content: center; }
+        .chip-total.tsd-chip-lg { font-size: 18px; padding: 8px 28px; }
+        .tsd-section-pad { padding: 20px 24px; }
+        .tsd-scroll-x { overflow-x: auto; }
+        .timesheet-details-page table.tsd-table { font-size: 13.5px; }
+        .timesheet-details-page table.tsd-table-flush { margin-bottom: 0; }
+        .timesheet-details-page tr.tsd-thead-row { background: var(--primary); color: var(--c-fff, #fff); }
+        .timesheet-details-page .tsd-cell { padding: 8px 12px; }
+        .timesheet-details-page .tsd-cell-sm { padding: 7px 12px; }
+        .timesheet-details-page .tsd-center { text-align: center; }
+        .timesheet-details-page .tsd-lh { line-height: 1.6; }
+        .timesheet-details-page .tsd-nowrap-12 { white-space: nowrap; font-size: 12px; }
+        .timesheet-details-page .tsd-w15 { width: 15%; }
+        .timesheet-details-page .tsd-w20 { width: 20%; }
+        .timesheet-details-page .tsd-w35 { width: 35%; }
+        .tsd-code-pill { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+        .tsd-field-pill { background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border); padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 700; display: inline-block; }
+        .timesheet-details-page .cards-grid.tsd-pad0 { padding: 0; }
+        .tsd-legacy-note { margin-top: 12px; font-size: 12px; color: var(--text-muted); }
+        .tsd-empty-fault { text-align: center; padding: 32px; color: var(--text-muted); }
+        .tsd-empty-icon { font-size: 36px; color: var(--success); display: block; margin-bottom: 12px; }
+        .tsd-empty-text { font-size: 14px; font-weight: 600; }
+        .timesheet-details-page .cards-grid.tsd-grid-260 { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+        .timesheet-details-page .cards-grid.tsd-grid-240 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
     </style>
 
 <div class="main timesheet-main timesheet-details-page ems-unified-page-shell">
@@ -455,7 +482,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <!-- ===== PAGE HERO ===== -->
     <div class="page-hero">
         <div class="page-hero-inner">
-            <div style="display:flex; align-items:center; gap:20px;">
+            <div class="tsd-hero-left">
                 <div class="hero-icon">
                     <i class="fas fa-clock"></i>
                 </div>
@@ -467,6 +494,8 @@ $header_title_html = htmlspecialchars('تفاصيل الوحدة', ENT_QUOTES, '
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 (9): حالاتُ الشاشةِ الدنيا (تحميل / فراغ / خطأ) — مخفيةٌ افتراضيًّا
+echo ems_states_bundle('لا تفاصيلَ لهذه الوحدةِ اليومية', 'ارجعْ إلى سجلِّ الوحداتِ اليوميةِ واختر سطرًا بزرِّ «عرض التفاصيل»');
 ?>
                     <p class="hero-subtitle">عرض تقرير مفصّل لجميع ساعات التشغيل والأعطال والمشغل</p>
                 </div>
@@ -895,8 +924,8 @@ if ($result) foreach ($result as $row) {
                     <span class="detail-card-title">فرق العداد</span>
                 </div>
                 <div class="detail-card-body">
-                    <div class="detail-row" style="padding-top: 10px; padding-bottom: 10px; justify-content: center;">
-                        <span class="chip-total" style="font-size: 18px; padding: 8px 28px;">
+                    <div class="detail-row tsd-row-center">
+                        <span class="chip-total tsd-chip-lg">
                             <i class="fas fa-minus"></i>
                             <?php echo htmlspecialchars($row['counter_diff']); ?>
                         </span>
@@ -913,18 +942,18 @@ if ($result) foreach ($result as $row) {
             <div class="section-header-icon"><i class="fas fa-clipboard-list"></i></div>
             <h4>تفاصيل الأعطال المصنفة</h4>
         </div>
-        <div style="padding: 20px 24px;">
+        <div class="tsd-section-pad">
             <?php if (!empty($ts_fault_records)): ?>
-                <div style="overflow-x:auto;">
-                    <table class="table table-sm table-hover table-bordered" data-no-dt="1" style="font-size:13.5px;">
+                <div class="tsd-scroll-x">
+                    <table class="table table-sm table-hover table-bordered tsd-table" data-no-dt="1">
                         <thead>
-                            <tr style="background:var(--primary);color:#fff;">
-                                <th style="padding:8px 12px;">#</th>
-                                <th style="padding:8px 12px;">الكود الكامل</th>
-                                <th style="padding:8px 12px;">نوع الحدث</th>
-                                <th style="padding:8px 12px;">الفئة الرئيسية</th>
-                                <th style="padding:8px 12px;">الفئة الفرعية</th>
-                                <th style="padding:8px 12px;">تفصيل العطل</th>
+                            <tr class="tsd-thead-row">
+                                <th class="tsd-cell">#</th>
+                                <th class="tsd-cell">الكود الكامل</th>
+                                <th class="tsd-cell">نوع الحدث</th>
+                                <th class="tsd-cell">الفئة الرئيسية</th>
+                                <th class="tsd-cell">الفئة الفرعية</th>
+                                <th class="tsd-cell">تفصيل العطل</th>
                                                 <!-- U10-B12: النواة الحاكمة (الخلايا يحشوها ui-unification.js) -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                     <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ السجل وبأي صفة">المُنشئ — الاسم والصفة</th>
@@ -935,23 +964,23 @@ if ($result) foreach ($result as $row) {
                         <tbody>
                             <?php $fi = 1; foreach ($ts_fault_records as $_flt): ?>
                             <tr>
-                                <td style="padding:7px 12px;"><?= $fi++ ?></td>
-                                <td style="padding:7px 12px;">
-                                    <span style="background:var(--danger-bg);color:var(--danger);border:1px solid var(--danger-border);padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">
+                                <td class="tsd-cell-sm"><?= $fi++ ?></td>
+                                <td class="tsd-cell-sm">
+                                    <span class="tsd-code-pill">
                                         <?= htmlspecialchars($_flt['full_code'] ?? '—') ?>
                                     </span>
                                 </td>
-                                <td style="padding:7px 12px;"><?= htmlspecialchars($_flt['event_type_name'] ?? '—') ?></td>
-                                <td style="padding:7px 12px;"><?= htmlspecialchars($_flt['main_category_name'] ?? '—') ?></td>
-                                <td style="padding:7px 12px;"><?= htmlspecialchars($_flt['sub_category'] ?? '—') ?></td>
-                                <td style="padding:7px 12px;"><?= htmlspecialchars($_flt['failure_detail'] ?? '—') ?></td>
+                                <td class="tsd-cell-sm"><?= htmlspecialchars($_flt['event_type_name'] ?? '—') ?></td>
+                                <td class="tsd-cell-sm"><?= htmlspecialchars($_flt['main_category_name'] ?? '—') ?></td>
+                                <td class="tsd-cell-sm"><?= htmlspecialchars($_flt['sub_category'] ?? '—') ?></td>
+                                <td class="tsd-cell-sm"><?= htmlspecialchars($_flt['failure_detail'] ?? '—') ?></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
                 </div>
             <?php elseif (!empty($row['fault_type']) || !empty($row['fault_part']) || !empty($row['fault_details'])): ?>
-                <div class="cards-grid grid-3" style="padding:0;">
+                <div class="cards-grid grid-3 tsd-pad0">
                     <?php if (!empty($row['fault_type'])): ?>
                     <div class="detail-card">
                         <div class="detail-card-header">
@@ -992,13 +1021,13 @@ if ($result) foreach ($result as $row) {
                     </div>
                     <?php endif; ?>
                 </div>
-                <p style="margin-top:12px;font-size:12px;color:var(--text-muted);">
+                <p class="tsd-legacy-note">
                     <i class="fas fa-info-circle"></i> هذه بيانات من النظام القديم. الأعطال المصنفة من المنظومة الجديدة ستظهر هنا عند إدخالها.
                 </p>
             <?php else: ?>
-                <div style="text-align:center;padding:32px;color:var(--text-muted);">
-                    <i class="fas fa-check-circle" style="font-size:36px;color:var(--success);display:block;margin-bottom:12px;"></i>
-                    <p style="font-size:14px;font-weight:600;">لا توجد أعطال مصنفة لهذا السجل</p>
+                <div class="tsd-empty-fault">
+                    <i class="fas fa-check-circle tsd-empty-icon"></i>
+                    <p class="tsd-empty-text">لا توجد أعطال مصنفة لهذا السجل</p>
                 </div>
             <?php endif; ?>
         </div>
@@ -1010,7 +1039,7 @@ if ($result) foreach ($result as $row) {
             <div class="section-header-icon"><i class="fas fa-user-clock"></i></div>
             <h4>ساعات المشغل</h4>
         </div>
-        <div class="cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(260px,1fr));">
+        <div class="cards-grid tsd-grid-260">
 
             <!-- ساعات عمل المشغل -->
             <div class="detail-card">
@@ -1065,7 +1094,7 @@ if ($result) foreach ($result as $row) {
             <div class="section-header-icon"><i class="fas fa-sticky-note"></i></div>
             <h4>الملاحظات</h4>
         </div>
-        <div class="cards-grid grid-3" style="grid-template-columns: repeat(auto-fit, minmax(240px,1fr));">
+        <div class="cards-grid grid-3 tsd-grid-240">
 
             <div class="detail-card">
                 <div class="detail-card-header">
@@ -1137,32 +1166,32 @@ if ($result) foreach ($result as $row) {
             <div class="section-header-icon"><i class="fas fa-clipboard-check"></i></div>
             <h4>الملاحظات المسجلة أثناء الاعتماد</h4>
         </div>
-        <div style="padding: 20px 24px;">
-            <div style="overflow-x:auto;">
-                <table class="table table-sm table-hover table-bordered" data-no-dt="1" style="font-size:13.5px;margin-bottom:0;">
+        <div class="tsd-section-pad">
+            <div class="tsd-scroll-x">
+                <table class="table table-sm table-hover table-bordered tsd-table tsd-table-flush" data-no-dt="1">
                     <thead>
-                        <tr style="background:var(--primary);color:#fff;">
-                            <th style="padding:8px 12px;width:15%;">#</th>
-                            <th style="padding:8px 12px;width:20%;">الحقل المعدّل</th>
-                            <th style="padding:8px 12px;width:35%;">الملاحظة</th>
-                            <th style="padding:8px 12px;width:15%;">المعدِّل</th>
-                            <th style="padding:8px 12px;width:15%;">التاريخ والوقت</th>
+                        <tr class="tsd-thead-row">
+                            <th class="tsd-cell tsd-w15">#</th>
+                            <th class="tsd-cell tsd-w20">الحقل المعدّل</th>
+                            <th class="tsd-cell tsd-w35">الملاحظة</th>
+                            <th class="tsd-cell tsd-w15">المعدِّل</th>
+                            <th class="tsd-cell tsd-w15">التاريخ والوقت</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php $an_idx = 1; foreach ($ts_approval_notes as $_note): ?>
                         <tr>
-                            <td style="padding:8px 12px;text-align:center;"><?= $an_idx++ ?></td>
-                            <td style="padding:8px 12px;">
-                                <span style="background:var(--info-bg);color:var(--info);border:1px solid var(--info-border);padding:3px 10px;border-radius:6px;font-size:12px;font-weight:700;display:inline-block;">
+                            <td class="tsd-cell tsd-center"><?= $an_idx++ ?></td>
+                            <td class="tsd-cell">
+                                <span class="tsd-field-pill">
                                     <?= htmlspecialchars($_note['column_label'] ?? $_note['column_name'] ?? '—') ?>
                                 </span>
                             </td>
-                            <td style="padding:8px 12px;line-height:1.6;"><?= htmlspecialchars($_note['note_text'] ?? '—') ?></td>
-                            <td style="padding:8px 12px;">
+                            <td class="tsd-cell tsd-lh"><?= htmlspecialchars($_note['note_text'] ?? '—') ?></td>
+                            <td class="tsd-cell">
                                 <i class="fas fa-user"></i> <?= htmlspecialchars($_note['created_by_name'] ?? '—') ?>
                             </td>
-                            <td style="padding:8px 12px;white-space:nowrap;font-size:12px;">
+                            <td class="tsd-cell tsd-nowrap-12">
                                 <i class="fas fa-calendar-alt"></i> <?= htmlspecialchars(isset($_note['created_at']) ? date('Y-m-d H:i', strtotime($_note['created_at'])) : '—') ?>
                             </td>
                         </tr>

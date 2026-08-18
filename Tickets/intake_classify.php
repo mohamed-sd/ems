@@ -100,7 +100,15 @@ $header_title_html = htmlspecialchars('الاستقبالُ والتصنيف —
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا بلاغاتِ جديدةً تنتظر التصنيف', 'ستظهر البلاغاتُ هنا فورَ ورودِها — أو راجع قوائمَ البلاغاتِ للمصنَّفِ منها');
 ?>
+  <style>
+  /* UXW-01 ①②: أنماطُ شاشةِ الاستقبالِ والتصنيفِ الثابتة — بادئةُ الشاشة tkt-ic- */
+  .tkt-ic-clean       { color: var(--c-198754); }
+  .tkt-ic-row-form    { display: flex; gap: 6px; }
+  .tkt-ic-picker      { max-width: 130px; }
+  </style>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>البلاغ</th><th>الوصف</th><th>منذ</th><th>تصنيفُه الحالي</th><th>التصنيف</th>
@@ -115,7 +123,7 @@ include __DIR__ . '/../includes/page_header.php';
               <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
               </tr></thead>
     <tbody>
-    <?php if (empty($rows)): ?><tr><td colspan="5" class="text-center" style="color:#198754">✔ لا جديدَ بلا تصنيف</td></tr><?php endif; ?>
+    <?php if (empty($rows)): ?><tr><td colspan="5" class="text-center tkt-ic-clean">✔ لا جديدَ بلا تصنيف</td></tr><?php endif; ?>
     <?php foreach ($rows as $t): ?>
       <tr>
         <td><a href="tickets_list.php?open=<?= intval($t['id']) ?>"><?= htmlspecialchars($t['ticket_no'], ENT_QUOTES, 'UTF-8') ?></a></td>
@@ -123,14 +131,14 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars(substr($t['created_at'], 0, 16), ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars(($t['cat_name'] !== null ? $t['cat_name'] : '؟') . ' / ' . ($t['type_name'] !== null ? $t['type_name'] : '؟'), ENT_QUOTES, 'UTF-8') ?></td>
         <td>
-          <form method="post" style="display:flex;gap:6px">
+          <form method="post" class="tkt-ic-row-form">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="classify_tk" value="<?= intval($t['id']) ?>">
-            <select name="category_id" class="form-control form-control-sm" required style="max-width:130px">
+            <select name="category_id" aria-label="فئةُ البلاغ" class="form-control form-control-sm tkt-ic-picker" required>
               <option value="">— الفئة —</option>
               <?php foreach ($cats as $c2): ?><option value="<?= intval($c2['id']) ?>"><?= htmlspecialchars($c2['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
             </select>
-            <select name="type_id" class="form-control form-control-sm" required style="max-width:130px">
+            <select name="type_id" aria-label="نوعُ البلاغ — يحدّد الإدارةَ المالكة" class="form-control form-control-sm tkt-ic-picker" required>
               <option value="">— النوع —</option>
               <?php foreach ($types as $t2): ?><option value="<?= intval($t2['id']) ?>"><?= htmlspecialchars($t2['name'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
             </select>

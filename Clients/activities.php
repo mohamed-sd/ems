@@ -420,6 +420,8 @@ function act_entity_label($type, $map)
     // ح-09 · نموذج + تصدير + استيراد (الإطار الموحّد)
     foreach (ems_excel_header_actions('activities', 'الأنشطة التجارية', $can_add) as $__xl) { $header_actions[] = $__xl; }
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أنشطةَ تجاريةً مسجَّلةً بعدُ', 'سجّل أولَ نشاطٍ تجاريٍّ بزرِّ «إضافة» في رأسِ الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -566,7 +568,7 @@ function act_entity_label($type, $map)
     <div class="card">
         <div class="card-body">
             <div class="table-container">
-                <table id="actTable" class="display act-table-nowrap no-datatable">
+                <table id="actTable" class="display act-table-nowrap no-datatable" data-state-save="false">
                     <thead>
                         <tr>
                             <th>إجراءات</th>
@@ -676,19 +678,25 @@ function act_entity_label($type, $map)
     }
 
     $(document).ready(function () {
-        const actTable = $('#actTable').DataTable({
-            autoWidth: false,
-            stateSave: false,
-            language: { url: '/ems/assets/i18n/datatables/ar.json' }
-        });
-
+        // UXW-01 ⑤: تهيئةُ الجدولِ للمكوّنِ المركزيِّ وحدَه (ui-unification.js) —
+        // وما كانت تضبطه التهيئةُ المحليةُ صار سماتٍ على وسمِ الجدول.
         function fillFilterOptions(columnIndex, selectId) {
             const select = $(selectId);
             const values = [];
-            actTable.column(columnIndex).data().each(function (value) {
-                const text = $('<div>').html(value).text().trim();
+            const addValue = function (raw) {
+                const text = String(raw).trim();
                 if (text !== '' && values.indexOf(text) === -1) values.push(text);
-            });
+            };
+            if ($.fn.dataTable && $.fn.dataTable.isDataTable('#actTable')) {
+                $('#actTable').DataTable().column(columnIndex).data().each(function (value) {
+                    addValue($('<div>').html(value).text());
+                });
+            } else {
+                $('#actTable tbody tr').each(function () {
+                    const cell = this.cells[columnIndex];
+                    if (cell) addValue($(cell).text());
+                });
+            }
             values.sort();
             values.forEach(function (val) {
                 select.append('<option value="' + val.replace(/"/g, '&quot;') + '">' + val + '</option>');
@@ -698,12 +706,14 @@ function act_entity_label($type, $map)
         fillFilterOptions(4, '#filterEntity');
 
         $('#filterType').on('change', function () {
+            if (!$.fn.dataTable || !$.fn.dataTable.isDataTable('#actTable')) { return; }
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
-            actTable.column(2).search(value ? value : '', true, false).draw();
+            $('#actTable').DataTable().column(2).search(value ? value : '', true, false).draw();
         });
         $('#filterEntity').on('change', function () {
+            if (!$.fn.dataTable || !$.fn.dataTable.isDataTable('#actTable')) { return; }
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
-            actTable.column(4).search(value ? '^' + value + '$' : '', true, false).draw();
+            $('#actTable').DataTable().column(4).search(value ? '^' + value + '$' : '', true, false).draw();
         });
 
         $('#entity_type').on('change', function () { actFillEntityOptions($(this).val(), ''); });
@@ -837,10 +847,10 @@ function act_entity_label($type, $map)
         background: linear-gradient(180deg, rgba(255,255,255,.95) 0%, var(--s2) 100%);
         box-shadow: var(--sh); padding: 14px; margin-bottom: 14px;
     }
-    .act-main .stats-card { background: #eee; border: 1px solid #aaa; border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px rgba(26,18,8,.07); position: relative; overflow: hidden; }
-    .act-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid #999; background:#fff; color:#000; }
-    .act-main .stats-card .stats-title { color: #555; font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
-    .act-main .stats-card .stats-value { color: #222; line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
+    .act-main .stats-card { background: var(--c-s-eee); border: 1px solid var(--c-s-aaa); border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px var(--c-rgba26188007); position: relative; overflow: hidden; }
+    .act-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-s-fff); color:var(--c-s-000); }
+    .act-main .stats-card .stats-title { color: var(--c-s-555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
+    .act-main .stats-card .stats-value { color: var(--c-s-222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
     @media (max-width: 900px) { .act-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
     @media (max-width: 560px) { .act-main .stats-grid { grid-template-columns: 1fr; } }
 
@@ -850,8 +860,8 @@ function act_entity_label($type, $map)
     #actTable.act-table-nowrap, #actTable.act-table-nowrap th, #actTable.act-table-nowrap td { white-space: nowrap; }
     #actTable .action-btns { flex-wrap: nowrap; white-space: nowrap; }
     .act-main .act-num { font-variant-numeric: tabular-nums; font-weight: 700; }
-    .act-main .act-muted { color: #999; }
-    .act-main .act-nego-badge { display:inline-block; margin-inline-start:6px; padding:1px 8px; border-radius:999px; font-size:.72rem; font-weight:800; background:rgba(249,115,22,.14); color:#c2410c; border:1px solid rgba(249,115,22,.3); }
+    .act-main .act-muted { color: var(--c-ink-400); }
+    .act-main .act-nego-badge { display:inline-block; margin-inline-start:6px; padding:1px 8px; border-radius:999px; font-size:.72rem; font-weight:800; background:var(--c-rgba2491152214, rgba(249,115,22,.14)); color:var(--c-c2410c); border:1px solid var(--c-rgba249115223, rgba(249,115,22,.3)); }
 </style>
 
 </body>

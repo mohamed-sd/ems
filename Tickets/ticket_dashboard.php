@@ -161,10 +161,12 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 
+/* UXW-01 ①: نغمةُ المرحلةِ صنفٌ من طقمِ النظامِ لا لونٌ مثبَّتٌ في الكود —
+   والألوانُ نفسُها معرَّفةٌ رموزًا في كتلةِ أنماطِ الشاشةِ أدناه. */
 $stage_colors = array(
-    'new' => '#6c757d', 'classified' => '#6610f2', 'routed' => '#0d6efd',
-    'in_progress' => '#fd7e14', 'waiting' => '#b58900', 'follow_up' => '#0dcaf0',
-    'done' => '#198754', 'closed' => '#212529', 'cancelled' => '#dc3545',
+    'new' => 'tkt-dash-st-new', 'classified' => 'tkt-dash-st-classified', 'routed' => 'tkt-dash-st-routed',
+    'in_progress' => 'tkt-dash-st-progress', 'waiting' => 'tkt-dash-st-waiting', 'follow_up' => 'tkt-dash-st-followup',
+    'done' => 'tkt-dash-st-done', 'closed' => 'tkt-dash-st-closed', 'cancelled' => 'tkt-dash-st-cancelled',
 );
 ?>
 <div class="main tkt-dash-main ems-unified-page-shell">
@@ -182,16 +184,60 @@ $stage_colors = array(
         array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع'),
     );
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بلاغاتِ في المدى الزمنيِّ المحدَّد', 'وسّع المدى من حقلَي «من» و«إلى» أعلاه ثم اضغط «تطبيق»');
     ?>
     <?php tkt_msg_banner(); ?>
+    <style>
+    /* UXW-01 ①②: أنماطُ لوحةِ متابعةِ البلاغاتِ الثابتة — بادئةُ الشاشة tkt-dash- */
+    .tkt-dash-filter-form  { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; width: 100%; }
+    .tkt-dash-kpi-grid     { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .tkt-dash-kpi          { border-top: 3px solid var(--tkt-dash-tone); }
+    .tkt-dash-kpi-body     { padding: 14px; }
+    .tkt-dash-kpi-row      { display: flex; align-items: center; gap: 10px; }
+    .tkt-dash-kpi-icon     { font-size: 22px; color: var(--tkt-dash-tone); }
+    .tkt-dash-kpi-num      { font-size: 22px; font-weight: 800; line-height: 1; }
+    .tkt-dash-kpi-cap      { font-size: 12px; color: var(--c-6c757d); margin-top: 4px; }
+    .tkt-dash-two          { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+    .tkt-dash-sub-head     { border: none; padding: 0 0 10px; }
+    .tkt-dash-sub-head-lg  { border: none; padding: 0 0 12px; }
+    .tkt-dash-muted        { color: var(--c-6c757d); }
+    .tkt-dash-tbl          { width: 100%; }
+    .tkt-dash-late-pill    { color: var(--c-s-fff); background: var(--c-c0392b); border-radius: 12px; padding: 2px 10px; }
+    .tkt-dash-bar-row      { margin-bottom: 9px; }
+    .tkt-dash-bar-head     { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 3px; }
+    .tkt-dash-bar-track    { background: var(--c-eef1f4, #eef1f4); border-radius: 6px; height: 10px; overflow: hidden; }
+    .tkt-dash-bar-fill     { height: 100%; background: var(--tkt-dash-tone); }
+    .tkt-dash-bar-type     { --tkt-dash-tone: var(--c-0d6efd); }
+    .tkt-dash-rank-grid    { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+    .tkt-dash-rank-title   { font-weight: 700; margin-bottom: 6px; color: var(--tkt-dash-tone); }
+    /* النغماتُ: قيمةٌ واحدةٌ تخدم الحدَّ والأيقونةَ وشريطَ النسبةِ معًا */
+    .tkt-dash-tone-total   { --tkt-dash-tone: var(--c-0d6efd); }
+    .tkt-dash-tone-open    { --tkt-dash-tone: var(--c-fd7e14, #fd7e14); }
+    .tkt-dash-tone-late    { --tkt-dash-tone: var(--c-dc3545); }
+    .tkt-dash-tone-crit    { --tkt-dash-tone: var(--c-b58900, #b58900); }
+    .tkt-dash-tone-safety  { --tkt-dash-tone: var(--c-6f42c1); }
+    .tkt-dash-tone-resp    { --tkt-dash-tone: var(--c-20c997); }
+    .tkt-dash-tone-reso    { --tkt-dash-tone: var(--c-0dcaf0, #0dcaf0); }
+    .tkt-dash-tone-ontime  { --tkt-dash-tone: var(--c-198754); }
+    .tkt-dash-st-new       { --tkt-dash-tone: var(--c-6c757d); }
+    .tkt-dash-st-classified{ --tkt-dash-tone: var(--c-6610f2, #6610f2); }
+    .tkt-dash-st-routed    { --tkt-dash-tone: var(--c-0d6efd); }
+    .tkt-dash-st-progress  { --tkt-dash-tone: var(--c-fd7e14, #fd7e14); }
+    .tkt-dash-st-waiting   { --tkt-dash-tone: var(--c-b58900, #b58900); }
+    .tkt-dash-st-followup  { --tkt-dash-tone: var(--c-0dcaf0, #0dcaf0); }
+    .tkt-dash-st-done      { --tkt-dash-tone: var(--c-198754); }
+    .tkt-dash-st-closed    { --tkt-dash-tone: var(--c-212529, #212529); }
+    .tkt-dash-st-cancelled { --tkt-dash-tone: var(--c-dc3545); }
+    </style>
 
     <!-- ═══ الفلترة الزمنية ═══ -->
     <div class="filter">
         <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-calendar-days"></i></span> المدى الزمني (تاريخ البلاغ)</div>
         <div class="filter-body">
-            <form method="get" action="" style="display:flex;flex-wrap:wrap;gap:10px;align-items:end;width:100%">
-                <div class="filter-field"><label for="emsf_509_54a4d">من</label><input type="date" name="from" class="form-control" value="<?php echo htmlspecialchars($from); ?>" id="emsf_509_54a4d"></div>
-                <div class="filter-field"><label for="emsf_510_a5f1b">إلى</label><input type="date" name="to" class="form-control" value="<?php echo htmlspecialchars($to); ?>" id="emsf_510_a5f1b"></div>
+            <form method="get" action="" class="tkt-dash-filter-form">
+                <div class="filter-field"><label for="emsf_509_54a4d">من</label><input type="date" name="from" id="emsf_509_54a4d" class="form-control" value="<?php echo htmlspecialchars($from); ?>"></div>
+                <div class="filter-field"><label for="emsf_510_a5f1b">إلى</label><input type="date" name="to" id="emsf_510_a5f1b" class="form-control" value="<?php echo htmlspecialchars($to); ?>"></div>
                 <div class="filter-actions">
                     <button type="submit" class="btn-primary"><i class="fa fa-search"></i> تطبيق</button>
                     <a href="ticket_dashboard.php" class="btn-secondary" title="إعادة تعيين"><i class="fa fa-rotate-right"></i></a>
@@ -201,25 +247,25 @@ $stage_colors = array(
     </div>
 
     <!-- ═══ ① بطاقات المؤشرات ═══ -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px">
+    <div class="tkt-dash-kpi-grid">
         <?php
         $kpis = array(
-            array('إجمالي البلاغات', $total_tickets, 'fa-inbox', '#0d6efd'),
-            array('مفتوحة الآن', $open_tickets, 'fa-folder-open', '#fd7e14'),
-            array('متأخّرة عن الاستحقاق', $overdue_now, 'fa-triangle-exclamation', '#dc3545'),
-            array('حرِجة للإنتاج (مفتوحة)', $prod_critical, 'fa-bolt', '#b58900'),
-            array('بلاغات سلامة مفتوحة', $safety_open, 'fa-helmet-safety', '#6f42c1'),
-            array('متوسّط الاستجابة (ساعة)', ($avg_response === null ? '—' : $avg_response), 'fa-stopwatch', '#20c997'),
-            array('متوسّط الإنجاز (ساعة)', ($avg_resolution === null ? '—' : $avg_resolution), 'fa-hourglass-end', '#0dcaf0'),
-            array('الإغلاق في الموعد', ($ontime_pct === null ? '—' : $ontime_pct . '%'), 'fa-circle-check', '#198754'),
+            array('إجمالي البلاغات', $total_tickets, 'fa-inbox', 'tkt-dash-tone-total'),
+            array('مفتوحة الآن', $open_tickets, 'fa-folder-open', 'tkt-dash-tone-open'),
+            array('متأخّرة عن الاستحقاق', $overdue_now, 'fa-triangle-exclamation', 'tkt-dash-tone-late'),
+            array('حرِجة للإنتاج (مفتوحة)', $prod_critical, 'fa-bolt', 'tkt-dash-tone-crit'),
+            array('بلاغات سلامة مفتوحة', $safety_open, 'fa-helmet-safety', 'tkt-dash-tone-safety'),
+            array('متوسّط الاستجابة (ساعة)', ($avg_response === null ? '—' : $avg_response), 'fa-stopwatch', 'tkt-dash-tone-resp'),
+            array('متوسّط الإنجاز (ساعة)', ($avg_resolution === null ? '—' : $avg_resolution), 'fa-hourglass-end', 'tkt-dash-tone-reso'),
+            array('الإغلاق في الموعد', ($ontime_pct === null ? '—' : $ontime_pct . '%'), 'fa-circle-check', 'tkt-dash-tone-ontime'),
         );
         foreach ($kpis as $k): ?>
-        <div class="card" style="border-top:3px solid <?php echo $k[3]; ?>"><div class="card-body" style="padding:14px">
-            <div style="display:flex;align-items:center;gap:10px">
-                <i class="fa <?php echo $k[2]; ?>" style="font-size:22px;color:<?php echo $k[3]; ?>"></i>
+        <div class="card tkt-dash-kpi <?php echo $k[3]; ?>"><div class="card-body tkt-dash-kpi-body">
+            <div class="tkt-dash-kpi-row">
+                <i class="fa <?php echo $k[2]; ?> tkt-dash-kpi-icon"></i>
                 <div>
-                    <div style="font-size:22px;font-weight:800;line-height:1"><?php echo htmlspecialchars((string)$k[1]); ?></div>
-                    <div style="font-size:12px;color:#6c757d;margin-top:4px"><?php echo htmlspecialchars($k[0]); ?></div>
+                    <div class="tkt-dash-kpi-num"><?php echo htmlspecialchars((string)$k[1]); ?></div>
+                    <div class="tkt-dash-kpi-cap"><?php echo htmlspecialchars($k[0]); ?></div>
                 </div>
             </div>
         </div></div>
@@ -227,12 +273,12 @@ $stage_colors = array(
     </div>
 
     <!-- ═══ ② الاختناقات ═══ -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+    <div class="tkt-dash-two">
         <div class="card"><div class="card-body">
-            <div class="card-header" style="border:none;padding:0 0 10px"><h5><i class="fa fa-hourglass-half"></i> أين تقف البلاغات الآن؟ (اختناقٌ حيّ)</h5></div>
-            <?php if (empty($holding)): ?><div style="color:#6c757d">لا بلاغات مفتوحة في المدى المحدّد.</div>
+            <div class="card-header tkt-dash-sub-head"><h5><i class="fa fa-hourglass-half"></i> أين تقف البلاغات الآن؟ (اختناقٌ حيّ)</h5></div>
+            <?php if (empty($holding)): ?><div class="tkt-dash-muted">لا بلاغات مفتوحة في المدى المحدّد.</div>
             <?php else: ?>
-            <table class="alltables no-datatable" style="width:100%">
+            <table class="alltables tkt-dash-tbl" data-no-dt="hard">
                 <thead><tr><th>الإدارة المالكة</th><th>مفتوحة</th><th>متوسّط العمر (يوم)</th><th>متأخّرة</th></tr></thead>
                 <tbody>
                 <?php foreach ($holding as $h): ?>
@@ -241,7 +287,7 @@ $stage_colors = array(
                         <td><strong><?php echo (int)$h['open_cnt']; ?></strong></td>
                         <td><?php echo htmlspecialchars((string)$h['avg_age_days']); ?></td>
                         <td><?php echo ((int)$h['late_cnt'] > 0)
-                            ? "<span class='action-btn' style='color:#fff;background:#c0392b;border-radius:12px;padding:2px 10px'>" . (int)$h['late_cnt'] . "</span>"
+                            ? "<span class='action-btn tkt-dash-late-pill'>" . (int)$h['late_cnt'] . "</span>"
                             : '—'; ?></td>
                     </tr>
                 <?php endforeach; ?>
@@ -251,10 +297,10 @@ $stage_colors = array(
         </div></div>
 
         <div class="card"><div class="card-body">
-            <div class="card-header" style="border:none;padding:0 0 10px"><h5><i class="fa fa-right-left"></i> متوسّط زمن الاحتجاز قبل التحويل</h5></div>
-            <?php if (empty($bottlenecks)): ?><div style="color:#6c757d">لا تحويلات مُقيَّدةٌ بعد.</div>
+            <div class="card-header tkt-dash-sub-head"><h5><i class="fa fa-right-left"></i> متوسّط زمن الاحتجاز قبل التحويل</h5></div>
+            <?php if (empty($bottlenecks)): ?><div class="tkt-dash-muted">لا تحويلات مُقيَّدةٌ بعد.</div>
             <?php else: ?>
-            <table class="alltables no-datatable" style="width:100%">
+            <table class="alltables tkt-dash-tbl" data-no-dt="hard">
                 <thead><tr><th>الإدارة</th><th>عدد التحويلات</th><th>متوسّط الاحتجاز (يوم)</th></tr></thead>
                 <tbody>
                 <?php foreach ($bottlenecks as $b): ?>
@@ -271,32 +317,32 @@ $stage_colors = array(
     </div>
 
     <!-- ═══ ⑤ التوزيع ═══ -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+    <div class="tkt-dash-two">
         <div class="card"><div class="card-body">
-            <div class="card-header" style="border:none;padding:0 0 10px"><h5><i class="fa fa-flag"></i> التوزيع حسب المرحلة</h5></div>
+            <div class="card-header tkt-dash-sub-head"><h5><i class="fa fa-flag"></i> التوزيع حسب المرحلة</h5></div>
             <?php foreach ($by_stage as $st => $cnt): if ($cnt === 0) { continue; }
                 $pct = $total_tickets > 0 ? round($cnt * 100 / $total_tickets) : 0; ?>
-                <div style="margin-bottom:9px">
-                    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px">
+                <div class="tkt-dash-bar-row">
+                    <div class="tkt-dash-bar-head">
                         <span><?php echo htmlspecialchars($stages_map[$st]); ?></span><strong><?php echo $cnt; ?></strong>
                     </div>
-                    <div style="background:#eef1f4;border-radius:6px;height:10px;overflow:hidden">
-                        <div style="width:<?php echo $pct; ?>%;height:100%;background:<?php echo $stage_colors[$st]; ?>"></div>
+                    <div class="tkt-dash-bar-track">
+                        <div class="tkt-dash-bar-fill <?php echo $stage_colors[$st]; ?>" data-allow-style style="width:<?php echo $pct; ?>%"></div>
                     </div>
                 </div>
             <?php endforeach; ?>
         </div></div>
 
         <div class="card"><div class="card-body">
-            <div class="card-header" style="border:none;padding:0 0 10px"><h5><i class="fa fa-tags"></i> أكثر أنواع البلاغات تكرارًا</h5></div>
-            <?php if (empty($by_type)): ?><div style="color:#6c757d">لا بيانات.</div>
+            <div class="card-header tkt-dash-sub-head"><h5><i class="fa fa-tags"></i> أكثر أنواع البلاغات تكرارًا</h5></div>
+            <?php if (empty($by_type)): ?><div class="tkt-dash-muted">لا بيانات.</div>
             <?php else: foreach ($by_type as $ty): $w = $max_type > 0 ? round((int)$ty['c'] * 100 / $max_type) : 0; ?>
-                <div style="margin-bottom:9px">
-                    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px">
+                <div class="tkt-dash-bar-row">
+                    <div class="tkt-dash-bar-head">
                         <span><?php echo htmlspecialchars($ty['label']); ?></span><strong><?php echo (int)$ty['c']; ?></strong>
                     </div>
-                    <div style="background:#eef1f4;border-radius:6px;height:10px;overflow:hidden">
-                        <div style="width:<?php echo $w; ?>%;height:100%;background:#0d6efd"></div>
+                    <div class="tkt-dash-bar-track">
+                        <div class="tkt-dash-bar-fill tkt-dash-bar-type" data-allow-style style="width:<?php echo $w; ?>%"></div>
                     </div>
                 </div>
             <?php endforeach; endif; ?>
@@ -305,15 +351,15 @@ $stage_colors = array(
 
     <!-- ═══ ④ تقارير الترتيب ═══ -->
     <div class="card"><div class="card-body">
-        <div class="card-header" style="border:none;padding:0 0 12px"><h5><i class="fa fa-ranking-star"></i> تقارير الترتيب — «مَن الأسرع؟»</h5></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+        <div class="card-header tkt-dash-sub-head-lg"><h5><i class="fa fa-ranking-star"></i> تقارير الترتيب — «مَن الأسرع؟»</h5></div>
+        <div class="tkt-dash-rank-grid">
 
             <div>
-                <div style="font-weight:700;margin-bottom:6px;color:#20c997"><i class="fa fa-bolt"></i> أسرع إدارةٍ استجابةً</div>
-                <table class="alltables no-datatable" style="width:100%">
+                <div class="tkt-dash-rank-title tkt-dash-tone-resp"><i class="fa fa-bolt"></i> أسرع إدارةٍ استجابةً</div>
+                <table class="alltables tkt-dash-tbl" data-no-dt="hard">
                     <thead><tr><th>#</th><th>الإدارة</th><th>ساعة</th></tr></thead>
                     <tbody>
-                    <?php if (empty($fastest_dept)): ?><tr><td colspan="3" style="color:#6c757d">لا بيانات</td></tr><?php endif; ?>
+                    <?php if (empty($fastest_dept)): ?><tr><td colspan="3" class="tkt-dash-muted">لا بيانات</td></tr><?php endif; ?>
                     <?php foreach ($fastest_dept as $i => $f): ?>
                         <tr><td><?php echo $i + 1; ?></td>
                             <td><?php echo htmlspecialchars(tkt_label($roles_map, intval($f['role_id']))); ?></td>
@@ -324,8 +370,8 @@ $stage_colors = array(
             </div>
 
             <div>
-                <div style="font-weight:700;margin-bottom:6px;color:#198754"><i class="fa fa-circle-check"></i> أعلى التزامًا بالاستحقاق</div>
-                <table class="alltables no-datatable" style="width:100%">
+                <div class="tkt-dash-rank-title tkt-dash-tone-ontime"><i class="fa fa-circle-check"></i> أعلى التزامًا بالاستحقاق</div>
+                <table class="alltables tkt-dash-tbl" data-no-dt="hard">
                     <thead><tr><th>#</th><th>الإدارة</th><th>نسبة الالتزام</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">الفترة</th>
@@ -343,7 +389,7 @@ $stage_colors = array(
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               </tr></thead>
                     <tbody>
-                    <?php if (empty($best_compliance)): ?><tr><td colspan="3" style="color:#6c757d">لا بيانات</td></tr><?php endif; ?>
+                    <?php if (empty($best_compliance)): ?><tr><td colspan="3" class="tkt-dash-muted">لا بيانات</td></tr><?php endif; ?>
                     <?php foreach ($best_compliance as $i => $b):
                         $p = (int)$b['closed_n'] > 0 ? round((int)$b['ontime_n'] * 100 / (int)$b['closed_n']) : 0; ?>
                         <tr><td><?php echo $i + 1; ?></td>
@@ -355,11 +401,11 @@ $stage_colors = array(
             </div>
 
             <div>
-                <div style="font-weight:700;margin-bottom:6px;color:#dc3545"><i class="fa fa-truck-monster"></i> أكثر المعدّات بلاغًا</div>
-                <table class="alltables no-datatable" style="width:100%">
+                <div class="tkt-dash-rank-title tkt-dash-tone-late"><i class="fa fa-truck-monster"></i> أكثر المعدّات بلاغًا</div>
+                <table class="alltables tkt-dash-tbl" data-no-dt="hard">
                     <thead><tr><th>#</th><th>المعدة</th><th>البلاغات الواردة</th><th>مفتوح</th></tr></thead>
                     <tbody>
-                    <?php if (empty($top_equipment)): ?><tr><td colspan="4" style="color:#6c757d">لا بيانات</td></tr><?php endif; ?>
+                    <?php if (empty($top_equipment)): ?><tr><td colspan="4" class="tkt-dash-muted">لا بيانات</td></tr><?php endif; ?>
                     <?php foreach ($top_equipment as $i => $e): ?>
                         <tr><td><?php echo $i + 1; ?></td>
                             <td><?php echo htmlspecialchars($e['label']); ?></td>
@@ -371,11 +417,11 @@ $stage_colors = array(
             </div>
 
             <div>
-                <div style="font-weight:700;margin-bottom:6px;color:#6f42c1"><i class="fa fa-user-check"></i> أنشط المُبلِّغين</div>
-                <table class="alltables no-datatable" style="width:100%">
+                <div class="tkt-dash-rank-title tkt-dash-tone-safety"><i class="fa fa-user-check"></i> أنشط المُبلِّغين</div>
+                <table class="alltables tkt-dash-tbl" data-no-dt="hard">
                     <thead><tr><th>#</th><th>المُبلِّغ</th><th>البلاغات المتكررة</th></tr></thead>
                     <tbody>
-                    <?php if (empty($top_reporters)): ?><tr><td colspan="3" style="color:#6c757d">لا بيانات</td></tr><?php endif; ?>
+                    <?php if (empty($top_reporters)): ?><tr><td colspan="3" class="tkt-dash-muted">لا بيانات</td></tr><?php endif; ?>
                     <?php foreach ($top_reporters as $i => $r): ?>
                         <tr><td><?php echo $i + 1; ?></td>
                             <td><?php echo htmlspecialchars($r['label']); ?></td>
@@ -389,9 +435,9 @@ $stage_colors = array(
 
     <!-- ═══ التصدير: جدولٌ مسطّحٌ واحدٌ لكل مؤشرات اللوحة ═══ -->
     <div class="card"><div class="card-body">
-        <div class="card-header" style="border:none;padding:0 0 10px"><h5><i class="fa fa-file-excel"></i> تصدير مؤشرات اللوحة</h5></div>
+        <div class="card-header tkt-dash-sub-head"><h5><i class="fa fa-file-excel"></i> تصدير مؤشرات اللوحة</h5></div>
         <div class="table-container">
-            <table id="tktExportTable" class="display nowrap alltables no-datatable" style="width:100%">
+            <table id="tktExportTable" class="display nowrap alltables tkt-dash-tbl" data-no-dt="hard">
                 <thead><tr><th>المؤشّر</th><th>القيمة</th></tr></thead>
                 <tbody>
                 <?php
@@ -427,20 +473,12 @@ $stage_colors = array(
 <script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
 <script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
 <script>
-(function () {
-    $(document).ready(function () {
-        $('#tktExportTable').DataTable({
-            paging: false, searching: false, info: false, ordering: false,
-            stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'excel', text: '📊 تصدير Excel', title: 'لوحة متابعة البلاغات' },
-                { extend: 'print', text: '🖨️ طباعة', title: 'لوحة متابعة البلاغات' },
-                { extend: 'copy',  text: '📋 نسخ' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
-    });
-})();
+/* UXW-01 ⑤: التهيئةُ اليدويةُ حُذفت. وجدولُ التصديرِ كان مُهيَّأً بلا ترقيمٍ
+   ولا بحثٍ ولا معلوماتٍ ولا فرز — أي جدولٌ ساكنٌ بشريطِ أزرارٍ فوقَه. فحُفظت
+   هيئتُه بخروجٍ صريحٍ (data-no-dt="hard") على وسمِه، وسقطت أزرارُ نسخ/إكسل/
+   طباعةِ dom:'Bfrtip' — خسارةٌ معلومةٌ بقرارِ المالك (2026-08-09). وسائرُ
+   جداولِ اللوحةِ الستةُ كانت تخرج خروجًا ناعمًا مشروطًا بهذه التهيئةِ نفسِها،
+   فأُعلن خروجُها صراحةً كي لا ينقلب الملخَّصُ إلى جدولٍ مُرقَّمٍ بمجردِ حذفِها. */
 </script>
 </body>
 </html>

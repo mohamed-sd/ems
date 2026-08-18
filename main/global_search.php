@@ -178,6 +178,8 @@ ems_screen_about(
     . 'ويصل كلَّ نتيجةٍ بملفّها مباشرةً فلا يُسأل أحدٌ عن الشاشة.',
     array('اكتب حرفين فأكثر: اسمًا أو كودًا (معدة · موظف · عقد · بلاغ · وحدة …)',
           'انقر أيَّ نتيجةٍ تفتح ملفَّ الكيان نفسِه'));
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا كيانَ يطابق ما بحثتَ عنه', 'اكتب حرفين فأكثر — كودًا أو اسمًا — ثم اضغط «ابحث»');
 ?>
 <style>
 /* ═══ البحث الموحّد — أنماطٌ خاصةٌ بالشاشة (الهوية من design-tokens) ═══ */
@@ -391,6 +393,10 @@ body.ems-site .main.gs-page .gs-btn {
   font-size: 11px;
   background: var(--gray-50);
 }
+.gs-page .gs-card-foot.gs-card-foot-error {
+  color: var(--danger-deep);
+  background: var(--danger-100);
+}
 
 /* ─── الحالة الفارغة ─── */
 .gs-page .gs-empty {
@@ -479,7 +485,7 @@ body.ems-site .main.gs-page .gs-btn {
             <span class="gs-count"><?= $rows === false ? "!" : count($rows) ?></span>
           </div>
           <?php if ($rows === false): ?>
-            <div class="gs-card-foot" style="color:var(--danger-deep);background:var(--danger-100)">
+            <div class="gs-card-foot gs-card-foot-error">
               <i class="fas fa-triangle-exclamation"></i>
               تعذّر البحثُ في هذا الكيان (خطأُ استعلام) — لا تعتبره «بلا نتيجة».
             </div>

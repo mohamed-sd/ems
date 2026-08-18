@@ -62,6 +62,13 @@ ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : nu
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+<style>
+/* UXW-01 ①②: أنماطُ تقريرِ الهامش — rpt-mrg */
+.rpt-mrg-filter{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.rpt-mrg-table{width:100%}
+.rpt-mrg-neg-row{background:var(--c-fff3f0, #fff3f0)}
+.rpt-mrg-note{color:var(--c-666, #666);margin-top:8px}
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'هامش الواقعة والعقد'; $header_icon = 'fa fa-percent';
@@ -71,12 +78,15 @@ include '../insidebar.php';
         . 'حكمُ المشغّل) مجمَّعًا بالعقد والعملة — كلُّ رقمٍ من سجل الأحكام لا من تقدير. '
         . 'وعقدٌ بعملتين يظهر سطرين معلَنين لا رقمًا ملفَّقًا.',
         array('حدّد الفترة', 'اقرأ الهامشَ السالبَ أولًا — هو القرار'));
+    // UXW-01 ⑨: حالتا التحميلِ والخطأِ (حالةُ الفراغِ قائمةٌ أسفلُ) — مخفيتانِ افتراضًا
+    echo ems_state('loading', 'جارٍ حسابُ الهامشِ من أحكامِ الوقائع', '', '', true);
+    echo ems_state('error', 'تعذّر عرضُ تقريرِ الهامش', 'أعد المحاولةَ — وإن استمر الخللُ أبلغ عن مشكلةٍ من هذه الشاشة', '', true);
     ?>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-            <label for="emsf_463_167fb">من</label><input type="date" name="from" value="<?php echo htmlspecialchars($from); ?>" id="emsf_463_167fb">
-            <label for="emsf_464_398bb">إلى</label><input type="date" name="to" value="<?php echo htmlspecialchars($to); ?>" id="emsf_464_398bb">
+        <form method="get" class="rpt-mrg-filter">
+            <label for="emsf_463_167fb">من</label><input type="date" name="from" id="emsf_463_167fb" value="<?php echo htmlspecialchars($from); ?>">
+            <label for="emsf_464_398bb">إلى</label><input type="date" name="to" id="emsf_464_398bb" value="<?php echo htmlspecialchars($to); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اعرض</button>
         </form>
     </div></div>
@@ -84,7 +94,7 @@ include '../insidebar.php';
     <div class="card"><div class="card-body">
         <?php if (!$rows): ems_state_empty('لا اعترافاتٍ في الفترة — الأحكامُ تولَد مع اعتماد الوحدات',
             'وسّع المدة', '?from=' . date('Y-01-01', strtotime('-1 year')) . '&to=' . $to); else: ?>
-        <div class="table-container"><table class="alltables display nowrap" style="width:100%">
+        <div class="table-container"><table class="alltables display nowrap rpt-mrg-table">
             <thead><tr><th>العقد</th><th>العملة</th><th>الوقائع</th>
                 <th>إيراد العميل</th><th>تكلفة المورد</th><th>استحقاق المشغّل</th>
                 <th>الهامش</th><th>الهامش٪</th>
@@ -110,7 +120,7 @@ include '../insidebar.php';
                 </tr></thead>
             <tbody>
             <?php foreach ($rows as $x): $cid = (string)($x['contract_ref'] ?? '—'); ?>
-                <tr<?php echo $x['margin'] < 0 ? ' style="background:#fff3f0"' : ''; ?>>
+                <tr class="<?php echo $x['margin'] < 0 ? 'rpt-mrg-neg-row' : ''; ?>">
                     <td><a href="../Contracts/contract_card.php?id=<?php echo intval($cid); ?>">عقد #<?php
                         echo htmlspecialchars($cid); ?> ▸</a>
                         <?php if (isset($multiCurrency[$cid])): ?>
@@ -141,7 +151,7 @@ include '../insidebar.php';
                 </tr>
             <?php endforeach; ?>
             </tbody></table></div>
-        <p style="color:#666;margin-top:8px">استحقاقُ المشغّل هنا من أحكام الوقائع (M-24) —
+        <p class="rpt-mrg-note">استحقاقُ المشغّل هنا من أحكام الوقائع (M-24) —
             وعقودُ الاستعداد المقطوعة ليست فيه (لا سعرَ ساعةٍ لها) فهامشُها يقرؤه كشفُ الرواتب.</p>
         <?php endif; ?>
     </div></div>

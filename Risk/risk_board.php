@@ -40,6 +40,11 @@ include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* ══ UXW-01 ②: أنماطٌ ثابتةٌ نُقِلت من سماتِ style إلى أصنافٍ ببادئةِ الشاشة ══ */
+.rbd-mt-16 { margin-top: 16px; }
+.rbd-esc-item { padding: 8px 0; border-bottom: 1px dashed var(--c-eeeeee); font-size: .82rem; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'لوحة المخاطر العليا';
@@ -48,6 +53,8 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     $header_back = array();
     $header_context = array('المقام' => 'السجل المركزي (نطاقك)', 'الفترة' => 'لحظي ' . $today);
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مخاطرَ مفتوحةً ولا تصعيداتٍ في نطاقِك', 'افرزْ صندوقَ الإشاراتِ لتحويلِ ما يستحقُّ إلى خطرٍ مسجَّل');
     ems_screen_about('لوحة الرئيس ومدير المخاطر: المحفظة بمستوياتها والتصعيدات المفتوحة — الخطر الحرج لا يختفي (RK-08).',
         array('التصعيد آلي بالمصفوفة — ولا يملك أحد إخفاءه ولا مدير المخاطر نفسه'));
 
@@ -76,7 +83,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         } ?>
     </div>
 
-    <div class="ems-grid" style="margin-top:16px">
+    <div class="ems-grid rbd-mt-16">
         <div class="ems-card ems-col-8">
             <h6>أعلى المخاطر (بالمستوى ثم الحداثة)</h6>
             <div class="table-responsive"><table class="table table-sm table-striped">
@@ -101,7 +108,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         <div class="ems-card ems-col-4" id="escList">
             <h6>التصعيدات المفتوحة (RK-08)</h6>
             <?php foreach ($escRows as $e): ?>
-            <div style="padding:8px 0;border-bottom:1px dashed #eee;font-size:.82rem">
+            <div class="rbd-esc-item">
                 <b><?php echo htmlspecialchars($e['reason_ar']); ?></b>
                 <div class="text-muted"><?php echo ($e['risk_code'] ?: 'إشارة') . ' · إلى: ' . $e['to_authority'] . ' · ' . $e['created_at']; ?></div>
                 <?php if ($RISK_AUTHORITY === 'ceo' || $RISK_FULL): ?>

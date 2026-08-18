@@ -104,6 +104,12 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارتْ أصنافًا ببادئةِ الشاشة */
+.fin-fnd-h5 { margin: 0 0 10px; }
+.fin-fnd-h5-next { margin: 18px 0 10px; }
+.fin-fnd-tbl { width: 100%; }
+</style>
 <div class="main fin-funding-main ems-unified-page-shell">
     <?php
     $header_title = 'التمويل والالتزامات'; $header_icon = 'fa fa-landmark';
@@ -111,6 +117,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إضافة تمويل'); }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا تسهيلاتِ تمويلٍ مسجَّلةً بعدُ', 'أضفْ تمويلًا بزرِّ «إضافة تمويل» في رأسِ الشاشة فيُولَّد جدولُ سدادِه آليًّا');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -126,7 +134,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_233_21a6f">أصل التمويل <span class="required">*</span></label><input type="number" step="0.01" min="0" name="principal" required id="emsf_233_21a6f"></div>
             <div class="form-group"><label for="emsf_234_b703a">هامش الربح %</label><input type="number" step="0.01" name="profit_rate" placeholder="مثال 12" id="emsf_234_b703a"></div>
             <div class="form-group"><label for="emsf_235_3b31f">العملة</label><select name="currency" id="emsf_235_3b31f"><option value="SDG">SDG</option><option value="USD">USD</option></select></div>
-            <div class="form-group"><label for="emsf_236_4d9af">تاريخ البداية</label><input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>" id="emsf_236_4d9af"></div>
+            <div class="form-group"><label for="emsf_236_4d9af">تاريخ البداية</label><input type="date" name="start_date" aria-label="تاريخُ بدايةِ التمويل" id="emsf_236_4d9af" value="<?php echo date('Y-m-d'); ?>"></div>
             <div class="form-group"><label for="emsf_237_a0d82">عدد الأقساط <span class="required">*</span></label><input type="number" min="1" max="120" name="installments" value="12" required id="emsf_237_a0d82"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
@@ -135,9 +143,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-landmark"></i> التمويلات والالتزامات</h5>
+        <h5 class="fin-fnd-h5"><i class="fas fa-landmark"></i> التمويلات والالتزامات</h5>
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="finTable" class="display nowrap alltables fin-fnd-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>الرقم</th><th>النوع</th><th>الغرض</th><th>الممول</th><th>الأصل</th><th>الهامش %</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -175,9 +183,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
 
         <?php if ($sel_fid > 0): ?>
-        <h5 style="margin:18px 0 10px"><i class="fas fa-calendar-days"></i> جدول سداد التمويل #<?php echo $sel_fid; ?></h5>
+        <h5 class="fin-fnd-h5-next"><i class="fas fa-calendar-days"></i> جدول سداد التمويل #<?php echo $sel_fid; ?></h5>
         <div class="table-container">
-            <table class="alltables" style="width:100%;">
+            <table class="alltables fin-fnd-tbl">
                 <thead><tr><th>القسط</th><th>الاستحقاق</th><th>الأصل</th><th>الفائدة</th><th>الإجمالي</th><th>المسدَّد</th><th>الحالة</th><th>الإجراء</th></tr></thead>
                 <tbody>
                 <?php
@@ -221,9 +229,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 <script>
 $(document).ready(function () {
-    $('#finTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    // جداولُ العرضِ يهيّئُها المكوّنُ المركزيُّ (assets/js/ui-unification.js)
     $('#toggleForm').on('click', function () { $('#finForm').toggleClass('allforms-visible'); });
 });
 </script>

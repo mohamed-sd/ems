@@ -104,10 +104,10 @@ include '../insidebar.php';
 
 function ems_board_tile($title, $value, $action, $link)
 {
-    echo '<div style="border:1px solid #ddd;border-radius:8px;padding:12px 16px;min-width:200px;flex:1">'
-        . '<div style="color:#666;font-size:13px">' . htmlspecialchars($title) . '</div>'
-        . '<div style="font-size:26px;font-weight:bold">' . $value . '</div>'
-        . '<a class="btn-primary" style="font-size:12px" href="' . htmlspecialchars($link) . '">' . htmlspecialchars($action) . ' ▸</a>'
+    echo '<div class="ops-mb-tile">'
+        . '<div class="ops-mb-tile-t">' . htmlspecialchars($title) . '</div>'
+        . '<div class="ops-mb-tile-v">' . $value . '</div>'
+        . '<a class="btn-primary ops-mb-tile-a" href="' . htmlspecialchars($link) . '">' . htmlspecialchars($action) . ' ▸</a>'
         . '</div>';
 }
 ?>
@@ -122,7 +122,20 @@ function ems_board_tile($title, $value, $action, $link)
         . 'معروض بساعات الانتظار لا بالعدد فقط: البند الأقدم انتظارًا أولًا.',
         array('ابدأ من «ما ينتظر قراره» — الأقدم ساعاتٍ أولًا',
               'كل بطاقة بزر يقفز إلى موضع الفعل'));
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بندَ ينتظر قرارَك الآن',
+        'تظهر هنا خططُ المواقعِ المرفوعةُ وأذوناتُ العملِ والتكليفاتُ المنتهية حالَ رفعِها');
     ?>
+
+    <style>
+    .ops-mb-tile   { border:1px solid var(--c-s-ddd); border-radius:8px; padding:12px 16px; min-width:200px; flex:1; }
+    .ops-mb-tile-t { color:var(--c-s-666); font-size:13px; }
+    .ops-mb-tile-v { font-size:26px; font-weight:bold; }
+    .ops-mb-tile-a { font-size:12px; }
+    .ops-mb-table  { width:100%; }
+    .ops-mb-tiles  { display:flex; gap:14px; flex-wrap:wrap; }
+    .ops-mb-sub    { font-size:13px; }
+    </style>
 
     <div class="card"><div class="card-header"><h5>⑦ ما ينتظر قراره —
         <strong><?php echo count($pending); ?></strong> بندًا بمجموع انتظار
@@ -130,7 +143,7 @@ function ems_board_tile($title, $value, $action, $link)
     <div class="card-body">
         <?php if (!$pending) { ems_state_empty('لا شيء ينتظر قرارك — نظيف ✨'); } else { ?>
         <div class="table-container">
-        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <table class="alltables display nowrap ops-mb-table" data-no-dt="1">
             <thead><tr><th>البند</th><th>منتظرًا منذ (ساعة)</th><th></th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -156,15 +169,15 @@ function ems_board_tile($title, $value, $action, $link)
         <?php } ?>
     </div></div>
 
-    <div class="card"><div class="card-body" style="display:flex;gap:14px;flex-wrap:wrap">
+    <div class="card"><div class="card-body ops-mb-tiles">
         <?php
         ems_board_tile('① الأداء التشغيلي — تشغيلات نشطة',
-            intval($ops['c'] ?? 0) . ' <small style="font-size:13px">(تعمل ' . intval($ops['working'] ?? 0)
+            intval($ops['c'] ?? 0) . ' <small class="ops-mb-sub">(تعمل ' . intval($ops['working'] ?? 0)
             . ' · معطلة ' . intval($ops['broken'] ?? 0) . ' · هدف يومي ' . round(floatval($ops['target_h'] ?? 0)) . ' س)</small>',
             'توزيع الموارد', '../movement/movement_operations.php');
         ems_board_tile('② خطط المواقع المرفوعة', count($plans), 'اعتماد أو إعادة', '../Operations/daily_plans.php');
         ems_board_tile('③ الصيانة — أوامر مفتوحة',
-            intval($mnt['open_orders'] ?? 0) . ' <small style="font-size:13px">(توقف ' . round(floatval($mnt['downtime_h'] ?? 0)) . ' س)</small>',
+            intval($mnt['open_orders'] ?? 0) . ' <small class="ops-mb-sub">(توقف ' . round(floatval($mnt['downtime_h'] ?? 0)) . ' س)</small>',
             'رفع أولوية', '../Maintenance/orders.php');
         ems_board_tile('④ القوى — مشغّلون معيَّنون', intval($ops4['c'] ?? 0), 'طلب نقل أو بديل', '../Oprators/oprators.php');
         ems_board_tile('⑤ المشتريات — أوامر مفتوحة', intval($proc['c'] ?? 0), 'أولوية صرف', '../Procurement/orders_proc.php');

@@ -114,7 +114,16 @@ $header_title_html = htmlspecialchars('الانحرافاتُ الثلاث', ENT
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('صفرُ انحرافٍ مرصودٍ على عملياتِ التمويل', 'الرصدُ آليٌّ عند كلِّ فتحٍ — راجعْ لاحقًا أو افحصْ عملياتِ التمويلِ النافذة');
 ?>
+  <style>
+    .fin-dev-badge-open { background: var(--c-fd7e14, #fd7e14); }
+    .fin-dev-badge-closed { background: var(--c-198754); }
+    .fin-dev-close-form { display: flex; gap: 6px; }
+    .fin-dev-decision { max-width: 160px; }
+    .fin-dev-docref { max-width: 120px; }
+  </style>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>الصنف</th><th>الموضوع</th><th>الوصف</th><th>الأولوية</th><th>الحالة</th><th>الإغلاقُ بقرار</th>
@@ -183,15 +192,15 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars($d['subject_ref'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars(mb_substr($d['description'], 0, 60), ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($d['priority'], ENT_QUOTES, 'UTF-8') ?></td>
-        <td><?= $open ? '<span class="badge" style="background:#fd7e14">مفتوح</span>'
-                       : '<span class="badge" style="background:#198754">مغلقٌ بقرار</span>' ?></td>
+        <td><?= $open ? '<span class="badge fin-dev-badge-open">مفتوح</span>'
+                       : '<span class="badge fin-dev-badge-closed">مغلقٌ بقرار</span>' ?></td>
         <td>
           <?php if ($open): ?>
-          <form method="post" style="display:flex;gap:6px">
+          <form method="post" class="fin-dev-close-form">
         <?= csrf_field() ?>
             <input type="hidden" name="close_dev" value="<?= intval($d['dev_id']) ?>">
-            <input type="text" name="decision" class="form-control form-control-sm" placeholder="القرار" style="max-width:160px" required aria-label="القرار">
-            <input type="text" name="decision_doc" class="form-control form-control-sm" placeholder="مرجعُ المستند" style="max-width:120px" aria-label="مرجعُ المستند">
+            <input type="text" name="decision" class="form-control form-control-sm fin-dev-decision" placeholder="القرار" required aria-label="القرار">
+            <input type="text" name="decision_doc" class="form-control form-control-sm fin-dev-docref" placeholder="مرجعُ المستند" aria-label="مرجعُ المستند">
             <button class="action-btn" type="submit">أغلق</button>
           </form>
           <?php else: ?><?= htmlspecialchars($d['decision'], ENT_QUOTES, 'UTF-8') ?><?php endif; ?>

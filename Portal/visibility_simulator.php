@@ -80,12 +80,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_title = 'من يرى ماذا (المحاكاة)'; $header_icon = 'fa fa-user-secret';
     $header_actions = array();
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لم تُطلَب محاكاةٌ بعدُ', 'اختر حسابًا لتعرفَ ما يراه، أو عنصرًا لتعرفَ من يراه، ثم اضغط «أجب»');
     ?>
 
+    <style>
+    .vsim-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .vsim-ctx    { color: var(--c-s-888); }
+    .vsim-table  { width: 100%; }
+    </style>
+
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="vsim-filter">
             <strong>ماذا يرى الحساب؟</strong>
-            <select name="account_id">
+            <select name="account_id" aria-label="الحسابُ المرادُ معرفةُ ما يراه">
                 <option value="0">— اختر حسابًا —</option>
                 <?php foreach ($accounts as $a): ?>
                     <option value="<?php echo intval($a['id']); ?>" <?php echo $askAccount === intval($a['id']) ? 'selected' : ''; ?>>
@@ -93,7 +101,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php endforeach; ?>
             </select>
             <strong>· من يرى العنصر؟</strong>
-            <select name="element_code">
+            <select name="element_code" aria-label="العنصرُ المرادُ معرفةُ من يراه">
                 <option value="">— اختر عنصرًا —</option>
                 <?php foreach ($elements as $e): ?>
                     <option value="<?php echo htmlspecialchars((string)$e['element_code']); ?>"
@@ -108,9 +116,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if ($simulation !== null): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-eye"></i>
         ماذا يرى الحساب #<?php echo $askAccount; ?>؟
-        <small style="color:#888">(السياقُ من صفته النشطة: <?php echo htmlspecialchars(json_encode($ctxUsed, JSON_UNESCAPED_UNICODE)); ?>)</small></h5></div>
+        <small class="vsim-ctx">(السياقُ من صفته النشطة: <?php echo htmlspecialchars(json_encode($ctxUsed, JSON_UNESCAPED_UNICODE)); ?>)</small></h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <table class="alltables display nowrap vsim-table" data-no-dt="1">
             <thead><tr><th>العنصر</th><th>القرار</th><th>مصدرُ القرار</th><th>سببُه</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -142,7 +150,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-users-viewfinder"></i>
         من يرى «<?php echo htmlspecialchars($askElement); ?>»؟ — <?php echo count($watchers); ?> حسابًا</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <table class="alltables display nowrap vsim-table" data-no-dt="1">
             <thead><tr><th>الحساب</th><th>فئةُ صفته</th><th>مصدرُ القرار</th></tr></thead>
             <tbody>
             <?php foreach ($watchers as $w): ?>

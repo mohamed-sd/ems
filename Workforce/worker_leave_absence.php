@@ -80,19 +80,34 @@ ems_shell_axes(isset($pp) ? $pp : null);
 include '../inheader.php'; include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ①②: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة — واللونُ برمزٍ باحتياطٍ حرفيّ */
+.wf-la-grid        { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 14px; }
+.wf-la-full        { grid-column: 1 / -1; }
+.wf-la-actions     { padding: 0 14px 16px; }
+.wf-la-tablewrap   { margin-top: 14px; }
+.wf-la-table       { width: 100%; }
+.wf-la-actionbtns  { gap: 4px; align-items: center; }
+.wf-la-inline-form { display: inline; }
+.wf-la-state-sel   { padding: 2px; }
+.wf-la-empty       { text-align: center; color: var(--c-888, #888); padding: 18px; }
+</style>
 <div class="main">
     <?php $header_title='الإجازات والغياب'; $header_icon='fas fa-plane-departure'; $header_actions=array();
     if($can_add) $header_actions[]=array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'تسجيل إجازة/غياب');
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
-    include('../includes/page_header.php'); ?>
+    include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا إجازاتِ ولا حالاتِ غيابٍ مسجَّلةً بعدُ',
+                           'سجّلْ أولَ إجازةٍ أو غيابٍ بزرِّ «تسجيل إجازة/غياب» في رأسِ الشاشة'); ?>
     <?php if(!empty($_GET['msg'])): $ok=strpos($_GET['msg'],'✅')!==false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
-    <form id="lForm" action="" method="post" class="allforms" style="display:none;">
+    <form id="lForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="save">
         <div class="card-header"><h5><i class="fas fa-plus"></i> إجازة / غياب</h5></div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
+        <div class="wf-la-grid">
             <div class="field"><label for="emsf_1856_cdcec">الموظف</label><select name="worker_id" required id="emsf_1856_cdcec"><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select></div>
             <div class="field"><label for="emsf_1857_c08d3">التصنيف</label><select name="event_class" id="emsf_1857_c08d3"><option value="مخطّط">مخطّط (إجازة/تناوب)</option><option value="طارئ">طارئ (غياب)</option></select></div>
             <div class="field"><label for="emsf_1858_1c6c2">النوع</label><select name="event_type" required id="emsf_1858_1c6c2">
@@ -106,11 +121,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="field"><label for="emsf_1863_63f44">أثر التغطية</label><select name="coverage_impact" id="emsf_1863_63f44"><option value="">—</option><option>مغطًّى</option><option>فجوة جزئية</option><option>فجوة حرجة</option></select></div>
             <div class="field"><label for="emsf_1864_da617">الاستحقاق القادم</label><input type="date" name="next_due_date" id="emsf_1864_da617"></div>
             <div class="field"><label for="emsf_1865_33bec">النتيجة</label><select name="outcome" id="emsf_1865_33bec"><option value="">—</option><option>عودة للعمل</option><option>تحويل لإجازة</option><option>إنهاء وتسوية</option></select></div>
-            <div class="field" style="grid-column:1/-1;"><label for="emsf_1866_9bedf">السبب/ملاحظات</label><input type="text" name="reason" id="emsf_1866_9bedf"></div>
+            <div class="field wf-la-full"><label for="emsf_1866_9bedf">السبب/ملاحظات</label><input type="text" name="reason" id="emsf_1866_9bedf"></div>
         </div>
-        <div style="padding:0 14px 16px;"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button></div>
+        <div class="wf-la-actions"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button></div>
     </form>
-    <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
+    <div class="table-wrap wf-la-tablewrap"><table class="data-table wf-la-table">
         <thead><tr><th>إجراءات</th><th>#</th><th>كود الموظف</th><th>التصنيف</th><th>نوع الإجازة</th><th>من تاريخ</th><th>إلى تاريخ</th><th>البديل المخصَّص</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم الطلب</th>
@@ -157,11 +172,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 ems_wf_field('الحالة', $r['state'], 'fas fa-flag', ['type' => 'status']),
                 ems_wf_field('السبب/ملاحظات', $r['reason'] ?: '-', 'fas fa-align-right', ['size' => 'full']),
             ]); ?>
-            <tr><td><div class="action-btns" style="gap:4px;align-items:center;">
+            <tr><td><div class="action-btns wf-la-actionbtns">
                 <?= ems_wf_view_button($r['id']) ?>
-                <form action="" method="post" style="display:inline;">
+                <form action="" method="post" class="wf-la-inline-form">
         <?= csrf_field() ?><input type="hidden" name="action" value="set_state"><input type="hidden" name="id" value="<?= intval($r['id']) ?>">
-                    <select name="new_state" onchange="this.form.submit()" <?= $can_edit?'':'disabled' ?> style="padding:2px;"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= ($r['state']===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select>
+                    <select name="new_state" aria-label="حالةُ الإجازةِ أو الغياب لهذا السجل" class="wf-la-state-sel" onchange="this.form.submit()" <?= $can_edit?'':'disabled' ?>><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= ($r['state']===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select>
                 </form>
                 <?php if($can_delete): ?><a href="worker_leave_absence.php?delete=<?= intval($r['id']) ?>" class="action-btn delete" onclick="return confirm('حذف؟')"><i class="fas fa-trash"></i></a><?php endif; ?>
             </div></td>
@@ -170,9 +185,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><?= htmlspecialchars($r['date_from'] ?: '-') ?></td><td><?= htmlspecialchars($r['date_to'] ?: '-') ?></td>
             <td><?= htmlspecialchars($r['sname'] ?: '-') ?></td>
             <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="9" style="text-align:center;color:#888;padding:18px;">لا توجد سجلاتٌ بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="9" class="wf-la-empty">لا توجد سجلاتٌ بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>
-<script>(function(){var b=document.getElementById('toggleForm'),f=document.getElementById('lForm');if(b&&f)b.addEventListener('click',function(){f.style.display=(f.style.display==='none'||!f.style.display)?'block':'none';});})();</script>
+<script>(function(){var b=document.getElementById('toggleForm'),f=document.getElementById('lForm');if(b&&f)b.addEventListener('click',function(){f.classList.toggle('allforms-visible');});})();</script>
 </body></html>

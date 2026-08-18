@@ -48,6 +48,16 @@ include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ①②: أنماطُ هذه الشاشةِ الثابتةُ أصنافًا ببادئةِ الشاشة — واللونُ برمزٍ باحتياطٍ حرفيّ */
+.tkt-my-alert   { margin: 10px 0; }
+.tkt-my-kpi     { padding: 10px 14px; margin: 10px 0; border-inline-start: 4px solid var(--c-0d6efd, #0d6efd); display: inline-block; }
+.tkt-my-kpi-lbl { font-size: .78rem; opacity: .75; }
+.tkt-my-kpi-val { font-size: 1.4rem; font-weight: 700; }
+.tkt-my-table   { width: 100%; }
+.tkt-my-empty   { text-align: center; opacity: .7; }
+.tkt-my-note    { font-size: .8rem; margin-top: 8px; }
+</style>
 <div class="main" dir="rtl">
 <?php
 $header_icon = 'fa fa-inbox';
@@ -55,19 +65,22 @@ $header_title_html = htmlspecialchars('بلاغاتي', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا بلاغَ رفعتَه أنت بعدُ',
+                       'ارفعْ بلاغًا بزرِّ «أبلغ عن مشكلة» في شريطِ الرأس — وبلاغاتُ إدارتِك في صندوقِ الإدارة');
 ?>
   <?php if ($failed): ?>
-  <div class="alert alert-danger" style="margin:10px 0">
+  <div class="alert alert-danger tkt-my-alert">
     <strong>تعذّرت قراءةُ البيانات.</strong>
     فرقٌ بين «لا صفَّ» و«تعذّر السؤال» — وهذه الثانية.
   </div>
   <?php else: ?>
-  <div class="ems-card" style="padding:10px 14px;margin:10px 0;border-inline-start:4px solid #0d6efd;display:inline-block">
-    <div style="font-size:.78rem;opacity:.75">صفوفٌ معروضة</div>
-    <div style="font-size:1.4rem;font-weight:700"><?php echo number_format(count($rows)); ?></div>
+  <div class="ems-card tkt-my-kpi">
+    <div class="tkt-my-kpi-lbl">صفوفٌ معروضة</div>
+    <div class="tkt-my-kpi-val"><?php echo number_format(count($rows)); ?></div>
   </div>
   <div class="card"><div class="card-body table-responsive">
-    <table class="table table-sm table-striped" style="width:100%">
+    <table class="table table-sm table-striped tkt-my-table">
       <thead><tr>
         <th>رقمُ البلاغ</th>
         <th>المرحلة</th>
@@ -77,7 +90,7 @@ include __DIR__ . '/../includes/page_header.php';
       </tr></thead>
       <tbody>
       <?php if (!$rows): ?>
-        <tr><td colspan="99" style="text-align:center;opacity:.7">لا صفَّ مسجَّلٌ بعد.</td></tr>
+        <tr><td colspan="99" class="tkt-my-empty">لا صفَّ مسجَّلٌ بعد.</td></tr>
       <?php else: foreach ($rows as $x): ?>
         <tr>
           <td><?php echo htmlspecialchars((string) $x['ticket_no'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -89,7 +102,7 @@ include __DIR__ . '/../includes/page_header.php';
       <?php endforeach; endif; ?>
       </tbody>
     </table>
-    <p class="text-muted" style="font-size:.8rem;margin-top:8px">
+    <p class="text-muted tkt-my-note">
       قراءةٌ محضة — ما رفعتَه أنت — والشرطُ على المُبلِّغِ لا على الإدارة؛ فبلاغاتُ إدارتِك في dept_inbox.php. وأحدثُ 500 صفٍّ.
     </p>
   </div></div>

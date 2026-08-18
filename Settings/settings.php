@@ -40,11 +40,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     /* ── بطاقة الترحيب العلوية ── */
     .settings-hero {
         position: relative;
-        background:  #ccc;
-        border: 1px solid rgba(244, 197, 66, 0.32);
+        background: var(--c-cccccc, #ccc);
+        border: 1px solid var(--c-rgba24419766032, rgba(244, 197, 66, 0.32));
         border-radius: var(--rl, 14px);
         padding: 26px;
-        color: #fff;
+        color: var(--c-surface, #fff);
         box-shadow: var(--sh2);
         overflow: hidden;
     }
@@ -53,7 +53,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         content: "";
         position: absolute;
         inset: 0;
-        background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        background-image: radial-gradient(var(--c-rgba255255255005, rgba(255, 255, 255, 0.05)) 1px, transparent 1px);
         background-size: 18px 18px;
         pointer-events: none;
     }
@@ -66,7 +66,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         width: 210px;
         height: 210px;
         border-radius: 50%;
-        background: radial-gradient(circle, rgba(244, 197, 66, 0.35) 0%, transparent 70%);
+        background: radial-gradient(circle, var(--c-rgba24419766035, rgba(244, 197, 66, 0.35)) 0%, transparent 70%);
         pointer-events: none;
     }
 
@@ -84,9 +84,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         width: fit-content;
         padding: 5px 13px;
         border-radius: 999px;
-        background: rgba(244, 197, 66, 0.18);
-        border: 1px solid rgba(244, 197, 66, 0.4);
-        color: #ffe7b5;
+        background: var(--c-rgba24419766018, rgba(244, 197, 66, 0.18));
+        border: 1px solid var(--c-rgba2441976604, rgba(244, 197, 66, 0.4));
+        color: var(--c-ffe7b5, #ffe7b5);
         font-size: 0.74rem;
         font-weight: 800;
     }
@@ -95,13 +95,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         margin: 0;
         font-size: 1.5rem;
         font-weight: 900;
-        color: #fff;
+        color: var(--c-surface, #fff);
     }
 
     .settings-hero p {
         margin: 0;
         font-size: 0.9rem;
-        color: rgba(255, 247, 230, 0.9);
+        color: var(--c-rgba2552472309, rgba(255, 247, 230, 0.9));
         max-width: 760px;
         line-height: 1.7;
     }
@@ -134,8 +134,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: rgba(244, 197, 66, 0.16);
-        color: #b8860b;
+        background: var(--c-rgba24419766016, rgba(244, 197, 66, 0.16));
+        color: var(--c-s-b8860b, #b8860b);
         font-size: .92rem;
     }
 
@@ -194,13 +194,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .settings-icon.account {
-        background: rgba(244, 197, 66, 0.18);
-        color: #b8860b;
+        background: var(--c-rgba24419766018, rgba(244, 197, 66, 0.18));
+        color: var(--c-s-b8860b, #b8860b);
     }
 
     .settings-icon.admin {
-        background: rgba(30, 58, 95, 0.1);
-        color: #1E3A5F;
+        background: var(--c-rgba30589501, rgba(30, 58, 95, 0.1));
+        color: var(--c-brand-navy, #1E3A5F);
     }
 
     .settings-meta h4 {
@@ -254,6 +254,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أقسامَ إعداداتٍ متاحةً لصلاحيتِك الحالية', 'راجع مديرَ الصلاحياتِ لمنحِ الأقسامِ التي يلزمها عملُك');
     ?>
 
     <div class="settings-shell">

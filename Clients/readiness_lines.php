@@ -396,6 +396,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'rdl-toggle-stats-text');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بنودَ جاهزيةٍ مسجَّلةً بعدُ', 'أضف أولَ بندِ جاهزيةٍ بزرِّ «إضافة» في رأسِ الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -529,7 +531,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card">
         <div class="card-body">
             <div class="table-container">
-                <table id="rdlTable" class="display rdl-table-nowrap no-datatable">
+                <table id="rdlTable" class="display rdl-table-nowrap no-datatable" data-state-save="false">
                     <thead>
                         <tr>
                             <th>إجراءات</th>
@@ -614,19 +616,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <script>
     $(document).ready(function () {
-        const rdlTable = $('#rdlTable').DataTable({
-            autoWidth: false,
-            stateSave: false,
-            language: { url: '/ems/assets/i18n/datatables/ar.json' }
-        });
-
+        // UXW-01 ⑤: تهيئةُ الجدولِ للمكوّنِ المركزيِّ وحدَه (ui-unification.js) —
+        // وما كانت تضبطه التهيئةُ المحليةُ صار سماتٍ على وسمِ الجدول.
         function fillFilterOptions(columnIndex, selectId) {
             const select = $(selectId);
             const values = [];
-            rdlTable.column(columnIndex).data().each(function (value) {
-                const text = $('<div>').html(value).text().trim();
+            const addValue = function (raw) {
+                const text = String(raw).trim();
                 if (text !== '' && text !== '—' && values.indexOf(text) === -1) values.push(text);
-            });
+            };
+            if ($.fn.dataTable && $.fn.dataTable.isDataTable('#rdlTable')) {
+                $('#rdlTable').DataTable().column(columnIndex).data().each(function (value) {
+                    addValue($('<div>').html(value).text());
+                });
+            } else {
+                $('#rdlTable tbody tr').each(function () {
+                    const cell = this.cells[columnIndex];
+                    if (cell) addValue($(cell).text());
+                });
+            }
             values.sort();
             values.forEach(function (val) {
                 select.append('<option value="' + val.replace(/"/g, '&quot;') + '">' + val + '</option>');
@@ -636,12 +644,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         fillFilterOptions(5, '#filterState');
 
         $('#filterName').on('change', function () {
+            if (!$.fn.dataTable || !$.fn.dataTable.isDataTable('#rdlTable')) { return; }
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
-            rdlTable.column(4).search(value ? '^' + value + '$' : '', true, false).draw();
+            $('#rdlTable').DataTable().column(4).search(value ? '^' + value + '$' : '', true, false).draw();
         });
         $('#filterState').on('change', function () {
+            if (!$.fn.dataTable || !$.fn.dataTable.isDataTable('#rdlTable')) { return; }
             const value = $.fn.dataTable.util.escapeRegex($(this).val());
-            rdlTable.column(5).search(value ? '^' + value + '$' : '', true, false).draw();
+            $('#rdlTable').DataTable().column(5).search(value ? '^' + value + '$' : '', true, false).draw();
         });
     });
 
@@ -774,10 +784,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         background: linear-gradient(180deg, rgba(255,255,255,.95) 0%, var(--s2) 100%);
         box-shadow: var(--sh); padding: 14px; margin-bottom: 14px;
     }
-    .rdl-main .stats-card { background: #eee; border: 1px solid #aaa; border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px rgba(26,18,8,.07); position: relative; overflow: hidden; }
-    .rdl-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid #999; background:#fff; color:#000; }
-    .rdl-main .stats-card .stats-title { color: #555; font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
-    .rdl-main .stats-card .stats-value { color: #222; line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
+    .rdl-main .stats-card { background: var(--c-s-eee); border: 1px solid var(--c-s-aaa); border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px var(--c-rgba26188007); position: relative; overflow: hidden; }
+    .rdl-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-s-fff); color:var(--c-s-000); }
+    .rdl-main .stats-card .stats-title { color: var(--c-s-555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
+    .rdl-main .stats-card .stats-value { color: var(--c-s-222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
     @media (max-width: 900px) { .rdl-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
     @media (max-width: 560px) { .rdl-main .stats-grid { grid-template-columns: 1fr; } }
 
@@ -786,12 +796,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     .rdl-main .table-container { overflow-x: auto; }
     #rdlTable.rdl-table-nowrap, #rdlTable.rdl-table-nowrap th, #rdlTable.rdl-table-nowrap td { white-space: nowrap; }
     #rdlTable .action-btns { flex-wrap: nowrap; white-space: nowrap; }
-    .rdl-main .rdl-muted { color: #999; }
+    .rdl-main .rdl-muted { color: var(--c-ink-400); }
     .rdl-main .rdl-badge { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: .82rem; font-weight: 700; border: 1px solid transparent; }
-    .rdl-main .rdl-badge-pass { background: #e6f5ea; color: #1a7a3a; border-color: #9ed6b0; }
-    .rdl-main .rdl-badge-gap { background: #fdeaea; color: #b02a2a; border-color: #f0b0b0; }
-    .rdl-main .rdl-badge-progress { background: #fff5e0; color: #9a6a00; border-color: #f0d79a; }
-    .rdl-main .rdl-badge-none { background: #eee; color: #777; border-color: #ccc; }
+    .rdl-main .rdl-badge-pass { background: var(--c-e6f5ea, #e6f5ea); color: var(--c-1a7a3a, #1a7a3a); border-color: var(--c-9ed6b0, #9ed6b0); }
+    .rdl-main .rdl-badge-gap { background: var(--c-fdeaea); color: var(--c-b02a2a, #b02a2a); border-color: var(--c-f0b0b0, #f0b0b0); }
+    .rdl-main .rdl-badge-progress { background: var(--c-fff5e0, #fff5e0); color: var(--c-9a6a00, #9a6a00); border-color: var(--c-f0d79a, #f0d79a); }
+    .rdl-main .rdl-badge-none { background: var(--c-s-eee); color: var(--c-s-777); border-color: var(--c-s-ccc); }
 </style>
 
 </body>

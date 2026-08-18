@@ -87,6 +87,12 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارتْ أصنافًا ببادئةِ الشاشة */
+.fin-mgmt-h5 { margin: 0 0 10px; }
+.fin-mgmt-h5-next { margin: 18px 0 10px; }
+.fin-mgmt-tbl { width: 100%; }
+</style>
 <div class="main fin-mgmt-main ems-unified-page-shell">
     <?php
     $header_title = 'المحاسبة الإدارية'; $header_icon = 'fa fa-diagram-project';
@@ -97,6 +103,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مراكزَ تكلفةٍ ولا تخصيصاتٍ بينيةً مسجَّلةً بعدُ', 'أنشئْ مركزًا بزرِّ «مركز تكلفة/ربح» ثمّ وزّعِ التكلفةَ بزرِّ «تخصيص/تسوية»');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -131,9 +139,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-sitemap"></i> مراكز التكلفة والربح</h5>
+        <h5 class="fin-mgmt-h5"><i class="fas fa-sitemap"></i> مراكز التكلفة والربح</h5>
         <div class="table-container">
-            <table id="ccTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="ccTable" class="display nowrap alltables fin-mgmt-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>الكود</th><th>اسم الحساب</th><th>نوع الحساب</th><th>الحساب الأب</th><th>الإدارة</th><th>المستوى</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم الحساب</th>
@@ -176,9 +184,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
 
-        <h5 style="margin:18px 0 10px"><i class="fas fa-arrows-turn-to-dots"></i> التخصيص الداخلي والتسويات البينية</h5>
+        <h5 class="fin-mgmt-h5-next"><i class="fas fa-arrows-turn-to-dots"></i> التخصيص الداخلي والتسويات البينية</h5>
         <div class="table-container">
-            <table id="iaTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="iaTable" class="display nowrap alltables fin-mgmt-tbl" data-scroll-x="1" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>النوع</th><th>مفتاح منع التكرار</th><th>إلى</th><th>الأساس</th><th>المبلغ</th><th>الحالة</th></tr></thead>
                 <tbody>
                 <?php
@@ -219,9 +227,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 <script>
 $(document).ready(function () {
-    $('#ccTable, #iaTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    // جداولُ العرضِ يهيّئُها المكوّنُ المركزيُّ (assets/js/ui-unification.js)
     $('#toggleCenter').on('click', function () { $('#centerForm').toggleClass('allforms-visible'); });
     $('#toggleAlloc').on('click', function () { $('#allocForm').toggleClass('allforms-visible'); });
 });

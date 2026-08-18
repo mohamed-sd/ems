@@ -97,14 +97,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array();
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مؤشراتِ يومٍ محسوبةً لدورِك الآن', 'افتحِ الصندوقَ أو المهامَّ من الشريطِ الجانبي — والمؤشراتُ تُحسب مع أولِ حركةٍ مسجَّلة');
     ?>
-    <p class="text-muted" style="margin:4px 2px 10px"><i class="fas fa-mug-hot"></i> أسئلةُ أول اليوم لدورك — اضغط أي رقمٍ لفتح مصدره. (<?php echo $today; ?>)</p>
+    <style>
+      .rbd-lead { margin: 4px 2px 10px; }
+      .rbd-kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 16px; }
+    </style>
+    <p class="text-muted rbd-lead"><i class="fas fa-mug-hot"></i> أسئلةُ أول اليوم لدورك — اضغط أي رقمٍ لفتح مصدره. (<?php echo $today; ?>)</p>
 
     <!-- ① مؤشرات اليوم — بطاقة KPI السباعية (UI-07: صفر رقم بلا عقده السبعة).
          الوحدة «سجل» حقيقية (الاستعلامات COUNT) والفترة «لحظي» حقيقية (تُقرأ الآن)،
          والمقارنة تُعلن غيابها صراحةً بدل ادعائها — أول تعميم للمكوّن (17 لوحة). -->
     <?php require_once __DIR__ . '/../includes/kpi_card.php'; ?>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:16px">
+    <div class="rbd-kpi-grid">
         <?php foreach ($rb_cards as $c): list($icon, $val, $lbl, $tone, $href) = $c;
             echo ems_kpi_card(array(
                 'title'  => $lbl,

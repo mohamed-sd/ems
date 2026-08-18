@@ -88,9 +88,15 @@ include '../insidebar.php';
         . 'وأعيانه ومدة علاقته واستحقاقه القائم بكل عملة. الشاشة خلف بوابة المجال المقيَّد: الرؤية '
         . 'بمنحة فردية، وكل فتح بسطر اطّلاع — فالتسرّب يقع بالاطّلاع لا بالتغيير.',
         array('الاستحقاق لمن يملك رؤية الشروط', 'الممول الجديد يُنشأ كيانًا في الحوكمة'));
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا كياناتٍ مسجَّلةً بصفةِ «مموِّل»', 'أنشئ الكيانَ في سجلِّ الكياناتِ ثم امنحه صفةَ «مموِّل» ليظهرَ هنا');
     ?>
+    <style>
+      .fin-fr-table { width: 100%; }
+      .fin-fr-cta { margin-top: 10px; }
+    </style>
     <div class="card"><div class="card-body">
-        <div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">
+        <div class="table-container"><table class="alltables display fin-fr-table" data-no-dt="1">
         <thead><tr><th>كود الممول</th><th>عدد العمليات</th><th>عدد الأعيان</th><th>مدة العلاقة</th><th>الاستحقاق القائم<?php echo $canTerms ? '' : ' (خلف صلاحية الشروط)'; ?></th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">الاسم القانوني</th>
@@ -139,7 +145,7 @@ include '../insidebar.php';
         <tr><td colspan="6">لا كيانات بصفة «ممول» — تُنشأ في <a href="../Governance/entities_registry.php">سجل الكيانات</a> بصفتها</td></tr>
         <?php endif; ?>
         </tbody></table></div>
-        <p style="margin-top:10px"><a href="financing_operation_new.php" class="btn-primary">+ إنشاء عملية تمويل (النموذج أولًا)</a></p>
+        <p class="fin-fr-cta"><a href="financing_operation_new.php" class="btn-primary">+ إنشاء عملية تمويل (النموذج أولًا)</a></p>
     </div></div>
 </div>
 <script src="../includes/js/jquery-3.7.1.main.js"></script>

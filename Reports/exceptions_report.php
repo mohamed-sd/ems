@@ -32,17 +32,24 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+<style>
+/* UXW-01 ②: أنماطٌ ثابتةٌ نُقِلت من سمةِ style إلى أصنافٍ ببادئةِ الشاشة */
+.exr-filter-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.exr-table { width: 100%; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'تقرير الاستثناءات'; $header_icon = 'fa fa-shield-halved';
     $header_actions = array();
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا استثناءاتِ حمايةٍ مسجَّلةً بالحالةِ المختارة', 'اختر حالةً أخرى من قائمةِ «الحالة» أو اعرضْ «الكل»');
     ems_screen_about('كل استثناءات الحمايات بحالتها ومدتها ودرجتها ونطاقها وعدد استعمالاتها — '
         . 'وارتفاع الاستعمال في حماية بعينها يعني مراجعة صنفها لا زيادة الاستثناءات.',
         array('رشّح بالحالة', 'راقب عدّاد الاستعمال'));
     ?>
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="exr-filter-form">
             <label for="emsf_1366_f63a6">الحالة</label>
             <select name="state" id="emsf_1366_f63a6">
                 <option value="">الكل</option>
@@ -54,7 +61,7 @@ include '../insidebar.php';
         </form>
     </div></div>
     <div class="card"><div class="card-body">
-        <div class="table-container"><table class="alltables display" style="width:100%">
+        <div class="table-container"><table class="alltables display exr-table">
         <thead><tr><th>#</th><th>الحماية</th><th>الحالة</th><th>الدرجة</th><th>النطاق</th>
                    <th>من</th><th>إلى</th><th>الاستعمالات</th><th>السبب</th></tr></thead><tbody>
         <?php foreach ($rows as $x): ?>

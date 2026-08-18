@@ -50,9 +50,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // TKT-15 · زر الإبلاغ السياقي — المخزون والاستلام (§2-③)
     require_once __DIR__ . '/../includes/report_button.php';
     ems_report_button(array('screen' => 'warehouse'));
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا حركاتِ مخزونٍ في الفترةِ والمخزنِ المختارين',
+        'وسّع الفترةَ أو اختر «كلَّ المخازن»، فالأرصدةُ هنا محسوبةٌ من الحركاتِ لا من رقمٍ مخزَّن');
     ?>
 
-    <div class="success-message is-success" style="background:#eef6ff;color:#245">
+    <div class="success-message is-success proc-stk-note">
         <i class="fas fa-circle-info"></i>
         القاعدة المحورية: <b>المتاح = الرصيد المادي − المحجوز</b>. الأرصدة هنا محسوبة من حركات المخزون الفعلية (الوارد + المرتجع − المصروف)، لا من رقمٍ مخزَّن.
     </div>
@@ -101,7 +104,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="procTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="procTable" class="display nowrap alltables proc-stk-table"
+                   data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>رقم الصنف</th><th>المخزن</th><th>الوارد</th><th>المرتجع</th><th>المصروف</th><th>المتاح</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -181,7 +185,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         $td(number_format($in, 2));
                         $td(number_format($ret, 2));
                         $td(number_format($out, 2));
-                        echo "<td><span class='action-btn' style='" . ($avail <= 0 ? 'color:#c0392b' : '') . "'>" . htmlspecialchars(number_format($avail, 2)) . "</span></td>";
+                        echo "<td><span class='action-btn" . ($avail <= 0 ? ' proc-stk-neg' : '') . "'>" . htmlspecialchars(number_format($avail, 2)) . "</span></td>";
                         $td($row['item_name']);                                       // اسم الصنف
                         $td($row['category']);                                        // الفئة
                         $td($row['uom']);                                             // الوحدة
@@ -205,26 +209,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div></div>
 </div>
 
+<style>
+    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — والألوانُ برموزِ اللوحةِ بقيمِها الاحتياطية */
+    .proc-stk-note { background: var(--c-eef6ff, #eef6ff); color: var(--c-245, #245); }
+    .proc-stk-table { width: 100%; }
+    .proc-stk-neg { color: var(--c-c0392b); }
+</style>
+
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/dataTables.buttons.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/buttons.html5.min.js"></script>
-<script src="/ems/assets/vendor/datatables/js/buttons.print.min.js"></script>
-<script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
-<script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
-<script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
-<script>
-$(document).ready(function () {
-    $('#procTable').DataTable({
-        scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-        buttons: [
-            { extend: 'copy', text: '📋 نسخ' },
-            { extend: 'excel', text: '📊 Excel' },
-            { extend: 'print', text: '🖨️ طباعة' }
-        ],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-    });
-});
-</script>
+<!-- UXW-01 ⑤: التهيئةُ المحليةُ حُذفت — المكوّنُ المركزيُّ (ui-unification.js) يلتقط
+     الجدولَ آليًّا، والسلوكُ محفوظٌ بسماتِ data-scroll-x و data-state-save على الوسم. -->
 </body>
 </html>

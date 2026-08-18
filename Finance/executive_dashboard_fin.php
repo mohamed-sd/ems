@@ -69,30 +69,43 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 $states = fin_event_states();
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارتْ أصنافًا ببادئةِ الشاشة */
+.fin-exec-note { margin: 4px 2px 0; }
+.fin-exec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; margin: 8px 0 16px; }
+.fin-exec-card { text-align: center; }
+.fin-exec-cardicon { font-size: 22px; opacity: .7; }
+.fin-exec-cardval { font-size: 24px; font-weight: 700; margin: 6px 0; }
+.fin-exec-h5 { margin: 0 0 10px; }
+.fin-exec-h5-next { margin: 18px 0 10px; }
+.fin-exec-tbl { width: 100%; }
+</style>
 <div class="main fin-exec-main ems-unified-page-shell">
     <?php
     $header_title = 'اللوحة التنفيذية المالية'; $header_icon = 'fa fa-chart-line';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أحداثَ ماليةً ولا ذممًا في نطاقِ الشركةِ لتُبنى منها اللوحة', 'سجّلِ الحدثَ الماليَّ الأولَ في «الأحداث المالية» فتظهرَ المؤشراتُ هنا');
     ?>
 
-    <p class="text-muted" style="margin:4px 2px 0"><i class="fas fa-circle-info"></i> كل المبالغ موحّدة إلى عملة الأساس <strong>الجنيه (SDG)</strong> — تُحوَّل مبالغ USD بسعر الصرف.</p>
+    <p class="text-muted fin-exec-note"><i class="fas fa-circle-info"></i> كل المبالغ موحّدة إلى عملة الأساس <strong>الجنيه (SDG)</strong> — تُحوَّل مبالغ USD بسعر الصرف.</p>
 
-    <div class="stats-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin:8px 0 16px">
+    <div class="stats-grid fin-exec-grid">
         <?php foreach ($cards as $cds): list($icon, $val, $lbl, $tone) = $cds; ?>
-        <div class="card"><div class="card-body" style="text-align:center">
-            <i class="fas <?php echo $icon; ?>" style="font-size:22px;opacity:.7"></i>
-            <div style="font-size:24px;font-weight:700;margin:6px 0"><?php echo htmlspecialchars($val); ?></div>
+        <div class="card"><div class="card-body fin-exec-card">
+            <i class="fas fin-exec-cardicon <?php echo $icon; ?>"></i>
+            <div class="fin-exec-cardval"><?php echo htmlspecialchars($val); ?></div>
             <div class="text-muted"><?php echo htmlspecialchars($lbl); ?></div>
         </div></div>
         <?php endforeach; ?>
     </div>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-diagram-next"></i> خط سير الاعتماد (الأحداث حسب الحالة)</h5>
+        <h5 class="fin-exec-h5"><i class="fas fa-diagram-next"></i> خط سير الاعتماد (الأحداث حسب الحالة)</h5>
         <div class="table-container">
-            <table class="alltables" style="width:100%">
+            <table class="alltables fin-exec-tbl">
                 <thead><tr><th>الحالة</th><th>العدد</th><th>الإجمالي</th></tr></thead>
                 <tbody>
                 <?php
@@ -110,9 +123,9 @@ $states = fin_event_states();
             </table>
         </div>
 
-        <h5 style="margin:18px 0 10px"><i class="fas fa-ranking-star"></i> ربحية المشاريع</h5>
+        <h5 class="fin-exec-h5-next"><i class="fas fa-ranking-star"></i> ربحية المشاريع</h5>
         <div class="table-container">
-            <table class="alltables" style="width:100%">
+            <table class="alltables fin-exec-tbl">
                 <thead><tr><th>المشروع</th><th>التكلفة</th><th>الإيراد</th><th>الربحية</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -143,9 +156,9 @@ $states = fin_event_states();
             </table>
         </div>
 
-        <h5 style="margin:18px 0 10px"><i class="fas fa-hourglass-end"></i> أعمار الذمم المدينة</h5>
+        <h5 class="fin-exec-h5-next"><i class="fas fa-hourglass-end"></i> أعمار الذمم المدينة</h5>
         <div class="table-container">
-            <table class="alltables" style="width:100%">
+            <table class="alltables fin-exec-tbl">
                 <thead><tr><th>الفئة العمرية</th><th>العدد</th><th>المتبقّي</th></tr></thead>
                 <tbody>
                 <?php

@@ -120,10 +120,15 @@ include '../insidebar.php';
     include '../includes/page_header.php';
     require_once __DIR__ . '/../includes/screen_contract.php';
     ems_screen_about('صندوقٌ واحدٌ لكل ما ينتظر قراري من كل المنابع — وكلُّ سطرٍ يقفز لموضع الفعل بحارسه.');
-
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('صندوقُ موافقاتِك فارغٌ — لا قرارَ معلَّقًا عليك', 'ستظهر هنا حلقاتُ سلسلةِ الوحدةِ والطلباتُ وخطواتُ الاعتمادِ فورَ إسنادِها إليك أو إلى دورِك');
     ?>
+    <style>
+    .apin-lead  { margin: 0 0 10px; }
+    .apin-title { white-space: normal; max-width: 340px; }
+    </style>
     <div class="card"><div class="card-body">
-        <p class="text-muted" style="margin:0 0 10px">
+        <p class="text-muted apin-lead">
             <i class="fas fa-inbox"></i> <strong>صندوقٌ واحدٌ لكل ما ينتظر قرارك</strong> —
             والقرارُ يقع في شاشة صاحبه بحارسه (WF-01): كلُّ سطرٍ يقفز لموضع الفعل، ولا سطرَ بلا إجراء (IAM-019).
             <?php /* ⑤ **لا يُكذَبُ بالسقف.** كان يُعرَض عددُ السطورِ المقصوصةِ على
@@ -164,7 +169,7 @@ include '../insidebar.php';
                 <tr>
                     <td><span class="badge bg-secondary"><?php echo htmlspecialchars($it['kind']); ?></span></td>
                     <td><code><?php echo htmlspecialchars((string) $it['ref']); ?></code></td>
-                    <td style="white-space:normal;max-width:340px"><?php echo htmlspecialchars((string) $it['title']); ?></td>
+                    <td class="apin-title"><?php echo htmlspecialchars((string) $it['title']); ?></td>
                     <td><?php echo htmlspecialchars((string) $it['age']); ?></td>
                     <td><?php echo $it['sla'] === 'متجاوز'
                         ? '<span class="badge bg-danger">متجاوز</span>'

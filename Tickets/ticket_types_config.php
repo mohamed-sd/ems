@@ -113,6 +113,10 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ②: عرضُ الجدولِ الثابتُ صنفًا ببادئةِ الشاشة */
+.tkt-typ-table { width: 100%; }
+</style>
 
 <div class="main tkt-types-main ems-unified-page-shell">
     <?php
@@ -124,6 +128,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا نوعَ بلاغٍ مسجَّلًا لهذه الشركة',
+                           'أضفْ نوعًا بزرِّ «إضافة نوع» — وأنواعُ النظامِ العامةُ تظهر للقراءةِ وحدَها');
     ?>
 
     <?php tkt_msg_banner(); ?>
@@ -166,7 +173,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </div>
                     <div class="form-group">
                         <label>مفعّل؟</label>
-                        <label class="switch-inline"><input type="checkbox" name="active" id="t_active" value="1" checked> نعم، مفعّل</label>
+                        <label class="switch-inline" for="t_active"><input type="checkbox" name="active" id="t_active" value="1" checked> نعم، مفعّل</label>
                     </div>
                 </div>
             </div>
@@ -179,7 +186,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="tktTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="tktTable" class="display nowrap alltables tkt-typ-table"
+                   data-scroll-x="1" data-state-save="false">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>المُنشئ — الاسم والصفة</th><th>الإدارة المالكة</th><th>نموذج التنفيذ</th><th>الطبيعة</th><th>النطاق</th><th>الحالة</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -256,15 +264,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function () {
     $(document).ready(function () {
-        $('#tktTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
+        // UXW-01 ⑤: لا تهيئةَ محليةً — المكوّنُ المركزيُّ في assets/js/ui-unification.js
+        // يلتقط الجدولَ ويقرأ سلوكَه من سماتِ data-* على وسمِ <table>.
 
         var toggleBtn = document.getElementById('toggleForm');
         if (toggleBtn) {

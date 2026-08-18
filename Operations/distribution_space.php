@@ -30,6 +30,14 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+<style>
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.dsp-filter { display: flex; gap: 8px; align-items: center; }
+.dsp-conflict-card { border-inline-start: 4px solid var(--c-state-danger-strong); }
+.dsp-conflict-icon { color: var(--c-state-danger-strong); }
+.dsp-conflict-item { margin: 6px 0; }
+.dsp-table-full { width: 100%; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'مساحة التوزيع البصرية'; $header_icon = 'fa fa-table-cells';
@@ -39,22 +47,24 @@ include '../insidebar.php';
         . 'التعارضُ يُفحص في الخادم بحالاته الثلاث: مشغّلٌ في معدتين · معدةٌ بلا مشغّل · '
         . 'رخصةٌ منتهية — ويظهر قبل أي اعتماد. لا أثرَ ماليًّا: تخطيطٌ يسبق التنفيذ.',
         array('اختر اليوم', 'اقرأ شاراتِ التعارض الحمراء', 'عالج التوزيعَ من شاشة الإدخال'));
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+    echo ems_states_bundle('لا توزيعَ معداتٍ على ورديّاتِ هذا اليوم', 'اختر يومًا آخرَ أو افتحْ إدخالَ الوحداتِ لتكليفِ المشغّلين');
     ?>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:8px;align-items:center">
-            <label for="emsf_351_e5768">اليوم</label><input type="date" name="date" value="<?php echo htmlspecialchars($date); ?>" id="emsf_351_e5768">
+        <form method="get" class="dsp-filter">
+            <label for="emsf_351_e5768">اليوم</label><input type="date" name="date" id="emsf_351_e5768" value="<?php echo htmlspecialchars($date); ?>">
             <button type="submit" class="btn-primary">اعرض الشبكة</button>
         </form>
     </div></div>
 
     <?php if ($conflicts): ?>
-    <div class="card" style="border-inline-start:4px solid #c00"><div class="card-header"><h5>
-        <i class="fa fa-triangle-exclamation" style="color:#c00"></i>
+    <div class="card dsp-conflict-card"><div class="card-header"><h5>
+        <i class="fa fa-triangle-exclamation dsp-conflict-icon"></i>
         تعارضاتُ اليوم (<?php echo count($conflicts); ?>) — **فحصٌ خادميٌّ شامل**</h5></div>
     <div class="card-body">
         <?php foreach ($conflicts as $c): ?>
-            <div class="alert alert-danger" style="margin:6px 0">
+            <div class="alert alert-danger dsp-conflict-item">
                 <span class="badge badge-danger"><?php echo htmlspecialchars($c['kind']); ?></span>
                 <?php echo htmlspecialchars($c['message']); ?></div>
         <?php endforeach; ?>
@@ -67,7 +77,7 @@ include '../insidebar.php';
         الشبكة — <?php echo count($grid); ?> معدةً عاملةً في <?php echo htmlspecialchars($date); ?></h5></div>
     <div class="card-body">
         <?php if (!$grid): ems_state_empty('لا توزيعَ لهذا اليوم', 'افتح إدخال الوحدات', 'units.php'); else: ?>
-        <div class="table-container"><table class="alltables display nowrap" style="width:100%" data-no-dt="1">
+        <div class="table-container"><table class="alltables display nowrap dsp-table-full" data-no-dt="1">
             <thead><tr><th>الوردية</th><th>☀ نهارية</th><th>🌙 ليلية</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم التكليف</th>

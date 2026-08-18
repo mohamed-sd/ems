@@ -19,6 +19,7 @@ include '../config.php';
 require_once __DIR__ . '/../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/screen_contract.php';
 require_once __DIR__ . '/../includes/dept_gov_registry.php';
+require_once __DIR__ . '/../includes/ux_components.php'; // مكوّنُ الحالات — inheader يُحمَّل لاحقًا داخلَ المكوّن
 
 $current_role   = strval($_SESSION['user']['role'] ?? '');
 $is_super_admin = ($current_role === '-1');
@@ -49,6 +50,10 @@ if ($deptCode === null || !isset($REG[$deptCode])) {
 }
 
 $GOV_DEPT = $REG[$deptCode];
+
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+// ويُخرجها includes/dept_gov_space.php بعدَ ترويسةِ الصفحةِ مباشرة
+$GOV_DEPT_STATES = ems_states_bundle('لا سجلاتِ حوكمةٍ في نطاقِ هذه الإدارة', 'راجِعْ حساباتِ الإدارةِ التابعةَ وصلاحياتِها — والنطاقُ من دورِ الجلسةِ لا من الرابط');
 
 /* فصلُ الواجباتِ يُقاس على المستنداتِ الحيةِ لا نصًّا — وكلُّ قياسٍ مقيَّدٌ
    بشركةِ الجلسة، فلا يتسرّب صفٌّ من شركةٍ أخرى فضلًا عن إدارةٍ أخرى. */

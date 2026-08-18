@@ -47,10 +47,10 @@ include __DIR__ . '/../inheader.php';
             min-width: 200px;
             padding: 20px;
             border-radius: 15px;
-            background: #000022;
-            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            background: var(--c-000022);
+            box-shadow: 0 3px 10px var(--c-shadow-soft, rgba(0, 0, 0, 0.1));
             text-align: center;
-            color : #fff;
+            color : var(--white);
         }
 
         .print-header {
@@ -116,6 +116,8 @@ $header_title_html = htmlspecialchars('Projects Reports', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا مشاريعَ مسجّلةً يشملها هذا التقرير', 'سجّلْ أولَ مشروعٍ من شاشةِ المشاريع، ثمّ أعدْ فتحَ التقرير');
 ?>
 
 
@@ -160,7 +162,7 @@ include __DIR__ . '/../includes/page_header.php';
             </div>
 
             <!-- الجدول -->
-            <table id="reportTable" class="table table-bordered table-striped" id="projectsTable">
+            <table id="reportTable" class="table table-bordered table-striped" data-page-length="10">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -196,17 +198,6 @@ include __DIR__ . '/../includes/page_header.php';
             <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
             <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
             <script src="/ems/assets/vendor/datatables/js/dataTables.bootstrap5.min.js"></script>
-            <script>
-                $(document).ready(function () {
-                    $('#reportTable').DataTable({
-                        pageLength: 10,
-                        lengthMenu: [10, 25, 50],
-                        language: {
-                            url: "/ems/assets/i18n/datatables/ar.json"
-                        }
-                    });
-                });
-            </script>
         </div>
     </div>
 </body>

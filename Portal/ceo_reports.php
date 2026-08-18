@@ -147,12 +147,27 @@ function cr_p($row, $key) {
     $header_back = false;
     include '../includes/page_header.php';
     ems_screen_about('ثمانيةُ تقارير M-00 مشتقةٌ حيًّا من مصادرها — العقودُ والمشاريعُ من جداولها، والوقائعُ من الجذر المحايد، والمعلَّقاتُ من مصادرها الثلاثة، والمتابعاتُ من المحرّك.');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بياناتٍ في التقاريرِ الثمانيةِ بعدُ', 'تمتلئ التقاريرُ آليًّا من العقودِ والمشاريعِ ووقائعِ الجذرِ المحايد — ولا تُدخَل يدويًّا');
     ?>
+
+    <style>
+    .cro-kpis      { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+    .cro-kpi       { border: 1px solid var(--ems-border, #e5e5e5); border-radius: 10px; padding: 12px; text-align: center; }
+    .cro-kpi-val   { font-size: 22px; font-weight: 700; }
+    .cro-sm        { font-size: 12px; }
+    .cro-note      { margin-top: 8px; font-size: 12px; }
+    .cro-note-full { font-size: 12px; grid-column: 1 / -1; }
+    .cro-table     { width: 100%; }
+    .cro-two       { display: grid; grid-template-columns: 1fr 1.4fr; gap: 14px; }
+    .cro-two-eq    { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .cro-ltr       { text-align: right; }
+    </style>
 
     <!-- ① اللوحة الجامعة -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-gauge-high"></i> ① اللوحة الجامعة</h5></div>
     <div class="card-body">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px">
+        <div class="cro-kpis">
             <?php
             $sumC = 0; foreach ($kContracts as $w) { $sumC += (int) $w['c']; }
             $sumP = 0; foreach ($kProjects as $w) { $sumP += (int) $w['c']; }
@@ -172,19 +187,19 @@ function cr_p($row, $key) {
                 array('متابعات منجزة', $doneF, 'fa-check-double'),
             );
             foreach ($cards as $c): ?>
-            <div style="border:1px solid var(--ems-border,#e5e5e5);border-radius:10px;padding:12px;text-align:center">
-                <div style="font-size:22px;font-weight:700"><?php echo (int) $c[1]; ?></div>
-                <div class="text-muted" style="font-size:12px"><i class="fa <?php echo $c[2]; ?>"></i> <?php echo htmlspecialchars($c[0], ENT_QUOTES, 'UTF-8'); ?></div>
+            <div class="cro-kpi">
+                <div class="cro-kpi-val"><?php echo (int) $c[1]; ?></div>
+                <div class="text-muted cro-sm"><i class="fa <?php echo $c[2]; ?>"></i> <?php echo htmlspecialchars($c[0], ENT_QUOTES, 'UTF-8'); ?></div>
             </div>
             <?php endforeach; ?>
         </div>
-        <div class="text-muted" style="margin-top:8px;font-size:12px">المصدر: contracts · project · الجذر المحايد ems_business_events · محرّك العمل (SRC-10)</div>
+        <div class="text-muted cro-note">المصدر: contracts · project · الجذر المحايد ems_business_events · محرّك العمل (SRC-10)</div>
     </div></div>
 
     <!-- ② معلَّقات الاعتماد الأعلى -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-hourglass-half"></i> ② معلَّقات الاعتماد الأعلى (المصادر الثلاثة)</h5></div>
     <div class="card-body">
-        <table class="alltables display no-datatable" style="width:100%"><thead>
+        <table class="alltables display no-datatable cro-table"><thead>
             <tr><th>المصدر</th><th>المرجع</th><th>البيان</th><th>الحالة/المهلة</th></tr></thead><tbody>
             <?php if (!$pInterim && !$pReqs && !$pLinks): ?>
                 <tr><td colspan="4" class="text-center text-muted">لا معلَّقَ الآن — صفرُ انتظارٍ أمام القمة</td></tr>
@@ -204,12 +219,12 @@ function cr_p($row, $key) {
                 <?php endforeach; ?>
             <?php endif; ?>
         </tbody></table>
-        <div class="text-muted" style="font-size:12px">الوجهة التنفيذية: <a href="approvals_inbox.php">موافقاتي</a> · <a href="ceo_approvals.php">شاشة الاعتماد الأعلى</a></div>
+        <div class="text-muted cro-sm">الوجهة التنفيذية: <a href="approvals_inbox.php">موافقاتي</a> · <a href="ceo_approvals.php">شاشة الاعتماد الأعلى</a></div>
     </div></div>
 
     <!-- ③ العقود -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-file-signature"></i> ③ العقود — الحالات وآخر التوقيعات</h5></div>
-    <div class="card-body" style="display:grid;grid-template-columns:1fr 1.4fr;gap:14px">
+    <div class="card-body cro-two">
         <table class="alltables display no-datatable"><thead><tr><th>الحالة</th><th>العدد</th></tr></thead><tbody>
             <?php foreach ($kContracts as $w): ?>
             <tr><td><?php echo htmlspecialchars((string) $w['st'], ENT_QUOTES, 'UTF-8'); ?></td><td><?php echo (int) $w['c']; ?></td></tr>
@@ -226,7 +241,7 @@ function cr_p($row, $key) {
 
     <!-- ④ المشاريع -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-diagram-project"></i> ④ المشاريع — الحالات وآخر المفتوح</h5></div>
-    <div class="card-body" style="display:grid;grid-template-columns:1fr 1.4fr;gap:14px">
+    <div class="card-body cro-two">
         <table class="alltables display no-datatable"><thead><tr><th>الحالة</th><th>العدد</th></tr></thead><tbody>
             <?php foreach ($kProjects as $w): ?>
             <tr><td><?php echo htmlspecialchars((string) $w['st'], ENT_QUOTES, 'UTF-8'); ?></td><td><?php echo (int) $w['c']; ?></td></tr>
@@ -244,7 +259,7 @@ function cr_p($row, $key) {
     <!-- ⑤ القرارات ومتابعاتها -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-gavel"></i> ⑤ القرارات التنفيذية ومتابعاتها (SRC-10)</h5></div>
     <div class="card-body">
-        <table class="alltables display no-datatable" style="width:100%"><thead>
+        <table class="alltables display no-datatable cro-table"><thead>
             <tr><th>القرار</th><th>القضية</th><th>المكلَّف</th><th>المهلة</th><th>حالة الصف</th><th>متابعته</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -274,20 +289,20 @@ function cr_p($row, $key) {
     <!-- ⑥ نبض المال -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-coins"></i> ⑥ نبض المال — وقائع 30 يومًا من الجذر</h5></div>
     <div class="card-body">
-        <table class="alltables display no-datatable" style="width:100%"><thead>
+        <table class="alltables display no-datatable cro-table"><thead>
             <tr><th>الواقعة</th><th>العدد</th></tr></thead><tbody>
             <?php foreach ($finPulse as $w): ?>
-            <tr><td dir="ltr" style="text-align:right"><?php echo htmlspecialchars((string) $w['k'], ENT_QUOTES, 'UTF-8'); ?></td>
+            <tr><td dir="ltr" class="cro-ltr"><?php echo htmlspecialchars((string) $w['k'], ENT_QUOTES, 'UTF-8'); ?></td>
                 <td><?php echo (int) $w['c']; ?></td></tr>
             <?php endforeach; if (!$finPulse): ?><tr><td colspan="2" class="text-center text-muted">لا وقائعَ ماليةً في الثلاثين يومًا</td></tr><?php endif; ?>
         </tbody></table>
-        <div class="text-muted" style="font-size:12px">التفصيل بشاشات المالية — هذه نبضٌ جامعٌ من ems_business_events (category=financial)</div>
+        <div class="text-muted cro-sm">التفصيل بشاشات المالية — هذه نبضٌ جامعٌ من ems_business_events (category=financial)</div>
     </div></div>
 
     <!-- ⑦ المخاطر المفتوحة -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-triangle-exclamation"></i> ⑦ القضايا بلا حسم (سجل المخاطر)</h5></div>
     <div class="card-body">
-        <table class="alltables display no-datatable" style="width:100%"><thead>
+        <table class="alltables display no-datatable cro-table"><thead>
             <tr><th>المرجع</th><th>النوع</th><th>القضية</th><th>الأثر المقدَّر</th><th>الحالة</th></tr></thead><tbody>
             <?php /* INJ-0411: المرجعُ رمزُ السجلِّ المركزيِّ والنقرُ يفتح بطاقتَه —
                      فالرقمُ والمصدرُ واحدٌ لا رقمان في شاشتين. */ ?>
@@ -304,7 +319,7 @@ function cr_p($row, $key) {
 
     <!-- ⑧ السقوف والموازنات -->
     <div class="card"><div class="card-header"><h5><i class="fa fa-scale-balanced"></i> ⑧ خريطة السقوف — ملكية التوجيه والموازنات</h5></div>
-    <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <div class="card-body cro-two-eq">
         <table class="alltables display no-datatable"><thead><tr><th>نوع الطلب المالي</th><th>الإدارة المالكة</th></tr></thead><tbody>
             <?php foreach ($routing as $w): ?>
             <tr><td><?php echo htmlspecialchars((string) $w['request_kind'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -318,7 +333,7 @@ function cr_p($row, $key) {
                 <td><?php echo (int) $w['lines_c']; ?></td></tr>
             <?php endforeach; if (!$budgets): ?><tr><td colspan="3" class="text-muted">لا موازناتِ للشركة</td></tr><?php endif; ?>
         </tbody></table>
-        <div class="text-muted" style="font-size:12px;grid-column:1/-1">حدودُ DEC-01 (5٪/10k$ للإدارة العامة · حدا الصافي ⅓+½) مُنفذةٌ في محرّك المنح — هذه خريطةُ الملكية</div>
+        <div class="text-muted cro-note-full">حدودُ DEC-01 (5٪/10k$ للإدارة العامة · حدا الصافي ⅓+½) مُنفذةٌ في محرّك المنح — هذه خريطةُ الملكية</div>
     </div></div>
 </div>
 

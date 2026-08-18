@@ -472,6 +472,38 @@
                     emsOpts.scrollX = true;
                     emsOpts.scrollCollapse = true;
                 }
+                /* ══ UXW-01 ⑤: المعالجةُ الخادميةُ سمةٌ لا تهيئةٌ محلية ═════════
+                   شاشةٌ دفترُها ينمو (H-22 · UI-01 §4) لا تُحمَّل كاملةً في
+                   المتصفح، وكانت تحفظ ذلك بتهيئةٍ محليةٍ تخالف المكوّنَ
+                   الموحَّد. فتُعلنه الآن سمةً: `data-ajax-url` نقطةُ الجلب،
+                   و`data-ajax-columns` عددُ الأعمدةِ التي تأتي في الحمولة —
+                   وما زاد عليها في الترويسةِ (أعمدةُ الحوكمةِ المؤجَّلة)
+                   يُعرَّف بمُصيِّرٍ فارغٍ وإلا رمى DataTables
+                   «Requested unknown parameter» فلا يظهر صفٌّ أصلًا. */
+                var dtAjaxUrl = table.getAttribute('data-ajax-url');
+                if (dtAjaxUrl) {
+                    emsOpts.serverSide = true;
+                    emsOpts.processing = true;
+                    emsOpts.deferRender = true;
+                    emsOpts.ajax = { url: dtAjaxUrl };
+                    var dtDelay = parseInt(table.getAttribute('data-search-delay'), 10);
+                    if (!isNaN(dtDelay) && dtDelay > 0) { emsOpts.searchDelay = dtDelay; }
+                    var dtPayloadCols = parseInt(table.getAttribute('data-ajax-columns'), 10);
+                    /* جدولٌ بلا <thead> يرمي هنا، والرميُ يبتلعه catch الخارجيُّ
+                       فيبقى الجدولُ بلا تهيئةٍ صامتًا — فالحارسُ صريح. */
+                    var headRow = (table.tHead && table.tHead.rows.length)
+                        ? table.tHead.rows[table.tHead.rows.length - 1] : null;
+                    if (!isNaN(dtPayloadCols) && dtPayloadCols > 0 && headRow &&
+                        headRow.cells.length > dtPayloadCols) {
+                        var ssCols = [];
+                        for (var sc = 0; sc < headRow.cells.length; sc++) {
+                            ssCols.push(sc < dtPayloadCols
+                                ? { data: sc }
+                                : { data: null, defaultContent: '', orderable: false });
+                        }
+                        emsOpts.columns = ssCols;
+                    }
+                }
                 $table.DataTable(emsOpts);
             } catch (e) { /* legacy tables may be initialized later */ }
         });

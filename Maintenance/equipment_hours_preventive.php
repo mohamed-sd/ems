@@ -59,8 +59,10 @@ $header_title_html = htmlspecialchars('ساعاتُ المعدة مقابل جد
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا خططَ وقائيةً بأساس عدّادِ الساعات', 'اربطِ الخطةَ الوقائيةَ بمعدةٍ واجعل أساسَ تكرارِها ساعاتٍ من شاشةِ الصيانةِ الوقائية');
 ?>
-  <p class="text-muted" style="font-size:.9em">زاويةُ الصيانة للتايم شيت: المتراكمُ منذ آخر إنجازٍ مقابل الفترة — لا «من عمل اليوم».</p>
+  <p class="text-muted mnt-eh-note">زاويةُ الصيانة للتايم شيت: المتراكمُ منذ آخر إنجازٍ مقابل الفترة — لا «من عمل اليوم».</p>
 
   <table class="table table-striped" data-no-dt>
     <thead><tr>
@@ -84,10 +86,11 @@ include __DIR__ . '/../includes/page_header.php';
         $since    = floatval($r['hours_since']);
         $left     = $interval - $since;
         $tol      = floatval($r['tolerance']);
-        if ($left < 0)          { $badge = array('#dc3545', 'متجاوزة'); }
-        elseif ($left <= $tol)  { $badge = array('#fd7e14', 'مستحقةٌ الآن'); }
-        elseif ($left <= $interval * 0.15) { $badge = array('#ffc107', 'تقترب'); }
-        else                    { $badge = array('#198754', 'ضمن الفترة'); }
+        // UXW-01 ①: نبرةُ الشارةِ صنفٌ مُعلَنٌ في كتلةِ أنماطِ الشاشةِ لا لونٌ مثبَّتٌ في الوسم
+        if ($left < 0)          { $badge = array('mnt-eh-badge--over', 'متجاوزة'); }
+        elseif ($left <= $tol)  { $badge = array('mnt-eh-badge--due', 'مستحقةٌ الآن'); }
+        elseif ($left <= $interval * 0.15) { $badge = array('mnt-eh-badge--near', 'تقترب'); }
+        else                    { $badge = array('mnt-eh-badge--ok', 'ضمن الفترة'); }
     ?>
       <tr>
         <td><a href="../Equipments/equipment_profile.php?id=<?= intval($r['eq_id']) ?>"><?= htmlspecialchars($r['eq_name'], ENT_QUOTES, 'UTF-8') ?></a></td>
@@ -95,9 +98,17 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= number_format($interval, 0) ?></td>
         <td><?= number_format($since, 1) ?></td>
         <td><strong><?= number_format($left, 1) ?></strong> ساعة</td>
-        <td><span class="badge" style="background:<?= $badge[0] ?>"><?= $badge[1] ?></span></td>
+        <td><span class="badge <?= $badge[0] ?>"><?= $badge[1] ?></span></td>
       </tr>
     <?php endforeach; ?>
     </tbody>
   </table>
 </div>
+<style>
+    /* UXW-01 ①②: نبراتُ شارةِ الاستحقاقِ برموزِ اللوحة، والنمطُ الموضعيُّ صنفًا */
+    .mnt-eh-note { font-size:.9em; }
+    .mnt-eh-badge--over { background:var(--c-dc3545); }
+    .mnt-eh-badge--due { background:var(--c-fd7e14, #fd7e14); }
+    .mnt-eh-badge--near { background:var(--c-ffc107); }
+    .mnt-eh-badge--ok { background:var(--c-198754); }
+</style>

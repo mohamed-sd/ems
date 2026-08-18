@@ -57,10 +57,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back    = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا طلباتٍ تحتَ المراجعةِ لإداراتِك الآن', 'راجِعِ الطلباتِ الواردةَ لاحقًا، أو افتحْ «التفاصيل والسجل» لطلبٍ سبقَ بتُّه');
     ?>
+    <style>
+    .fdi-alert      { margin-bottom: 14px; font-weight: 700; }
+    .fdi-mb14       { margin-bottom: 14px; }
+    .fdi-card-head  { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+    .fdi-summary    { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 10px; }
+    .fdi-actions    { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+    .fdi-form       { display: flex; gap: 8px; }
+    .fdi-reason     { min-width: 200px; }
+    .fdi-reason-sm  { min-width: 180px; }
+    </style>
 
     <?php if (isset($_GET['msg']) && trim($_GET['msg']) !== ''): ?>
-        <div class="alert alert-info" style="margin-bottom:14px;font-weight:700;"><?php echo htmlspecialchars($_GET['msg']); ?></div>
+        <div class="alert alert-info fdi-alert"><?php echo htmlspecialchars($_GET['msg']); ?></div>
     <?php endif; ?>
 
     <?php if (!$my_routes): ?>
@@ -71,8 +83,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $can_approve   = $is_super || finreq_role_is($rt, $role, 'manager');
         $docs_ok = finreq_docs_satisfied($gate, $r);
     ?>
-        <div class="card" style="margin-bottom:14px;">
-            <div class="card-header" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div class="card fdi-mb14">
+            <div class="card-header fdi-card-head">
                 <h5><i class="<?php echo htmlspecialchars($catalog[$r['request_type']]['icon']); ?>"></i>
                     <?php echo htmlspecialchars($r['request_no']); ?> — <?php echo htmlspecialchars($catalog[$r['request_type']]['label']); ?>
                     <?php echo finreq_state_badge($r['state']); ?>
@@ -82,26 +94,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <a href="request_form.php?id=<?php echo intval($r['id']); ?>" class="btn btn-sm btn-secondary"><i class="fa fa-eye"></i> التفاصيل والسجل</a>
             </div>
             <div class="card-body">
-                <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:10px;">
+                <div class="fdi-summary">
                     <div><strong>الإدارة:</strong> <?php echo htmlspecialchars($rt['module_label']); ?></div>
                     <div><strong>المبرّر:</strong> <?php echo htmlspecialchars($r['justification']); ?></div>
                     <div><strong>المستفيد:</strong> <?php echo htmlspecialchars($r['beneficiary_name'] ?? '-'); ?></div>
                     <div><strong>المبلغ:</strong> <?php echo number_format(floatval($r['amount']), 2) . ' ' . htmlspecialchars($r['currency']); ?></div>
                     <div><strong>الحاجة:</strong> <?php echo htmlspecialchars($r['need_class']); ?></div>
                 </div>
-                <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;">
+                <div class="fdi-actions">
                     <?php if ($can_recommend): ?>
-                    <form action="request_actions.php" method="post" style="display:flex;gap:8px;">
+                    <form action="request_actions.php" method="post" class="fdi-form">
         <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="return_request">
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="dept_inbox.php">
-                        <input type="text" name="reason" placeholder="سبب الإعادة للاستكمال" required style="min-width:200px;" aria-label="سبب الإعادة للاستكمال">
+                        <input type="text" name="reason" class="fdi-reason" placeholder="سبب الإعادة للاستكمال" required aria-label="سبب الإعادة للاستكمال">
                         <button type="submit" class="btn btn-secondary"><i class="fa fa-rotate-left"></i> إعادة</button>
                     </form>
                     <?php endif; ?>
                     <?php if ($can_approve): ?>
-                    <form action="request_actions.php" method="post" style="display:flex;gap:8px;">
+                    <form action="request_actions.php" method="post" class="fdi-form">
         <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="dept_approve">
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
@@ -110,16 +122,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <i class="fa fa-check-double"></i> اعتماد إداري
                         </button>
                     </form>
-                    <form action="request_actions.php" method="post" style="display:flex;gap:8px;">
+                    <form action="request_actions.php" method="post" class="fdi-form">
         <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="reject">
                         <input type="hidden" name="id" value="<?php echo intval($r['id']); ?>">
                         <input type="hidden" name="back" value="dept_inbox.php">
-                        <select name="rejection_class" required>
+                        <select name="rejection_class" aria-label="تصنيفُ سببِ الرفض" required>
                             <option value="">— تصنيف الرفض —</option>
                             <?php foreach ($rej_classes as $k => $v): ?><option value="<?php echo $k; ?>"><?php echo $v; ?></option><?php endforeach; ?>
                         </select>
-                        <input type="text" name="reason" placeholder="سبب الرفض (إلزامي)" required style="min-width:180px;" aria-label="سبب الرفض (إلزامي)">
+                        <input type="text" name="reason" class="fdi-reason-sm" placeholder="سبب الرفض (إلزامي)" required aria-label="سبب الرفض (إلزامي)">
                         <button type="submit" class="btn btn-danger"><i class="fa fa-ban"></i> رفض</button>
                     </form>
                     <?php endif; ?>
