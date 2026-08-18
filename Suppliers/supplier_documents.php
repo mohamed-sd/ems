@@ -117,6 +117,7 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'المستندات');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 // NAV-01 §8 (update0006-b): الشاشةُ قسمٌ من ملف المورد الأم
 $sf_supplier_id = intval($_GET['supplier_id'] ?? $_GET['id'] ?? 0); $sf_active = 'documents';
@@ -132,12 +133,24 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا وثيقةَ نظاميةً مسجَّلةً لهذا المورد', 'سجِّل السجلَّ التجاريَّ والشهادةَ الضريبيةَ بتواريخِ صلاحيتها من نموذجِ «وثيقةٌ نظامية»');
     ?>
+    <style>
+        .sup-doc-filter-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .sup-doc-picker     { min-width: 320px; }
+        .sup-doc-gate       { margin-top: 10px; }
+        .sup-doc-reasons    { margin: 6px 0 0 0; }
+        .sup-doc-hint       { color: var(--c-s-666, #666); }
+        .sup-doc-req        { color: var(--c-state-danger-strong, #c00); }
+        .sup-doc-actions    { margin-top: 12px; }
+        .sup-doc-table      { width: 100%; }
+    </style>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="sup-doc-filter-row">
             <strong>المورد:</strong>
-            <select name="supplier_id" onchange="this.form.submit()" style="min-width:320px">
+            <select name="supplier_id" aria-label="المورد" onchange="this.form.submit()" class="sup-doc-picker">
                 <?php foreach ($suppliers as $s): ?>
                     <option value="<?php echo intval($s['id']); ?>" <?php echo $selected === intval($s['id']) ? 'selected' : ''; ?>>
                         #<?php echo intval($s['id']); ?> — <?php echo htmlspecialchars((string)$s['name']); ?>
@@ -145,12 +158,12 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <?php endforeach; ?>
             </select>
         </form>
-        <div class="alert <?php echo $gateInfo['reasons'] ? 'alert-warning' : 'alert-success'; ?>" style="margin-top:10px">
+        <div class="sup-doc-gate alert <?php echo $gateInfo['reasons'] ? 'alert-warning' : 'alert-success'; ?>">
             <strong>بوابةُ المستندات (<?php echo htmlspecialchars($gateInfo['mode']); ?>):</strong>
             <?php if (!$gateInfo['reasons']): ?>
                 لا مانعَ — الوثائقُ النظاميةُ حاضرةٌ ساريةٌ والحسابُ موثَّق.
             <?php else: ?>
-                <ul style="margin:6px 0 0 0">
+                <ul class="sup-doc-reasons">
                 <?php foreach ($gateInfo['reasons'] as $rr): ?>
                     <li><?php echo htmlspecialchars($rr); ?></li>
                 <?php endforeach; ?>
@@ -164,7 +177,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-building-columns"></i> الحسابُ البنكيُّ الموثَّق</h5></div>
     <div class="card-body">
-        <p style="color:#666"><strong>توثيقٌ بلا مستندٍ دعوى</strong> — رقمُ الحساب والمستندُ إلزاميان معًا،
+        <p class="sup-doc-hint"><strong>توثيقٌ بلا مستندٍ دعوى</strong> — رقمُ الحساب والمستندُ إلزاميان معًا،
             ويحرسهما <code>CHECK</code> فوق حارس الخدمة.</p>
         <?php if ($sup !== null): ?>
         <p>
@@ -185,19 +198,19 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
                 <div class="form-group"><label for="emsf_489_fccd8">البنك</label>
-                    <input type="text" name="bank_name" maxlength="150"
-                           value="<?php echo htmlspecialchars((string)($sup['bank_name'] ?? '')); ?>" id="emsf_489_fccd8"></div>
-                <div class="form-group"><label for="emsf_490_14be2">رقم الحساب <span style="color:#c00">*</span></label>
-                    <input type="text" name="bank_account_no" maxlength="60" required
-                           value="<?php echo htmlspecialchars((string)($sup['bank_account_no'] ?? '')); ?>" id="emsf_490_14be2"></div>
+                    <input type="text" name="bank_name" id="emsf_489_fccd8" maxlength="150"
+                           value="<?php echo htmlspecialchars((string)($sup['bank_name'] ?? '')); ?>"></div>
+                <div class="form-group"><label for="emsf_490_14be2">رقم الحساب <span class="sup-doc-req">*</span></label>
+                    <input type="text" name="bank_account_no" id="emsf_490_14be2" maxlength="60" required
+                           value="<?php echo htmlspecialchars((string)($sup['bank_account_no'] ?? '')); ?>"></div>
                 <div class="form-group"><label for="emsf_491_5d559">IBAN</label>
-                    <input type="text" name="bank_iban" maxlength="60"
-                           value="<?php echo htmlspecialchars((string)($sup['bank_iban'] ?? '')); ?>" id="emsf_491_5d559"></div>
-                <div class="form-group"><label for="emsf_492_c50a7">مستند التوثيق <span style="color:#c00">*</span></label>
+                    <input type="text" name="bank_iban" id="emsf_491_5d559" maxlength="60"
+                           value="<?php echo htmlspecialchars((string)($sup['bank_iban'] ?? '')); ?>"></div>
+                <div class="form-group"><label for="emsf_492_c50a7">مستند التوثيق <span class="sup-doc-req">*</span></label>
                     <input type="text" name="bank_doc_ref" maxlength="120" required
                            placeholder="شهادةٌ بنكيةٌ أو شيكٌ ملغًى" id="emsf_492_c50a7"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-shield-halved"></i> وثِّق الحساب</button></div>
+            <div class="sup-doc-actions"><button type="submit" class="btn-primary"><i class="fa fa-shield-halved"></i> وثِّق الحساب</button></div>
         </form>
         <?php endif; ?>
     </div></div>
@@ -205,7 +218,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <?php if ($can_add): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-file-lines"></i> وثيقةٌ نظامية</h5></div>
     <div class="card-body">
-        <p style="color:#666">«الوثائقُ <strong>بتواريخ صلاحيتها</strong> — تنبيهٌ آليٌّ قبل الانتهاء»:
+        <p class="sup-doc-hint">«الوثائقُ <strong>بتواريخ صلاحيتها</strong> — تنبيهٌ آليٌّ قبل الانتهاء»:
             و<strong>السجلُّ التجاري والشهادةُ الضريبية يلزمهما تاريخُ صلاحية</strong>،
             فتنبيهٌ بلا تاريخٍ وعدٌ لا يُنفَّذ.</p>
         <form method="post" class="ems-form">
@@ -213,13 +226,13 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <input type="hidden" name="sd_action" value="document">
             <input type="hidden" name="supplier_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
-                <div class="form-group"><label for="emsf_493_99820">النوع <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_493_99820">النوع <span class="sup-doc-req">*</span></label>
                     <select name="doc_type" required id="emsf_493_99820">
                         <?php foreach (SDS::SUPPLIER_DOC_TYPES as $t): ?>
                             <option value="<?php echo htmlspecialchars($t); ?>"><?php echo htmlspecialchars($t); ?></option>
                         <?php endforeach; ?>
                     </select></div>
-                <div class="form-group"><label for="emsf_494_c741d">الرقم <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_494_c741d">الرقم <span class="sup-doc-req">*</span></label>
                     <input type="text" name="doc_no" maxlength="100" required id="emsf_494_c741d"></div>
                 <div class="form-group"><label for="emsf_495_73e9e">جهة الإصدار</label><input type="text" name="issuer" maxlength="255" id="emsf_495_73e9e"></div>
                 <div class="form-group"><label for="emsf_496_8b0ef">تاريخ الإصدار</label><input type="date" name="issue_date" id="emsf_496_8b0ef"></div>
@@ -229,7 +242,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <div class="form-group"><label for="emsf_499_a39a7">المرفق</label><input type="text" name="file_ref" maxlength="255" id="emsf_499_a39a7"></div>
                 <div class="form-group"><label for="emsf_500_49c69">ملاحظة</label><input type="text" name="dnote" maxlength="200" id="emsf_500_49c69"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ الوثيقة</button></div>
+            <div class="sup-doc-actions"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ الوثيقة</button></div>
         </form>
     </div></div>
     <?php endif; ?>
@@ -244,7 +257,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <strong><?php echo htmlspecialchars(implode(' · ', $state['missing'])); ?></strong></div>
         <?php endif; ?>
         <div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap sup-doc-table">
             <thead><tr><th>النوع</th><th>الرقم</th><th>الجهة</th><th>الإصدار</th>
                 <th>الانتهاء</th><th>التنبيه</th><th>الحال</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -286,7 +299,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-clock-rotate-left"></i>
         سجلُّ تدقيق المورد <small>— قراءةٌ على <code>activity_logs</code>، لا سجلٌّ ثانٍ</small></h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap sup-doc-table">
             <thead><tr><th>متى</th><th>أين</th><th>ماذا</th><th>قبل</th><th>بعد</th><th>من</th></tr></thead>
             <tbody>
             <?php foreach ($audit as $a): ?>

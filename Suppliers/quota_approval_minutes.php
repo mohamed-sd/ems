@@ -55,19 +55,30 @@ $header_title_html = htmlspecialchars('محاضرُ اعتمادِ وحداتِ 
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا محضرَ اعتمادِ تغطيةٍ بديلةٍ مسجَّلًا بعدُ', 'يُنشأ الطلبُ من شاشةِ طلبِ الإحلال ثم يُعتمد من صندوقِ الاعتمادِ الجامع');
 ?>
+  <style>
+    .sup-qam-alert      { margin: 10px 0; }
+    .sup-qam-kpi        { padding: 10px 14px; margin: 10px 0; border-inline-start: 4px solid var(--c-0d6efd, #0d6efd); display: inline-block; }
+    .sup-qam-kpi-label  { font-size: .78rem; opacity: .75; }
+    .sup-qam-kpi-value  { font-size: 1.4rem; font-weight: 700; }
+    .sup-qam-table      { width: 100%; }
+    .sup-qam-empty-cell { text-align: center; opacity: .7; }
+    .sup-qam-note       { font-size: .8rem; margin-top: 8px; }
+  </style>
   <?php if ($failed): ?>
-  <div class="alert alert-danger" style="margin:10px 0">
+  <div class="alert alert-danger sup-qam-alert">
     <strong>تعذّرت قراءةُ البيانات.</strong>
     فرقٌ بين «لا صفَّ» و«تعذّر السؤال» — وهذه الثانية.
   </div>
   <?php else: ?>
-  <div class="ems-card" style="padding:10px 14px;margin:10px 0;border-inline-start:4px solid #0d6efd;display:inline-block">
-    <div style="font-size:.78rem;opacity:.75">صفوفٌ معروضة</div>
-    <div style="font-size:1.4rem;font-weight:700"><?php echo number_format(count($rows)); ?></div>
+  <div class="ems-card sup-qam-kpi">
+    <div class="sup-qam-kpi-label">صفوفٌ معروضة</div>
+    <div class="sup-qam-kpi-value"><?php echo number_format(count($rows)); ?></div>
   </div>
   <div class="card"><div class="card-body table-responsive">
-    <table class="table table-sm table-striped" style="width:100%">
+    <table class="table table-sm table-striped sup-qam-table">
       <thead><tr>
         <th>#</th>
         <th>الدرجة</th>
@@ -81,7 +92,7 @@ include __DIR__ . '/../includes/page_header.php';
       </tr></thead>
       <tbody>
       <?php if (!$rows): ?>
-        <tr><td colspan="99" style="text-align:center;opacity:.7">لا صفَّ مسجَّلٌ بعد.</td></tr>
+        <tr><td colspan="99" class="sup-qam-empty-cell">لا صفَّ مسجَّلٌ بعد.</td></tr>
       <?php else: foreach ($rows as $x): ?>
         <tr>
           <td><?php echo htmlspecialchars((string) $x['cov_id'], ENT_QUOTES, 'UTF-8'); ?></td>
@@ -97,7 +108,7 @@ include __DIR__ . '/../includes/page_header.php';
       <?php endforeach; endif; ?>
       </tbody>
     </table>
-    <p class="text-muted" style="font-size:.8rem;margin-top:8px">
+    <p class="text-muted sup-qam-note">
       قراءةٌ محضة — التغطيةُ البديلةُ باعتمادين (CAP-01) — والطلبُ يُنشأ من Operations/swap_request.php والاعتمادُ من صندوقِ الاعتمادِ الجامع؛ وهذه الشاشةُ محضرُها. وأحدثُ 500 صفٍّ.
     </p>
   </div></div>

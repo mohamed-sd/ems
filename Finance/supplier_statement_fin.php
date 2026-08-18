@@ -102,12 +102,37 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بنودَ لهذا الموردِ في الفترةِ المختارة', 'بدّل الشهرَ أو اختر موردًا آخرَ من قائمةِ الأعلى');
     ?>
+    <style>
+        /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
+        .fin-sup-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .fin-sup-select { min-width: 220px; }
+        .fin-sup-h5 { margin: 0 0 12px; }
+        .fin-sup-h5-mid { margin: 18px 0 10px; }
+        .fin-sup-h5-sec { margin: 16px 0 10px; }
+        .fin-sup-kpi { text-align: center; }
+        .fin-sup-kpi-value { font-size: 20px; font-weight: 700; }
+        .fin-sup-ok { color: var(--c-166534); }
+        .fin-sup-neg { color: var(--c-991b1b); }
+        .fin-sup-hint { color: var(--c-ink-500); }
+        .fin-sup-badge-gap { margin-inline-start: 8px; }
+        .fin-sup-layer { margin-bottom: 10px; }
+        .fin-sup-layer-total { font-weight: 700; }
+        .fin-sup-layer-wrap { margin-top: 8px; }
+        .fin-sup-tbl { width: 100%; }
+        .fin-sup-objected { background: var(--c-fef2f2); }
+        .fin-sup-amt { white-space: nowrap; }
+        .fin-sup-net { margin: 6px 0 16px; }
+        .fin-sup-empty-cell { text-align: center; color: var(--c-ink-500); padding: 14px; }
+        .fin-sup-pick { margin: 0; }
+    </style>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="fin-sup-filter">
             <strong><i class="fas fa-truck-field"></i> المورد:</strong>
-            <select name="sup" onchange="this.form.submit()" style="min-width:220px"><?php
+            <select name="sup" aria-label="المورد المعروض كشفُ حسابه" class="fin-sup-select" onchange="this.form.submit()"><?php
                 // H-20: المقيَّدُ يرى خيارَ موردِه وحده — لا تسريبَ لأسماء بقية الموردين
                 if ($spg_scope !== null) {
                     echo '<option value="' . intval($spg_scope) . '" selected>' . htmlspecialchars($sup_name !== '' ? $sup_name : ('#' . intval($spg_scope))) . '</option>';
@@ -116,51 +141,51 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 }
             ?></select>
             <strong>الفترة:</strong>
-            <input type="month" name="period" value="<?php echo htmlspecialchars($sel_period); ?>" onchange="this.form.submit()">
+            <input type="month" name="period" aria-label="شهرُ كشفِ الحساب" onchange="this.form.submit()" value="<?php echo htmlspecialchars($sel_period); ?>">
         </form>
     </div></div>
 
     <?php if ($sel_sup > 0): ?>
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 12px"><i class="fas fa-file-invoice"></i> كشف <?php echo htmlspecialchars($sup_name); ?> — <?php echo htmlspecialchars($sel_period); ?></h5>
+        <h5 class="fin-sup-h5"><i class="fas fa-file-invoice"></i> كشف <?php echo htmlspecialchars($sup_name); ?> — <?php echo htmlspecialchars($sel_period); ?></h5>
         <div class="form-grid">
-            <div class="card" style="text-align:center"><div class="card-body"><div class="text-muted">له (مستحقات)</div><div style="font-size:20px;font-weight:700;color:#166534"><?php echo number_format($credit_sum, 2); ?></div></div></div>
-            <div class="card" style="text-align:center"><div class="card-body"><div class="text-muted">عليه (سلف/خصومات/استرداد)</div><div style="font-size:20px;font-weight:700;color:#991b1b">(<?php echo number_format($debit_sum, 2); ?>)</div></div></div>
-            <div class="card" style="text-align:center"><div class="card-body"><div class="text-muted">الصافي</div><div style="font-size:20px;font-weight:700"><span class="badge badge-<?php echo $net >= 0 ? 'primary' : 'danger'; ?>"><?php echo number_format($net, 2); ?></span></div></div></div>
-            <div class="card" style="text-align:center"><div class="card-body"><div class="text-muted">المصروف له بالفترة</div><div style="font-size:20px;font-weight:700"><?php echo number_format($paid_sum, 2); ?></div></div></div>
-            <div class="card" style="text-align:center"><div class="card-body"><div class="text-muted">وحداته المعتمدة بالفترة</div><div style="font-size:20px;font-weight:700"><?php echo number_format($units_sum, 2); ?></div></div></div>
+            <div class="card fin-sup-kpi"><div class="card-body"><div class="text-muted">له (مستحقات)</div><div class="fin-sup-kpi-value fin-sup-ok"><?php echo number_format($credit_sum, 2); ?></div></div></div>
+            <div class="card fin-sup-kpi"><div class="card-body"><div class="text-muted">عليه (سلف/خصومات/استرداد)</div><div class="fin-sup-kpi-value fin-sup-neg">(<?php echo number_format($debit_sum, 2); ?>)</div></div></div>
+            <div class="card fin-sup-kpi"><div class="card-body"><div class="text-muted">الصافي</div><div class="fin-sup-kpi-value"><span class="badge badge-<?php echo $net >= 0 ? 'primary' : 'danger'; ?>"><?php echo number_format($net, 2); ?></span></div></div></div>
+            <div class="card fin-sup-kpi"><div class="card-body"><div class="text-muted">المصروف له بالفترة</div><div class="fin-sup-kpi-value"><?php echo number_format($paid_sum, 2); ?></div></div></div>
+            <div class="card fin-sup-kpi"><div class="card-body"><div class="text-muted">وحداته المعتمدة بالفترة</div><div class="fin-sup-kpi-value"><?php echo number_format($units_sum, 2); ?></div></div></div>
         </div>
 
         <?php // ── M-14 · الطبقاتُ الخمسُ بروابط مصادرها ─────────────────── ?>
-        <h5 style="margin:18px 0 10px"><i class="fas fa-layer-group"></i>
-            الكشفُ بطبقاته — <small style="color:#6b7280">كلُّ رقمٍ ينقر إلى مصدره</small>
+        <h5 class="fin-sup-h5-mid"><i class="fas fa-layer-group"></i>
+            الكشفُ بطبقاته — <small class="fin-sup-hint">كلُّ رقمٍ ينقر إلى مصدره</small>
             <?php if ($adv_balance > 0): ?>
-                <span class="badge badge-warning" style="margin-inline-start:8px"
+                <span class="badge badge-warning fin-sup-badge-gap"
                       title="رصيدُ السلف المفتوح — ظاهرٌ في بطاقته دائمًا (ENT-02 §3)">
                     رصيدُ سلفٍ مفتوح: <?php echo number_format($adv_balance, 2); ?></span>
             <?php endif; ?>
             <?php if (intval($stmt['orphans']) > 0): ?>
-                <span class="badge badge-danger" style="margin-inline-start:8px">
+                <span class="badge badge-danger fin-sup-badge-gap">
                     <?php echo intval($stmt['orphans']); ?> سطرًا بلا مصدرٍ — يُعلَن ولا يُخفى</span>
             <?php endif; ?>
         </h5>
         <?php foreach ($stmt['layers'] as $lkey => $layer):
             if (!$layer['rows']) { continue; } ?>
-            <div class="card" style="margin-bottom:10px"><div class="card-body">
+            <div class="card fin-sup-layer"><div class="card-body">
                 <strong><?php echo htmlspecialchars($layer['label']); ?></strong>
-                — <span style="font-weight:700"><?php echo number_format((float) $layer['total'], 2); ?></span>
-                <div class="table-container" style="margin-top:8px">
-                <table class="alltables no-datatable" style="width:100%">
+                — <span class="fin-sup-layer-total"><?php echo number_format((float) $layer['total'], 2); ?></span>
+                <div class="table-container fin-sup-layer-wrap">
+                <table class="alltables no-datatable fin-sup-tbl" data-no-dt="hard">
                     <thead><tr><th>تاريخ مطابقة المورد</th><th>البيان</th><th>المبلغ</th><th>المصدر</th><th>السياق</th></tr></thead>
                     <tbody>
                     <?php foreach ($layer['rows'] as $row): ?>
-                        <tr<?php echo !empty($row['objected']) ? ' style="background:#fef2f2"' : ''; ?>>
+                        <tr<?php echo !empty($row['objected']) ? ' class="fin-sup-objected"' : ''; ?>>
                             <td><?php echo htmlspecialchars((string) $row['date']); ?></td>
                             <td><?php echo htmlspecialchars((string) $row['description']); ?>
                                 <?php if (!empty($row['objected'])): ?>
                                     <span class="badge badge-danger">معترَض</span>
                                 <?php endif; ?></td>
-                            <td style="white-space:nowrap;<?php echo ((float) $row['amount'] < 0) ? 'color:#991b1b' : ''; ?>">
+                            <td class="fin-sup-amt<?php echo ((float) $row['amount'] < 0) ? ' fin-sup-neg' : ''; ?>">
                                 <?php echo ((float) $row['amount'] == 0.0 && $lkey === 'advances')
                                     ? '—' : number_format((float) $row['amount'], 2); ?>
                                 <small><?php echo htmlspecialchars((string) $row['currency']); ?></small></td>
@@ -183,7 +208,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             </div></div>
         <?php endforeach; ?>
         <?php if (!empty($stmt['totals'])): ?>
-        <p style="margin:6px 0 16px">
+        <p class="fin-sup-net">
             صافي الفترة (استحقاقٌ − تحميلاتٌ − جزاءاتٌ):
             <strong><?php echo number_format((float) $stmt['totals']['net'], 2); ?></strong>
             · بعد السداد:
@@ -192,14 +217,14 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <?php endif; ?>
 
         <?php // ── «تبويبُ اللقطة يعرض الأسعارَ التي احتُسب بها» (§6) ────── ?>
-        <h5 style="margin:16px 0 10px"><i class="fas fa-tags"></i> اللقطةُ — الأسعارُ التي احتُسب بها</h5>
+        <h5 class="fin-sup-h5-sec"><i class="fas fa-tags"></i> اللقطةُ — الأسعارُ التي احتُسب بها</h5>
         <div class="table-container">
-            <table class="alltables no-datatable" style="width:100%">
+            <table class="alltables no-datatable fin-sup-tbl" data-no-dt="hard">
                 <thead><tr><th>العقد</th><th>النموذج</th><th>الوحدة</th><th>سعر الوحدة</th>
                     <th>أساس الاستعداد</th><th>سريان البند</th></tr></thead>
                 <tbody>
                 <?php if (!$price_snapshot): ?>
-                    <tr><td colspan="6" style="text-align:center;color:#6b7280;padding:14px">
+                    <tr><td colspan="6" class="fin-sup-empty-cell">
                         لا عقدَ موردٍ نافذًا بتاريخ <?php echo htmlspecialchars($stmt_to); ?> —
                         <strong>يُعلَن ولا تُخترع أسعار</strong>.</td></tr>
                 <?php endif; ?>
@@ -223,9 +248,9 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             </table>
         </div>
 
-        <h5 style="margin:16px 0 10px"><i class="fas fa-list"></i> بنود الكشف (له / عليه)</h5>
+        <h5 class="fin-sup-h5-sec"><i class="fas fa-list"></i> بنود الكشف (له / عليه)</h5>
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="finTable" class="display nowrap alltables fin-sup-tbl" data-state-save="false">
                 <thead><tr><th>التاريخ</th><th>النوع</th><th>الاتجاه</th><th>المبلغ</th><th>التسوية</th><th>الفترة</th></tr></thead>
                 <tbody>
                 <?php
@@ -253,9 +278,9 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             </table>
         </div>
 
-        <h5 style="margin:16px 0 10px"><i class="fas fa-cubes"></i> وحداته المعتمدة بالفترة (من التطابق الثلاثي)</h5>
+        <h5 class="fin-sup-h5-sec"><i class="fas fa-cubes"></i> وحداته المعتمدة بالفترة (من التطابق الثلاثي)</h5>
         <div class="table-container">
-            <table class="alltables" style="width:100%">
+            <table class="alltables fin-sup-tbl">
                 <thead><tr><th>رقم الكشف</th><th>التاريخ</th><th>النموذج</th><th>الكمية المعتمدة</th><th>سعر عقده</th><th>قيمة مستحقه</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">المورد</th>
@@ -307,7 +332,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         </div>
     </div></div>
     <?php else: ?>
-    <div class="card"><div class="card-body"><p class="text-muted" style="margin:0"><i class="fas fa-arrow-up"></i> اختر موردًا لعرض كشفه.</p></div></div>
+    <div class="card"><div class="card-body"><p class="text-muted fin-sup-pick"><i class="fas fa-arrow-up"></i> اختر موردًا لعرض كشفه.</p></div></div>
     <?php endif; ?>
 </div>
 
@@ -319,14 +344,8 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
 <script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
 <script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
-<script>
-$(document).ready(function () {
-    if (document.getElementById('finTable')) {
-        $('#finTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
-    }
-});
-</script>
+<!-- UXW-01 ⑤: التهيئةُ المحليةُ أُزيلت — المكوّنُ المركزيُّ في assets/js/ui-unification.js
+     يلتقط #finTable آليًّا (تعريبٌ وأزرارُ تصدير)، وجداولُ الطبقاتِ واللقطةِ تبقى ساكنةً
+     بـdata-no-dt="hard" كما كانت. -->
 </body>
 </html>

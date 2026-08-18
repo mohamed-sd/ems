@@ -696,7 +696,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-drivers-page #projectDriversTable {
-        min-width: 1400px;
+        min-width: 1200px;
+        width: 100%;
     }
 
     .movement-drivers-page .dataTables_wrapper .dataTables_scroll {
@@ -711,9 +712,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        background: #eef6ff;
-        color: #0b4c8c;
-        border: 1px solid #cfe2ff;
+        background: var(--c-eef6ff, #eef6ff);
+        color: var(--c-0b4c8c, #0b4c8c);
+        border: 1px solid var(--c-cfe2ff, #cfe2ff);
         border-radius: 999px;
         padding: 4px 10px;
         font-weight: 700;
@@ -734,17 +735,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        color: #0c1c3e;
-        background: #f7f9fc;
-        border: 1px solid #d7dee8;
+        color: var(--c-0c1c3e, #0c1c3e);
+        background: var(--c-f7f9fc, #f7f9fc);
+        border: 1px solid var(--c-d7dee8, #d7dee8);
         text-decoration: none;
         transition: all .2s ease;
     }
 
     .driver-icon-link:hover {
-        background: #0c1c3e;
-        color: #fff;
-        border-color: #0c1c3e;
+        background: var(--c-0c1c3e, #0c1c3e);
+        color: var(--c-surface, #ffffff);
+        border-color: var(--c-0c1c3e, #0c1c3e);
     }
 
     .manage-drivers-modal .table td,
@@ -760,7 +761,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     /* نمط الرابط لاسم المعدة */
     .equipment-name-link {
-        color: #0c1c3e;
+        color: var(--c-0c1c3e, #0c1c3e);
         text-decoration: none;
         display: inline-flex;
         align-items: center;
@@ -771,9 +772,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .equipment-name-link:hover {
-        color: #e8b800;
+        color: var(--c-e8b800, #e8b800);
         text-decoration: underline;
-        background: rgba(232, 184, 0, 0.1);
+        background: var(--c-rgba232184001, rgba(232, 184, 0, 0.1));
     }
 
     .equipment-name-link:hover::before {
@@ -799,6 +800,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions[] = array('href' => '../main/dashboard.php', 'class' => 'movement-topbar-btn', 'icon' => 'fas fa-home', 'label' => 'لوحة التحكم');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include(__DIR__ . '/../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا سائقين مسنَدين لآلياتِ هذا المشروعِ بعدُ', 'أضفْ أولَ تشغيلِ سائقٍ بزرِّ «إضافة تشغيل سائق» في رأسِ الشاشة');
     ?>
 
     <div class="ems-content">
@@ -847,7 +850,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                             <div>
                                 <label for="emsf_743_02e54"><i class="fas fa-calendar-plus"></i> تاريخ البداية *</label>
-                                <input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>" required id="emsf_743_02e54">
+                                <input type="date" name="start_date" id="emsf_743_02e54" required value="<?php echo date('Y-m-d'); ?>">
                             </div>
 
                             <div>
@@ -885,8 +888,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <h5><i class="fas fa-users"></i> توزيع السائقين على آليات المشروع</h5>
             </div>
             <div class="card-body">
-                <div class="table-container" style="overflow-x: auto; width: 100%;">
-                    <table id="projectDriversTable" class="display nowrap table-full-width" style="min-width: 1200px; width: 100%;">
+                <div class="table-container">
+                    <table id="projectDriversTable" class="display nowrap table-full-width">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -977,7 +980,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <div class="row g-3 mb-3">
                                 <div class="col-md-4">
                                     <label class="form-label">تاريخ التطبيق</label>
-                                    <input type="date" class="form-control" name="effective_date" value="<?php echo date('Y-m-d'); ?>" required>
+                                    <input type="date" class="form-control" name="effective_date" aria-label="تاريخُ تطبيقِ تغييرِ السائقين" required value="<?php echo date('Y-m-d'); ?>">
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label" for="emsf_746_ab2a1">وردية السائقين المضافين</label>
@@ -1014,7 +1017,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </div>
 
                             <h6 class="mb-2">إضافة سائقين جدد لنفس الآلية</h6>
-                            <select name="add_driver_ids[]" class="form-control" multiple size="8">
+                            <select name="add_driver_ids[]" class="form-control" aria-label="سائقون جددٌ يُضافون لهذه الآلية" multiple size="8">
                                 <?php foreach ($all_project_drivers as $drv): ?>
                                     <option value="<?php echo intval($drv['id']); ?>"><?php echo htmlspecialchars($drv['name'] . ' - ' . $drv['phone'], ENT_QUOTES, 'UTF-8'); ?></option>
                                 <?php endforeach; ?>
@@ -1036,23 +1039,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
     <script>
         $(document).ready(function () {
-            var projectDriversTable = $('#projectDriversTable').DataTable({
-                scrollX: true,
-                scrollCollapse: true,
-                autoWidth: false,
-                language: {
-                    url: '/ems/assets/i18n/datatables/ar.json'
-                }
-            });
-
-            setTimeout(function () {
-                projectDriversTable.columns.adjust().draw(false);
-            }, 100);
-
-            $(window).on('resize', function () {
-                projectDriversTable.columns.adjust();
-            });
-
+            // UXW-01 ⑤: تهيئةُ الجدولِ المركزيةُ في assets/js/ui-unification.js
+            // (التعريبُ وعرضُ الأعمدةِ منها) — والتمريرُ الأفقيُّ من غلافِ .table-container.
             $('#toggleAddDriverForm').on('click', function () {
                 var $form = $('#addDriverForm');
                 if ($form.hasClass('allforms-visible')) {
@@ -1114,17 +1102,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     row += '<td><a href="../Employees/employee_profile.php?id=' + driverId + '" target="_blank" rel="noopener">' + $('<div>').text(driverName).html() + '</a></td>';
                     row += '<td>' + $('<div>').text(driverPhone).html() + '</td>';
                     row += '<td>' + shiftLabel + '</td>';
-                    row += '<td><input type="date" class="form-control form-control-sm" name="existing_start_date[' + relationId + ']" value="' + startDate + '"></td>';
-                    row += '<td><input type="date" class="form-control form-control-sm" name="existing_end_date[' + relationId + ']" value="' + endDate + '"></td>';
+                    row += '<td><input type="date" class="form-control form-control-sm" aria-label="تاريخُ بدايةِ تشغيلِ السائق" name="existing_start_date[' + relationId + ']" value="' + startDate + '"></td>';
+                    row += '<td><input type="date" class="form-control form-control-sm" aria-label="تاريخُ نهايةِ تشغيلِ السائق" name="existing_end_date[' + relationId + ']" value="' + endDate + '"></td>';
                     row += '<td>';
-                    row += '<select class="form-control form-control-sm existing-action" name="existing_action[' + relationId + ']" data-relation-id="' + relationId + '">';
+                    row += '<select class="form-control form-control-sm existing-action" aria-label="الإجراءُ على تشغيلِ السائق: إبقاءٌ أو حذفٌ أو نقل" name="existing_action[' + relationId + ']" data-relation-id="' + relationId + '">';
                     row += '<option value="keep" selected>إبقاء</option>';
                     row += '<option value="remove">حذف من الآلية</option>';
                     row += '<option value="move">نقل إلى آلية أخرى</option>';
                     row += '</select>';
                     row += '</td>';
                     row += '<td>';
-                    row += '<select class="form-control form-control-sm move-target" name="move_to_equipment[' + relationId + ']" disabled>' + moveOptions + '</select>';
+                    row += '<select class="form-control form-control-sm move-target" aria-label="الآليةُ التي يُنقل إليها السائق" name="move_to_equipment[' + relationId + ']" disabled>' + moveOptions + '</select>';
                     row += '</td>';
                     row += '</tr>';
 

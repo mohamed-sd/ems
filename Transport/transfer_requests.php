@@ -142,6 +142,22 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ شاشةِ موافقاتِ الترحيلِ أصنافًا برموزِ الألوان */
+.trs-rq-full{grid-column:1/-1}
+.trs-rq-tbl{width:100%}
+.trs-rq-actgap{gap:4px}
+.trs-rq-inline{display:inline}
+.trs-rq-ok{color:var(--c-198754, #198754)}
+.trs-rq-link{color:var(--c-0d6efd, #0d6efd)}
+.trs-rq-chip{color:var(--c-surface, #ffffff);border-radius:12px;padding:2px 10px}
+.trs-rq-modal{display:none;position:fixed;inset:0;background:var(--c-rgba00005, rgba(0,0,0,.5));z-index:9999;align-items:center;justify-content:center}
+.trs-rq-modal.is-open{display:flex}
+.trs-rq-modal-box{background:var(--c-surface, #ffffff);border-radius:12px;padding:24px;min-width:320px;max-width:90%}
+.trs-rq-modal-title{margin-top:0}
+.trs-rq-dirsel{width:100%;padding:8px}
+.trs-rq-modal-actions{display:flex;gap:8px;margin-top:16px}
+</style>
 <div class="main trs-requests-main ems-unified-page-shell">
     <?php
     $header_title = 'موافقات الترحيل';
@@ -150,6 +166,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'طلب جديد'); }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا طلباتِ ترحيلٍ مقدَّمةً بعدُ', 'قدّم أولَ طلبٍ بزرِّ «طلب جديد» في رأسِ الشاشة');
     // TKT-15 · زر الإبلاغ السياقي — النقل والترحيل (§2-④)
     require_once __DIR__ . '/../includes/report_button.php';
     ems_report_button(array('screen' => 'transport'));
@@ -176,7 +194,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <select name="to_location_id" id="emsf_1601_02058"><?php echo trs_location_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
             <div class="form-group"><label for="emsf_1602_e56fc">الأولوية</label>
                 <select name="priority" id="emsf_1602_e56fc"><?php foreach ($prios as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?></select></div>
-            <div class="form-group" style="grid-column:1/-1"><label for="emsf_1603_27f33">مبرّر الاحتياج <span class="required">*</span></label>
+            <div class="form-group trs-rq-full"><label for="emsf_1603_27f33">مبرّر الاحتياج <span class="required">*</span></label>
                 <input type="text" name="reason" required placeholder="سبب الترحيل ومصدره" id="emsf_1603_27f33"></div>
         </div></div>
         <div class="form-actions">
@@ -187,7 +205,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <div class="card"><div class="card-body"><div class="table-container">
-        <table id="reqTable" class="display nowrap alltables no-datatable" style="width:100%"><thead><tr>
+        <table id="reqTable" class="display nowrap alltables trs-rq-tbl" data-order='[[1,"desc"]]' data-state-save="false" data-scroll-x="true"><thead><tr>
             <th>الإجراءات</th><th>كود العنصر</th><th>نوع الترحيل</th><th>مصدر تحميل التكلفة</th><th>المشروع</th><th>المبرّر</th><th>الأولوية</th><th>الحالة</th>
             <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
             <th class="ems-fn-th" data-fn="1">رقم الطلب</th>
@@ -225,21 +243,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             $src_ar = trs_label($srcs, $row['source_module']);
             $prio_ar = trs_label($prios, $row['priority']);
             $state_ar = trs_label($states, $state);
-            $scolor = array('submitted' => '#0d6efd', 'approved' => '#198754', 'converted' => '#212529', 'rejected' => '#dc3545');
-            $sc = $scolor[$state] ?? '#6c757d';
+            $scolor = array('submitted' => 'var(--c-0d6efd, #0d6efd)', 'approved' => 'var(--c-198754, #198754)',
+                            'converted' => 'var(--c-212529, #212529)', 'rejected' => 'var(--c-dc3545, #dc3545)');
+            $sc = $scolor[$state] ?? 'var(--c-6c757d, #6c757d)';
             echo "<tr>";
-            echo "<td><div class='action-btns' style='gap:4px'>";
+            echo "<td><div class='action-btns trs-rq-actgap'>";
             if ($can_edit && $state === 'submitted') {
-                echo "<form method='post' style='display:inline'>
-        <?= csrf_field() ?><input type='hidden' name='action' value='approve'><input type='hidden' name='request_id' value='" . intval($row['id']) . "'><button class='action-btn' style='color:#198754' title='اعتماد'><i class='fas fa-check'></i></button></form>";
-                echo "<form method='post' style='display:inline' onsubmit='return confirm(\"رفض الطلب؟\")'>
+                echo "<form method='post' class='trs-rq-inline'>
+        <?= csrf_field() ?><input type='hidden' name='action' value='approve'><input type='hidden' name='request_id' value='" . intval($row['id']) . "'><button class='action-btn trs-rq-ok' title='اعتماد'><i class='fas fa-check'></i></button></form>";
+                echo "<form method='post' class='trs-rq-inline' onsubmit='return confirm(\"رفض الطلب؟\")'>
         <?= csrf_field() ?><input type='hidden' name='action' value='reject'><input type='hidden' name='request_id' value='" . intval($row['id']) . "'><button class='action-btn delete' title='رفض'><i class='fas fa-times'></i></button></form>";
             }
             if ($can_edit && $state === 'approved') {
                 echo "<button type='button' class='action-btn edit convertBtn' data-id='" . intval($row['id']) . "' title='تحويل لأمر'><i class='fas fa-right-to-bracket'></i></button>";
             }
             if ($state === 'converted' && $row['order_id']) {
-                echo "<a href='transfer_order_form.php?id=" . intval($row['order_id']) . "' class='action-btn' style='color:#0d6efd' title='فتح الأمر'><i class='fas fa-up-right-from-square'></i></a>";
+                echo "<a href='transfer_order_form.php?id=" . intval($row['order_id']) . "' class='action-btn trs-rq-link' title='فتح الأمر'><i class='fas fa-up-right-from-square'></i></a>";
             }
             echo "</div></td>";
             echo "<td>" . htmlspecialchars((string)$row['code']) . "</td>";
@@ -248,7 +267,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             echo "<td>" . htmlspecialchars((string)($row['project_name'] ?? '—')) . "</td>";
             echo "<td>" . htmlspecialchars((string)$row['reason']) . "</td>";
             echo "<td>" . htmlspecialchars($prio_ar) . "</td>";
-            echo "<td><span class='action-btn' style='color:#fff;background:$sc;border-radius:12px;padding:2px 10px'>" . htmlspecialchars($state_ar) . "</span></td>";
+            echo "<td><span class='action-btn trs-rq-chip' data-allow-style style='background:$sc'>" . htmlspecialchars($state_ar) . "</span></td>";
             echo "</tr>";
         }
         ?>
@@ -257,21 +276,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 </div>
 
 <!-- نافذة اختيار الاتجاه عند التحويل -->
-<div id="convertModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:12px;padding:24px;min-width:320px;max-width:90%">
-    <h5 style="margin-top:0"><i class="fa fa-arrows-turn-right"></i> تحويل الطلب إلى أمر</h5>
+<div id="convertModal" class="trs-rq-modal">
+  <div class="trs-rq-modal-box">
+    <h5 class="trs-rq-modal-title"><i class="fa fa-arrows-turn-right"></i> تحويل الطلب إلى أمر</h5>
     <form method="post">
         <?= csrf_field() ?>
       <input type="hidden" name="action" value="convert">
       <input type="hidden" name="request_id" id="convert_rid" value="">
       <div class="form-group"><label for="emsf_1604_5b717">الاتجاه (إلزامي) <span class="required">*</span></label>
-        <select name="direction" required style="width:100%;padding:8px" id="emsf_1604_5b717">
+        <select name="direction" required class="trs-rq-dirsel" id="emsf_1604_5b717">
           <option value="">— اختر الاتجاه —</option>
           <?php foreach ($dirs as $k => $v) echo "<option value='$k'>" . htmlspecialchars($v) . "</option>"; ?>
         </select></div>
-      <div style="display:flex;gap:8px;margin-top:16px">
+      <div class="trs-rq-modal-actions">
         <button type="submit" class="btn-primary"><i class="fas fa-check"></i> تحويل</button>
-        <button type="button" class="btn-secondary" onclick="document.getElementById('convertModal').style.display='none'"><i class="fas fa-times"></i> إلغاء</button>
+        <button type="button" class="btn-secondary" onclick="document.getElementById('convertModal').classList.remove('is-open')"><i class="fas fa-times"></i> إلغاء</button>
       </div>
     </form>
   </div>
@@ -282,12 +301,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function () {
     $(document).ready(function () {
-        $('#reqTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, order: [[1, 'desc']], "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
         var toggleBtn = document.getElementById('toggleForm');
         if (toggleBtn) toggleBtn.addEventListener('click', function () { document.getElementById('trsForm').reset(); $('#trsForm').toggleClass('allforms-visible'); });
         $(document).on('click', '.convertBtn', function () {
             $('#convert_rid').val($(this).data('id'));
-            document.getElementById('convertModal').style.display = 'flex';
+            document.getElementById('convertModal').classList.add('is-open');
         });
     });
     window.trsToggleForm = function () {

@@ -78,6 +78,8 @@ include('../insidebar.php'); ?>
     foreach (ems_excel_header_actions('driver_contracts', 'عقود السائقين', true) as $__xlAction) { $header_actions[] = $__xlAction; }
     $header_back = array('href' => 'employees.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا عقودَ مسجَّلةً لهذا السائق بعدُ', 'أنشئ أولَ عقدٍ بزرِّ «عقد جديد» في رأسِ الشاشة');
     ?>
 
     <!-- فورم إضافة عقد -->
@@ -103,7 +105,7 @@ include('../insidebar.php'); ?>
             <div class="field md-4">
               <label>اسم المشروع <font color="red">*</font></label>
               <div class="control">
-                <select name="project_id" id="project_id" required>
+                <select name="project_id" aria-label="اسم المشروع" id="project_id" required>
                   <option value="">— اختر المشروع —</option>
                   <?php
                   // مشاريع الشركة عبر البوابة
@@ -118,7 +120,7 @@ include('../insidebar.php'); ?>
             <div class="field md-4">
               <label>عقد المشروع <font color="red">*</font></label>
               <div class="control">
-                <select name="project_contract_id" id="project_contract_id" required disabled>
+                <select name="project_contract_id" aria-label="عقد المشروع" id="project_contract_id" required disabled>
                   <option value="">— اختر المشروع أولاً —</option>
                 </select>
               </div>
@@ -192,7 +194,7 @@ include('../insidebar.php'); ?>
             <!-- صف 1: 3 خانات -->
             <div class="field md-3 sm-6">
               <label>تاريخ توقيع العقد </label>
-              <div class="control"><input name="contract_signing_date" id="contract_signing_date" type="date"></div>
+              <div class="control"><input name="contract_signing_date" aria-label="تاريخ توقيع العقد" id="contract_signing_date" type="date"></div>
             </div>
 
             <div class="field md-3 sm-6">
@@ -203,13 +205,13 @@ include('../insidebar.php'); ?>
 
             <div class="field md-3 sm-6">
               <label>بداية التنفيذ الفعلي المتفق عليه</label>
-              <div class="control"><input name="actual_start" id="actual_start" type="date"></div>
+              <div class="control"><input name="actual_start" aria-label="بداية التنفيذ الفعلي المتفق عليه" id="actual_start" type="date"></div>
             </div>
 
 
             <div class="field md-3 sm-6">
               <label>نهاية التنفيذ الفعلي المتفق عليه</label>
-              <div class="control"><input name="actual_end" id="actual_end" type="date"></div>
+              <div class="control"><input name="actual_end" aria-label="نهاية التنفيذ الفعلي المتفق عليه" id="actual_end" type="date"></div>
             </div>
 
 
@@ -232,7 +234,7 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6">
               <label>العملة</label>
               <div class="control">
-                <select name="price_currency_contract" id="price_currency_contract">
+                <select name="price_currency_contract" aria-label="عملة العقد" id="price_currency_contract">
                   <option value="">— اختر —</option>
                   <option value="دولار">دولار</option>
                   <option value="جنيه">جنيه</option>
@@ -241,13 +243,13 @@ include('../insidebar.php'); ?>
             </div>
             <div class="field md-3 sm-6">
               <label>المبلغ المدفوع</label>
-              <div class="control"><input name="paid_contract" type="text"></div>
+              <div class="control"><input name="paid_contract" aria-label="المبلغ المدفوع" type="text"></div>
             </div>
 
             <div class="field md-3 sm-6">
               <label>وقت الدفع</label>
               <div class="control">
-                <select name="payment_time" id="payment_time">
+                <select name="payment_time" aria-label="وقت الدفع" id="payment_time">
                   <option value="">— اختر —</option>
                   <option value="مقدم">مقدم</option>
                   <option value=" مؤخر">مؤخر </option>
@@ -258,12 +260,12 @@ include('../insidebar.php'); ?>
 
             <div class="field md-3 sm-6">
               <label> الضمانات</label>
-              <div class="control"><input name="guarantees" type="text"></div>
+              <div class="control"><input name="guarantees" aria-label="الضمانات" type="text"></div>
             </div>
 
             <div class="field md-3 sm-6">
               <label> تاريخ الدفع</label>
-              <div class="control"><input name="payment_date" id="payment_date" type="date"></div>
+              <div class="control"><input name="payment_date" aria-label="تاريخ الدفع" id="payment_date" type="date"></div>
             </div>
 
 
@@ -284,7 +286,7 @@ include('../insidebar.php'); ?>
 
             <div class="field md-3 sm-6">
               <label> ساعات الوردية للعقد</label>
-              <div class="control"><input name="shift_contract" type="number" min="0"></div>
+              <div class="control"><input name="shift_contract" aria-label="ساعات الوردية للعقد" type="number" min="0"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>إجمالي الوحدات يومياً للعقد </label>
@@ -292,7 +294,7 @@ include('../insidebar.php'); ?>
             </div>
             <div class="field md-3 sm-6">
               <label>وحدات العمل في الشهر للعقد</label>
-              <div class="control"><input name="total_contract_permonth" type="number" min="0"></div>
+              <div class="control"><input name="total_contract_permonth" aria-label="وحدات العمل في الشهر للعقد" type="number" min="0"></div>
             </div>
 
 
@@ -312,7 +314,7 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6">
               <label>الترحيل (Transportation)</label>
               <div class="control">
-                <select name="transportation" id="transportation">
+                <select name="transportation" aria-label="الترحيل (Transportation)" id="transportation">
                   <option value="">— اختر —</option>
                   <option value="مالك المعدة">مالك المعدة</option>
                   <option value="مالك المشروع">مالك المشروع</option>
@@ -324,7 +326,7 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6">
               <label>السكن (Place for Living)</label>
               <div class="control">
-                <select name="place_for_living" id="place_for_living">
+                <select name="place_for_living" aria-label="السكن (Place for Living)" id="place_for_living">
                   <option value="">— اختر —</option>
                   <option value="مالك المعدة">مالك المعدة</option>
                   <option value="مالك المشروع">مالك المشروع</option>
@@ -336,7 +338,7 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6">
               <label>الإعاشة (Accommodation)</label>
               <div class="control">
-                <select name="accommodation" id="accommodation">
+                <select name="accommodation" aria-label="الإعاشة (Accommodation)" id="accommodation">
                   <option value="">— اختر —</option>
                   <option value="مالك المعدة">مالك المعدة</option>
                   <option value="مالك المشروع">مالك المشروع</option>
@@ -348,7 +350,7 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6">
               <label>الورشة (Workshop)</label>
               <div class="control">
-                <select name="workshop" id="workshop">
+                <select name="workshop" aria-label="الورشة (Workshop)" id="workshop">
                   <option value="">— اختر —</option>
                   <option value="مالك المعدة">مالك المعدة</option>
                   <option value="مالك المشروع">مالك المشروع</option>
@@ -375,7 +377,7 @@ include('../insidebar.php'); ?>
                   <div class="field md-3 sm-6">
                     <label>نوع المعدة</label>
                     <div class="control">
-                      <select name="equip_type_1" class="equip-type">
+                      <select name="equip_type_1" aria-label="نوع المعدة — المعدة رقم 1" class="equip-type">
                         <option value="">— اختر —</option>
                         <option value="حفار">حفار</option>
                         <option value="قلاب">قلاب</option>
@@ -389,29 +391,29 @@ include('../insidebar.php'); ?>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>عدد المعدات</label>
-                    <div class="control"><input name="equip_count_1" type="number" min="0"></div>
+                    <div class="control"><input name="equip_count_1" aria-label="عدد المعدات — المعدة رقم 1" type="number" min="0"></div>
                   </div>
 
                   <div class="field md-3 sm-6">
                     <label><span class="label-dot basic">■</span> المعدات الأساسية</label>
-                    <div class="control"><input name="equip_count_basic_1" type="number" min="0" class="basic-input">
+                    <div class="control"><input name="equip_count_basic_1" aria-label="عدد المعدات الأساسية — المعدة رقم 1" type="number" min="0" class="basic-input">
                     </div>
                   </div>
 
                   <div class="field md-3 sm-6">
                     <label><span class="label-dot backup">■</span> المعدات الاحتياطية</label>
-                    <div class="control"><input name="equip_count_backup_1" type="number" min="0" class="backup-input">
+                    <div class="control"><input name="equip_count_backup_1" aria-label="عدد المعدات الاحتياطية — المعدة رقم 1" type="number" min="0" class="backup-input">
                     </div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>عدد المشغلين</label>
-                    <div class="control"><input name="equip_operators_1" type="number" min="0"></div>
+                    <div class="control"><input name="equip_operators_1" aria-label="عدد المشغلين — المعدة رقم 1" type="number" min="0"></div>
                   </div>
 
 
                   <div class="field md-3 sm-6">
                     <label>عدد المساعدين</label>
-                    <div class="control"><input name="equip_assistants_1" type="number" min="0"></div>
+                    <div class="control"><input name="equip_assistants_1" aria-label="عدد المساعدين — المعدة رقم 1" type="number" min="0"></div>
                   </div>
 
 
@@ -422,24 +424,24 @@ include('../insidebar.php'); ?>
                   <!-- أوقات الورديات -->
                   <div class="field md-3 sm-6">
                     <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
-                    <div class="control"><input name="shift1_start_1" type="time" placeholder="مثال: 08:00" aria-label="مثال: 08:00"></div>
+                    <div class="control"><input name="shift1_start_1" aria-label="بداية الوردية الأولى — المعدة رقم 1" type="time" placeholder="مثال: 08:00"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label><i class="fas fa-clock"></i> نهاية الوردية الأولى</label>
-                    <div class="control"><input name="shift1_end_1" type="time" placeholder="مثال: 16:00" aria-label="مثال: 16:00"></div>
+                    <div class="control"><input name="shift1_end_1" aria-label="نهاية الوردية الأولى — المعدة رقم 1" type="time" placeholder="مثال: 16:00"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label><i class="fas fa-clock"></i> بداية الوردية الثانية</label>
-                    <div class="control"><input name="shift2_start_1" type="time" placeholder="مثال: 16:00" aria-label="مثال: 16:00"></div>
+                    <div class="control"><input name="shift2_start_1" aria-label="بداية الوردية الثانية — المعدة رقم 1" type="time" placeholder="مثال: 16:00"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
-                    <div class="control"><input name="shift2_end_1" type="time" placeholder="مثال: 00:00" aria-label="مثال: 00:00"></div>
+                    <div class="control"><input name="shift2_end_1" aria-label="نهاية الوردية الثانية — المعدة رقم 1" type="time" placeholder="مثال: 00:00"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>وحدة القياس</label>
                     <div class="control">
-                      <select name="equip_unit_1" class="equip-unit">
+                      <select name="equip_unit_1" aria-label="وحدة القياس — المعدة رقم 1" class="equip-unit">
                         <option value="">— اختر —</option>
                         <option value="ساعة">ساعة</option>
                         <option value="طن">طن</option>
@@ -451,7 +453,7 @@ include('../insidebar.php'); ?>
 
                   <div class="field md-3 sm-6">
                     <label>ساعات الوردية</label>
-                    <div class="control"><input name="shift_hours_1" type="number" min="0"></div>
+                    <div class="control"><input name="shift_hours_1" aria-label="ساعات الوردية — المعدة رقم 1" type="number" min="0"></div>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>إجمالي الوحدات يومياً</label>
@@ -460,7 +462,7 @@ include('../insidebar.php'); ?>
                   </div>
                   <div class="field md-3 sm-6">
                     <label>وحدات العمل في الشهر</label>
-                    <div class="control"><input name="equip_target_per_month_1" type="number" min="0"></div>
+                    <div class="control"><input name="equip_target_per_month_1" aria-label="وحدات العمل في الشهر — المعدة رقم 1" type="number" min="0"></div>
                   </div>
 
 
@@ -474,7 +476,7 @@ include('../insidebar.php'); ?>
                   <div class="field md-3 sm-6">
                     <label>العملة</label>
                     <div class="control">
-                      <select name="equip_price_currency_1">
+                      <select name="equip_price_currency_1" aria-label="عملة سعر الوحدة — المعدة رقم 1">
                         <option value="">— اختر —</option>
                         <option value="دولار">دولار</option>
                         <option value="جنيه">جنيه</option>
@@ -499,12 +501,12 @@ include('../insidebar.php'); ?>
 
                   <div class="field md-3 sm-6">
                     <label>عدد المشرفين</label>
-                    <div class="control"><input name="equip_supervisors_1" type="number" min="0"></div>
+                    <div class="control"><input name="equip_supervisors_1" aria-label="عدد المشرفين — المعدة رقم 1" type="number" min="0"></div>
                   </div>
 
                   <div class="field md-3 sm-6">
                     <label>عدد الفنيين</label>
-                    <div class="control"><input name="equip_technicians_1" type="number" min="0"></div>
+                    <div class="control"><input name="equip_technicians_1" aria-label="عدد الفنيين — المعدة رقم 1" type="number" min="0"></div>
                   </div>
                   <!-- إكمال الصف بثلاث خانات -->
                   <div class="field md-3 sm-6"></div>
@@ -592,35 +594,35 @@ include('../insidebar.php'); ?>
           <span class="group-tools-title">
             <i class="fas fa-filter"></i> عرض المجموعات:
           </span>
-          <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
+          <button class="ems-btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
             <i class="fas fa-info-circle"></i> أساسية
           </button>
-          <button class="btn-group-toggle active" data-group="dates" title="التواريخ والمدد">
+          <button class="ems-btn-group-toggle active" data-group="dates" title="التواريخ والمدد">
             <i class="far fa-calendar"></i> تواريخ
           </button>
-          <button class="btn-group-toggle active" data-group="hours" title="الساعات والأهداف">
+          <button class="ems-btn-group-toggle active" data-group="hours" title="الساعات والأهداف">
             <i class="fas fa-clock"></i> ساعات
           </button>
-          <button class="btn-group-toggle" data-group="parties" title="أطراف العقد">
+          <button class="ems-btn-group-toggle" data-group="parties" title="أطراف العقد">
             <i class="fas fa-users"></i> أطراف
           </button>
-          <button class="btn-group-toggle" data-group="services" title="الخدمات المقدمة">
+          <button class="ems-btn-group-toggle" data-group="services" title="الخدمات المقدمة">
             <i class="fas fa-hands-helping"></i> خدمات
           </button>
-          <button class="btn-group-toggle" data-group="operations" title="التشغيل اليومي">
+          <button class="ems-btn-group-toggle" data-group="operations" title="التشغيل اليومي">
             <i class="fas fa-cogs"></i> تشغيل
           </button>
-          <button class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
+          <button class="ems-btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
             <i class="fas fa-check-circle"></i> حالة
           </button>
-          <button class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
+          <button class="ems-btn-group-toggle-all" title="إظهار/إخفاء الكل">
             <i class="fas fa-eye"></i> الكل
           </button>
         </div>
       </div>
 
       <div class="card-body contracts-table-body">
-        <table id="projectsTable" class="display nowrap contracts-table contracts-table-nowrap no-datatable">
+        <table id="projectsTable" class="display nowrap contracts-table contracts-table-nowrap" data-scroll-x="1">
           <thead>
             <tr>
               <th class="group-status"><i class="fas fa-cogs"></i> الإجراءات</th>
@@ -1105,13 +1107,13 @@ include('../insidebar.php'); ?>
       transition: all .2s ease;
     }
 
-    #projectsTable .action-btn.view { background: rgba(232, 184, 0, .18); color: #9a7b00; }
-    #projectsTable .action-btn.edit { background: rgba(12, 28, 62, .08); color: #0c1c3e; }
-    #projectsTable .action-btn.delete { background: rgba(220, 38, 38, .12); color: #b91c1c; }
+    #projectsTable .action-btn.view { background: var(--c-rgba232184018, rgba(232, 184, 0, .18)); color: var(--c-9a7b00, #9a7b00); }
+    #projectsTable .action-btn.edit { background: var(--c-rgba12286208, rgba(12, 28, 62, .08)); color: var(--c-0c1c3e, #0c1c3e); }
+    #projectsTable .action-btn.delete { background: var(--c-rgba220383812, rgba(220, 38, 38, .12)); color: var(--c-b91c1c, #b91c1c); }
 
-    #projectsTable .action-btn.view:hover { background: #e8b800; color: #0c1c3e; transform: translateY(-2px); }
-    #projectsTable .action-btn.edit:hover { background: #0c1c3e; color: #fff; transform: translateY(-2px); }
-    #projectsTable .action-btn.delete:hover { background: #dc2626; color: #fff; transform: translateY(-2px); }
+    #projectsTable .action-btn.view:hover { background: var(--c-e8b800, #e8b800); color: var(--c-0c1c3e, #0c1c3e); transform: translateY(-2px); }
+    #projectsTable .action-btn.edit:hover { background: var(--c-0c1c3e, #0c1c3e); color: var(--c-surface, #fff); transform: translateY(-2px); }
+    #projectsTable .action-btn.delete:hover { background: var(--c-dc2626, #dc2626); color: var(--c-surface, #fff); transform: translateY(-2px); }
   </style>
 
 
@@ -1120,27 +1122,11 @@ include('../insidebar.php'); ?>
       // تشغيل DataTable بالعربية
 
 
-      $(document).ready(function () {
-        if ($.fn.dataTable.isDataTable('#projectsTable')) {
-          return; // already initialised elsewhere — avoid "Cannot reinitialise"
-        }
-        $('#projectsTable').DataTable({
-          dom: 'Bfrtip', // Buttons + Search + Pagination
-          scrollX: true,
-          autoWidth: false,
-          buttons: [
-            { extend: 'copy', text: 'نسخ' },
-            { extend: 'excel', text: 'تصدير Excel' },
-            { extend: 'csv', text: 'تصدير CSV' },
-            { extend: 'pdf', text: 'تصدير PDF' },
-            { extend: 'print', text: 'طباعة' }
-          ],
-          "language": {
-            "url": "/ems/assets/i18n/datatables/ar.json"
-          }
-        });
-      });
-
+      /* UXW-01 ⑤: التهيئةُ المحليةُ رُفعت — المكوّنُ المركزيُّ في
+         assets/js/ui-unification.js يلتقط الجدولَ آليًّا (تعريبٌ من
+         /ems/assets/i18n/datatables/ar.json و autoWidth:false)، والتمريرُ
+         الأفقيُّ محفوظٌ بسمةِ data-scroll-x على وسمِ الجدول، وزرُّ إكسل
+         يُلحقه المكوّنُ المركزيُّ نفسُه. */
 
       // التحكم في إظهار وإخفاء الفورم
       const toggleContractFormBtn = document.getElementById('toggleForm');
@@ -1218,7 +1204,7 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6">
               <label>نوع المعدة</label>
               <div class="control">
-                <select name="equip_type_${equipmentIndex}" class="equip-type">
+                <select name="equip_type_${equipmentIndex}" aria-label="نوع المعدة — المعدة رقم ${equipmentIndex}" class="equip-type">
                   <option value="">— اختر —</option>
                   <option value="حفار">حفار</option>
                   <option value="قلاب">قلاب</option>
@@ -1232,24 +1218,24 @@ include('../insidebar.php'); ?>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد المعدات</label>
-              <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_count_${equipmentIndex}" aria-label="عدد المعدات — المعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><span class="label-dot basic">■</span> المعدات الأساسية</label>
-              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" class="basic-input"></div>
+              <div class="control"><input name="equip_count_basic_${equipmentIndex}" aria-label="عدد المعدات الأساسية — المعدة رقم ${equipmentIndex}" type="number" min="0" class="basic-input"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><span class="label-dot backup">■</span> المعدات الاحتياطية</label>
-              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" class="backup-input"></div>
+              <div class="control"><input name="equip_count_backup_${equipmentIndex}" aria-label="عدد المعدات الاحتياطية — المعدة رقم ${equipmentIndex}" type="number" min="0" class="backup-input"></div>
             </div>
 
             <div class="field md-3 sm-6">
               <label>عدد المشغلين</label>
-              <div class="control"><input name="equip_operators_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_operators_${equipmentIndex}" aria-label="عدد المشغلين — المعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد المساعدين</label>
-              <div class="control"><input name="equip_assistants_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_assistants_${equipmentIndex}" aria-label="عدد المساعدين — المعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
 
             <div class="field md-3 sm-6">
@@ -1260,25 +1246,25 @@ include('../insidebar.php'); ?>
             <!-- أوقات الورديات -->
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
-              <div class="control"><input name="shift1_start_${equipmentIndex}" type="time" placeholder="مثال: 08:00" aria-label="مثال: 08:00"></div>
+              <div class="control"><input name="shift1_start_${equipmentIndex}" aria-label="بداية الوردية الأولى — المعدة رقم ${equipmentIndex}" type="time" placeholder="مثال: 08:00"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> نهاية الوردية الأولى</label>
-              <div class="control"><input name="shift1_end_${equipmentIndex}" type="time" placeholder="مثال: 16:00" aria-label="مثال: 16:00"></div>
+              <div class="control"><input name="shift1_end_${equipmentIndex}" aria-label="نهاية الوردية الأولى — المعدة رقم ${equipmentIndex}" type="time" placeholder="مثال: 16:00"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> بداية الوردية الثانية</label>
-              <div class="control"><input name="shift2_start_${equipmentIndex}" type="time" placeholder="مثال: 16:00" aria-label="مثال: 16:00"></div>
+              <div class="control"><input name="shift2_start_${equipmentIndex}" aria-label="بداية الوردية الثانية — المعدة رقم ${equipmentIndex}" type="time" placeholder="مثال: 16:00"></div>
             </div>
             <div class="field md-3 sm-6">
               <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
-              <div class="control"><input name="shift2_end_${equipmentIndex}" type="time" placeholder="مثال: 00:00" aria-label="مثال: 00:00"></div>
+              <div class="control"><input name="shift2_end_${equipmentIndex}" aria-label="نهاية الوردية الثانية — المعدة رقم ${equipmentIndex}" type="time" placeholder="مثال: 00:00"></div>
             </div>
 
             <div class="field md-3 sm-6">
               <label>وحدة القياس</label>
               <div class="control">
-                <select name="equip_unit_${equipmentIndex}" class="equip-unit">
+                <select name="equip_unit_${equipmentIndex}" aria-label="وحدة القياس — المعدة رقم ${equipmentIndex}" class="equip-unit">
                   <option value="">— اختر —</option>
                   <option value="ساعة">ساعة</option>
                   <option value="طن">طن</option>
@@ -1290,7 +1276,7 @@ include('../insidebar.php'); ?>
 
             <div class="field md-3 sm-6">
               <label>ساعات الوردية</label>
-              <div class="control"><input name="shift_hours_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="shift_hours_${equipmentIndex}" aria-label="ساعات الوردية — المعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>إجمالي الساعات يومياً</label>
@@ -1298,7 +1284,7 @@ include('../insidebar.php'); ?>
             </div>
             <div class="field md-3 sm-6">
               <label>وحدات العمل في الشهر</label>
-              <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_target_per_month_${equipmentIndex}" aria-label="وحدات العمل في الشهر — المعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
 
             <div class="field md-3 sm-6">
@@ -1308,7 +1294,7 @@ include('../insidebar.php'); ?>
             <div class="field md-3 sm-6">
               <label>العملة</label>
               <div class="control">
-                <select name="equip_price_currency_${equipmentIndex}">
+                <select name="equip_price_currency_${equipmentIndex}" aria-label="عملة سعر الوحدة — المعدة رقم ${equipmentIndex}">
                   <option value="">— اختر —</option>
                   <option value="دولار">دولار</option>
                   <option value="جنيه">جنيه</option>
@@ -1323,11 +1309,11 @@ include('../insidebar.php'); ?>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد المشرفين</label>
-              <div class="control"><input name="equip_supervisors_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_supervisors_${equipmentIndex}" aria-label="عدد المشرفين — المعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد الفنيين</label>
-              <div class="control"><input name="equip_technicians_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_technicians_${equipmentIndex}" aria-label="عدد الفنيين — المعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
           </div>
         </div>
@@ -1589,26 +1575,26 @@ include('../insidebar.php'); ?>
 
               if (sectionIndex === 1) {
                 // تحديث القسم الأول
-                $(`select[name="equip_type_1"]`).val(equip.equip_type);
+                $(`select[name="equip_type_1" aria-label="نوع المعدة — المعدة رقم 1"]`).val(equip.equip_type);
                 $(`input[name="equip_size_1"]`).val(equip.equip_size);
-                $(`input[name="equip_count_1"]`).val(equip.equip_count);
-                $(`input[name="equip_count_basic_1"]`).val(equip.equip_count_basic || 0);
-                $(`input[name="equip_count_backup_1"]`).val(equip.equip_count_backup || 0);
+                $(`input[name="equip_count_1" aria-label="عدد المعدات — المعدة رقم 1"]`).val(equip.equip_count);
+                $(`input[name="equip_count_basic_1" aria-label="عدد المعدات الأساسية — المعدة رقم 1"]`).val(equip.equip_count_basic || 0);
+                $(`input[name="equip_count_backup_1" aria-label="عدد المعدات الاحتياطية — المعدة رقم 1"]`).val(equip.equip_count_backup || 0);
                 $(`input[name="equip_shifts_1"]`).val(equip.equip_shifts);
-                $(`select[name="equip_unit_1"]`).val(equip.equip_unit);
-                $(`input[name="shift1_start_1"]`).val(equip.shift1_start);
-                $(`input[name="shift1_end_1"]`).val(equip.shift1_end);
-                $(`input[name="shift2_start_1"]`).val(equip.shift2_start);
-                $(`input[name="shift2_end_1"]`).val(equip.shift2_end);
-                $(`input[name="shift_hours_1"]`).val(equip.shift_hours);
+                $(`select[name="equip_unit_1" aria-label="وحدة القياس — المعدة رقم 1"]`).val(equip.equip_unit);
+                $(`input[name="shift1_start_1" aria-label="بداية الوردية الأولى — المعدة رقم 1"]`).val(equip.shift1_start);
+                $(`input[name="shift1_end_1" aria-label="نهاية الوردية الأولى — المعدة رقم 1"]`).val(equip.shift1_end);
+                $(`input[name="shift2_start_1" aria-label="بداية الوردية الثانية — المعدة رقم 1"]`).val(equip.shift2_start);
+                $(`input[name="shift2_end_1" aria-label="نهاية الوردية الثانية — المعدة رقم 1"]`).val(equip.shift2_end);
+                $(`input[name="shift_hours_1" aria-label="ساعات الوردية — المعدة رقم 1"]`).val(equip.shift_hours);
                 $(`input[name="equip_total_month_1"]`).val(equip.equip_total_month);
                 $(`input[name="equip_total_contract_1"]`).val(equip.equip_total_contract);
                 $(`input[name="equip_price_1"]`).val(equip.equip_price);
-                $(`select[name="equip_price_currency_1"]`).val(equip.equip_price_currency);
-                $(`input[name="equip_operators_1"]`).val(equip.equip_operators);
-                $(`input[name="equip_supervisors_1"]`).val(equip.equip_supervisors);
-                $(`input[name="equip_technicians_1"]`).val(equip.equip_technicians);
-                $(`input[name="equip_assistants_1"]`).val(equip.equip_assistants);
+                $(`select[name="equip_price_currency_1" aria-label="عملة سعر الوحدة — المعدة رقم 1"]`).val(equip.equip_price_currency);
+                $(`input[name="equip_operators_1" aria-label="عدد المشغلين — المعدة رقم 1"]`).val(equip.equip_operators);
+                $(`input[name="equip_supervisors_1" aria-label="عدد المشرفين — المعدة رقم 1"]`).val(equip.equip_supervisors);
+                $(`input[name="equip_technicians_1" aria-label="عدد الفنيين — المعدة رقم 1"]`).val(equip.equip_technicians);
+                $(`input[name="equip_assistants_1" aria-label="عدد المساعدين — المعدة رقم 1"]`).val(equip.equip_assistants);
                 equipmentIndex = 1;
               } else {
                 // إضافة أقسام جديدة
@@ -1628,7 +1614,7 @@ include('../insidebar.php'); ?>
                       <div class="field md-3 sm-6">
                         <label>نوع المعدة</label>
                         <div class="control">
-                          <select name="equip_type_${equipmentIndex}" class="equip-type">
+                          <select name="equip_type_${equipmentIndex}" aria-label="نوع المعدة — المعدة رقم ${equipmentIndex}" class="equip-type">
                             <option value="">— اختر —</option>
                             <option value="حفار" ${equip.equip_type === 'حفار' ? 'selected' : ''}>حفار</option>
                             <option value="قلاب" ${equip.equip_type === 'قلاب' ? 'selected' : ''}>قلاب</option>
@@ -1642,19 +1628,19 @@ include('../insidebar.php'); ?>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المعدات</label>
-                        <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0" value="${equip.equip_count}"></div>
+                        <div class="control"><input name="equip_count_${equipmentIndex}" aria-label="عدد المعدات — المعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.equip_count}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label><span class="label-dot basic">■</span> المعدات الأساسية</label>
-                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" value="${equip.equip_count_basic || 0}" class="basic-input"></div>
+                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" aria-label="عدد المعدات الأساسية — المعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.equip_count_basic || 0}" class="basic-input"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label><span class="label-dot backup">■</span> المعدات الاحتياطية</label>
-                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" value="${equip.equip_count_backup || 0}" class="backup-input"></div>
+                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" aria-label="عدد المعدات الاحتياطية — المعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.equip_count_backup || 0}" class="backup-input"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المساعدين</label>
-                        <div class="control"><input name="equip_assistants_${equipmentIndex}" type="number" min="0" value="${equip.equip_assistants}"></div>
+                        <div class="control"><input name="equip_assistants_${equipmentIndex}" aria-label="عدد المساعدين — المعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.equip_assistants}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد الورديات</label>
@@ -1664,25 +1650,25 @@ include('../insidebar.php'); ?>
                       <!-- أوقات الورديات -->
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
-                        <div class="control"><input name="shift1_start_${equipmentIndex}" type="time" value="${equip.shift1_start || ''}"></div>
+                        <div class="control"><input name="shift1_start_${equipmentIndex}" aria-label="بداية الوردية الأولى — المعدة رقم ${equipmentIndex}" type="time" value="${equip.shift1_start || ''}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> نهاية الوردية الأولى</label>
-                        <div class="control"><input name="shift1_end_${equipmentIndex}" type="time" value="${equip.shift1_end || ''}"></div>
+                        <div class="control"><input name="shift1_end_${equipmentIndex}" aria-label="نهاية الوردية الأولى — المعدة رقم ${equipmentIndex}" type="time" value="${equip.shift1_end || ''}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> بداية الوردية الثانية</label>
-                        <div class="control"><input name="shift2_start_${equipmentIndex}" type="time" value="${equip.shift2_start || ''}"></div>
+                        <div class="control"><input name="shift2_start_${equipmentIndex}" aria-label="بداية الوردية الثانية — المعدة رقم ${equipmentIndex}" type="time" value="${equip.shift2_start || ''}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
-                        <div class="control"><input name="shift2_end_${equipmentIndex}" type="time" value="${equip.shift2_end || ''}"></div>
+                        <div class="control"><input name="shift2_end_${equipmentIndex}" aria-label="نهاية الوردية الثانية — المعدة رقم ${equipmentIndex}" type="time" value="${equip.shift2_end || ''}"></div>
                       </div>
 
                       <div class="field md-3 sm-6">
                         <label>وحدة القياس</label>
                         <div class="control">
-                          <select name="equip_unit_${equipmentIndex}" class="equip-unit">
+                          <select name="equip_unit_${equipmentIndex}" aria-label="وحدة القياس — المعدة رقم ${equipmentIndex}" class="equip-unit">
                             <option value="">— اختر —</option>
                             <option value="ساعة" ${equip.equip_unit === 'ساعة' ? 'selected' : ''}>ساعة</option>
                             <option value="طن" ${equip.equip_unit === 'طن' ? 'selected' : ''}>طن</option>
@@ -1694,7 +1680,7 @@ include('../insidebar.php'); ?>
 
                       <div class="field md-3 sm-6">
                         <label>ساعات الوردية</label>
-                        <div class="control"><input name="shift_hours_${equipmentIndex}" type="number" min="0" value="${equip.shift_hours}"></div>
+                        <div class="control"><input name="shift_hours_${equipmentIndex}" aria-label="ساعات الوردية — المعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.shift_hours}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي الساعات يومياً</label>
@@ -1702,7 +1688,7 @@ include('../insidebar.php'); ?>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>وحدات العمل في الشهر</label>
-                        <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0" value="${equip.equip_monthly_target || 0}"></div>
+                        <div class="control"><input name="equip_target_per_month_${equipmentIndex}" aria-label="وحدات العمل في الشهر — المعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.equip_monthly_target || 0}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي ساعات العقد</label>
@@ -1711,7 +1697,7 @@ include('../insidebar.php'); ?>
                       <div class="field md-3 sm-6">
                         <label>العملة</label>
                         <div class="control">
-                          <select name="equip_price_currency_${equipmentIndex}">
+                          <select name="equip_price_currency_${equipmentIndex}" aria-label="عملة سعر الوحدة — المعدة رقم ${equipmentIndex}">
                             <option value="">— اختر —</option>
                             <option value="دولار" ${equip.equip_price_currency === 'دولار' ? 'selected' : ''}>دولار</option>
                             <option value="جنيه" ${equip.equip_price_currency === 'جنيه' ? 'selected' : ''}>جنيه</option>
@@ -1726,11 +1712,11 @@ include('../insidebar.php'); ?>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المشرفين</label>
-                        <div class="control"><input name="equip_supervisors_${equipmentIndex}" type="number" min="0" value="${equip.equip_supervisors}"></div>
+                        <div class="control"><input name="equip_supervisors_${equipmentIndex}" aria-label="عدد المشرفين — المعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.equip_supervisors}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد الفنيين</label>
-                        <div class="control"><input name="equip_technicians_${equipmentIndex}" type="number" min="0" value="${equip.equip_technicians}"></div>
+                        <div class="control"><input name="equip_technicians_${equipmentIndex}" aria-label="عدد الفنيين — المعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.equip_technicians}"></div>
                       </div>
                     </div>
                   </div>
@@ -1759,7 +1745,12 @@ include('../insidebar.php'); ?>
     (function () {
       function go() {
         if (window.EmsColumnGroups) {
-          EmsColumnGroups.init({ storageKey: 'driverContractGroupStates', mode: 'classic' });
+          // UXW-01 ③: الأصنافُ اعتُمدت باسمِ العائلةِ المؤسسية ems-btn — المحدِّدان يمرَّران صراحةً
+          EmsColumnGroups.init({
+            storageKey: 'driverContractGroupStates', mode: 'classic',
+            buttons: '.ems-btn-group-toggle[data-group]',
+            allButton: '.ems-btn-group-toggle-all'
+          });
         }
       }
       if (window.EmsColumnGroups) { go(); } else { window.addEventListener('DOMContentLoaded', go); }

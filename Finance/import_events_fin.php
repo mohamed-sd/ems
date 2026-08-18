@@ -152,40 +152,52 @@ foreach (fin_pending_import(ems_tenant_db(), 'proc_order', 'total_amount', 'proc
 }
 $mnt_pending  = count(fin_pending_import(ems_tenant_db(), 'mnt_order', 'total_cost', 'maintenance'));
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة */
+.fin-imp-notice { background: var(--c-eef6ff, #eef6ff); border-color: var(--c-b6d4fe, #b6d4fe); color: var(--c-084298, #084298); }
+.fin-imp-cards { margin-top: 12px; }
+.fin-imp-card { text-align: center; }
+.fin-imp-count { font-size: 26px; margin: 8px 0; }
+.fin-imp-cta { display: inline-block; text-decoration: none; }
+.fin-imp-h5 { margin: 0 0 10px; }
+.fin-imp-table { width: 100%; }
+</style>
 <div class="main fin-import-main ems-unified-page-shell">
     <?php
     $header_title = 'استقبال معاملات الإدارات (نموذج السحب)'; $header_icon = 'fa fa-file-import';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+    echo ems_states_bundle('لا أحداثَ ماليةً مستوردةً بعدُ', 'ولّدْ أحداثَ المشترياتِ أوِ الصيانةِ من بطاقتي الأعلى حين يظهرُ عددٌ منتظر');
     ?>
     <?php fin_msg_banner(); ?>
 
     <div class="card"><div class="card-body">
-        <div class="success-message is-success" style="background:#eef6ff;border-color:#b6d4fe;color:#084298">
+        <div class="success-message is-success fin-imp-notice">
             <i class="fas fa-shield-halved"></i>
             المالية تقرأ أوامر المشتريات والصيانة <strong>قراءةً فقط</strong> وتولّد أحداثاً مالية جديدة —
             <strong>دون أي تعديل على النظام القائم</strong>. الأحداث المولّدة تبدأ «مسودة» وتمرّ بدورة الاعتماد كالمعتاد.
         </div>
 
-        <div class="form-grid" style="margin-top:12px">
-            <div class="card" style="text-align:center"><div class="card-body">
+        <div class="form-grid fin-imp-cards">
+            <div class="card fin-imp-card"><div class="card-body">
                 <h5><i class="fas fa-file-invoice-dollar"></i> المشتريات (أوامر الشراء)</h5>
-                <p style="font-size:26px;margin:8px 0"><strong><?php echo $proc_pending; ?></strong></p>
+                <p class="fin-imp-count"><strong><?php echo $proc_pending; ?></strong></p>
                 <p class="text-muted">أمر شراء لم يُولّد له حدث بعد</p>
                 <?php if ($can_add && $proc_pending > 0): ?>
-                    <a href="?gen_proc=1&_t=<?php echo fin_action_token(); ?>" class="btn-primary" style="display:inline-block;text-decoration:none" onclick="return confirm('توليد <?php echo $proc_pending; ?> حدث مصروف من المشتريات؟')"><i class="fas fa-bolt"></i> توليد أحداث المشتريات</a>
+                    <a href="?gen_proc=1&_t=<?php echo fin_action_token(); ?>" class="btn-primary fin-imp-cta" onclick="return confirm('توليد <?php echo $proc_pending; ?> حدث مصروف من المشتريات؟')"><i class="fas fa-bolt"></i> توليد أحداث المشتريات</a>
                 <?php elseif ($proc_pending === 0): ?>
                     <span class="badge badge-success">لا جديد — كل الأوامر مستوردة</span>
                 <?php endif; ?>
             </div></div>
 
-            <div class="card" style="text-align:center"><div class="card-body">
+            <div class="card fin-imp-card"><div class="card-body">
                 <h5><i class="fas fa-screwdriver-wrench"></i> الصيانة (أوامر الصيانة)</h5>
-                <p style="font-size:26px;margin:8px 0"><strong><?php echo $mnt_pending; ?></strong></p>
+                <p class="fin-imp-count"><strong><?php echo $mnt_pending; ?></strong></p>
                 <p class="text-muted">أمر صيانة بتكلفة لم يُولّد له حدث بعد</p>
                 <?php if ($can_add && $mnt_pending > 0): ?>
-                    <a href="?gen_mnt=1&_t=<?php echo fin_action_token(); ?>" class="btn-primary" style="display:inline-block;text-decoration:none" onclick="return confirm('توليد <?php echo $mnt_pending; ?> حدث مصروف من الصيانة؟')"><i class="fas fa-bolt"></i> توليد أحداث الصيانة</a>
+                    <a href="?gen_mnt=1&_t=<?php echo fin_action_token(); ?>" class="btn-primary fin-imp-cta" onclick="return confirm('توليد <?php echo $mnt_pending; ?> حدث مصروف من الصيانة؟')"><i class="fas fa-bolt"></i> توليد أحداث الصيانة</a>
                 <?php elseif ($mnt_pending === 0): ?>
                     <span class="badge badge-success">لا جديد — كل الأوامر مستوردة</span>
                 <?php endif; ?>
@@ -194,9 +206,9 @@ $mnt_pending  = count(fin_pending_import(ems_tenant_db(), 'mnt_order', 'total_co
     </div></div>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-list"></i> الأحداث المستوردة</h5>
+        <h5 class="fin-imp-h5"><i class="fas fa-list"></i> الأحداث المستوردة</h5>
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="finTable" class="display nowrap alltables fin-imp-table">
                 <thead><tr><th>رقم الحدث</th><th>المصدر</th><th>المرجع</th><th>المبلغ</th><th>الحالة</th><th>ملاحظة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -243,9 +255,7 @@ $mnt_pending  = count(fin_pending_import(ems_tenant_db(), 'mnt_order', 'total_co
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 <script>
 $(document).ready(function () {
-    $('#finTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    // جدولُ العرضِ يهيّئُه المكوّنُ المركزيُّ (assets/js/ui-unification.js)
 });
 </script>
 </body>

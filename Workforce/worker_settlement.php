@@ -118,21 +118,38 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if($can_add) $header_actions[]=array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'تسوية جديدة');
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>
+    <?php // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا تسوياتِ عاملين مسجَّلةً في هذا السجلِّ العرضيّ', 'أعِدَّ التسويةَ من شاشةِ «تسويات الموظفين» الموحّدةِ لتظهرَ هنا'); ?>
+    <style>
+        .ws-notice-body { border-right: 4px solid var(--c-f59e0b, #f59e0b); }
+        .ws-notice-text { color: var(--c-note-ink); margin: 0; line-height: var(--leading-loose); }
+        .ws-notice-link { margin-top: var(--space-2); }
+        .ws-form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); padding: 14px; }
+        .ws-span-full { grid-column: 1 / -1; }
+        .ws-form-actions { padding: 0 14px 16px; display: flex; gap: 10px; }
+        .ws-cancel-btn { background: var(--c-ink-500); }
+        .ws-lines-card { display: block; }
+        .ws-line-actions { display: flex; align-items: flex-end; }
+        .ws-table-wrap { margin-top: 14px; }
+        .ws-table-full { width: 100%; }
+        .ws-empty-line { text-align: center; color: var(--c-888, #888); }
+        .ws-empty-cell { text-align: center; color: var(--c-888, #888); padding: 18px; }
+    </style>
     <?php /* ── إحالةٌ إلى المسار الموحّد (E-02 · 2026-07-29) ──────────────────
        هذه الشاشةُ مسارُ كتابةٍ ثانٍ بإدخالٍ يدويٍّ حرٍّ للمبالغ — ومبدأُ النظام
        «الإدخالُ مرةً واحدةً في المنبع وما سواه اشتقاق». فأُحيلت إلى العرض
        (سُحبت مِنحُ الإضافة والتعديل بترحيل 2026_07_29)، والعملُ في الشاشة
        الموحّدة التي تجلب البنودَ من مصادرها. ولم يُمسّ صفٌّ: الجدولُ فارغٌ
        أصلًا (صفرُ صفٍّ مقيسٌ 2026-07-29) والبنيةُ باقيةٌ كما هي. */ ?>
-    <div class="card"><div class="card-body" style="border-right:4px solid #f59e0b;">
-        <p style="color:#78350f;margin:0;line-height:1.8;">
+    <div class="card"><div class="card-body ws-notice-body">
+        <p class="ws-notice-text">
             <i class="fas fa-triangle-exclamation"></i>
             <strong>هذه الشاشةُ صارت للعرض فقط.</strong>
             تسويةُ الموظف تُعدّ الآن من الشاشة الموحّدة التي <strong>تجلب البنودَ من
             مصادرها</strong> — استحقاقُه وتحميلاتُه من دفتر ذممه بروابط أصولها،
             بلا إدخال مبلغٍ باليد، وبفصلِ يدين: مَن يُعدّ لا يُجيز.
             <br>
-            <a class="btn btn-sm btn-primary" style="margin-top:8px"
+            <a class="btn btn-sm btn-primary ws-notice-link"
                href="employee_settlements.php">
                <i class="fas fa-arrow-left"></i> اذهب إلى «تسويات الموظفين»</a>
         </p>
@@ -140,37 +157,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if(!empty($_GET['msg'])): $ok=strpos($_GET['msg'],'✅')!==false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
-    <form id="sForm" action="" method="post" class="allforms" style="<?= $edit?'display:block;':'display:none;' ?>
-        <?= csrf_field() ?>">
+    <form id="sForm" action="" method="post" class="allforms<?= $edit?' allforms-visible':'' ?>">
+        <?= csrf_field() ?>
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= $edit?intval($edit['id']):0 ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $edit?'تعديل تسوية':'تسوية جديدة' ?></h5></div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
-            <div class="field"><label>الموظف</label><?php if($edit): ?><input type="text" value="<?= htmlspecialchars($edit['wname'] ?: ('#'.$edit['employee_id'])) ?>" disabled><?php else: ?><select name="worker_id" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?></div>
-            <div class="field"><label>المصدر</label><select name="source_type"><option value="">—</option><?php foreach(['شركة','مورد','مقاول'] as $s): ?><option value="<?= $s ?>" <?= (($edit['source_type']??'')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
+        <div class="ws-form-grid">
+            <div class="field"><label for="ws_worker">الموظف</label><?php if($edit): ?><input type="text" id="ws_worker" aria-label="اسمُ الموظفِ صاحبِ التسوية" value="<?= htmlspecialchars($edit['wname'] ?: ('#'.$edit['employee_id'])) ?>" disabled><?php else: ?><select name="worker_id" id="ws_worker" required><option value="">—</option><?php foreach($workers as $wid=>$wn): ?><option value="<?= intval($wid) ?>"><?= htmlspecialchars($wn) ?></option><?php endforeach; ?></select><?php endif; ?></div>
+            <div class="field"><label for="ws_source_type">المصدر</label><select name="source_type" id="ws_source_type"><option value="">—</option><?php foreach(['شركة','مورد','مقاول'] as $s): ?><option value="<?= $s ?>" <?= (($edit['source_type']??'')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
             <div class="field"><label for="emsf_624_8d8b1">أساس التسوية</label><select name="settlement_basis" id="emsf_624_8d8b1"><option value="">—</option><?php foreach(['عمالة شركة','فاتورة مورد','مستخلص مقاول'] as $b): ?><option value="<?= $b ?>" <?= (($edit['settlement_basis']??'')===$b)?'selected':'' ?>><?= $b ?></option><?php endforeach; ?></select></div>
             <div class="field"><label for="emsf_625_12a01">الحالة</label><select name="state" id="emsf_625_12a01"><?php foreach($STATES as $s): ?><option value="<?= $s ?>" <?= (($edit['state']??'محتسب')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label for="emsf_626_d9937">جهة التسوية</label><input type="text" name="settlement_party" value="<?= htmlspecialchars($edit['settlement_party'] ?? '') ?>" id="emsf_626_d9937"></div>
-            <div class="field"><label for="emsf_627_607ef">عقد مرتبط (#)</label><input type="number" name="worker_contract_id" value="<?= htmlspecialchars($edit['worker_contract_id'] ?? '') ?>" id="emsf_627_607ef"></div>
-            <div class="field"><label for="emsf_628_39c52">الصافي (مالي — يدوي)</label><input type="number" step="0.01" name="net_amount" value="<?= htmlspecialchars($edit['net_amount'] ?? '') ?>" id="emsf_628_39c52"></div>
-            <div class="field"><label for="emsf_629_386b4">تعليق مالي</label><input type="text" name="net_finance_note" value="<?= htmlspecialchars($edit['net_finance_note'] ?? '') ?>" id="emsf_629_386b4"></div>
-            <div class="field" style="grid-column:1/-1;"><label for="emsf_630_ac9d5">ملاحظات</label><input type="text" name="notes" value="<?= htmlspecialchars($edit['notes'] ?? '') ?>" id="emsf_630_ac9d5"></div>
+            <div class="field"><label for="emsf_626_d9937">جهة التسوية</label><input type="text" name="settlement_party" id="emsf_626_d9937" aria-label="جهةُ التسوية" value="<?= htmlspecialchars($edit['settlement_party'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_627_607ef">عقد مرتبط (#)</label><input type="number" name="worker_contract_id" id="emsf_627_607ef" aria-label="رقمُ العقدِ المرتبط" value="<?= htmlspecialchars($edit['worker_contract_id'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_628_39c52">الصافي (مالي — يدوي)</label><input type="number" step="0.01" name="net_amount" id="emsf_628_39c52" aria-label="صافي التسوية" value="<?= htmlspecialchars($edit['net_amount'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_629_386b4">تعليق مالي</label><input type="text" name="net_finance_note" id="emsf_629_386b4" aria-label="تعليقُ الماليةِ على الصافي" value="<?= htmlspecialchars($edit['net_finance_note'] ?? '') ?>"></div>
+            <div class="field ws-span-full"><label for="emsf_630_ac9d5">ملاحظات</label><input type="text" name="notes" id="emsf_630_ac9d5" aria-label="ملاحظاتٌ على التسوية" value="<?= htmlspecialchars($edit['notes'] ?? '') ?>"></div>
         </div>
-        <div style="padding:0 14px 16px;display:flex;gap:10px;"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button><a href="worker_settlement.php" class="add-btn" style="background:#6b7280;"><i class="fas fa-times"></i> إلغاء</a></div>
+        <div class="ws-form-actions"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button><a href="worker_settlement.php" class="add-btn ws-cancel-btn"><i class="fas fa-times"></i> إلغاء</a></div>
     </form>
 
     <?php if ($edit): $sum=0; foreach($lines as $l){ $sum += ($l['line_type']==='خصم'?-1:1)*floatval($l['amount']); } ?>
-    <div class="allforms" style="display:block;">
+    <div class="allforms ws-lines-card">
         <div class="card-header"><h5><i class="fas fa-list"></i> بنود المستحقات والخصومات — الصافي المحسوب: <?= number_format($sum,2) ?></h5></div>
-        <form action="" method="post" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
+        <form action="" method="post" class="ws-form-grid">
         <?= csrf_field() ?>
             <input type="hidden" name="action" value="add_line"><input type="hidden" name="settlement_id" value="<?= intval($edit['id']) ?>">
             <div class="field"><label for="emsf_631_06f0f">النوع</label><select name="line_type" id="emsf_631_06f0f"><option>مستحق</option><option>خصم</option></select></div>
             <div class="field"><label for="emsf_632_4e9a8">الوصف</label><input type="text" name="description" id="emsf_632_4e9a8"></div>
             <div class="field"><label for="emsf_633_c75a6">المبلغ</label><input type="number" step="0.01" name="amount" id="emsf_633_c75a6"></div>
-            <div class="field" style="display:flex;align-items:flex-end;"><button type="submit" class="add-btn"><i class="fas fa-plus"></i> إضافة بند</button></div>
+            <div class="field ws-line-actions"><button type="submit" class="add-btn"><i class="fas fa-plus"></i> إضافة بند</button></div>
         </form>
-        <table class="data-table" style="width:100%;"><thead><tr><th>النوع</th><th>الوصف</th><th>المبلغ</th><th></th></tr></thead><tbody>
-        <?php if(empty($lines)): ?><tr><td colspan="4" style="text-align:center;color:#888;">لا بنود</td></tr><?php else: foreach($lines as $l): ?>
+        <table class="data-table ws-table-full"><thead><tr><th>النوع</th><th>الوصف</th><th>المبلغ</th><th></th></tr></thead><tbody>
+        <?php if(empty($lines)): ?><tr><td colspan="4" class="ws-empty-line">لا بنود</td></tr><?php else: foreach($lines as $l): ?>
             <tr><td><span class="badge badge-info"><?= htmlspecialchars($l['line_type']) ?></span></td><td><?= htmlspecialchars($l['description'] ?: '-') ?></td><td><?= htmlspecialchars($l['amount'] ?: '0') ?></td>
             <td><?php if($can_delete): ?><a href="worker_settlement.php?edit=<?= intval($edit['id']) ?>&del_line=<?= intval($l['id']) ?>" class="action-btn delete" onclick="return confirm('حذف البند؟')"><i class="fas fa-trash"></i></a><?php endif; ?></td></tr>
         <?php endforeach; endif; ?>
@@ -178,7 +195,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
     <?php endif; ?>
 
-    <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
+    <div class="table-wrap ws-table-wrap"><table class="data-table ws-table-full">
         <thead><tr><th>إجراءات</th><th>#</th><th>الموظف</th><th>المصدر</th><th>الأساس</th><th>الصافي</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -215,9 +232,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><?= htmlspecialchars($r['source_type'] ?: '-') ?></td><td><?= htmlspecialchars($r['settlement_basis'] ?: '-') ?></td>
             <td><?= htmlspecialchars($r['net_amount'] ?: '-') ?></td>
             <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="7" style="text-align:center;color:#888;padding:18px;">لا توجد تسوياتٌ بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="7" class="ws-empty-cell">لا توجد تسوياتٌ بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>
-<script>(function(){var b=document.getElementById('toggleForm'),f=document.getElementById('sForm');if(b&&f)b.addEventListener('click',function(){f.style.display=(f.style.display==='none'||!f.style.display)?'block':'none';});})();</script>
+<script>(function(){var b=document.getElementById('toggleForm'),f=document.getElementById('sForm');if(b&&f)b.addEventListener('click',function(){f.classList.toggle("allforms-visible");});})();</script>
 </body></html>

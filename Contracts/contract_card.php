@@ -48,18 +48,38 @@ include '../insidebar.php';
     include('../includes/page_header.php');
     ems_screen_about('بطاقةُ العقد الواحدة بتبويباتها السبعة — تجميعُ قراءاتٍ حيةٍ من مصادرها '
         . 'القائمة بروابط أصلها: لا شاشاتٍ متفرقةً بعد اليوم.', array());
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
+    echo ems_states_bundle('لا بياناتٍ في هذا التبويبِ من بطاقةِ العقد',
+                           'انتقل إلى تبويبٍ آخرَ من شريطِ التبويبات أو افتح المصدرَ الأصليَّ من رابطِه');
     ?>
+
+    <style>
+    .cc-head{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .cc-title{font-size:1.1rem}
+    .cc-tabs{margin-inline-start:auto}
+    .cc-tab{border:1px solid var(--c-ddd, #ddd);border-radius:6px;padding:4px 10px;margin:0 2px}
+    .cc-tab-active{background:var(--c-e2b93b, #e2b93b);font-weight:800}
+    .cc-table{width:100%}
+    .cc-alert-split{display:flex;justify-content:space-between}
+    .cc-chips{display:flex;gap:12px;flex-wrap:wrap}
+    .cc-chips-mb{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+    .cc-chip-lg{font-size:15px;padding:10px 16px}
+    .cc-chip{font-size:14px;padding:8px 14px}
+    .cc-note{margin-top:10px;color:var(--c-666, #666)}
+    .cc-empty-cell{color:var(--c-ink-400)}
+    .cc-sub-h{margin-top:12px}
+    </style>
 
     <?php if (!$c): ems_state_empty('اختر عقدًا', 'إلى العقود', 'contracts.php'); ?>
     <?php else: ?>
-    <div class="card"><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-        <strong style="font-size:1.1rem">عقد #<?php echo $cid; ?> —
+    <div class="card"><div class="card-body cc-head">
+        <strong class="cc-title">عقد #<?php echo $cid; ?> —
             <?php echo htmlspecialchars((string)($c['second_party'] ?? '')); ?></strong>
         <span class="badge badge-secondary"><?php echo htmlspecialchars((string)$c['contract_status']); ?></span>
-        <span style="margin-inline-start:auto">
+        <span class="cc-tabs">
         <?php foreach ($TABS as $tk => $tl): ?>
-            <a class="btn btn-sm" style="border:1px solid #ddd;border-radius:6px;padding:4px 10px;margin:0 2px;<?php
-                echo $tk === $tab ? 'background:#e2b93b;font-weight:800' : ''; ?>"
+            <a class="btn btn-sm cc-tab<?php
+                echo $tk === $tab ? ' cc-tab-active' : ''; ?>"
                href="?id=<?php echo $cid; ?>&tab=<?php echo $tk; ?>"><?php echo $tl; ?></a>
         <?php endforeach; ?></span>
     </div></div>
@@ -68,7 +88,7 @@ include '../insidebar.php';
     <?php
     switch ($tab) {
         case '1':
-            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%"><tbody>';
+            echo '<div class="table-container"><table class="alltables display cc-table" data-no-dt="1"><tbody>';
             foreach (array('first_party' => 'الطرف الأول', 'second_party' => 'الطرف الثاني',
                            'contract_status' => 'حالة العلاقة (H-02)',
                            'contract_signing_date' => 'التوقيع', 'actual_start' => 'البدء',
@@ -99,7 +119,7 @@ include '../insidebar.php';
                                   AND COALESCE(is_deleted,0)=0 ORDER BY line_no");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
             if (!$rows) { ems_state_empty('لا بنودَ بيعٍ — العقدُ قبل خط الأساس', 'افتح البنود', 'contract_lines.php?contract_id=' . $cid); break; }
-            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+            echo '<div class="table-container"><table class="alltables display cc-table" data-no-dt="1">'
                . '<thead><tr><th>بند</th><th>النموذج</th><th>الوصف</th><th>الكمية</th><th>مصدر سعر الصرف</th><th>الحال</th><th>السريان</th></tr></thead><tbody>';
             foreach ($rows as $x) {
                 echo '<tr><td>' . intval($x['line_no']) . '</td>'
@@ -126,7 +146,7 @@ include '../insidebar.php';
                       'contract_payment_schedule.php'),
             ) as $pl) {
                 $x = $conn->query($pl[1])->fetch_assoc();
-                echo '<div class="alert alert-info" style="display:flex;justify-content:space-between">'
+                echo '<div class="alert alert-info cc-alert-split">'
                    . '<span><strong>' . $pl[0] . ':</strong> ' . intval($x['n']) . ' سطرًا'
                    . ($x['f'] !== null ? (' (' . $x['f'] . ' → ' . $x['t'] . ')') : '') . '</span>'
                    . '<a href="' . $pl[2] . '?contract_id=' . $cid . '">الشاشة ▸</a></div>';
@@ -152,7 +172,7 @@ include '../insidebar.php';
                                   AND COALESCE(c.is_deleted,0)=0 ORDER BY c.id DESC LIMIT 50");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
             if (!$rows) { ems_state_empty('لا مستخلصاتٍ بعدُ', 'إلى المستخلصات', 'claims.php'); break; }
-            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+            echo '<div class="table-container"><table class="alltables display cc-table" data-no-dt="1">'
                . '<thead><tr><th>مهلة اعتماد المستخلص</th><th>الفترة</th><th>الصافي</th><th>الحال</th><th>فاتورته</th><th></th></tr></thead><tbody>';
             foreach ($rows as $x) {
                 echo '<tr><td>' . htmlspecialchars((string)$x['claim_no']) . '</td>'
@@ -198,13 +218,13 @@ include '../insidebar.php';
         case '7':
             $row = CBD::row($gate, $cid);
             if (!$row['ok']) { ems_state_error('تعذّرت قراءةُ اللوحة'); break; }
-            echo '<div style="display:flex;gap:12px;flex-wrap:wrap">';
+            echo '<div class="cc-chips">';
             foreach (array('planned' => 'المخطَّط', 'executed' => 'المنفَّذ',
                            'billed' => 'المفوتَر', 'collected' => 'المحصَّل') as $k => $lbl) {
-                echo '<div class="badge badge-secondary" style="font-size:15px;padding:10px 16px">'
+                echo '<div class="badge badge-secondary cc-chip-lg">'
                    . $lbl . ': <strong>' . htmlspecialchars((string)$row[$k]) . '</strong></div>';
             }
-            echo '</div><p style="margin-top:10px;color:#666">' . htmlspecialchars((string)$row['note'])
+            echo '</div><p class="cc-note">' . htmlspecialchars((string)$row['note'])
                . '</p><p><a class="btn-primary" href="commercial_board.php">اللوحة التجارية الكاملة ▸</a></p>';
             break;
         case '8':
@@ -213,22 +233,22 @@ include '../insidebar.php';
             require_once dirname(__DIR__) . '/app/Services/ContractSeatService.php';
             $row = CBD::row($gate, $cid);
             if ($row['ok']) {
-                echo '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">';
+                echo '<div class="cc-chips-mb">';
                 foreach (array('planned' => 'المخطَّط', 'executed' => 'المنفَّذ',
                                'billed' => 'المفوتَر', 'collected' => 'المحصَّل') as $k => $lbl) {
-                    echo '<div class="badge badge-secondary" style="font-size:14px;padding:8px 14px">'
+                    echo '<div class="badge badge-secondary cc-chip">'
                        . $lbl . ': <strong>' . htmlspecialchars((string)$row[$k]) . '</strong></div>';
                 }
                 echo '</div>';
             }
             $gap = \App\Services\ContractSeatService::seatGap($gate, $co, $cid);
-            echo '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">'
-               . '<div class="badge badge-info" style="font-size:14px;padding:8px 14px">المقاعد المتعاقدة: <strong>' . intval($gap['seats_contracted']) . '</strong></div>'
-               . '<div class="badge badge-success" style="font-size:14px;padding:8px 14px">المملوءة: <strong>' . intval($gap['seats_filled']) . '</strong></div>'
-               . '<div class="badge ' . ($gap['seat_gap'] > 0 ? 'badge-warning' : 'badge-secondary') . '" style="font-size:14px;padding:8px 14px">الفجوة: <strong>' . intval($gap['seat_gap']) . '</strong></div>'
+            echo '<div class="cc-chips-mb">'
+               . '<div class="badge badge-info cc-chip">المقاعد المتعاقدة: <strong>' . intval($gap['seats_contracted']) . '</strong></div>'
+               . '<div class="badge badge-success cc-chip">المملوءة: <strong>' . intval($gap['seats_filled']) . '</strong></div>'
+               . '<div class="cc-chip badge ' . ($gap['seat_gap'] > 0 ? 'badge-warning' : 'badge-secondary') . '">الفجوة: <strong>' . intval($gap['seat_gap']) . '</strong></div>'
                . '</div>';
             if (!empty($gap['empty_seats'])) {
-                echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+                echo '<div class="table-container"><table class="alltables display cc-table" data-no-dt="1">'
                    . '<thead><tr><th>المقعد الفارغ</th><th>نوعه</th><th>دلالته — والمطالبة من العقد لا تُفترض</th></tr></thead><tbody>';
                 foreach ($gap['empty_seats'] as $es) {
                     echo '<tr><td>#' . intval($es['seat_no']) . '</td><td>' . htmlspecialchars((string)$es['seat_kind'])
@@ -244,7 +264,7 @@ include '../insidebar.php';
             if (empty($seats)) {
                 ems_state_empty('لا مقاعدَ معرَّفةً لهذا العقد بعد — تُعرَّف على حاويات المعدات (N-11)', 'إلى الحاويات', 'containers.php');
             } else {
-                echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+                echo '<div class="table-container"><table class="alltables display cc-table" data-no-dt="1">'
                    . '<thead><tr><th>المقعد</th><th>المعدة</th><th>المُنشئ — الاسم والصفة</th><th>إلى</th><th>سبب الاستبدال</th><th>الصفة</th><th>السائقون</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم العقد</th>
@@ -274,7 +294,7 @@ include '../insidebar.php';
                 foreach ($seats as $s) {
                     $succ = \App\Services\ContractSeatService::successionOf($gate, $co, intval($s['id']));
                     if (empty($succ)) {
-                        echo '<tr><td>#' . intval($s['seat_no']) . '</td><td colspan="6" style="color:#999">فارغ — لم تجلس فيه معدة</td></tr>';
+                        echo '<tr><td>#' . intval($s['seat_no']) . '</td><td colspan="6" class="cc-empty-cell">فارغ — لم تجلس فيه معدة</td></tr>';
                         continue;
                     }
                     foreach ($succ as $a) {
@@ -296,8 +316,8 @@ include '../insidebar.php';
                    LEFT JOIN monthly_performance_downtime d ON d.perf_id = m.id
                   WHERE {TENANT_SCOPE} AND m.contract_id = ? ORDER BY m.period DESC LIMIT 24", array($cid));
             if (!empty($dt) && $dt[0]['reason_code'] !== null) {
-                echo '<h6 style="margin-top:12px">التعطل بأطرافه (سجل الأداء N-12)</h6>'
-                   . '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+                echo '<h6 class="cc-sub-h">التعطل بأطرافه (سجل الأداء N-12)</h6>'
+                   . '<div class="table-container"><table class="alltables display cc-table" data-no-dt="1">'
                    . '<thead><tr><th>الشهر</th><th>السبب</th><th>الساعات</th><th>الطرف المتحمل</th></tr></thead><tbody>';
                 foreach ($dt as $x) {
                     if ($x['reason_code'] === null) { continue; }

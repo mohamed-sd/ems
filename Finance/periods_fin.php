@@ -183,6 +183,15 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة */
+.fin-prd-h5 { margin: 0 0 10px; }
+.fin-prd-h5-list { margin: 18px 0 10px; }
+.fin-prd-table { width: 100%; }
+.fin-prd-dash { color: var(--c-ink-400); }
+.fin-prd-doneform { display: flex; gap: 4px; align-items: center; }
+.fin-prd-evidence { width: 150px; }
+</style>
 <div class="main fin-periods-main ems-unified-page-shell">
     <?php
     $header_title = 'إقفال الفترات'; $header_icon = 'fa fa-calendar-check';
@@ -190,6 +199,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if ($can_add) { $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'إنشاء فترة'); }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+    echo ems_states_bundle('لا فتراتِ ماليةً منشأةً بعدُ', 'أنشئْ فترةً بزرِّ «إنشاء فترة» في رأسِ الشاشة ثم استوفِ قائمةَ إقفالها');
     ?>
     <?php fin_msg_banner(); ?>
 
@@ -197,7 +208,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-edit"></i> إنشاء فترة مالية</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label for="emsf_262_63abd">السنة المالية <span class="required">*</span></label><input type="number" name="fiscal_year" required value="<?php echo date('Y'); ?>" id="emsf_262_63abd"></div>
+            <div class="form-group"><label for="emsf_262_63abd">السنة المالية <span class="required">*</span></label><input type="number" name="fiscal_year" required aria-label="السنةُ الماليةُ للفترة" value="<?php echo date('Y'); ?>" id="emsf_262_63abd"></div>
             <div class="form-group"><label for="pt">النوع</label><select name="period_type" id="pt"><option value="month">شهر</option><option value="year">سنة</option></select></div>
             <div class="form-group" id="pnowrap"><label for="emsf_263_737be">رقم الشهر</label><input type="number" name="period_no" min="1" max="12" value="1" id="emsf_263_737be"></div>
         </div></div>
@@ -207,9 +218,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-calendar"></i> الفترات المالية</h5>
+        <h5 class="fin-prd-h5"><i class="fas fa-calendar"></i> الفترات المالية</h5>
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="finTable" class="display nowrap alltables fin-prd-table">
                 <thead><tr><th>الإجراءات</th><th>السنة</th><th>النوع</th><th>القيود المنشورة</th><th>إلى</th><th>القيد مسموح</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم المحضر</th>
@@ -266,9 +277,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
 
         <?php if ($sel_pid > 0): ?>
-        <h5 style="margin:18px 0 10px"><i class="fas fa-list-check"></i> قائمة إقفال الفترة #<?php echo $sel_pid; ?></h5>
+        <h5 class="fin-prd-h5-list"><i class="fas fa-list-check"></i> قائمة إقفال الفترة #<?php echo $sel_pid; ?></h5>
         <div class="table-container">
-            <table class="alltables" style="width:100%;">
+            <table class="alltables fin-prd-table">
                 <thead><tr><th>البند</th><th>إلزامي</th><th>الحالة</th><th>الدليل</th><th>مَن أنجزه ومتى</th><th>الإجراء</th></tr></thead>
                 <tbody>
                 <?php
@@ -285,7 +296,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     /* ◆ الدليلُ ومَن أنجزه ومتى — معروضةٌ لا مخزَّنةً وحدَها (INJ-0183) */
                     $__ev = trim((string) ($it['note'] ?? ''));
                     echo "<td>" . ($__ev !== '' ? htmlspecialchars($__ev, ENT_QUOTES, 'UTF-8')
-                                                : "<span style='color:#999'>—</span>") . "</td>";
+                                                : "<span class='fin-prd-dash'>—</span>") . "</td>";
                     $__who = intval($it['done_by'] ?? 0);
                     $__when = trim((string) ($it['done_at'] ?? ''));
                     if ($__who > 0 || $__when !== '') {
@@ -303,16 +314,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td>" . htmlspecialchars(($__who > 0 ? ($__doerName[$__who] ?? ('#' . $__who)) : '—')
                              . ' · ' . ($__when !== '' ? $__when : '—'), ENT_QUOTES, 'UTF-8') . "</td>";
                     } else {
-                        echo "<td><span style='color:#999'>—</span></td>";
+                        echo "<td><span class='fin-prd-dash'>—</span></td>";
                     }
                     echo "<td>";
                     if ($can_edit && $it['item_state'] === 'pending') {
                         /* ◆ نموذجُ POST بدليلٍ إلزاميٍّ — لا رابطَ إنجازٍ عارٍ */
-                        echo "<form method='post' style='display:flex;gap:4px;align-items:center'>"
+                        echo "<form method='post' class='fin-prd-doneform'>"
                            . (function_exists('csrf_field') ? csrf_field() : '')
                            . "<input type='hidden' name='done_item' value='" . intval($it['id']) . "'>"
                            . "<input type='hidden' name='pid' value='" . intval($sel_pid) . "'>"
-                           . "<input type='text' name='evidence_ref' required minlength='3' style='width:150px'"
+                           . "<input type='text' name='evidence_ref' required minlength='3' class='fin-prd-evidence'"
                            . " placeholder='مرجعُ الدليل' title='مرجعُ الدليل — إلزاميّ'>"
                            . "<button type='submit' class='action-btn edit' title='إنجاز'>"
                            . "<i class='fas fa-check'></i></button></form>";
@@ -339,9 +350,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 <script>
 $(document).ready(function () {
-    $('#finTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    // جدولُ العرضِ يهيّئُه المكوّنُ المركزيُّ (assets/js/ui-unification.js)
     $('#toggleForm').on('click', function () { $('#finForm').toggleClass('allforms-visible'); });
     $('#pt').on('change', function () { $('#pnowrap').toggle(this.value === 'month'); });
 });

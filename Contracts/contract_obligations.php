@@ -321,6 +321,9 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
+    echo ems_states_bundle('لا التزاماتِ عقدٍ مسجّلةً على هذا العقدِ بعدُ',
+                           'اختر العقدَ من المرشِّح أعلاه ثمّ سجّل أولَ التزامٍ بزرِّ الإضافةِ في رأسِ الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -602,39 +605,39 @@ $(function () {
 <style>
     .obl-main .obl-warning {
         display: flex; gap: 12px; align-items: flex-start;
-        border: 1px solid #e0b300; border-right: 5px solid #e0b300; border-radius: 10px;
-        background: #fffbe9; padding: 12px 14px; margin-bottom: 14px; line-height: 1.7;
+        border: 1px solid var(--c-e0b300, #e0b300); border-right: 5px solid var(--c-e0b300, #e0b300); border-radius: 10px;
+        background: var(--c-fffbe9, #fffbe9); padding: 12px 14px; margin-bottom: 14px; line-height: 1.7;
     }
-    .obl-main .obl-warning i { color: #b58900; font-size: 1.3rem; margin-top: 3px; }
-    .obl-main .obl-coverage { border: 1px solid var(--bdr); border-radius: 12px; padding: 14px; margin-bottom: 14px; background: #fff; }
-    .obl-main .obl-coverage.is-full { border-color: #2e7d32; background: #f3fbf3; }
-    .obl-main .obl-coverage.is-partial { border-color: #c77700; background: #fff8ef; }
+    .obl-main .obl-warning i { color: var(--c-b58900, #b58900); font-size: 1.3rem; margin-top: 3px; }
+    .obl-main .obl-coverage { border: 1px solid var(--bdr); border-radius: 12px; padding: 14px; margin-bottom: 14px; background: var(--c-fff, #fff); }
+    .obl-main .obl-coverage.is-full { border-color: var(--c-2e7d32, #2e7d32); background: var(--c-f3fbf3, #f3fbf3); }
+    .obl-main .obl-coverage.is-partial { border-color: var(--c-c77700, #c77700); background: var(--c-fff8ef, #fff8ef); }
     .obl-main .obl-coverage-head { display: flex; align-items: center; gap: 10px; font-size: 1.02rem; flex-wrap: wrap; }
     .obl-main .obl-coverage-missing { margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-    .obl-main .obl-coverage-note { margin-top: 8px; color: #666; font-size: .9rem; }
+    .obl-main .obl-coverage-note { margin-top: 8px; color: var(--c-666, #666); font-size: .9rem; }
     .obl-main .obl-chip { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: .85rem; font-weight: 700; }
-    .obl-main .obl-chip-missing { background: #ffe9e0; color: #a33; border: 1px solid #e0a090; }
-    .obl-main .obl-chip-draft { background: #eef2ff; color: #3949ab; border: 1px solid #9fa8da; }
+    .obl-main .obl-chip-missing { background: var(--c-ffe9e0, #ffe9e0); color: var(--c-a33, #a33); border: 1px solid var(--c-e0a090, #e0a090); }
+    .obl-main .obl-chip-draft { background: var(--c-eef2ff, #eef2ff); color: var(--c-3949ab, #3949ab); border: 1px solid var(--c-9fa8da, #9fa8da); }
     .obl-main .obl-inline-form { display: inline; margin: 0; }
     .obl-main .obl-coverage .obl-inline-form { display: block; margin-top: 10px; }
     .obl-main .obl-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: .85rem; font-weight: 700; white-space: nowrap; }
-    .obl-main .obl-badge-eff { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
-    .obl-main .obl-badge-past { background: #eceff1; color: #546e7a; border: 1px solid #b0bec5; }
-    .obl-main .obl-badge-draft { background: #eef2ff; color: #3949ab; border: 1px solid #9fa8da; }
+    .obl-main .obl-badge-eff { background: var(--c-e8f5e9, #e8f5e9); color: var(--c-2e7d32, #2e7d32); border: 1px solid var(--c-a5d6a7, #a5d6a7); }
+    .obl-main .obl-badge-past { background: var(--c-eceff1, #eceff1); color: var(--c-546e7a, #546e7a); border: 1px solid var(--c-b0bec5, #b0bec5); }
+    .obl-main .obl-badge-draft { background: var(--c-eef2ff, #eef2ff); color: var(--c-3949ab, #3949ab); border: 1px solid var(--c-9fa8da, #9fa8da); }
     .obl-main .obl-obligor { font-weight: 700; }
-    .obl-main .obl-obligor-client { color: #1565c0; }
-    .obl-main .obl-obligor-company { color: #6a1b9a; }
-    .obl-main .obl-obligor-supplier { color: #ad1457; }
-    .obl-main .obl-obligor-operator { color: #00695c; }
-    .obl-main .obl-obligor-none { color: #757575; }
-    .obl-main .obl-row-effective { background: #fcfffc; }
+    .obl-main .obl-obligor-client { color: var(--c-1565c0, #1565c0); }
+    .obl-main .obl-obligor-company { color: var(--c-6a1b9a, #6a1b9a); }
+    .obl-main .obl-obligor-supplier { color: var(--c-ad1457, #ad1457); }
+    .obl-main .obl-obligor-operator { color: var(--c-00695c, #00695c); }
+    .obl-main .obl-obligor-none { color: var(--c-757575, #757575); }
+    .obl-main .obl-row-effective { background: var(--c-fcfffc, #fcfffc); }
     .obl-main .obl-row-expired { opacity: .62; }
-    .obl-main .obl-lock { color: #999; padding: 0 6px; }
-    .obl-main .obl-empty { text-align: center; color: #888; padding: 22px; }
-    .obl-main .obl-muted { color: #999; }
+    .obl-main .obl-lock { color: var(--c-ink-400); padding: 0 6px; }
+    .obl-main .obl-empty { text-align: center; color: var(--c-888, #888); padding: 22px; }
+    .obl-main .obl-muted { color: var(--c-ink-400); }
     .obl-main .obl-small { font-size: .86rem; }
     .obl-main .obl-dates { white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .obl-main .obl-hint { display: block; color: #888; font-size: .82rem; margin-top: 3px; }
+    .obl-main .obl-hint { display: block; color: var(--c-888, #888); font-size: .82rem; margin-top: 3px; }
     .obl-main .table-container { overflow-x: auto; }
     .obl-main .action-btn.approve { background: none; border: none; cursor: pointer; }
 </style>

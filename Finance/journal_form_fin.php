@@ -229,6 +229,14 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة */
+.fin-jrn-span-all { grid-column: 1 / -1; }
+.fin-jrn-lines-wrap { margin-top: 10px; }
+.fin-jrn-table { width: 100%; }
+.fin-jrn-total-th { text-align: end; }
+</style>
+
 <div class="main fin-journal-main ems-unified-page-shell">
     <?php
     $header_title = 'القيود اليومية';
@@ -239,6 +247,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+    echo ems_states_bundle('لا قيودَ يوميةً مسجّلةً بعدُ', 'أنشئْ قيدًا متوازنًا (مدين = دائن) بزرِّ «إنشاء قيد» في رأسِ الشاشة');
     ?>
 
     <?php fin_msg_banner(); ?>
@@ -278,19 +288,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             ?>
                         </select>
                     </div>
-                    <div class="form-group" style="grid-column:1/-1">
+                    <div class="form-group fin-jrn-span-all">
                         <label for="j_memo">بيان القيد</label>
                         <input type="text" name="memo" id="j_memo" placeholder="وصف القيد">
                     </div>
                 </div>
             </div>
 
-            <div class="table-container" style="margin-top:10px;">
-                <table class="alltables" style="width:100%;" id="j_lines">
+            <div class="table-container fin-jrn-lines-wrap">
+                <table class="alltables fin-jrn-table" id="j_lines">
                     <thead><tr><th>رقم الحساب</th><th>مركز التكلفة</th><th>مدين</th><th>دائن</th><th>بيان</th><th></th></tr></thead>
                     <tbody id="j_lines_body"></tbody>
                     <tfoot><tr>
-                        <th colspan="2" style="text-align:end">الإجمالي</th>
+                        <th colspan="2" class="fin-jrn-total-th">الإجمالي</th>
                         <th id="j_tot_d">0.00</th>
                         <th id="j_tot_c">0.00</th>
                         <th colspan="2"><span id="j_balance" class="badge badge-secondary">—</span></th>
@@ -308,7 +318,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="finTable" class="display nowrap alltables fin-jrn-table">
                 <thead><tr>
                     <th>الإجراءات</th><th>رقم القيد</th><th>تاريخ القيد</th><th>مدين</th><th>دائن</th>
                     <th>التوازن</th><th>البيان</th><th>الحالة</th>
@@ -382,11 +392,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <template id="j_line_tpl">
     <tr class="j-line">
-        <td><select name="account_id[]" class="j-acc"><?php echo fin_postable_account_options($conn, $is_super_admin, $company_id); ?></select></td>
-        <td><select name="cost_center_id[]" class="j-cc"><?php echo fin_cost_center_options($conn, $is_super_admin, $company_id); ?></select></td>
-        <td><input type="number" step="0.01" min="0" name="debit[]" class="j-debit" value="0"></td>
-        <td><input type="number" step="0.01" min="0" name="credit[]" class="j-credit" value="0"></td>
-        <td><input type="text" name="line_memo[]" class="j-memo"></td>
+        <td><select name="account_id[]" aria-label="رقمُ حسابِ السطر" class="j-acc"><?php echo fin_postable_account_options($conn, $is_super_admin, $company_id); ?></select></td>
+        <td><select name="cost_center_id[]" aria-label="مركزُ تكلفةِ السطر" class="j-cc"><?php echo fin_cost_center_options($conn, $is_super_admin, $company_id); ?></select></td>
+        <td><input type="number" step="0.01" min="0" name="debit[]" aria-label="المبلغُ المدين" class="j-debit" value="0"></td>
+        <td><input type="number" step="0.01" min="0" name="credit[]" aria-label="المبلغُ الدائن" class="j-credit" value="0"></td>
+        <td><input type="text" name="line_memo[]" aria-label="بيانُ السطر" class="j-memo"></td>
         <td><a href="javascript:void(0)" class="action-btn delete j-del" title="حذف السطر"><i class="fas fa-times"></i></a></td>
     </tr>
 </template>
@@ -422,15 +432,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     };
 
     $(document).ready(function () {
-        $('#finTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
+        // جدولُ العرضِ يهيّئُه المكوّنُ المركزيُّ (assets/js/ui-unification.js)
 
         // سطران افتراضيان جاهزان
         jAddLine(); jAddLine();

@@ -539,42 +539,42 @@ $fmtH = function ($h) { return rtrim(rtrim(number_format((float) $h, 1, '.', '')
 $contractBadge = function ($contracted, $doneHours) use ($fmtH) {
     if ($contracted <= 0) return '<span class="b hrs" title="لا توجد ساعات تعاقدية مسجّلة"><i class="fas fa-file-contract"></i> العقد —</span>';
     $pct  = ($doneHours / $contracted) * 100;
-    $color = $pct >= 90 ? '#15803d' : ($pct >= 60 ? '#b45309' : '#b91c1c');
-    $bg    = $pct >= 90 ? '#dcfce7' : ($pct >= 60 ? '#fef3c7' : '#fee2e2');
+    $color = $pct >= 90 ? 'var(--c-15803d, #15803d)' : ($pct >= 60 ? 'var(--c-b45309, #b45309)' : 'var(--c-b91c1c, #b91c1c)');
+    $bg    = $pct >= 90 ? 'var(--c-dcfce7, #dcfce7)' : ($pct >= 60 ? 'var(--c-fef3c7, #fef3c7)' : 'var(--c-fee2e2, #fee2e2)');
     return '<span class="b hrs" title="إجمالي ساعات العقد المتفق عليها"><i class="fas fa-clock"></i> العقد ' . $fmtH($contracted) . ' س</span>'
-        . '<span class="b" style="color:' . $color . ';background:' . $bg . ';font-weight:700" title="نسبة الإنجاز من العقد = المنفّذ التراكمي ÷ المتفق عليه">' . number_format($pct, 0) . '%</span>';
+        . '<span class="b" data-allow-style style="color:' . $color . ';background:' . $bg . ';font-weight:700" title="نسبة الإنجاز من العقد = المنفّذ التراكمي ÷ المتفق عليه">' . number_format($pct, 0) . '%</span>';
 };
 // شريط نسبة الإنجاز من العقد — يُوضع كعنصر مباشر في .cnode-row ليمتد بعرض الكارد كاملاً (من أوّله لآخره)
 $contractBar = function ($contracted, $doneHours) {
     if ($contracted <= 0) return '';
     $pct  = ($doneHours / $contracted) * 100;
     $pctC = min(100, max(0, $pct));
-    return '<span class="cnode-bar" title="' . number_format($pct, 1) . '% من ساعات العقد منجزة"><span style="width:' . $pctC . '%"></span></span>';
+    return '<span class="cnode-bar" title="' . number_format($pct, 1) . '% من ساعات العقد منجزة"><span data-allow-style style="width:' . $pctC . '%"></span></span>';
 };
 // شارة الهدف الشهري للآلية: الهدف اليومي × 30 + نسبة الإنجاز (المنفّذ ÷ الهدف الشهري) — بنفس تصميم شارة العقد
 $monthlyBadge = function ($monthlyTarget, $doneHours) use ($fmtH) {
     if ($monthlyTarget <= 0) return '<span class="b" title="لا يوجد هدف شهري محدّد للآلية"><i class="fas fa-bullseye"></i> الهدف الشهري —</span>';
     $pct = ($doneHours / $monthlyTarget) * 100;
-    $color = $pct >= 90 ? '#15803d' : ($pct >= 60 ? '#b45309' : '#b91c1c');
-    $bg    = $pct >= 90 ? '#dcfce7' : ($pct >= 60 ? '#fef3c7' : '#fee2e2');
+    $color = $pct >= 90 ? 'var(--c-15803d, #15803d)' : ($pct >= 60 ? 'var(--c-b45309, #b45309)' : 'var(--c-b91c1c, #b91c1c)');
+    $bg    = $pct >= 90 ? 'var(--c-dcfce7, #dcfce7)' : ($pct >= 60 ? 'var(--c-fef3c7, #fef3c7)' : 'var(--c-fee2e2, #fee2e2)');
     return '<span class="b hrs" title="الهدف الشهري للآلية = الهدف اليومي × 30"><i class="fas fa-bullseye"></i> الهدف الشهري ' . $fmtH($monthlyTarget) . ' س</span>'
-        . '<span class="b" style="color:' . $color . ';background:' . $bg . ';font-weight:700" title="نسبة الإنجاز الشهري = المنفّذ ÷ الهدف الشهري">' . number_format($pct, 0) . '%</span>';
+        . '<span class="b" data-allow-style style="color:' . $color . ';background:' . $bg . ';font-weight:700" title="نسبة الإنجاز الشهري = المنفّذ ÷ الهدف الشهري">' . number_format($pct, 0) . '%</span>';
 };
 // شريط الإنجاز مقابل الهدف الشهري — يمتد بعرض الكارد كاملاً (عنصر مباشر في .cnode-row / .cleaf)
 $monthlyBar = function ($monthlyTarget, $doneHours) {
     if ($monthlyTarget <= 0) return '';
     $pct  = ($doneHours / $monthlyTarget) * 100;
     $pctC = min(100, max(0, $pct));
-    return '<span class="cnode-bar" title="' . number_format($pct, 1) . '% من الهدف منجز"><span style="width:' . $pctC . '%"></span></span>';
+    return '<span class="cnode-bar" title="' . number_format($pct, 1) . '% من الهدف منجز"><span data-allow-style style="width:' . $pctC . '%"></span></span>';
 };
 // شارة هدف المشغّل: حصّته من الهدف الشهري للمعدّة (÷ عدد المشغّلين) + نسبة إنجازه — بنفس تصميم باقي الشارات
 $operatorBadge = function ($opTarget, $doneHours) use ($fmtH) {
     if ($opTarget <= 0) return '<span class="b" title="لا يوجد هدف محدّد للمشغّل"><i class="fas fa-bullseye"></i> الهدف —</span>';
     $pct = ($doneHours / $opTarget) * 100;
-    $color = $pct >= 90 ? '#15803d' : ($pct >= 60 ? '#b45309' : '#b91c1c');
-    $bg    = $pct >= 90 ? '#dcfce7' : ($pct >= 60 ? '#fef3c7' : '#fee2e2');
+    $color = $pct >= 90 ? 'var(--c-15803d, #15803d)' : ($pct >= 60 ? 'var(--c-b45309, #b45309)' : 'var(--c-b91c1c, #b91c1c)');
+    $bg    = $pct >= 90 ? 'var(--c-dcfce7, #dcfce7)' : ($pct >= 60 ? 'var(--c-fef3c7, #fef3c7)' : 'var(--c-fee2e2, #fee2e2)');
     return '<span class="b hrs" title="هدف المشغّل = الهدف الشهري للمعدّة ÷ عدد المشغّلين"><i class="fas fa-bullseye"></i> هدف ' . $fmtH($opTarget) . ' س</span>'
-        . '<span class="b" style="color:' . $color . ';background:' . $bg . ';font-weight:700" title="نسبة إنجاز المشغّل = المنفّذ ÷ هدفه">' . number_format($pct, 0) . '%</span>';
+        . '<span class="b" data-allow-style style="color:' . $color . ';background:' . $bg . ';font-weight:700" title="نسبة إنجاز المشغّل = المنفّذ ÷ هدفه">' . number_format($pct, 0) . '%</span>';
 };
 $shiftIcon = function ($s) {
     $s = (string) $s;
@@ -602,6 +602,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back    = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا عملاءَ ضمنَ نطاقِك بعدُ', 'اختر عميلًا من فلترِ العملاء أو راجعْ نطاقَ مشروعِك مع مسؤولِ النظام');
     ?>
 
     <!-- شريط الأدوات: بحث + فتح/طيّ الكل (فلتر الفترة محذوف؛ الافتراضي «هذا الشهر») -->

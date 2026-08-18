@@ -205,6 +205,11 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
     foreach (ems_excel_header_actions('failure_codes', 'أكواد الأعطال', $can_add) as $__xlAction) { $header_actions[] = $__xlAction; }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    if (function_exists('ems_states_bundle')) {
+        echo ems_states_bundle('لا كودَ عطلٍ مسجَّلًا في دليلِ التصنيفاتِ بعدُ',
+                               'أضف أولَ كودٍ بزرِّ «إضافة كود جديد» في رأسِ الشاشة، أو استورد الدليلَ من ملفِّ إكسل');
+    }
     ?>
 
     <!-- ══ رسائل ══ -->
@@ -217,8 +222,8 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
 
     <!-- ══ نموذج الإضافة / التعديل (بنفس بنية وتصميم فورم صفحة العملاء) ══ -->
     <?php if ($can_add): ?>
-    <form method="POST" action="" id="fcForm" class="allforms<?= ($edit_data || $error_msg) ? ' allforms-visible' : '' ?>
-        <?= csrf_field() ?>">
+    <form method="POST" action="" id="fcForm" class="allforms<?= ($edit_data || $error_msg) ? ' allforms-visible' : '' ?>">
+        <?= csrf_field() ?>
         <div class="card-header">
             <h5>
                 <i class="fas fa-<?= $edit_data ? 'edit' : 'plus-circle' ?>"></i>
@@ -413,7 +418,8 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
 
         <div class="card-body">
             <div class="table-responsive">
-                <table id="fcTable" class="display table table-bordered table-hover fc-table">
+                <table id="fcTable" class="display table table-bordered table-hover fc-table"
+                       data-order='[[0,"asc"]]' data-page-length="50">
                     <thead class="table-dark">
                         <tr>
                             <th class="fc-col-id">#</th>
@@ -549,44 +555,10 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 
 <script>
-$(document).ready(function () {
-    $('#fcTable').DataTable({
-        language: { url: '/ems/assets/i18n/datatables/ar.json' },
-        dom: 'Bfrtip',
-        buttons: [
-            {
-                extend: 'excelHtml5',
-                text: '<i class="fas fa-file-excel"></i> Excel',
-                className: 'btn btn-primary btn-sm',
-                title: 'أكواد الأعطال',
-                exportOptions: { columns: ':not(:last-child)' }
-            },
-            {
-                extend: 'pdfHtml5',
-                text: '<i class="fas fa-file-pdf"></i> PDF',
-                className: 'btn btn-danger btn-sm',
-                title: 'أكواد الأعطال',
-                orientation: 'landscape',
-                pageSize: 'A4',
-                exportOptions: { columns: ':not(:last-child)' }
-            },
-            {
-                extend: 'print',
-                text: '<i class="fas fa-print"></i> طباعة',
-                className: 'btn btn-secondary btn-sm',
-                exportOptions: { columns: ':not(:last-child)' }
-            }
-        ],
-        order: [[0, 'asc']],
-        pageLength: 50,
-        lengthMenu: [[25, 50, 100, 250, -1], [25, 50, 100, 250, 'الكل']],
-        searchDelay: 300,
-        deferRender: true,
-        columnDefs: [
-            { orderable: false, targets: -1 }
-        ]
-    });
-});
+/* UXW-01 بوابة ٥: تهيئةُ جدولِ أكوادِ الأعطال انتقلت إلى المكوّنِ المركزي
+   (assets/js/ui-unification.js) — والسلوكُ المحفوظُ بسماتٍ على وسمِ الجدول:
+   data-order='[[0,"asc"]]' · data-page-length="50". واللغةُ العربيةُ وزرُّ
+   إكسل الموحَّد من المكوّنِ نفسِه. */
 
 function toggleForm() {
     var form = document.getElementById('fcForm');

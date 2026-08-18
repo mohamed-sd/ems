@@ -48,6 +48,7 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'العقودُ والحصص');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">
@@ -59,8 +60,13 @@ $header_title_html = htmlspecialchars('حصصُ الموردين والتغطي�
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا حصةَ موردٍ عليها التزامٌ أو استهلاكٌ في دفترِ القدرات', 'سجِّل التزامَ الحصةِ في عقدِ المورد ثم أعِد فتحَ هذه الشاشة');
 ?>
-  <p class="text-muted" style="font-size:.9em">المستهلَكُ محسوبٌ من دفتر القدرات لا من عمودٍ مخزَّن — والتغطيةُ الاستثنائيةُ بندٌ لا يرفع الحصة (CAP-01 §7).</p>
+  <style>
+    .sup-shc-note { font-size: .9em; }
+  </style>
+  <p class="text-muted sup-shc-note">المستهلَكُ محسوبٌ من دفتر القدرات لا من عمودٍ مخزَّن — والتغطيةُ الاستثنائيةُ بندٌ لا يرفع الحصة (CAP-01 §7).</p>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>المورد</th><th>نسبة الحصة من الالتزام</th><th>المستهلَك (الدفتر)</th><th>التنفيذ ٪</th><th>تغطيةٌ أعطاها</th><th>الفجوة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -120,7 +126,7 @@ include __DIR__ . '/../includes/page_header.php';
         <td><a href="supplier_profile.php?id=<?= intval($s['supplier_id']) ?>"><?= htmlspecialchars($s['name'], ENT_QUOTES, 'UTF-8') ?></a></td>
         <td><?= number_format(floatval($s['committed']), 1) ?></td>
         <td><?= number_format(floatval($s['consumed']), 1) ?></td>
-        <td><span class="badge" style="background:<?= $pct >= 90 ? '#198754' : ($pct >= 60 ? '#fd7e14' : '#dc3545') ?>"><?= $pct ?>٪</span></td>
+        <td><span class="badge" data-allow-style style="background:<?= $pct >= 90 ? 'var(--c-198754, #198754)' : ($pct >= 60 ? 'var(--c-fd7e14, #fd7e14)' : 'var(--c-dc3545, #dc3545)') ?>"><?= $pct ?>٪</span></td>
         <td><?= number_format(floatval($s['coverage_given']), 1) ?> <span class="text-muted">(بندٌ مستقل)</span></td>
         <td><?= number_format($gap, 1) ?></td>
       </tr>

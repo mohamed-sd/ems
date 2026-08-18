@@ -276,6 +276,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   );
   $header_back = array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fa-solid fa-house', 'label' => 'الرئيسية');
   include(__DIR__ . '/../includes/page_header.php');
+  // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+  echo ems_states_bundle('لا مورّدين ولا آلياتٍ منشورةً في هذا المشروعِ بعدُ', 'أضفْ أولَ تشغيلٍ بزرِّ «إدارة التشغيل» في رأسِ الشاشة');
   ?>
 
   <div class="movement-content-wrapper">

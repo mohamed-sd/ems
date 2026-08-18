@@ -274,7 +274,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); };
 ?>
 
-<div style="background-color:#fff; padding: 10px;;" class="main">
+<div class="main fm-page">
 
     <?php
     $header_title   = 'الأنواع والموديلات';
@@ -289,13 +289,15 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
     foreach (ems_excel_header_actions('fleet_models', 'سجل النوع والموديل', $perms['can_add']) as $__xlAction) { $header_actions[] = $__xlAction; }
     $header_back = array('href' => 'equipments_fleet.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا موديلَ معدّاتٍ مسجَّلًا بعدُ', 'أضف أولَ موديلٍ بزرِّ «إضافة موديل جديد» في رأسِ الشاشة');
     ?>
 
     <?php if (!empty($flash)): ?>
-        <div class="success-message is-success" style="margin:10px 0;"><?= $e($flash); ?></div>
+        <div class="success-message is-success fm-msg"><?= $e($flash); ?></div>
     <?php endif; ?>
     <?php if (!empty($errors)): ?>
-        <div class="success-message is-error" style="margin:10px 0;">
+        <div class="success-message is-error fm-msg">
             <i class="fa-solid fa-triangle-exclamation"></i>
             <?= $e(implode(' — ', $errors)); ?>
         </div>
@@ -303,8 +305,8 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 
     <!-- نموذج إضافة / تعديل -->
     <form id="projectForm" method="post" enctype="multipart/form-data"
-          class="allforms<?= (!empty($editData) || !empty($errors)) ? ' allforms-visible' : ''; ?>
-        <?= csrf_field() ?>">
+          class="allforms<?= (!empty($editData) || !empty($errors)) ? ' allforms-visible' : ''; ?>">
+        <?= csrf_field() ?>
          <div class="card-header">
                 <h5><i class="fas fa-clipboard-list"></i>
                     <?= !empty($editData) ? 'تعديل الموديل' : 'إضافة موديل جديد'; ?>
@@ -318,15 +320,15 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 
                 <div class="form-grid">
                     <div>
-                        <label for="emsf_135_ba4fc">كود الموديل <span style="color:#c0392b">*</span></label>
-                        <input type="text" name="code" required
-                               value="<?= $e($editData['code'] ?? ''); ?>" id="emsf_135_ba4fc">
+                        <label for="emsf_135_ba4fc">كود الموديل <span class="fm-required">*</span></label>
+                        <input type="text" name="code" required id="emsf_135_ba4fc"
+                               value="<?= $e($editData['code'] ?? ''); ?>">
                     </div>
 
                     <div>
                         <label for="emsf_136_273df">الصانع / الماركة</label>
-                        <input type="text" name="manufacturer" list="manufacturerList" autocomplete="off"
-                               value="<?= $e($editData['manufacturer'] ?? ''); ?>" id="emsf_136_273df">
+                        <input type="text" name="manufacturer" list="manufacturerList" autocomplete="off" id="emsf_136_273df"
+                               value="<?= $e($editData['manufacturer'] ?? ''); ?>">
                         <datalist id="manufacturerList">
                             <?php foreach ($manufacturers as $m): ?>
                                 <option value="<?= $e($m); ?>"></option>
@@ -335,9 +337,9 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                     </div>
 
                     <div>
-                        <label for="emsf_137_79fe7">اسم / رقم الموديل <span style="color:#c0392b">*</span></label>
-                        <input type="text" name="model_name" required
-                               value="<?= $e($editData['model_name'] ?? ''); ?>" id="emsf_137_79fe7">
+                        <label for="emsf_137_79fe7">اسم / رقم الموديل <span class="fm-required">*</span></label>
+                        <input type="text" name="model_name" required id="emsf_137_79fe7"
+                               value="<?= $e($editData['model_name'] ?? ''); ?>">
                     </div>
 
                     <div>
@@ -381,8 +383,8 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 
                     <div>
                         <label for="emsf_141_4fa8d">السعة / القدرة القياسية</label>
-                        <input type="number" step="0.01" name="std_capacity"
-                               value="<?= $e($editData['std_capacity'] ?? ''); ?>" id="emsf_141_4fa8d">
+                        <input type="number" step="0.01" name="std_capacity" id="emsf_141_4fa8d"
+                               value="<?= $e($editData['std_capacity'] ?? ''); ?>">
                     </div>
 
                     <div>
@@ -417,14 +419,14 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                 </option>
                             <?php endforeach; ?>
                         </select>
-                        <small style="color:#777">المعدّات التابعة لهذا الموديل ترث افتراضات الإهلاك منه.</small>
+                        <small class="fm-hint">المعدّات التابعة لهذا الموديل ترث افتراضات الإهلاك منه.</small>
                     </div>
                     <?php endif; ?>
 
                     <div>
                         <label for="emsf_145_075cb">مرجع فني / كتالوج</label>
-                        <input type="text" name="tech_reference"
-                               value="<?= $e($editData['tech_reference'] ?? ''); ?>" id="emsf_145_075cb">
+                        <input type="text" name="tech_reference" id="emsf_145_075cb"
+                               value="<?= $e($editData['tech_reference'] ?? ''); ?>">
                     </div>
 
                     <div>
@@ -468,14 +470,15 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                     <tr class="spec-row">
                                         <td>
                                             <input type="text" name="spec_item_type[]" list="specItemTypes"
-                                                   value="<?= $iv('item_type'); ?>" placeholder="فلتر / زيت ..." aria-label="فلتر / زيت ...">
+                                                   placeholder="فلتر / زيت ..." aria-label="نوعُ البند"
+                                                   value="<?= $iv('item_type'); ?>">
                                         </td>
-                                        <td><input type="text" name="spec_recommended_ref[]" value="<?= $iv('recommended_ref'); ?>"></td>
-                                        <td><input type="number" step="0.01" name="spec_qty[]" value="<?= $iv('qty'); ?>" style="max-width:90px"></td>
+                                        <td><input type="text" name="spec_recommended_ref[]" aria-label="المرجعُ الموصى به" value="<?= $iv('recommended_ref'); ?>"></td>
+                                        <td><input type="number" step="0.01" name="spec_qty[]" class="fm-qty-cell" aria-label="الكميةُ المطلوبة" value="<?= $iv('qty'); ?>"></td>
                                         <td>
-                                            <input type="text" name="spec_uom[]" list="specUoms" value="<?= $iv('uom'); ?>" style="max-width:100px">
+                                            <input type="text" name="spec_uom[]" list="specUoms" class="fm-uom-cell" aria-label="وحدةُ القياس" value="<?= $iv('uom'); ?>">
                                         </td>
-                                        <td><input type="text" name="spec_alt_ref[]" value="<?= $iv('alt_ref'); ?>"></td>
+                                        <td><input type="text" name="spec_alt_ref[]" aria-label="المرجعُ البديل" value="<?= $iv('alt_ref'); ?>"></td>
                                         <td>
                                             <input type="hidden" name="spec_existing_photo[]" value="<?= $e($photo); ?>">
                                             <?php if (!empty($photo)): ?>
@@ -483,9 +486,9 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
                                                     <img src="../<?= $e($photo); ?>" class="spec-thumb" alt="صورة">
                                                 </a>
                                             <?php endif; ?>
-                                            <input type="file" name="spec_photo[]" accept="image/*" class="spec-file">
+                                            <input type="file" name="spec_photo[]" accept="image/*" class="spec-file" aria-label="صورةُ البند">
                                         </td>
-                                        <td><input type="text" name="spec_note[]" value="<?= $iv('note'); ?>"></td>
+                                        <td><input type="text" name="spec_note[]" aria-label="ملاحظةٌ على البند" value="<?= $iv('note'); ?>"></td>
                                         <td class="text-center">
                                             <button type="button" class="action-btn delete removeSpecRow" title="حذف البند">
                                                 <i class="fa-solid fa-trash"></i>
@@ -530,7 +533,7 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
     <div class="card models-list-card">
         <div class="card-body">
             <div class="table-container">
-                <table id="projectsTable" class="display fleet-models-table">
+                <table id="projectsTable" class="display fleet-models-table" data-order='[]'>
                     <thead>
                         <tr>
                             <th>الإجراءات</th>
@@ -654,12 +657,20 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 </div>
 
 <style>
+    /* UXW-01 ①②: الأنماطُ الموضعيةُ صارت أصنافًا برموزِ اللون — القيمُ ذاتُها حرفًا */
+    .fm-page { background-color: var(--c-surface); padding: 10px; }
+    .fm-msg { margin: 10px 0; }
+    .fm-required { color: var(--c-c0392b); }
+    .fm-hint { color: var(--c-777777, #777); }
+    .fm-qty-cell { max-width: 90px; }
+    .fm-uom-cell { max-width: 100px; }
+
     /* مساحة خارجية حول منطقة المحتوى الرئيسية + خلفية بيضاء للصفحة */
-    .fleet-models-main { margin: 10px; background: #fff; }
+    .fleet-models-main { margin: 10px; background: var(--c-surface); }
 
     /* خلفية بطاقة الجدول رمادي فاتح (نفس درجة --light-gray في صفحة المشاريع).
-       محدّد عالي الأولوية لتجاوز القاعدة العامة body.ems-site .main .card { background:#fff !important } */
-    body.ems-site .main.fleet-models-main .models-list-card { background: #F2F3F5 !important; }
+       محدّد عالي الأولوية لتجاوز القاعدة العامة التي تصبغ البطاقات بلونِ السطحِ الأبيض */
+    body.ems-site .main.fleet-models-main .models-list-card { background: var(--c-f2f3f5, #F2F3F5) !important; }
 
     /* عمود الإجراءات: الأزرار الثلاثة في صفّ واحد بجانب بعضها */
     .fleet-models-table th:first-child,
@@ -673,7 +684,7 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
     }
     .fleet-models-table .action-btns .delete-model-form { display: inline-flex; margin: 0; }
 
-    .spec-section { margin-top: 18px; border-top: 1px dashed #d8d8d8; padding-top: 14px; }
+    .spec-section { margin-top: 18px; border-top: 1px dashed var(--c-d8d8d8, #d8d8d8); padding-top: 14px; }
     .spec-section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
     .spec-section-head h6 { margin: 0; font-weight: 700; }
     .spec-table th, .spec-table td { vertical-align: middle; padding: 6px; }
@@ -683,18 +694,18 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
     .delete-model-form { margin: 0; }
 
     /* نافذة عرض المواصفات */
-    .fm-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 20000; display: none; align-items: center; justify-content: center; padding: 20px; }
-    .fm-modal { background: #fff; border-radius: 12px; max-width: 920px; width: 100%; max-height: 88vh; overflow: auto; box-shadow: 0 10px 40px rgba(0,0,0,.3); }
-    .fm-modal-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid #eee; position: sticky; top: 0; background: #fff; z-index: 1; }
+    .fm-modal-overlay { position: fixed; inset: 0; background: var(--c-rgba00005, rgba(0,0,0,.5)); z-index: 20000; display: none; align-items: center; justify-content: center; padding: 20px; }
+    .fm-modal { background: var(--c-surface); border-radius: 12px; max-width: 920px; width: 100%; max-height: 88vh; overflow: auto; box-shadow: 0 10px 40px var(--c-rgba00003, rgba(0,0,0,.3)); }
+    .fm-modal-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--c-eeeeee, #eee); position: sticky; top: 0; background: var(--c-surface); z-index: 1; }
     .fm-modal-head h5 { margin: 0; font-weight: 800; }
-    .fm-modal-close { background: none; border: none; font-size: 26px; line-height: 1; cursor: pointer; color: #888; }
+    .fm-modal-close { background: none; border: none; font-size: 26px; line-height: 1; cursor: pointer; color: var(--c-888888, #888); }
     .fm-modal-body { padding: 16px 18px; }
     .fm-info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; margin-bottom: 16px; }
-    .fm-chip { background: #f7f7f9; border: 1px solid #ececf0; border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
-    .fm-chip span { font-size: 11px; color: #888; }
-    .fm-chip b { font-size: 13px; color: #222; }
+    .fm-chip { background: var(--c-f7f7f9, #f7f7f9); border: 1px solid var(--c-ececf0, #ececf0); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
+    .fm-chip span { font-size: 11px; color: var(--c-888888, #888); }
+    .fm-chip b { font-size: 13px; color: var(--c-222222, #222); }
     .fm-spec-h { font-weight: 800; margin: 6px 0 10px; }
-    .fm-empty { color: #888; padding: 16px; text-align: center; background: #fafafa; border-radius: 8px; }
+    .fm-empty { color: var(--c-888888, #888); padding: 16px; text-align: center; background: var(--c-fafafa, #fafafa); border-radius: 8px; }
 </style>
 
 <!-- نافذة عرض المواصفات القياسية -->
@@ -716,16 +727,16 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 <!-- قالب سطر مواصفة جديد (لإضافته عبر JS) -->
 <template id="specRowTemplate">
     <tr class="spec-row">
-        <td><input type="text" name="spec_item_type[]" list="specItemTypes" placeholder="فلتر / زيت ..." aria-label="فلتر / زيت ..."></td>
-        <td><input type="text" name="spec_recommended_ref[]"></td>
-        <td><input type="number" step="0.01" name="spec_qty[]" style="max-width:90px"></td>
-        <td><input type="text" name="spec_uom[]" list="specUoms" style="max-width:100px"></td>
-        <td><input type="text" name="spec_alt_ref[]"></td>
+        <td><input type="text" name="spec_item_type[]" list="specItemTypes" placeholder="فلتر / زيت ..." aria-label="نوعُ البند"></td>
+        <td><input type="text" name="spec_recommended_ref[]" aria-label="المرجعُ الموصى به"></td>
+        <td><input type="number" step="0.01" name="spec_qty[]" class="fm-qty-cell" aria-label="الكميةُ المطلوبة"></td>
+        <td><input type="text" name="spec_uom[]" list="specUoms" class="fm-uom-cell" aria-label="وحدةُ القياس"></td>
+        <td><input type="text" name="spec_alt_ref[]" aria-label="المرجعُ البديل"></td>
         <td>
             <input type="hidden" name="spec_existing_photo[]" value="">
-            <input type="file" name="spec_photo[]" accept="image/*" class="spec-file">
+            <input type="file" name="spec_photo[]" accept="image/*" class="spec-file" aria-label="صورةُ البند">
         </td>
-        <td><input type="text" name="spec_note[]"></td>
+        <td><input type="text" name="spec_note[]" aria-label="ملاحظةٌ على البند"></td>
         <td class="text-center">
             <button type="button" class="action-btn delete removeSpecRow" title="حذف البند">
                 <i class="fa-solid fa-trash"></i>
@@ -739,11 +750,9 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 <script src="../includes/js/jquery.dataTables.main.js"></script>
 <script>
     $(document).ready(function () {
-        $('#projectsTable').DataTable({
-            order: [],                                  // إبقاء ترتيب الاستعلام (الأحدث أولاً)
-            columnDefs: [{ orderable: false, targets: 0 }], // عمود الإجراءات (الأول) غير قابل للفرز
-            language: { url: "/ems/assets/i18n/datatables/ar.json" }
-        });
+        // UXW-01 ⑤: التهيئةُ المحليةُ رُفعت — المكوّنُ المركزيُّ (ui-unification.js)
+        // يلتقط الجدولَ ويحمّل ar.json ذاتَه. والسلوكُ المنقولُ سماتٍ على وسمِ
+        // <table>: data-order='[]'. وتعطيلُ فرزِ عمودِ الإجراءاتِ لا سمةَ له في المكوّن.
 
         $('#toggleForm').on('click', function () {
             const $form = $('#projectForm');

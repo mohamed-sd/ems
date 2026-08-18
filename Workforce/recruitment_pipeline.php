@@ -135,18 +135,31 @@ $header_title_html = htmlspecialchars('دورةُ التوظيف — عشرُ خ
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا متقدمين في دورةِ التوظيفِ الآن', 'افتحْ شاغرًا بنموذجِ «① طلبُ شاغرٍ جديد» ثم سجّلْ سيرةَ متقدمٍ عليه');
 ?>
+  <style>
+    .rec-forms-row { display: flex; gap: var(--space-6); flex-wrap: wrap; margin-bottom: 16px; }
+    .rec-inline-form { display: flex; gap: var(--space-2); align-items: end; }
+    .rec-row-form { display: flex; gap: 6px; }
+    .rec-row-form-tight { display: flex; gap: var(--space-1); }
+    .rec-w-90 { max-width: 90px; }
+    .rec-w-110 { max-width: 110px; }
+    .rec-w-130 { max-width: 130px; }
+    .rec-stage-badge { background: var(--c-0d6efd, #0d6efd); }
+    .rec-reject-btn { color: var(--c-dc3545, #dc3545); }
+  </style>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
 
-  <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:16px">
-    <form method="post" class="ems-form" style="display:flex;gap:8px;align-items:end">
+  <div class="rec-forms-row">
+    <form method="post" class="ems-form rec-inline-form">
         <?= csrf_field() ?>
       <input type="hidden" name="new_vacancy" value="1">
       <div><label for="emsf_1785_5c43b">① طلبُ شاغرٍ جديد</label><input type="text" name="title_text" class="form-control" placeholder="المسمّى" required id="emsf_1785_5c43b"></div>
       <div><label for="emsf_1786_048c7">السبب</label><input type="text" name="reason" class="form-control" id="emsf_1786_048c7"></div>
       <button class="btn btn-primary">افتح وانشر</button>
     </form>
-    <form method="post" class="ems-form" style="display:flex;gap:8px;align-items:end">
+    <form method="post" class="ems-form rec-inline-form">
         <?= csrf_field() ?>
       <input type="hidden" name="new_applicant" value="1">
       <div><label for="emsf_1787_75453">③ سيرةٌ لمتقدم</label>
@@ -154,8 +167,8 @@ include __DIR__ . '/../includes/page_header.php';
           <?php foreach ($vacs as $v): ?><option value="<?= intval($v['vac_id']) ?>"><?= htmlspecialchars($v['vacancy_no'] . ' — ' . $v['title_text'], ENT_QUOTES, 'UTF-8') ?></option><?php endforeach; ?>
         </select></div>
       <div><label for="emsf_1788_6b93b">الاسم</label><input type="text" name="applicant_name" class="form-control" required id="emsf_1788_6b93b"></div>
-      <div><label for="emsf_1789_0744a">الهاتف</label><input type="text" name="applicant_phone" class="form-control" style="max-width:130px" id="emsf_1789_0744a"></div>
-      <div><label for="emsf_1790_cebd8">مرجعُ السيرة</label><input type="text" name="cv_ref" class="form-control" style="max-width:130px" id="emsf_1790_cebd8"></div>
+      <div><label for="emsf_1789_0744a">الهاتف</label><input type="text" name="applicant_phone" class="form-control rec-w-130" id="emsf_1789_0744a"></div>
+      <div><label for="emsf_1790_cebd8">مرجعُ السيرة</label><input type="text" name="cv_ref" class="form-control rec-w-130" id="emsf_1790_cebd8"></div>
       <button class="btn btn-primary">سجّل</button>
     </form>
   </div>
@@ -201,30 +214,30 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= intval($a2['app_id']) ?></td>
         <td><?= htmlspecialchars($a2['applicant_name'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($a2['vacancy_no'] . ' — ' . $a2['title_text'], ENT_QUOTES, 'UTF-8') ?></td>
-        <td><span class="badge" style="background:#0d6efd"><?= ($idx + 1) . '/10 · ' . $STAGES[$a2['stage']] ?></span></td>
+        <td><span class="badge rec-stage-badge"><?= ($idx + 1) . '/10 · ' . $STAGES[$a2['stage']] ?></span></td>
         <td><?= $a2['test_score'] !== null ? floatval($a2['test_score']) : '—' ?></td>
         <td>
           <?php if ($nextLabel): ?>
-          <form method="post" style="display:flex;gap:6px">
+          <form method="post" class="rec-row-form">
         <?= csrf_field() ?>
             <input type="hidden" name="advance_app" value="<?= intval($a2['app_id']) ?>">
             <?php if ($a2['stage'] === 'practical_test'): ?>
-              <input type="number" step="0.5" name="test_score" class="form-control form-control-sm" placeholder="الدرجة" style="max-width:90px" aria-label="الدرجة">
+              <input type="number" step="0.5" name="test_score" class="form-control form-control-sm rec-w-90" placeholder="الدرجة" aria-label="الدرجة">
             <?php endif; ?>
             <?php if ($ORDER[$idx + 1] === 'onboarded'): ?>
-              <input type="number" name="employee_id" class="form-control form-control-sm" placeholder="رقم الموظف" style="max-width:110px" required aria-label="رقم الموظف">
+              <input type="number" name="employee_id" class="form-control form-control-sm rec-w-110" placeholder="رقم الموظف" required aria-label="رقم الموظف">
             <?php endif; ?>
-            <input type="text" name="stage_note" class="form-control form-control-sm" placeholder="ملاحظة" style="max-width:130px" aria-label="ملاحظة">
+            <input type="text" name="stage_note" class="form-control form-control-sm rec-w-130" placeholder="ملاحظة" aria-label="ملاحظة">
             <button class="action-btn" type="submit">← <?= $nextLabel ?></button>
           </form>
           <?php else: ?>—<?php endif; ?>
         </td>
         <td>
-          <form method="post" style="display:flex;gap:4px">
+          <form method="post" class="rec-row-form-tight">
         <?= csrf_field() ?>
             <input type="hidden" name="reject_app" value="<?= intval($a2['app_id']) ?>">
-            <input type="text" name="reject_reason" class="form-control form-control-sm" placeholder="السبب" style="max-width:110px" required aria-label="السبب">
-            <button class="action-btn" type="submit" style="color:#dc3545">رفض</button>
+            <input type="text" name="reject_reason" class="form-control form-control-sm rec-w-110" placeholder="السبب" required aria-label="السبب">
+            <button class="action-btn rec-reject-btn" type="submit">رفض</button>
           </form>
         </td>
       </tr>

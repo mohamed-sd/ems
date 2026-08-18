@@ -37,23 +37,23 @@ include __DIR__ . '/../inheader.php';
         }
 
         body {
-            background: #f5f7fa;
+            background: var(--c-f5f7fa, #f5f7fa);
         }
 
         .main {
             padding: 2rem;
-            background: #f5f7fa;
+            background: var(--c-f5f7fa, #f5f7fa);
         }
 
         /* Page Title */
         .main h3 {
             font-size: 2rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--c-667eea, #667eea) 0%, var(--c-764ba2, #764ba2) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 2rem;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            text-shadow: 2px 2px 4px var(--c-rgba00001, rgba(0,0,0,0.1));
         }
 
         /* Action Buttons Container */
@@ -65,7 +65,7 @@ include __DIR__ . '/../inheader.php';
             padding: 1rem;
             background: white;
             border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 10px var(--c-rgba000008, rgba(0,0,0,0.08));
         }
 
         /* Modern Action Buttons */
@@ -78,7 +78,7 @@ include __DIR__ . '/../inheader.php';
             color: white;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 15px var(--c-rgba000015, rgba(0,0,0,0.15));
             position: relative;
             overflow: hidden;
         }
@@ -91,7 +91,7 @@ include __DIR__ . '/../inheader.php';
             width: 0;
             height: 0;
             border-radius: 50%;
-            background: rgba(255,255,255,0.3);
+            background: var(--c-rgba25525525503, rgba(255,255,255,0.3));
             transform: translate(-50%, -50%);
             transition: width 0.6s, height 0.6s;
         }
@@ -103,7 +103,7 @@ include __DIR__ . '/../inheader.php';
 
         .aligin .add:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 25px rgba(0,0,0,0.25);
+            box-shadow: 0 6px 25px var(--c-rgba000025, rgba(0,0,0,0.25));
         }
 
         .aligin .add:active {
@@ -111,31 +111,31 @@ include __DIR__ . '/../inheader.php';
         }
 
         #renewalBtn {
-            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+            background: linear-gradient(135deg, var(--c-17a2b8, #17a2b8) 0%, var(--c-138496, #138496) 100%);
         }
 
         #settlementBtn {
-            background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);
+            background: linear-gradient(135deg, var(--c-6c757d, #6c757d) 0%, var(--c-545b62, #545b62) 100%);
         }
 
         #pauseBtn {
-            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            background: linear-gradient(135deg, var(--c-ffc107, #ffc107) 0%, var(--c-e0a800, #e0a800) 100%);
         }
 
         #resumeBtn {
-            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            background: linear-gradient(135deg, var(--c-28a745, #28a745) 0%, var(--c-218838, #218838) 100%);
         }
 
         #terminateBtn {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: linear-gradient(135deg, var(--c-dc3545, #dc3545) 0%, var(--c-c82333, #c82333) 100%);
         }
 
         #mergeBtn {
-            background: linear-gradient(135deg, #e83e8c 0%, #d63384 100%);
+            background: linear-gradient(135deg, var(--c-e83e8c, #e83e8c) 0%, var(--c-d63384, #d63384) 100%);
         }
 
         #completeBtn {
-            background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);
+            background: linear-gradient(135deg, var(--c-6f42c1, #6f42c1) 0%, var(--c-5a32a3, #5a32a3) 100%);
         }
 
         /* Report Container */
@@ -143,7 +143,7 @@ include __DIR__ . '/../inheader.php';
             background: white;
             padding: 2rem;
             border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 20px var(--c-rgba00001, rgba(0,0,0,0.1));
             margin-bottom: 2rem;
         }
 
@@ -156,24 +156,24 @@ include __DIR__ . '/../inheader.php';
         }
 
         .info-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            background: linear-gradient(135deg, var(--c-surface, #ffffff) 0%, var(--c-f8f9fa, #f8f9fa) 100%);
             border-radius: 15px;
             padding: 1.5rem;
             border-right: 5px solid;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 3px 15px var(--c-rgba000008, rgba(0,0,0,0.08));
             transition: all 0.3s ease;
         }
 
         .info-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 25px var(--c-rgba000015, rgba(0,0,0,0.15));
         }
 
-        .info-card.primary { border-right-color: #667eea; }
-        .info-card.success { border-right-color: #28a745; }
-        .info-card.warning { border-right-color: #ffc107; }
-        .info-card.danger { border-right-color: #dc3545; }
-        .info-card.info { border-right-color: #17a2b8; }
+        .info-card.primary { border-right-color: var(--c-667eea, #667eea); }
+        .info-card.success { border-right-color: var(--c-28a745, #28a745); }
+        .info-card.warning { border-right-color: var(--c-ffc107, #ffc107); }
+        .info-card.danger { border-right-color: var(--c-dc3545, #dc3545); }
+        .info-card.info { border-right-color: var(--c-17a2b8, #17a2b8); }
 
         .info-card h5 {
             font-size: 1.1rem;
@@ -192,7 +192,7 @@ include __DIR__ . '/../inheader.php';
             display: flex;
             justify-content: space-between;
             padding: 0.75rem 0;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid var(--c-e9ecef, #e9ecef);
         }
 
         .info-item:last-child {
@@ -201,7 +201,7 @@ include __DIR__ . '/../inheader.php';
 
         .info-label {
             font-weight: 600;
-            color: #495057;
+            color: var(--c-495057, #495057);
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -209,7 +209,7 @@ include __DIR__ . '/../inheader.php';
 
         .info-value {
             font-weight: 500;
-            color: #212529;
+            color: var(--c-212529, #212529);
         }
 
         /* Status Badge */
@@ -221,16 +221,16 @@ include __DIR__ . '/../inheader.php';
             font-size: 0.9rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 2px 10px var(--c-rgba000015, rgba(0,0,0,0.15));
         }
 
         .status-badge.active {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: linear-gradient(135deg, var(--c-28a745, #28a745) 0%, var(--c-20c997, #20c997) 100%);
             color: white;
         }
 
         .status-badge.inactive {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: linear-gradient(135deg, var(--c-dc3545, #dc3545) 0%, var(--c-c82333, #c82333) 100%);
             color: white;
         }
 
@@ -241,12 +241,12 @@ include __DIR__ . '/../inheader.php';
             border-spacing: 0;
             border-radius: 15px;
             overflow: hidden;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 3px 15px var(--c-rgba000008, rgba(0,0,0,0.08));
             margin-bottom: 2rem;
         }
 
         .modern-table thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--c-667eea, #667eea) 0%, var(--c-764ba2, #764ba2) 100%);
             color: white;
         }
 
@@ -263,15 +263,15 @@ include __DIR__ . '/../inheader.php';
         }
 
         .modern-table tbody tr:hover {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            background: linear-gradient(135deg, var(--c-f8f9fa, #f8f9fa) 0%, var(--c-e9ecef, #e9ecef) 100%);
             transform: scale(1.01);
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px var(--c-rgba00001, rgba(0,0,0,0.1));
         }
 
         .modern-table tbody td {
             padding: 1rem;
             text-align: center;
-            border-bottom: 1px solid #e9ecef;
+            border-bottom: 1px solid var(--c-e9ecef, #e9ecef);
             font-weight: 500;
         }
 
@@ -279,12 +279,12 @@ include __DIR__ . '/../inheader.php';
         .modal-content {
             border: none;
             border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 40px var(--c-rgba00002, rgba(0,0,0,0.2));
             overflow: hidden;
         }
 
         .modal-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--c-667eea, #667eea) 0%, var(--c-764ba2, #764ba2) 100%);
             color: white;
             border: none;
             padding: 1.5rem;
@@ -306,17 +306,17 @@ include __DIR__ . '/../inheader.php';
         .modal-footer {
             border: none;
             padding: 1.5rem;
-            background: #f8f9fa;
+            background: var(--c-f8f9fa, #f8f9fa);
         }
 
         .form-label {
             font-weight: 600;
-            color: #495057;
+            color: var(--c-495057, #495057);
             margin-bottom: 0.5rem;
         }
 
         .form-control, .form-select {
-            border: 2px solid #e9ecef;
+            border: 2px solid var(--c-e9ecef, #e9ecef);
             border-radius: 10px;
             padding: 0.75rem;
             transition: all 0.3s ease;
@@ -324,8 +324,8 @@ include __DIR__ . '/../inheader.php';
         }
 
         .form-control:focus, .form-select:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            border-color: var(--c-667eea, #667eea);
+            box-shadow: 0 0 0 0.2rem var(--c-rgba102126234025, rgba(102, 126, 234, 0.25));
         }
 
         .btn {
@@ -337,7 +337,7 @@ include __DIR__ . '/../inheader.php';
 
         .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 5px 15px var(--c-rgba00002, rgba(0,0,0,0.2));
         }
 
         .alert {
@@ -377,6 +377,230 @@ include __DIR__ . '/../inheader.php';
                 grid-template-columns: 1fr;
             }
         }
+        /* ═══ UXW-01 ②: أنماطٌ موضعيةٌ نُقلت أصنافًا صفحيةً ببادئةِ الشاشة dcd- ═══ */
+        .dcd-icon-ml { margin-left: 0.5rem; }
+        .dcd-icon-ml5 { margin-left: 5px; }
+        .dcd-icon-lg { font-size: 1.3rem; }
+        .dcd-req { color: red; }
+        .dcd-on-primary { color: white; }
+        .dcd-lbl-onprimary { color: var(--c-rgba25525525509, rgba(255,255,255,0.9)); }
+        .dcd-val-onprimary { color: white; font-weight: 700; }
+        .dcd-accent { color: var(--c-667eea, #667eea); }
+        .dcd-ok { color: var(--c-28a745, #28a745); }
+        .dcd-icon-ok { color: var(--c-28a745, #28a745); margin-left: 0.5rem; }
+        .dcd-icon-danger { color: var(--c-dc3545, #dc3545); margin-left: 0.5rem; }
+        .dcd-align-right,
+        .modern-table tbody td.dcd-align-right { text-align: right; }
+        .dcd-scroll-x { overflow-x: auto; }
+        .dcd-mb-1r { margin-bottom: 1rem; }
+        .dcd-mt-1r { margin-top: 1rem; }
+        .dcd-mb-2r { margin-bottom: 2rem; }
+        .dcd-mt-20 { margin-top: 20px; }
+        .dcd-minh-100 { min-height: 100px; }
+
+        .dcd-card-driver { border-right-color: var(--c-ff6b6b, #ff6b6b); }
+        .dcd-card-system { border-right-color: var(--c-6c757d, #6c757d); }
+        .dcd-card-extra {
+            display: none;
+            background: linear-gradient(135deg, var(--c-667eea, #667eea) 0%, var(--c-764ba2, #764ba2) 100%);
+            color: white;
+        }
+        .dcd-edit-btn { padding: 0.25rem 0.75rem; border-radius: 8px; }
+
+        .dcd-panel {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px var(--c-rgba00001, rgba(0,0,0,0.1));
+            margin-top: 2rem;
+        }
+        .dcd-panel-notes { margin-bottom: 3rem; }
+        .dcd-section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--c-667eea, #667eea);
+            font-weight: 700;
+        }
+        .dcd-merge-hint { font-size: 0.9rem; color: var(--c-6c757d, #6c757d); }
+
+        .dcd-legend-basic { color: var(--c-007bff, #007bff); font-weight: 600; }
+        .dcd-legend-backup { color: var(--c-ffc107, #ffc107); font-weight: 600; }
+        .dcd-pill-primary,
+        .dcd-pill-success,
+        .dcd-pill-basic,
+        .dcd-pill-backup {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .dcd-pill-primary {
+            background: linear-gradient(135deg, var(--c-667eea, #667eea) 0%, var(--c-764ba2, #764ba2) 100%);
+            color: white;
+        }
+        .dcd-pill-success {
+            background: linear-gradient(135deg, var(--c-28a745, #28a745) 0%, var(--c-20c997, #20c997) 100%);
+            color: white;
+        }
+        .dcd-pill-basic {
+            background: var(--c-e3f2fd, #e3f2fd);
+            color: var(--c-007bff, #007bff);
+            border-right: 3px solid var(--c-007bff, #007bff);
+        }
+        .dcd-pill-backup {
+            background: var(--c-fffde7, #fffde7);
+            color: var(--c-f57f17, #f57f17);
+            border-right: 3px solid var(--c-ffc107, #ffc107);
+        }
+
+        .dcd-empty-cell,
+        .modern-table tbody td.dcd-empty-cell { text-align: center; padding: 2rem; }
+        .dcd-empty-icon { font-size: 3rem; color: var(--c-e9ecef, #e9ecef); margin-bottom: 1rem; }
+        .dcd-empty-text { color: var(--c-ink-400, #999); font-size: 1.1rem; }
+        .dcd-empty-note { text-align: center; color: var(--c-ink-400, #999); }
+        .dcd-err-note { text-align: center; color: var(--c-state-danger-strong, #c00); }
+
+        .dcd-note-badge {
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .dcd-badge-primary   { background: linear-gradient(135deg, var(--c-667eea, #667eea) 0%, var(--c-764ba2, #764ba2) 100%); }
+        .dcd-badge-secondary { background: linear-gradient(135deg, var(--c-6c757d, #6c757d) 0%, var(--c-545b62, #545b62) 100%); }
+        .dcd-badge-warning   { background: linear-gradient(135deg, var(--c-ffc107, #ffc107) 0%, var(--c-e0a800, #e0a800) 100%); }
+        .dcd-badge-success   { background: linear-gradient(135deg, var(--c-28a745, #28a745) 0%, var(--c-20c997, #20c997) 100%); }
+        .dcd-badge-danger    { background: linear-gradient(135deg, var(--c-dc3545, #dc3545) 0%, var(--c-c82333, #c82333) 100%); }
+        .dcd-badge-purple    { background: linear-gradient(135deg, var(--c-6f42c1, #6f42c1) 0%, var(--c-5a32a3, #5a32a3) 100%); }
+        .dcd-badge-info      { background: linear-gradient(135deg, var(--c-17a2b8, #17a2b8) 0%, var(--c-138496, #138496) 100%); }
+
+        .dcd-back-wrap { text-align: center; margin: 2rem 0; }
+        .dcd-back-btn,
+        .dcd-back-btn:hover {
+            background: linear-gradient(135deg, var(--c-667eea, #667eea) 0%, var(--c-764ba2, #764ba2) 100%);
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 15px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px var(--c-rgba10212623403, rgba(102, 126, 234, 0.3));
+        }
+
+        .dcd-hd-primary   { background: linear-gradient(135deg, var(--c-667eea, #667eea) 0%, var(--c-764ba2, #764ba2) 100%); }
+        .dcd-hd-info      { background: linear-gradient(135deg, var(--c-17a2b8, #17a2b8) 0%, var(--c-138496, #138496) 100%); }
+        .dcd-hd-secondary { background: linear-gradient(135deg, var(--c-6c757d, #6c757d) 0%, var(--c-545b62, #545b62) 100%); }
+        .dcd-hd-warning   { background: linear-gradient(135deg, var(--c-ffc107, #ffc107) 0%, var(--c-e0a800, #e0a800) 100%); }
+        .dcd-hd-success   { background: linear-gradient(135deg, var(--c-28a745, #28a745) 0%, var(--c-20c997, #20c997) 100%); }
+        .dcd-hd-danger    { background: linear-gradient(135deg, var(--c-dc3545, #dc3545) 0%, var(--c-c82333, #c82333) 100%); }
+        .dcd-hd-purple    { background: linear-gradient(135deg, var(--c-6f42c1, #6f42c1) 0%, var(--c-5a32a3, #5a32a3) 100%); }
+        .dcd-hd-amber     { background: linear-gradient(135deg, var(--c-ffc107, #ffc107) 0%, var(--c-ff9800, #ff9800) 100%); }
+
+        .dcd-btn-info,
+        .dcd-btn-secondary,
+        .dcd-btn-warning,
+        .dcd-btn-success,
+        .dcd-btn-purple { color: white; border: none; }
+        .dcd-btn-info      { background: linear-gradient(135deg, var(--c-17a2b8, #17a2b8) 0%, var(--c-138496, #138496) 100%); }
+        .dcd-btn-secondary { background: linear-gradient(135deg, var(--c-6c757d, #6c757d) 0%, var(--c-545b62, #545b62) 100%); }
+        .dcd-btn-warning   { background: linear-gradient(135deg, var(--c-ffc107, #ffc107) 0%, var(--c-e0a800, #e0a800) 100%); }
+        .dcd-btn-success   { background: linear-gradient(135deg, var(--c-28a745, #28a745) 0%, var(--c-20c997, #20c997) 100%); }
+        .dcd-btn-purple    { background: linear-gradient(135deg, var(--c-6f42c1, #6f42c1) 0%, var(--c-5a32a3, #5a32a3) 100%); }
+        .dcd-btn-purple-soft {
+            background: linear-gradient(135deg, var(--c-6f42c1, #6f42c1) 0%, var(--c-5a32a3, #5a32a3) 100%);
+            color: white;
+        }
+
+        .dcd-duration-box {
+            display: none;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--c-e3f2fd, #e3f2fd) 0%, var(--c-bbdefb, #bbdefb) 100%);
+            border-radius: 10px;
+        }
+        .dcd-duration-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--c-1976d2, #1976d2);
+            font-weight: 600;
+        }
+
+        .dcd-pause-box {
+            padding: 1.25rem;
+            background: linear-gradient(135deg, var(--c-fff3cd, #fff3cd) 0%, var(--c-s-ffeaa7, #ffeaa7) 100%);
+            border-radius: 12px;
+            border-right: 5px solid var(--c-ffc107, #ffc107);
+            box-shadow: 0 2px 10px var(--c-rgba255193702, rgba(255, 193, 7, 0.2));
+        }
+        .dcd-pause-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--c-s-856404, #856404);
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+        }
+        .dcd-pause-row {
+            color: var(--c-s-856404, #856404);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .dcd-pause-date {
+            background: white;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            font-weight: 700;
+            color: var(--c-d39e00, #d39e00);
+        }
+        .dcd-pause-reason {
+            color: var(--c-s-856404, #856404);
+            font-size: 0.95rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px dashed var(--c-ffc107, #ffc107);
+        }
+
+        .dcd-lbl-lg { font-weight: 700; font-size: 1.05rem; }
+        .dcd-input-lg { font-size: 1.05rem; font-weight: 600; }
+        .dcd-hint-block { display: block; margin-top: 0.5rem; }
+        .dcd-choice-box {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid var(--c-1976d2, #1976d2);
+        }
+        .dcd-choice-title {
+            font-weight: 700;
+            color: var(--c-1976d2, #1976d2);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .dcd-radio-wrap { padding-right: 1.8rem; }
+        .dcd-radio-input { float: right; margin-right: -1.8rem; margin-top: 0.3rem; }
+        .dcd-radio-label { font-weight: 600; color: var(--c-495057, #495057); cursor: pointer; }
+        .dcd-radio-hint {
+            display: block;
+            color: var(--c-6c757d, #6c757d);
+            font-weight: normal;
+            margin-top: 0.25rem;
+            margin-right: 1.5rem;
+        }
+
+        .dcd-eq-head,
+        .dcd-eq-head-alt {
+            background-color: var(--c-f0f0f0, #f0f0f0);
+            padding: 10px;
+        }
+        .dcd-eq-head { border-right: 3px solid var(--c-0066cc, #0066cc); }
+        .dcd-eq-head-alt { border-right: 3px solid var(--c-28a745, #28a745); }
     </style>
 
 
@@ -395,6 +619,8 @@ $header_title_html = htmlspecialchars('ملف عقد الموظف', ENT_QUOTES, 
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 (9): halat al-shasha — loading/empty/error, hidden by default
+echo ems_states_bundle('لا عقدَ موظفٍ معروضًا الآن', 'ارجعْ إلى قائمةِ الموظّفين واخترْ عقدًا مسجَّلًا لعرضِ تفاصيلِه');
 ?>
 
 
@@ -488,7 +714,7 @@ foreach ($dcd_rows as $row) {
     <!-- بطاقات ملخص العقد -->
     <div class="info-cards-grid">
         <!-- بطاقة معلومات السائق -->
-        <div class="info-card" style="border-right-color: #ff6b6b;">
+        <div class="info-card dcd-card-driver">
             <h5><i class="fas fa-industry"></i> معلومات السائق</h5>
             <div class="info-item">
                 <span class="info-label">اسم السائق</span>
@@ -525,7 +751,7 @@ foreach ($dcd_rows as $row) {
             </div>
             <div class="info-item">
                 <span class="info-label"><i class="fas fa-hourglass-half"></i> المتبقي</span>
-                <span class="info-value" style="color: <?php echo $remaining_days > 30 ? '#28a745' : ($remaining_days > 0 ? '#ffc107' : '#dc3545'); ?>; font-weight: 700;">
+                <span class="info-value" data-allow-style style="color: <?php echo $remaining_days > 30 ? 'var(--c-28a745, #28a745)' : ($remaining_days > 0 ? 'var(--c-ffc107, #ffc107)' : 'var(--c-dc3545, #dc3545)'); ?>; font-weight: 700;">
                     <?php echo $remaining_days; ?> يوم
                 </span>
             </div>
@@ -566,27 +792,27 @@ foreach ($dcd_rows as $row) {
         </div>
 
         <!-- بطاقة البيانات الإضافية للعقد -->
-        <div class="info-card" style="display: none; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-            <h5 style="color: white;"><i class="fas fa-file-contract"></i> بيانات العقد الإضافية</h5>
+        <div class="info-card dcd-card-extra">
+            <h5 class="dcd-on-primary"><i class="fas fa-file-contract"></i> بيانات العقد الإضافية</h5>
             <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">عدد الورديات</span>
-                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['equip_shifts_contract']) ? $row['equip_shifts_contract'] : 0; ?></span>
+                <span class="info-label dcd-lbl-onprimary">عدد الورديات</span>
+                <span class="info-value dcd-val-onprimary"><?php echo isset($row['equip_shifts_contract']) ? $row['equip_shifts_contract'] : 0; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">ساعات الوردية</span>
-                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['shift_contract']) ? $row['shift_contract'] : 0; ?> ساعة</span>
+                <span class="info-label dcd-lbl-onprimary">ساعات الوردية</span>
+                <span class="info-value dcd-val-onprimary"><?php echo isset($row['shift_contract']) ? $row['shift_contract'] : 0; ?> ساعة</span>
             </div>
             <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">الوحدات يومياً</span>
-                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['equip_total_contract_daily']) ? $row['equip_total_contract_daily'] : 0; ?></span>
+                <span class="info-label dcd-lbl-onprimary">الوحدات يومياً</span>
+                <span class="info-value dcd-val-onprimary"><?php echo isset($row['equip_total_contract_daily']) ? $row['equip_total_contract_daily'] : 0; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">وحدات الشهر</span>
-                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['total_contract_permonth']) ? $row['total_contract_permonth'] : 0; ?></span>
+                <span class="info-label dcd-lbl-onprimary">وحدات الشهر</span>
+                <span class="info-value dcd-val-onprimary"><?php echo isset($row['total_contract_permonth']) ? $row['total_contract_permonth'] : 0; ?></span>
             </div>
             <div class="info-item">
-                <span class="info-label" style="color: rgba(255,255,255,0.9);">إجمالي الوحدات</span>
-                <span class="info-value" style="color: white; font-weight: 700;"><?php echo isset($row['total_contract_units']) ? $row['total_contract_units'] : 0; ?></span>
+                <span class="info-label dcd-lbl-onprimary">إجمالي الوحدات</span>
+                <span class="info-value dcd-val-onprimary"><?php echo isset($row['total_contract_units']) ? $row['total_contract_units'] : 0; ?></span>
             </div>
         </div>
     </div>
@@ -597,7 +823,7 @@ foreach ($dcd_rows as $row) {
         <div class="info-card primary">
             <h5>
                 <i class="fas fa-project-diagram"></i> معلومات المشروع
-                <button class="btn btn-sm btn-secondary ms-auto" id="editProjectInfoBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
+                <button class="btn btn-sm btn-secondary ms-auto dcd-edit-btn" id="editProjectInfoBtn">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
             </h5>
@@ -620,7 +846,7 @@ foreach ($dcd_rows as $row) {
         <div class="info-card success">
             <h5>
                 <i class="fas fa-concierge-bell"></i> الخدمات المقدمة
-                <button class="btn btn-sm btn-primary ms-auto" id="editServicesBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
+                <button class="btn btn-sm btn-primary ms-auto dcd-edit-btn" id="editServicesBtn">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
             </h5>
@@ -646,7 +872,7 @@ foreach ($dcd_rows as $row) {
         <div class="info-card info">
             <h5>
                 <i class="fas fa-users"></i> أطراف العقد
-                <button class="btn btn-sm btn-secondary ms-auto" id="editPartiesBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
+                <button class="btn btn-sm btn-secondary ms-auto dcd-edit-btn" id="editPartiesBtn">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
             </h5>
@@ -672,7 +898,7 @@ foreach ($dcd_rows as $row) {
         <div class="info-card warning">
             <h5>
                 <i class="fas fa-money-bill-wave"></i> البيانات المالية
-                <button class="btn btn-sm btn-secondary ms-auto" id="editPaymentBtn" style="padding: 0.25rem 0.75rem; border-radius: 8px;">
+                <button class="btn btn-sm btn-secondary ms-auto dcd-edit-btn" id="editPaymentBtn">
                     <i class="fas fa-edit"></i> تعديل
                 </button>
             </h5>
@@ -699,7 +925,7 @@ foreach ($dcd_rows as $row) {
         </div>
 
         <!-- معلومات النظام -->
-        <div class="info-card" style="border-right-color: #6c757d;">
+        <div class="info-card dcd-card-system">
             <h5><i class="fas fa-database"></i> معلومات النظام</h5>
             <div class="info-item">
                 <span class="info-label">تاريخ الإنشاء</span>
@@ -714,7 +940,7 @@ foreach ($dcd_rows as $row) {
 
     <?php if ((isset($row['pause_reason']) && !empty($row['pause_reason'])) || (isset($row['termination_reason']) && !empty($row['termination_reason']))): ?>
     <!-- بطاقة التحذيرات والملاحظات -->
-    <div class="info-card danger" style="margin-bottom: 2rem;">
+    <div class="info-card danger dcd-mb-2r">
         <h5><i class="fas fa-exclamation-triangle"></i> تحذيرات وملاحظات هامة</h5>
         <?php if (isset($row['pause_reason']) && !empty($row['pause_reason'])): ?>
         <div class="info-item">
@@ -760,17 +986,17 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 ?>
 
 <!-- جدول معدات العقد (بما فيها معدات العقد المدموج) -->
-<div style="background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-top: 2rem;">
-    <h4 style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; color: #667eea; font-weight: 700;">
+<div class="dcd-panel">
+    <h4 class="dcd-section-title">
         <i class="fas fa-boxes"></i>
         معدات العقد
         <?php
         if (!empty($row['merged_with']) && $row['merged_with'] != '0') {
-            echo "<span style='font-size: 0.9rem; color: #6c757d;'>(العقد #" . $contract_id . " + العقد #" . $row['merged_with'] . ")</span>";
+            echo "<span class='dcd-merge-hint'>(العقد #" . $contract_id . " + العقد #" . $row['merged_with'] . ")</span>";
         }
         ?>
     </h4>
-    <div style="overflow-x: auto;">
+    <div class="dcd-scroll-x">
         <table class="modern-table">
             <thead>
                 <tr>
@@ -778,8 +1004,8 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                     <th>نوع المعدة</th>
                     <th>الحجم</th>
                     <th>العدد</th>
-                    <th><span style="color: #007bff; font-weight: 600;">■</span> أساسية</th>
-                    <th><span style="color: #ffc107; font-weight: 600;">■</span> احتياطية</th>
+                    <th><span class="dcd-legend-basic">■</span> أساسية</th>
+                    <th><span class="dcd-legend-backup">■</span> احتياطية</th>
                     <th>عدد الورديات</th>
                     <th>الساعات/اليوم</th>
                     <th>إجمالي الساعات</th>
@@ -833,16 +1059,16 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         echo "<td>" . $i . "</td>";
                         echo "<td><strong>" . htmlspecialchars($equip['equip_type']) . "</strong></td>";
                         echo "<td>" . $equip['equip_size'] . "</td>";
-                        echo "<td><span style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . $equip['equip_count'] . "</span></td>";
-                        echo "<td><span style='background: #e3f2fd; color: #007bff; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600; border-right: 3px solid #007bff;'>" . (isset($equip['equip_count_basic']) ? $equip['equip_count_basic'] : 0) . "</span></td>";
-                        echo "<td><span style='background: #fffde7; color: #f57f17; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600; border-right: 3px solid #ffc107;'>" . (isset($equip['equip_count_backup']) ? $equip['equip_count_backup'] : 0) . "</span></td>";
-                        echo "<td><span style='background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 600;'>" . (isset($equip['equip_shifts']) ? $equip['equip_shifts'] : 0) . "</span></td>";
+                        echo "<td><span class='dcd-pill-primary'>" . $equip['equip_count'] . "</span></td>";
+                        echo "<td><span class='dcd-pill-basic'>" . (isset($equip['equip_count_basic']) ? $equip['equip_count_basic'] : 0) . "</span></td>";
+                        echo "<td><span class='dcd-pill-backup'>" . (isset($equip['equip_count_backup']) ? $equip['equip_count_backup'] : 0) . "</span></td>";
+                        echo "<td><span class='dcd-pill-success'>" . (isset($equip['equip_shifts']) ? $equip['equip_shifts'] : 0) . "</span></td>";
                         echo "<td>" . $equip['shift_hours'] . "</td>";
                         echo "<td>" . $equip['equip_total_month'] . "</td>";
-                        echo "<td><strong style='color: #667eea;'>" . (isset($equip['equip_monthly_target']) ? $equip['equip_monthly_target'] : 0) . "</strong></td>";
+                        echo "<td><strong class='dcd-accent'>" . (isset($equip['equip_monthly_target']) ? $equip['equip_monthly_target'] : 0) . "</strong></td>";
                         echo "<td>" . $equip['equip_unit'] . "</td>";
-                        echo "<td><strong style='color: #667eea;'>" . $equip['equip_total_contract'] . "</strong></td>";
-                        echo "<td><strong style='color: #28a745;'>" . $equip['equip_price'] . " " . $equip['equip_price_currency'] . "</strong></td>";
+                        echo "<td><strong class='dcd-accent'>" . $equip['equip_total_contract'] . "</strong></td>";
+                        echo "<td><strong class='dcd-ok'>" . $equip['equip_price'] . " " . $equip['equip_price_currency'] . "</strong></td>";
                         echo "<td>" . $equip['equip_operators'] . "</td>";
                         echo "<td>" . $equip['equip_supervisors'] . "</td>";
                         echo "<td>" . $equip['equip_technicians'] . "</td>";
@@ -867,9 +1093,9 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                         $i++;
                     }
                 } else {
-                    echo "<tr><td colspan='17' style='text-align: center; padding: 2rem;'>";
-                    echo "<i class='fas fa-inbox' style='font-size: 3rem; color: #e9ecef; margin-bottom: 1rem;'></i>";
-                    echo "<p style='color: #999; font-size: 1.1rem;'>لا توجد معدات لهذا العقد</p>";
+                    echo "<tr><td colspan='17' class='dcd-empty-cell'>";
+                    echo "<i class='fas fa-inbox dcd-empty-icon'></i>";
+                    echo "<p class='dcd-empty-text'>لا توجد معدات لهذا العقد</p>";
                     echo "</td></tr>";
                 }
                 ?>
@@ -885,12 +1111,12 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
     <br/><br/><br/>
 
     <!-- جدول الملاحظات -->
-    <div style="background: white; padding: 2rem; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-top: 2rem; margin-bottom: 3rem;">
-        <h4 style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; color: #667eea; font-weight: 700;">
+    <div class="dcd-panel dcd-panel-notes">
+        <h4 class="dcd-section-title">
             <i class="fas fa-history"></i>
             سجل الملاحظات والتغييرات
         </h4>
-        <div style="overflow-x: auto;">
+        <div class="dcd-scroll-x">
             <table class="modern-table">
                 <thead>
                     <tr>
@@ -954,28 +1180,28 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                             }
 
                             $badge_colors = [
-                                'primary' => 'background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);',
-                                'secondary' => 'background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);',
-                                'warning' => 'background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);',
-                                'success' => 'background: linear-gradient(135deg, #28a745 0%, #20c997 100%);',
-                                'danger' => 'background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);',
-                                'purple' => 'background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);',
-                                'info' => 'background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);'
+                                'primary'   => 'dcd-badge-primary',
+                                'secondary' => 'dcd-badge-secondary',
+                                'warning'   => 'dcd-badge-warning',
+                                'success'   => 'dcd-badge-success',
+                                'danger'    => 'dcd-badge-danger',
+                                'purple'    => 'dcd-badge-purple',
+                                'info'      => 'dcd-badge-info'
                             ];
 
                             echo "<tr>";
                             echo "<td>" . $j . "</td>";
-                            echo "<td><span style='" . $badge_colors[$action_badge] . " color: white; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 0.5rem;'>" . $action_icon . " " . $action_type . "</span></td>";
-                            echo "<td style='text-align: right;'>" . $note_text . "</td>";
-                            echo "<td><i class='fas fa-user' style='color:#667eea; margin-left:5px;'></i>النظام</td>";
-                            echo "<td><i class='far fa-clock' style='margin-left: 0.5rem;'></i>" . $note['created_at'] . "</td>";
+                            echo "<td><span class='dcd-note-badge " . $badge_colors[$action_badge] . "'>" . $action_icon . " " . $action_type . "</span></td>";
+                            echo "<td class='dcd-align-right'>" . $note_text . "</td>";
+                            echo "<td><i class='fas fa-user dcd-accent dcd-icon-ml5'></i>النظام</td>";
+                            echo "<td><i class='far fa-clock dcd-icon-ml'></i>" . $note['created_at'] . "</td>";
                             echo "</tr>";
                             $j++;
                         }
                     } else {
-                        echo "<tr><td colspan='5' style='text-align: center; padding: 2rem;'>";
-                        echo "<i class='fas fa-inbox' style='font-size: 3rem; color: #e9ecef; margin-bottom: 1rem;'></i>";
-                        echo "<p style='color: #999; font-size: 1.1rem;'>لا توجد ملاحظات لهذا العقد</p>";
+                        echo "<tr><td colspan='5' class='dcd-empty-cell'>";
+                        echo "<i class='fas fa-inbox dcd-empty-icon'></i>";
+                        echo "<p class='dcd-empty-text'>لا توجد ملاحظات لهذا العقد</p>";
                         echo "</td></tr>";
                     }
                     ?>
@@ -985,8 +1211,8 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
     </div>
 
     <!-- زر العودة -->
-    <div style="text-align: center; margin: 2rem 0;">
-        <a href="employees.php" class="btn btn-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 1rem 3rem; border-radius: 15px; font-weight: 700; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);">
+    <div class="dcd-back-wrap">
+        <a href="employees.php" class="btn btn-lg dcd-back-btn">
             <i class="fas fa-arrow-right"></i> العودة إلى قائمة السائقين
         </a>
     </div>
@@ -997,7 +1223,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="renewalModal" tabindex="-1" aria-labelledby="renewalModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+            <div class="modal-header dcd-hd-info">
                 <h5 class="modal-title" id="renewalModalLabel">
                     <i class="fas fa-sync-alt"></i>
                     تجديد العقد
@@ -1011,20 +1237,20 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
                 <div class="mb-4">
                     <label for="renewalStartDate" class="form-label">
-                        <i class="far fa-calendar-alt" style="margin-left: 0.5rem;"></i>
-                        تاريخ بدء التجديد <span style="color: red;">*</span>
+                        <i class="far fa-calendar-alt dcd-icon-ml"></i>
+                        تاريخ بدء التجديد <span class="dcd-req">*</span>
                     </label>
                     <input type="date" id="renewalStartDate" class="form-control">
                 </div>
                 <div class="mb-3">
                     <label for="renewalEndDate" class="form-label">
-                        <i class="far fa-calendar-check" style="margin-left: 0.5rem;"></i>
-                        تاريخ انتهاء التجديد <span style="color: red;">*</span>
+                        <i class="far fa-calendar-check dcd-icon-ml"></i>
+                        تاريخ انتهاء التجديد <span class="dcd-req">*</span>
                     </label>
                     <input type="date" id="renewalEndDate" class="form-control">
                 </div>
-                <div id="renewalDurationDisplay" style="display: none; padding: 1rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 10px; margin-top: 1rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; color: #1976d2; font-weight: 600;">
+                <div id="renewalDurationDisplay" class="dcd-duration-box dcd-mt-1r">
+                    <div class="dcd-duration-row">
                         <i class="fas fa-calendar-days"></i>
                         <span>مدة العقد الجديدة: <strong id="calculatedDays">0</strong> يوم</span>
                     </div>
@@ -1034,7 +1260,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> الغاء
                 </button>
-                <button type="button" class="btn" id="confirmRenewal" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%); color: white; border: none;">
+                <button type="button" class="btn dcd-btn-info" id="confirmRenewal">
                     <i class="fas fa-check"></i> تجديد
                 </button>
             </div>
@@ -1046,7 +1272,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="settlementModal" tabindex="-1" aria-labelledby="settlementModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%);">
+            <div class="modal-header dcd-hd-secondary">
                 <h5 class="modal-title" id="settlementModalLabel">
                     <i class="fas fa-balance-scale"></i>
                     تسوية العقد
@@ -1060,8 +1286,8 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
                 <div class="mb-4">
                     <label for="settlementType" class="form-label">
-                        <i class="fas fa-exchange-alt" style="margin-left: 0.5rem;"></i>
-                        نوع التسوية <span style="color: red;">*</span>
+                        <i class="fas fa-exchange-alt dcd-icon-ml"></i>
+                        نوع التسوية <span class="dcd-req">*</span>
                     </label>
                     <select id="settlementType" class="form-select">
                         <option value="">-- اختر --</option>
@@ -1071,14 +1297,14 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
                 <div class="mb-4">
                     <label for="settlementHours" class="form-label">
-                        <i class="far fa-clock" style="margin-left: 0.5rem;"></i>
-                        عدد الساعات <span style="color: red;">*</span>
+                        <i class="far fa-clock dcd-icon-ml"></i>
+                        عدد الساعات <span class="dcd-req">*</span>
                     </label>
                     <input type="number" id="settlementHours" class="form-control" min="1" placeholder="أدخل عدد الساعات">
                 </div>
                 <div class="mb-3">
                     <label for="settlementReason" class="form-label">
-                        <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-comment-alt dcd-icon-ml"></i>
                         السبب (اختياري)
                     </label>
                     <textarea id="settlementReason" class="form-control" rows="3" placeholder="أدخل السبب"></textarea>
@@ -1088,7 +1314,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn" id="confirmSettlement" style="background: linear-gradient(135deg, #6c757d 0%, #545b62 100%); color: white; border: none;">
+                <button type="button" class="btn dcd-btn-secondary" id="confirmSettlement">
                     <i class="fas fa-check"></i> تسوية
                 </button>
             </div>
@@ -1100,7 +1326,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="pauseModal" tabindex="-1" aria-labelledby="pauseModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);">
+            <div class="modal-header dcd-hd-warning">
                 <h5 class="modal-title" id="pauseModalLabel">
                     <i class="fas fa-pause-circle"></i>
                     إيقاف العقد
@@ -1114,15 +1340,15 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
                 <div class="mb-4">
                     <label for="pauseDate" class="form-label">
-                        <i class="far fa-calendar-alt" style="margin-left: 0.5rem;"></i>
-                        تاريخ الإيقاف <span style="color: red;">*</span>
+                        <i class="far fa-calendar-alt dcd-icon-ml"></i>
+                        تاريخ الإيقاف <span class="dcd-req">*</span>
                     </label>
                     <input type="date" id="pauseDate" class="form-control" value="<?php echo date('Y-m-d'); ?>">
                 </div>
                 <div class="mb-3">
                     <label for="pauseReason" class="form-label">
-                        <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
-                        سبب الإيقاف <span style="color: red;">*</span>
+                        <i class="fas fa-comment-alt dcd-icon-ml"></i>
+                        سبب الإيقاف <span class="dcd-req">*</span>
                     </label>
                     <textarea id="pauseReason" class="form-control" rows="4" placeholder="أدخل السبب المفصل للإيقاف"></textarea>
                 </div>
@@ -1131,7 +1357,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn" id="confirmPause" style="background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%); color: white; border: none;">
+                <button type="button" class="btn dcd-btn-warning" id="confirmPause">
                     <i class="fas fa-pause-circle"></i> إيقاف
                 </button>
             </div>
@@ -1143,7 +1369,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="resumeModal" tabindex="-1" aria-labelledby="resumeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+            <div class="modal-header dcd-hd-success">
                 <h5 class="modal-title" id="resumeModalLabel">
                     <i class="fas fa-play-circle"></i>
                     استئناف العقد
@@ -1157,20 +1383,20 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
 
                 <!-- عرض تاريخ الإيقاف تلقائياً -->
-                <div class="mb-4" style="padding: 1.25rem; background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%); border-radius: 12px; border-right: 5px solid #ffc107; box-shadow: 0 2px 10px rgba(255, 193, 7, 0.2);">
-                    <div style="display: flex; align-items: center; gap: 0.75rem; color: #856404; font-weight: 700; margin-bottom: 0.75rem; font-size: 1.05rem;">
-                        <i class="fas fa-pause-circle" style="font-size: 1.3rem;"></i>
+                <div class="mb-4 dcd-pause-box">
+                    <div class="dcd-pause-title">
+                        <i class="fas fa-pause-circle dcd-icon-lg"></i>
                         <span>معلومات الإيقاف</span>
                     </div>
-                    <div style="color: #856404; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <div class="dcd-pause-row">
                         <i class="far fa-calendar-times"></i>
                         <strong>تاريخ إيقاف العقد:</strong>
-                        <span style="background: white; padding: 0.4rem 1rem; border-radius: 6px; font-weight: 700; color: #d39e00;">
+                        <span class="dcd-pause-date">
                             <?php echo !empty($pause_date) ? date('Y-m-d', strtotime($pause_date)) : 'غير محدد'; ?>
                         </span>
                     </div>
                     <?php if (!empty($pause_reason)): ?>
-                    <div style="color: #856404; font-size: 0.95rem; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed #ffc107;">
+                    <div class="dcd-pause-reason">
                         <i class="fas fa-comment-dots"></i>
                         <strong>سبب الإيقاف:</strong> <?php echo htmlspecialchars($pause_reason); ?>
                     </div>
@@ -1179,44 +1405,44 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 
                 <!-- إدخال تاريخ الاستئناف -->
                 <div class="mb-4">
-                    <label for="resumeDate" class="form-label" style="font-weight: 700; font-size: 1.05rem;">
-                        <i class="far fa-calendar-check" style="margin-left: 0.5rem; color: #28a745;"></i>
-                        تاريخ استئناف العقد <span style="color: red;">*</span>
+                    <label for="resumeDate" class="form-label dcd-lbl-lg">
+                        <i class="far fa-calendar-check dcd-icon-ok"></i>
+                        تاريخ استئناف العقد <span class="dcd-req">*</span>
                     </label>
-                    <input type="date" id="resumeDate" class="form-control" value="<?php echo date('Y-m-d'); ?>" style="font-size: 1.05rem; font-weight: 600;">
-                    <small class="form-text text-muted" style="display: block; margin-top: 0.5rem;">
+                    <input type="date" id="resumeDate" class="form-control dcd-input-lg" value="<?php echo date('Y-m-d'); ?>">
+                    <small class="form-text text-muted dcd-hint-block">
                         <i class="fas fa-info-circle"></i> التاريخ الافتراضي هو اليوم، يمكنك تعديله حسب الحاجة
                     </small>
                 </div>
 
-                <div id="pauseDurationDisplay" style="display: none; padding: 1rem; background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); border-radius: 10px; margin-bottom: 1rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; color: #1976d2; font-weight: 600; margin-bottom: 1rem;">
+                <div id="pauseDurationDisplay" class="dcd-duration-box dcd-mb-1r">
+                    <div class="dcd-duration-row dcd-mb-1r">
                         <i class="fas fa-clock"></i>
                         <span>مدة الإيقاف: <strong id="calculatedPauseDays">0</strong> يوم</span>
                     </div>
 
                     <!-- خيارات معالجة أيام الإيقاف -->
-                    <div style="background: white; padding: 1rem; border-radius: 8px; border: 2px solid #1976d2;">
-                        <div style="font-weight: 700; color: #1976d2; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <div class="dcd-choice-box">
+                        <div class="dcd-choice-title">
                             <i class="fas fa-question-circle"></i>
                             <span>كيف تريد معالجة أيام الإيقاف؟</span>
                         </div>
-                        <div class="form-check mb-2" style="padding-right: 1.8rem;">
-                            <input class="form-check-input" type="radio" name="pauseHandling" id="extendContract" value="extend" checked style="float: right; margin-right: -1.8rem; margin-top: 0.3rem;">
-                            <label class="form-check-label" for="extendContract" style="font-weight: 600; color: #495057; cursor: pointer;">
-                                <i class="fas fa-plus-circle" style="color: #28a745; margin-left: 0.5rem;"></i>
+                        <div class="form-check mb-2 dcd-radio-wrap">
+                            <input class="form-check-input dcd-radio-input" type="radio" name="pauseHandling" id="extendContract" value="extend" checked>
+                            <label class="form-check-label dcd-radio-label" for="extendContract">
+                                <i class="fas fa-plus-circle dcd-icon-ok"></i>
                                 تمديد العقد: إضافة أيام الإيقاف إلى تاريخ الانتهاء
-                                <small style="display: block; color: #6c757d; font-weight: normal; margin-top: 0.25rem; margin-right: 1.5rem;">
+                                <small class="dcd-radio-hint">
                                     سيتم تأجيل تاريخ انتهاء العقد بعدد أيام الإيقاف
                                 </small>
                             </label>
                         </div>
-                        <div class="form-check" style="padding-right: 1.8rem;">
-                            <input class="form-check-input" type="radio" name="pauseHandling" id="deductFromContract" value="deduct" style="float: right; margin-right: -1.8rem; margin-top: 0.3rem;">
-                            <label class="form-check-label" for="deductFromContract" style="font-weight: 600; color: #495057; cursor: pointer;">
-                                <i class="fas fa-minus-circle" style="color: #dc3545; margin-left: 0.5rem;"></i>
+                        <div class="form-check dcd-radio-wrap">
+                            <input class="form-check-input dcd-radio-input" type="radio" name="pauseHandling" id="deductFromContract" value="deduct">
+                            <label class="form-check-label dcd-radio-label" for="deductFromContract">
+                                <i class="fas fa-minus-circle dcd-icon-danger"></i>
                                 خصم من العقد: تقليل مدة العقد بأيام الإيقاف
-                                <small style="display: block; color: #6c757d; font-weight: normal; margin-top: 0.25rem; margin-right: 1.5rem;">
+                                <small class="dcd-radio-hint">
                                     سيتم تقليل تاريخ انتهاء العقد بعدد أيام الإيقاف
                                 </small>
                             </label>
@@ -1226,7 +1452,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 
                 <div class="mb-3">
                     <label for="resumeReason" class="form-label">
-                        <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-comment-alt dcd-icon-ml"></i>
                         ملاحظات (اختياري)
                     </label>
                     <textarea id="resumeReason" class="form-control" rows="3" placeholder="أدخل أي ملاحظات"></textarea>
@@ -1236,7 +1462,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn" id="confirmResume" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border: none;">
+                <button type="button" class="btn dcd-btn-success" id="confirmResume">
                     <i class="fas fa-play-circle"></i> استئناف
                 </button>
             </div>
@@ -1248,7 +1474,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="terminateModal" tabindex="-1" aria-labelledby="terminateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);">
+            <div class="modal-header dcd-hd-danger">
                 <h5 class="modal-title" id="terminateModalLabel">
                     <i class="fas fa-times-circle"></i>
                     إنهاء العقد
@@ -1262,8 +1488,8 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
                 <div class="mb-4">
                     <label for="terminationType" class="form-label">
-                        <i class="fas fa-list-ul" style="margin-left: 0.5rem;"></i>
-                        نوع الإنهاء <span style="color: red;">*</span>
+                        <i class="fas fa-list-ul dcd-icon-ml"></i>
+                        نوع الإنهاء <span class="dcd-req">*</span>
                     </label>
                     <select id="terminationType" class="form-select">
                         <option value="">-- اختر النوع --</option>
@@ -1273,8 +1499,8 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
                 <div class="mb-3">
                     <label for="terminationReason" class="form-label">
-                        <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
-                        السبب المفصل <span style="color: red;">*</span>
+                        <i class="fas fa-comment-alt dcd-icon-ml"></i>
+                        السبب المفصل <span class="dcd-req">*</span>
                     </label>
                     <textarea id="terminationReason" class="form-control" rows="4" placeholder="أدخل السبب المفصل لإنهاء العقد" required></textarea>
                 </div>
@@ -1295,7 +1521,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="mergeModal" tabindex="-1" aria-labelledby="mergeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+            <div class="modal-header dcd-hd-purple">
                 <h5 class="modal-title" id="mergeModalLabel">
                     <i class="fas fa-object-group"></i>
                     دمج العقود
@@ -1309,8 +1535,8 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
                 <div class="mb-4">
                     <label for="mergeWithId" class="form-label">
-                        <i class="fas fa-file-contract" style="margin-left: 0.5rem;"></i>
-                        اختر العقد للدمج معه <span style="color: red;">*</span>
+                        <i class="fas fa-file-contract dcd-icon-ml"></i>
+                        اختر العقد للدمج معه <span class="dcd-req">*</span>
                     </label>
                     <select id="mergeWithId" class="form-select">
                         <option value="">-- اختر عقد --</option>
@@ -1331,12 +1557,12 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
 
                 <!-- عرض المعدات الحالية والمعدات الخاصة بالعقد المختار -->
-                <div id="mergeEquipmentsContainer" style="margin-top: 20px;">
+                <div id="mergeEquipmentsContainer" class="dcd-mt-20">
                     <h6 class="mb-3">معدات العقود:</h6>
 
                     <!-- معدات العقد الحالي -->
                     <div class="mb-4">
-                        <h6 style="background-color: #f0f0f0; padding: 10px; border-right: 3px solid #0066cc;">
+                        <h6 class="dcd-eq-head">
                             <i class="fa fa-cube"></i> معدات العقد الحالي (#<?php echo $contract_id; ?>)
                         </h6>
                         <div id="currentContractEquipments">
@@ -1364,7 +1590,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                                             echo "</tr>";
                                         }
                                     } else {
-                                        echo "<tr><td colspan='5' style='text-align: center; color: #999;'>لا توجد معدات</td></tr>";
+                                        echo "<tr><td colspan='5' class='dcd-empty-note'>لا توجد معدات</td></tr>";
                                     }
                                     ?>
                                 </tbody>
@@ -1374,11 +1600,11 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 
                     <!-- معدات العقد المختار -->
                     <div class="mb-4">
-                        <h6 style="background-color: #f0f0f0; padding: 10px; border-right: 3px solid #28a745;">
+                        <h6 class="dcd-eq-head-alt">
                             <i class="fa fa-cube"></i> معدات العقد المختار
                         </h6>
-                        <div id="selectedContractEquipments" style="min-height: 100px;">
-                            <p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>
+                        <div id="selectedContractEquipments" class="dcd-minh-100">
+                            <p class="dcd-empty-note">اختر عقداً لعرض معداته</p>
                         </div>
                     </div>
                 </div>
@@ -1387,7 +1613,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn" id="confirmMerge" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%); color: white; border: none;">
+                <button type="button" class="btn dcd-btn-purple" id="confirmMerge">
                     <i class="fas fa-object-group"></i> دمج العقد
                 </button>
             </div>
@@ -1399,7 +1625,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="completeModal" tabindex="-1" aria-labelledby="completeModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%);">
+            <div class="modal-header dcd-hd-purple">
                 <h5 class="modal-title" id="completeModalLabel">
                     <i class="fas fa-check-circle"></i>
                     انتهاء العقد
@@ -1413,8 +1639,8 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
                 <div class="mb-3">
                     <label for="completeNote" class="form-label">
-                        <i class="fas fa-comment-alt" style="margin-left: 0.5rem;"></i>
-                        ملاحظات الانتهاء <span style="color: red;">*</span>
+                        <i class="fas fa-comment-alt dcd-icon-ml"></i>
+                        ملاحظات الانتهاء <span class="dcd-req">*</span>
                     </label>
                     <textarea id="completeNote" class="form-control" rows="4" placeholder="أدخل ملاحظات حول انتهاء العقد" required></textarea>
                 </div>
@@ -1423,7 +1649,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="fas fa-times"></i> إلغاء
                 </button>
-                <button type="button" class="btn" style="background: linear-gradient(135deg, #6f42c1 0%, #5a32a3 100%); color: white;" id="confirmComplete">
+                <button type="button" class="btn dcd-btn-purple-soft" id="confirmComplete">
                     <i class="fas fa-check-circle"></i> تسجيل الانتهاء
                 </button>
             </div>
@@ -1435,7 +1661,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="editProjectInfoModal" tabindex="-1" aria-labelledby="editProjectInfoLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <div class="modal-header dcd-hd-primary">
                 <h5 class="modal-title" id="editProjectInfoLabel">
                     <i class="fas fa-edit"></i> تعديل معلومات المشروع
                 </h5>
@@ -1444,14 +1670,14 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="editGracePeriod" class="form-label">
-                        <i class="fas fa-calendar-alt" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-calendar-alt dcd-icon-ml"></i>
                         فترة السماح (بالأيام)
                     </label>
                     <input type="number" id="editGracePeriod" class="form-control" value="<?php echo $grace_period; ?>" min="0">
                 </div>
                 <div class="mb-3">
                     <label for="editDailyOperators" class="form-label">
-                        <i class="fas fa-users-cog" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-users-cog dcd-icon-ml"></i>
                         عدد المشغلين اليومي
                     </label>
                     <input type="number" id="editDailyOperators" class="form-control" value="<?php echo $daily_operators; ?>" min="0">
@@ -1473,7 +1699,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="editServicesModal" tabindex="-1" aria-labelledby="editServicesLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%);">
+            <div class="modal-header dcd-hd-success">
                 <h5 class="modal-title" id="editServicesLabel">
                     <i class="fas fa-edit"></i> تعديل الخدمات
                 </h5>
@@ -1482,7 +1708,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="editTransportation" class="form-label">
-                        <i class="fas fa-bus" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-bus dcd-icon-ml"></i>
                         النقل (Transportation)
                     </label>
                     <select id="editTransportation" class="form-select">
@@ -1494,7 +1720,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
                 <div class="mb-3">
                     <label for="editAccommodation" class="form-label">
-                        <i class="fas fa-hotel" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-hotel dcd-icon-ml"></i>
                         الإعاشة (Accommodation)
                     </label>
                     <select id="editAccommodation" class="form-select">
@@ -1506,7 +1732,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
                 <div class="mb-3">
                     <label for="editPlaceLiving" class="form-label">
-                        <i class="fas fa-map-marker-alt" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-map-marker-alt dcd-icon-ml"></i>
                         مكان السكن (Place for Living)
                     </label>
                     <select id="editPlaceLiving" class="form-select">
@@ -1518,7 +1744,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
                 <div class="mb-3">
                     <label for="editWorkshop" class="form-label">
-                        <i class="fas fa-wrench" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-wrench dcd-icon-ml"></i>
                         الورشة (Workshop)
                     </label>
                     <select id="editWorkshop" class="form-select">
@@ -1545,7 +1771,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="editPartiesModal" tabindex="-1" aria-labelledby="editPartiesLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);">
+            <div class="modal-header dcd-hd-info">
                 <h5 class="modal-title" id="editPartiesLabel">
                     <i class="fas fa-edit"></i> تعديل أطراف العقد
                 </h5>
@@ -1554,28 +1780,28 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="editFirstParty" class="form-label">
-                        <i class="fas fa-user-tie" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-user-tie dcd-icon-ml"></i>
                         الطرف الأول
                     </label>
                     <input type="text" id="editFirstParty" class="form-control" value="<?php echo htmlspecialchars($first_party); ?>" placeholder="اسم الطرف الأول">
                 </div>
                 <div class="mb-3">
                     <label for="editSecondParty" class="form-label">
-                        <i class="fas fa-user-check" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-user-check dcd-icon-ml"></i>
                         الطرف الثاني
                     </label>
                     <input type="text" id="editSecondParty" class="form-control" value="<?php echo htmlspecialchars($second_party); ?>" placeholder="اسم الطرف الثاني">
                 </div>
                 <div class="mb-3">
                     <label for="editWitnessOne" class="form-label">
-                        <i class="fas fa-eye" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-eye dcd-icon-ml"></i>
                         الشاهد الأول
                     </label>
                     <input type="text" id="editWitnessOne" class="form-control" value="<?php echo htmlspecialchars($witness_one); ?>" placeholder="اسم الشاهد الأول">
                 </div>
                 <div class="mb-3">
                     <label for="editWitnessTwo" class="form-label">
-                        <i class="fas fa-eye" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-eye dcd-icon-ml"></i>
                         الشاهد الثاني
                     </label>
                     <input type="text" id="editWitnessTwo" class="form-control" value="<?php echo htmlspecialchars($witness_two); ?>" placeholder="اسم الشاهد الثاني">
@@ -1597,7 +1823,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
 <div class="modal fade" id="editPaymentModal" tabindex="-1" aria-labelledby="editPaymentLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header" style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);">
+            <div class="modal-header dcd-hd-amber">
                 <h5 class="modal-title" id="editPaymentLabel">
                     <i class="fas fa-edit"></i> تعديل البيانات المالية
                 </h5>
@@ -1606,7 +1832,7 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
             <div class="modal-body">
                 <div class="mb-3">
                     <label for="editCurrency" class="form-label">
-                        <i class="fas fa-dollar-sign" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-dollar-sign dcd-icon-ml"></i>
                         العملة
                     </label>
                     <select id="editCurrency" class="form-select">
@@ -1617,14 +1843,14 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
                 <div class="mb-3">
                     <label for="editPaidAmount" class="form-label">
-                        <i class="fas fa-money-check-alt" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-money-check-alt dcd-icon-ml"></i>
                         المبلغ المدفوع
                     </label>
                     <input type="text" id="editPaidAmount" class="form-control" value="<?php echo htmlspecialchars($paid_contract); ?>" placeholder="أدخل المبلغ">
                 </div>
                 <div class="mb-3">
                     <label for="editPaymentTime" class="form-label">
-                        <i class="fas fa-clock" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-clock dcd-icon-ml"></i>
                         وقت الدفع
                     </label>
                     <select id="editPaymentTime" class="form-select">
@@ -1635,14 +1861,14 @@ $payment_date = isset($row['payment_date']) ? $row['payment_date'] : '';
                 </div>
                 <div class="mb-3">
                     <label for="editGuarantees" class="form-label">
-                        <i class="fas fa-shield-alt" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-shield-alt dcd-icon-ml"></i>
                         الضمانات
                     </label>
                     <textarea id="editGuarantees" class="form-control" rows="3" placeholder="تفاصيل الضمانات"><?php echo htmlspecialchars($guarantees); ?></textarea>
                 </div>
                 <div class="mb-3">
                     <label for="editPaymentDate" class="form-label">
-                        <i class="fas fa-calendar-check" style="margin-left: 0.5rem;"></i>
+                        <i class="fas fa-calendar-check dcd-icon-ml"></i>
                         تاريخ الدفع
                     </label>
                     <input type="date" id="editPaymentDate" class="form-control" value="<?php echo htmlspecialchars($payment_date); ?>">
@@ -2141,7 +2367,7 @@ $('#mergeWithId').on('change', function() {
     const selectedContractId = $(this).val();
 
     if (!selectedContractId) {
-        $('#selectedContractEquipments').html('<p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>');
+        $('#selectedContractEquipments').html('<p class="dcd-empty-note">اختر عقداً لعرض معداته</p>');
         return;
     }
 
@@ -2177,16 +2403,16 @@ $('#mergeWithId').on('change', function() {
 
                     html += '</tbody></table>';
                 } else {
-                    html = '<p style="text-align: center; color: #999;">لا توجد معدات لهذا العقد</p>';
+                    html = '<p class="dcd-empty-note">لا توجد معدات لهذا العقد</p>';
                 }
                 $('#selectedContractEquipments').html(html);
             } else {
-                $('#selectedContractEquipments').html('<p style="text-align: center; color: #c00;">خطأ: ' + response.message + '</p>');
+                $('#selectedContractEquipments').html('<p class="dcd-err-note">خطأ: ' + response.message + '</p>');
             }
         },
         error: function(xhr, status, error) {
             console.error('الخطأ:', error);
-            $('#selectedContractEquipments').html('<p style="text-align: center; color: #c00;">خطأ في تحميل المعدات</p>');
+            $('#selectedContractEquipments').html('<p class="dcd-err-note">خطأ في تحميل المعدات</p>');
         }
     });
 });
@@ -2207,7 +2433,7 @@ $('#confirmMerge').click(function() {
     // Close modal
     bootstrap.Modal.getInstance(document.getElementById('mergeModal')).hide();
     $('#mergeWithId').val('');
-    $('#selectedContractEquipments').html('<p style="text-align: center; color: #999;">اختر عقداً لعرض معداته</p>');
+    $('#selectedContractEquipments').html('<p class="dcd-empty-note">اختر عقداً لعرض معداته</p>');
 });
 </script>
 

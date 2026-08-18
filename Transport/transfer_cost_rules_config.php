@@ -97,6 +97,14 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
+<style>
+/* UXW-01: أنماطُ شاشةِ قواعدِ تحميلِ التكلفةِ أصنافًا برموزِ الألوان */
+.trs-cr-note{background:var(--c-brand-gold-soft, #fff8e6);color:var(--c-8a6d1a, #8a6d1a);border-color:var(--c-e0ae2e, #e0ae2e)}
+.trs-cr-full{grid-column:1/-1}
+.trs-cr-tbl{width:100%}
+.trs-cr-on{color:var(--c-1e7e34, #1e7e34)}
+.trs-cr-off{color:var(--c-c0392b, #c0392b)}
+</style>
 <div class="main trs-rules-main ems-unified-page-shell">
     <?php
     $header_title = 'إعداد قواعد تحميل تكلفة الترحيل';
@@ -107,11 +115,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا قواعدَ تحميلِ تكلفةٍ مسجَّلةً بعدُ', 'أضف أولَ قاعدةٍ بزرِّ «إضافة قاعدة» في رأسِ الشاشة');
     ?>
 
     <?php trs_msg_banner(); ?>
 
-    <div class="success-message is-success" style="background:#fff8e6;color:#8a6d1a;border-color:#e0ae2e">
+    <div class="success-message is-success trs-cr-note">
         <i class="fas fa-circle-info"></i>
         قاعدة الستين يوماً: عودة (demob) لمشروع <b>أقل من 60 يوماً ← العميل</b>، و<b>≥ 60 يوماً ← الشركة</b>. يحسب المحرّك مدة المشروع تلقائياً ويختار الصف الصحيح.
     </div>
@@ -151,13 +161,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php endforeach; ?>
                         </select>
                     </div>
-                    <div class="form-group" style="grid-column:1/-1">
+                    <div class="form-group trs-cr-full">
                         <label for="r_basis">الأساس / ملاحظة</label>
                         <input type="text" name="basis_note" id="r_basis" placeholder="تعاقدي / قاعدة الستين / داخلي ...">
                     </div>
                     <div class="form-group">
                         <label>مفعّلة؟</label>
-                        <label class="switch-inline"><input type="checkbox" name="active" id="r_active" value="1" checked> نعم، مفعّلة</label>
+                        <label class="switch-inline"><input type="checkbox" name="active" id="r_active" aria-label="تفعيلُ القاعدة" value="1" checked> نعم، مفعّلة</label>
                     </div>
                 </div>
             </div>
@@ -170,7 +180,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="trsTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="trsTable" class="display nowrap alltables trs-cr-tbl" data-state-save="false" data-scroll-x="true">
                 <thead><tr>
                     <th>الإجراءات</th><th>نوع الحركة</th><th>عامل المدة</th><th>العتبة (يوم)</th><th>المتحمِّل</th><th>الأساس</th><th>الحالة</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -215,7 +225,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td>" . htmlspecialchars((string)$thr) . "</td>";
                         echo "<td>" . htmlspecialchars($bearer_ar) . "</td>";
                         echo "<td>" . htmlspecialchars((string)($row['basis_note'] ?? '—')) . "</td>";
-                        echo "<td>" . ((int)$row['active'] === 1 ? "<span class='action-btn' style='color:#1e7e34'>مفعّلة</span>" : "<span class='action-btn' style='color:#c0392b'>معطّلة</span>") . "</td>";
+                        echo "<td>" . ((int)$row['active'] === 1 ? "<span class='action-btn trs-cr-on'>مفعّلة</span>" : "<span class='action-btn trs-cr-off'>معطّلة</span>") . "</td>";
                         echo "</tr>";
                     } }
                     ?>
@@ -234,16 +244,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function () {
     $(document).ready(function () {
-        $('#trsTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
-
         function toggleThreshold() {
             if ($('#r_operator').val() === 'any') { $('#r_threshold_wrap').hide(); $('#r_threshold').val(''); }
             else { $('#r_threshold_wrap').show(); }

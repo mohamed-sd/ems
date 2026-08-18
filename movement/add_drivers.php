@@ -74,28 +74,28 @@ include("../inheader.php");
 <style>
     /* استخدام نفس نظام الألوان الموحد للنظام */
     :root {
-        --navy: #0c1c3e;
-        --navy-m: #132050;
-        --navy-l: #1b2f6e;
-        --gold: #e8b800;
-        --gold-l: #ffd740;
-        --gold-soft: rgba(232, 184, 0, .13);
-        --bg: #f0f2f8;
-        --surface: #ffffff;
-        --border: rgba(12, 28, 62, .07);
-        --txt: #0c1c3e;
-        --sub: #64748b;
-        --green: #16a34a;
-        --green-soft: rgba(22, 163, 74, .11);
-        --red: #dc2626;
-        --red-soft: rgba(220, 38, 38, .10);
-        --blue: #2563eb;
-        --blue-soft: rgba(37, 99, 235, .10);
-        --orange: #ea6f00;
-        --orange-soft: rgba(234, 111, 0, .10);
-        --shadow-sm: 0 1px 5px rgba(12, 28, 62, .06);
-        --shadow-md: 0 5px 20px rgba(12, 28, 62, .09);
-        --shadow-lg: 0 14px 44px rgba(12, 28, 62, .13);
+        --navy: var(--c-0c1c3e, #0c1c3e);
+        --navy-m: var(--c-132050, #132050);
+        --navy-l: var(--c-1b2f6e, #1b2f6e);
+        --gold: var(--c-e8b800, #e8b800);
+        --gold-l: var(--c-ffd740, #ffd740);
+        --gold-soft: var(--c-rgba232184013, rgba(232, 184, 0, .13));
+        --bg: var(--c-f0f2f8, #f0f2f8);
+        --surface: var(--c-ffffff, #ffffff);
+        --border: var(--c-rgba12286207, rgba(12, 28, 62, .07));
+        --txt: var(--c-0c1c3e, #0c1c3e);
+        --sub: var(--c-64748b, #64748b);
+        --green: var(--c-16a34a, #16a34a);
+        --green-soft: var(--c-rgba221637411, rgba(22, 163, 74, .11));
+        --red: var(--c-dc2626, #dc2626);
+        --red-soft: var(--c-rgba220383810, rgba(220, 38, 38, .10));
+        --blue: var(--c-2563eb, #2563eb);
+        --blue-soft: var(--c-rgba379923510, rgba(37, 99, 235, .10));
+        --orange: var(--c-ea6f00, #ea6f00);
+        --orange-soft: var(--c-rgba234111010, rgba(234, 111, 0, .10));
+        --shadow-sm: 0 1px 5px var(--c-rgba12286206, rgba(12, 28, 62, .06));
+        --shadow-md: 0 5px 20px var(--c-rgba12286209, rgba(12, 28, 62, .09));
+        --shadow-lg: 0 14px 44px var(--c-rgba12286213, rgba(12, 28, 62, .13));
         --radius: 12px;
         --radius-lg: 18px;
         --ease: .22s cubic-bezier(.4, 0, .2, 1);
@@ -165,7 +165,7 @@ include("../inheader.php");
         background: var(--gold-soft);
         padding: 12px 20px;
         border-radius: var(--radius);
-        border: 1.5px solid rgba(232, 184, 0, .28);
+        border: 1.5px solid var(--c-rgba232184028, rgba(232, 184, 0, .28));
     }
 
     .equipment-info h3 {
@@ -212,38 +212,38 @@ include("../inheader.php");
     .btn-primary {
         background: var(--gold-soft);
         color: var(--navy);
-        border-color: rgba(232, 184, 0, .28);
+        border-color: var(--c-rgba232184028, rgba(232, 184, 0, .28));
     }
 
     .btn-primary:hover,
     .btn-primary:hover {
         background: var(--gold);
         color: var(--navy);
-        box-shadow: 0 5px 16px rgba(232, 184, 0, .35);
+        box-shadow: 0 5px 16px var(--c-rgba232184035, rgba(232, 184, 0, .35));
     }
 
     .btn-secondary {
         background: var(--blue-soft);
         color: var(--blue);
-        border-color: rgba(37, 99, 235, .18);
+        border-color: var(--c-rgba379923518, rgba(37, 99, 235, .18));
     }
 
     .btn-secondary:hover {
         background: var(--blue);
         color: white;
-        box-shadow: 0 5px 16px rgba(37, 99, 235, .35);
+        box-shadow: 0 5px 16px var(--c-rgba379923535, rgba(37, 99, 235, .35));
     }
 
     .btn-danger {
         background: var(--red-soft);
         color: var(--red);
-        border-color: rgba(220, 38, 38, .18);
+        border-color: var(--c-rgba220383818, rgba(220, 38, 38, .18));
     }
 
     .btn-danger:hover {
         background: var(--red);
         color: white;
-        box-shadow: 0 5px 16px rgba(220, 38, 38, .35);
+        box-shadow: 0 5px 16px var(--c-rgba220383835, rgba(220, 38, 38, .35));
     }
 
     .card {
@@ -396,7 +396,7 @@ include("../inheader.php");
         padding: 8px 16px;
         background: var(--gold-soft);
         color: var(--navy);
-        border: 1.5px solid rgba(232, 184, 0, .28);
+        border: 1.5px solid var(--c-rgba232184028, rgba(232, 184, 0, .28));
         border-radius: 50px;
         font-weight: 700;
         font-size: 0.85rem;
@@ -475,7 +475,7 @@ include("../inheader.php");
     .driver-card.selected {
         border-color: var(--gold);
         background: var(--gold-soft);
-        box-shadow: 0 0 0 3px rgba(232, 184, 0, .15);
+        box-shadow: 0 0 0 3px var(--c-rgba232184015, rgba(232, 184, 0, .15));
     }
 
     .driver-card.selected::before {
@@ -590,7 +590,7 @@ include("../inheader.php");
         align-items: center;
         gap: 8px;
         padding: 10px 12px;
-        background: #f8fafc;
+        background: var(--c-f8fafc, #f8fafc);
         border: 1px solid var(--border);
         border-radius: var(--radius);
     }
@@ -622,13 +622,13 @@ include("../inheader.php");
     .alert-info {
         background: var(--blue-soft);
         color: var(--blue);
-        border: 1.5px solid rgba(37, 99, 235, .25);
+        border: 1.5px solid var(--c-rgba379923525, rgba(37, 99, 235, .25));
     }
 
     .alert-success {
         background: var(--green-soft);
         color: var(--green);
-        border: 1.5px solid rgba(22, 163, 74, .25);
+        border: 1.5px solid var(--c-rgba221637425, rgba(22, 163, 74, .25));
     }
 
     .table-container {
@@ -678,13 +678,13 @@ include("../inheader.php");
     .status-active {
         background: var(--green-soft);
         color: var(--green);
-        border: 1.5px solid rgba(22, 163, 74, .22);
+        border: 1.5px solid var(--c-rgba221637422, rgba(22, 163, 74, .22));
     }
 
     .status-inactive {
         background: var(--red-soft);
         color: var(--red);
-        border: 1.5px solid rgba(220, 38, 38, .22);
+        border: 1.5px solid var(--c-rgba220383822, rgba(220, 38, 38, .22));
     }
 
     /* أنماط بطاقات الوردية */
@@ -700,21 +700,21 @@ include("../inheader.php");
     }
 
     .shift-day {
-        background: linear-gradient(135deg, #fff7e6 0%, #ffe8b3 100%);
-        color: #d97706;
-        border: 1.5px solid rgba(217, 119, 6, .25);
+        background: linear-gradient(135deg, var(--c-fff7e6, #fff7e6) 0%, var(--c-ffe8b3, #ffe8b3) 100%);
+        color: var(--c-d97706, #d97706);
+        border: 1.5px solid var(--c-rgba217119625, rgba(217, 119, 6, .25));
     }
 
     .shift-night {
-        background: linear-gradient(135deg, #e8e9f3 0%, #c7cae0 100%);
-        color: #4338ca;
-        border: 1.5px solid rgba(67, 56, 202, .25);
+        background: linear-gradient(135deg, var(--c-e8e9f3, #e8e9f3) 0%, var(--c-c7cae0, #c7cae0) 100%);
+        color: var(--c-4338ca, #4338ca);
+        border: 1.5px solid var(--c-rgba675620225, rgba(67, 56, 202, .25));
     }
 
     .shift-both {
-        background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-        color: #15803d;
-        border: 1.5px solid rgba(21, 128, 61, .25);
+        background: linear-gradient(135deg, var(--c-dcfce7, #dcfce7) 0%, var(--c-bbf7d0, #bbf7d0) 100%);
+        color: var(--c-15803d, #15803d);
+        border: 1.5px solid var(--c-rgba211286125, rgba(21, 128, 61, .25));
     }
 
     /* أنماط تعديل الوردية */
@@ -724,7 +724,7 @@ include("../inheader.php");
     }
 
     .shift-cell:hover {
-        background: rgba(232, 184, 0, 0.1);
+        background: var(--c-rgba232184001, rgba(232, 184, 0, 0.1));
     }
 
     .shift-cell:hover .shift-badge::after {
@@ -744,12 +744,12 @@ include("../inheader.php");
         background: white;
         color: var(--txt);
         cursor: pointer;
-        box-shadow: 0 2px 8px rgba(232, 184, 0, 0.2);
+        box-shadow: 0 2px 8px var(--c-rgba232184002, rgba(232, 184, 0, 0.2));
     }
 
     .shift-edit-select:focus {
         outline: none;
-        box-shadow: 0 4px 12px rgba(232, 184, 0, 0.3);
+        box-shadow: 0 4px 12px var(--c-rgba232184003, rgba(232, 184, 0, 0.3));
     }
 
     /* رسالة النجاح المؤقتة */
@@ -758,13 +758,13 @@ include("../inheader.php");
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        background: linear-gradient(135deg, var(--c-10b981, #10b981) 0%, var(--c-059669, #059669) 100%);
         color: white;
         padding: 8px 16px;
         border-radius: 8px;
         font-size: 0.8rem;
         font-weight: 700;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        box-shadow: 0 4px 12px var(--c-rgba1618512904, rgba(16, 185, 129, 0.4));
         z-index: 1000;
         animation: popIn 0.3s ease;
         white-space: nowrap;
@@ -812,7 +812,7 @@ include("../inheader.php");
     .action-btn.edit {
         background: var(--blue-soft);
         color: var(--blue);
-        border-color: rgba(37, 99, 235, .2);
+        border-color: var(--c-rgba37992352, rgba(37, 99, 235, .2));
     }
 
     .action-btn.edit:hover {
@@ -823,7 +823,7 @@ include("../inheader.php");
     .action-btn.delete {
         background: var(--red-soft);
         color: var(--red);
-        border-color: rgba(220, 38, 38, .2);
+        border-color: var(--c-rgba22038382, rgba(220, 38, 38, .2));
     }
 
     .action-btn.delete:hover {
@@ -834,7 +834,7 @@ include("../inheader.php");
     .action-btn.activate {
         background: var(--green-soft);
         color: var(--green);
-        border-color: rgba(22, 163, 74, .2);
+        border-color: var(--c-rgba22163742, rgba(22, 163, 74, .2));
     }
 
     .action-btn.activate:hover {
@@ -852,7 +852,7 @@ include("../inheader.php");
     .dt-button {
         background: linear-gradient(135deg, var(--navy), var(--navy-l)) !important;
         color: white !important;
-        border: 1.5px solid rgba(232, 184, 0, .28) !important;
+        border: 1.5px solid var(--c-rgba232184028, rgba(232, 184, 0, .28)) !important;
         padding: 8px 16px !important;
         border-radius: 50px !important;
         font-family: 'Cairo', sans-serif !important;
@@ -919,6 +919,43 @@ include("../inheader.php");
             justify-content: center;
         }
     }
+
+    /* UXW-01 ②: أنماطٌ ثابتةٌ نُقلت من سماتِ style الموضعيةِ إلى أصنافِ الشاشة */
+    .adrv-hdr-sub {
+        font-size: 15px;
+    }
+
+    .adrv-span-full {
+        grid-column: 1 / -1;
+    }
+
+    .adrv-info-ico {
+        color: var(--blue);
+    }
+
+    .adrv-label-flush {
+        margin: 0;
+    }
+
+    .adrv-req {
+        color: red;
+    }
+
+    .adrv-linked-count {
+        background: var(--c-rgba25525525502, rgba(255, 255, 255, 0.2));
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        margin-right: auto;
+    }
+
+    .adrv-table-full {
+        width: 100%;
+    }
+
+    .shift-cell {
+        cursor: pointer;
+    }
 </style>
 
 <?php include('../insidebar.php'); ?>
@@ -930,7 +967,7 @@ include("../inheader.php");
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
     $header_icon       = 'fas fa-users-cog';
     $header_title_html = 'مشغّلو المعدة
-            <span style="font-size: 15px;">
+            <span class="adrv-hdr-sub">
                 <i class="fas fa-cogs"></i> ' . htmlspecialchars($equipment['name']) . '
                 <p><i class="fas fa-barcode"></i> الكود:
                     <strong>' . htmlspecialchars($equipment['code']) . '</strong> |
@@ -943,6 +980,8 @@ include("../inheader.php");
     );
     $header_back = array('href' => '../main/dashboard.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include(__DIR__ . '/../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مشغّلين مرتبطين بهذه المعدةِ بعدُ', 'أسنِدْ أولَ مشغلٍ بزرِّ «إسناد مشغل جديد» في رأسِ الشاشة');
     ?>
 
     <?php if (isset($_GET['msg'])): ?>
@@ -953,7 +992,7 @@ include("../inheader.php");
     <?php endif; ?>
 
     <!-- فورم إضافة مشغل -->
-    <div class="card" id="projectForm" style="display: none;">
+    <div class="card is-hidden" id="projectForm">
         <div class="card-header">
             <i class="fas fa-user-plus"></i> إسناد مشغل جديد للمعدة
         </div>
@@ -972,9 +1011,9 @@ include("../inheader.php");
                 <input type="hidden" name="equipment_id" value="<?php echo $equipment_id; ?>">
 
                 <div class="form-grid">
-                    <div class="driver-form-check-row" style="grid-column: 1 / -1;">
-                        <i class="fas fa-info-circle" style="color: var(--blue);"></i>
-                        <label class="driver-form-check-label" style="margin:0;" for="emsf_2047_8d699">
+                    <div class="driver-form-check-row adrv-span-full">
+                        <i class="fas fa-info-circle adrv-info-ico"></i>
+                        <label class="driver-form-check-label adrv-label-flush" for="emsf_2047_8d699">
                             تُحتسب تواريخ بداية/نهاية التشغيل تلقائياً من عقد المشغل الساري؛
                             وإن لم يوجد عقد ساري تبدأ من تاريخ اليوم وتبقى مفتوحة حتى إنهاء العمل.
                         </label>
@@ -982,13 +1021,13 @@ include("../inheader.php");
 
                     <div class="form-group">
                         <label>
-                            <i class="fas fa-sync-alt"></i> نظام الوردية <span style="color: red;">*</span>
+                            <i class="fas fa-sync-alt"></i> نظام الوردية <span class="adrv-req">*</span>
                         </label>
                     </div>
 
                     <div class="form-group">
                         <label>
-                            <i class="fas fa-sync-alt"></i> نظام الوردية <span style="color: red;">*</span>
+                            <i class="fas fa-sync-alt"></i> نظام الوردية <span class="adrv-req">*</span>
                         </label>
                         <select name="shift_type" required id="emsf_2047_8d699">
                             <option value="D">نهاري فقط</option>
@@ -1006,7 +1045,7 @@ include("../inheader.php");
 
                 <div class="form-group">
                     <label>
-                        <i class="fas fa-users"></i> اختر المشغلين <span style="color: red;">*</span>
+                        <i class="fas fa-users"></i> اختر المشغلين <span class="adrv-req">*</span>
                     </label>
 
                     <div class="drivers-selection-container">
@@ -1057,7 +1096,7 @@ include("../inheader.php");
                                     $driverInitial = mb_substr($driverName, 0, 1);
                                     echo "
                                     <div class='driver-card' data-driver-id='{$d['id']}' data-driver-name='$driverName' data-driver-phone='$driverPhone'>
-                                        <input type='checkbox' name='drivers[]' value='{$d['id']}' style='display: none;' class='driver-checkbox-input'>
+                                        <input type='checkbox' name='drivers[]' aria-label='اختيارُ المشغل $driverName' value='{$d['id']}' class='driver-checkbox-input is-hidden'>
                                         <div class='driver-card-header'>
                                             <div class='driver-checkbox'></div>
                                             <div class='driver-avatar'>$driverInitial</div>
@@ -1106,7 +1145,7 @@ include("../inheader.php");
             <i class="fas fa-list-alt"></i> المشغلون المرتبطون بهذه المعدة
             <?php if (count($linked) > 0): ?>
                 <span
-                    style="background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; margin-right: auto;">
+                    class="adrv-linked-count">
                     <?php echo count($linked); ?> مشغل
                 </span>
             <?php endif; ?>
@@ -1114,7 +1153,7 @@ include("../inheader.php");
         <div class="card-body">
             <?php if (count($linked) > 0): ?>
                 <div class="table-container">
-                    <table id="projectsTable" class="display nowrap" style="width:100%">
+                    <table id="projectsTable" class="display nowrap adrv-table-full" data-order='[[0,"asc"]]' data-page-length="25">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -1170,11 +1209,11 @@ include("../inheader.php");
                                     <td><?php echo $row['start_date'] ? date('Y-m-d', strtotime($row['start_date'])) : '-'; ?>
                                     </td>
                                     <td><?php echo htmlspecialchars(ems_format_open_end($row['end_date'])); ?></td>
-                                    <td class="shift-cell" data-relation-id="<?php echo $row['id']; ?>" data-current-shift="<?php echo $shift_type; ?>" style="cursor: pointer;" title="انقر للتعديل">
+                                    <td class="shift-cell" data-relation-id="<?php echo $row['id']; ?>" data-current-shift="<?php echo $shift_type; ?>" title="انقر للتعديل">
                                         <span class="shift-badge <?php echo $shift_class; ?>">
                                             <?php echo $shift_label; ?>
                                         </span>
-                                        <select class="shift-edit-select" style="display:none;" data-relation-id="<?php echo $row['id']; ?>" aria-label="وردية السائق">
+                                        <select class="shift-edit-select is-hidden" aria-label="وردية السائق" data-relation-id="<?php echo $row['id']; ?>">
                                             <option value="D" <?php echo $shift_type === 'D' ? 'selected' : ''; ?>>☀️ نهاري فقط</option>
                                             <option value="N" <?php echo $shift_type === 'N' ? 'selected' : ''; ?>>🌙 ليلي فقط</option>
                                             <option value="B" <?php echo $shift_type === 'B' ? 'selected' : ''; ?>>🔄 نهاري + ليلي</option>
@@ -1236,24 +1275,8 @@ include("../inheader.php");
 <!-- تهيئة DataTable وجافاسكربت الواجهة -->
 <script>
     $(document).ready(function () {
-        // تهيئة DataTable
-        <?php if (count($linked) > 0): ?>
-            $('#projectsTable').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    { extend: 'copy', text: '<i class="fas fa-copy"></i> نسخ' },
-                    { extend: 'excel', text: '<i class="fas fa-file-excel"></i> تصدير Excel' },
-                    { extend: 'csv', text: '<i class="fas fa-file-csv"></i> تصدير CSV' },
-                    { extend: 'pdf', text: '<i class="fas fa-file-pdf"></i> تصدير PDF' },
-                    { extend: 'print', text: '<i class="fas fa-print"></i> طباعة' }
-                ],
-                language: {
-                    url: 'https:/ems/assets/i18n/datatables/ar.json'
-                },
-                order: [[0, 'asc']],
-                pageLength: 25
-            });
-        <?php endif; ?>
+        // UXW-01 ⑤: تهيئةُ الجدولِ المركزيةُ في assets/js/ui-unification.js —
+        // الترتيبُ وطولُ الصفحةِ معلَنانِ سمتَيْ data على وسمِ <table>، وزرُّ إكسل يُلحقه المكوّنُ المركزيّ.
 
         // التحكم في إظهار/إخفاء الفورم
         $('#toggleForm').on('click', function (e) {
@@ -1354,7 +1377,7 @@ include("../inheader.php");
             if (visibleCards === 0 && searchTerm !== '') {
                 if (noResultsMsg.length === 0) {
                     $('#driversGrid').append(`
-                    <div id="noResultsMsg" class="no-drivers-message" style="grid-column: 1 / -1;">
+                    <div id="noResultsMsg" class="no-drivers-message adrv-span-full">
                         <i class="fas fa-search"></i>
                         <p>لم يتم العثور على نتائج للبحث: "${searchTerm}"</p>
                     </div>

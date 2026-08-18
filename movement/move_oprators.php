@@ -597,7 +597,7 @@ include("../inheader.php"); ?>
     position: fixed;
     z-index: 1000;
     inset: 0;
-    background-color: rgba(0,0,0,.35);
+    background-color: var(--c-rgba00035, rgba(0,0,0,.35));
     animation: fadeIn .3s ease;
 }
 .modal.show {
@@ -611,19 +611,19 @@ include("../inheader.php"); ?>
 .modal-content.movement-view-modal-content {
     width: min(900px, 95vw);
     max-height: 85vh;
-    border: 1px solid #e8dcc8;
+    border: 1px solid var(--c-e8dcc8, #e8dcc8);
     border-radius: 14px;
-    background: linear-gradient(180deg,#fff 0%,#fdf8f0 100%);
-    box-shadow: 0 22px 42px rgba(26,18,8,.25);
+    background: linear-gradient(180deg,var(--c-fff, #fff) 0%,var(--c-fdf8f0, #fdf8f0) 100%);
+    box-shadow: 0 22px 42px var(--c-rgba2618825, rgba(26,18,8,.25));
     overflow: hidden;
     animation: slideIn .35s cubic-bezier(.4,0,.2,1) both;
     display: flex;
     flex-direction: column;
 }
 .modal-header.movement-view-modal-header {
-    background: linear-gradient(135deg,#1a1208,#2a1b0c);
-    color: #fff;
-    border-bottom: 1px solid rgba(255,207,144,.22);
+    background: linear-gradient(135deg,var(--c-1a1208, #1a1208),var(--c-2a1b0c, #2a1b0c));
+    color: var(--c-fff, #fff);
+    border-bottom: 1px solid var(--c-rgba25520714422, rgba(255,207,144,.22));
     padding: 14px 16px;
     display: flex;
     align-items: center;
@@ -633,49 +633,49 @@ include("../inheader.php"); ?>
 }
 .modal-header.movement-view-modal-header h5 {
     margin:0; font-weight:900; font-size:1.15rem;
-    display:inline-flex; align-items:center; gap:8px; color:#fff;
+    display:inline-flex; align-items:center; gap:8px; color:var(--c-fff, #fff);
 }
-.modal-header.movement-view-modal-header i { color:#f7931a; font-size:1.1rem; }
+.modal-header.movement-view-modal-header i { color:var(--c-f7931a, #f7931a); font-size:1.1rem; }
 
 .movement-view-modal-close {
-    border:0; background:rgba(255,255,255,.14); color:#fff;
+    border:0; background:var(--c-rgba25525525514, rgba(255,255,255,.14)); color:var(--c-fff, #fff);
     width:36px; height:36px; border-radius:8px; font-size:1.3rem;
     line-height:1; cursor:pointer; transition:all .2s ease; padding:0;
     display:flex; align-items:center; justify-content:center;
 }
-.movement-view-modal-close:hover { background:rgba(255,255,255,.25); transform:rotate(90deg); }
+.movement-view-modal-close:hover { background:var(--c-rgba25525525525, rgba(255,255,255,.25)); transform:rotate(90deg); }
 
 .modal-body.movement-view-modal-body {
     overflow-y:auto; padding:16px; flex:1;
-    background:linear-gradient(180deg,#fff 0%,#fffbf5 100%);
+    background:linear-gradient(180deg,var(--c-fff, #fff) 0%,var(--c-fffbf5, #fffbf5) 100%);
 }
 .movement-view-modal-grid {
     display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px;
 }
 .movement-view-modal-item {
-    border:1px solid #e8dcc8; border-radius:11px; padding:12px;
-    background:#fff; box-shadow:0 1px 3px rgba(26,18,8,.05); transition:all .2s ease;
+    border:1px solid var(--c-e8dcc8, #e8dcc8); border-radius:11px; padding:12px;
+    background:var(--c-fff, #fff); box-shadow:0 1px 3px var(--c-rgba2618805, rgba(26,18,8,.05)); transition:all .2s ease;
 }
-.movement-view-modal-item:hover { border-color:#f7931a; box-shadow:0 4px 12px rgba(247,147,26,.12); }
+.movement-view-modal-item:hover { border-color:var(--c-f7931a, #f7931a); box-shadow:0 4px 12px var(--c-rgba2471472612, rgba(247,147,26,.12)); }
 .movement-view-modal-item-wide { grid-column:1 / -1; }
 .movement-view-modal-label {
-    color:#6b4e2a; font-size:.81rem; font-weight:800; margin-bottom:6px;
+    color:var(--c-6b4e2a, #6b4e2a); font-size:.81rem; font-weight:800; margin-bottom:6px;
     display:flex; align-items:center; gap:5px;
 }
-.movement-view-modal-label i { color:#f7931a; font-size:.9rem; }
-.movement-view-modal-value { color:#1a1208; font-weight:800; font-size:.92rem; word-break:break-word; line-height:1.4; }
+.movement-view-modal-label i { color:var(--c-f7931a, #f7931a); font-size:.9rem; }
+.movement-view-modal-value { color:var(--c-1a1208, #1a1208); font-weight:800; font-size:.92rem; word-break:break-word; line-height:1.4; }
 .movement-view-modal-reason {
-    background:linear-gradient(135deg,rgba(247,147,26,.08),rgba(247,147,26,.03));
-    border:1.5px solid rgba(247,147,26,.2);
+    background:linear-gradient(135deg,var(--c-rgba2471472608, rgba(247,147,26,.08)),var(--c-rgba2471472603, rgba(247,147,26,.03)));
+    border:1.5px solid var(--c-rgba247147262, rgba(247,147,26,.2));
 }
 .movement-view-modal-reason-label {
-    color:#b45309; font-size:.81rem; font-weight:800; margin-bottom:6px;
+    color:var(--c-b45309, #b45309); font-size:.81rem; font-weight:800; margin-bottom:6px;
     display:flex; align-items:center; gap:5px;
 }
-.movement-view-modal-reason-label i { color:#b45309; font-size:.9rem; }
-.movement-view-modal-reason-value { color:#6b4e2a; font-weight:700; font-size:.88rem; line-height:1.5; }
+.movement-view-modal-reason-label i { color:var(--c-b45309, #b45309); font-size:.9rem; }
+.movement-view-modal-reason-value { color:var(--c-6b4e2a, #6b4e2a); font-weight:700; font-size:.88rem; line-height:1.5; }
 .modal-footer.movement-view-modal-footer {
-    border-top:1px solid #e8dcc8; background:#fff;
+    border-top:1px solid var(--c-e8dcc8, #e8dcc8); background:var(--c-fff, #fff);
     display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; padding:12px 16px; flex-shrink:0;
 }
 .movement-view-modal-btn {
@@ -683,14 +683,14 @@ include("../inheader.php"); ?>
     display:inline-flex; align-items:center; gap:6px; cursor:pointer; transition:all .2s ease;
 }
 .movement-view-modal-btn-primary {
-    background:linear-gradient(135deg,#1a1208,#2d200a); color:#fff;
-    border-left:3px solid #f7931a; box-shadow:0 4px 12px rgba(247,147,26,.25);
+    background:linear-gradient(135deg,var(--c-1a1208, #1a1208),var(--c-2d200a, #2d200a)); color:var(--c-fff, #fff);
+    border-left:3px solid var(--c-f7931a, #f7931a); box-shadow:0 4px 12px var(--c-rgba2471472625, rgba(247,147,26,.25));
 }
-.movement-view-modal-btn-primary:hover { transform:translateY(-2px); box-shadow:0 6px 18px rgba(247,147,26,.35); }
+.movement-view-modal-btn-primary:hover { transform:translateY(-2px); box-shadow:0 6px 18px var(--c-rgba2471472635, rgba(247,147,26,.35)); }
 .movement-view-modal-btn-secondary {
-    background:#fff; color:#6b4e2a; border:1.5px solid #e8dcc8;
+    background:var(--c-fff, #fff); color:var(--c-6b4e2a, #6b4e2a); border:1.5px solid var(--c-e8dcc8, #e8dcc8);
 }
-.movement-view-modal-btn-secondary:hover { border-color:#a07848; background:#fdf8f0; color:#1a1208; }
+.movement-view-modal-btn-secondary:hover { border-color:var(--c-a07848, #a07848); background:var(--c-fdf8f0, #fdf8f0); color:var(--c-1a1208, #1a1208); }
 
 @media(max-width:768px){
     .movement-view-modal-grid{grid-template-columns:1fr;}
@@ -704,26 +704,26 @@ include("../inheader.php"); ?>
     display:inline-flex; align-items:center; gap:6px;
     padding:6px 14px; border-radius:50px; font-size:.78rem; font-weight:700; white-space:nowrap;
 }
-.shift-day   { background:linear-gradient(135deg,#fff7e6,#ffe8b3); color:#d97706; border:1.5px solid rgba(217,119,6,.25); }
-.shift-night { background:linear-gradient(135deg,#e8e9f3,#c7cae0); color:#4338ca; border:1.5px solid rgba(67,56,202,.25); }
-.shift-both  { background:linear-gradient(135deg,#dcfce7,#bbf7d0); color:#15803d; border:1.5px solid rgba(21,128,61,.25); }
+.shift-day   { background:linear-gradient(135deg,var(--c-fff7e6, #fff7e6),var(--c-ffe8b3, #ffe8b3)); color:var(--c-d97706, #d97706); border:1.5px solid var(--c-rgba217119625, rgba(217,119,6,.25)); }
+.shift-night { background:linear-gradient(135deg,var(--c-e8e9f3, #e8e9f3),var(--c-c7cae0, #c7cae0)); color:var(--c-4338ca, #4338ca); border:1.5px solid var(--c-rgba675620225, rgba(67,56,202,.25)); }
+.shift-both  { background:linear-gradient(135deg,var(--c-dcfce7, #dcfce7),var(--c-bbf7d0, #bbf7d0)); color:var(--c-15803d, #15803d); border:1.5px solid var(--c-rgba211286125, rgba(21,128,61,.25)); }
 
 .shift-cell { position:relative; transition:all .2s ease; cursor:pointer; }
-.shift-cell:hover { background:rgba(232,184,0,.1); }
+.shift-cell:hover { background:var(--c-rgba23218401, rgba(232,184,0,.1)); }
 
 .shift-edit-select {
-    width:100%; padding:8px 12px; border:2px solid #f7931a;
+    width:100%; padding:8px 12px; border:2px solid var(--c-f7931a, #f7931a);
     border-radius:8px; font-family:'Cairo',sans-serif; font-size:.82rem;
-    font-weight:600; background:#fff; color:#1a1208; cursor:pointer;
-    box-shadow:0 2px 8px rgba(247,147,26,.2);
+    font-weight:600; background:var(--c-fff, #fff); color:var(--c-1a1208, #1a1208); cursor:pointer;
+    box-shadow:0 2px 8px var(--c-rgba247147262, rgba(247,147,26,.2));
 }
-.shift-edit-select:focus { outline:none; box-shadow:0 4px 12px rgba(247,147,26,.3); }
+.shift-edit-select:focus { outline:none; box-shadow:0 4px 12px var(--c-rgba247147263, rgba(247,147,26,.3)); }
 
 .shift-success-msg {
     position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-    background:linear-gradient(135deg,#10b981,#059669); color:#fff;
+    background:linear-gradient(135deg,var(--c-10b981, #10b981),var(--c-059669, #059669)); color:var(--c-fff, #fff);
     padding:8px 16px; border-radius:8px; font-size:.8rem; font-weight:700;
-    box-shadow:0 4px 12px rgba(16,185,129,.4); z-index:1000; animation:popIn .3s ease; white-space:nowrap;
+    box-shadow:0 4px 12px var(--c-rgba161851294, rgba(16,185,129,.4)); z-index:1000; animation:popIn .3s ease; white-space:nowrap;
 }
 @keyframes popIn {
     0%{transform:translate(-50%,-50%) scale(.5);opacity:0}
@@ -741,15 +741,19 @@ include("../inheader.php"); ?>
 .ems-toast {
     min-width:280px; max-width:480px; padding:14px 20px;
     border-radius:12px; font-family:'Cairo',sans-serif; font-weight:700;
-    font-size:.93rem; box-shadow:0 6px 24px rgba(0,0,0,.18);
+    font-size:.93rem; box-shadow:0 6px 24px var(--c-rgba00018, rgba(0,0,0,.18));
     display:flex; align-items:center; gap:10px;
     animation:toastIn .35s cubic-bezier(.4,0,.2,1) both;
     pointer-events:auto;
 }
-.ems-toast.success { background:#10b981; color:#fff; }
-.ems-toast.error   { background:#ef4444; color:#fff; }
+.ems-toast.success { background:var(--c-10b981, #10b981); color:var(--c-fff, #fff); }
+.ems-toast.error   { background:var(--c-ef4444, #ef4444); color:var(--c-fff, #fff); }
 @keyframes toastIn { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
 @keyframes toastOut{ from{opacity:1}                             to{opacity:0;transform:translateY(-20px)} }
+
+/* UXW-01 ②: أنماطٌ ثابتةٌ نُقلت من سماتِ style الموضعيةِ إلى أصنافِ الشاشة */
+.mvop-hint { color: var(--c-888, #888); }
+.mvop-card-title { color: var(--c-333, #333); }
 </style>
 
 <!-- Toast Container -->
@@ -770,6 +774,8 @@ include("../inheader.php"); ?>
     $header_actions[] = array('href' => 'project_drivers.php?project_id=' . intval($selected_project_id), 'class' => 'movement-topbar-btn', 'icon' => 'fas fa-id-badge', 'label' => 'سائقي المشروع');
     $header_back = array('href' => '../main/dashboard.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include(__DIR__ . '/../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا آلياتٍ مُشغَّلةً في هذا المشروعِ بعدُ', 'أضفْ أولَ تشغيلِ آليةٍ من نموذجِ «اضافة تشغيل آلية جديد» أسفلَ الشاشة');
     ?>
 
     <div class="ems-content">
@@ -808,15 +814,15 @@ include("../inheader.php"); ?>
                         <input type="hidden" name="project_id"   id="project_id"
                                value="<?= intval($selected_project_id) ?>">
 
-                        <select name="contract_id" id="contract_id" required>
+                        <select name="contract_id" id="contract_id" aria-label="عقدُ التشغيل" required>
                             <option value="">-- اختر العقد --</option>
                         </select>
 
-                        <select name="supplier_id" id="supplier_id" required>
+                        <select name="supplier_id" id="supplier_id" aria-label="المورِّدُ المُشغِّل" required>
                             <option value="">-- اختر المورد --</option>
                         </select>
 
-                        <select name="type" id="type" required>
+                        <select name="type" id="type" aria-label="نوعُ المعدة" required>
                             <option value="">-- حدد نوع المعدة --</option>
                             <?php foreach ($type_rows as $type_row): ?>
                             <option value="<?= intval($type_row['id']) ?>">
@@ -825,7 +831,7 @@ include("../inheader.php"); ?>
                             <?php endforeach; ?>
                         </select>
 
-                        <select name="equipment" id="equipment" required>
+                        <select name="equipment" id="equipment" aria-label="المعدةُ المُشغَّلة" required>
                             <option value="">-- اختر المعدة --</option>
                         </select>
 
@@ -859,7 +865,7 @@ include("../inheader.php"); ?>
                         </div>
 
                         <div>
-                            <label for="target_daily_hours"><i class="fa fa-bullseye"></i> الساعات اليومية المستهدفة <small style="color:#888">(تلقائي ويمكن تعديله)</small></label>
+                            <label for="target_daily_hours"><i class="fa fa-bullseye"></i> الساعات اليومية المستهدفة <small class="mvop-hint">(تلقائي ويمكن تعديله)</small></label>
                             <input type="number" name="target_daily_hours" id="target_daily_hours"
                                    step="0.01" placeholder="الهدف اليومي للآلية" value="0" min="0">
                         </div>
@@ -873,7 +879,7 @@ include("../inheader.php"); ?>
                             </select>
                         </div>
 
-                        <select name="status" id="status" required>
+                        <select name="status" id="status" aria-label="حالةُ التشغيل: سارٍ أو منتهٍ" required>
                             <option value="1">ساري</option>
                             <option value="0">منتهي</option>
                         </select>
@@ -958,7 +964,7 @@ include("../inheader.php"); ?>
         <?php foreach ($operations_tables as $table): ?>
         <div class="card">
             <div class="card-header">
-                <h5 style="color: #333;"><i class="fas fa-cogs"></i> <?= htmlspecialchars($table['title'], ENT_QUOTES, 'UTF-8') ?></h5>
+                <h5 class="mvop-card-title"><i class="fas fa-cogs"></i> <?= htmlspecialchars($table['title'], ENT_QUOTES, 'UTF-8') ?></h5>
             </div>
             <div class="card-body card-body-zero">
                 <div class="tbl-scroll-wrap tbl-scroll-zero">
@@ -1021,8 +1027,8 @@ include("../inheader.php"); ?>
                                 <span class="shift-badge <?= $shift_info['class'] ?>">
                                     <?= $shift_info['label'] ?>
                                 </span>
-                                <select class="shift-edit-select" style="display:none;"
-                                        data-operation-id="<?= intval($row['id']) ?>" aria-label="وردية المشغّل">
+                                <select class="shift-edit-select is-hidden" aria-label="وردية المشغّل"
+                                        data-operation-id="<?= intval($row['id']) ?>">
                                     <option value="D" <?= $shift_code === 'D' ? 'selected' : '' ?>>☀️ نهاري فقط</option>
                                     <option value="N" <?= $shift_code === 'N' ? 'selected' : '' ?>>🌙 ليلي فقط</option>
                                     <option value="B" <?= $shift_code === 'B' ? 'selected' : '' ?>>🔄 نهاري + ليلي</option>

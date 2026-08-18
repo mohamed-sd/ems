@@ -39,10 +39,23 @@ $header_title_html = htmlspecialchars('Suppliers Details', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا آلياتِ ولا عقودَ مسجَّلةً لهذا المورد', 'أضِف عقدَ موردٍ بزرِّ «عقودات المورد» أعلاه، أو اربطْ آلياتِه من سجلِّ المعدات');
 ?>
+        <style>
+            .sup-det-strong { font-weight: 600; }
+            .sup-det-hours  { font-weight: 700; color: var(--c-667eea, #667eea); font-size: 1.1rem; }
+            .sup-det-table  { width: 100%; margin-top: 20px; }
+            .sup-det-th-r   { text-align: right; }
+            .sup-det-th-c   { text-align: center; }
+            .sup-det-type-a { color: green; }
+            .sup-det-type-b { color: red; }
+            .sup-det-target { font-weight: 600; color: var(--c-28a745, #28a745); }
+            .sup-det-total  { font-weight: 700; color: var(--c-667eea, #667eea); font-size: 1.05rem; }
+            .sup-det-view   { color: var(--c-28a745, #28a745); }
+        </style>
 
-
-        <!-- <h2>تفاصيل المشروع</h2> -->
+        <!-- عنوانُ الشاشةِ يأتي من رأسِ الصفحةِ الموحَّد -->
         <div class="aligin">
             <a href="supplierscontracts.php?id=<?php echo $_GET['id']; ?>" id="toggleForm" class="add">
                 <i class="fa fa-plus"></i> عقودات المورد
@@ -92,9 +105,9 @@ include __DIR__ . '/../includes/page_header.php';
                     <div class="col-lg-2 col-5"> عدد الآليات </div>
                     <div class="col-lg-4 col-7"> <?php echo $row['equipments']; ?> </div>
                     <div class="col-lg-2 col-5"> عدد العقود </div>
-                    <div class="col-lg-4 col-7" style="font-weight: 600;"> <?php echo $row['num_contracts']; ?> </div>
+                    <div class="col-lg-4 col-7 sup-det-strong"> <?php echo $row['num_contracts']; ?> </div>
                     <div class="col-lg-2 col-5"> إجمالي الساعات المتعاقد عليها </div>
-                    <div class="col-lg-4 col-7" style="font-weight: 700; color: #667eea; font-size: 1.1rem;"> <?php echo number_format($row['total_hours']); ?> ساعة </div>
+                    <div class="col-lg-4 col-7 sup-det-hours"> <?php echo number_format($row['total_hours']); ?> ساعة </div>
                     <div class="col-lg-2 col-5"> الحالة </div>
                     <div class="col-lg-4 col-7"><?php echo $row['status'] == "1" ? "نشط" : "معلق"; ?></div>
                 </div>
@@ -109,15 +122,15 @@ include __DIR__ . '/../includes/page_header.php';
         <!-- جدول المشاريع -->
         <h3> الآليات </h3>
         <br />
-        <table id="projectsTable" class="display" style="width:100%; margin-top: 20px;">
+        <table id="projectsTable" class="display sup-det-table">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th style="text-align: right;">كود المعدة</th>
-                    <th style="text-align: right;"> الاسم </th>
-                    <th style="text-align: right;">نوع الآليه</th>
-                    <!-- <th style="text-align: right;"> اسم العميل </th> -->
-                    <!-- <th style="text-align: right;">إجراءات</th> -->
+                    <th class="sup-det-th-r">كود المعدة</th>
+                    <th class="sup-det-th-r"> الاسم </th>
+                    <th class="sup-det-th-r">نوع الآليه</th>
+                    <!-- عمودُ اسمِ العميل معطَّلٌ في هذه الشاشة -->
+                    <!-- عمودُ الإجراءات معطَّلٌ في هذه الشاشة -->
                 </tr>
             </thead>
             <tbody>
@@ -135,7 +148,7 @@ include __DIR__ . '/../includes/page_header.php';
                     echo "<td>" . $i++ . "</td>";
                     echo "<td>" . $row['code'] . "</td>";
                     echo "<td>" . $row['name'] . "</td>";
-                    echo $row['type'] == "1" ? "<td style='color:green;'> حفار </td>" : "<td style='color:red;'> قلاب </td>";
+                    echo $row['type'] == "1" ? "<td class='sup-det-type-a'> حفار </td>" : "<td class='sup-det-type-b'> قلاب </td>";
 
                     // echo "<td>".$row['status']."</td>";
                     // echo "<td>
@@ -153,16 +166,16 @@ include __DIR__ . '/../includes/page_header.php';
          <br />
         <h3> العقود </h3>
         <br />
-        <table id="projectsTable1" class="projectsTable" style="width:100%; margin-top: 20px;">
+        <table id="projectsTable1" class="projectsTable sup-det-table">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>المشروع</th>
-                    <th style="text-align: center;">تاريخ البداية</th>
-                    <th style="text-align: center;">المستهدف شهرياً</th>
-                    <th style="text-align: center;">إجمالي ساعات العقد</th>
-                    <th style="text-align: center;">الحالة</th>
-                    <th style="text-align: center;">إجراءات</th>
+                    <th class="sup-det-th-c">تاريخ البداية</th>
+                    <th class="sup-det-th-c">المستهدف شهرياً</th>
+                    <th class="sup-det-th-c">إجمالي ساعات العقد</th>
+                    <th class="sup-det-th-c">الحالة</th>
+                    <th class="sup-det-th-c">إجراءات</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
                     <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
                     <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
@@ -196,14 +209,14 @@ include __DIR__ . '/../includes/page_header.php';
                     echo "<td>" . $i++ . "</td>";
                     echo "<td><strong>" . ($row['project_name'] ?? 'غير محدد') . "</strong></td>";
                     echo "<td>" . $row['contract_signing_date'] . "</td>";
-                    echo "<td style='font-weight: 600; color: #28a745;'>" . number_format($row['hours_monthly_target']) . " ساعة</td>";
-                    echo "<td style='font-weight: 700; color: #667eea; font-size: 1.05rem;'>" . number_format($row['forecasted_contracted_hours']) . " ساعة</td>";
+                    echo "<td class='sup-det-target'>" . number_format($row['hours_monthly_target']) . " ساعة</td>";
+                    echo "<td class='sup-det-total'>" . number_format($row['forecasted_contracted_hours']) . " ساعة</td>";
                     echo "<td>" . $status . "</td>";
                     // echo "<td>
                     //         <a href='edit.php?id=".$row['id']."'>تعديل</a> | 
                     //         <a href='delete.php?id=".$row['id']."' onclick='return confirm(\"هل أنت متأكد؟\")'>حذف</a> | <a href=''> عرض </a>
                     //       </td>";
-                    echo "<td><a href='../Contracts/contracts_details.php?id=" . $row['id'] . "' style='color: #28a745'><i class='fa fa-eye'></i></a></td>";
+                    echo "<td><a href='../Contracts/contracts_details.php?id=" . $row['id'] . "' class='sup-det-view'><i class='fa fa-eye'></i></a></td>";
                     echo "</tr>";
                 }
                 ?>
@@ -222,21 +235,10 @@ include __DIR__ . '/../includes/page_header.php';
 
     <script>
         (function () {
-            // تشغيل DataTable بالعربية
-            $(document).ready(function () {
-                $('#projectsTable').DataTable({
-                    "language": {
-                        "url": "/ems/assets/i18n/datatables/ar.json"
-                    }
-                });
-            });
-            $(document).ready(function () {
-                $('#projectsTable1').DataTable({
-                    "language": {
-                        "url": "/ems/assets/i18n/datatables/ar.json"
-                    }
-                });
-            });
+            /* UXW-01 ⑤: تهيئةُ الجدولَين المحليةُ رُفعت — المكوّنُ المركزيُّ في
+               assets/js/ui-unification.js يلتقط الجداولَ آليًّا ويضبط اللغةَ
+               العربيةَ من المصدرِ نفسِه (/ems/assets/i18n/datatables/ar.json)،
+               فلا سلوكَ ضائعٌ ولا سمةَ ترتيبٍ أو طولِ صفحةٍ كانت معلَنةً هنا. */
 
             // التحكم في إظهار وإخفاء الفورم
             const toggleProjectFormBtn = document.getElementById('toggleForm');

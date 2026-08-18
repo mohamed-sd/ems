@@ -232,7 +232,25 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بندَ تسعيرٍ مسجَّلًا في هذا العقد', 'أضِف أولَ بندٍ بنموذجِ «بندٌ جديد / تعديل» أسفلَ الجدول — نموذجُ التشغيلِ والوحدةُ والسعرُ إلزامية');
     ?>
+    <style>
+        .sup-scl-req           { color: var(--c-state-danger-strong, #c00); }
+        .sup-scl-actions       { margin-top: 12px; }
+        .sup-scl-filter-row    { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+        .sup-scl-picker        { min-width: 340px; }
+        .sup-scl-headline      { margin-bottom: 12px; line-height: 1.9; }
+        .sup-scl-lifecycle     { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 12px;
+                                 padding: 8px 10px; border: 1px solid var(--c-e0d7bd, #e0d7bd); border-radius: 8px;
+                                 background: var(--c-fffdf3, #fffdf3); }
+        .sup-scl-inline-form   { display: inline; }
+        .sup-scl-revoke-form   { display: flex; gap: 4px; align-items: center; }
+        .sup-scl-note-input    { width: 150px; }
+        .sup-scl-table         { width: 100%; }
+        .sup-scl-line-form     { margin-top: 16px; }
+        .sup-scl-section-split { grid-column: 1 / -1; border-top: 1px dashed var(--c-bbb, #bbb); padding-top: 10px; }
+    </style>
 
     <?php if ($can_add): ?>
     <form method="post" class="allforms" id="contractForm">
@@ -241,7 +259,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <div class="card"><div class="card-header"><h5><i class="fa fa-handshake"></i> عقدُ مورد جديد (يُنشأ مسودةً)</h5></div>
         <div class="card-body"><div class="form-grid">
             <div class="form-group">
-                <label for="emsf_1437_0825d">المورد <span style="color:#c00">*</span></label>
+                <label for="emsf_1437_0825d">المورد <span class="sup-scl-req">*</span></label>
                 <select name="supplier_id" required id="emsf_1437_0825d">
                     <option value="">— اختر المورد —</option>
                     <?php foreach ($suppliers_options as $s): ?>
@@ -261,7 +279,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="form-group"><label for="emsf_1439_c99c8">تاريخ البدء <span style="color:#c00">*</span></label>
+            <div class="form-group"><label for="emsf_1439_c99c8">تاريخ البدء <span class="sup-scl-req">*</span></label>
                 <input type="date" name="start_date" required id="emsf_1439_c99c8"></div>
             <div class="form-group"><label for="emsf_1440_a35df">تاريخ الانتهاء</label><input type="date" name="end_date" id="emsf_1440_a35df"></div>
             <div class="form-group">
@@ -275,15 +293,15 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             </div>
             <div class="form-group"><label for="emsf_1442_2a0d8">ملاحظات</label><input type="text" name="notes" maxlength="255" id="emsf_1442_2a0d8"></div>
         </div>
-        <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button></div>
+        <div class="sup-scl-actions"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ</button></div>
         </div></div>
     </form>
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px">
+        <form method="get" class="sup-scl-filter-row">
             <strong>عقد المورد:</strong>
-            <select name="contract_id" onchange="this.form.submit()" style="min-width:340px">
+            <select name="contract_id" aria-label="عقدُ المورد" onchange="this.form.submit()" class="sup-scl-picker">
                 <?php foreach ($heads as $h): ?>
                     <option value="<?php echo intval($h['id']); ?>" <?php echo $selected === intval($h['id']) ? 'selected' : ''; ?>>
                         #<?php echo intval($h['id']); ?> — <?php echo htmlspecialchars((string)($h['supplier_name'] ?? '—')); ?>
@@ -295,7 +313,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         </form>
 
         <?php if ($head !== null): ?>
-        <div style="margin-bottom:12px;line-height:1.9">
+        <div class="sup-scl-headline">
             <strong><?php echo htmlspecialchars((string)($head['supplier_name'] ?? '—')); ?></strong>
             · <span class="badge badge-info"><?php echo htmlspecialchars((string)$head['state']); ?></span>
             · المدة: <?php echo htmlspecialchars((string)($head['start_date'] ?? '—')); ?>
@@ -321,12 +339,11 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             $__scActs = \App\Services\Contract\ContractLifecycleActions::availableFor('supplier', (string) $head['state']);
             $__isEnded = ((string) $head['state'] === \App\Services\Contract\ContractStateMachine::ENDED);
             if ($__scActs || $__isEnded) { ?>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:12px;
-                        padding:8px 10px;border:1px solid #e0d7bd;border-radius:8px;background:#fffdf3">
+            <div class="sup-scl-lifecycle">
                 <strong>دورةُ الحياة:</strong>
                 <?php foreach ($__scActs as $__c => $__a):
                     $__rv = \App\Services\Contract\ContractLifecycleActions::reverseOf('supplier', $__c); ?>
-                    <form method="post" style="display:inline">
+                    <form method="post" class="sup-scl-inline-form">
                         <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="sc_lifecycle">
                         <input type="hidden" name="contract_id" value="<?php echo intval($head['id']); ?>">
@@ -342,11 +359,11 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </form>
                 <?php endforeach; ?>
                 <?php if ($__isEnded): ?>
-                    <form method="post" style="display:flex;gap:4px;align-items:center">
+                    <form method="post" class="sup-scl-revoke-form">
                         <?php echo csrf_field(); ?>
                         <input type="hidden" name="action" value="sc_revoke_end">
                         <input type="hidden" name="contract_id" value="<?php echo intval($head['id']); ?>">
-                        <input type="text" name="sc_note" required minlength="3" style="width:150px"
+                        <input type="text" name="sc_note" required minlength="3" class="sup-scl-note-input"
                                placeholder="سببُ النقض">
                         <button class="action-btn" type="submit"
                                 title="نقضُ الإنهاء — حركةٌ معوِّضةٌ داخلَ سبعةِ أيامٍ تُعيد الحالةَ السابقةَ وتفتح حاوياتِها">
@@ -366,7 +383,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         <?php endif; ?>
 
         <div class="table-container">
-            <table class="alltables display nowrap" id="linesTable" style="width:100%">
+            <table class="alltables display nowrap sup-scl-table" id="linesTable">
                 <thead><tr>
                     <th>الإجراءات</th><th>النموذج</th><th>الوحدة</th><th>سعر الوحدة</th>
                     <th>العملة</th><th>أساس الاستعداد</th><th>المعدل</th><th>السريان</th><th>الحالة</th>
@@ -432,7 +449,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         </div>
 
         <?php if (($can_add || $can_edit) && $head !== null && $blocked === null): ?>
-        <form method="post" class="ems-form" id="lineForm" style="margin-top:16px">
+        <form method="post" class="ems-form sup-scl-line-form" id="lineForm">
         <?= csrf_field() ?>
             <input type="hidden" name="sc_action" value="save_line">
             <input type="hidden" name="contract_id" value="<?php echo $selected; ?>">
@@ -440,7 +457,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
             <div class="card"><div class="card-header"><h5><i class="fa fa-plus"></i> بندٌ جديد / تعديل</h5></div>
             <div class="card-body"><div class="form-grid">
                 <div class="form-group">
-                    <label for="f_model">نموذج التشغيل <span style="color:#c00">*</span></label>
+                    <label for="f_model">نموذج التشغيل <span class="sup-scl-req">*</span></label>
                     <select name="work_model" id="f_model" required>
                         <?php foreach ($MODEL_LABELS as $k => $lbl): ?>
                             <option value="<?php echo $k; ?>"><?php echo $lbl; ?> (<?php echo $k; ?>)</option>
@@ -448,10 +465,10 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="f_unit">الوحدة <span style="color:#c00">*</span> <small>— كما يقرؤها محرّكُ الفوترة</small></label>
+                    <label for="f_unit">الوحدة <span class="sup-scl-req">*</span> <small>— كما يقرؤها محرّكُ الفوترة</small></label>
                     <select name="unit" id="f_unit" required></select>
                 </div>
-                <div class="form-group"><label for="f_price">سعر الوحدة <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="f_price">سعر الوحدة <span class="sup-scl-req">*</span></label>
                     <input type="number" step="0.01" min="0.01" name="unit_price" id="f_price" required></div>
                 <div class="form-group">
                     <label for="f_currency">العملة</label>
@@ -476,7 +493,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 </div>
                 <div class="form-group"><label for="f_from">سريان من</label><input type="date" name="valid_from" id="f_from"></div>
                 <div class="form-group"><label for="f_to">سريان إلى</label><input type="date" name="valid_to" id="f_to"></div>
-                <div class="form-group" style="grid-column:1/-1;border-top:1px dashed #bbb;padding-top:10px">
+                <div class="form-group sup-scl-section-split">
                     <strong><i class="fa fa-shield-halved"></i> التغطية والاحتياطي — بند نوع المعدة (CAP-01 §8.2)</strong>
                 </div>
                 <div class="form-group">
@@ -507,7 +524,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 <div class="form-group"><label for="f_sbpay">مقابل احتياطيّه <small>— فارغٌ = لم يُنَصَّ ولا يُفترض</small></label>
                     <input type="text" name="standby_payment_terms" id="f_sbpay" maxlength="255"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ البند</button></div>
+            <div class="sup-scl-actions"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> حفظ البند</button></div>
             </div></div>
         </form>
         <?php endif; ?>

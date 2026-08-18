@@ -107,11 +107,39 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا وقائعَ في السجلِّ القانونيِّ ضمنَ هذا النطاق', 'أدخِل يومَ عملٍ في التايم شيت اليوميِّ فتُنشأ الواقعةُ وأحكامُ أطرافها');
     ?>
+    <style>
+        /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
+        .fin-units-tight { padding-bottom: 6px; }
+        .fin-units-m0 { margin: 0; }
+        .fin-units-queue-card { margin-bottom: 14px; border-right: 4px solid var(--c-d4b06a, #d4b06a); }
+        .fin-units-queue-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .fin-units-btns { display: flex; gap: 8px; }
+        .fin-units-note { margin: 0 0 10px; }
+        .fin-units-filter { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin-bottom: 12px; }
+        .fin-units-flabel { font-size: .85rem; }
+        .fin-units-pad10 { padding: 10px; }
+        .fin-units-tbl { width: 100%; }
+        .fin-units-chk-col { width: 34px; }
+        .fin-units-rev { color: var(--c-1a7a3a, #1a7a3a); }
+        .fin-units-reason { color: var(--c-9a6a00, #9a6a00); font-size: .82rem; max-width: 340px; white-space: normal; }
+        .fin-units-focus { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .fin-units-h5 { margin: 0 0 6px; }
+        .fin-units-legend { margin: 0 0 10px; font-size: .9rem; }
+        .fin-units-natural { border: 1px solid var(--c-d4b06a, #d4b06a); }
+        .fin-units-dim { font-size: .82rem; }
+        .fin-units-emptynote { text-align: center; padding: 14px; }
+        .fin-units-legacy { opacity: .92; }
+        .fin-units-legacy-note { margin: 0 0 10px; font-size: .88rem; }
+        .fin-units-src { font-size: .85rem; }
+        .fin-units-hidden-form { display: none; }
+    </style>
     <?php fin_msg_banner(); ?>
 
-    <div class="card"><div class="card-body" style="padding-bottom:6px">
-        <p class="text-muted" style="margin:0"><i class="fas fa-shield-halved"></i>
+    <div class="card"><div class="card-body fin-units-tight">
+        <p class="text-muted fin-units-m0"><i class="fas fa-shield-halved"></i>
         <strong>واقعةٌ واحدة وأحكامُ أطرافٍ مستقلة.</strong>
         كلُّ يومِ عملٍ واقعةٌ في السجل القانوني، ولكل طرفٍ (العميل · المورد · المشغّل)
         <strong>حكمُه المستقل</strong> بوحدة عقده وكميته وحالته واستحقاقه — وقد يفوتر العميلُ بالمتر
@@ -131,16 +159,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $readyCount = 0;
     foreach ($pricing as $pr) { if (!empty($pr['ready'])) { $readyCount++; } }
     ?>
-    <div class="card" style="margin-bottom:14px;border-right:4px solid #d4b06a;">
-        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <h5 style="margin:0"><i class="fas fa-money-check-dollar"></i> طابور اعتماد الأحكام والتحويل المالي
+    <div class="card fin-units-queue-card">
+        <div class="card-header fin-units-queue-head">
+            <h5 class="fin-units-m0"><i class="fas fa-money-check-dollar"></i> طابور اعتماد الأحكام والتحويل المالي
                 <span class="badge bg-warning"><?php echo count($queue); ?> يومًا بانتظار الختم</span>
                 <?php if (!fin_convert_gate_on()): ?>
                     <span class="badge bg-secondary" title="العلَم EMS_UNIT_CONVERT_GATE=off">البوابة غير مفعّلة — الأثر يتولّد تلقائيًّا عند الاعتماد الرابع</span>
                 <?php endif; ?>
             </h5>
             <?php if ($can_edit && $queue): ?>
-            <div style="display:flex;gap:8px;">
+            <div class="fin-units-btns">
                 <button type="button" class="btn btn-sm btn-secondary" onclick="qSelectAll(true)"><i class="fas fa-check-double"></i> حدّد الكل</button>
                 <button type="button" class="btn btn-sm btn-secondary" onclick="qSelectAll(false)">إلغاء التحديد</button>
                 <button type="button" class="btn btn-sm btn-primary" onclick="qConvert()"><i class="fas fa-gavel"></i> اعتماد أحكام المحدد (<span id="qCount">0</span>)</button>
@@ -148,7 +176,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <?php endif; ?>
         </div>
         <div class="card-body">
-            <p class="text-muted" style="margin:0 0 10px">
+            <p class="text-muted fin-units-note">
                 <i class="fas fa-shield-halved"></i> <strong>مصدر الحقيقة سجلّ الدوام والسجلُّ القانوني مرآتُه.</strong>
                 هذه الأيام اكتمل اعتمادها التشغيلي (المستويات الأربعة) وتنتظر اعتماد الأحكام —
                 <strong>ولحظةَ الاعتماد تُكتب بطاقاتُ الأطراف الثلاث ويتولّد الأثر دفعةً واحدة</strong>:
@@ -157,27 +185,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     : '<strong>لديك صلاحية العرض فقط</strong> — الاعتماد يحتاج صلاحية التعديل على هذه الشاشة.'; ?>
             </p>
 
-            <form method="get" style="display:flex;gap:10px;flex-wrap:wrap;align-items:end;margin-bottom:12px;">
-                <div><label style="font-size:.85rem">المشروع</label><br>
-                    <select name="q_project" onchange="this.form.submit()"><?php echo fin_project_options($conn, $is_super_admin, $company_id, $q_project); ?></select></div>
-                <div><label style="font-size:.85rem">الشهر</label><br>
-                    <input type="month" name="q_period" value="<?php echo htmlspecialchars($q_period); ?>" onchange="this.form.submit()"></div>
+            <form method="get" class="fin-units-filter">
+                <div><label class="fin-units-flabel" for="fin_units_q_project">المشروع</label><br>
+                    <select id="fin_units_q_project" name="q_project" onchange="this.form.submit()"><?php echo fin_project_options($conn, $is_super_admin, $company_id, $q_project); ?></select></div>
+                <div><label class="fin-units-flabel" for="fin_units_q_period">الشهر</label><br>
+                    <input type="month" id="fin_units_q_period" name="q_period" onchange="this.form.submit()" value="<?php echo htmlspecialchars($q_period); ?>"></div>
                 <?php if ($q_project || $q_period !== ''): ?>
                     <a href="unit_records_fin.php" class="btn btn-sm btn-secondary">مسح المرشّحات</a>
                 <?php endif; ?>
             </form>
 
             <?php if (!empty($GLOBALS['fin_queue_error'])): ?>
-                <div class="alert alert-danger" style="padding:10px"><i class="fas fa-triangle-exclamation"></i>
+                <div class="alert alert-danger fin-units-pad10"><i class="fas fa-triangle-exclamation"></i>
                     <strong>تعذّر بناء الطابور</strong> — لا تعتبر هذه الشاشة فارغةً بحق:
                     <code><?php echo htmlspecialchars((string) $GLOBALS['fin_queue_error']); ?></code></div>
             <?php elseif (!$queue): ?>
-                <div class="text-muted" style="padding:10px"><i class="fas fa-check-circle"></i> لا أيامَ بانتظار الاعتماد ضمن هذا النطاق.</div>
+                <div class="text-muted fin-units-pad10"><i class="fas fa-check-circle"></i> لا أيامَ بانتظار الاعتماد ضمن هذا النطاق.</div>
             <?php else: ?>
             <div class="table-container">
-                <table id="queueTable" class="display nowrap alltables no-datatable" style="width:100%;">
+                <table id="queueTable" class="display nowrap alltables no-datatable fin-units-tbl" data-no-dt="hard">
                     <thead><tr>
-                        <?php if ($can_edit): ?><th style="width:34px"><input type="checkbox" id="qAll" onchange="qSelectAll(this.checked)"></th><?php endif; ?>
+                        <?php if ($can_edit): ?><th class="fin-units-chk-col"><input type="checkbox" id="qAll" aria-label="تحديدُ كلِّ أيامِ الطابور" onchange="qSelectAll(this.checked)"></th><?php endif; ?>
                         <th>اليوم</th><th>المرجع</th><th>المشروع</th><th>المعدة</th><th>الكمية</th>
                         <th>الإيراد المتوقَّع</th><th>مستحق المورد</th><th>الحالة</th><th>اعتمده</th>
                     </tr></thead>
@@ -190,7 +218,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <tr class="<?php echo $ready ? '' : 'table-warning'; ?>">
                             <?php if ($can_edit): ?>
                             <td><?php if ($ready): ?>
-                                <input type="checkbox" class="q-chk" value="<?php echo $tid; ?>" onchange="qCount()" aria-label="تحديد السجل للتحويل">
+                                <input type="checkbox" class="q-chk" aria-label="تحديدُ يومِ العملِ لاعتمادِ أحكامه" onchange="qCount()" value="<?php echo $tid; ?>">
                             <?php else: ?><span title="غير قابلٍ للتحويل">—</span><?php endif; ?></td>
                             <?php endif; ?>
                             <td><?php echo htmlspecialchars((string) $row['work_date']); ?></td>
@@ -201,7 +229,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <td><?php echo htmlspecialchars((string) ($row['equipment_name'] ?? '—')); ?></td>
                             <td><?php echo $pr['qty'] !== null ? number_format((float) $pr['qty'], 2) . ' ' . fin_unit_label_ar($pr['unit']) : '—'; ?></td>
                             <td><?php echo $pr['revenue'] !== null
-                                ? '<strong style="color:#1a7a3a;">' . number_format((float) $pr['revenue'], 2) . '</strong> <small>' . htmlspecialchars((string) $pr['revenue_cur']) . '</small>'
+                                ? '<strong class="fin-units-rev">' . number_format((float) $pr['revenue'], 2) . '</strong> <small>' . htmlspecialchars((string) $pr['revenue_cur']) . '</small>'
                                 : '<span class="text-muted">—</span>'; ?></td>
                             <td><?php echo $pr['due'] !== null
                                 ? number_format((float) $pr['due'], 2) . ' <small>' . htmlspecialchars((string) $pr['due_cur']) . '</small>'
@@ -209,7 +237,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <td><?php if ($ready): ?><span class="badge bg-success">جاهزٌ للاعتماد</span>
                                 <?php else: ?><span class="badge bg-secondary" title="<?php echo htmlspecialchars((string) $pr['reason']); ?>">متعذّر</span><?php endif; ?>
                                 <?php if ((string) $pr['reason'] !== ''): ?>
-                                    <div style="color:#9a6a00;font-size:.82rem;max-width:340px;white-space:normal;"><?php echo htmlspecialchars((string) $pr['reason']); ?></div>
+                                    <div class="fin-units-reason"><?php echo htmlspecialchars((string) $pr['reason']); ?></div>
                                 <?php endif; ?>
                             </td>
                             <td><?php echo htmlspecialchars((string) ($row['approved_by_name'] ?? '—')); ?></td>
@@ -219,7 +247,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </table>
             </div>
             <?php if ($can_edit): ?>
-            <form id="qForm" method="post" style="display:none">
+            <form id="qForm" method="post" class="fin-units-hidden-form">
                 <input type="hidden" name="action" value="convert_units">
                 <input type="hidden" name="csrf_token" value="<?php echo fin_action_token(); ?>">
                 <input type="hidden" name="ids" id="qIds" value="">
@@ -333,7 +361,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
     <div class="card"><div class="card-body">
         <?php if ($entry_focus !== null): ?>
-            <div class="alert alert-info" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <div class="alert alert-info fin-units-focus">
                 <i class="fas fa-crosshairs"></i>
                 <span>العرضُ محصورٌ بالواقعة <code><?php echo htmlspecialchars($entry_focus, ENT_QUOTES, 'UTF-8'); ?></code>
                     <?php if (empty($entries)): ?>
@@ -342,15 +370,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <a class="btn btn-sm btn-secondary" href="unit_records_fin.php">اعرض كلَّ الوقائع</a>
             </div>
         <?php endif; ?>
-        <h5 style="margin:0 0 6px;"><i class="fas fa-scale-balanced"></i> وقائعُ السجل القانوني وأحكامُ أطرافها
+        <h5 class="fin-units-h5"><i class="fas fa-scale-balanced"></i> وقائعُ السجل القانوني وأحكامُ أطرافها
             <span class="badge badge-info"><?php echo count($entries); ?> واقعة</span></h5>
-        <p class="text-muted" style="margin:0 0 10px;font-size:.9rem;">
+        <p class="text-muted fin-units-legend">
             لكل واقعةٍ ثلاثُ بطاقات حكمٍ مستقلة — والواقعةُ غيرُ المحوَّلة أحكامُها
             <strong>لم تُكتب بعد</strong> (تُكتب لحظةَ الاعتماد من الطابور أعلاه).
-            علامة <span class="badge badge-light" style="border:1px solid #d4b06a;">⚖ تساوٍ طبيعي</span>
+            علامة <span class="badge badge-light fin-units-natural">⚖ تساوٍ طبيعي</span>
             تظهر حين تتفق وحدتا العميل والمورد وكميتاهما وفق العقود — إعلامًا لا شرطًا.</p>
         <div class="table-container">
-            <table id="entriesTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="entriesTable" class="display nowrap alltables fin-units-tbl" data-page-length="25" data-order='[]' data-state-save="false">
                 <thead><tr>
                     <th>الواقعة</th><th>التاريخ</th><th>الوردية</th><th>المشروع</th><th>المعدة</th><th>المشغّل</th>
                     <th>الكمية المسجّلة</th><th>الزمن (فعلي·استعداد·توقف)</th><th>حالة السلسلة</th>
@@ -398,9 +426,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <td><?php echo upa_card(isset($aw['supplier']) ? $aw['supplier'] : null, $UNIT_AR, $STATE_AR); ?></td>
                         <td><?php echo upa_card(isset($aw['operator']) ? $aw['operator'] : null, $UNIT_AR, $STATE_AR); ?></td>
                         <td><?php if ($natural): ?>
-                            <span class="badge badge-light" style="border:1px solid #d4b06a;" title="اتفقت وحدتا العميل والمورد وكميتاهما وفق العقود — إعلامٌ لا شرط">⚖ تساوٍ طبيعي</span>
+                            <span class="badge badge-light fin-units-natural" title="اتفقت وحدتا العميل والمورد وكميتاهما وفق العقود — إعلامٌ لا شرط">⚖ تساوٍ طبيعي</span>
                         <?php elseif (!$aw): ?>
-                            <span class="text-muted" style="font-size:.82rem;" title="الأحكام تُكتب لحظة الاعتماد من الطابور">لم تُحكم بعد</span>
+                            <span class="text-muted fin-units-dim" title="الأحكام تُكتب لحظة الاعتماد من الطابور">لم تُحكم بعد</span>
                         <?php endif; ?></td>
                     </tr>
                 <?php endforeach; ?>
@@ -408,7 +436,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
         <?php if (empty($entries)): ?>
-            <p class="text-muted" style="text-align:center;padding:14px;"><i class="fas fa-circle-info"></i>
+            <p class="text-muted fin-units-emptynote"><i class="fas fa-circle-info"></i>
                 لا وقائعَ في السجل القانوني ضمن هذا النطاق — تُنشأ الوقائع من إدخال التايم شيت اليومي (الكتابة المزدوجة).</p>
         <?php endif; ?>
     </div></div>
@@ -426,15 +454,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
          ORDER BY u.record_date DESC, u.id DESC", array());
     ?>
     <?php if ($legacy_rows): ?>
-    <div class="card" style="opacity:.92;">
-        <div class="card-header"><h5 style="margin:0"><i class="fas fa-box-archive"></i> السجل اليدوي القديم
+    <div class="card fin-units-legacy">
+        <div class="card-header"><h5 class="fin-units-m0"><i class="fas fa-box-archive"></i> السجل اليدوي القديم
             <span class="badge badge-secondary">مجمّدٌ — قراءةً فقط</span></h5></div>
         <div class="card-body">
-        <p class="text-muted" style="margin:0 0 10px;font-size:.88rem;">
+        <p class="text-muted fin-units-legacy-note">
             سجلاتٌ أُدخلت يدويًّا قبل قيام السجل القانوني — مالُها المولَّد باقٍ بروابطه ولا يُعاد توليده،
             ولا إدخالَ يدويًّا بعد اليوم: كلُّ يومِ عملٍ يبدأ من التايم شيت.</p>
         <div class="table-container">
-            <table id="legacyTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="legacyTable" class="display nowrap alltables fin-units-tbl" data-page-length="10" data-order='[]' data-state-save="false">
                 <thead><tr>
                     <th>الرقم</th><th>التاريخ</th><th>المشروع</th><th>النموذج</th>
                     <th>تشغيل</th><th>عميل</th><th>مورد</th><th>الحالة</th><th>هامش</th><th>المرجع</th>
@@ -453,7 +481,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     echo "<td>" . ($row['supplier_qty'] !== null ? number_format((float) $row['supplier_qty'], 2) : '—') . "</td>";
                     echo "<td><span class='badge badge-" . $tone . "'>" . htmlspecialchars($match_states[$ms] ?? $ms) . "</span></td>";
                     echo "<td>" . ($ms === 'approved' ? number_format((float) $row['unit_margin'], 2) : '—') . "</td>";
-                    echo "<td style='font-size:.85rem'>" . htmlspecialchars((string) ($row['source_ref'] ?? '')) . "</td>";
+                    echo "<td class='fin-units-src'>" . htmlspecialchars((string) ($row['source_ref'] ?? '')) . "</td>";
                     echo "</tr>";
                 } ?>
                 </tbody>
@@ -467,10 +495,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function () {
-    $('#entriesTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, pageLength: 25, order: [],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
-    $('#legacyTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, pageLength: 10, order: [],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    /* UXW-01 ⑤: التهيئتان المحليتان أُزيلتا — المكوّنُ المركزيُّ في assets/js/ui-unification.js
+       يلتقط #entriesTable و#legacyTable آليًّا، والسلوكُ معلَنٌ بسماتِ <table>.
+       و#queueTable يبقى ساكنًا بسمةِ خروجٍ صريحة: مربعاتُ التحديد تلزمها الصفحةُ كاملة. */
 });
 
 // ═══ طابور اعتماد الأحكام — نمط شاشة الاعتمادات نفسه (سجل/مجموعة/الكل) ═══

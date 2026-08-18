@@ -209,12 +209,34 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا سياساتِ استحقاقٍ للمشغّلين بعدُ', 'أضف أولى السياساتِ من نموذجِ «سياسة جديدة» أعلاه ثم فعّلها لتسري');
     ?>
+    <style>
+        /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
+        .fin-oppol-intro { color: var(--c-4b5563); margin: 0 0 12px; line-height: 1.8; }
+        .fin-oppol-badges { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .fin-oppol-badge { padding: 6px 12px; }
+        .fin-oppol-h5 { margin: 0 0 10px; }
+        .fin-oppol-form { box-shadow: none; padding: 0; }
+        .fin-oppol-check-label { display: flex; align-items: center; gap: 8px; }
+        .fin-oppol-check { width: auto; }
+        .fin-oppol-tbl { width: 100%; }
+        .fin-oppol-stopped { opacity: .55; }
+        .fin-oppol-ltr { direction: ltr; }
+        .fin-oppol-note { color: var(--c-ink-500); }
+        .fin-oppol-wrap { white-space: normal; }
+        .fin-oppol-act { text-decoration: none; padding: 5px 10px; }
+        .fin-oppol-inline-form { display: flex; gap: 6px; align-items: center; }
+        .fin-oppol-reason { width: 150px; }
+        .fin-oppol-stopbtn { border: 0; padding: 5px 10px; }
+        .fin-oppol-emptynote { color: var(--c-ink-500); text-align: center; padding: 16px; }
+    </style>
 
     <?php fin_msg_banner(); ?>
 
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;margin:0 0 12px;line-height:1.8;">
+        <p class="fin-oppol-intro">
             <i class="fas fa-circle-info"></i>
             لكل مشغّلٍ <strong>سياسةُ استحقاقٍ</strong> بنموذج عمله (ساعة/طن/نقلة/متر) وأساسه
             (تشغيل فعلي · استعداد · حضور · إنتاج) ومعدله وحدَّيه ونطاقه —
@@ -222,20 +244,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <strong>السياسةُ تغلب</strong>؛ ومن لا سياسةَ له يُقرأ من
             <a href="operator_pay_fin.php">الوضع القديم (بالراتب/بالمستحق)</a> مؤقتًا.
         </p>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <span class="badge badge-success" style="padding:6px 12px;"><?php echo $liveN; ?> سياسة نافذة</span>
+        <div class="fin-oppol-badges">
+            <span class="badge badge-success fin-oppol-badge"><?php echo $liveN; ?> سياسة نافذة</span>
             <?php if ($draftN > 0): ?>
-            <span class="badge badge-secondary" style="padding:6px 12px;">
+            <span class="badge badge-secondary fin-oppol-badge">
                 <i class="fas fa-pen"></i> <?php echo $draftN; ?> مسودة — <strong>لا تسعّر شيئًا حتى تُفعَّل</strong>
             </span>
             <?php endif; ?>
             <?php if ($supN > 0): ?>
-            <span class="badge badge-info" style="padding:6px 12px;">
+            <span class="badge badge-info fin-oppol-badge">
                 <?php echo $supN; ?> مستبدَلة — تبقى حاكمةً لما قبل سريان خَلَفها
             </span>
             <?php endif; ?>
             <?php if ($trialN > 0): ?>
-            <span class="badge badge-warning" style="padding:6px 12px;">
+            <span class="badge badge-warning fin-oppol-badge">
                 <i class="fas fa-flask"></i> <?php echo $trialN; ?> تجريبية — استبدل قيمَها قبل الاستعمال الحقيقي
             </span>
             <?php endif; ?>
@@ -244,14 +266,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($can_edit): ?>
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-plus"></i> سياسة جديدة</h5>
-        <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;">
+        <h5 class="fin-oppol-h5"><i class="fas fa-plus"></i> سياسة جديدة</h5>
+        <form action="" method="post" class="allforms allforms-visible fin-oppol-form">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="add_policy" value="1">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
-                    <label>المشغّل *</label>
-                    <select name="employee_id" required>
+                    <label for="oppol_employee_id">المشغّل *</label>
+                    <select id="oppol_employee_id" name="employee_id" required>
                         <option value="">— اختر —</option>
                         <?php foreach ($operators as $op) {
                             $eid = intval($op['employee_id']);
@@ -261,14 +283,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>نموذج العمل *</label>
-                    <select name="work_model" required>
+                    <label for="oppol_work_model">نموذج العمل *</label>
+                    <select id="oppol_work_model" name="work_model" required>
                         <?php foreach ($MODELS as $k => $v) { echo "<option value='{$k}'>{$v}</option>"; } ?>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>أساس الاستحقاق *</label>
-                    <select name="basis" required>
+                    <label for="oppol_basis">أساس الاستحقاق *</label>
+                    <select id="oppol_basis" name="basis" required>
                         <?php foreach ($BASES as $k => $v) {
                             $note = ($k === 'composite') ? ' (بلا صيغةٍ بعد — لا يُحسب)' : '';
                             echo "<option value='{$k}'>{$v}{$note}</option>";
@@ -277,19 +299,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </div>
                 <div class="form-group"><label>المعدّل *</label>
                     <input type="number" name="rate" step="0.0001" min="0.0001" required placeholder="لوحدة الأساس"></div>
-                <div class="form-group"><label>العملة *</label>
-                    <input type="text" name="currency" value="SDG" required maxlength="10"></div>
+                <div class="form-group"><label for="oppol_currency">العملة *</label>
+                    <input type="text" id="oppol_currency" name="currency" value="SDG" required maxlength="10"></div>
                 <div class="form-group"><label>حدٌّ أدنى يومي</label>
                     <input type="number" name="min_amount" step="0.01" min="0" placeholder="اختياري"></div>
                 <div class="form-group"><label>حدٌّ أقصى يومي</label>
                     <input type="number" name="max_amount" step="0.01" min="0" placeholder="اختياري"></div>
-                <div class="form-group"><label>سريان من</label>
-                    <input type="date" name="effective_from"></div>
-                <div class="form-group"><label>سريان إلى</label>
-                    <input type="date" name="effective_to"></div>
+                <div class="form-group"><label for="oppol_effective_from">سريان من</label>
+                    <input type="date" id="oppol_effective_from" name="effective_from"></div>
+                <div class="form-group"><label for="oppol_effective_to">سريان إلى</label>
+                    <input type="date" id="oppol_effective_to" name="effective_to"></div>
                 <div class="form-group">
-                    <label>نطاق: مشروع</label>
-                    <select name="scope_project_id">
+                    <label for="oppol_scope_project_id">نطاق: مشروع</label>
+                    <select id="oppol_scope_project_id" name="scope_project_id">
                         <option value="0">— افتراضية (كل المشاريع) —</option>
                         <?php foreach ($projects as $pr) {
                             echo "<option value='" . intval($pr['id']) . "'>" . htmlspecialchars($pr['name']) . "</option>";
@@ -297,8 +319,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>نطاق: نوع معدة</label>
-                    <select name="scope_equipment_type">
+                    <label for="oppol_scope_equipment_type">نطاق: نوع معدة</label>
+                    <select id="oppol_scope_equipment_type" name="scope_equipment_type">
                         <option value="0">— كل الأنواع —</option>
                         <?php foreach ($equipTypes as $tid => $tname) {
                             echo "<option value='{$tid}'>" . htmlspecialchars($tname) . "</option>";
@@ -309,10 +331,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="text" name="deductions_note" maxlength="200" placeholder="اختياري"></div>
                 <div class="form-group"><label>الاستثناءات (توثيق)</label>
                     <input type="text" name="exceptions_note" maxlength="200" placeholder="اختياري"></div>
-                <div class="form-group"><label>ملاحظة</label>
-                    <input type="text" name="note" maxlength="200"></div>
-                <div class="form-group"><label style="display:flex;align-items:center;gap:8px;">
-                    <input type="checkbox" name="is_trial" value="1" style="width:auto;"> سياسةٌ تجريبية (توسم ولا تُعتمد للأجر الحقيقي)</label></div>
+                <div class="form-group"><label for="oppol_note">ملاحظة</label>
+                    <input type="text" id="oppol_note" name="note" maxlength="200"></div>
+                <div class="form-group"><label class="fin-oppol-check-label" for="oppol_is_trial">
+                    <input type="checkbox" id="oppol_is_trial" name="is_trial" value="1" class="fin-oppol-check"> سياسةٌ تجريبية (توسم ولا تُعتمد للأجر الحقيقي)</label></div>
             </div></div>
             <div class="form-actions">
                 <button type="submit" class="btn-primary"><i class="fas fa-save"></i> إضافة السياسة</button>
@@ -322,9 +344,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-list"></i> السياسات</h5>
+        <h5 class="fin-oppol-h5"><i class="fas fa-list"></i> السياسات</h5>
         <div class="table-container">
-            <table id="polTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="polTable" class="display nowrap alltables fin-oppol-tbl" data-page-length="25" data-order='[]' data-state-save="false">
                 <thead><tr>
                     <th>المشغّل</th><th>النموذج</th><th>الأساس</th><th>المعدّل</th>
                     <th>الحدود</th><th>العملة</th><th>النطاق</th><th>السريان</th>
@@ -352,7 +374,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     $limits = ($p['min_amount'] !== null ? '≥' . $p['min_amount'] : '') .
                               (($p['min_amount'] !== null && $p['max_amount'] !== null) ? ' · ' : '') .
                               ($p['max_amount'] !== null ? '≤' . $p['max_amount'] : '');
-                    echo "<tr" . ($stopped ? " style='opacity:.55;'" : '') . ">";
+                    echo "<tr" . ($stopped ? " class='fin-oppol-stopped'" : '') . ">";
                     echo "<td>" . htmlspecialchars($p['emp_name'] !== null && $p['emp_name'] !== '' ? $p['emp_name'] : ('#' . $p['operator_id'])) . "</td>";
                     echo "<td>" . ($MODELS[$p['work_model']] ?? $p['work_model']) . "</td>";
                     echo "<td>" . ($BASES[$p['basis']] ?? $p['basis']) . "</td>";
@@ -360,7 +382,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     echo "<td>" . ($limits !== '' ? $limits : '—') . "</td>";
                     echo "<td>" . htmlspecialchars($p['currency']) . "</td>";
                     echo "<td>" . htmlspecialchars($scope) . "</td>";
-                    echo "<td style='direction:ltr;'>" . $valid . "</td>";
+                    echo "<td class='fin-oppol-ltr'>" . $valid . "</td>";
                     // E-24: الحالةُ من آلتها — والوسمُ التجريبيُّ محورٌ ثانٍ لا بديلٌ عنها
                     $ps = strval($p['policy_state']);
                     $psCls = array('draft' => 'badge-secondary', 'active' => 'badge-success',
@@ -375,20 +397,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     }
                     if ($stopped) { $stateCell .= " <span class='badge badge-secondary'>موقوفة</span>"; }
                     if ($p['state_note'] !== null && $p['state_note'] !== '') {
-                        $stateCell .= "<div><small style='color:#6b7280;'>"
+                        $stateCell .= "<div><small class='fin-oppol-note'>"
                             . htmlspecialchars(strval($p['state_note'])) . "</small></div>";
                     }
-                    echo "<td style='white-space:normal;'>" . $stateCell . "</td>";
+                    echo "<td class='fin-oppol-wrap'>" . $stateCell . "</td>";
                     if ($can_edit) {
                         $act = '—';
                         if ($ps === 'draft') {
-                            $act = "<a href='?activate_policy=" . intval($p['id']) . "' class='badge badge-success' style='text-decoration:none;padding:5px 10px;' onclick=\"return confirm('تفعيلُ السياسة؟ ما يُخلِفه سريانُها من سياساتٍ نافذةٍ يُغلق عند يومٍ قبله.');\"><i class='fas fa-play'></i> فعّل</a>";
+                            $act = "<a href='?activate_policy=" . intval($p['id']) . "' class='badge badge-success fin-oppol-act' onclick=\"return confirm('تفعيلُ السياسة؟ ما يُخلِفه سريانُها من سياساتٍ نافذةٍ يُغلق عند يومٍ قبله.');\"><i class='fas fa-play'></i> فعّل</a>";
                         } elseif ($ps === 'active' || $ps === 'superseded') {
-                            $act = "<form method='post' style='display:flex;gap:6px;align-items:center;'>" . csrf_field()
+                            $act = "<form method='post' class='fin-oppol-inline-form'>" . csrf_field()
                                  . "<input type='hidden' name='expire_policy' value='1'>"
                                  . "<input type='hidden' name='policy_id' value='" . intval($p['id']) . "'>"
-                                 . "<input type='text' name='expire_reason' maxlength='200' required placeholder='سببُ الإنهاء' style='width:150px;'>"
-                                 . "<button type='submit' class='badge badge-danger' style='border:0;padding:5px 10px;'><i class='fas fa-stop'></i> أنهِ</button></form>";
+                                 . "<input type='text' name='expire_reason' maxlength='200' required placeholder='سببُ الإنهاء' class='fin-oppol-reason'>"
+                                 . "<button type='submit' class='badge badge-danger fin-oppol-stopbtn'><i class='fas fa-stop'></i> أنهِ</button></form>";
                         }
                         echo "<td>" . $act . "</td>";
                     }
@@ -398,18 +420,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
         <?php if (empty($policies)): ?>
-            <p style="color:#6b7280;text-align:center;padding:16px;"><i class="fas fa-circle-info"></i> لا سياساتٍ بعد — أضف أولى السياسات من النموذج أعلاه.</p>
+            <p class="fin-oppol-emptynote"><i class="fas fa-circle-info"></i> لا سياساتٍ بعد — أضف أولى السياسات من النموذج أعلاه.</p>
         <?php endif; ?>
     </div></div>
 </div>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script>
-$(document).ready(function () {
-    $('#polTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, pageLength: 25, order: [],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
-});
-</script>
+<!-- UXW-01 ⑤: التهيئةُ المحليةُ أُزيلت — المكوّنُ المركزيُّ في assets/js/ui-unification.js
+     يلتقط #polTable آليًّا (تعريبٌ وأزرارُ تصدير)، والسلوكُ المحفوظُ معلَنٌ بسماتِ <table>. -->
 </body>
 </html>

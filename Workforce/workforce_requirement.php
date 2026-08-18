@@ -106,32 +106,48 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if($can_add) $header_actions[]=array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'احتياج جديد');
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>
+    <?php // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا احتياجَ قوًى عاملةٍ مسجَّلًا لأيِّ مشروعٍ بعدُ', 'سجّلْ أولَ احتياجٍ بزرِّ «احتياج جديد» في رأسِ الشاشة'); ?>
+    <style>
+        .wr-form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); padding: 14px; }
+        .wr-hint-muted { color: var(--c-888, #888); }
+        .wr-manual-label { display: flex; align-items: center; gap: 6px; font-weight: var(--weight-regular); margin-top: 4px; font-size: .85rem; }
+        .wr-auto-hint { color: var(--c-b9770e, #b9770e); }
+        .wr-inline-check { display: flex; align-items: center; gap: var(--space-2); }
+        .wr-check-label { margin: 0; }
+        .wr-span-full { grid-column: 1 / -1; }
+        .wr-form-actions { padding: 0 14px 16px; display: flex; gap: 10px; }
+        .wr-cancel-btn { background: var(--c-ink-500); }
+        .wr-table-wrap { margin-top: 14px; }
+        .wr-table-full { width: 100%; }
+        .wr-empty-cell { text-align: center; color: var(--c-888, #888); padding: 18px; }
+    </style>
     <?php if(!empty($_GET['msg'])): $ok=strpos($_GET['msg'],'✅')!==false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>
-    <form id="rForm" action="" method="post" class="allforms" style="<?= $edit?'display:block;':'display:none;' ?>
-        <?= csrf_field() ?>">
+    <form id="rForm" action="" method="post" class="allforms<?= $edit?' allforms-visible':'' ?>">
+        <?= csrf_field() ?>
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= $edit?intval($edit['id']):0 ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $edit?'تعديل احتياج':'احتياج جديد' ?></h5></div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
+        <div class="wr-form-grid">
             <div class="field"><label for="emsf_634_3d483">المشروع</label><select name="project_id" id="emsf_634_3d483"><option value="">—</option><?php foreach($projects as $pid=>$pn): ?><option value="<?= intval($pid) ?>" <?= (intval($edit['project_id']??0)===intval($pid))?'selected':'' ?>><?= htmlspecialchars($pn) ?></option><?php endforeach; ?></select></div>
             <div class="field"><label for="emsf_635_6db6c">الفئة</label><select name="worker_category" id="emsf_635_6db6c"><?php foreach(ems_worker_categories() as $c): ?><option value="<?= $c ?>" <?= (($edit['worker_category']??'')===$c)?'selected':'' ?>><?= $c ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label for="emsf_636_beefe">المطلوب</label><input type="number" name="required_qty" value="<?= htmlspecialchars($edit['required_qty'] ?? '0') ?>" id="emsf_636_beefe"></div>
-            <div class="field"><label for="emsf_637_4aad4">المتوفّر <small style="color:#888;">(يُحسَب آلياً)</small></label>
-                <input type="number" name="available_qty" value="<?= htmlspecialchars($edit['available_qty'] ?? '0') ?>" id="emsf_637_4aad4">
-                <label style="display:flex;align-items:center;gap:6px;font-weight:400;margin-top:4px;font-size:.85rem;"><input type="checkbox" name="manual_available" value="1"> إدخال يدوي للمتوفّر (تجاوز)</label>
-                <?php if($auto_preview!==null): ?><small style="color:#b9770e;">المحسوب آلياً الآن من التخصيصات النشطة: <strong><?= intval($auto_preview) ?></strong></small><?php endif; ?>
+            <div class="field"><label for="emsf_636_beefe">المطلوب</label><input type="number" name="required_qty" id="emsf_636_beefe" aria-label="عددُ العاملين المطلوب" value="<?= htmlspecialchars($edit['required_qty'] ?? '0') ?>"></div>
+            <div class="field"><label for="emsf_637_4aad4">المتوفّر <small class="wr-hint-muted">(يُحسَب آلياً)</small></label>
+                <input type="number" name="available_qty" id="emsf_637_4aad4" aria-label="عددُ العاملين المتوفّر" value="<?= htmlspecialchars($edit['available_qty'] ?? '0') ?>">
+                <label class="wr-manual-label" for="wr_manual_available"><input type="checkbox" name="manual_available" id="wr_manual_available" value="1"> إدخال يدوي للمتوفّر (تجاوز)</label>
+                <?php if($auto_preview!==null): ?><small class="wr-auto-hint">المحسوب آلياً الآن من التخصيصات النشطة: <strong><?= intval($auto_preview) ?></strong></small><?php endif; ?>
             </div>
-            <div class="field"><label>الأولوية</label><select name="priority"><?php foreach($PRIORITY as $p): ?><option value="<?= $p ?>" <?= (($edit['priority']??'عادية')===$p)?'selected':'' ?>><?= $p ?></option><?php endforeach; ?></select></div>
-            <div class="field"><label for="emsf_638_3e1af">تاريخ الحاجة</label><input type="date" name="need_date" value="<?= htmlspecialchars($edit['need_date'] ?? '') ?>" id="emsf_638_3e1af"></div>
+            <div class="field"><label for="wr_priority">الأولوية</label><select name="priority" id="wr_priority"><?php foreach($PRIORITY as $p): ?><option value="<?= $p ?>" <?= (($edit['priority']??'عادية')===$p)?'selected':'' ?>><?= $p ?></option><?php endforeach; ?></select></div>
+            <div class="field"><label for="emsf_638_3e1af">تاريخ الحاجة</label><input type="date" name="need_date" id="emsf_638_3e1af" aria-label="تاريخُ الحاجةِ للقوى العاملة" value="<?= htmlspecialchars($edit['need_date'] ?? '') ?>"></div>
             <div class="field"><label for="emsf_639_5cba4">مرحلة التلبية</label><select name="fulfillment_stage" id="emsf_639_5cba4"><?php foreach($STAGES as $s): ?><option value="<?= $s ?>" <?= (($edit['fulfillment_stage']??'مفتوح')===$s)?'selected':'' ?>><?= $s ?></option><?php endforeach; ?></select></div>
-            <div class="field" style="display:flex;align-items:center;gap:8px;"><input type="checkbox" name="is_critical" id="crit" value="1" <?= (intval($edit['is_critical']??0)===1)?'checked':'' ?>><label for="crit" style="margin:0;">وظيفة حرجة</label></div>
-            <div class="field" style="grid-column:1/-1;"><label>المرشّحون (إدخال يدوي)</label><input type="text" name="candidates_note" value="<?= htmlspecialchars($edit['candidates_note'] ?? '') ?>"></div>
-            <div class="field" style="grid-column:1/-1;"><label for="emsf_640_318d4">ملاحظات</label><input type="text" name="notes" value="<?= htmlspecialchars($edit['notes'] ?? '') ?>" id="emsf_640_318d4"></div>
+            <div class="field wr-inline-check"><input type="checkbox" name="is_critical" id="crit" value="1" <?= (intval($edit['is_critical']??0)===1)?'checked':'' ?>><label for="crit" class="wr-check-label">وظيفة حرجة</label></div>
+            <div class="field wr-span-full"><label for="wr_candidates_note">المرشّحون (إدخال يدوي)</label><input type="text" name="candidates_note" id="wr_candidates_note" aria-label="أسماءُ المرشّحين — إدخالٌ يدوي" value="<?= htmlspecialchars($edit['candidates_note'] ?? '') ?>"></div>
+            <div class="field wr-span-full"><label for="emsf_640_318d4">ملاحظات</label><input type="text" name="notes" id="emsf_640_318d4" aria-label="ملاحظاتٌ على الاحتياج" value="<?= htmlspecialchars($edit['notes'] ?? '') ?>"></div>
         </div>
-        <div style="padding:0 14px 16px;display:flex;gap:10px;"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ (يحسب المتوفّر والعجز/الفائض)</button><a href="workforce_requirement.php" class="add-btn" style="background:#6b7280;"><i class="fas fa-times"></i> إلغاء</a></div>
+        <div class="wr-form-actions"><button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ (يحسب المتوفّر والعجز/الفائض)</button><a href="workforce_requirement.php" class="add-btn wr-cancel-btn"><i class="fas fa-times"></i> إلغاء</a></div>
     </form>
-    <div class="table-wrap" style="margin-top:14px;"><table class="data-table" style="width:100%;">
+    <div class="table-wrap wr-table-wrap"><table class="data-table wr-table-full">
         <thead><tr><th>إجراءات</th><th>المشروع</th><th>الفئة</th><th>مطلوب</th><th>متوفّر</th><th>عجز</th><th>فائض</th><th>الأولوية</th><th>المرحلة</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -173,9 +189,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><?= intval($r['shortage_qty']) ?><?= intval($r['is_critical'])?' ⚠️':'' ?></td><td><?= intval($r['surplus_qty']) ?></td>
             <td><?= htmlspecialchars($r['priority']) ?></td><td><?= htmlspecialchars($r['fulfillment_stage']) ?></td>
             <td><span class="status-pill <?= $sc ?>"><?= htmlspecialchars($r['state']) ?></span></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="10" style="text-align:center;color:#888;padding:18px;">لا توجد سجلاتٌ بعد.</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="10" class="wr-empty-cell">لا توجد سجلاتٌ بعد.</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>
-<script>(function(){var b=document.getElementById('toggleForm'),f=document.getElementById('rForm');if(b&&f)b.addEventListener('click',function(){f.style.display=(f.style.display==='none'||!f.style.display)?'block':'none';});})();</script>
+<script>(function(){var b=document.getElementById('toggleForm'),f=document.getElementById('rForm');if(b&&f)b.addEventListener('click',function(){f.classList.toggle("allforms-visible");});})();</script>
 </body></html>

@@ -89,7 +89,7 @@ function fin_stmt_rows($rows, $type_lbl)
     $out = '';
     foreach ($rows as $r) {
         $out .= "<tr><td>" . htmlspecialchars($r['code']) . "</td><td>" . htmlspecialchars($r['name']) . "</td>"
-              . "<td style='text-align:end'>" . number_format((float)$r['balance'], 2) . "</td></tr>";
+              . "<td class='fin-stmt-num'>" . number_format((float)$r['balance'], 2) . "</td></tr>";
     }
     return $out;
 }
@@ -100,32 +100,45 @@ function fin_stmt_rows($rows, $type_lbl)
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا قيودَ مرحَّلةً تُشتَقُّ منها القوائمُ بعدُ', 'رحِّل قيدًا واحدًا على الأقلِّ من دفترِ اليوميةِ لتظهرَ القوائمُ الثلاث');
     ?>
-    <p class="text-muted" style="margin:4px 2px 10px"><i class="fas fa-circle-info"></i> مُشتَقّة من <strong>القيود المرحّلة فقط</strong> · عملة الأساس SDG · المركز المالي يتوازن آليًا (نتيجة القيد المزدوج).</p>
+    <style>
+        /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
+        .fin-stmt-num { text-align: end; }
+        .fin-stmt-tbl { width: 100%; }
+        .fin-stmt-h5 { margin: 0 0 10px; }
+        .fin-stmt-note { margin: 4px 2px 10px; }
+        .fin-stmt-sec-rev { background: var(--c-f0fdf4); }
+        .fin-stmt-sec-neg { background: var(--c-fef2f2); }
+        .fin-stmt-sec-ast { background: var(--c-eff6ff); }
+        .fin-stmt-sec-eqt { background: var(--c-f5f3ff, #f5f3ff); }
+    </style>
+    <p class="text-muted fin-stmt-note"><i class="fas fa-circle-info"></i> مُشتَقّة من <strong>القيود المرحّلة فقط</strong> · عملة الأساس SDG · المركز المالي يتوازن آليًا (نتيجة القيد المزدوج).</p>
 
     <!-- قائمة الدخل -->
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-arrow-trend-up"></i> قائمة الدخل (الأرباح والخسائر)</h5>
-        <div class="table-container"><table class="alltables no-datatable" data-no-dt="1" style="width:100%">
-            <thead><tr><th>الكود</th><th>رقم الحساب</th><th style="text-align:end">المبلغ</th></tr></thead>
+        <h5 class="fin-stmt-h5"><i class="fas fa-arrow-trend-up"></i> قائمة الدخل (الأرباح والخسائر)</h5>
+        <div class="table-container"><table class="alltables no-datatable fin-stmt-tbl" data-no-dt="1">
+            <thead><tr><th>الكود</th><th>رقم الحساب</th><th class="fin-stmt-num">المبلغ</th></tr></thead>
             <tbody>
-                <tr><th colspan="3" style="background:#f0fdf4">الإيرادات</th></tr>
+                <tr><th colspan="3" class="fin-stmt-sec-rev">الإيرادات</th></tr>
                 <?php echo fin_stmt_rows($byType['revenue'], $type_lbl); ?>
-                <tr><th colspan="2">إجمالي الإيرادات</th><th style="text-align:end"><?php echo number_format($T['revenue'], 2); ?></th></tr>
-                <tr><th colspan="3" style="background:#fef2f2">المصروفات</th></tr>
+                <tr><th colspan="2">إجمالي الإيرادات</th><th class="fin-stmt-num"><?php echo number_format($T['revenue'], 2); ?></th></tr>
+                <tr><th colspan="3" class="fin-stmt-sec-neg">المصروفات</th></tr>
                 <?php echo fin_stmt_rows($byType['expense'], $type_lbl); ?>
-                <tr><th colspan="2">إجمالي المصروفات</th><th style="text-align:end"><?php echo number_format($T['expense'], 2); ?></th></tr>
+                <tr><th colspan="2">إجمالي المصروفات</th><th class="fin-stmt-num"><?php echo number_format($T['expense'], 2); ?></th></tr>
             </tbody>
             <tfoot><tr><th colspan="2">صافي الربح / (الخسارة)</th>
-                <th style="text-align:end"><span class="badge badge-<?php echo $net_profit >= 0 ? 'success' : 'danger'; ?>"><?php echo number_format($net_profit, 2); ?></span></th></tr></tfoot>
+                <th class="fin-stmt-num"><span class="badge badge-<?php echo $net_profit >= 0 ? 'success' : 'danger'; ?>"><?php echo number_format($net_profit, 2); ?></span></th></tr></tfoot>
         </table></div>
     </div></div>
 
     <!-- المركز المالي -->
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-scale-balanced"></i> قائمة المركز المالي (الميزانية العمومية)</h5>
-        <div class="table-container"><table class="alltables no-datatable" data-no-dt="1" style="width:100%">
-            <thead><tr><th>الكود</th><th>الحساب</th><th style="text-align:end">الرصيد الحالي</th>
+        <h5 class="fin-stmt-h5"><i class="fas fa-scale-balanced"></i> قائمة المركز المالي (الميزانية العمومية)</h5>
+        <div class="table-container"><table class="alltables no-datatable fin-stmt-tbl" data-no-dt="1">
+            <thead><tr><th>الكود</th><th>الحساب</th><th class="fin-stmt-num">الرصيد الحالي</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">الفترة</th>
               <th class="ems-fn-th" data-fn="1">نوع القائمة</th>
@@ -154,31 +167,31 @@ function fin_stmt_rows($rows, $type_lbl)
               <th class="ems-gov-th none" data-gov="currency" data-slice="3" title="لا مبلغ بلا عملة">العملة</th>
               </tr></thead>
             <tbody>
-                <tr><th colspan="3" style="background:#eff6ff">الأصول</th></tr>
+                <tr><th colspan="3" class="fin-stmt-sec-ast">الأصول</th></tr>
                 <?php echo fin_stmt_rows($byType['asset'], $type_lbl); ?>
-                <tr><th colspan="2">إجمالي الأصول</th><th style="text-align:end"><?php echo number_format($total_assets, 2); ?></th></tr>
-                <tr><th colspan="3" style="background:#fef2f2">الخصوم</th></tr>
+                <tr><th colspan="2">إجمالي الأصول</th><th class="fin-stmt-num"><?php echo number_format($total_assets, 2); ?></th></tr>
+                <tr><th colspan="3" class="fin-stmt-sec-neg">الخصوم</th></tr>
                 <?php echo fin_stmt_rows($byType['liability'], $type_lbl); ?>
-                <tr><th colspan="3" style="background:#f5f3ff">حقوق الملكية</th></tr>
+                <tr><th colspan="3" class="fin-stmt-sec-eqt">حقوق الملكية</th></tr>
                 <?php echo fin_stmt_rows($byType['equity'], $type_lbl); ?>
-                <tr><td>—</td><td>الأرباح المحتجزة (نتيجة الفترة)</td><td style="text-align:end"><?php echo number_format($net_profit, 2); ?></td></tr>
-                <tr><th colspan="2">إجمالي الخصوم + حقوق الملكية</th><th style="text-align:end"><?php echo number_format($total_liab_equity, 2); ?></th></tr>
+                <tr><td>—</td><td>الأرباح المحتجزة (نتيجة الفترة)</td><td class="fin-stmt-num"><?php echo number_format($net_profit, 2); ?></td></tr>
+                <tr><th colspan="2">إجمالي الخصوم + حقوق الملكية</th><th class="fin-stmt-num"><?php echo number_format($total_liab_equity, 2); ?></th></tr>
             </tbody>
             <tfoot><tr><th colspan="2">التوازن (الأصول = الخصوم + حقوق الملكية)</th>
-                <th style="text-align:end"><span class="badge badge-<?php echo $balanced ? 'success' : 'danger'; ?>"><?php echo $balanced ? 'متوازن ✔' : 'غير متوازن ✘'; ?></span></th></tr></tfoot>
+                <th class="fin-stmt-num"><span class="badge badge-<?php echo $balanced ? 'success' : 'danger'; ?>"><?php echo $balanced ? 'متوازن ✔' : 'غير متوازن ✘'; ?></span></th></tr></tfoot>
         </table></div>
     </div></div>
 
     <!-- التدفق النقدي -->
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-water"></i> قائمة التدفق النقدي (مبسّطة — من المدفوعات المنفّذة)</h5>
-        <div class="table-container"><table class="alltables no-datatable" data-no-dt="1" style="width:100%">
+        <h5 class="fin-stmt-h5"><i class="fas fa-water"></i> قائمة التدفق النقدي (مبسّطة — من المدفوعات المنفّذة)</h5>
+        <div class="table-container"><table class="alltables no-datatable fin-stmt-tbl" data-no-dt="1">
             <tbody>
-                <tr><td>التدفّق النقدي الداخل (تحصيل)</td><td style="text-align:end"><?php echo number_format($inflow, 2); ?></td></tr>
-                <tr><td>التدفّق النقدي الخارج (صرف)</td><td style="text-align:end">(<?php echo number_format($outflow, 2); ?>)</td></tr>
+                <tr><td>التدفّق النقدي الداخل (تحصيل)</td><td class="fin-stmt-num"><?php echo number_format($inflow, 2); ?></td></tr>
+                <tr><td>التدفّق النقدي الخارج (صرف)</td><td class="fin-stmt-num">(<?php echo number_format($outflow, 2); ?>)</td></tr>
             </tbody>
             <tfoot><tr><th>صافي التدفّق النقدي</th>
-                <th style="text-align:end"><span class="badge badge-<?php echo $net_cash >= 0 ? 'success' : 'danger'; ?>"><?php echo number_format($net_cash, 2); ?></span></th></tr></tfoot>
+                <th class="fin-stmt-num"><span class="badge badge-<?php echo $net_cash >= 0 ? 'success' : 'danger'; ?>"><?php echo number_format($net_cash, 2); ?></span></th></tr></tfoot>
         </table></div>
     </div></div>
 </div>

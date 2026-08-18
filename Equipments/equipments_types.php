@@ -59,12 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <style>
     /* خلفية الصفحة بيضاء */
     body:has(.equipments-types-main) {
-        background: #ffffff !important;
+        background: var(--c-surface) !important;
     }
 
     /* منطقة المحتوى الرئيسية: خلفية بيضاء + هامش 10 */
     .ems-site .main.equipments-types-main {
-        background: #ffffff !important;
+        background: var(--c-surface) !important;
         margin: 10px !important;
     }
 </style>
@@ -84,6 +84,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach (ems_excel_header_actions('equipment_types', 'أنواع المعدات', $perms['can_add']) as $__xlAction) { $header_actions[] = $__xlAction; }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    if (function_exists('ems_states_bundle')) {
+        echo ems_states_bundle('لا نوعَ معداتٍ مسجَّلًا في الدليلِ بعدُ',
+                               'أضف أولَ نوعٍ بزرِّ «إضافة نوع جديد» في رأسِ الشاشة، أو استورده من ملفِّ إكسل');
+    }
     ?>
     <!-- تنبيه الحذف (معطل) -->
     <div id="deleteAlert" class="alert alert-warning text-center equipments-types-alert-hidden">
@@ -92,8 +97,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <!-- نموذج إضافة / تعديل -->
-    <form id="projectForm" method="post" class="allforms<?= !empty($editData) ? ' allforms-visible' : ''; ?>
-        <?= csrf_field() ?>">
+    <form id="projectForm" method="post" class="allforms<?= !empty($editData) ? ' allforms-visible' : ''; ?>">
+        <?= csrf_field() ?>
         <div class="card-header">
                 <h5>
                     <?= !empty($editData) ? 'تعديل نوع المعدة' : 'إضافة نوع جديد'; ?>
@@ -123,8 +128,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div>
 
                         <label for="emsf_119_f9c75">نوع المعدة</label>
-                        <input type="text" name="type" required
-                            value="<?= htmlspecialchars($editData['type'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" id="emsf_119_f9c75">
+                        <input type="text" name="type" required id="emsf_119_f9c75"
+                            value="<?= htmlspecialchars($editData['type'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
                     </div>
 
                     <div>
@@ -251,11 +256,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script>
     $(document).ready(function () {
 
-        $('#projectsTable').DataTable({
-            language: {
-                url: "/ems/assets/i18n/datatables/ar.json"
-            }
-        });
+        /* UXW-01 بوابة ٥: تهيئةُ جدولِ أنواعِ المعدات انتقلت إلى المكوّنِ المركزي
+           (assets/js/ui-unification.js) — اللغةُ العربيةُ وزرُّ إكسل الموحَّد
+           منه. ولم يكن للشاشةِ ضبطُ ترتيبٍ ولا طولِ صفحةٍ خاصٌّ يُحفظ بسمة. */
 
         $('#toggleForm').on('click', function () {
             const $form = $('#projectForm');

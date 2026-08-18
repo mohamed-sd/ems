@@ -107,10 +107,30 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                          'icon' => 'fas fa-arrow-right', 'label' => 'ربط الخطة بالفعلي');
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
+    echo ems_states_bundle('لا خطَّ أساسٍ مفتوحًا على العقدِ المختار',
+                           'اختر عقدًا من جدولِ العقودِ أعلاه ثمّ اضغط «افتح خطَّ الأساس»');
     ?>
 
+    <style>
+    .bl-note{color:var(--c-4b5563, #4b5563);line-height:1.8;margin:0}
+    .bl-modes{margin-top:10px}
+    .bl-badge-pad{padding:6px 12px}
+    .bl-table{width:100%}
+    .bl-wrap{white-space:normal}
+    .bl-chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    .bl-reason{color:var(--c-ink-500)}
+    .bl-row-gap{background:var(--c-fff7ed, #fff7ed)}
+    .bl-gaps{margin-top:10px;color:var(--c-b45309)}
+    .bl-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .bl-form-inline{display:flex;gap:6px;align-items:flex-end}
+    .bl-w220{width:220px}
+    .bl-w110{width:110px}
+    .bl-req{color:var(--c-state-danger-strong)}
+    </style>
+
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;line-height:1.8;margin:0">
+        <p class="bl-note">
             <i class="fas fa-circle-info"></i>
             <strong>عند القفل تُقفل كلُّ المكوّنات — ومن هنا فقط تبدأ الفوترة</strong>.
             و<strong>لا يُقفل خطُّ أساسٍ بفجوة</strong>: المكوّناتُ الستةُ تُعدّ وتُسمّى فجوتُها.
@@ -119,23 +139,23 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <strong>والبوابةُ تبدأ مطفأة</strong> (الملحق §2-②): القاعدةُ تسري على <strong>الجديد لا على القائم</strong>،
             والعقودُ القائمةُ <strong>تُفوتر كما هي</strong> — <strong>ولا تُقلب على الجميع دفعةً واحدة</strong>.
         </p>
-        <div style="margin-top:10px">
-            <span class="badge <?php echo $MODE === 'enforce' ? 'badge-warning'
-                : ($MODE === 'monitor' ? 'badge-info' : 'badge-secondary'); ?>" style="padding:6px 12px">
+        <div class="bl-modes">
+            <span class="bl-badge-pad badge <?php echo $MODE === 'enforce' ? 'badge-warning'
+                : ($MODE === 'monitor' ? 'badge-info' : 'badge-secondary'); ?>">
                 وضعُ البوابة: <strong><?php echo htmlspecialchars($MODE); ?></strong></span>
-            <span class="badge badge-secondary" style="padding:6px 12px">
+            <span class="badge badge-secondary bl-badge-pad">
                 العقودُ الرائدة: <?php echo $PILOT ? htmlspecialchars(implode(' · ', $PILOT)) : '<strong>لا شيء</strong>'; ?></span>
         </div>
     </div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-file-contract"></i> العقود</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable bl-table" data-no-dt="1">
             <thead><tr><th>#</th><th>العميل</th><th>المدة</th><th>حالُ العقد</th><th></th></tr></thead>
             <tbody>
             <?php foreach ($contracts as $c): ?>
                 <tr><td>#<?php echo intval($c['id']); ?></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars((string)$c['second_party']); ?></td>
+                    <td class="bl-wrap"><?php echo htmlspecialchars((string)$c['second_party']); ?></td>
                     <td><?php echo htmlspecialchars((string)$c['actual_start'] . ' → ' . (string)$c['actual_end']); ?></td>
                     <td><?php echo htmlspecialchars((string)$c['contract_status']); ?></td>
                     <td><a class="action-btn" href="?contract=<?php echo intval($c['id']); ?>">
@@ -149,26 +169,26 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-list-check"></i>
         المكوّناتُ الستة — للعقد #<?php echo $CID; ?></h5></div>
     <div class="card-body">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-            <span class="badge <?php echo $cur ? 'badge-info' : 'badge-warning'; ?>" style="padding:6px 12px">
+        <div class="bl-chips">
+            <span class="bl-badge-pad badge <?php echo $cur ? 'badge-info' : 'badge-warning'; ?>">
                 خطُّ الأساس: <strong><?php echo $cur
                     ? htmlspecialchars($STATE_AR[(string)$cur['state']]) . ' · نسخة ' . intval($cur['version'])
                     : 'غيرُ مفتوح'; ?></strong></span>
-            <span class="badge <?php echo $rd['ok'] ? 'badge-success' : 'badge-warning'; ?>" style="padding:6px 12px">
+            <span class="bl-badge-pad badge <?php echo $rd['ok'] ? 'badge-success' : 'badge-warning'; ?>">
                 <?php echo $rd['ok'] ? 'المكوّناتُ مكتملة' : (count($rd['gaps']) . ' فجوة'); ?></span>
             <?php if ($gt !== null): ?>
-                <span class="badge <?php echo $gt['allow'] ? 'badge-success' : 'badge-warning'; ?>"
-                    style="padding:6px 12px">الفوترة:
+                <span class="bl-badge-pad badge <?php echo $gt['allow'] ? 'badge-success' : 'badge-warning'; ?>"
+                    >الفوترة:
                     <?php echo $gt['allow'] ? 'مسموحة' : '<strong>ممنوعة</strong>'; ?></span>
             <?php endif; ?>
         </div>
         <?php if ($gt !== null): ?>
-            <p style="color:#6b7280"><small><?php
+            <p class="bl-reason"><small><?php
                 echo htmlspecialchars(str_replace('**', '', (string)$gt['reason'])); ?></small></p>
         <?php endif; ?>
 
         <div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable bl-table" data-no-dt="1">
             <thead><tr><th>المكوّن</th><th>الحال</th><th>العدّ</th></tr></thead>
             <tbody>
             <?php
@@ -176,7 +196,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                               'plan_sealed' => 'plan_sealed', 'resource_plan' => 'resource_rows',
                               'payment_schedule' => 'payment_rows', 'sites' => 'sites');
             foreach ($COMP as $k => $label): $okc = !empty($rd['components'][$k]); ?>
-                <tr<?php echo $okc ? '' : " style='background:#fff7ed'"; ?>>
+                <tr<?php echo $okc ? '' : " class='bl-row-gap'"; ?>>
                     <td><?php echo htmlspecialchars($label); ?></td>
                     <td><span class="badge <?php echo $okc ? 'badge-success' : 'badge-warning'; ?>">
                         <?php echo $okc ? 'مكتمل' : 'فجوة'; ?></span></td>
@@ -187,7 +207,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         </table>
         </div>
         <?php if ($rd['gaps']): ?>
-            <ul style="margin-top:10px;color:#b45309">
+            <ul class="bl-gaps">
             <?php foreach ($rd['gaps'] as $g): ?>
                 <li><?php echo htmlspecialchars(str_replace('**', '', (string)$g)); ?></li>
             <?php endforeach; ?>
@@ -195,7 +215,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <?php endif; ?>
 
         <?php if ($can_edit): ?>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <div class="bl-actions">
             <?php if (!$cur): ?>
             <form method="post">
         <?php echo csrf_field(); ?><input type="hidden" name="bl_action" value="open">
@@ -203,7 +223,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <button type="submit" class="btn-primary"><i class="fa fa-folder-open"></i> افتح خطَّ الأساس</button>
             </form>
             <?php else: ?>
-            <form method="post" style="display:flex;gap:6px;align-items:flex-end">
+            <form method="post" class="bl-form-inline">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="bl_action" value="state">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
@@ -213,17 +233,17 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
                 <div class="form-group"><label for="emsf_49_f9441">ملاحظة/سبب</label>
-                    <input type="text" name="note" maxlength="255" style="width:220px" id="emsf_49_f9441"></div>
+                    <input type="text" name="note" maxlength="255" class="bl-w220" id="emsf_49_f9441"></div>
                 <button type="submit" class="btn-primary"><i class="fa fa-forward"></i> انتقل</button>
             </form>
-            <form method="post" style="display:flex;gap:6px;align-items:flex-end">
+            <form method="post" class="bl-form-inline">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="bl_action" value="amend">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-                <div class="form-group"><label for="emsf_50_55026">سببُ الملحق <span style="color:#c00">*</span></label>
-                    <input type="text" name="note" maxlength="255" required style="width:220px" id="emsf_50_55026"></div>
+                <div class="form-group"><label for="emsf_50_55026">سببُ الملحق <span class="bl-req">*</span></label>
+                    <input type="text" name="note" maxlength="255" required class="bl-w220" id="emsf_50_55026"></div>
                 <div class="form-group"><label for="emsf_51_164a9">رقمُ الملحق</label>
-                    <input type="number" name="amendment_id" style="width:110px" id="emsf_51_164a9"></div>
+                    <input type="number" name="amendment_id" class="bl-w110" id="emsf_51_164a9"></div>
                 <button type="submit" class="btn-primary"><i class="fa fa-code-branch"></i>
                     ملحقٌ — <strong>نسخةٌ جديدةٌ والقديمةُ تبقى</strong></button>
             </form>
@@ -236,7 +256,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-clock-rotate-left"></i>
         النسخُ — <strong>والمُستبدَلةُ تبقى</strong></h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable bl-table" data-no-dt="1">
             <thead><tr><th>النسخة</th><th>الحال</th><th>راجع</th><th>اعتمد</th><th>أقفل</th>
                 <th>البصمة</th><th>المكوّنات وقتَ القفل</th><th>السبب</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -264,7 +284,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         مختوم <?php echo intval($v['comp_plan_sealed']); ?> ·
                         دفع <?php echo intval($v['comp_payment_rows']); ?> ·
                         نطاق <?php echo intval($v['comp_sites']); ?></small></td>
-                    <td style="white-space:normal"><small><?php
+                    <td class="bl-wrap"><small><?php
                         echo htmlspecialchars((string)($v['state_note'] ?? '—')); ?></small></td></tr>
             <?php endforeach; ?>
             </tbody>

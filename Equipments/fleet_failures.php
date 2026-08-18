@@ -151,7 +151,16 @@ $event_types_rows = $ff_gate->scopedQuery(
     );
     $header_back = array('href' => 'manage_failure_codes.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    if (function_exists('ems_states_bundle')) {
+        echo ems_states_bundle('لا عطلَ أسطولٍ مطابقًا لهذه الفلاترِ في المدةِ المحددة',
+                               'وسِّع مدةَ التاريخِ أو أزِل فلترَ المشروعِ ونوعِ الحدث، ثم اضغط «بحث»');
+    }
     ?>
+    <style>
+    /* UXW-01 بوابة ٢: عرضُ جدولِ الأعطال صنفًا بدل style= */
+    .ff-table-full { width: 100%; }
+    </style>
 
     <div class="hero-note">
         <i class="fas fa-chart-line"></i>
@@ -234,14 +243,14 @@ $event_types_rows = $ff_gate->scopedQuery(
 
                     <div class="col-md-3 mb-3">
                         <label class="form-label fc-filter-label" for="emsf_133_a9f70">التاريخ من</label>
-                        <input type="date" name="date_from" class="form-control"
-                            value="<?php echo htmlspecialchars($filter_date_from); ?>" id="emsf_133_a9f70">
+                        <input type="date" name="date_from" class="form-control" id="emsf_133_a9f70"
+                            value="<?php echo htmlspecialchars($filter_date_from); ?>">
                     </div>
 
                     <div class="col-md-3 mb-3">
                         <label class="form-label fc-filter-label" for="emsf_134_22878">التاريخ إلى</label>
-                        <input type="date" name="date_to" class="form-control"
-                            value="<?php echo htmlspecialchars($filter_date_to); ?>" id="emsf_134_22878">
+                        <input type="date" name="date_to" class="form-control" id="emsf_134_22878"
+                            value="<?php echo htmlspecialchars($filter_date_to); ?>">
                     </div>
 
                     <div class="col-md-3 mb-3 d-flex align-items-end">
@@ -312,7 +321,8 @@ $event_types_rows = $ff_gate->scopedQuery(
                 </div>
             </div>
             <div class="table-responsive">
-                <table id="failuresTable" class="display table table-bordered table-striped table-hover" style="width:100%">
+                <table id="failuresTable" class="display table table-bordered table-striped table-hover ff-table-full"
+                       data-order='[[1,"desc"]]' data-page-length="50" data-state-save="true">
                     <thead class="table-dark">
                         <tr>
                             <th>#</th>
@@ -384,53 +394,22 @@ $event_types_rows = $ff_gate->scopedQuery(
 
 <script>
 $(document).ready(function() {
-    var table = $('#failuresTable').DataTable({
-        language: {
-            url: "/ems/assets/i18n/datatables/ar.json"
-        },
-        dom: 'Bfrtip',
-        buttons: [
-            {
-                extend: 'excelHtml5',
-                text: '<i class="fas fa-file-excel"></i> تصدير Excel',
-                className: 'btn btn-primary',
-                title: 'تقرير الأعطال',
-                exportOptions: {
-                    columns: ':visible'
-                }
-            },
-            {
-                extend: 'pdfHtml5',
-                text: '<i class="fas fa-file-pdf"></i> تصدير PDF',
-                className: 'btn btn-danger',
-                title: 'تقرير الأعطال',
-                orientation: 'landscape',
-                pageSize: 'A4',
-                exportOptions: {
-                    columns: ':visible'
-                },
-                customize: function(doc) {
-                    doc.defaultStyle.font = 'Amiri';
-                    doc.styles.tableHeader.alignment = 'right';
-                }
-            },
-            {
-                extend: 'print',
-                text: '<i class="fas fa-print"></i> طباعة',
-                className: 'btn btn-secondary'
-            }
-        ],
-        order: [[1, 'desc']],
-        pageLength: 50,
-        lengthMenu: [[25, 50, 100, 250], [25, 50, 100, 250]],
-        searchDelay: 350,
-        deferRender: true,
-        stateSave: true
-    });
+    /* UXW-01 بوابة ٥: تهيئةُ جدولِ الأعطال انتقلت إلى المكوّنِ المركزي
+       (assets/js/ui-unification.js) — والسلوكُ محفوظٌ بسماتٍ على وسمِ الجدول:
+       data-order='[[1,"desc"]]' · data-page-length="50" · data-state-save="true".
+       وهنا يُربَط البحثُ السريعُ بعد التهيئةِ المركزية. */
+    function bindFailuresQuickSearch() {
+        var table = $('#failuresTable').DataTable();
+        $('#quickTableSearch').on('keyup', function() {
+            table.search(this.value).draw();
+        });
+    }
 
-    $('#quickTableSearch').on('keyup', function() {
-        table.search(this.value).draw();
-    });
+    if ($.fn.dataTable && $.fn.dataTable.isDataTable('#failuresTable')) {
+        bindFailuresQuickSearch();
+    } else {
+        $('#failuresTable').one('init.dt', bindFailuresQuickSearch);
+    }
 });
 
 function exportToExcel() {

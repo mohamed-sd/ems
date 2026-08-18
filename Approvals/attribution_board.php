@@ -208,6 +208,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا وقائعَ تشغيلٍ مسجَّلةً في هذا اليوم', 'اختر يومًا آخرَ من حقلِ التاريخ، أو أدخِلْ وقائعَ اليومِ من شاشةِ الدوام');
     ?>
 
     <?php if (!empty($_GET['msg'])):
@@ -234,7 +236,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <form method="get" action="">
                 <div class="filter-field">
                     <label for="emsf_1_0b552"><i class="fa fa-calendar"></i> التاريخ</label>
-                    <input type="date" name="day" value="<?php echo atb_e($day); ?>" onchange="this.form.submit()" class="form-control" id="emsf_1_0b552">
+                    <input type="date" name="day" aria-label="يومُ العملِ المعروضُ في اللوحة" value="<?php echo atb_e($day); ?>" onchange="this.form.submit()" class="form-control" id="emsf_1_0b552">
                 </div>
             </form>
         </div>
@@ -313,7 +315,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <span class="atb-chip atb-chip-grey">مفوترة (لم يُحكم)</span>
                         <?php endif; ?>
                     </div>
-                    <p class="atb-small" style="margin:6px 0 8px">
+                    <p class="atb-small atb-qty-note">
                         سؤالان مستقلّان: هذا عن <strong>الكمية نفسِها</strong>
                         (إعادةُ تنفيذٍ لعيبٍ لا تُفوتر)، والجدولُ أدناه عن
                         <strong>زمن التوقف</strong>. حكمُ أحدهما لا يغني عن الآخر.
@@ -327,7 +329,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php echo csrf_field(); ?>
                         <input type="hidden" name="atb_action" value="rule_qty">
                         <input type="hidden" name="entry_id" value="<?php echo $eid; ?>">
-                        <select name="qty_billable" class="atb-qty-select">
+                        <select name="qty_billable" aria-label="حكمُ فوترةِ كميةِ الواقعة" class="atb-qty-select">
                             <option value=""  <?php echo $qb === ''  ? 'selected' : ''; ?>>لم يُحكم — تُفوتر</option>
                             <option value="1" <?php echo $qb === '1' ? 'selected' : ''; ?>>تُفوتر صراحةً</option>
                             <option value="0" <?php echo $qb === '0' ? 'selected' : ''; ?>>لا تُفوتر (إعادةُ تنفيذٍ لعيب)</option>
@@ -385,7 +387,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                         <?php if ($isWork): ?>
                                             <span class="atb-muted">— لا بندَ للتشغيل الفعلي</span>
                                         <?php elseif ($can_decide && !$noMatrix): ?>
-                                            <select name="oblig[<?php echo $lid; ?>]" class="atb-select <?php echo $needs ? 'is-missing' : ''; ?>">
+                                            <select aria-label="بندُ التزامِ هذه الفترةِ من مصفوفةِ العقد" name="oblig[<?php echo $lid; ?>]" class="atb-select <?php echo $needs ? 'is-missing' : ''; ?>">
                                                 <option value="">— اختر البند —</option>
                                                 <?php foreach ($mx as $k => $m): ?>
                                                     <option value="<?php echo atb_e($k); ?>" <?php echo $k === $ob ? 'selected' : ''; ?>>
@@ -449,7 +451,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <div id="atbResFields" hidden>
                 <div class="atb-res-note"></div>
-                <label>البندُ بعد الحسم (اتركه كما هو للإبقاء عليه)</label>
+                <label for="atbNewOblig">البندُ بعد الحسم (اتركه كما هو للإبقاء عليه)</label>
                 <?php
                 // ⚠️ الخياراتُ من **مصفوفات عقود اليوم** لا من البنود التسعة كلِّها:
                 //    قائمةٌ تعرض بندًا خارجَ العقد تدعو إلى 422 لا لزومَ له. والخدمةُ
@@ -501,52 +503,53 @@ $(function () {
 </script>
 
 <style>
-    .atb-main .atb-rule { display:flex; gap:12px; align-items:flex-start; border:1px solid #90caf9;
-        border-right:5px solid #1976d2; border-radius:10px; background:#f2f8ff; padding:12px 14px; margin-bottom:14px; line-height:1.7; }
-    .atb-main .atb-rule i { color:#1976d2; font-size:1.25rem; margin-top:3px; }
+    .atb-main .atb-rule { display:flex; gap:12px; align-items:flex-start; border:1px solid var(--c-90caf9, #90caf9);
+        border-right:5px solid var(--c-1976d2); border-radius:10px; background:var(--c-f2f8ff, #f2f8ff); padding:12px 14px; margin-bottom:14px; line-height:1.7; }
+    .atb-main .atb-rule i { color:var(--c-1976d2); font-size:1.25rem; margin-top:3px; }
     .atb-main .atb-summary { display:flex; gap:12px; align-items:center; flex-wrap:wrap;
-        border:1px solid var(--bdr); border-radius:12px; padding:12px 14px; margin-bottom:14px; background:#fff; }
-    .atb-main .atb-summary.is-blocked { border-color:#c62828; background:#fff5f5; }
-    .atb-main .atb-summary.is-clear { border-color:#2e7d32; background:#f4fbf4; }
+        border:1px solid var(--bdr); border-radius:12px; padding:12px 14px; margin-bottom:14px; background:var(--c-surface); }
+    .atb-main .atb-summary.is-blocked { border-color:var(--c-c62828); background:var(--c-fff5f5, #fff5f5); }
+    .atb-main .atb-summary.is-clear { border-color:var(--c-2e7d32); background:var(--c-f4fbf4, #f4fbf4); }
     .atb-main .atb-chip { display:inline-block; padding:3px 10px; border-radius:20px; font-size:.85rem; font-weight:700; }
-    .atb-main .atb-chip-red { background:#ffebee; color:#c62828; border:1px solid #ef9a9a; }
-    .atb-main .atb-chip-green { background:#e8f5e9; color:#2e7d32; border:1px solid #a5d6a7; }
-    .atb-main .atb-chip-amber { background:#fff8e1; color:#a06b00; border:1px solid #ffe082; }
-    .atb-main .atb-chip-grey { background:#eceff1; color:#546e7a; border:1px solid #b0bec5; }
+    .atb-main .atb-chip-red { background:var(--c-ffebee, #ffebee); color:var(--c-c62828); border:1px solid var(--c-ef9a9a, #ef9a9a); }
+    .atb-main .atb-chip-green { background:var(--c-e8f5e9, #e8f5e9); color:var(--c-2e7d32); border:1px solid var(--c-a5d6a7, #a5d6a7); }
+    .atb-main .atb-chip-amber { background:var(--c-fff8e1, #fff8e1); color:var(--c-a06b00, #a06b00); border:1px solid var(--c-ffe082, #ffe082); }
+    .atb-main .atb-chip-grey { background:var(--c-eceff1, #eceff1); color:var(--c-546e7a, #546e7a); border:1px solid var(--c-b0bec5, #b0bec5); }
     .atb-main .atb-entry { margin-bottom:14px; }
     .atb-main .atb-entry-head { display:flex; justify-content:space-between; align-items:center; }
-    .atb-main .atb-state { font-size:.82rem; color:#666; background:#f1f1f1; padding:2px 10px; border-radius:12px; }
-    .atb-main .atb-423 { display:flex; gap:10px; align-items:flex-start; border:1px solid #c62828;
-        border-right:5px solid #c62828; border-radius:10px; background:#fff5f5; padding:11px 13px; margin-bottom:12px; line-height:1.7; }
-    .atb-main .atb-423 i { color:#c62828; margin-top:3px; }
-    .atb-main .atb-row-missing { background:#fff5f5; }
-    .atb-main .atb-select.is-missing { border-color:#c62828; box-shadow:0 0 0 2px rgba(198,40,40,.12); }
-    .atb-main .atb-missing { color:#c62828; font-weight:700; }
-    .atb-main .atb-y { color:#2e7d32; font-weight:700; }
-    .atb-main .atb-n { color:#c62828; font-weight:700; }
-    .atb-main .atb-u { color:#999; font-weight:700; }
+    .atb-main .atb-state { font-size:.82rem; color:var(--c-666, #666); background:var(--c-f1f1f1); padding:2px 10px; border-radius:12px; }
+    .atb-main .atb-423 { display:flex; gap:10px; align-items:flex-start; border:1px solid var(--c-c62828);
+        border-right:5px solid var(--c-c62828); border-radius:10px; background:var(--c-fff5f5, #fff5f5); padding:11px 13px; margin-bottom:12px; line-height:1.7; }
+    .atb-main .atb-423 i { color:var(--c-c62828); margin-top:3px; }
+    .atb-main .atb-row-missing { background:var(--c-fff5f5, #fff5f5); }
+    .atb-main .atb-select.is-missing { border-color:var(--c-c62828); box-shadow:0 0 0 2px var(--c-rgba1984040012, rgba(198,40,40,.12)); }
+    .atb-main .atb-missing { color:var(--c-c62828); font-weight:700; }
+    .atb-main .atb-y { color:var(--c-2e7d32); font-weight:700; }
+    .atb-main .atb-n { color:var(--c-c62828); font-weight:700; }
+    .atb-main .atb-u { color:var(--c-ink-400); font-weight:700; }
     .atb-main .atb-num { font-variant-numeric:tabular-nums; font-weight:700; }
     .atb-main .atb-small { font-size:.84rem; }
-    .atb-main .atb-muted { color:#999; }
-    .atb-main .atb-empty { text-align:center; color:#888; padding:22px; }
-    .atb-main .atb-link { background:none; border:none; color:#1976d2; cursor:pointer; text-decoration:underline; font-size:.84rem; padding:0 4px; }
+    .atb-main .atb-muted { color:var(--c-ink-400); }
+    .atb-main .atb-empty { text-align:center; color:var(--c-888, #888); padding:22px; }
+    .atb-main .atb-link { background:none; border:none; color:var(--c-1976d2); cursor:pointer; text-decoration:underline; font-size:.84rem; padding:0 4px; }
     /* M-24 ①: لوحُ حكم الكمية — مفصولٌ بصريًّا عن جدول الزمن لأن السؤالين مختلفان */
-    .atb-main .atb-qty-rule { background:#fffbeb; border:1px solid #fde68a; border-radius:8px;
+    .atb-main .atb-qty-rule { background:var(--c-note-bg); border:1px solid var(--c-note-line); border-radius:8px;
                               padding:10px 12px; margin-bottom:12px; }
     .atb-main .atb-qty-head { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .atb-main .atb-qty-note { margin:6px 0 8px; }
     .atb-main .atb-qty-form { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
     .atb-main .atb-qty-form input[type=text] { flex:1 1 260px; min-width:200px; padding:4px 8px; }
     .atb-main .atb-qty-select { padding:4px 8px; }
     .atb-main .atb-actions { margin-top:10px; }
     .atb-main .table-container { overflow-x:auto; }
-    .atb-modal { position:fixed; inset:0; background:rgba(0,0,0,.45); display:flex; align-items:center;
+    .atb-modal { position:fixed; inset:0; background:var(--c-rgba000045); display:flex; align-items:center;
         justify-content:center; z-index:9999; }
     .atb-modal[hidden] { display:none; }
-    .atb-modal-card { background:#fff; border-radius:14px; padding:20px; width:min(520px,92vw); box-shadow:0 10px 40px rgba(0,0,0,.3); }
+    .atb-modal-card { background:var(--c-surface); border-radius:14px; padding:20px; width:min(520px,92vw); box-shadow:0 10px 40px var(--c-rgba00003); }
     .atb-modal-card label { display:block; margin:10px 0 4px; font-weight:700; }
     .atb-modal-card textarea, .atb-modal-card input, .atb-modal-card select { width:100%; }
     .atb-modal-actions { display:flex; gap:10px; margin-top:16px; }
-    .atb-res-note { background:#fff8e1; border:1px solid #ffe082; border-radius:8px; padding:8px 10px; font-size:.9rem; }
+    .atb-res-note { background:var(--c-fff8e1, #fff8e1); border:1px solid var(--c-ffe082, #ffe082); border-radius:8px; padding:8px 10px; font-size:.9rem; }
 </style>
 
 </body>

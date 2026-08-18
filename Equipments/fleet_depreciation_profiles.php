@@ -194,7 +194,21 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : 'بالساعة التشغيلية'; };
 ?>
 
-<div class="main fleet-dep-main" style="padding:15px;background:#fff;">
+<style>
+/* UXW-01 ①②: الأنماطُ الموضعيةُ صارت أصنافًا برموزِ اللون — القيمُ ذاتُها حرفًا */
+.fdp-main { padding:15px; background:var(--c-surface); }
+.fdp-msg { margin:10px 0; }
+.fdp-note { background:var(--c-eef6ff, #eef6ff); border:1px solid var(--c-cfe3fb, #cfe3fb); border-radius:8px; padding:10px 14px; margin:10px 0; font-size:13px; color:var(--c-1c4e80, #1c4e80); }
+.fdp-form { margin:10px; }
+.fdp-badge-gap { margin-inline-start:10px; }
+.fdp-ro { background:var(--c-f5f5f5); }
+.fdp-ro-muted { background:var(--c-f5f5f5); color:var(--c-888888, #888); }
+.fdp-req { color:var(--c-c0392b); }
+.fdp-span-all { grid-column:1/-1; }
+.fdp-approve { color:var(--c-1f9d55, #1f9d55); }
+</style>
+
+<div class="main fleet-dep-main fdp-main">
 
     <?php
     $header_title   = 'إعداد الإهلاك';
@@ -207,31 +221,33 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
     foreach (ems_excel_header_actions('fleet_depreciation_profiles', 'ملف الإهلاك المالي', $perms['can_add']) as $__xlAction) { $header_actions[] = $__xlAction; }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا ملفَّ إهلاكٍ مسجَّلًا بعدُ', 'أضف أولَ ملفِّ إهلاكٍ بزرِّ «إضافة ملف جديد» في رأسِ الشاشة');
     ?>
 
     <?php if (!empty($flash)): ?>
-        <div class="success-message is-success" style="margin:10px 0;"><?= $e($flash); ?></div>
+        <div class="success-message is-success fdp-msg"><?= $e($flash); ?></div>
     <?php endif; ?>
     <?php if (!empty($errors)): ?>
-        <div class="success-message is-error" style="margin:10px 0;">
+        <div class="success-message is-error fdp-msg">
             <i class="fa-solid fa-triangle-exclamation"></i> <?= $e(implode(' — ', $errors)); ?>
         </div>
     <?php endif; ?>
 
-    <div class="alert alert-info" style="background:#eef6ff;border:1px solid #cfe3fb;border-radius:8px;padding:10px 14px;margin:10px 0;font-size:13px;color:#1c4e80;">
+    <div class="alert alert-info fdp-note">
         <i class="fa-solid fa-circle-info"></i>
         الملف ملك الإدارة المالية واعتماده لمستوى الإدارة. تعديل الافتراض <b>يسري على الحساب اللاحق فقط</b> ولا يُعدّل الإهلاك المُرحَّل، وكل تعديل يُسجَّل في الأثر التدقيقي.
     </div>
 
     <!-- نموذج إضافة / تعديل -->
-    <form id="projectForm" method="post" class="allforms<?= (!empty($editData) || !empty($errors)) ? ' allforms-visible' : ''; ?>
-        <?= csrf_field() ?>" style="margin:10px;">
+    <form id="projectForm" method="post" class="allforms fdp-form<?= (!empty($editData) || !empty($errors)) ? ' allforms-visible' : ''; ?>">
+        <?= csrf_field() ?>
     <div class="card-header">
                 <h5><i class="fas fa-coins"></i> <?= !empty($editData) ? 'تعديل الملف' : 'إضافة ملف جديد'; ?>
                     <?php if (!empty($editData) && $editData['state'] === 'approved'): ?>
-                        <span class="status-active" style="margin-inline-start:10px"><i class="fas fa-check-circle"></i> معتمد</span>
+                        <span class="status-active fdp-badge-gap"><i class="fas fa-check-circle"></i> معتمد</span>
                     <?php elseif (!empty($editData)): ?>
-                        <span class="status-inactive" style="margin-inline-start:10px">مسودة</span>
+                        <span class="status-inactive fdp-badge-gap">مسودة</span>
                     <?php endif; ?>
                 </h5>
             </div>
@@ -245,17 +261,17 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                     <?php if (!empty($editData)): ?>
                     <div>
                         <label for="emsf_121_5c01c">كود الملف</label>
-                        <input type="text" value="<?= $e($editData['code']); ?>" readonly style="background:#f5f5f5" id="emsf_121_5c01c">
+                        <input type="text" id="emsf_121_5c01c" readonly class="fdp-ro" value="<?= $e($editData['code']); ?>">
                     </div>
                     <?php else: ?>
                     <div>
                         <label for="emsf_122_6d615">كود الملف</label>
-                        <input type="text" value="(يُولّد تلقائياً)" readonly style="background:#f5f5f5;color:#888" id="emsf_122_6d615">
+                        <input type="text" value="(يُولّد تلقائياً)" readonly class="fdp-ro-muted" id="emsf_122_6d615">
                     </div>
                     <?php endif; ?>
 
                     <div>
-                        <label for="emsf_123_c0aa3">فئة الأصل <span style="color:#c0392b">*</span></label>
+                        <label for="emsf_123_c0aa3">فئة الأصل <span class="fdp-req">*</span></label>
                         <input type="text" name="asset_category" required
                                placeholder="مثال: حفّار 22ط جديد"
                                value="<?= $e($editData['asset_category'] ?? ''); ?>" id="emsf_123_c0aa3">
@@ -263,7 +279,7 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
 
                     <div>
                         <label for="emsf_124_da80e">الماركة (اختياري)</label>
-                        <input type="text" name="brand" value="<?= $e($editData['brand'] ?? ''); ?>" id="emsf_124_da80e">
+                        <input type="text" name="brand" id="emsf_124_da80e" value="<?= $e($editData['brand'] ?? ''); ?>">
                     </div>
 
                     <div>
@@ -280,7 +296,7 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                     </div>
 
                     <div>
-                        <label for="methodSelect">طريقة الإهلاك <span style="color:#c0392b">*</span></label>
+                        <label for="methodSelect">طريقة الإهلاك <span class="fdp-req">*</span></label>
                         <select name="method" id="methodSelect" required>
                             <option value="uop" <?= (!empty($editData) && $editData['method'] === 'uop') ? 'selected' : ''; ?>>بالساعة التشغيلية (UOP)</option>
                             <option value="sl"  <?= (!empty($editData) && $editData['method'] === 'sl') ? 'selected' : ''; ?>>زمني بالسنوات (SL)</option>
@@ -288,19 +304,19 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                     </div>
 
                     <div>
-                        <label id="usefulLifeLabel" for="emsf_126_93c46">العمر الإنتاجي <span style="color:#c0392b">*</span></label>
-                        <input type="number" step="0.01" min="0.01" name="useful_life" required
-                               value="<?= $e($editData['useful_life'] ?? ''); ?>" id="emsf_126_93c46">
+                        <label id="usefulLifeLabel" for="emsf_126_93c46">العمر الإنتاجي <span class="fdp-req">*</span></label>
+                        <input type="number" step="0.01" min="0.01" name="useful_life" required id="emsf_126_93c46"
+                               value="<?= $e($editData['useful_life'] ?? ''); ?>">
                     </div>
 
                     <div>
-                        <label for="emsf_127_6b647">نسبة التخريد (0 إلى 1) <span style="color:#c0392b">*</span></label>
+                        <label for="emsf_127_6b647">نسبة التخريد (0 إلى 1) <span class="fdp-req">*</span></label>
                         <input type="number" step="0.0001" min="0" max="1" name="salvage_pct" required
                                placeholder="مثال: 0.08"
                                value="<?= $e($editData['salvage_pct'] ?? ''); ?>" id="emsf_127_6b647">
                     </div>
 
-                    <div style="grid-column:1/-1">
+                    <div class="fdp-span-all">
                         <label for="emsf_128_508e5">ملاحظات / سياسات مالية</label>
                         <textarea name="notes" rows="2" id="emsf_128_508e5"><?= $e($editData['notes'] ?? ''); ?></textarea>
                     </div>
@@ -388,7 +404,7 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
                                             <form method="post" class="d-inline" onsubmit="return confirm('اعتماد هذا الملف؟ سيصبح متاحاً للربط بالموديلات.');">
         <?= csrf_field() ?>
                                                 <input type="hidden" name="approve_id" value="<?= (int) $row['id']; ?>">
-                                                <button type="submit" class="action-btn" style="color:#1f9d55" title="اعتماد">
+                                                <button type="submit" class="action-btn fdp-approve" title="اعتماد">
                                                     <i class="fa-solid fa-circle-check"></i>
                                                 </button>
                                             </form>
@@ -427,9 +443,8 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
 <script src="../includes/js/jquery.dataTables.main.js"></script>
 <script>
     $(document).ready(function () {
-        $('#projectsTable').DataTable({
-            language: { url: "/ems/assets/i18n/datatables/ar.json" }
-        });
+        // UXW-01 ⑤: التهيئةُ المحليةُ رُفعت — المكوّنُ المركزيُّ (ui-unification.js)
+        // يلتقط الجدولَ ويحمّل ar.json ذاتَه.
 
         $('#toggleForm').on('click', function () {
             const $form = $('#projectForm');
@@ -451,7 +466,7 @@ $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : '
         function syncUnit() {
             var m = document.getElementById('methodSelect').value;
             var lbl = document.getElementById('usefulLifeLabel');
-            lbl.innerHTML = (m === 'sl' ? 'العمر الإنتاجي (سنوات)' : 'العمر الإنتاجي (ساعة تشغيلية)') + ' <span style="color:#c0392b">*</span>';
+            lbl.innerHTML = (m === 'sl' ? 'العمر الإنتاجي (سنوات)' : 'العمر الإنتاجي (ساعة تشغيلية)') + ' <span class="fdp-req">*</span>';
         }
         var ms = document.getElementById('methodSelect');
         if (ms) { ms.addEventListener('change', syncUnit); syncUnit(); }

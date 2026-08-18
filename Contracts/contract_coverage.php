@@ -139,6 +139,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => 'contracts_details.php?id=' . $contract_id, 'class' => '',
                          'icon' => 'fas fa-arrow-right', 'label' => 'ملف العقد');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
+    echo ems_states_bundle('لا بنودَ تغطيةٍ محسوبةً لهذا العقد',
+                           'افتح «ملفَّ العقد» وسجّل بنودَ الخدمةِ وساعاتِها ثمّ عُد إلى هذه الشاشة');
     ?>
 
     <!-- الفجوةُ بالساعات — تتصدر لوحةَ العقد (§10-①) -->
@@ -300,13 +303,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <style>
     .cov-gap-banner { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; font-size: 1.05rem;
         display: flex; align-items: center; gap: 10px; border: 1px solid; }
-    .cov-gap-banner.is-gap { background: #fff4f2; border-color: #e0a9a0; color: #8a2c1d; }
-    .cov-gap-banner.is-ok { background: #f2fbf4; border-color: #a9d8b0; color: #1d6b2e; }
+    .cov-gap-banner.is-gap { background: var(--c-fff4f2, #fff4f2); border-color: var(--c-e0a9a0, #e0a9a0); color: var(--c-8a2c1d, #8a2c1d); }
+    .cov-gap-banner.is-ok { background: var(--c-f2fbf4, #f2fbf4); border-color: var(--c-a9d8b0, #a9d8b0); color: var(--c-1d6b2e, #1d6b2e); }
     .cov-table th, .cov-table td { white-space: nowrap; padding: 6px 10px; }
-    .cov-table .cov-sub th { font-size: .8rem; color: #666; }
-    .cov-bad { color: #b3261e; font-weight: 800; }
-    .cov-ok { color: #1d6b2e; font-weight: 700; }
-    .cov-sep { border-right: 2px dashed #bbb; }
+    .cov-table .cov-sub th { font-size: .8rem; color: var(--c-666, #666); }
+    .cov-bad { color: var(--c-b3261e, #b3261e); font-weight: 800; }
+    .cov-ok { color: var(--c-1d6b2e, #1d6b2e); font-weight: 700; }
+    .cov-sep { border-right: 2px dashed var(--c-bbb, #bbb); }
     .cov-lvl2 { margin-top: 10px; }
     .cov-lvl3 { margin-top: 6px; margin-bottom: 18px; }
     .table-container { overflow-x: auto; }

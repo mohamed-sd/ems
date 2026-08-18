@@ -272,6 +272,35 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 ?>
 
 <script src="/ems/assets/vendor/chartjs/chart.umd.min.js"></script>
+<style>
+/* UXW-01 ②: أنماطٌ موضعيةٌ نُقلت أصنافًا صفحيةً ببادئةِ الشاشة eprof- */
+.eprof-flash { margin-bottom: 14px; font-weight: 700; }
+.eprof-acct-actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
+.eprof-inline-form { display: inline; margin: 0; }
+.eprof-btn-revoke { background: var(--c-c81f24, #c81f24); border-color: var(--c-c81f24, #c81f24); }
+.eprof-acct-create { margin-top: 12px; }
+
+/* UXW-01 ①: لوحةُ ألوانِ الرسومِ صارت رموزًا تُقرأ من CSS لا قيمًا مثبَّتةً في
+   جافاسكربت — والاحتياطيُّ الحرفيُّ يضمن صفرَ تغييرٍ مرئيّ. */
+:root {
+    --eprof-bar-total:    var(--c-rgba37992350780, rgba(37, 99, 235, 0.78));
+    --eprof-bar-operator: var(--c-rgba1618512950780, rgba(16, 185, 129, 0.78));
+    --eprof-bar-standby:  var(--c-rgba245158110780, rgba(245, 158, 11, 0.78));
+    --eprof-slice-1: var(--c-1d4ed8, #1d4ed8);
+    --eprof-slice-2: var(--c-0ea5e9, #0ea5e9);
+    --eprof-slice-3: var(--c-22c55e, #22c55e);
+    --eprof-slice-4: var(--c-f59e0b, #f59e0b);
+    --eprof-slice-5: var(--c-ef4444, #ef4444);
+    --eprof-slice-6: var(--c-8b5cf6, #8b5cf6);
+    --eprof-slice-7: var(--c-14b8a6, #14b8a6);
+    --eprof-slice-8: var(--c-f97316, #f97316);
+    --eprof-slice-none:  var(--c-cbd5e1, #cbd5e1);
+    --eprof-line-hours:      var(--c-0f172a, #0f172a);
+    --eprof-line-hours-fill: var(--c-rgba1523420150, rgba(15, 23, 42, 0.15));
+    --eprof-line-shifts:      var(--c-e11d48, #e11d48);
+    --eprof-line-shifts-fill: var(--c-rgba22529720, rgba(225, 29, 72, 0.2));
+}
+</style>
 
 <div class="main driver-profile-page ems-unified-page-shell">
 
@@ -285,10 +314,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = array('href' => 'employees.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا وردياتٍ ولا ساعاتِ تشغيلٍ مسجَّلةً لهذا السائق', 'سجِّلْ ورديةً في كشفِ الدوامِ لتظهرَ إحصاءاتُه ورسومُه هنا');
     ?>
 
     <?php if (isset($_GET['msg']) && trim($_GET['msg']) !== ''): ?>
-        <div class="alert alert-info" style="margin-bottom:14px;font-weight:700;">
+        <div class="alert alert-info eprof-flash">
             <?php echo htmlspecialchars($_GET['msg'], ENT_QUOTES, 'UTF-8'); ?>
         </div>
     <?php endif; ?>
@@ -399,16 +430,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </div>
                 </div>
                 <?php if ($can_manage_accounts): ?>
-                    <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;">
+                    <div class="eprof-acct-actions">
                         <a href="../main/users.php?employee_id=<?php echo intval($employee_id); ?>" class="add-btn">
                             <i class="fas fa-user-gear"></i> إدارة الحساب / تغيير الدور
                         </a>
-                        <form method="post" style="display:inline;margin:0;"
+                        <form method="post" class="eprof-inline-form"
                               onsubmit="return confirm('هل تريد سحب حساب الدخول من هذا الموظف وتعطيله؟');">
         <?= csrf_field() ?>
                             <input type="hidden" name="account_action" value="revoke">
                             <input type="hidden" name="target_uid" value="<?php echo intval($linked_user['id']); ?>">
-                            <button type="submit" class="add-btn" style="background:#c81f24;border-color:#c81f24;">
+                            <button type="submit" class="add-btn eprof-btn-revoke">
                                 <i class="fas fa-user-slash"></i> سحب الحساب
                             </button>
                         </form>
@@ -417,7 +448,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <?php else: ?>
                 <div class="alert alert-warning mb-0">لا يملك هذا الموظف حساب دخول للنظام حالياً.</div>
                 <?php if ($can_manage_accounts): ?>
-                    <div style="margin-top:12px;">
+                    <div class="eprof-acct-create">
                         <a href="../main/users.php?employee_id=<?php echo intval($employee_id); ?>" class="add-btn">
                             <i class="fas fa-user-plus"></i> إنشاء حساب لهذا الموظف
                         </a>
@@ -715,6 +746,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <script>
     (function () {
+        /* UXW-01 ①: ألوانُ الرسومِ تُقرأ من رموزِ CSS المعرَّفةِ في كتلةِ الأنماطِ
+           أعلاه (‎--eprof-*‎) بدلَ قيمٍ مثبَّتةٍ هنا — والقيمُ نفسُها لم تتغير. */
+        const emsPalette = getComputedStyle(document.documentElement);
+        const eprofColor = function (name) {
+            return (emsPalette.getPropertyValue('--eprof-' + name) || '').trim();
+        };
+
         const monthlyLabels = <?php echo json_encode($monthly_labels); ?>;
         const monthlyTotal = <?php echo json_encode($monthly_total); ?>;
         const monthlyOperator = <?php echo json_encode($monthly_operator); ?>;
@@ -757,19 +795,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     {
                         label: 'إجمالي الساعات',
                         data: hasMonthlyData ? monthlyTotal : [0],
-                        backgroundColor: 'rgba(37, 99, 235, 0.78)',
+                        backgroundColor: eprofColor('bar-total'),
                         borderRadius: 8
                     },
                     {
                         label: 'ساعات المشغل المنفذة',
                         data: hasMonthlyData ? monthlyOperator : [0],
-                        backgroundColor: 'rgba(16, 185, 129, 0.78)',
+                        backgroundColor: eprofColor('bar-operator'),
                         borderRadius: 8
                     },
                     {
                         label: 'ساعات الاستعداد',
                         data: hasMonthlyData ? monthlyStandby : [0],
-                        backgroundColor: 'rgba(245, 158, 11, 0.78)',
+                        backgroundColor: eprofColor('bar-standby'),
                         borderRadius: 8
                     }
                 ]
@@ -796,8 +834,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 datasets: [{
                     data: hasEquipmentData ? equipmentHours : [1],
                     backgroundColor: hasEquipmentData
-                        ? ['#1d4ed8', '#0ea5e9', '#22c55e', '#f59e0b', '#ef4444', '#8b5cf6', '#14b8a6', '#f97316']
-                        : ['#cbd5e1']
+                        ? ['slice-1','slice-2','slice-3','slice-4','slice-5','slice-6','slice-7','slice-8'].map(eprofColor)
+                        : [eprofColor('slice-none')]
                 }]
             },
             options: {
@@ -820,16 +858,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     {
                         label: 'إجمالي ساعات كل مشروع',
                         data: hasProjectData ? projectHours : [0],
-                        borderColor: '#0f172a',
-                        backgroundColor: 'rgba(15, 23, 42, 0.15)',
+                        borderColor: eprofColor('line-hours'),
+                        backgroundColor: eprofColor('line-hours-fill'),
                         tension: 0.35,
                         fill: true
                     },
                     {
                         label: 'عدد الورديات في المشروع',
                         data: hasProjectData ? projectShifts : [0],
-                        borderColor: '#e11d48',
-                        backgroundColor: 'rgba(225, 29, 72, 0.2)',
+                        borderColor: eprofColor('line-shifts'),
+                        backgroundColor: eprofColor('line-shifts-fill'),
                         tension: 0.35,
                         fill: false,
                         yAxisID: 'y1'

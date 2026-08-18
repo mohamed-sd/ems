@@ -107,24 +107,43 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة */
+.fin-cfo-lead { margin: 4px 2px 10px; }
+.fin-cfo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 12px; }
+.fin-cfo-cardlink { text-decoration: none; color: inherit; }
+.fin-cfo-card { height: 100%; }
+.fin-cfo-cardbody { text-align: center; }
+.fin-cfo-icon { font-size: 20px; opacity: .65; }
+.fin-cfo-figure { font-size: 22px; font-weight: 800; margin: 6px 0; }
+.fin-cfo-ok { color: var(--c-166534); }
+.fin-cfo-err { color: var(--c-991b1b); }
+.fin-cfo-warn { color: var(--c-92400e); }
+.fin-cfo-cardlabel { font-size: 13px; }
+.fin-cfo-panel { margin-top: 14px; }
+.fin-cfo-h5 { margin: 0 0 10px; }
+.fin-cfo-table { width: 100%; }
+</style>
 <div class="main fin-cfo-main ems-unified-page-shell">
     <?php
     $header_title = 'لوحة المدير المالي'; $header_icon = 'fa fa-gauge-high';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+    echo ems_states_bundle('لا أرقامَ يومٍ لهذا التاريخ بعدُ', 'افتحْ سجلَّ المصدرِ من أيِّ بطاقةٍ — والأرقامُ تظهرُ متى سُجّلت حركاتُ اليوم');
     ?>
-    <p class="text-muted" style="margin:4px 2px 10px"><i class="fas fa-mug-hot"></i> عشر بطاقات تُقرأ في دقائق أول اليوم — اضغط أي بطاقة لفتح سجلّها المصدر. (<?php echo $today; ?>)</p>
+    <p class="text-muted fin-cfo-lead"><i class="fas fa-mug-hot"></i> عشر بطاقات تُقرأ في دقائق أول اليوم — اضغط أي بطاقة لفتح سجلّها المصدر. (<?php echo $today; ?>)</p>
     <?php fin_notifications_panel($conn, $ctx, 'cfo_daily_board_fin.php'); ?>
 
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:12px">
+    <div class="fin-cfo-grid">
         <?php foreach ($cards as $c): list($icon, $val, $lbl, $tone, $href) = $c;
-            $color = $tone === 'ok' ? '#166534' : ($tone === 'err' ? '#991b1b' : '#92400e'); ?>
-        <a href="<?php echo $href; ?>" style="text-decoration:none;color:inherit">
-            <div class="card" style="height:100%"><div class="card-body" style="text-align:center">
-                <i class="fas <?php echo $icon; ?>" style="font-size:20px;opacity:.65"></i>
-                <div style="font-size:22px;font-weight:800;margin:6px 0;color:<?php echo $color; ?>"><?php echo htmlspecialchars($val); ?></div>
-                <div class="text-muted" style="font-size:13px"><?php echo htmlspecialchars($lbl); ?></div>
+            $toneCls = $tone === 'ok' ? 'fin-cfo-ok' : ($tone === 'err' ? 'fin-cfo-err' : 'fin-cfo-warn'); ?>
+        <a class="fin-cfo-cardlink" href="<?php echo $href; ?>">
+            <div class="card fin-cfo-card"><div class="card-body fin-cfo-cardbody">
+                <i class="fas fin-cfo-icon <?php echo $icon; ?>"></i>
+                <div class="fin-cfo-figure <?php echo $toneCls; ?>"><?php echo htmlspecialchars($val); ?></div>
+                <div class="text-muted fin-cfo-cardlabel"><?php echo htmlspecialchars($lbl); ?></div>
             </div></div>
         </a>
         <?php endforeach; ?>
@@ -132,9 +151,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php include __DIR__ . '/../includes/role_board_widgets.php'; ?>
 
-    <div class="card" style="margin-top:14px"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-clipboard-check"></i> جدول القرار اليومي</h5>
-        <div class="table-container"><table class="alltables" style="width:100%">
+    <div class="card fin-cfo-panel"><div class="card-body">
+        <h5 class="fin-cfo-h5"><i class="fas fa-clipboard-check"></i> جدول القرار اليومي</h5>
+        <div class="table-container"><table class="alltables fin-cfo-table">
             <thead><tr><th>القرار</th><th>المؤشر</th><th>أين يُتّخذ</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>

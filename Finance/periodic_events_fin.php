@@ -88,17 +88,31 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة */
+.fin-per-lead { color: var(--c-4b5563); line-height: 1.8; margin: 0 0 10px; }
+.fin-per-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.fin-per-runbar { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.fin-per-inline-form { display: inline; }
+.fin-per-req { color: var(--c-state-danger-strong); }
+.fin-per-actions { margin-top: 12px; }
+.fin-per-table { width: 100%; }
+.fin-per-ltr { direction: ltr; }
+.fin-per-gap { margin-top: 12px; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'الدوريات المالية'; $header_icon = 'fa fa-repeat';
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+    echo ems_states_bundle('لا دورياتِ ماليةً مولّدةً لهذه الفترة', 'اخترِ الفترةَ ثم شغّلْ دوريةً من أزرارِ التشغيلِ أعلاه — ولا مخصصَ بلا قاعدةٍ سارية');
     ?>
     <?php fin_msg_banner(); ?>
 
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;line-height:1.8;margin:0 0 10px">
+        <p class="fin-per-lead">
             <i class="fas fa-circle-info"></i>
             ثلاثُ دورياتٍ <strong>كلٌّ بمفتاحها الذي يمنع التكرار</strong>:
             مخصصُ الصيانة <code>(المعدة × الفترة)</code> · قسطُ التمويل <code>(الالتزام × القسط)</code> ·
@@ -106,19 +120,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             و<strong>لا كتابةَ يدويةً على الدفتر</strong>: كلُّ مبلغٍ محسوبٌ من مصدره —
             ولا يقع شيءٌ منها في <strong>فترةٍ مقفلة</strong>.
         </p>
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="fin-per-filter">
             <label for="emsf_254_00734">الفترة:</label>
-            <input type="month" name="period" value="<?php echo htmlspecialchars($period); ?>" id="emsf_254_00734">
+            <input type="month" name="period" aria-label="فترةُ عرضِ الدوريات" value="<?php echo htmlspecialchars($period); ?>" id="emsf_254_00734">
             <button type="submit" class="btn-primary"><i class="fa fa-filter"></i> اعرض</button>
         </form>
         <?php if ($can_edit): ?>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">
+        <div class="fin-per-runbar">
             <?php foreach (array(
                 'provisions'   => array('مخصصُ الصيانة', 'fa-screwdriver-wrench'),
                 'installments' => array('أقساطُ التمويل المستحقة', 'fa-file-invoice-dollar'),
                 'tax_return'   => array('الإقرارُ الضريبي', 'fa-percent'),
             ) as $k => $v): ?>
-            <form method="post" style="display:inline">
+            <form method="post" class="fin-per-inline-form">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="per_action" value="<?php echo $k; ?>">
                 <input type="hidden" name="period" value="<?php echo htmlspecialchars($period); ?>">
@@ -143,14 +157,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="number" name="equipment_type" min="0" value="0" id="emsf_256_a476e"></div>
                 <div class="form-group"><label for="emsf_257_a43c9">الأساس</label>
                     <select name="basis" id="emsf_257_a43c9"><option value="hour">ساعة</option><option value="unit">وحدة</option></select></div>
-                <div class="form-group"><label for="emsf_258_b3336">المعدّل <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_258_b3336">المعدّل <span class="fin-per-req">*</span></label>
                     <input type="number" name="rate" step="0.0001" min="0.0001" required id="emsf_258_b3336"></div>
                 <div class="form-group"><label for="emsf_259_38d9e">العملة</label><input type="text" name="currency" value="SDG" maxlength="8" id="emsf_259_38d9e"></div>
-                <div class="form-group"><label for="emsf_260_e7a32">سريان من <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_260_e7a32">سريان من <span class="fin-per-req">*</span></label>
                     <input type="date" name="effective_from" required id="emsf_260_e7a32"></div>
                 <div class="form-group"><label for="emsf_261_3ad4a">مرجعُ القاعدة</label><input type="text" name="note" maxlength="200" id="emsf_261_3ad4a"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> أضف القاعدة</button></div>
+            <div class="fin-per-actions"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> أضف القاعدة</button></div>
         </form>
     </div></div>
     <?php endif; ?>
@@ -159,7 +173,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         ① قواعدُ المخصص ومخصصاتُ <?php echo htmlspecialchars($period); ?></h5></div>
     <div class="card-body">
         <div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable fin-per-table" data-no-dt="1">
             <thead><tr><th>القاعدة</th><th>المعدة</th><th>النوع</th><th>الأساس</th><th>المعدّل</th>
                 <th>السريان</th><th>الحال</th></tr></thead>
             <tbody>
@@ -170,7 +184,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?php echo (string)$r['basis'] === 'hour' ? 'ساعة' : 'وحدة'; ?></td>
                     <td><strong><?php echo htmlspecialchars((string)$r['rate']); ?></strong>
                         <?php echo htmlspecialchars((string)$r['currency']); ?></td>
-                    <td style="direction:ltr"><?php echo htmlspecialchars((string)$r['effective_from']); ?>
+                    <td class="fin-per-ltr"><?php echo htmlspecialchars((string)$r['effective_from']); ?>
                         → <?php echo htmlspecialchars((string)($r['effective_to'] ?? '…')); ?></td>
                     <td><?php echo (string)$r['state'] === 'active'
                         ? '<span class="badge badge-success">سارية</span>'
@@ -180,8 +194,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tbody>
         </table>
         </div>
-        <div class="table-container" style="margin-top:12px">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <div class="table-container fin-per-gap">
+        <table class="alltables display nowrap no-datatable fin-per-table" data-no-dt="1">
             <thead><tr><th>المعدة</th><th>الأساس</th><th>الكمية</th><th>المعدّل</th><th>المبلغ</th>
                 <th>القاعدة</th><th>الحدث</th></tr></thead>
             <tbody>
@@ -206,7 +220,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-file-invoice-dollar"></i>
         ② أقساطُ التمويل المستحقة حتى نهاية <?php echo htmlspecialchars($period); ?></h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable fin-per-table" data-no-dt="1">
             <thead><tr><th>الالتزام</th><th>القسط</th><th>الاستحقاق</th><th>الأصل</th><th>الربح</th>
                 <th>الإجمالي</th><th>الحال</th><th>الاعتراف</th></tr></thead>
             <tbody>
@@ -231,7 +245,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-percent"></i>
         ③ الإقراراتُ الضريبية</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable fin-per-table" data-no-dt="1">
             <thead><tr><th>الفترة</th><th>المبيعاتُ الخاضعة</th><th>ضريبةُ المخرجات</th>
                 <th>المشتريات</th><th>ضريبةُ المدخلات</th><th>الصافي</th><th>الحركات</th>
                 <th>الحال</th><th>الحدث</th>

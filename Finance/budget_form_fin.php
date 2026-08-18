@@ -141,6 +141,20 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
+<style>
+/* UXW-01 ②: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة */
+.fin-bud-span-all { grid-column: 1 / -1; }
+.fin-bud-lines-wrap { margin-top: 10px; }
+.fin-bud-table { width: 100%; }
+.fin-bud-h5 { margin: 0 0 10px; }
+.fin-bud-h5-var { margin: 18px 0 10px; }
+.fin-bud-note { margin: 0 0 10px; }
+.fin-bud-inline-form { display: inline; }
+.fin-bud-why { font-size: 12px; }
+.fin-bud-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.fin-bud-returned { color: var(--c-7c2d12); font-size: 12px; margin-top: 4px; }
+</style>
+
 <div class="main fin-budget-main ems-unified-page-shell">
     <?php
     $header_title = 'الميزانية والانحراف';
@@ -156,6 +170,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا موازناتٍ مسجَّلةً لقسمك بعدُ', 'أنشئ موازنةً بزرِّ «إنشاء ميزانية» في رأسِ الشاشة ثم ارفعها للمالية');
     ?>
 
     <?php fin_msg_banner(); ?>
@@ -192,17 +208,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <label for="b_pno">رقم الفترة (ربع/شهر)</label>
                         <input type="number" name="period_no" id="b_pno" min="1" max="12" placeholder="اختياري">
                     </div>
-                    <div class="form-group" style="grid-column:1/-1">
+                    <div class="form-group fin-bud-span-all">
                         <label for="b_note">ملاحظة</label>
                         <input type="text" name="note" id="b_note">
                     </div>
                 </div>
             </div>
 
-            <div class="table-container" style="margin-top:10px;">
+            <div class="table-container fin-bud-lines-wrap">
                 <!-- جدولُ بنودٍ ديناميكيٌّ لا جدولَ عرض: لا يُهيَّأ DataTable البتّة،
                      وإلا محا إعادةُ الرسم صفوفَ البنود التي يضيفها bAddLine. -->
-                <table class="alltables no-datatable" data-no-dt="1" style="width:100%;" id="b_lines">
+                <table class="alltables no-datatable ems-no-enhance fin-bud-table" data-no-dt="hard" id="b_lines">
                     <thead><tr><th>النوع</th><th>الفئة</th><th>المبلغ المخطّط</th><th></th></tr></thead>
                     <tbody id="b_lines_body"></tbody>
                 </table>
@@ -217,7 +233,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-list"></i> الميزانيات</h5>
+        <h5 class="fin-bud-h5"><i class="fas fa-list"></i> الميزانيات</h5>
         <?php
         // النطاق: كلُّ إدارةٍ ترى موازنتَها وحدها؛ والمُجيزُ يرى الكلَّ
         $budget_rows = fin_gate($is_super_admin)->select('fin_budgets', array('orderBy' => 'id DESC'));
@@ -230,11 +246,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         // أعمدة الترويسة، فيرمي DataTables استثناءً يُجهض بقيةَ مُعالج ready —
         // ومنه ربطُ زرِّ فتح الفورم. الجدولُ الفارغُ يعرض رسالةَ ar.json بنفسه.
         if (!$budget_rows) {
-            echo "<p class='text-muted' style='margin:0 0 10px'>لا موازناتٍ لقسمك بعد — ابدأ بإنشاء موازنةٍ ثم ارفعها للمالية.</p>";
+            echo "<p class='text-muted fin-bud-note'>لا موازناتٍ لقسمك بعد — ابدأ بإنشاء موازنةٍ ثم ارفعها للمالية.</p>";
         }
         ?>
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="finTable" class="display nowrap alltables fin-bud-table">
                 <thead><tr>
                     <th>الإجراءات</th><th>الرقم</th><th>الإدارة</th><th>الفترة</th><th>السنة</th>
                     <th>مخطّط إيراد</th><th>مخطّط مصروف</th><th>الحالة</th>
@@ -262,7 +278,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         ob_start();
                         // ① رفعٌ من الإدارة — مسودةً كانت أو معادة
                         if ($can_edit && $mine && !$is_approver && in_array($st, fin_budget_editable_states(), true)) {
-                            echo "<form method='post' style='display:inline' onsubmit='return confirm(\"رفعُ الموازنة للمالية؟ لن تستطيع تعديلَ بنودها بعده.\")'>" . csrf_field()
+                            echo "<form method='post' class='fin-bud-inline-form' onsubmit='return confirm(\"رفعُ الموازنة للمالية؟ لن تستطيع تعديلَ بنودها بعده.\")'>" . csrf_field()
                                . "<input type='hidden' name='bg_action' value='submit'>"
                                . "<input type='hidden' name='id' value='" . intval($row['id']) . "'>"
                                . "<button type='submit' class='action-btn edit' title='رفعٌ للمالية'><i class='fas fa-paper-plane'></i></button></form>";
@@ -271,11 +287,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         //    المرفوعة وحدها، وبشرط ألّا يكون القسمُ قسمَه هو.
                         $self_owned = fin_budget_self_owned($ctx['role'], strval($row['dept_module']), $is_super_admin);
                         if ($is_approver && $st === 'submitted' && $can_edit && !$self_owned) {
-                            echo "<form method='post' style='display:inline' onsubmit='return confirm(\"إجازةُ الموازنة كمرجعٍ حاكم؟\")'>" . csrf_field()
+                            echo "<form method='post' class='fin-bud-inline-form' onsubmit='return confirm(\"إجازةُ الموازنة كمرجعٍ حاكم؟\")'>" . csrf_field()
                                . "<input type='hidden' name='bg_action' value='approve'>"
                                . "<input type='hidden' name='id' value='" . intval($row['id']) . "'>"
                                . "<button type='submit' class='action-btn edit' title='إجازة'><i class='fas fa-gavel'></i></button></form>";
-                            echo "<form method='post' style='display:inline' onsubmit='var r=prompt(\"سببُ الإعادة (تقرؤه الإدارة):\");if(!r)return false;this.reason.value=r;'>" . csrf_field()
+                            echo "<form method='post' class='fin-bud-inline-form' onsubmit='var r=prompt(\"سببُ الإعادة (تقرؤه الإدارة):\");if(!r)return false;this.reason.value=r;'>" . csrf_field()
                                . "<input type='hidden' name='bg_action' value='return'>"
                                . "<input type='hidden' name='id' value='" . intval($row['id']) . "'>"
                                . "<input type='hidden' name='reason' value=''>"
@@ -307,9 +323,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             } else {
                                 $why = '—';
                             }
-                            $btns = "<span class='text-muted' style='font-size:12px'>{$why}</span>";
+                            $btns = "<span class='text-muted fin-bud-why'>{$why}</span>";
                         }
-                        echo "<td><div class='action-btns' style='display:flex;gap:6px;flex-wrap:wrap;align-items:center'>"
+                        echo "<td><div class='action-btns fin-bud-actions'>"
                            . $btns . "</div></td>";
                         echo "<td>" . htmlspecialchars((string)$row['budget_no']) . "</td>";
                         echo "<td>" . htmlspecialchars($dept_modules[$row['dept_module']] ?? $row['dept_module']) . "</td>";
@@ -320,7 +336,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td><span class='badge badge-" . $st_tone . "'>" . htmlspecialchars($budget_states[$st] ?? $st) . "</span>";
                         // سببُ الإعادة بارزٌ فوق كل شيءٍ للإدارة (الدستور §4.3)
                         if ($st === 'returned' && !empty($row['return_reason'])) {
-                            echo "<div style='color:#7C2D12;font-size:12px;margin-top:4px'><i class='fas fa-rotate-left'></i> أُعيدت لاستكمال: "
+                            echo "<div class='fin-bud-returned'><i class='fas fa-rotate-left'></i> أُعيدت لاستكمال: "
                                . htmlspecialchars((string)$row['return_reason']) . "</div>";
                         }
                         echo "</td>";
@@ -331,9 +347,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
 
-        <h5 style="margin:18px 0 10px"><i class="fas fa-triangle-exclamation"></i> مراقبة الانحراف (المخطّط مقابل الفعلي)</h5>
+        <h5 class="fin-bud-h5-var"><i class="fas fa-triangle-exclamation"></i> مراقبة الانحراف (المخطّط مقابل الفعلي)</h5>
         <div class="table-container">
-            <table id="varTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="varTable" class="display nowrap alltables fin-bud-table">
                 <thead><tr>
                     <th>الميزانية</th><th>النوع</th><th>الفئة</th><th>مخطّط</th><th>فعلي</th><th>الانحراف</th><th>النسبة %</th><th>الحالة</th>
                 </tr></thead>
@@ -372,9 +388,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <template id="b_line_tpl">
     <tr class="b-line">
-        <td><select name="line_kind[]" class="b-kind"><option value="expense">مصروف</option><option value="revenue">إيراد</option></select></td>
-        <td><select name="category[]" class="b-cat"><?php foreach ($categories as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></td>
-        <td><input type="number" step="0.01" min="0" name="planned[]" class="b-planned" value="0"></td>
+        <td><select name="line_kind[]" aria-label="نوعُ البند — إيرادٌ أو مصروف" class="b-kind"><option value="expense">مصروف</option><option value="revenue">إيراد</option></select></td>
+        <td><select name="category[]" aria-label="فئةُ البند" class="b-cat"><?php foreach ($categories as $k => $v) echo "<option value='" . htmlspecialchars($k) . "'>" . htmlspecialchars($v) . "</option>"; ?></select></td>
+        <td><input type="number" step="0.01" min="0" name="planned[]" aria-label="المبلغُ المخطّطُ للبند" class="b-planned" value="0"></td>
         <td><a href="javascript:void(0)" class="action-btn delete b-del" title="حذف"><i class="fas fa-times"></i></a></td>
     </tr>
 </template>
@@ -400,12 +416,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         if (toggleBtn) { toggleBtn.addEventListener('click', function () { $('#finForm').toggleClass('allforms-visible'); }); }
         $(document).on('click', '.b-del', function () { $(this).closest('tr').remove(); });
         bAddLine(); bAddLine();
-        // ② جداولُ العرض بعده
-        $('#finTable, #varTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
+        // ② جداولُ العرض يهيّئها المكوّنُ المركزيُّ (assets/js/ui-unification.js)
+        //    وجدولُ البنودِ الديناميكيُّ مستثنًى صراحةً بـdata-no-dt="hard".
     });
     window.finToggleForm = function () { $('#finForm').toggleClass('allforms-visible'); };
 })();

@@ -59,11 +59,11 @@ if (!in_array($role, $allowed_roles)) {
 // (قرارُ المالك 2026-08-12 · `SPEC_TIMESHEET_CYCLE §TS-13`).
 $role_level_map  = ems_hours_role_level_map();
 $level_role_name = [
-    1 => ['label' => 'مدير المشاريع',   'color' => '#0B1E3F', 'icon' => 'fa-user-tie'],
-    2 => ['label' => 'مدير الموردين',   'color' => '#A8541C', 'icon' => 'fa-truck-medical'],
-    3 => ['label' => 'مدير الأسطول',    'color' => '#475569', 'icon' => 'fa-truck'],
-    4 => ['label' => 'مدير المشغلين',   'color' => '#5B7F1E', 'icon' => 'fa-shield-halved'],
-    5 => ['label' => 'مدير المبيعات',   'color' => '#7C2D12', 'icon' => 'fa-file-signature'],
+    1 => ['label' => 'مدير المشاريع',   'color' => 'var(--c-0b1e3f, #0B1E3F)', 'icon' => 'fa-user-tie'],
+    2 => ['label' => 'مدير الموردين',   'color' => 'var(--c-a8541c)', 'icon' => 'fa-truck-medical'],
+    3 => ['label' => 'مدير الأسطول',    'color' => 'var(--c-ink-600)', 'icon' => 'fa-truck'],
+    4 => ['label' => 'مدير المشغلين',   'color' => 'var(--c-5b7f1e)', 'icon' => 'fa-shield-halved'],
+    5 => ['label' => 'مدير المبيعات',   'color' => 'var(--c-7c2d12)', 'icon' => 'fa-file-signature'],
 ];
 $FINAL_LEVEL = EMS_HOURS_APPROVAL_FINAL_LEVEL;
 
@@ -360,6 +360,79 @@ include('../inheader.php');
   width: max-content !important;
   min-width: 100%;
 }
+
+/* UXW-01 ②·①: أنماطُ الشاشةِ منقولةً من السماتِ الموضعيةِ إلى أصنافٍ برموزِ الألوان */
+.hours-approval-main .ha-mb16 { margin-bottom: 16px; }
+.hours-approval-main .ha-mb0  { margin-bottom: 0; }
+.hours-approval-main .ha-steps-wrap { border-radius: 8px; overflow: hidden; }
+.hours-approval-main .ha-stat-1 { border-color: var(--c-a8541c); }
+.hours-approval-main .ha-stat-1 .stat-icon { background: var(--c-a8541c); }
+.hours-approval-main .ha-stat-2 { border-color: var(--c-5b7f1e); }
+.hours-approval-main .ha-stat-2 .stat-icon { background: var(--c-5b7f1e); }
+.hours-approval-main .ha-stat-3 { border-color: var(--c-0b1e3f, #0B1E3F); }
+.hours-approval-main .ha-stat-3 .stat-icon { background: var(--c-0b1e3f, #0B1E3F); }
+.hours-approval-main .ha-stat-4 { border-color: var(--c-ink-600); }
+.hours-approval-main .ha-stat-4 .stat-icon { background: var(--c-ink-600); }
+.hours-approval-main .ha-toolbar-card {
+  background: var(--c-f8f9fa);
+  border-right: 4px solid var(--c-0b1e3f, #0B1E3F);
+  padding-bottom: 0;
+}
+.hours-approval-main .ha-lbl-140 { min-width: 140px; }
+.hours-approval-main .ha-sel-200 { max-width: 200px; }
+.hours-approval-main .ha-fs-82 { font-size: .82rem; }
+.hours-approval-main .ha-fs-75 { font-size: .75rem; }
+.hours-approval-main .ha-fs-68 { font-size: .68rem; }
+.hours-approval-main .ha-fb-100 { flex-basis: 100%; }
+.hours-approval-main .ha-ico-pending   { background: var(--c-fd7e14, #fd7e14); }
+.hours-approval-main .ha-badge-pending { background: var(--c-fd7e14, #fd7e14); }
+.hours-approval-main .ha-ico-approved   { background: var(--c-5b7f1e); }
+.hours-approval-main .ha-badge-approved { background: var(--c-5b7f1e); }
+.hours-approval-main .ha-w100 { width: 100%; }
+.hours-approval-main .ha-w36  { width: 36px; }
+.hours-approval-main .ha-w44  { width: 44px; }
+.hours-approval-main .ha-nw   { white-space: nowrap; }
+.hours-approval-main .ha-tc   { text-align: center; }
+.hours-approval-main .ha-mw120 { max-width: 120px; }
+.hours-approval-main .ha-mw100 { max-width: 100px; }
+.hours-approval-main .ha-shift {
+  padding: 2px 8px; border-radius: 12px; font-size: .75rem; font-weight: 600;
+}
+.hours-approval-main .ha-shift-day   { background: var(--c-fff3cd); color: var(--c-856404, #856404); }
+.hours-approval-main .ha-shift-night { background: var(--c-d1ecf1, #d1ecf1); color: var(--c-0c5460, #0c5460); }
+.hours-approval-main .ha-t-actual  { color: var(--c-state-ok);   font-weight: 700; }
+.hours-approval-main .ha-t-standby { color: var(--c-state-info); font-weight: 700; }
+.hours-approval-main .ha-t-stop    { color: var(--c-ink-500);    font-weight: 700; }
+.hours-approval-main .ha-t-sep     { color: var(--c-9ca3af); }
+.hours-approval-main .ha-flag-badge {
+  background: var(--c-f0b429, #f0b429); color: var(--c-7c2d12); cursor: pointer;
+}
+.hours-approval-main .ha-ico-danger { color: var(--c-dc3545); font-size: .85rem; }
+.hours-approval-main .ha-ico-ok     { color: var(--c-059669); font-size: .9rem; }
+.hours-approval-main .ha-note-active { color: var(--c-ffaa33, #ffaa33); }
+.hours-approval-main .ha-ico-xs  { font-size: .5rem; }
+.hours-approval-main .ha-ico-xxs { font-size: .38rem; }
+.hours-approval-main .ha-ico-mr3 { margin-right: 3px; }
+.hours-approval-main .ha-btn-return {
+  background: var(--c-fef3c7);
+  border: 1px solid var(--c-f0b429, #f0b429);
+  color: var(--c-92400e);
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+.hours-approval-main .ha-meta-date { font-size: .78rem; color: var(--c-6c757d); }
+
+/* المودالاتُ والتنبيهاتُ خارجَ حاويةِ .hours-approval-main فلا تُقيَّد بها */
+.ha-mh-danger { border-bottom: 2px solid var(--c-f8d7da, #f8d7da); }
+.ha-mh-warn   { background: var(--c-fef3c7); }
+.ha-mh-info   { background: var(--c-e0e7ff, #e0e7ff); }
+.ha-ico-warn  { color: var(--c-b45309); }
+.ha-note-p    { font-size: .85rem; color: var(--c-ink-500); }
+.ha-fs-85     { font-size: .85rem; }
+.ha-hidden    { display: none; }
+.ha-toast-wrap { z-index: 9999; }
+.ha-reject-reason { border-color: var(--c-dee2e6); }
+.ha-reject-reason.ha-invalid { border-color: var(--c-dc3545); }
 </style>
 
 <!-- ============================================================
@@ -387,11 +460,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   // TKT-15 · زر الإبلاغ السياقي — الاعتمادات (§2-⑥)
   require_once __DIR__ . '/../includes/report_button.php';
   ems_report_button(array('screen' => 'approvals'));
+  // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+  echo ems_states_bundle('لا سجلَّ ساعاتٍ في نطاقِ اعتمادِك الآن', 'وسِّعْ فلترَ نوعِ المعدة، أو انتظرْ اعتمادَ المستوى السابقِ في السلسلة');
   ?>
 
   <?php /* E-08-أ: موضعُ الأسباب المفصَّلة للصفوف الموقوفة — يملؤه renderBlocked()
            من `blocked[].reasons`. يبقى فارغًا حتى يقع حجبٌ فعليّ. */ ?>
-  <div id="blocked-panel" class="alert alert-warning d-none" role="alert" style="margin-bottom:16px">
+  <div id="blocked-panel" class="alert alert-warning d-none ha-mb16" role="alert">
     <div class="d-flex justify-content-between align-items-start">
       <h6 class="fw-bold mb-2"><i class="fa fa-ban me-1"></i> صفوفٌ لم تُعتمد — والسببُ لكلٍّ منها:</h6>
       <button type="button" class="btn-close" aria-label="إغلاق"
@@ -413,7 +488,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   </div>
 
   <!-- ── شريط التقدم الهرمي ── -->
-  <div class="approval-steps mb-4" style="border-radius:8px;overflow:hidden;">
+  <div class="approval-steps mb-4 ha-steps-wrap">
     <?php foreach ($level_role_name as $lvl => $info):
       $cls = '';
       if (!$is_admin) {
@@ -423,7 +498,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           $cls = 'done';
       }
     ?>
-    <div class="approval-step <?= $cls ?>"
+    <div class="approval-step <?= $cls ?>" data-allow-style
          style="background:<?= $info['color'] ?>;">
       <div>
         <div class="step-num mx-auto"><?= $lvl ?></div>
@@ -436,8 +511,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <!-- ── بطاقات الإحصاء ── -->
   <div class="row g-3 mb-4">
     <div class="col-sm-6 col-lg-3">
-      <div class="stat-card" style="border-color:#A8541C;">
-        <div class="stat-icon" style="background:#A8541C;"><i class="fa fa-hourglass-half"></i></div>
+      <div class="stat-card ha-stat-1">
+        <div class="stat-icon"><i class="fa fa-hourglass-half"></i></div>
         <div>
           <div class="stat-val"><?= count($pending_rows) ?></div>
           <div class="stat-label">قيد الاعتماد</div>
@@ -445,8 +520,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
       </div>
     </div>
     <div class="col-sm-6 col-lg-3">
-      <div class="stat-card" style="border-color:#5B7F1E;">
-        <div class="stat-icon" style="background:#5B7F1E;"><i class="fa fa-check-circle"></i></div>
+      <div class="stat-card ha-stat-2">
+        <div class="stat-icon"><i class="fa fa-check-circle"></i></div>
         <div>
           <div class="stat-val"><?= count($approved_rows) ?></div>
           <div class="stat-label">معتمد نهائياً (آخر 100)</div>
@@ -454,8 +529,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
       </div>
     </div>
     <div class="col-sm-6 col-lg-3">
-      <div class="stat-card" style="border-color:#0B1E3F;">
-        <div class="stat-icon" style="background:#0B1E3F;"><i class="fa fa-layer-group"></i></div>
+      <div class="stat-card ha-stat-3">
+        <div class="stat-icon"><i class="fa fa-layer-group"></i></div>
         <div>
           <div class="stat-val"><?= $is_admin ? $FINAL_LEVEL : $my_level ?></div>
           <div class="stat-label">مستوى الاعتماد الحالي</div>
@@ -463,8 +538,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
       </div>
     </div>
     <div class="col-sm-6 col-lg-3">
-      <div class="stat-card" style="border-color:#475569;">
-        <div class="stat-icon" style="background:#475569;"><i class="fa fa-comment-dots"></i></div>
+      <div class="stat-card ha-stat-4">
+        <div class="stat-icon"><i class="fa fa-comment-dots"></i></div>
         <div>
           <div class="stat-val" id="total-notes-count">—</div>
           <div class="stat-label">إجمالي الملاحظات</div>
@@ -474,13 +549,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   </div>
 
   <!-- ── شريط الأدوات والفلاتر المدمجة ── -->
-  <div class="table-card" style="background:#f8f9fa;border-right:4px solid #0B1E3F;padding-bottom:0;">
+  <div class="table-card ha-toolbar-card">
     <!-- التصفية حسب نوع المعدة -->
     <div class="toolbar-row">
-      <label for="equip_type" class="fw-semibold mb-0" style="min-width:140px;">
+      <label for="equip_type" class="fw-semibold mb-0 ha-lbl-140">
         <i class="fa fa-filter me-1"></i>نوع المعدة:
       </label>
-      <select name="equip_type" id="equip_type" class="form-select form-select-sm" style="max-width:200px;">
+      <select name="equip_type" id="equip_type" class="form-select form-select-sm ha-sel-200">
         <option value="0" <?= $equip_type_filter === 0 ? 'selected' : '' ?>>الكل</option>
         <option value="1" <?= $equip_type_filter === 1 ? 'selected' : '' ?>>حفارات</option>
         <option value="2" <?= $equip_type_filter === 2 ? 'selected' : '' ?>>قلابات</option>
@@ -498,23 +573,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <!-- شريط إظهار/إخفاء مجموعات الأعمدة -->
-    <div class="toolbar-row" style="margin-bottom:0;">
-      <span class="fw-semibold text-muted me-2" style="font-size:.82rem;">
+    <div class="toolbar-row ha-mb0">
+      <span class="fw-semibold text-muted me-2 ha-fs-82">
         <i class="fa fa-table-columns me-1"></i> الأعمدة الإضافية:
       </span>
-      <button type="button" class="btn-group-toggle" data-group="hours">
+      <button type="button" class="ems-btn-group-toggle" data-group="hours">
         <i class="fa fa-clock"></i> ساعات تفصيلية
       </button>
-      <button type="button" class="btn-group-toggle" data-group="faults">
+      <button type="button" class="ems-btn-group-toggle" data-group="faults">
         <i class="fa fa-tools"></i> الأعطال
       </button>
-      <button type="button" class="btn-group-toggle" data-group="notes">
+      <button type="button" class="ems-btn-group-toggle" data-group="notes">
         <i class="fa fa-sticky-note"></i> ملاحظات
       </button>
-      <button type="button" class="btn-group-toggle-all">
+      <button type="button" class="ems-btn-group-toggle-all">
         <i class="fa fa-eye"></i> الكل
       </button>
-      <small class="text-muted ms-auto" style="font-size:.75rem;">
+      <small class="text-muted ms-auto ha-fs-75">
         <i class="fa fa-info-circle me-1"></i> المجموع = الساعات المنفذة + الانتظار
       </small>
     </div>
@@ -572,7 +647,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <button type="button" class="btn-secondary" title="إعادة تعيين" onclick="resetFilters()"><i class="fa fa-rotate-left"></i></button>
       </div>
 
-      <span class="active-filters-info" id="active-filters-info" style="flex-basis:100%;">
+      <span class="active-filters-info ha-fb-100" id="active-filters-info">
         <i class="fa fa-check-circle me-1"></i>
         <span id="active-filters-text"></span>
       </span>
@@ -584,7 +659,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   ══════════════════════════════════════════════════════════ -->
   <div class="table-card">
     <div class="card-header-custom">
-      <div class="ch-icon" style="background:#fd7e14;"><i class="fa fa-hourglass-half"></i></div>
+      <div class="ch-icon ha-ico-pending"><i class="fa fa-hourglass-half"></i></div>
       <div>
         <h5>سجلات التايمشيت — قيد الاعتماد</h5>
         <small class="text-muted">
@@ -597,7 +672,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           <?php endif; ?>
         </small>
       </div>
-      <span class="badge-count badge" style="background:#fd7e14;"><?= count($pending_rows) ?> سجل</span>
+      <span class="badge-count badge ha-badge-pending"><?= count($pending_rows) ?> سجل</span>
     </div>
 
     <!-- شريط الأدوات -->
@@ -618,12 +693,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- الجدول -->
     <div class="table-wrap">
-      <table id="tbl-pending" class="ha-table display nowrap" style="width:100%">
+      <table id="tbl-pending" class="ha-table display nowrap ha-w100">
         <thead>
           <tr>
             <?php if (!$is_admin && !$is_site_manager): ?>
-            <th class="nosort" style="width:36px;">
-              <input type="checkbox" id="chk-all-pending" onchange="toggleAllPending(this)">
+            <th class="nosort ha-w36">
+              <input type="checkbox" id="chk-all-pending" aria-label="تحديدُ كلِّ السجلاتِ المعروضةِ للاعتماد" onchange="toggleAllPending(this)">
             </th>
             <?php endif; ?>
             <th>#</th>
@@ -635,7 +710,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th>المشغل</th>
             <?php if ($box_on): ?>
             <th class="nosort" title="من سطور السجل القانوني">توزيع الزمن</th>
-            <th class="nosort" style="width:44px;">⚠</th>
+            <th class="nosort ha-w44">⚠</th>
             <?php endif; ?>
             <th>المنفذة</th>
             <th>الانتظار</th>
@@ -654,7 +729,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <th class="col-g-notes nosort">ملاحظات العمل</th>
             <th class="col-g-faults nosort">ملاحظات الأعطال</th>
             <th class="nosort">ملاحظات</th>
-            <th class="nosort" style="white-space:nowrap;">الاعتماد والتفاصيل</th>
+            <th class="nosort ha-nw">الاعتماد والتفاصيل</th>
             <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
             <th class="ems-gov-th none" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
             <th class="ems-gov-th none" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
@@ -689,7 +764,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               data-equip="<?= htmlspecialchars($_prow_equip) ?>">
             <?php if (!$is_admin && !$is_site_manager): ?>
             <td>
-              <input type="checkbox" class="row-chk" value="<?= $row['id'] ?>"
+              <input type="checkbox" class="row-chk" aria-label="تحديدُ هذا السجلِّ للاعتماد" value="<?= $row['id'] ?>"
                      onchange="updateSelCount()">
             </td>
             <?php endif; ?>
@@ -698,36 +773,34 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td>
               <?php $shift = $row['shift'] ?? '';
                     $shift_ar = ($shift === 'D') ? 'نهاري' : (($shift === 'N') ? 'ليلي' : $shift);
-                    $shift_bg = ($shift === 'D') ? '#fff3cd' : '#d1ecf1';
-                    $shift_clr= ($shift === 'D') ? '#856404' : '#0c5460';
+                    $shift_cls = ($shift === 'D') ? 'ha-shift-day' : 'ha-shift-night';
               ?>
-              <span style="background:<?=$shift_bg?>;color:<?=$shift_clr?>;padding:2px 8px;border-radius:12px;font-size:.75rem;font-weight:600;">
+              <span class="ha-shift <?= $shift_cls ?>">
                 <?= $shift_ar ?>
               </span>
             </td>
-            <td><span class="text-truncate d-block" style="max-width:120px;" title="<?= htmlspecialchars($row['project_name'] ?? '') ?>"><?= htmlspecialchars($row['project_name'] ?? '—') ?></span></td>
+            <td><span class="text-truncate d-block ha-mw120" title="<?= htmlspecialchars($row['project_name'] ?? '') ?>"><?= htmlspecialchars($row['project_name'] ?? '—') ?></span></td>
             <td><?= htmlspecialchars($row['supplier_name'] ?? '—') ?></td>
             <td><?= htmlspecialchars(trim(($row['equip_code'] ?? '') . ' ' . ($row['equip_name'] ?? ''))) ?: '—' ?></td>
             <td><?= htmlspecialchars($row['driver_name'] ?? '—') ?></td>
             <?php if ($box_on):
               // §5.2: ملخّصُ الزمن من السجل القانوني + شارةُ تجاوز الطاقة
               $_bx = $box_map[intval($row['id'])] ?? null; ?>
-            <td style="white-space:nowrap;" data-order="0">
+            <td class="ha-nw" data-order="0">
               <?php if ($_bx): $_t = $_bx['time']; ?>
-                <span title="تشغيل فعلي" style="color:#16a34a;font-weight:700;"><?= $_t['actual'] ?></span>
-                <span style="color:#9ca3af;">·</span>
-                <span title="استعداد" style="color:#2563eb;font-weight:700;"><?= $_t['standby'] ?></span>
-                <span style="color:#9ca3af;">·</span>
-                <span title="توقف" style="color:#6b7280;font-weight:700;"><?= $_t['stop'] ?></span>
+                <span title="تشغيل فعلي" class="ha-t-actual"><?= $_t['actual'] ?></span>
+                <span class="ha-t-sep">·</span>
+                <span title="استعداد" class="ha-t-standby"><?= $_t['standby'] ?></span>
+                <span class="ha-t-sep">·</span>
+                <span title="توقف" class="ha-t-stop"><?= $_t['stop'] ?></span>
               <?php else: ?>
                 <span class="text-muted" title="صفٌّ سابقٌ للسجل القانوني — لا سطورَ له">—</span>
               <?php endif; ?>
             </td>
-            <td style="text-align:center;">
+            <td class="ha-tc">
               <?php if ($_bx && $_bx['flagged'] && !empty($_bx['flags'])): ?>
-                <span class="badge bx-flag" data-ts-id="<?= intval($row['id']) ?>"
+                <span class="badge bx-flag ha-flag-badge" data-ts-id="<?= intval($row['id']) ?>"
                       data-flags="<?= htmlspecialchars(implode(' · ', $_bx['flags'])) ?>"
-                      style="background:#f0b429;color:#7c2d12;cursor:pointer;"
                       title="<?= htmlspecialchars(implode(' · ', $_bx['flags'])) ?> — لا يُعتمد قبل التخليص (انقر للتخليص)">⚠</span>
               <?php elseif ($_bx && $_bx['flagged']): ?>
                 <span class="badge bg-success" title="كان معلَّمًا وخُلِّص — التفصيل في سجل الأعلام">✓</span>
@@ -743,14 +816,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               $_has_leg = !empty($row['fault_type']) || !empty($row['fault_part']);
               $_bc = $_fc_c > 0 ? $_fc_c : ($_has_leg ? 1 : 0);
             ?>
-            <td style="text-align:center;">
+            <td class="ha-tc">
               <?php if ($_bc > 0): ?>
-                <button class="btn-ghost" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
-                  <i class="fa fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i>
-                  <span class="badge rounded-pill bg-danger" style="font-size:.68rem;"><?= $_bc ?></span>
+                <button class="btn-ghost" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال">
+                  <i class="fa fa-exclamation-triangle ha-ico-danger"></i>
+                  <span class="badge rounded-pill bg-danger ha-fs-68"><?= $_bc ?></span>
                 </button>
               <?php else: ?>
-                <i class="fa fa-check-circle" style="color:#059669;font-size:.9rem;" title="لا توجد أعطال"></i>
+                <i class="fa fa-check-circle ha-ico-ok" title="لا توجد أعطال"></i>
               <?php endif; ?>
             </td>
             <td><?= floatval($row['shift_hours'] ?? 0) ?></td>
@@ -761,29 +834,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><?= floatval($row['hr_fault'] ?? 0) ?></td>
             <td><?= floatval($row['other_fault_hours'] ?? 0) ?></td>
             <td><?= floatval($row['counter_diff'] ?? 0) ?></td>
-            <td style="text-align:center;">
+            <td class="ha-tc">
               <?php if ($_bc > 0): ?>
-                <button class="btn-ghost" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
-                  <i class="fa fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i>
-                  <span class="badge rounded-pill bg-danger" style="font-size:.68rem;"><?= $_bc ?></span>
+                <button class="btn-ghost" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال">
+                  <i class="fa fa-exclamation-triangle ha-ico-danger"></i>
+                  <span class="badge rounded-pill bg-danger ha-fs-68"><?= $_bc ?></span>
                 </button>
               <?php else: ?>
-                <i class="fa fa-check-circle" style="color:#059669;font-size:.9rem;" title="لا توجد أعطال"></i>
+                <i class="fa fa-check-circle ha-ico-ok" title="لا توجد أعطال"></i>
               <?php endif; ?>
             </td>
-            <td class="text-truncate" style="max-width:100px;" title="<?= htmlspecialchars($row['work_notes'] ?? '') ?>"><?= htmlspecialchars($row['work_notes'] ?? '—') ?></td>
-            <td class="text-truncate" style="max-width:100px;" title="<?= htmlspecialchars($row['fault_notes'] ?? '') ?>"><?= htmlspecialchars($row['fault_notes'] ?? '—') ?></td>
+            <td class="text-truncate ha-mw100" title="<?= htmlspecialchars($row['work_notes'] ?? '') ?>"><?= htmlspecialchars($row['work_notes'] ?? '—') ?></td>
+            <td class="text-truncate ha-mw100" title="<?= htmlspecialchars($row['fault_notes'] ?? '') ?>"><?= htmlspecialchars($row['fault_notes'] ?? '—') ?></td>
             <td>
               <button class="btn-ghost" onclick="openNotes(<?= $row['id'] ?>)"
                       title="عرض / إضافة ملاحظة">
-                <i class="fa fa-comment-dots" <?php if (intval($row['notes_count']) > 0): ?>style="color:#ffaa33;"<?php endif; ?>></i>
+                <i class="fa fa-comment-dots<?php if (intval($row['notes_count']) > 0): ?> ha-note-active<?php endif; ?>"></i>
                 <?php if (intval($row['notes_count']) > 0): ?>
                   <span class="note-cnt"><?= $row['notes_count'] ?></span>
                 <?php endif; ?>
               </button>
             </td>
             <!-- عمود مؤشر التقدم البصري وإجراءات الاعتماد -->
-            <td style="white-space:nowrap;">
+            <td class="ha-nw">
               <div class="d-inline-flex align-items-center gap-2">
                 <!-- مؤشر التقدم: 4 دوائر -->
                 <div class="apv-circles">
@@ -792,11 +865,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     $done    = (intval($row['max_approved_level'] ?? 0) >= $lv);
                   ?>
                   <span class="apv-circle-wrap">
-                    <span class="apv-circle <?= $done ? 'apv-done' : 'apv-pending' ?>"
+                    <span class="apv-circle <?= $done ? 'apv-done' : 'apv-pending' ?>" data-allow-style
                           style="border-color:<?= $lv_info['color'] ?>;
-                                  <?php if ($done): ?>background:<?= $lv_info['color'] ?>;color:#fff;<?php endif; ?>"
+                                  <?php if ($done): ?>background:<?= $lv_info['color'] ?>;color:var(--c-surface);<?php endif; ?>"
                           title="<?= $lv_info['label'] ?>">
-                      <i class="fa <?= $lv_info['icon'] ?>" style="font-size:.5rem;"></i>
+                      <i class="fa <?= $lv_info['icon'] ?> ha-ico-xs"></i>
                     </span>
                     <span class="apv-tooltip">
                       <span class="tt-role"><?= $lv_info['label'] ?></span>
@@ -824,9 +897,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                   </button>
                   <?php if ($box_on && isset($box_map[intval($row['id'])])): ?>
                   <!-- §5.2 الثلاثية الموحّدة: اعتماد · إعادة بسبب · رفض بسبب -->
-                  <button class="apv-return" onclick="returnSingle(<?= $row['id'] ?>)"
-                          title="إعادة للاستكمال بسبب — بالرقم نفسه"
-                          style="background:#fef3c7;border:1px solid #f0b429;color:#92400e;border-radius:6px;padding:2px 8px;">
+                  <button class="apv-return ha-btn-return" onclick="returnSingle(<?= $row['id'] ?>)"
+                          title="إعادة للاستكمال بسبب — بالرقم نفسه">
                     <i class="fa fa-rotate-left"></i>
                   </button>
                   <?php endif; ?>
@@ -850,16 +922,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   ══════════════════════════════════════════════════════════ -->
   <div class="table-card">
     <div class="card-header-custom">
-      <div class="ch-icon" style="background:#5B7F1E;"><i class="fa fa-shield-check"></i></div>
+      <div class="ch-icon ha-ico-approved"><i class="fa fa-shield-check"></i></div>
       <div>
         <h5>التايمشيت المعتمد نهائياً</h5>
         <small class="text-muted">آخر 100 سجل حصلوا على اعتماد المستوى الرابع (مدير المشغلين)</small>
       </div>
-      <span class="badge-count badge" style="background:#5B7F1E;"><?= count($approved_rows) ?> سجل</span>
+      <span class="badge-count badge ha-badge-approved"><?= count($approved_rows) ?> سجل</span>
     </div>
 
     <div class="table-wrap">
-      <table id="tbl-approved" class="ha-table display nowrap" style="width:100%">
+      <table id="tbl-approved" class="ha-table display nowrap ha-w100">
         <thead>
           <tr>
             <th>#</th>
@@ -905,14 +977,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td>
               <?php $shift = $row['shift'] ?? '';
                     $shift_ar = ($shift === 'D') ? 'نهاري' : (($shift === 'N') ? 'ليلي' : $shift);
-                    $shift_bg = ($shift === 'D') ? '#fff3cd' : '#d1ecf1';
-                    $shift_clr= ($shift === 'D') ? '#856404' : '#0c5460';
+                    $shift_cls = ($shift === 'D') ? 'ha-shift-day' : 'ha-shift-night';
               ?>
-              <span style="background:<?=$shift_bg?>;color:<?=$shift_clr?>;padding:2px 8px;border-radius:12px;font-size:.75rem;font-weight:600;">
+              <span class="ha-shift <?= $shift_cls ?>">
                 <?= $shift_ar ?>
               </span>
             </td>
-            <td><span class="text-truncate d-block" style="max-width:120px;" title="<?= htmlspecialchars($row['project_name'] ?? '') ?>"><?= htmlspecialchars($row['project_name'] ?? '—') ?></span></td>
+            <td><span class="text-truncate d-block ha-mw120" title="<?= htmlspecialchars($row['project_name'] ?? '') ?>"><?= htmlspecialchars($row['project_name'] ?? '—') ?></span></td>
             <td><?= htmlspecialchars($row['supplier_name'] ?? '—') ?></td>
             <td><?= htmlspecialchars(trim(($row['equip_code'] ?? '') . ' ' . ($row['equip_name'] ?? ''))) ?: '—' ?></td>
             <td><?= htmlspecialchars($row['driver_name'] ?? '—') ?></td>
@@ -925,14 +996,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               $_has_leg2 = !empty($row['fault_type']) || !empty($row['fault_part']);
               $_bc2 = $_fc_c2 > 0 ? $_fc_c2 : ($_has_leg2 ? 1 : 0);
             ?>
-            <td style="text-align:center;">
+            <td class="ha-tc">
               <?php if ($_bc2 > 0): ?>
-                <button class="btn-ghost" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
-                  <i class="fa fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i>
-                  <span class="badge rounded-pill bg-danger" style="font-size:.68rem;"><?= $_bc2 ?></span>
+                <button class="btn-ghost" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال">
+                  <i class="fa fa-exclamation-triangle ha-ico-danger"></i>
+                  <span class="badge rounded-pill bg-danger ha-fs-68"><?= $_bc2 ?></span>
                 </button>
               <?php else: ?>
-                <i class="fa fa-check-circle" style="color:#059669;font-size:.9rem;" title="لا توجد أعطال"></i>
+                <i class="fa fa-check-circle ha-ico-ok" title="لا توجد أعطال"></i>
               <?php endif; ?>
             </td>
             <td><?= floatval($row['shift_hours'] ?? 0) ?></td>
@@ -943,21 +1014,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <td><?= floatval($row['hr_fault'] ?? 0) ?></td>
             <td><?= floatval($row['other_fault_hours'] ?? 0) ?></td>
             <td><?= floatval($row['counter_diff'] ?? 0) ?></td>
-            <td style="text-align:center;">
+            <td class="ha-tc">
               <?php if ($_bc2 > 0): ?>
-                <button class="btn-ghost" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="background:none;border:none;cursor:pointer;padding:2px 6px;">
-                  <i class="fa fa-exclamation-triangle" style="color:#dc3545;font-size:.85rem;"></i>
-                  <span class="badge rounded-pill bg-danger" style="font-size:.68rem;"><?= $_bc2 ?></span>
+                <button class="btn-ghost" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال">
+                  <i class="fa fa-exclamation-triangle ha-ico-danger"></i>
+                  <span class="badge rounded-pill bg-danger ha-fs-68"><?= $_bc2 ?></span>
                 </button>
               <?php else: ?>
-                <i class="fa fa-check-circle" style="color:#059669;font-size:.9rem;" title="لا توجد أعطال"></i>
+                <i class="fa fa-check-circle ha-ico-ok" title="لا توجد أعطال"></i>
               <?php endif; ?>
             </td>
-            <td class="text-truncate" style="max-width:100px;" title="<?= htmlspecialchars($row['work_notes'] ?? '') ?>"><?= htmlspecialchars($row['work_notes'] ?? '—') ?></td>
-            <td class="text-truncate" style="max-width:100px;" title="<?= htmlspecialchars($row['fault_notes'] ?? '') ?>"><?= htmlspecialchars($row['fault_notes'] ?? '—') ?></td>
+            <td class="text-truncate ha-mw100" title="<?= htmlspecialchars($row['work_notes'] ?? '') ?>"><?= htmlspecialchars($row['work_notes'] ?? '—') ?></td>
+            <td class="text-truncate ha-mw100" title="<?= htmlspecialchars($row['fault_notes'] ?? '') ?>"><?= htmlspecialchars($row['fault_notes'] ?? '—') ?></td>
 
             <!-- ══ عمود مؤشر التقدم: 4 دوائر بـ tooltip مع معلومات المعتمد ══ -->
-            <td style="white-space:nowrap;">
+            <td class="ha-nw">
               <div class="d-inline-flex align-items-center gap-0">
                 <?php for ($lv = 1; $lv <= 4; $lv++):
                   $lv_info  = $level_role_name[$lv];
@@ -967,14 +1038,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                   $apv_role = htmlspecialchars($lv_info['label']);
                 ?>
                 <span class="apv-circle-wrap">
-                  <span class="apv-circle apv-done"
-                        style="background:<?= $lv_info['color'] ?>;border-color:<?= $lv_info['color'] ?>;color:#fff;">
-                    <i class="fa <?= $lv_info['icon'] ?>" style="font-size:.38rem;"></i>
+                  <span class="apv-circle apv-done" data-allow-style
+                        style="background:<?= $lv_info['color'] ?>;border-color:<?= $lv_info['color'] ?>;color:var(--c-surface);">
+                    <i class="fa <?= $lv_info['icon'] ?> ha-ico-xxs"></i>
                   </span>
                   <span class="apv-tooltip">
                     <span class="tt-role"><?= $apv_role ?></span>
                     <span class="tt-name"><?= $apv_name ?></span>
-                    <span class="tt-date"><i class="fa fa-clock" style="margin-right:3px;"></i><?= $apv_date ?></span>
+                    <span class="tt-date"><i class="fa fa-clock ha-ico-mr3"></i><?= $apv_date ?></span>
                   </span>
                 </span>
                 <?php if ($lv < 4): ?><span class="apv-connector apv-conn-done"></span><?php endif; ?>
@@ -983,14 +1054,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </td>
 
             <td>
-              <span style="font-size:.78rem;color:#6c757d;">
+              <span class="ha-meta-date">
                 <?= date('Y-m-d H:i', strtotime($row['final_approved_at'] ?? 'now')) ?>
               </span>
             </td>
             <td>
               <button class="btn-ghost" onclick="openNotes(<?= $row['id'] ?>)"
                       title="عرض الملاحظات">
-                <i class="fa fa-comment-dots" <?php if (intval($row['notes_count']) > 0): ?>style="color:#ffaa33;"<?php endif; ?>></i>
+                <i class="fa fa-comment-dots<?php if (intval($row['notes_count']) > 0): ?> ha-note-active<?php endif; ?>"></i>
                 <?php if (intval($row['notes_count']) > 0): ?>
                   <span class="note-cnt"><?= $row['notes_count'] ?></span>
                 <?php endif; ?>
@@ -1119,7 +1190,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" dir="rtl">
-      <div class="modal-header" style="border-bottom:2px solid #f8d7da;">
+      <div class="modal-header ha-mh-danger">
         <h5 class="modal-title fw-bold">
           <i class="fa fa-xmark me-2 text-danger"></i> رفض السجل #<span id="reject-ts-id">—</span>
         </h5>
@@ -1134,10 +1205,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           <i class="fa fa-comment-dots me-1 text-danger"></i>
           سبب الرفض <span class="text-danger">*</span>
         </label>
-        <textarea id="reject-reason-text" class="form-control" rows="4"
-                  placeholder="اكتب سبب الرفض بالتفصيل..."
-                  style="border-color:#dee2e6;"></textarea>
-        <div id="reject-reason-error" class="text-danger small mt-1" style="display:none;">
+        <textarea id="reject-reason-text" class="form-control ha-reject-reason" rows="4"
+                  placeholder="اكتب سبب الرفض بالتفصيل..."></textarea>
+        <div id="reject-reason-error" class="text-danger small mt-1 ha-hidden">
           <i class="fa fa-exclamation-circle me-1"></i> يرجى كتابة سبب الرفض
         </div>
       </div>
@@ -1157,7 +1227,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" dir="rtl">
-      <div class="modal-header" style="border-bottom:2px solid #f8d7da;">
+      <div class="modal-header ha-mh-danger">
         <h5 class="modal-title fw-bold">
           <i class="fa fa-xmark me-2 text-danger"></i>
           رفض السجل #<span id="reject-ts-id">—</span>
@@ -1173,9 +1243,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           <i class="fa fa-comment-dots me-1 text-danger"></i>
           سبب الرفض <span class="text-danger">*</span>
         </label>
-        <textarea id="reject-reason-text" class="form-control" rows="4"
+        <textarea id="reject-reason-text" class="form-control ha-reject-reason" rows="4"
                   placeholder="اكتب سبب الرفض بالتفصيل..."></textarea>
-        <div id="reject-reason-error" class="text-danger small mt-1" style="display:none;">
+        <div id="reject-reason-error" class="text-danger small mt-1 ha-hidden">
           <i class="fa fa-exclamation-circle me-1"></i> يرجى كتابة سبب الرفض
         </div>
       </div>
@@ -1190,7 +1260,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 </div>
 
 <!-- ── Toasts ── -->
-<div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999">
+<div class="position-fixed bottom-0 end-0 p-3 ha-toast-wrap">
   <div id="approvalToast" class="toast align-items-center text-white border-0" role="alert">
     <div class="d-flex">
       <div class="toast-body fw-bold" id="toast-msg"></div>
@@ -1252,7 +1322,9 @@ $(function () {
       storageKey: 'hoursApprovalGroupStates',
       mode: 'datatable',
       tables: [dtPending, dtApproved],
-      columnClass: true
+      columnClass: true,
+      buttons  : '.ems-btn-group-toggle[data-group]',
+      allButton: '.ems-btn-group-toggle-all'
     });
   }
 
@@ -1341,7 +1413,7 @@ function rejectSingle(id) {
   $('#reject-ts-id').text(id);
   $('#reject-reason-text').val('');
   $('#reject-reason-error').hide();
-  $('#reject-reason-text').css('border-color', '#dee2e6');
+  $('#reject-reason-text').removeClass('ha-invalid');
   new bootstrap.Modal(document.getElementById('rejectModal')).show();
 }
 
@@ -1350,7 +1422,7 @@ $(function() {
     var reason = $('#reject-reason-text').val().trim();
     if (!reason) {
       $('#reject-reason-error').show();
-      $('#reject-reason-text').css('border-color', '#dc3545').trigger('focus');
+      $('#reject-reason-text').addClass('ha-invalid').trigger('focus');
       return;
     }
     var btn = this;
@@ -1660,14 +1732,14 @@ function applyEquipTypeFilter() {
 <!-- ═══ UX-03 §5.2 — مودالا التخليص والإعادة (خلف EMS_APPROVAL_BOX) ═══ -->
 <div class="modal fade" id="bxClearModal" tabindex="-1">
   <div class="modal-dialog"><div class="modal-content">
-    <div class="modal-header" style="background:#fef3c7;">
-      <h6 class="modal-title"><i class="fa fa-triangle-exclamation" style="color:#b45309;"></i>
+    <div class="modal-header ha-mh-warn">
+      <h6 class="modal-title"><i class="fa fa-triangle-exclamation ha-ico-warn"></i>
         تخليصُ تجاوز الطاقة — السجل <strong id="bx-clear-id"></strong></h6>
       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
     </div>
     <div class="modal-body">
-      <div class="alert alert-warning py-2" id="bx-clear-flags" style="font-size:.85rem;"></div>
-      <p style="font-size:.85rem;color:#6b7280;">
+      <div class="alert alert-warning py-2 ha-fs-85" id="bx-clear-flags"></div>
+      <p class="ha-note-p">
         نصّ §5.2: «صفُّ تجاوزِ طاقةٍ لا يُعتمد قبل: السبب · فحصُ التداخل ·
         تحديدُ المشغّل الثاني» — الفحصُ يجري آليًّا، والاثنان الباقيان إفصاحُك أنت.
       </p>
@@ -1676,10 +1748,10 @@ function applyEquipTypeFilter() {
                 placeholder="مثال: ورديةٌ مزدوجةٌ طارئةٌ بطلب العميل — تسليمُ شحنة"></textarea>
       <label class="form-label fw-bold mt-3" for="bx-return-reason">هل عمل مشغّلٌ ثانٍ؟ *</label>
       <div>
-        <label class="me-3"><input type="radio" name="bx-second" value="1"> نعم — مشغّلان تناوبا</label>
-        <label><input type="radio" name="bx-second" value="0"> لا — مشغّلٌ واحد</label>
+        <label class="me-3"><input type="radio" name="bx-second" value="1" aria-label="نعم — عمل مشغّلٌ ثانٍ في الوردية"> نعم — مشغّلان تناوبا</label>
+        <label><input type="radio" name="bx-second" value="0" aria-label="لا — مشغّلٌ واحدٌ في الوردية"> لا — مشغّلٌ واحد</label>
       </div>
-      <div id="bx-clear-err" class="text-danger mt-2" style="display:none;font-size:.85rem;"></div>
+      <div id="bx-clear-err" class="text-danger mt-2 ha-fs-85 ha-hidden"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إلغاء</button>
@@ -1691,22 +1763,22 @@ function applyEquipTypeFilter() {
 
 <div class="modal fade" id="bxReturnModal" tabindex="-1">
   <div class="modal-dialog"><div class="modal-content">
-    <div class="modal-header" style="background:#e0e7ff;">
+    <div class="modal-header ha-mh-info">
       <h6 class="modal-title"><i class="fa fa-rotate-left"></i>
         إعادةٌ للاستكمال — السجل <strong id="bx-return-id"></strong></h6>
       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
     </div>
     <div class="modal-body">
-      <p style="font-size:.85rem;color:#6b7280;">
+      <p class="ha-note-p">
         تعود الواقعةُ لمُدخِلها <strong>بالرقم نفسه</strong> في جولةٍ جديدة —
         يعدّلها ويعيد إرسالها، وتاريخُ الجولات كلِّه محفوظ (§8.2).
       </p>
       <label class="form-label fw-bold">سببُ الإعادة *</label>
       <div>
-        <label class="me-3"><input type="radio" name="bx-second" value="1"> نعم — مشغّلان تناوبا</label>
-        <label><input type="radio" name="bx-second" value="0"> لا — مشغّلٌ واحد</label>
+        <label class="me-3"><input type="radio" name="bx-second" value="1" aria-label="نعم — عمل مشغّلٌ ثانٍ في الوردية"> نعم — مشغّلان تناوبا</label>
+        <label><input type="radio" name="bx-second" value="0" aria-label="لا — مشغّلٌ واحدٌ في الوردية"> لا — مشغّلٌ واحد</label>
       </div>
-      <div id="bx-clear-err" class="text-danger mt-2" style="display:none;font-size:.85rem;"></div>
+      <div id="bx-clear-err" class="text-danger mt-2 ha-fs-85 ha-hidden"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إلغاء</button>
@@ -1718,20 +1790,20 @@ function applyEquipTypeFilter() {
 
 <div class="modal fade" id="bxReturnModal" tabindex="-1">
   <div class="modal-dialog"><div class="modal-content">
-    <div class="modal-header" style="background:#e0e7ff;">
+    <div class="modal-header ha-mh-info">
       <h6 class="modal-title"><i class="fa fa-rotate-left"></i>
         إعادةٌ للاستكمال — السجل <strong id="bx-return-id"></strong></h6>
       <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
     </div>
     <div class="modal-body">
-      <p style="font-size:.85rem;color:#6b7280;">
+      <p class="ha-note-p">
         تعود الواقعةُ لمُدخِلها <strong>بالرقم نفسه</strong> في جولةٍ جديدة —
         يعدّلها ويعيد إرسالها، وتاريخُ الجولات كلِّه محفوظ (§8.2).
       </p>
       <label class="form-label fw-bold">سببُ الإعادة *</label>
       <textarea id="bx-return-reason" class="form-control" rows="2"
                 placeholder="مثال: توزيعُ الزمن ناقص — ساعتا التوقف بلا مسؤولٍ ومرجع"></textarea>
-      <div id="bx-return-err" class="text-danger mt-2" style="display:none;font-size:.85rem;"></div>
+      <div id="bx-return-err" class="text-danger mt-2 ha-fs-85 ha-hidden"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal">إلغاء</button>

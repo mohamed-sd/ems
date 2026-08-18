@@ -111,10 +111,30 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                          'icon' => 'fas fa-arrow-right', 'label' => 'الجدول الشهري');
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
+    echo ems_states_bundle('لا صفوفَ مخطَّطٍ ومنفَّذٍ ومفوترٍ في النطاقِ المختار',
+                           'اختر عقدًا من جدولِ العقودِ أعلاه وحدِّد مدى الأشهرِ ثمّ اضغط «اعرض»');
     ?>
 
+    <style>
+    .pal-note{color:var(--c-4b5563, #4b5563);line-height:1.8;margin:0}
+    .pal-cov{margin-top:10px}
+    .pal-badge-pad{padding:6px 12px}
+    .pal-table{width:100%}
+    .pal-wrap{white-space:normal}
+    .pal-filter{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+    .pal-w110{width:110px}
+    .pal-w150{width:150px}
+    .pal-filter-go{align-self:flex-end}
+    .pal-chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    .pal-actions{display:flex;gap:8px;margin-top:12px}
+    .pal-inline{display:inline}
+    .pal-row-unlinked{background:var(--c-fff7ed, #fff7ed)}
+    .pal-link-form{display:flex;gap:4px}
+    </style>
+
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;line-height:1.8;margin:0">
+        <p class="pal-note">
             <i class="fas fa-circle-info"></i>
             «المخطَّطُ» و«المنفَّذُ» و«المفوتَرُ» ثلاثةُ أرقامٍ كانت <strong>لا تلتقي على مفتاح</strong>،
             فمقارنتُها <strong>تخمينٌ بالتاريخ والعقد</strong>. وبمفاتيح
@@ -123,22 +143,22 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             و<strong>الوصلُ يُشتقّ ولا يُخمَّن</strong>: بندان يصلحان ⇒ <strong>يُعلَن الالتباسُ ولا يُختار بالحدس</strong>.
             و<strong>غيرُ الموصول يُعدّ ولا يُخفى</strong>.
         </p>
-        <div style="margin-top:10px">
-            <span class="badge badge-secondary" style="padding:6px 12px">
+        <div class="pal-cov">
+            <span class="badge badge-secondary pal-badge-pad">
                 وحداتٌ موصولة <?php echo $cov['units_linked'] . '/' . $cov['units_total']; ?></span>
-            <span class="badge badge-secondary" style="padding:6px 12px">
+            <span class="badge badge-secondary pal-badge-pad">
                 أسطرُ مستخلصٍ موصولة <?php echo $cov['claims_linked'] . '/' . $cov['claims_total']; ?></span>
         </div>
     </div></div>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-file-contract"></i> العقود</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable pal-table" data-no-dt="1">
             <thead><tr><th>#</th><th>العميل</th><th>المدة</th><th>الحال</th><th></th></tr></thead>
             <tbody>
             <?php foreach ($contracts as $c): ?>
                 <tr><td>#<?php echo intval($c['id']); ?></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars((string)$c['second_party']); ?></td>
+                    <td class="pal-wrap"><?php echo htmlspecialchars((string)$c['second_party']); ?></td>
                     <td><?php echo htmlspecialchars((string)$c['actual_start'] . ' → ' . (string)$c['actual_end']); ?></td>
                     <td><?php echo htmlspecialchars((string)$c['contract_status']); ?></td>
                     <td><a class="action-btn" href="?contract=<?php echo intval($c['id']); ?>">
@@ -152,29 +172,29 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-table-columns"></i>
         المخطَّطُ · المنفَّذُ · المفوتَر — للعقد #<?php echo $CID; ?></h5></div>
     <div class="card-body">
-        <form method="get" class="ems-form" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+        <form method="get" class="ems-form pal-filter">
             <input type="hidden" name="contract" value="<?php echo $CID; ?>">
             <div class="form-group"><label for="emsf_81_e9776">من شهر</label>
-                <input type="text" name="from" placeholder="2091-01" style="width:110px"
+                <input type="text" name="from" placeholder="2091-01" class="pal-w110"
                        value="<?php echo htmlspecialchars($FROM); ?>" id="emsf_81_e9776"></div>
             <div class="form-group"><label for="emsf_82_2cd30">إلى شهر</label>
-                <input type="text" name="to" placeholder="2091-12" style="width:110px"
+                <input type="text" name="to" placeholder="2091-12" class="pal-w110"
                        value="<?php echo htmlspecialchars($TO); ?>" id="emsf_82_2cd30"></div>
-            <div style="align-self:flex-end"><button type="submit" class="btn-primary">
+            <div class="pal-filter-go"><button type="submit" class="btn-primary">
                 <i class="fa fa-filter"></i> اعرض</button></div>
         </form>
 
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-            <span class="badge badge-secondary" style="padding:6px 12px">مخطَّط
+        <div class="pal-chips">
+            <span class="badge badge-secondary pal-badge-pad">مخطَّط
                 <?php echo $pv['totals']['planned']; ?></span>
-            <span class="badge badge-info" style="padding:6px 12px">منفَّذ
+            <span class="badge badge-info pal-badge-pad">منفَّذ
                 <?php echo $pv['totals']['actual']; ?></span>
-            <span class="badge badge-success" style="padding:6px 12px">مفوتَر
+            <span class="badge badge-success pal-badge-pad">مفوتَر
                 <?php echo $pv['totals']['billed']; ?></span>
         </div>
 
         <div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable pal-table" data-no-dt="1">
             <thead><tr><th>البند</th><th>الوصف</th><th>الشهر</th><th>الوحدة</th>
                 <th>مخطَّط</th><th>منفَّذ</th><th>مفوتَر</th>
                 <th>فجوةُ التنفيذ</th><th>فجوةُ الفوترة</th>
@@ -191,7 +211,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <tbody>
             <?php foreach ($pv['rows'] as $r): ?>
                 <tr><td>#<?php echo intval($r['line_no']); ?></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars((string)$r['description']); ?></td>
+                    <td class="pal-wrap"><?php echo htmlspecialchars((string)$r['description']); ?></td>
                     <td><strong><?php echo htmlspecialchars((string)$r['period_month']); ?></strong></td>
                     <td><?php echo htmlspecialchars((string)$r['unit']); ?></td>
                     <td><?php echo $r['planned']; ?></td>
@@ -208,15 +228,15 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         </div>
 
         <?php if ($can_edit): ?>
-        <div style="display:flex;gap:8px;margin-top:12px">
-            <form method="post" style="display:inline">
+        <div class="pal-actions">
+            <form method="post" class="pal-inline">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="pal_action" value="dry">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                 <button type="submit" class="btn-primary"><i class="fa fa-magnifying-glass"></i>
                     اعرض المرشَّح <strong>(بلا كتابة)</strong></button>
             </form>
-            <form method="post" style="display:inline">
+            <form method="post" class="pal-inline">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="pal_action" value="link_all">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
@@ -230,24 +250,24 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-link-slash"></i>
         وحداتٌ <strong>غيرُ موصولة</strong> — <?php echo count($unlinked); ?></h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable pal-table" data-no-dt="1">
             <thead><tr><th>الرقم</th><th>التاريخ</th><th>الوحدة</th><th>الكمية</th><th>الحال</th><th></th></tr></thead>
             <tbody>
             <?php foreach ($unlinked as $u): ?>
-                <tr style="background:#fff7ed">
+                <tr class="pal-row-unlinked">
                     <td><?php echo htmlspecialchars((string)$u['entry_no']); ?></td>
                     <td><?php echo htmlspecialchars((string)$u['entry_date']); ?></td>
                     <td><?php echo htmlspecialchars((string)$u['unit_type']); ?></td>
                     <td><?php echo htmlspecialchars((string)$u['qty']); ?></td>
                     <td><?php echo htmlspecialchars((string)$u['state']); ?></td>
                     <td><?php if ($can_edit): ?>
-                        <form method="post" style="display:flex;gap:4px">
+                        <form method="post" class="pal-link-form">
         <?php echo csrf_field(); ?>
                             <input type="hidden" name="pal_action" value="link_one">
                             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                             <input type="hidden" name="row_kind" value="unit">
                             <input type="hidden" name="row_id" value="<?php echo intval($u['id']); ?>">
-                            <input type="number" name="line_id" placeholder="بندٌ صريح (اختياري)" style="width:150px" aria-label="بندٌ صريح (اختياري)">
+                            <input type="number" name="line_id" placeholder="بندٌ صريح (اختياري)" class="pal-w150" aria-label="بندٌ صريح (اختياري)">
                             <button type="submit" class="action-btn"><i class="fa fa-link"></i> صِل</button>
                         </form>
                     <?php else: ?>—<?php endif; ?></td></tr>

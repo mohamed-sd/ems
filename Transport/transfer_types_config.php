@@ -99,6 +99,12 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
+<style>
+/* UXW-01: أنماطُ شاشةِ أنواعِ الترحيلِ أصنافًا برموزِ الألوان */
+.trs-ty-tbl{width:100%}
+.trs-ty-on{color:var(--c-1e7e34, #1e7e34)}
+.trs-ty-off{color:var(--c-c0392b, #c0392b)}
+</style>
 <div class="main trs-types-main ems-unified-page-shell">
     <?php
     $header_title = 'إعدادات الترحيل';
@@ -109,6 +115,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أنواعَ ترحيلٍ معرَّفةً بعدُ', 'عرِّف أولَ نوعٍ بزرِّ «إضافة نوع» في رأسِ الشاشة');
     ?>
 
     <?php trs_msg_banner(); ?>
@@ -142,7 +150,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </div>
                     <div class="form-group">
                         <label>مفعّل؟</label>
-                        <label class="switch-inline"><input type="checkbox" name="active" id="t_active" value="1" checked> نعم، مفعّل</label>
+                        <label class="switch-inline"><input type="checkbox" name="active" id="t_active" aria-label="تفعيلُ نوعِ الترحيل" value="1" checked> نعم، مفعّل</label>
                     </div>
                 </div>
             </div>
@@ -155,7 +163,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="trsTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="trsTable" class="display nowrap alltables trs-ty-tbl" data-state-save="false" data-scroll-x="true">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>الفئة التشغيلية</th><th>المتحمِّل الافتراضي</th><th>الحالة</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -195,7 +203,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td>" . htmlspecialchars((string)$row['name']) . "</td>";
                         echo "<td>" . htmlspecialchars($cat_ar) . "</td>";
                         echo "<td>" . htmlspecialchars($bearer_ar) . "</td>";
-                        echo "<td>" . ((int)$row['active'] === 1 ? "<span class='action-btn' style='color:#1e7e34'>مفعّل</span>" : "<span class='action-btn' style='color:#c0392b'>معطّل</span>") . "</td>";
+                        echo "<td>" . ((int)$row['active'] === 1 ? "<span class='action-btn trs-ty-on'>مفعّل</span>" : "<span class='action-btn trs-ty-off'>معطّل</span>") . "</td>";
                         echo "</tr>";
                     } }
                     ?>
@@ -214,16 +222,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function () {
     $(document).ready(function () {
-        $('#trsTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
-
         var toggleBtn = document.getElementById('toggleForm');
         if (toggleBtn) {
             toggleBtn.addEventListener('click', function () {

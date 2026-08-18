@@ -96,6 +96,25 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ②: أنماطٌ موضعيةٌ نُقلت أصنافًا صفحيةً ببادئةِ الشاشة er- */
+.is-hidden { display: none; }
+.er-note {
+    margin: 6px 0 0;
+    padding: 8px 12px;
+    background: var(--c-rgba379923507, rgba(37,99,235,.07));
+    border-radius: 8px;
+    font-size: .85rem;
+    color: var(--c-555555, #555);
+}
+.er-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 14px; }
+.er-actions { padding: 0 14px 16px; display: flex; gap: 10px; }
+.er-btn-cancel { background: var(--c-6b7280, #6b7280); }
+.er-table-wrap { margin-top: 14px; }
+.er-table-full { width: 100%; }
+.er-badge-muted { opacity: .6; }
+.er-empty-cell { text-align: center; color: var(--c-888888, #888); padding: 18px; }
+</style>
 <div class="main">
     <?php
     $header_title   = 'الأدوار الوظيفية';
@@ -106,6 +125,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => 'employees.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'سجل الموظفين');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أدوارَ موظفين تنظيميةً مسجَّلةً بعدُ', 'أضف أولَ دورٍ تنظيميٍّ بزرِّ «إضافة دور» في رأسِ الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])): $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
@@ -118,16 +139,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="success-message is-error"><i class="fas fa-exclamation-circle"></i> <?= $error_msg ?></div>
     <?php endif; ?>
 
-    <div style="margin:6px 0 0;padding:8px 12px;background:rgba(37,99,235,.07);border-radius:8px;font-size:.85rem;color:#555;">
+    <div class="er-note">
         <i class="fas fa-circle-info"></i> هذه أدوار الموظفين التنظيمية (مهنية)، وهي منفصلةٌ تماماً عن أدوار مستخدمي النظام وصلاحيات الدخول.
     </div>
 
     <!-- فورم إضافة/تعديل -->
-    <form id="erForm" action="" method="post" class="allforms" style="<?= $editData ? '' : 'display:none;' ?>
-        <?= csrf_field() ?>">
+    <form id="erForm" action="" method="post" class="allforms<?= $editData ? '' : ' is-hidden' ?>">
+        <?= csrf_field() ?>
         <input type="hidden" name="edit_id" id="edit_id" value="<?= $editData ? intval($editData['id']) : '' ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $editData ? 'تعديل دور' : 'إضافة دور' ?></h5></div>
-        <div class="form-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:14px;">
+        <div class="form-grid er-grid-3">
             <div class="field">
                 <label for="name"><i class="fas fa-tag"></i> اسم الدور *</label>
                 <input type="text" name="name" id="name" required value="<?= htmlspecialchars($editData['name'] ?? '') ?>" placeholder="مثال: مشرف، مراقب، عمالة مساندة">
@@ -148,15 +169,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </select>
             </div>
         </div>
-        <div style="padding:0 14px 16px;display:flex;gap:10px;">
+        <div class="er-actions">
             <button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button>
-            <a href="employee_roles.php" class="add-btn" style="background:#6b7280;"><i class="fas fa-times"></i> إلغاء</a>
+            <a href="employee_roles.php" class="add-btn er-btn-cancel"><i class="fas fa-times"></i> إلغاء</a>
         </div>
     </form>
 
     <!-- جدول الأدوار -->
-    <div class="table-wrap" style="margin-top:14px;">
-        <table class="data-table" id="erTable" style="width:100%;">
+    <div class="table-wrap er-table-wrap">
+        <table class="data-table er-table-full" id="erTable">
             <thead>
                 <tr><th>إجراءات</th><th>#</th><th>الدور</th><th>الوصف</th><th>الموظفون</th><th>النطاق</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -192,7 +213,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <a href="javascript:void(0);" class="action-btn delete" title="حذف"
                                onclick="confirmDel(<?= intval($row['id']) ?>, '<?= htmlspecialchars($row['name'], ENT_QUOTES) ?>', <?= intval($row['used_count']) ?>)"><i class="fas fa-trash"></i></a>
                         <?php endif; ?>
-                        <?php if (!$can_manage): ?><span class="badge" style="opacity:.6;">عامّ</span><?php endif; ?>
+                        <?php if (!$can_manage): ?><span class="badge er-badge-muted">عامّ</span><?php endif; ?>
                     </div></td>
                     <td><?= $i++ ?></td>
                     <td><strong><?= htmlspecialchars($row['name']) ?></strong></td>
@@ -203,7 +224,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tr>
             <?php endforeach; }
             if (empty($er_rows)): ?>
-                <tr><td colspan="7" style="text-align:center;color:#888;padding:18px;">لا توجد أدوار بعد.</td></tr>
+                <tr><td colspan="7" class="er-empty-cell">لا توجد أدوار بعد.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>
@@ -213,10 +234,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function(){
     var btn = document.getElementById('toggleForm'), form = document.getElementById('erForm');
-    if (btn && form) btn.addEventListener('click', function(){ form.style.display = (form.style.display === 'none' || !form.style.display) ? 'block' : 'none'; });
+    if (btn && form) btn.addEventListener('click', function(){ form.classList.toggle('is-hidden'); });
 })();
 function editER(d){
-    var f = document.getElementById('erForm'); f.style.display = 'block';
+    var f = document.getElementById('erForm'); f.classList.remove('is-hidden');
     document.getElementById('edit_id').value = d.id;
     document.getElementById('name').value = d.name || '';
     document.getElementById('description').value = d.description || '';

@@ -137,8 +137,24 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('equipment', 'الوثائقُ وصلاحيتُها');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 بوابتا ١·٢: أنماطُ شاشةِ وثائقِ المعداتِ والمشغّلين — أصنافٌ ببادئةِ
+   الشاشة بدل style=، والألوانُ برموزٍ ذاتِ ردمٍ حرفيٍّ يحفظ المظهرَ كما كان */
+.eqdoc-msg       { background: var(--c-fffbe6, #fffbe6); border: 1px solid var(--c-f0c36d, #f0c36d);
+                   border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; }
+.eqdoc-lede      { color: var(--c-4b5563, #4b5563); margin: 0 0 12px; line-height: 1.8; }
+.eqdoc-counts    { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.eqdoc-count     { padding: 6px 12px; font-size: 13px; }
+.eqdoc-h5        { margin: 0 0 10px; }
+.eqdoc-form-flat { box-shadow: none; padding: 0; }
+.eqdoc-table     { width: 100%; }
+.eqdoc-ltr       { direction: ltr; }
+.eqdoc-stop      { text-decoration: none; padding: 5px 10px; }
+.eqdoc-empty     { color: var(--c-ink-500, #6b7280); text-align: center; padding: 16px; }
+</style>
 
 <div class="main eq-docs-main ems-unified-page-shell">
     <?php
@@ -147,29 +163,34 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    if (function_exists('ems_states_bundle')) {
+        echo ems_states_bundle('لا وثيقةَ معدةٍ أو مشغّلٍ مسجَّلةً بعدُ',
+                               'أضف أولَ وثيقةٍ من بطاقةِ «وثيقة جديدة / تجديد» أعلاه بتاريخِ انتهائها ومهلةِ التنبيه');
+    }
     ?>
 
     <?php if (isset($_GET['msg'])): ?>
-        <div class="alert" style="background:#fffbe6;border:1px solid #f0c36d;border-radius:8px;padding:10px 14px;margin-bottom:12px;">
+        <div class="alert eqdoc-msg">
             <?php echo htmlspecialchars($_GET['msg']); ?>
         </div>
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;margin:0 0 12px;line-height:1.8;">
+        <p class="eqdoc-lede">
             <i class="fas fa-circle-info"></i>
             ملفُّ وثائقَ لكل معدةٍ ومشغّل — <strong>الانتهاءُ يُحسب من التاريخ لا من الحالة</strong>،
             والتنبيهُ قبل الانتهاء بمهلة كلِّ وثيقة (alert_days). التجديدُ بإضافة وثيقةٍ جديدةٍ
             بتاريخها الجديد — والقديمةُ تبقى تاريخًا.
         </p>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <span class="badge badge-danger" style="padding:6px 12px;font-size:13px;">
+        <div class="eqdoc-counts">
+            <span class="badge badge-danger eqdoc-count">
                 <i class="fas fa-circle-xmark"></i> منتهية: <?php echo $nExpired; ?>
             </span>
-            <span class="badge badge-warning" style="padding:6px 12px;font-size:13px;">
+            <span class="badge badge-warning eqdoc-count">
                 <i class="fas fa-hourglass-half"></i> توشك على الانتهاء: <?php echo $nSoon; ?>
             </span>
-            <span class="badge badge-success" style="padding:6px 12px;font-size:13px;">
+            <span class="badge badge-success eqdoc-count">
                 <i class="fas fa-circle-check"></i> سارية: <?php echo $nOk; ?>
             </span>
         </div>
@@ -177,8 +198,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($can_add || $can_edit): ?>
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-plus"></i> وثيقة جديدة / تجديد</h5>
-        <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;">
+        <h5 class="eqdoc-h5"><i class="fas fa-plus"></i> وثيقة جديدة / تجديد</h5>
+        <form action="" method="post" class="allforms allforms-visible eqdoc-form-flat">
         <?= csrf_field() ?>
             <input type="hidden" name="add_doc" value="1">
             <div class="form-section"><div class="form-grid">
@@ -197,7 +218,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             echo "<option value='" . intval($e['id']) . "'>" . htmlspecialchars(trim($e['code'] . ' ' . $e['name'])) . "</option>";
                         } ?>
                     </select>
-                    <select name="subject_id_operator" id="docSubjectOp" style="display:none;" disabled>
+                    <select name="subject_id_operator" id="docSubjectOp" aria-label="اختيارُ المشغّلِ صاحبِ الوثيقة" class="is-hidden" disabled>
                         <option value="">— اختر المشغّل —</option>
                         <?php foreach ($operators as $o) {
                             echo "<option value='" . intval($o['id']) . "'>" . htmlspecialchars($o['name']) . "</option>";
@@ -237,9 +258,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-list"></i> الوثائق</h5>
+        <h5 class="eqdoc-h5"><i class="fas fa-list"></i> الوثائق</h5>
         <div class="table-container">
-            <table id="docsTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="docsTable" class="display nowrap alltables eqdoc-table"
+                   data-scroll-x="1" data-state-save="false" data-page-length="25" data-order='[]'>
                 <thead><tr>
                     <th>الصاحب</th><th>نوع الوثيقة</th><th>رقم الوثيقة</th><th>الجهة المصدِرة</th>
                     <th>تاريخ الانتهاء</th><th>الوضع الفعلي</th><th>الحالة</th>
@@ -282,11 +304,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     echo "<td>" . htmlspecialchars($d['doc_type']) . "</td>";
                     echo "<td>" . htmlspecialchars($d['doc_no'] ?: '—') . "</td>";
                     echo "<td>" . htmlspecialchars($d['issuer'] ?: '—') . "</td>";
-                    echo "<td style='direction:ltr;'>" . htmlspecialchars($d['expiry_date'] ?: '—') . "</td>";
+                    echo "<td class='eqdoc-ltr'>" . htmlspecialchars($d['expiry_date'] ?: '—') . "</td>";
                     echo "<td>" . $real . "</td>";
                     echo "<td>" . htmlspecialchars($d['status']) . "</td>";
                     if ($can_edit) {
-                        echo "<td><a href='?stop_doc=" . intval($d['doc_id']) . "' class='badge badge-danger' style='text-decoration:none;padding:5px 10px;' onclick=\"return confirm('إلغاء هذه الوثيقة؟');\"><i class='fas fa-ban'></i> إلغاء</a></td>";
+                        echo "<td><a href='?stop_doc=" . intval($d['doc_id']) . "' class='badge badge-danger eqdoc-stop' onclick=\"return confirm('إلغاء هذه الوثيقة؟');\"><i class='fas fa-ban'></i> إلغاء</a></td>";
                     }
                     echo "</tr>";
                 } ?>
@@ -294,7 +316,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
         <?php if (empty($docs)): ?>
-            <p style="color:#6b7280;text-align:center;padding:16px;"><i class="fas fa-circle-info"></i> لا وثائقَ بعد.</p>
+            <p class="eqdoc-empty"><i class="fas fa-circle-info"></i> لا وثائقَ بعد.</p>
         <?php endif; ?>
     </div></div>
 </div>
@@ -303,14 +325,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function () {
-    $('#docsTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, pageLength: 25, order: [],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    /* UXW-01 بوابة ٥: تهيئةُ جدولِ الوثائق انتقلت إلى المكوّنِ المركزي
+       (assets/js/ui-unification.js) — والسلوكُ محفوظٌ بسماتٍ على وسمِ الجدول:
+       data-scroll-x · data-state-save · data-page-length · data-order */
 
     // تبديلُ قائمة الصاحب (معدة ⇄ مشغّل) — قائمةٌ واحدةٌ نشطةٌ تحمل الاسم subject_id
     $('#docSubjectType').on('change', function () {
         var isOp = $(this).val() === 'operator';
-        $('#docSubjectEq').prop('disabled', isOp).attr('name', isOp ? 'subject_id_equipment' : 'subject_id').toggle(!isOp);
-        $('#docSubjectOp').prop('disabled', !isOp).attr('name', isOp ? 'subject_id' : 'subject_id_operator').toggle(isOp);
+        $('#docSubjectEq').prop('disabled', isOp).attr('name', isOp ? 'subject_id_equipment' : 'subject_id').toggleClass('is-hidden', isOp);
+        $('#docSubjectOp').prop('disabled', !isOp).attr('name', isOp ? 'subject_id' : 'subject_id_operator').toggleClass('is-hidden', !isOp);
     });
 });
 </script>

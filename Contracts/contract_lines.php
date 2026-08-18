@@ -121,10 +121,35 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                          'icon' => 'fas fa-arrow-right', 'label' => 'نطاقات العقد');
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بنودَ بيعٍ مسجَّلةً على هذا العقد بعدُ',
+                           'اختر عقدًا من جدولِ العقود ثم أضف أولَ بندِ بيعٍ بنموذجِه وسعرِه وسريانِه');
     ?>
 
+    <style>
+    .cl-note{color:var(--c-4b5563, #4b5563);line-height:1.8;margin:0}
+    .cl-muted{color:var(--c-ink-500, #6b7280)}
+    .cl-note-muted{color:var(--c-ink-500, #6b7280);margin:0}
+    .cl-req{color:var(--c-state-danger-strong, #c00)}
+    .cl-table{width:100%}
+    .cl-wrap{white-space:normal}
+    .cl-ltr{direction:ltr}
+    .cl-filter-form{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+    .cl-badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+    .cl-badge-pad{padding:8px 14px}
+    .cl-badge-value{padding:8px 14px;font-size:15px}
+    .cl-alert-gap{margin-top:12px}
+    .cl-row-past{opacity:.6}
+    .cl-inline-form{display:flex;gap:4px;flex-wrap:wrap}
+    .cl-mini-btn{border:0;padding:5px 8px}
+    .cl-add-form{margin-top:14px}
+    .cl-actions{margin-top:12px}
+    .cl-w90{width:90px}
+    .cl-w140{width:140px}
+    </style>
+
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;line-height:1.8;margin:0">
+        <p class="cl-note">
             <i class="fas fa-circle-info"></i>
             <strong>هذا الجدولُ وحدَه يحمل المال.</strong> والتزاماتُ الطاقة
             (عددُ المعدات · ساعاتُ الإتاحة · دعمُ الطاقة) <strong>لا تدخل القيمة أبدًا</strong> —
@@ -135,14 +160,14 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-file-contract"></i> العقود</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable cl-table" data-no-dt="1">
             <thead><tr><th>#</th><th>الطرفُ الثاني</th><th>المدة</th><th>الحال</th><th>بنودُ البيع</th><th></th></tr></thead>
             <tbody>
             <?php foreach ($contracts as $c):
                 $n = count(CLS::linesOf($gate, (int) $c['id'], false)); ?>
                 <tr><td><?php echo intval($c['id']); ?></td>
                     <td><?php echo htmlspecialchars((string)($c['second_party'] ?? '—')); ?></td>
-                    <td style="direction:ltr"><?php echo htmlspecialchars((string)($c['actual_start'] ?? '…')); ?>
+                    <td class="cl-ltr"><?php echo htmlspecialchars((string)($c['actual_start'] ?? '…')); ?>
                         → <?php echo htmlspecialchars((string)($c['actual_end'] ?? '…')); ?></td>
                     <td><?php echo htmlspecialchars((string)($c['contract_status'] ?? '—')); ?></td>
                     <td><span class="badge <?php echo $n > 0 ? 'badge-success' : 'badge-secondary'; ?>"><?php echo $n; ?></span></td>
@@ -157,26 +182,26 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-sack-dollar"></i>
         قيمةُ العقد #<?php echo $sel; ?></h5></div>
     <div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+        <form method="get" class="cl-filter-form">
             <input type="hidden" name="contract" value="<?php echo $sel; ?>">
             <label for="emsf_46_ee666">القيمةُ بتاريخ:</label>
-            <input type="date" name="as_of" value="<?php echo htmlspecialchars($asOf); ?>" id="emsf_46_ee666">
+            <input type="date" name="as_of" id="emsf_46_ee666" value="<?php echo htmlspecialchars($asOf); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-calculator"></i> احسب</button>
-            <small style="color:#6b7280">— فارغٌ = القيمةُ النافذةُ اليوم · وبتاريخٍ = <strong>ما حكم ذلك اليوم</strong></small>
+            <small class="cl-muted">— فارغٌ = القيمةُ النافذةُ اليوم · وبتاريخٍ = <strong>ما حكم ذلك اليوم</strong></small>
         </form>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+        <div class="cl-badges">
             <?php foreach ($value['by_currency'] as $cur => $amt): ?>
-                <span class="badge badge-success" style="padding:8px 14px;font-size:15px">
+                <span class="badge badge-success cl-badge-value">
                     <?php echo number_format($amt, 2); ?> <?php echo htmlspecialchars((string)$cur); ?></span>
             <?php endforeach; ?>
             <?php if (!$value['by_currency']): ?>
-                <span class="badge badge-secondary" style="padding:8px 14px">لا بنودَ بيعٍ نافذة</span>
+                <span class="badge badge-secondary cl-badge-pad">لا بنودَ بيعٍ نافذة</span>
             <?php endif; ?>
         </div>
-        <p style="color:#6b7280;margin:0"><?php echo htmlspecialchars($value['note']); ?></p>
+        <p class="cl-note-muted"><?php echo htmlspecialchars($value['note']); ?></p>
 
         <?php if ($value['excluded']): ?>
-        <div class="alert alert-warning" style="margin-top:12px">
+        <div class="alert alert-warning cl-alert-gap">
             <strong>مستبعَدٌ من القيمة — التزاماتُ طاقةٍ لا تُفوتَر:</strong>
             <?php foreach ($value['excluded'] as $e): ?>
                 <div>• <?php echo htmlspecialchars((string)$e['code']); ?> —
@@ -189,7 +214,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list-ol"></i> البنود</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable cl-table" data-no-dt="1">
             <thead><tr><th>#</th><th>الوصف</th><th>النموذج</th><th>الكمية</th><th>السعر</th>
                 <th>القيمة</th><th>السريان</th><th>الضريبة</th><th>الحال</th>
                 <?php if ($can_edit) echo '<th>إعادةُ تسعير</th>'; ?>
@@ -205,9 +230,9 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 </tr></thead>
             <tbody>
             <?php foreach ($lines as $l): ?>
-                <tr<?php echo (string)$l['state'] !== 'active' ? " style='opacity:.6'" : ''; ?>>
+                <tr<?php echo (string)$l['state'] !== 'active' ? ' class="cl-row-past"' : ''; ?>>
                     <td><?php echo intval($l['line_no']); ?></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars((string)$l['description']); ?>
+                    <td class="cl-wrap"><?php echo htmlspecialchars((string)$l['description']); ?>
                         <?php if ($l['supersedes_line_id'] !== null): ?>
                             <div><small>يُخلِف البند #<?php echo intval($l['supersedes_line_id']); ?></small></div>
                         <?php endif; ?></td>
@@ -216,7 +241,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <td><?php echo htmlspecialchars((string)$l['unit_price']); ?></td>
                     <td><strong><?php echo number_format((float)$l['qty_contracted'] * (float)$l['unit_price'], 2); ?></strong>
                         <?php echo htmlspecialchars((string)$l['currency']); ?></td>
-                    <td style="direction:ltr"><?php echo htmlspecialchars((string)$l['valid_from']); ?>
+                    <td class="cl-ltr"><?php echo htmlspecialchars((string)$l['valid_from']); ?>
                         → <?php echo htmlspecialchars((string)($l['valid_to'] ?? '…')); ?></td>
                     <td><?php echo htmlspecialchars($TAX_AR[(string)$l['tax_status']] ?? (string)$l['tax_status']); ?>
                         <?php echo $l['tax_code_id'] !== null ? ('<small>#' . intval($l['tax_code_id']) . '</small>') : ''; ?></td>
@@ -224,15 +249,15 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <?php echo htmlspecialchars($ST_AR[(string)$l['state']] ?? (string)$l['state']); ?></span></td>
                     <?php if ($can_edit): ?>
                     <td><?php if ((string)$l['state'] === 'active'): ?>
-                        <form method="post" style="display:flex;gap:4px;flex-wrap:wrap">
+                        <form method="post" class="cl-inline-form">
         <?php echo csrf_field(); ?>
                             <input type="hidden" name="cl_action" value="reprice">
                             <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
                             <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                             <input type="number" name="new_price" step="0.0001" min="0.0001" required
-                                   placeholder="سعر" style="width:90px" aria-label="سعر">
-                            <input type="date" name="effective_from" required style="width:140px">
-                            <button type="submit" class="badge badge-info" style="border:0;padding:5px 8px">أخلِف</button>
+                                   placeholder="السعرُ الجديد" class="cl-w90" aria-label="السعرُ الجديدُ للبند">
+                            <input type="date" name="effective_from" class="cl-w140" required aria-label="تاريخُ سريانِ السعرِ الجديد">
+                            <button type="submit" class="badge badge-info cl-mini-btn">أخلِف</button>
                         </form>
                     <?php else: ?>—<?php endif; ?></td>
                     <?php endif; ?>
@@ -244,7 +269,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     </div>
 
     <?php if ($can_add): ?>
-    <form method="post" class="ems-form" style="margin-top:14px">
+    <form method="post" class="ems-form cl-add-form">
         <?php echo csrf_field(); ?>
         <input type="hidden" name="cl_action" value="add">
         <input type="hidden" name="contract_id" value="<?php echo $sel; ?>">
@@ -261,22 +286,22 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <?php endforeach; ?>
                 </select>
                 <?php if ($split['capacity']): ?>
-                <small style="color:#c00">⚠ التزاماتُ الطاقة **لا تظهر هنا**:
+                <small class="cl-req">⚠ التزاماتُ الطاقة **لا تظهر هنا**:
                     <?php $names = array(); foreach ($split['capacity'] as $m) { $names[] = (string)$m['commitment_code']; }
                           echo htmlspecialchars(implode(' · ', $names)); ?></small>
                 <?php endif; ?></div>
-            <div class="form-group"><label for="emsf_48_04c07">النموذج <span style="color:#c00">*</span></label>
+            <div class="form-group"><label for="emsf_48_04c07">النموذج <span class="cl-req">*</span></label>
                 <select name="pricing_model" required id="emsf_48_04c07">
                     <?php foreach ($MODEL_AR as $k => $v): ?>
                         <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                     <?php endforeach; ?></select></div>
             <div class="form-group"><label for="emsf_49_156b9">الوصف</label><input type="text" name="description" maxlength="200" id="emsf_49_156b9"></div>
-            <div class="form-group"><label for="emsf_50_5ed2f">الكمية <span style="color:#c00">*</span></label>
+            <div class="form-group"><label for="emsf_50_5ed2f">الكمية <span class="cl-req">*</span></label>
                 <input type="number" name="qty_contracted" step="0.01" min="0.01" required id="emsf_50_5ed2f"></div>
-            <div class="form-group"><label for="emsf_51_1ad79">سعرُ الوحدة <span style="color:#c00">*</span></label>
+            <div class="form-group"><label for="emsf_51_1ad79">سعرُ الوحدة <span class="cl-req">*</span></label>
                 <input type="number" name="unit_price" step="0.0001" min="0.0001" required id="emsf_51_1ad79"></div>
             <div class="form-group"><label for="emsf_52_ff69f">العملة</label><input type="text" name="currency" value="SDG" maxlength="8" id="emsf_52_ff69f"></div>
-            <div class="form-group"><label for="emsf_53_0548a">سريان من <span style="color:#c00">*</span></label>
+            <div class="form-group"><label for="emsf_53_0548a">سريان من <span class="cl-req">*</span></label>
                 <input type="date" name="valid_from" required id="emsf_53_0548a"></div>
             <div class="form-group"><label for="emsf_54_bc668">سريان إلى</label><input type="date" name="valid_to" id="emsf_54_bc668"></div>
             <div class="form-group"><label for="emsf_55_127c2">الحالةُ الضريبية</label>
@@ -293,7 +318,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <?php endforeach; ?></select></div>
             <div class="form-group"><label for="emsf_57_93be6">ملاحظة</label><input type="text" name="note" maxlength="200" id="emsf_57_93be6"></div>
         </div>
-        <div style="margin-top:12px"><button type="submit" class="btn-primary">
+        <div class="cl-actions"><button type="submit" class="btn-primary">
             <i class="fa fa-plus"></i> أضف بندَ بيع</button></div>
     </form>
     <?php endif; ?>

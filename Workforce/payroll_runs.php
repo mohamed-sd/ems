@@ -201,12 +201,33 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
     $header_back = array('href' => 'contract_registry.php', 'class' => '',
                          'icon' => 'fas fa-arrow-right', 'label' => 'سجل العقود');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا دوراتِ مسيّرِ رواتبَ مفتوحةً بعدُ', 'افتحْ أولَ دورةٍ بزرِّ «دورة جديدة» في رأسِ الشاشة');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     ?>
+    <style>
+        .pr-notice { margin-bottom: 14px; }
+        .pr-required-mark { color: var(--c-state-danger-strong); }
+        .pr-submit-row { margin-top: var(--space-3); }
+        .pr-filter-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .pr-run-select { min-width: 380px; }
+        .pr-inline-form { display: inline; }
+        .pr-transition-row { margin-top: var(--space-3); display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap; }
+        .pr-payref-input { max-width: 200px; }
+        .pr-muted { color: var(--c-s-666); }
+        .pr-hint { color: var(--c-s-666); margin-bottom: 10px; }
+        .pr-alert-gap { margin-top: 10px; }
+        .pr-summary-row { margin-top: 14px; line-height: 1.9; }
+        .pr-table-full { width: 100%; }
+        .pr-row-red { background: var(--c-ffecec, #ffecec); }
+        .pr-layer-title { margin-top: var(--space-3); }
+        .pr-layer-list { line-height: 1.8; }
+        .pr-net-emph { font-size: 1.2em; }
+    </style>
 
-    <div class="alert alert-warning" style="margin-bottom:14px">
+    <div class="alert alert-warning pr-notice">
         <i class="fa fa-circle-info"></i>
         <strong>الشريحة ① — بوابةُ اللقطة.</strong>
         يُحتسب هنا ما لا يحتاج زمنًا ولا إنتاجًا (مبلغٌ ثابتٌ · نسبةٌ من الأساسي).
@@ -220,9 +241,9 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
         <input type="hidden" name="pr_action" value="open_run">
         <div class="card"><div class="card-header"><h5><i class="fa fa-calendar"></i> دورةُ مسيّرٍ جديدة</h5></div>
         <div class="card-body"><div class="form-grid">
-            <div class="form-group"><label for="emsf_1751_f3df5">من <span style="color:#c00">*</span></label>
+            <div class="form-group"><label for="emsf_1751_f3df5">من <span class="pr-required-mark">*</span></label>
                 <input type="date" name="period_from" required id="emsf_1751_f3df5"></div>
-            <div class="form-group"><label for="emsf_1752_32b51">إلى <span style="color:#c00">*</span></label>
+            <div class="form-group"><label for="emsf_1752_32b51">إلى <span class="pr-required-mark">*</span></label>
                 <input type="date" name="period_to" required id="emsf_1752_32b51"></div>
             <div class="form-group">
                 <label for="emsf_1753_3f066">الفئة</label>
@@ -233,15 +254,15 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                 </select>
             </div>
         </div>
-        <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> فتح</button></div>
+        <div class="pr-submit-row"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> فتح</button></div>
         </div></div>
     </form>
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="pr-filter-form">
             <strong>الدورة:</strong>
-            <select name="run_id" onchange="this.form.submit()" style="min-width:380px">
+            <select name="run_id" aria-label="اختيارُ دورةِ المسيّر" onchange="this.form.submit()" class="pr-run-select">
                 <?php foreach ($runs as $r): ?>
                     <option value="<?php echo intval($r['id']); ?>" <?php echo $selected === intval($r['id']) ? 'selected' : ''; ?>>
                         #<?php echo intval($r['id']); ?> — <?php echo htmlspecialchars((string)$r['period_from']); ?>
@@ -254,7 +275,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
             <?php if ($run !== null && $can_edit
                       && in_array((string)$run['state'], array('Open','Blocked'), true)): ?>
                 </form>
-                <form method="post" style="display:inline">
+                <form method="post" class="pr-inline-form">
         <?= csrf_field() ?>
                     <input type="hidden" name="pr_action" value="bind">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
@@ -263,19 +284,19 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
             <?php else: ?></form><?php endif; ?>
             <?php if ($run !== null && $can_edit
                       && in_array((string)$run['state'], array('Calculated','Blocked'), true)): ?>
-                <form method="post" style="display:inline">
+                <form method="post" class="pr-inline-form">
         <?= csrf_field() ?>
                     <input type="hidden" name="pr_action" value="time_path">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
                     <button type="submit" class="btn-primary"><i class="fa fa-clock"></i> المسارُ الزمني</button>
                 </form>
-                <form method="post" style="display:inline">
+                <form method="post" class="pr-inline-form">
         <?= csrf_field() ?>
                     <input type="hidden" name="pr_action" value="production_path">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
                     <button type="submit" class="btn-primary"><i class="fa fa-cubes"></i> المسارُ الإنتاجي</button>
                 </form>
-                <form method="post" style="display:inline">
+                <form method="post" class="pr-inline-form">
         <?= csrf_field() ?>
                     <input type="hidden" name="pr_action" value="offsets">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
@@ -287,25 +308,25 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
             $red = PSM::redRows($gate, $selected);
             $allowed = PSM::allowedFrom((string) $run['state']);
         ?>
-        <div style="margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div class="pr-transition-row">
             <strong>الانتقال:</strong>
             <?php foreach ($allowed as $to): ?>
-                <form method="post" style="display:inline">
+                <form method="post" class="pr-inline-form">
         <?= csrf_field() ?>
                     <input type="hidden" name="pr_action" value="transition">
                     <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
                     <input type="hidden" name="to_state" value="<?php echo htmlspecialchars($to); ?>">
                     <?php if ($to === PSM::PAID): ?>
                         <input type="text" name="payment_ref" placeholder="مرجع الصرف (إلزامي)"
-                               required style="max-width:200px" aria-label="مرجع الصرف (إلزامي)">
+                               required class="pr-payref-input" aria-label="مرجع الصرف (إلزامي)">
                     <?php endif; ?>
                     <button type="submit" class="btn-primary">→ <?php echo htmlspecialchars(PSM::labelAr($to)); ?></button>
                 </form>
             <?php endforeach; ?>
-            <?php if (!$allowed): ?><span style="color:#666">حالةٌ نهائية — التصحيحُ بحدثٍ عاكسٍ لا بتعديل</span><?php endif; ?>
+            <?php if (!$allowed): ?><span class="pr-muted">حالةٌ نهائية — التصحيحُ بحدثٍ عاكسٍ لا بتعديل</span><?php endif; ?>
         </div>
         <?php if (!$red['ok']): ?>
-            <div class="alert alert-danger" style="margin-top:10px">
+            <div class="alert alert-danger pr-alert-gap">
                 <i class="fa fa-circle-exclamation"></i>
                 <strong>صفوفٌ حمراءُ تمنع الاعتماد:</strong>
                 <?php echo htmlspecialchars(implode(' · ', $red['reasons'])); ?>
@@ -314,7 +335,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
         <?php endif; ?>
 
         <?php if ($run !== null): ?>
-        <div style="margin-top:14px;line-height:1.9">
+        <div class="pr-summary-row">
             <span class="badge <?php echo (string)$run['state'] === 'Blocked' ? 'badge-danger' : 'badge-info'; ?>">
                 <?php echo htmlspecialchars($STATE_LABELS[$run['state']] ?? $run['state']); ?></span>
             · أشخاص: <strong><?php echo intval($run['persons_count']); ?></strong>
@@ -333,7 +354,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
     <div class="card"><div class="card-header">
         <h5><i class="fa fa-ban"></i> قائمةُ الموانع والمستبعَدين (<?php echo count($blocks); ?>)</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap pr-table-full">
             <thead><tr><th>النوع</th><th>العقد</th><th>الشخص</th><th>الرمز</th><th>السبب</th></tr></thead>
             <tbody>
             <?php foreach ($blocks as $b): ?>
@@ -357,7 +378,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
     <div class="card"><div class="card-header">
         <h5><i class="fa fa-keyboard"></i> مدخلاتُ الزمن — <strong>بمستندها إلزامًا</strong></h5></div>
     <div class="card-body">
-        <p style="color:#666;margin-bottom:10px">
+        <p class="pr-hint">
             «ولا خصمَ بلا مستند» (ENT-01 §4) — والزيادةُ مثلُه: ساعةُ إضافيٍّ بلا مرجعٍ
             رقمٌ يزيد أجرًا بلا سند. ولا مصدرَ آليًّا لهذه المدخلات في النظام اليوم.
         </p>
@@ -366,24 +387,24 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
             <input type="hidden" name="pr_action" value="time_input">
             <input type="hidden" name="run_id" value="<?php echo $selected; ?>">
             <div class="form-grid">
-                <div class="form-group"><label for="emsf_1754_c6a9e">رقم الشخص <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_1754_c6a9e">رقم الشخص <span class="pr-required-mark">*</span></label>
                     <input type="number" name="person_id" min="1" required id="emsf_1754_c6a9e"></div>
                 <div class="form-group">
-                    <label for="emsf_1755_df58c">النوع <span style="color:#c00">*</span></label>
+                    <label for="emsf_1755_df58c">النوع <span class="pr-required-mark">*</span></label>
                     <select name="kind" required id="emsf_1755_df58c">
                         <option value="overtime_hours">ساعاتُ إضافي</option>
                         <option value="night_shifts">ورديّاتٌ ليلية</option>
                         <option value="unpaid_days">أيامٌ غيرُ مدفوعة</option>
                     </select>
                 </div>
-                <div class="form-group"><label for="emsf_1756_dd6a7">الكمية <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_1756_dd6a7">الكمية <span class="pr-required-mark">*</span></label>
                     <input type="number" step="0.01" min="0.01" name="qty" required id="emsf_1756_dd6a7"></div>
-                <div class="form-group"><label for="emsf_1757_ed8d0">مرجع المستند <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_1757_ed8d0">مرجع المستند <span class="pr-required-mark">*</span></label>
                     <input type="text" name="doc_ref" required maxlength="120"
                            placeholder="إذنُ عملٍ إضافي 2047/114" id="emsf_1757_ed8d0"></div>
                 <div class="form-group"><label for="emsf_1758_457e2">ملاحظة</label><input type="text" name="input_note" maxlength="255" id="emsf_1758_457e2"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> تسجيل</button></div>
+            <div class="pr-submit-row"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> تسجيل</button></div>
         </form>
     </div></div>
     <?php endif; ?>
@@ -392,7 +413,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
     <div class="card"><div class="card-header">
         <h5><i class="fa fa-table-list"></i> سجلُّ المراجعة — صفٌّ لكل شخص</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap pr-table-full">
             <thead><tr>
                 <th>الشخص</th><th>أجرٌ وإنتاج</th><th>حوافز</th><th>إضافي</th>
                 <th>خصم الغياب</th><th>إجمالي الخصومات</th><th>صافي المستحق</th>
@@ -432,7 +453,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                 </tr></thead>
             <tbody>
             <?php $tNet = 0.0; foreach ($register as $rr): $tNet += (float) $rr['net']; ?>
-                <tr <?php echo intval($rr['red_rows']) > 0 ? 'style="background:#ffecec"' : ''; ?>>
+                <tr <?php echo intval($rr['red_rows']) > 0 ? 'class="pr-row-red"' : ''; ?>>
                     <td>#<?php echo intval($rr['person_id']); ?>
                         <?php if (intval($rr['red_rows']) > 0): ?>
                             <span class="badge badge-danger"
@@ -466,9 +487,9 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
         <h5><i class="fa fa-file-invoice"></i> كشفُ الفرد #<?php echo $slipPerson; ?> — بطبقاته</h5></div>
     <div class="card-body">
         <?php foreach ($slip['layers'] as $layerName => $layer): ?>
-            <h6 style="margin-top:12px"><strong><?php echo htmlspecialchars($layerName); ?></strong>
+            <h6 class="pr-layer-title"><strong><?php echo htmlspecialchars($layerName); ?></strong>
                 — <?php echo number_format((float)$layer['total'], 2); ?></h6>
-            <ul style="line-height:1.8">
+            <ul class="pr-layer-list">
             <?php foreach ($layer['rows'] as $row): ?>
                 <li>
                     <?php echo htmlspecialchars((string)($row['component_ref'] ?? ($row['source_type'] ?? ''))); ?>
@@ -479,7 +500,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
                         · <small>سند: <?php echo htmlspecialchars((string)$row['doc_ref']); ?></small>
                     <?php endif; ?>
                     <?php if (!empty($row['note'])): ?>
-                        <br><small style="color:#666"><?php echo htmlspecialchars((string)$row['note']); ?></small>
+                        <br><small class="pr-muted"><?php echo htmlspecialchars((string)$row['note']); ?></small>
                     <?php endif; ?>
                 </li>
             <?php endforeach; ?>
@@ -488,8 +509,8 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
         <hr>
         <p>الإجمالي <strong><?php echo htmlspecialchars($__money($slip['gross'])); ?></strong>
            · الخصومات <strong><?php echo number_format($slip['deductions'], 2); ?></strong>
-           · <span style="font-size:1.2em">الصافي <strong><?php echo htmlspecialchars($__money($slip['net'])); ?></strong></span></p>
-        <p style="color:#666">اللقطاتُ المستنَدُ إليها:
+           · <span class="pr-net-emph">الصافي <strong><?php echo htmlspecialchars($__money($slip['net'])); ?></strong></span></p>
+        <p class="pr-muted">اللقطاتُ المستنَدُ إليها:
             <?php foreach ($slip['snapshot_ids'] as $sid): ?>
                 <span class="badge badge-secondary">لقطة #<?php echo intval($sid); ?></span>
             <?php endforeach; ?>
@@ -507,7 +528,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
         <h5><i class="fa fa-scale-balanced"></i> المقاصّة — خصومٌ بمراجعها
             (<?php echo count($deductions); ?> · <?php echo number_format($dedTotal, 2); ?>)</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap pr-table-full">
             <thead><tr>
                 <th>الشخص</th><th>المصدر</th><th>المستحق</th><th>المخصوم</th>
                 <th>المستند</th><th>الحالة</th><th>البيان</th>
@@ -534,7 +555,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> أسطرُ الاحتساب بلقطاتها</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap pr-table-full">
             <thead><tr>
                 <th>الشخص</th><th>النوع</th><th>المسار</th><th>المكوّن</th><th>الطريقة</th>
                 <th>المعدل</th><th>الأيام</th><th>الجهة</th><th>٪</th><th>المبلغ</th><th>الحالة</th><th>اللقطة</th>

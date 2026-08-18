@@ -125,10 +125,31 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                          'icon' => 'fas fa-arrow-right', 'label' => 'بنود العقد');
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا
+    echo ems_states_bundle('لا بنودَ بيعٍ نافذةً لها جدولٌ شهريٌّ','اختر بندًا من جدولِ بنودِ البيعِ أعلاه ثمّ احفظ نسخةً للجدول');
     ?>
 
+    <style>
+    .mp-note{color:var(--c-4b5563, #4b5563);line-height:1.8;margin:0}
+    .mp-table{width:100%}
+    .mp-wrap{white-space:normal}
+    .mp-chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    .mp-badge-pad{padding:6px 12px}
+    .mp-vers{margin-bottom:10px}
+    .mp-ver-link{text-decoration:none;padding:5px 10px;margin-left:4px}
+    .mp-eff{max-width:280px;margin-bottom:12px}
+    .mp-req{color:var(--c-state-danger-strong)}
+    .mp-row-missing{background:var(--c-fff7ed, #fff7ed)}
+    .mp-qty{width:120px}
+    .mp-note-in{width:220px}
+    .mp-actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+    .mp-actions2{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .mp-inline{display:inline}
+    .mp-btn-link{text-decoration:none}
+    </style>
+
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;line-height:1.8;margin:0">
+        <p class="mp-note">
             <i class="fas fa-circle-info"></i>
             الكميةُ المتعاقَدةُ <strong>ليست رقمًا يُقسَّم بالتساوي</strong> — بل <strong>منحنًى</strong>:
             شهرُ تعبئةٍ جزئيةٍ وشهرُ توقفٍ موسميٍّ وأشهرٌ اعتيادية.
@@ -139,7 +160,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list-ol"></i> بنودُ البيع النافذة</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable mp-table" data-no-dt="1">
             <thead><tr><th>العقد</th><th>#</th><th>الوصف</th><th>المتعاقَد</th><th>المخطَّط</th>
                 <th>الفجوة</th><th>مختوم</th><th></th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -157,7 +178,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 $gap = round((float)$l['qty_contracted'] - (float)$l['qty_planned_total'], 2); ?>
                 <tr><td>#<?php echo intval($l['contract_id']); ?></td>
                     <td><?php echo intval($l['line_no']); ?></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars((string)$l['description']); ?></td>
+                    <td class="mp-wrap"><?php echo htmlspecialchars((string)$l['description']); ?></td>
                     <td><?php echo htmlspecialchars((string)$l['qty_contracted']); ?></td>
                     <td><?php echo htmlspecialchars((string)$l['qty_planned_total']); ?></td>
                     <td><span class="badge <?php echo abs($gap) < 0.005 ? 'badge-success' : 'badge-warning'; ?>">
@@ -178,26 +199,25 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         جدولُ البند #<?php echo intval($line['line_no']); ?> —
         <?php echo htmlspecialchars((string)$line['description']); ?></h5></div>
     <div class="card-body">
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-            <span class="badge badge-secondary" style="padding:6px 12px">المتعاقَد
+        <div class="mp-chips">
+            <span class="badge badge-secondary mp-badge-pad">المتعاقَد
                 <?php echo htmlspecialchars((string)$line['qty_contracted']); ?></span>
-            <span class="badge badge-info" style="padding:6px 12px">Σ النسخة <?php echo $VER; ?>:
+            <span class="badge badge-info mp-badge-pad">Σ النسخة <?php echo $VER; ?>:
                 <?php echo $sum; ?></span>
             <?php $gap = round((float)$line['qty_contracted'] - $sum, 2); ?>
-            <span class="badge <?php echo abs($gap) < 0.005 ? 'badge-success' : 'badge-warning'; ?>"
-                style="padding:6px 12px">الفجوة <?php echo $gap; ?>
+            <span class="mp-badge-pad badge <?php echo abs($gap) < 0.005 ? 'badge-success' : 'badge-warning'; ?>"
+                >الفجوة <?php echo $gap; ?>
                 <?php echo abs($gap) < 0.005 ? '— **يُختم**' : '— **لا يُختم**'; ?></span>
             <?php if ($miss): ?>
-                <span class="badge badge-warning" style="padding:6px 12px">
+                <span class="badge badge-warning mp-badge-pad">
                     <?php echo count($miss); ?> شهرًا غائبًا</span>
             <?php endif; ?>
         </div>
 
         <?php if ($vers): ?>
-        <div style="margin-bottom:10px">النسخ:
+        <div class="mp-vers">النسخ:
             <?php foreach ($vers as $v): ?>
-                <a class="badge <?php echo (int)$v['plan_version'] === $VER ? 'badge-info' : 'badge-secondary'; ?>"
-                   style="text-decoration:none;padding:5px 10px;margin-left:4px"
+                <a class="mp-ver-link badge <?php echo (int)$v['plan_version'] === $VER ? 'badge-info' : 'badge-secondary'; ?>"
                    href="?line=<?php echo $LID; ?>&v=<?php echo intval($v['plan_version']); ?>">
                     <?php echo intval($v['plan_version']); ?>
                     (<?php echo htmlspecialchars((string)$v['effective_from']); ?> ·
@@ -211,29 +231,29 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <input type="hidden" name="mp_action" value="save">
             <input type="hidden" name="line_id" value="<?php echo $LID; ?>">
             <input type="hidden" name="plan_version" value="<?php echo $VER; ?>">
-            <div class="form-group" style="max-width:280px;margin-bottom:12px">
-                <label for="emsf_58_73c4b">سريانُ النسخة <span style="color:#c00">*</span></label>
-                <input type="date" name="effective_from" required
+            <div class="form-group mp-eff">
+                <label for="emsf_58_73c4b">سريانُ النسخة <span class="mp-req">*</span></label>
+                <input type="date" name="effective_from" aria-label="تاريخُ سريانِ نسخةِ الجدول" required
                        value="<?php echo htmlspecialchars((string)($rows ? $rows[0]['effective_from'] : $line['valid_from'])); ?>" id="emsf_58_73c4b">
             </div>
             <div class="table-container">
-            <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+            <table class="alltables display nowrap no-datatable mp-table" data-no-dt="1">
                 <thead><tr><th>الشهر</th><th>الكمية</th><th>طبيعتُه</th><th>ملاحظة</th></tr></thead>
                 <tbody>
                 <?php foreach ($grid as $mm): $r = isset($byMonth[$mm]) ? $byMonth[$mm] : null; ?>
-                    <tr<?php echo $r === null ? " style='background:#fff7ed'" : ''; ?>>
+                    <tr<?php echo $r === null ? " class='mp-row-missing'" : ''; ?>>
                         <td><strong><?php echo htmlspecialchars($mm); ?></strong>
                             <?php echo $r === null ? '<span class="badge badge-warning">غائب</span>' : ''; ?></td>
-                        <td><input type="number" step="0.01" min="0" style="width:120px"
+                        <td><input type="number" step="0.01" min="0" aria-label="الكميةُ المخطَّطةُ لهذا الشهر" class="mp-qty"
                             name="qty[<?php echo $mm; ?>]"
                             value="<?php echo $r !== null ? htmlspecialchars((string)$r['qty_planned']) : ''; ?>"></td>
-                        <td><select name="kind[<?php echo $mm; ?>]">
+                        <td><select aria-label="طبيعةُ الشهرِ في المنحنى" name="kind[<?php echo $mm; ?>]">
                             <?php foreach ($KIND_AR as $k => $v): ?>
                                 <option value="<?php echo $k; ?>"
                                     <?php echo ($r !== null && (string)$r['month_kind'] === $k) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($v); ?></option>
                             <?php endforeach; ?></select></td>
-                        <td><input type="text" maxlength="200" style="width:220px"
+                        <td><input type="text" maxlength="200" aria-label="ملاحظةُ الشهرِ المخطَّط" class="mp-note-in"
                             name="mnote[<?php echo $mm; ?>]"
                             value="<?php echo $r !== null ? htmlspecialchars((string)($r['note'] ?? '')) : ''; ?>"></td></tr>
                 <?php endforeach; ?>
@@ -241,15 +261,15 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             </table>
             </div>
             <?php if ($can_edit): ?>
-            <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <div class="mp-actions">
                 <button type="submit" class="btn-primary"><i class="fa fa-save"></i> احفظ النسخة <?php echo $VER; ?></button>
             </div>
             <?php endif; ?>
         </form>
 
         <?php if ($can_edit): ?>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
-            <form method="post" style="display:inline">
+        <div class="mp-actions2">
+            <form method="post" class="mp-inline">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="mp_action" value="seal">
                 <input type="hidden" name="line_id" value="<?php echo $LID; ?>">
@@ -257,7 +277,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <button type="submit" class="btn-primary"><i class="fa fa-stamp"></i>
                     اختم النسخة <?php echo $VER; ?></button>
             </form>
-            <a class="btn-primary" style="text-decoration:none"
+            <a class="btn-primary mp-btn-link"
                href="?line=<?php echo $LID; ?>&v=<?php echo $VER + 1; ?>">
                 <i class="fa fa-copy"></i> نسخةٌ جديدة (<?php echo $VER + 1; ?>)</a>
         </div>

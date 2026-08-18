@@ -148,28 +148,39 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => 'payroll_runs.php', 'class' => '',
                          'icon' => 'fas fa-arrow-right', 'label' => 'مسيّر الرواتب');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا سلفياتِ موظفين مفتوحةً بعدُ', 'افتحْ أولَ سلفةٍ بزرِّ «سلفة جديدة» في رأسِ الشاشة');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     ?>
+    <style>
+        .adv-note-muted { color: var(--c-s-666); }
+        .adv-required-mark { color: var(--c-state-danger-strong); }
+        .adv-protection-form { display: flex; gap: var(--space-2); align-items: center; margin-top: 10px; flex-wrap: wrap; }
+        .adv-protection-input { max-width: 180px; }
+        .adv-submit-row { margin-top: var(--space-3); }
+        .adv-table-full { width: 100%; }
+        .adv-inline-form { display: inline; }
+    </style>
 
     <div class="card"><div class="card-body">
         <strong>حدُّ حمايةِ الصافي:</strong>
         <?php if ($protection === null): ?>
             <span class="badge badge-warning">لم يُقرَّر بعد</span>
-            <span style="color:#666"> — وحتى يُقرَّر يُخصم القسطُ كاملًا، ولا يُفترض حدٌّ لم يقرّره أحد.</span>
+            <span class="adv-note-muted"> — وحتى يُقرَّر يُخصم القسطُ كاملًا، ولا يُفترض حدٌّ لم يقرّره أحد.</span>
         <?php else: ?>
             <span class="badge badge-success"><?php echo htmlspecialchars((string)$protection); ?>٪</span>
-            <span style="color:#666"> — لا ينزل صافي العامل تحت هذه النسبة من إجماليه؛ وما لا يسعه الحدُّ
+            <span class="adv-note-muted"> — لا ينزل صافي العامل تحت هذه النسبة من إجماليه؛ وما لا يسعه الحدُّ
                 <strong>يُرحَّل</strong> للفترة التالية ولا يُلغى.</span>
         <?php endif; ?>
         <?php if ($can_edit): ?>
-        <form method="post" style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
+        <form method="post" class="adv-protection-form">
         <?= csrf_field() ?>
             <input type="hidden" name="ad_action" value="set_protection">
-            <input type="number" step="0.01" min="0" max="100" name="protection_percent"
-                   value="<?php echo $protection === null ? '' : htmlspecialchars((string)$protection); ?>"
-                   placeholder="فارغٌ = غيرُ مقرَّر" style="max-width:180px" aria-label="فارغٌ = غيرُ مقرَّر">
+            <input type="number" step="0.01" min="0" max="100" name="protection_percent" class="adv-protection-input"
+                   placeholder="فارغٌ = غيرُ مقرَّر" aria-label="فارغٌ = غيرُ مقرَّر"
+                   value="<?php echo $protection === null ? '' : htmlspecialchars((string)$protection); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-shield-halved"></i> حفظ الحد</button>
         </form>
         <?php endif; ?>
@@ -182,7 +193,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="card"><div class="card-header"><h5><i class="fa fa-hand-holding-dollar"></i> سلفةٌ جديدة</h5></div>
         <div class="card-body"><div class="form-grid">
             <div class="form-group">
-                <label for="emsf_1675_61b58">المستفيد <span style="color:#c00">*</span></label>
+                <label for="emsf_1675_61b58">المستفيد <span class="adv-required-mark">*</span></label>
                 <select name="person_id" required id="emsf_1675_61b58">
                     <option value="">— اختر —</option>
                     <?php foreach ($people as $p): ?>
@@ -200,13 +211,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="form-group"><label for="emsf_1677_95bc0">المبلغ <span style="color:#c00">*</span></label>
+            <div class="form-group"><label for="emsf_1677_95bc0">المبلغ <span class="adv-required-mark">*</span></label>
                 <input type="number" step="0.01" min="0.01" name="amount" required id="emsf_1677_95bc0"></div>
             <div class="form-group"><label for="emsf_1678_244f8">العملة</label><input type="text" name="currency" maxlength="8" id="emsf_1678_244f8"></div>
-            <div class="form-group"><label for="emsf_1679_3b65c">مستند الصرف <span style="color:#c00">*</span>
+            <div class="form-group"><label for="emsf_1679_3b65c">مستند الصرف <span class="adv-required-mark">*</span>
                     <small>— «كلٌّ بمستنده»</small></label>
                 <input type="text" name="doc_ref" required maxlength="120" placeholder="إذنُ صرف 2049/221" id="emsf_1679_3b65c"></div>
-            <div class="form-group"><label for="emsf_1680_f09a4">تاريخ الصرف <span style="color:#c00">*</span></label>
+            <div class="form-group"><label for="emsf_1680_f09a4">تاريخ الصرف <span class="adv-required-mark">*</span></label>
                 <input type="date" name="issued_date" required id="emsf_1680_f09a4"></div>
             <div class="form-group"><label for="emsf_1681_8f91d">عدد الأقساط</label>
                 <input type="number" min="1" name="installments_count" value="1" id="emsf_1681_8f91d"></div>
@@ -216,14 +227,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <input type="date" name="first_deduction_period" id="emsf_1683_dd69b"></div>
             <div class="form-group"><label for="emsf_1684_dd952">ملاحظة</label><input type="text" name="note" maxlength="255" id="emsf_1684_dd952"></div>
         </div>
-        <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> فتح السلفة</button></div>
+        <div class="adv-submit-row"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> فتح السلفة</button></div>
         </div></div>
     </form>
     <?php endif; ?>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> السلفيات وأرصدتُها</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap adv-table-full">
             <thead><tr>
                 <th>الإجراءات</th><th>المستفيد</th><th>النوع</th><th>المبلغ</th>
                 <th>قيمة القسط</th><th>المستردّ</th><th>الرصيد</th><th>المستند</th><th>الحالة</th>
@@ -261,7 +272,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <tr>
                     <td>
                     <?php if ($can_edit && (string)$a['state'] === 'draft'): ?>
-                        <form method="post" style="display:inline">
+                        <form method="post" class="adv-inline-form">
         <?= csrf_field() ?>
                             <input type="hidden" name="ad_action" value="approve">
                             <input type="hidden" name="advance_id" value="<?php echo intval($a['id']); ?>">

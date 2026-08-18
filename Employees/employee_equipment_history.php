@@ -41,12 +41,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <style>
     .history-header {
-        background: linear-gradient(135deg, #01072a 0%, #2d2b22 100%);
+        background: linear-gradient(135deg, var(--c-01072a, #01072a) 0%, var(--c-2d2b22, #2d2b22) 100%);
         padding: 1.5rem;
         border-radius: 16px;
         margin-bottom: 1.5rem;
-        color: #fff;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        color: var(--c-surface, #fff);
+        box-shadow: 0 6px 20px var(--c-rgba000015, rgba(0, 0, 0, 0.15));
     }
 
     .history-header h2 {
@@ -57,13 +57,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     .history-meta {
         margin-top: 0.5rem;
         font-size: 0.95rem;
-        color: rgba(255, 255, 255, 0.8);
+        color: var(--c-rgba25525525508, rgba(255, 255, 255, 0.8));
     }
 
     .current-assignment {
-        background: rgba(40, 167, 69, 0.12) !important;
-        border-right: 4px solid #28a745;
+        background: var(--c-rgba4016769012, rgba(40, 167, 69, 0.12)) !important;
+        border-right: 4px solid var(--c-28a745, #28a745);
     }
+
+    /* UXW-01 ②: أنماطٌ موضعيةٌ نُقلت أصنافًا صفحيةً ببادئةِ الشاشة eeh- */
+    .eeh-table { width: 100%; margin-top: 10px; }
+    .eeh-empty-note { margin-top: 1rem; color: var(--c-6c757d, #6c757d); }
 </style>
 
 <div class="main">
@@ -74,6 +78,8 @@ $header_title_html = htmlspecialchars('Employee Equipment History', ENT_QUOTES, 
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا سجلَّ قيادةِ معدّاتٍ لهذا السائق', 'اربطْ سائقًا بمعدّةٍ من شاشةِ سائقي المعدات ليظهرَ سجلُّه هنا');
 ?>
 
     <div class="history-header">
@@ -88,7 +94,7 @@ include __DIR__ . '/../includes/page_header.php';
             <h5 class="mb-0">تاريخ قيادة الشاحنات</h5>
         </div>
         <div class="card-body">
-            <table id="historyTable" class="display" style="width:100%; margin-top: 10px;">
+            <table id="historyTable" class="display eeh-table">
                 <thead>
                     <tr>
                         <th>#</th>
@@ -166,7 +172,7 @@ include __DIR__ . '/../includes/page_header.php';
                 </tbody>
             </table>
             <?php if (empty($history_rows)) { ?>
-                <div style="margin-top: 1rem; color: #6c757d;">لا يوجد سجل قيادة للشاحنات لهذا السائق.</div>
+                <div class="eeh-empty-note">لا يوجد سجل قيادة للشاحنات لهذا السائق.</div>
             <?php } ?>
         </div>
     </div>
@@ -176,17 +182,11 @@ include __DIR__ . '/../includes/page_header.php';
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <!-- DataTables JS -->
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
-<script>
-    (function () {
-        $(document).ready(function () {
-            $('#historyTable').DataTable({
-                "language": {
-                    "url": "https:/ems/assets/i18n/datatables/ar.json"
-                }
-            });
-        });
-    })();
-</script>
+<?php
+/* UXW-01 ⑤: التهيئةُ المحليةُ رُفعت — المكوّنُ المركزيُّ في
+   assets/js/ui-unification.js يلتقط الجدولَ آليًّا ويحمّل التعريبَ من
+   /ems/assets/i18n/datatables/ar.json (كان المسارُ المحليُّ مكسورًا: https:/ems/…). */
+?>
 
 </body>
 </html>

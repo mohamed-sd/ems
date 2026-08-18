@@ -443,9 +443,9 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
 
 .equipments-fleet-main .stats-section {
     margin: 12px 0 16px;
-    border: 1px solid #eadfce;
+    border: 1px solid var(--c-eadfce, #eadfce);
     border-radius: 14px;
-    background: linear-gradient(180deg, #fff 0%, #fffbf5 100%);
+    background: linear-gradient(180deg, var(--c-surface) 0%, var(--c-fffbf5) 100%);
     padding: 12px;
 }
 
@@ -456,9 +456,9 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
 }
 
 .equipments-fleet-main .stats-card {
-    border: 1px solid #e8dcc8;
+    border: 1px solid var(--c-e8dcc8);
     border-radius: 12px;
-    background: #fff;
+    background: var(--c-surface);
     padding: 12px;
 }
 
@@ -474,7 +474,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
 
 .equipments-fleet-main .stats-title {
     font-size: .84rem;
-    color: #6b4e2a;
+    color: var(--c-6b4e2a);
     margin-bottom: 6px;
     font-weight: 700;
 }
@@ -482,15 +482,22 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
 .equipments-fleet-main .stats-value {
     font-size: 1.4rem;
     font-weight: 900;
-    color: #1a1208;
+    color: var(--c-1a1208, #1a1208);
 }
 
-.equipments-fleet-main .stats-primary .stats-icon { background: rgba(37,99,235,.14); color: #1d4ed8; }
-.equipments-fleet-main .stats-success .stats-icon { background: rgba(22,163,74,.14); color: #15803d; }
-.equipments-fleet-main .stats-danger .stats-icon { background: rgba(220,38,38,.14); color: #b91c1c; }
-.equipments-fleet-main .stats-purple .stats-icon { background: rgba(124,58,237,.14); color: #6d28d9; }
-.equipments-fleet-main .stats-cyan .stats-icon { background: rgba(8,145,178,.14); color: #0e7490; }
-.equipments-fleet-main .stats-orange .stats-icon { background: rgba(217,119,6,.14); color: #b45309; }
+.equipments-fleet-main .stats-primary .stats-icon { background: var(--c-rgba379923514, rgba(37,99,235,.14)); color: var(--c-state-info-deep); }
+.equipments-fleet-main .stats-success .stats-icon { background: var(--c-rgba221637414, rgba(22,163,74,.14)); color: var(--c-15803d); }
+.equipments-fleet-main .stats-danger .stats-icon { background: var(--c-rgba220383814, rgba(220,38,38,.14)); color: var(--c-b91c1c); }
+.equipments-fleet-main .stats-purple .stats-icon { background: var(--c-rgba1245823714, rgba(124,58,237,.14)); color: var(--c-6d28d9); }
+.equipments-fleet-main .stats-cyan .stats-icon { background: var(--c-rgba814517814, rgba(8,145,178,.14)); color: var(--c-0e7490); }
+.equipments-fleet-main .stats-orange .stats-icon { background: var(--c-rgba217119614, rgba(217,119,6,.14)); color: var(--c-b45309); }
+
+/* UXW-01 ①②: الأنماطُ الموضعيةُ صارت أصنافًا برموزِ اللون — القيمُ ذاتُها حرفًا */
+.eqf-hint { color: var(--c-777777, #777); }
+.eqf-badge-gap { margin-inline-start: 4px; }
+.eqf-approve { color: var(--c-1f9d55, #1f9d55); }
+.eqf-modal-loading { padding: 20px; text-align: center; color: var(--t2); }
+.eqf-modal-error { padding: 16px; text-align: center; color: var(--c-c0392b); }
 </style>
 
 <div class="main equipments-fleet-main ems-unified-page-shell">
@@ -513,6 +520,8 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
         array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع'),
     );
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا معدّةَ مسجَّلةً في الأسطولِ بعدُ', 'أضف أولَ معدّةٍ بزرِّ «إضافة معدة جديدة» في رأسِ الشاشة');
     ?>
 
 
@@ -564,8 +573,8 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
     <?php if ($can_add || $can_edit) { ?>
         <!-- فورم إضافة / تعديل معدة -->
         <form id="projectForm" action="" method="post"
-            class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>
-        <?= csrf_field() ?>">
+            class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>">
+        <?= csrf_field() ?>
               <div class="card-header">
                     <h5>
                         <i class="fas fa-<?php echo !empty($editData) ? 'edit' : 'plus-circle'; ?>"></i>
@@ -715,7 +724,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                                 }
                                 ?>
                             </select>
-                            <small style="color:#777">عند الاختيار تُملأ تلقائياً حقول النوع والماركة والموديل من السجل.</small>
+                            <small class="eqf-hint">عند الاختيار تُملأ تلقائياً حقول النوع والماركة والموديل من السجل.</small>
                         </div>
                         <?php endif; ?>
 
@@ -1174,19 +1183,19 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                 <span class="contracts-group-toolbar-label">
                     <i class="fas fa-filter"></i> عرض المجموعات:
                 </span>
-                <button type="button" class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
+                <button type="button" class="ems-btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
                     <i class="fas fa-info-circle"></i> أساسية
                 </button>
-                <button type="button" class="btn-group-toggle" data-group="manufacturing" title="بيانات الصنع">
+                <button type="button" class="ems-btn-group-toggle" data-group="manufacturing" title="بيانات الصنع">
                     <i class="fas fa-industry"></i> الصنع
                 </button>
-                <button type="button" class="btn-group-toggle" data-group="technical" title="الحالة الفنية">
+                <button type="button" class="ems-btn-group-toggle" data-group="technical" title="الحالة الفنية">
                     <i class="fas fa-wrench"></i> فنية
                 </button>
-                <button type="button" class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
+                <button type="button" class="ems-btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
                     <i class="fas fa-toggle-on"></i> الحالة
                 </button>
-                <button type="button" class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
+                <button type="button" class="ems-btn-group-toggle-all" title="إظهار/إخفاء الكل">
                     <i class="fas fa-eye"></i> الكل
                 </button>
               </div>
@@ -1280,15 +1289,15 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                             // ── كرت المعدة: شارة الحالة + اعتماد ──
                             $card_state = isset($row['card_state']) ? $row['card_state'] : 'active';
                             if ($card_state === 'active') {
-                                echo "<span class='badge-available' title='كرت معتمد' style='margin-inline-start:4px'><i class='fas fa-id-card'></i> نشط</span>";
+                                echo "<span class='badge-available' title='كرت معتمد' class='eqf-badge-gap'><i class='fas fa-id-card'></i> نشط</span>";
                             } else {
-                                echo "<span class='badge-busy' title='كرت مسودة' style='margin-inline-start:4px'><i class='fas fa-id-card'></i> مسودة</span>";
+                                echo "<span class='badge-busy' title='كرت مسودة' class='eqf-badge-gap'><i class='fas fa-id-card'></i> مسودة</span>";
                                 if ($can_edit) {
                                     echo "<form method='post' action='approve_card.php' class='d-inline' onsubmit=\"return confirm('اعتماد كرت هذه المعدة؟');\">
         <?= csrf_field() ?>"
                                         . "<input type='hidden' name='equipment_id' value='" . intval($row['id']) . "'>"
                                         . "<input type='hidden' name='return' value='equipments_fleet.php'>"
-                                        . "<button type='submit' class='action-btn' style='color:#1f9d55' title='اعتماد الكرت'><i class='fas fa-circle-check'></i></button>"
+                                        . "<button type='submit' class='action-btn eqf-approve' title='اعتماد الكرت'><i class='fas fa-circle-check'></i></button>"
                                         . "</form>";
                                 }
                             }
@@ -1413,21 +1422,12 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
     <script>
         (function () {
             $(document).ready(function () {
-                var table = $('#projectsTable').DataTable({
-                    dom: 'Bfrtip',
-                    scrollX: true,
-                    autoWidth: false,
-                    buttons: [
-                        { extend: 'copy', text: 'نسخ' },
-                        { extend: 'excel', text: 'تصدير Excel' },
-                        { extend: 'csv', text: 'تصدير CSV' },
-                        { extend: 'pdf', text: 'تصدير PDF' },
-                        { extend: 'print', text: 'طباعة' }
-                    ],
-                    "language": {
-                        "url": "/ems/assets/i18n/datatables/ar.json"
-                    }
-                });
+                // UXW-01 ⑤: التهيئةُ المحليةُ رُفعت — المكوّنُ المركزيُّ
+                // (assets/js/ui-unification.js) يهيّئ الجدولَ ويحمّل ar.json ويلفُّه
+                // بتمريرٍ أفقيٍّ ويُلحق زرَّ إكسل. وهذا النداءُ بلا خياراتٍ يُرجِع
+                // واجهةَ النسخةِ القائمةِ لا يُنشئ ثانية — فالفلترةُ ومجموعاتُ
+                // الأعمدةِ تعمل على النسخةِ الموحَّدةِ نفسِها.
+                var table = $('#projectsTable').DataTable();
 
                 // نظام إظهار/إخفاء المجموعات — خريطة الفهارس تُمرّر للوحدة الموحّدة.
                 // الحالة الافتراضية (المُفعّلة/المخفية) تؤخذ من كلاس active على الأزرار.
@@ -1563,7 +1563,9 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                                 storageKey: 'fleetGroupStates',
                                 mode: 'datatable',
                                 table: table,
-                                columnMap: columnGroups
+                                columnMap: columnGroups,
+                                buttons: '.ems-btn-group-toggle[data-group]',
+                                allButton: '.ems-btn-group-toggle-all'
                             });
                         }
                     }
@@ -1860,7 +1862,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                     title: 'بيانات المعدة',
                     icon: 'fas fa-truck-monster',
                     sections: [{ title: 'تحميل البيانات', icon: 'fas fa-spinner',
-                        html: '<div style="padding:20px;text-align:center;color:var(--t2)"><i class="fas fa-spinner fa-spin"></i> جار التحميل...</div>' }],
+                        html: '<div class="eqf-modal-loading"><i class="fas fa-spinner fa-spin"></i> جار التحميل...</div>' }],
                     actions: fleetActions(equipmentId)
                 });
 
@@ -1873,7 +1875,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                         if (!response.success || !response.data) {
                             const failMessage = (response && response.message) ? response.message : 'تعذر تحميل البيانات';
                             EmsDetailsModal.setSection(0, { title: 'خطأ', icon: 'fas fa-exclamation-triangle',
-                                html: '<div style="padding:16px;text-align:center;color:#c0392b">' + failMessage + '</div>' });
+                                html: '<div class="eqf-modal-error">' + failMessage + '</div>' });
                             return;
                         }
                         EmsDetailsModal.open({
@@ -1885,7 +1887,7 @@ $fleet_active_ops_count = intval($_faoc_rows[0]['t'] ?? 0);
                     },
                     error: function () {
                         EmsDetailsModal.setSection(0, { title: 'خطأ', icon: 'fas fa-exclamation-triangle',
-                            html: '<div style="padding:16px;text-align:center;color:#c0392b">تعذر الاتصال بالخادم</div>' });
+                            html: '<div class="eqf-modal-error">تعذر الاتصال بالخادم</div>' });
                     }
                 });
             });

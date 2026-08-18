@@ -431,7 +431,7 @@
             if (structureMismatch) { table.dataset.emsDtSkip = '1'; return; }
             $table.addClass('display');
             try {
-                $table.DataTable({
+                var emsOpts = {
                     autoWidth: false,
                     language: { url: '/ems/assets/i18n/datatables/ar.json' },
                     // إصلاح tn/18 من stateSave: performance-boost.js يفعّل stateSave عمومياً،
@@ -444,7 +444,35 @@
                             return false;
                         }
                     }
-                });
+                };
+                /* ══ UXW-01 ⑤: سماتُ حفظِ السلوكِ على وسمِ الجدول ═══════════════
+                   الشاشةُ المرحَّلةُ تحذف تهيئتَها المحليةَ وتُعلن ما كانت تضبطه
+                   سماتٍ على `<table>`. وكان المكوّنُ لا يقرؤها — فنقلُ التهيئةِ
+                   إلى سماتٍ كان **توثيقًا بلا أثر**: ترتيبُ الخادمِ ينقلب إلى
+                   `[[0,'asc']]` وطولُ الصفحةِ إلى الافتراضِ العام، صامتًا.
+                   رصدته دفعتا المالية والحركةِ مستقلّتَين، والموضعُ الصحيحُ
+                   للحلِّ هذا الملفُّ وحدَه فيعود السلوكُ لكلِّ الدفعاتِ معًا. */
+                var dtOrder = table.getAttribute('data-order');
+                if (dtOrder) {
+                    try { emsOpts.order = JSON.parse(dtOrder); } catch (eOrder) { /* سمةٌ تالفةٌ تُتجاهل */ }
+                }
+                var dtLen = parseInt(table.getAttribute('data-page-length'), 10);
+                if (!isNaN(dtLen) && dtLen > 0) { emsOpts.pageLength = dtLen; }
+                var dtState = table.getAttribute('data-state-save');
+                if (dtState !== null) { emsOpts.stateSave = (dtState !== 'false' && dtState !== '0'); }
+                /* عمودٌ غيرُ قابلٍ للفرز (عمودُ «الإجراءات» غالبًا) وما شابهه:
+                   data-column-defs='[{"orderable":false,"targets":-1}]' — مخرَجُ
+                   الطوارئِ العامُّ لما لا تعبّر عنه سمةٌ بعينِها. */
+                var dtDefs = table.getAttribute('data-column-defs');
+                if (dtDefs) {
+                    try { emsOpts.columnDefs = JSON.parse(dtDefs); } catch (eDefs) { /* سمةٌ تالفةٌ تُتجاهل */ }
+                }
+                var dtScrollX = table.getAttribute('data-scroll-x');
+                if (dtScrollX !== null && dtScrollX !== 'false' && dtScrollX !== '0') {
+                    emsOpts.scrollX = true;
+                    emsOpts.scrollCollapse = true;
+                }
+                $table.DataTable(emsOpts);
             } catch (e) { /* legacy tables may be initialized later */ }
         });
     }

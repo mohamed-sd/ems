@@ -54,9 +54,17 @@ $header_title_html = htmlspecialchars('خطةُ معدات المورد', ENT_QU
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا خطةَ معداتٍ لهذا المورد', 'اختر موردًا من القائمةِ أعلاه، أو خصِّص له مقاعدَ معداتٍ في حاويةِ التشغيل');
 ?>
-  <form method="get" class="ems-form" style="margin-bottom:14px">
-    <select name="supplier_id" class="form-control" style="max-width:340px" onchange="this.form.submit()">
+  <style>
+    .sup-eqp-filter        { margin-bottom: 14px; }
+    .sup-eqp-picker        { max-width: 340px; }
+    .sup-eqp-role-standby  { background: var(--c-6c757d, #6c757d); }
+    .sup-eqp-role-primary  { background: var(--c-0d6efd, #0d6efd); }
+  </style>
+  <form method="get" class="ems-form sup-eqp-filter">
+    <select name="supplier_id" aria-label="المورد" class="form-control sup-eqp-picker" onchange="this.form.submit()">
       <option value="">— اختر موردًا —</option>
       <?php foreach ($sups as $s): ?>
         <option value="<?= intval($s['id']) ?>" <?= $s['id'] == $sup ? 'selected' : '' ?>><?= htmlspecialchars($s['name'], ENT_QUOTES, 'UTF-8') ?></option>
@@ -114,8 +122,8 @@ include __DIR__ . '/../includes/page_header.php';
         <td><?= htmlspecialchars($c['seat_no'] !== null ? $c['seat_no'] : '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= $c['eq_id'] ? '<a href="../Equipments/equipment_profile.php?id=' . intval($c['eq_id']) . '">'
               . htmlspecialchars($c['eq_name'], ENT_QUOTES, 'UTF-8') . '</a>' : '<span class="text-muted">فجوةٌ — بلا معدة</span>' ?></td>
-        <td><?= $standby ? '<span class="badge" style="background:#6c757d">احتياطية — صفرُ ساعاتٍ قبل التفعيل</span>'
-                          : '<span class="badge" style="background:#0d6efd">أساسية</span>' ?></td>
+        <td><?= $standby ? '<span class="badge sup-eqp-role-standby">احتياطية — صفرُ ساعاتٍ قبل التفعيل</span>'
+                          : '<span class="badge sup-eqp-role-primary">أساسية</span>' ?></td>
         <td><?= number_format(floatval($c['cap_qty']), 1) ?></td>
         <td><?= htmlspecialchars(($c['valid_from'] !== null ? $c['valid_from'] : '؟') . ' ← ' . ($c['valid_to'] !== null ? $c['valid_to'] : 'ساري'), ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($c['state'], ENT_QUOTES, 'UTF-8') ?></td>

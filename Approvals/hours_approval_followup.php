@@ -44,10 +44,10 @@ $my_level = $role_level_map[$role] ?? 0;
 $next_level = ($my_level > 0 && $my_level < 4) ? $my_level + 1 : 0;
 
 $level_role_name = array(
-    1 => array('label' => 'مدير المشاريع', 'color' => '#0B1E3F', 'icon' => 'fa-user-tie'),
-    2 => array('label' => 'مدير الموردين', 'color' => '#A8541C', 'icon' => 'fa-truck-medical'),
-    3 => array('label' => 'مدير الأسطول',  'color' => '#475569', 'icon' => 'fa-truck'),
-    4 => array('label' => 'مدير المشغلين', 'color' => '#5B7F1E', 'icon' => 'fa-shield-halved'),
+    1 => array('label' => 'مدير المشاريع', 'color' => 'var(--c-0b1e3f, #0B1E3F)', 'icon' => 'fa-user-tie'),
+    2 => array('label' => 'مدير الموردين', 'color' => 'var(--c-a8541c)', 'icon' => 'fa-truck-medical'),
+    3 => array('label' => 'مدير الأسطول',  'color' => 'var(--c-ink-600)', 'icon' => 'fa-truck'),
+    4 => array('label' => 'مدير المشغلين', 'color' => 'var(--c-5b7f1e)', 'icon' => 'fa-shield-halved'),
 );
 
 // نطاق الشركة عبر بوابة المستأجر ({TENANT_SCOPE}) — فرع OR IS NULL القديم مكافئ حرفيًا
@@ -294,6 +294,64 @@ include('../inheader.php');
 ?>
 <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
 
+<style>
+/* UXW-01 ②·①: أنماطُ الشاشةِ منقولةً من السماتِ الموضعيةِ إلى أصنافٍ برموزِ الألوان */
+.hours-approval-followup-main .haf-fs-85  { font-size: .85rem; }
+.hours-approval-followup-main .haf-fs-60  { font-size: .6rem; }
+.hours-approval-followup-main .haf-sel-200 { max-width: 200px; }
+.hours-approval-followup-main .haf-tc     { text-align: center; }
+.hours-approval-followup-main .haf-mb12   { margin-bottom: 12px; }
+.hours-approval-followup-main .note-btn.haf-fault-btn {
+  border-color: var(--c-dc3545);
+  color: var(--c-surface);
+}
+.hours-approval-followup-main .haf-fault-ico { color: var(--c-surface); }
+.hours-approval-followup-main .note-badge.haf-fault-badge {
+  background: var(--c-dc3545);
+  color: var(--c-surface);
+}
+.hours-approval-followup-main .note-btn.haf-fault-btn2 {
+  border-color: var(--c-dc3545);
+  color: var(--c-dc3545);
+}
+.hours-approval-followup-main .haf-fault-ico2 { color: var(--c-dc3545); }
+.hours-approval-followup-main .note-badge.haf-fault-badge2 { background: var(--c-dc3545); }
+.hours-approval-followup-main .haf-ico-ok { color: var(--c-059669); font-size: .9rem; }
+.hours-approval-followup-main .haf-note-active { color: var(--c-ffaa33, #ffaa33); }
+
+/* المودالُ ومحتواه المصيَّرُ بجافاسكربت — خارجَ حاويةِ الشاشة فلا يُقيَّد بها */
+.haf-mh-danger {
+  background: linear-gradient(135deg, var(--c-7f1d1d), var(--c-b91c1c));
+  color: var(--c-surface);
+}
+.haf-note-head { font-size: .75rem; color: var(--c-334155); font-weight: 700; margin-bottom: 4px; }
+.haf-note-body { font-size: .83rem; color: var(--c-0f172a); }
+.haf-note-meta { font-size: .72rem; color: var(--c-64748b); margin-top: 5px; }
+.haf-none-wrap { color: var(--c-6c757d); }
+.haf-none-ico  { font-size: 48px; color: var(--c-198754); display: block; margin-bottom: 12px; }
+.haf-none-txt  { font-size: 15px; font-weight: 600; }
+.haf-fx-scroll { overflow-x: auto; }
+.haf-fx-table  { font-size: 13px; min-width: 650px; }
+.haf-fx-table th { padding: 8px 12px; }
+.haf-fx-table td { padding: 7px 12px; }
+.haf-fx-head {
+  background: linear-gradient(135deg, var(--c-ink-950), var(--c-1a1f28));
+  color: var(--c-f7931a);
+  border-bottom: 2px solid var(--c-e67e00);
+}
+.haf-fx-num    { color: var(--c-6c757d); }
+.haf-fx-detail { font-weight: 600; }
+.haf-fx-code {
+  background: var(--c-fef2f2);
+  color: var(--c-b91c1c);
+  border: 1px solid var(--c-fecaca);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+</style>
+
 <div class="main hours-approval-followup-main">
 <div class="page-wrapper">
   <?php
@@ -306,9 +364,11 @@ include('../inheader.php');
   );
   $header_back = array();
   include('../includes/page_header.php');
+  // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+  echo ems_states_bundle('لا سجلَّ اعتمادٍ منقولًا إلى مستواك بعدُ', 'تابِعْ من شاشةِ الاعتمادِ حتى يعتمدَ المستوى السابقُ سجلَّه فيظهرَ هنا');
   ?>
 
-  <div class="mb-3 text-muted" style="font-size:.85rem;">
+  <div class="mb-3 text-muted haf-fs-85">
     <?php if ($is_admin): ?>
       عرض إداري للسجلات المنقولة بين المستويات ولم تصل للاعتماد النهائي بعد
     <?php elseif ($my_level >= 1 && $my_level <= 3): ?>
@@ -323,7 +383,7 @@ include('../inheader.php');
   <div class="toolbar-row mb-3">
     <form method="get" class="d-flex align-items-center gap-2">
       <label for="equip_type" class="fw-semibold mb-0">نوع المعدة:</label>
-      <select name="equip_type" id="equip_type" class="form-select form-select-sm" style="max-width:200px;">
+      <select name="equip_type" id="equip_type" class="form-select form-select-sm haf-sel-200">
         <option value="0" <?= $equip_type_filter === 0 ? 'selected' : '' ?>>الكل</option>
         <option value="1" <?= $equip_type_filter === 1 ? 'selected' : '' ?>>حفارات</option>
         <option value="2" <?= $equip_type_filter === 2 ? 'selected' : '' ?>>قلابات</option>
@@ -480,29 +540,29 @@ include('../inheader.php');
                     $_tooltip   = $_linfo['title'] . ': ' . $_tip_name . ($_tip_at ? ' — ' . $_tip_at : '');
                   ?>
                   <div class="ap-circle <?= $_is_done ? 'done' : '' ?>" title="<?= $_tooltip ?>">
-                    <?= $_is_done ? '<i class="fa fa-check" style="font-size:.6rem"></i>' : $_linfo['label'] ?>
+                    <?= $_is_done ? '<i class="fa fa-check haf-fs-60"></i>' : $_linfo['label'] ?>
                   </div>
                 <?php endforeach; ?>
               </div>
             </td>
-            <td style="text-align:center;">
+            <td class="haf-tc">
               <?php
                 $_fup_fc_cnt = intval($fault_counts_map_fup[$row['id']] ?? 0);
                 $_fup_leg_has = !empty($row['fault_type']) || !empty($row['fault_part']);
                 $_fup_badge = $_fup_fc_cnt > 0 ? $_fup_fc_cnt : ($_fup_leg_has ? 1 : 0);
               ?>
               <?php if ($_fup_badge > 0): ?>
-              <button class="note-btn fup-fault-btn" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="border-color:#dc3545;color:#fff;">
-                <i class="fa fa-exclamation-triangle" style="color:#dc3545;color:#fff;"></i>
-                <span class="note-badge" style="background:#dc3545;color:#fff;"><?= $_fup_badge ?></span>
+              <button class="note-btn fup-fault-btn haf-fault-btn" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال">
+                <i class="fa fa-exclamation-triangle haf-fault-ico"></i>
+                <span class="note-badge haf-fault-badge"><?= $_fup_badge ?></span>
               </button>
               <?php else: ?>
-              <i class="fa fa-check-circle" style="color:#059669;font-size:.9rem;" title="لا توجد أعطال"></i>
+              <i class="fa fa-check-circle haf-ico-ok" title="لا توجد أعطال"></i>
               <?php endif; ?>
             </td>
             <td>
               <button class="note-btn" onclick="openNotes(<?= intval($row['id']) ?>)">
-                <i class="fa fa-comment" <?php if (intval($row['notes_count']) > 0): ?>style="color:#ffaa33;"<?php endif; ?>></i>
+                <i class="fa fa-comment<?php if (intval($row['notes_count']) > 0): ?> haf-note-active<?php endif; ?>"></i>
                 <?php if (intval($row['notes_count']) > 0): ?>
                 <span class="note-badge"><?= intval($row['notes_count']) ?></span>
                 <?php endif; ?>
@@ -523,7 +583,7 @@ include('../inheader.php');
   <div class="table-card">
     <h5 class="card-title"><i class="fa fa-check-circle text-success"></i> سجلات مكتملة الاعتماد النهائي</h5>
 
-    <div class="filters-wrap" style="margin-bottom: 12px;">
+    <div class="filters-wrap haf-mb12">
       <div class="fg">
         <label for="ff-equipment-type">نوع المعدة</label>
         <select id="ff-equipment-type">
@@ -621,24 +681,24 @@ include('../inheader.php');
             <td><strong><?= floatval($row['total_work_hours'] ?? 0) ?></strong></td>
             <td><?= htmlspecialchars($row['final_approver'] ?? '—') ?></td>
             <td><?= !empty($row['final_approved_at']) ? date('Y-m-d H:i', strtotime($row['final_approved_at'])) : '—' ?></td>
-            <td style="text-align:center;">
+            <td class="haf-tc">
               <?php
                 $_fin_fc_cnt = intval($fault_counts_map_fup[$row['id']] ?? 0);
                 $_fin_leg_has = !empty($row['fault_type']) || !empty($row['fault_part']);
                 $_fin_badge = $_fin_fc_cnt > 0 ? $_fin_fc_cnt : ($_fin_leg_has ? 1 : 0);
               ?>
               <?php if ($_fin_badge > 0): ?>
-              <button class="note-btn fup-fault-btn" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال" style="border-color:#dc3545;color:#dc3545;">
-                <i class="fa fa-exclamation-triangle" style="color:#dc3545;"></i>
-                <span class="note-badge" style="background:#dc3545;"><?= $_fin_badge ?></span>
+              <button class="note-btn fup-fault-btn haf-fault-btn2" data-ts-id="<?= intval($row['id']) ?>" title="عرض الأعطال">
+                <i class="fa fa-exclamation-triangle haf-fault-ico2"></i>
+                <span class="note-badge haf-fault-badge2"><?= $_fin_badge ?></span>
               </button>
               <?php else: ?>
-              <i class="fa fa-check-circle" style="color:#059669;font-size:.9rem;" title="لا توجد أعطال"></i>
+              <i class="fa fa-check-circle haf-ico-ok" title="لا توجد أعطال"></i>
               <?php endif; ?>
             </td>
             <td>
               <button class="note-btn" onclick="openNotes(<?= intval($row['id']) ?>)">
-                <i class="fa fa-comment" <?php if (intval($row['notes_count']) > 0): ?>style="color:#ffaa33;"<?php endif; ?>></i>
+                <i class="fa fa-comment<?php if (intval($row['notes_count']) > 0): ?> haf-note-active<?php endif; ?>"></i>
                 <?php if (intval($row['notes_count']) > 0): ?>
                 <span class="note-badge"><?= intval($row['notes_count']) ?></span>
                 <?php endif; ?>
@@ -662,7 +722,7 @@ include('../inheader.php');
 <div class="modal fade" id="fupFaultModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content" dir="rtl">
-      <div class="modal-header" style="background:linear-gradient(135deg,#7f1d1d,#b91c1c);color:#fff;">
+      <div class="modal-header haf-mh-danger">
         <h5 class="modal-title fw-bold"><i class="fa fa-exclamation-triangle me-2"></i> تفاصيل الأعطال — التايم شيت #<span id="fup-fault-ts-id">—</span></h5>
         <button type="button" class="btn-close btn-secondary" data-bs-dismiss="modal"></button>
       </div>
@@ -852,9 +912,9 @@ function loadNotes(tsId) {
       var html = '';
       res.notes.forEach(function(n) {
         html += '<div class="note-item">'
-          + '<div style="font-size:.75rem;color:#334155;font-weight:700;margin-bottom:4px;">' + escHtml(n.column_label || '') + ' - ' + escHtml(n.created_by_name || '') + '</div>'
-          + '<div style="font-size:.83rem;color:#0f172a;">' + escHtml(n.note_text || '') + '</div>'
-          + '<div style="font-size:.72rem;color:#64748b;margin-top:5px;">' + escHtml(n.created_at || '') + '</div>'
+          + '<div class="haf-note-head">' + escHtml(n.column_label || '') + ' - ' + escHtml(n.created_by_name || '') + '</div>'
+          + '<div class="haf-note-body">' + escHtml(n.note_text || '') + '</div>'
+          + '<div class="haf-note-meta">' + escHtml(n.created_at || '') + '</div>'
           + '</div>';
       });
       $('#notes-list').html(html);
@@ -920,32 +980,32 @@ $(document).on('click', '.fup-fault-btn', function() {
   $.getJSON('../Timesheet/get_timesheet_failures.php?timesheet_id=' + tsId, function(res) {
     if (!res || !res.success || !res.data || res.data.length === 0) {
       $('#fupFaultModalBody').html(
-        '<div class="text-center py-5" style="color:#6c757d;">' +
-        '<i class="fas fa-check-circle" style="font-size:48px;color:#198754;display:block;margin-bottom:12px;"></i>' +
-        '<p style="font-size:15px;font-weight:600;">لا توجد أعطال مصنفة من المنظومة الجديدة</p>' +
+        '<div class="text-center py-5 haf-none-wrap">' +
+        '<i class="fas fa-check-circle haf-none-ico"></i>' +
+        '<p class="haf-none-txt">لا توجد أعطال مصنفة من المنظومة الجديدة</p>' +
         '</div>'
       );
       return;
     }
-    var html = '<div style="overflow-x:auto;">';
-    html += '<table class="table table-sm table-hover" style="font-size:13px;min-width:650px;">';
-    html += '<thead style="background:linear-gradient(135deg,#0f1115,#1a1f28);color:#f7931a;border-bottom:2px solid #e67e00;">' +
+    var html = '<div class="haf-fx-scroll">';
+    html += '<table class="table table-sm table-hover haf-fx-table">';
+    html += '<thead class="haf-fx-head">' +
             '<tr>' +
-            '<th style="padding:8px 12px;">#</th>' +
-            '<th style="padding:8px 12px;">الكود الكامل</th>' +
-            '<th style="padding:8px 12px;">نوع الحدث</th>' +
-            '<th style="padding:8px 12px;">الفئة الرئيسية</th>' +
-            '<th style="padding:8px 12px;">الفئة الفرعية</th>' +
-            '<th style="padding:8px 12px;">تفصيل العطل</th>' +
+            '<th>#</th>' +
+            '<th>الكود الكامل</th>' +
+            '<th>نوع الحدث</th>' +
+            '<th>الفئة الرئيسية</th>' +
+            '<th>الفئة الفرعية</th>' +
+            '<th>تفصيل العطل</th>' +
             '</tr></thead><tbody>';
     res.data.forEach(function(f, i) {
       html += '<tr>' +
-              '<td style="padding:7px 12px;color:#6c757d;">' + (i + 1) + '</td>' +
-              '<td style="padding:7px 12px;"><span style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;">' + escHtml(f.full_code || '—') + '</span></td>' +
-              '<td style="padding:7px 12px;">' + escHtml(f.event_type_name || '—') + '</td>' +
-              '<td style="padding:7px 12px;">' + escHtml(f.main_category_name || '—') + '</td>' +
-              '<td style="padding:7px 12px;">' + escHtml(f.sub_category || '—') + '</td>' +
-              '<td style="padding:7px 12px;font-weight:600;">' + escHtml(f.failure_detail || '—') + '</td>' +
+              '<td class="haf-fx-num">' + (i + 1) + '</td>' +
+              '<td><span class="haf-fx-code">' + escHtml(f.full_code || '—') + '</span></td>' +
+              '<td>' + escHtml(f.event_type_name || '—') + '</td>' +
+              '<td>' + escHtml(f.main_category_name || '—') + '</td>' +
+              '<td>' + escHtml(f.sub_category || '—') + '</td>' +
+              '<td class="haf-fx-detail">' + escHtml(f.failure_detail || '—') + '</td>' +
               '</tr>';
     });
     html += '</tbody></table></div>';

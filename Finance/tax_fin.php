@@ -90,6 +90,14 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة */
+.fin-tax-periodbar { display: flex; gap: 8px; align-items: center; margin-bottom: 12px; }
+.fin-tax-card { text-align: center; }
+.fin-tax-figure { font-size: 22px; font-weight: 700; margin: 6px 0; }
+.fin-tax-h5 { margin: 0 0 10px; }
+.fin-tax-table { width: 100%; }
+</style>
 <div class="main fin-tax-main ems-unified-page-shell">
     <?php
     $header_title = 'الضرائب والقيمة المضافة'; $header_icon = 'fa fa-percent';
@@ -100,27 +108,29 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+    echo ems_states_bundle('لا حركاتِ ضريبيةً في هذه الفترة', 'سجّلْ حركةً بزرِّ «حركة ضريبية» في رأسِ الشاشة، أو غيّرِ الفترةَ أعلاه');
     ?>
     <?php fin_msg_banner(); ?>
 
     <!-- إقرار الضريبة -->
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+        <form method="get" class="fin-tax-periodbar">
             <strong><i class="fas fa-file-invoice"></i> إقرار الضريبة للفترة:</strong>
-            <input type="month" name="period" value="<?php echo htmlspecialchars($sel_period); ?>" onchange="this.form.submit()">
+            <input type="month" name="period" aria-label="فترةُ إقرارِ الضريبة" value="<?php echo htmlspecialchars($sel_period); ?>" onchange="this.form.submit()">
         </form>
         <div class="form-grid">
-            <div class="card" style="text-align:center"><div class="card-body">
+            <div class="card fin-tax-card"><div class="card-body">
                 <div class="text-muted">ضريبة المخرجات (مبيعات)</div>
-                <div style="font-size:22px;font-weight:700;margin:6px 0"><?php echo number_format($out_tax, 2); ?></div>
+                <div class="fin-tax-figure"><?php echo number_format($out_tax, 2); ?></div>
             </div></div>
-            <div class="card" style="text-align:center"><div class="card-body">
+            <div class="card fin-tax-card"><div class="card-body">
                 <div class="text-muted">ضريبة المدخلات (مشتريات)</div>
-                <div style="font-size:22px;font-weight:700;margin:6px 0">(<?php echo number_format($in_tax, 2); ?>)</div>
+                <div class="fin-tax-figure">(<?php echo number_format($in_tax, 2); ?>)</div>
             </div></div>
-            <div class="card" style="text-align:center"><div class="card-body">
+            <div class="card fin-tax-card"><div class="card-body">
                 <div class="text-muted"><?php echo $net_tax >= 0 ? 'صافي الضريبة المستحقة للسداد' : 'رصيد ضريبي قابل للاسترداد'; ?></div>
-                <div style="font-size:22px;font-weight:700;margin:6px 0"><span class="badge badge-<?php echo $net_tax >= 0 ? 'danger' : 'success'; ?>"><?php echo number_format(abs($net_tax), 2); ?></span></div>
+                <div class="fin-tax-figure"><span class="badge badge-<?php echo $net_tax >= 0 ? 'danger' : 'success'; ?>"><?php echo number_format(abs($net_tax), 2); ?></span></div>
             </div></div>
         </div>
     </div></div>
@@ -156,7 +166,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-group"><label for="emsf_269_687c2">الوعاء الضريبي <span class="required">*</span></label><input type="number" step="0.01" min="0" name="base_amount" required id="emsf_269_687c2"></div>
             <div class="form-group"><label for="tx_rate">النسبة %</label><input type="number" step="0.01" name="tax_rate" id="tx_rate" value="15"></div>
             <div class="form-group"><label for="emsf_270_84ddc">المرجع</label><input type="text" name="source_ref" placeholder="فاتورة/أمر" id="emsf_270_84ddc"></div>
-            <div class="form-group"><label for="emsf_271_8602e">الفترة</label><input type="month" name="period_ref" value="<?php echo date('Y-m'); ?>" id="emsf_271_8602e"></div>
+            <div class="form-group"><label for="emsf_271_8602e">الفترة</label><input type="month" name="period_ref" aria-label="فترةُ الحركةِ الضريبية" value="<?php echo date('Y-m'); ?>" id="emsf_271_8602e"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-secondary" onclick="$('#txForm').removeClass('allforms-visible')">إلغاء</button></div>
@@ -164,9 +174,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-list"></i> الحركات الضريبية</h5>
+        <h5 class="fin-tax-h5"><i class="fas fa-list"></i> الحركات الضريبية</h5>
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="finTable" class="display nowrap alltables fin-tax-table">
                 <thead><tr><th>الإجراءات</th><th>النوع</th><th>الرمز</th><th>الوعاء</th><th>النسبة</th><th>الضريبة</th><th>المرجع</th><th>الفترة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -215,9 +225,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 <script>
 $(document).ready(function () {
-    $('#finTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    // جدولُ العرضِ يهيّئُه المكوّنُ المركزيُّ (assets/js/ui-unification.js)
     $('#toggleCode').on('click', function () { $('#codeForm').toggleClass('allforms-visible'); });
     $('#toggleTx').on('click', function () { $('#txForm').toggleClass('allforms-visible'); });
     $('#tx_code').on('change', function () { var r = $(this).find(':selected').data('rate'); if (r !== undefined && r !== '') $('#tx_rate').val(r); });

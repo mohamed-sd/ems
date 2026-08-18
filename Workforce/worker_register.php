@@ -195,7 +195,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا عمالَ تشغيليين مصنَّفين في السجلِّ بعدُ', 'صنّفْ أولَ موظفٍ عاملًا تشغيليًّا بزرِّ «تصنيف عامل تشغيلي» في رأسِ الشاشة');
     ?>
+    <style>
+        .wrg-form-grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 14px; }
+        .wrg-form-grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); padding: 14px; }
+        .wrg-inline-check { display: flex; align-items: center; gap: var(--space-2); }
+        .wrg-check-label { margin: 0; }
+        .wrg-span-full { grid-column: 1 / -1; }
+        .wrg-field-actions { display: flex; align-items: flex-end; }
+        .wrg-form-actions { padding: 0 14px 16px; display: flex; gap: 10px; }
+        .wrg-cancel-btn { background: var(--c-ink-500); }
+        .wrg-quals-table { width: 100%; margin-top: 6px; }
+        .wrg-inline-form { display: inline; }
+        .wrg-table-wrap { margin-top: 14px; }
+        .wrg-table-full { width: 100%; }
+        .wrg-empty-line { text-align: center; color: var(--c-888, #888); }
+        .wrg-empty-cell { text-align: center; color: var(--c-888, #888); padding: 18px; }
+    </style>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
@@ -235,19 +253,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
 
     <!-- ═══ فورم تصنيف/تعديل العامل ═══ -->
-    <form id="workerForm" action="" method="post" class="allforms" style="<?= $show_form ? '' : 'display:none;' ?>
-        <?= csrf_field() ?>">
+    <form id="workerForm" action="" method="post" class="allforms<?= $show_form ? ' allforms-visible' : '' ?>">
+        <?= csrf_field() ?>
         <input type="hidden" name="action" value="save_worker">
         <input type="hidden" name="id" value="<?= $edit_worker ? intval($edit_worker['id']) : 0 ?>">
         <div class="card-header">
             <h5><i class="fas fa-edit"></i> <?= $edit_worker ? 'تعديل بيانات العامل' : 'تصنيف موظفٍ عاملاً تشغيلياً' ?></h5>
         </div>
 
-        <div class="form-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:14px;">
+        <div class="form-grid wrg-form-grid3">
             <div class="field">
-                <label><i class="fas fa-user"></i> الموظف</label>
+                <label for="employee_id"><i class="fas fa-user"></i> الموظف</label>
                 <?php if ($edit_worker): ?>
-                    <input type="text" value="<?= htmlspecialchars($edit_worker['employee_name'] ?? '-') ?>" disabled>
+                    <input type="text" id="employee_id" aria-label="اسمُ الموظفِ المصنَّف" value="<?= htmlspecialchars($edit_worker['employee_name'] ?? '-') ?>" disabled>
                 <?php else: ?>
                     <select name="employee_id" id="employee_id" required onchange="emsSuggestCategory()">
                         <option value="">— اختر موظفاً غير مصنّف —</option>
@@ -261,8 +279,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
 
             <div class="field">
-                <label><i class="fas fa-barcode"></i> كود العامل (يدوي)</label>
-                <input type="text" name="code" value="<?= htmlspecialchars($edit_worker['code'] ?? '') ?>" placeholder="اختياري">
+                <label for="wrg_code"><i class="fas fa-barcode"></i> كود العامل (يدوي)</label>
+                <input type="text" name="code" id="wrg_code" placeholder="اختياري" aria-label="كودُ العاملِ التشغيلي — إدخالٌ يدوي" value="<?= htmlspecialchars($edit_worker['code'] ?? '') ?>">
             </div>
 
             <div class="field">
@@ -283,7 +301,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </select>
             </div>
 
-            <div class="field" id="supplierField" style="<?= (($edit_worker['source_type'] ?? 'شركة') === 'شركة') ? 'display:none;' : '' ?>">
+            <div class="field<?= (($edit_worker["source_type"] ?? "شركة") === "شركة") ? " is-hidden" : "" ?>" id="supplierField">
                 <label for="emsf_608_9e84e"><i class="fas fa-truck"></i> المورد/المقاول</label>
                 <select name="supplier_id" id="emsf_608_9e84e">
                     <option value="">—</option>
@@ -333,7 +351,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="field">
                 <label for="emsf_613_a34d6"><i class="fas fa-notes-medical"></i> شروط اللياقة</label>
-                <input type="text" name="fitness_conditions" value="<?= htmlspecialchars($edit_worker['fitness_conditions'] ?? '') ?>" placeholder="عند «لائق بشروط»" id="emsf_613_a34d6">
+                <input type="text" name="fitness_conditions" id="emsf_613_a34d6" placeholder="عند «لائق بشروط»" aria-label="شروطُ اللياقةِ الطبية" value="<?= htmlspecialchars($edit_worker['fitness_conditions'] ?? '') ?>">
             </div>
 
             <div class="field">
@@ -347,20 +365,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </select>
             </div>
 
-            <div class="field" style="display:flex;align-items:center;gap:8px;">
+            <div class="field wrg-inline-check">
                 <input type="checkbox" name="is_replaceable" id="is_replaceable" value="1" <?= (!$edit_worker || intval($edit_worker['is_replaceable'] ?? 1) === 1) ? 'checked' : '' ?>>
-                <label for="is_replaceable" style="margin:0;">قابل للإحلال</label>
+                <label for="is_replaceable" class="wrg-check-label">قابل للإحلال</label>
             </div>
 
-            <div class="field" style="grid-column:1/-1;">
-                <label><i class="fas fa-align-right"></i> ملاحظات</label>
-                <textarea name="notes" rows="2"><?= htmlspecialchars($edit_worker['notes'] ?? '') ?></textarea>
+            <div class="field wrg-span-full">
+                <label for="wrg_notes"><i class="fas fa-align-right"></i> ملاحظات</label>
+                <textarea name="notes" id="wrg_notes" rows="2" aria-label="ملاحظاتٌ عامةٌ على العامل"><?= htmlspecialchars($edit_worker['notes'] ?? '') ?></textarea>
             </div>
         </div>
 
-        <div style="padding:0 14px 16px;display:flex;gap:10px;">
+        <div class="wrg-form-actions">
             <button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button>
-            <a href="worker_register.php" class="add-btn" style="background:#6b7280;"><i class="fas fa-times"></i> إلغاء</a>
+            <a href="worker_register.php" class="add-btn wrg-cancel-btn"><i class="fas fa-times"></i> إلغاء</a>
         </div>
     </form>
 
@@ -368,7 +386,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <!-- ═══ 8.2 المهارات والرخص والاعتمادات ═══ -->
     <div class="allforms" id="qualsPanel">
         <div class="card-header"><h5><i class="fas fa-certificate"></i> المهارات والرخص والاعتمادات</h5></div>
-        <form action="" method="post" class="form-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:14px;">
+        <form action="" method="post" class="form-grid wrg-form-grid4">
         <?= csrf_field() ?>
             <input type="hidden" name="action" value="save_qualification">
             <input type="hidden" name="worker_id" value="<?= intval($edit_worker['id']) ?>">
@@ -387,16 +405,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <select name="proficiency_level" id="emsf_622_a12ca"><option value="">—</option><?php foreach (['مبتدئ','متوسط','متقدم','خبير'] as $pl): ?><option value="<?= $pl ?>"><?= $pl ?></option><?php endforeach; ?></select>
             </div>
             <div class="field"><label for="emsf_623_74024">مدة التنبيه (يوم)</label><input type="number" name="alert_lead_days" value="30" min="0" id="emsf_623_74024"></div>
-            <div class="field" style="display:flex;align-items:center;gap:8px;"><input type="checkbox" name="is_critical" id="is_critical_q" value="1"><label for="is_critical_q" style="margin:0;">اعتماد حرج (يمنع التخصيص عند انتهائه)</label></div>
-            <div class="field"><label>مرجع القرار (للترقية)</label><input type="text" name="decision_ref"></div>
-            <div class="field" style="display:flex;align-items:flex-end;"><button type="submit" class="add-btn"><i class="fas fa-plus"></i> إضافة</button></div>
+            <div class="field wrg-inline-check"><input type="checkbox" name="is_critical" id="is_critical_q" value="1"><label for="is_critical_q" class="wrg-check-label">اعتماد حرج (يمنع التخصيص عند انتهائه)</label></div>
+            <div class="field"><label for="wrg_decision_ref">مرجع القرار (للترقية)</label><input type="text" name="decision_ref" id="wrg_decision_ref"></div>
+            <div class="field wrg-field-actions"><button type="submit" class="add-btn"><i class="fas fa-plus"></i> إضافة</button></div>
         </form>
 
-        <table class="data-table" style="width:100%;margin-top:6px;">
+        <table class="data-table wrg-quals-table">
             <thead><tr><th>النوع</th><th>العنوان</th><th>الجهة</th><th>المعدة</th><th>الإصدار</th><th>الانتهاء</th><th>الصلاحية</th><th>حرج</th><th></th></tr></thead>
             <tbody>
             <?php if (empty($edit_quals)): ?>
-                <tr><td colspan="9" style="text-align:center;color:#888;">لا توجد اعتمادات بعد</td></tr>
+                <tr><td colspan="9" class="wrg-empty-line">لا توجد اعتمادات بعد</td></tr>
             <?php else: foreach ($edit_quals as $q):
                 $vClass = $q['validity'] === 'منتهٍ' ? 'status-inactive' : ($q['validity'] === 'قارب الانتهاء' ? 'status-warning' : 'status-active'); ?>
                 <tr>
@@ -409,7 +427,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><span class="status-pill <?= $vClass ?>"><?= htmlspecialchars($q['validity']) ?></span></td>
                     <td><?= intval($q['is_critical']) ? '⚠️' : '—' ?></td>
                     <td><?php if ($can_delete): ?>
-                        <form action="" method="post" onsubmit="return confirm('حذف الاعتماد؟');" style="display:inline;">
+                        <form action="" method="post" onsubmit="return confirm('حذف الاعتماد؟');" class="wrg-inline-form">
         <?= csrf_field() ?>
                             <input type="hidden" name="action" value="delete_qualification">
                             <input type="hidden" name="qid" value="<?= intval($q['id']) ?>">
@@ -425,8 +443,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <!-- ═══ جدول سجل العمال ═══ -->
-    <div class="table-wrap" style="margin-top:14px;">
-        <table class="data-table" style="width:100%;">
+    <div class="table-wrap wrg-table-wrap">
+        <table class="data-table wrg-table-full">
             <thead>
                 <tr><th>إجراءات</th><th>#</th><th>الكود</th><th>الاسم</th><th>الفئة</th><th>المصدر</th><th>موقع القوة</th><th>الدرجة</th><th>الحالة</th><th>اللياقة</th><th>الاعتمادات</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -496,7 +514,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tr>
             <?php endforeach; }
             if (!$res || $i === 1): ?>
-                <tr><td colspan="11" style="text-align:center;color:#888;padding:18px;">لا يوجد عمالٌ مصنّفون بعد. استخدم «تصنيف عامل تشغيلي» لإضافة أول عامل.</td></tr>
+                <tr><td colspan="11" class="wrg-empty-cell">لا يوجد عمالٌ مصنّفون بعد. استخدم «تصنيف عامل تشغيلي» لإضافة أول عامل.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>
@@ -523,12 +541,12 @@ function emsSuggestCategory() {
 function emsToggleSupplier() {
     var st = document.getElementById('source_type');
     var f = document.getElementById('supplierField');
-    if (st && f) f.style.display = (st.value === 'شركة') ? 'none' : '';
+    if (st && f) f.classList.toggle("is-hidden", st.value === "شركة");
 }
 (function(){
     var btn = document.getElementById('toggleForm');
     var form = document.getElementById('workerForm');
-    if (btn && form) btn.addEventListener('click', function(){ form.style.display = (form.style.display === 'none' || !form.style.display) ? 'block' : 'none'; });
+    if (btn && form) btn.addEventListener("click", function(){ form.classList.toggle("allforms-visible"); });
 })();
 </script>
 </body>

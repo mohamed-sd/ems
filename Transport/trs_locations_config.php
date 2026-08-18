@@ -96,6 +96,12 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
+<style>
+/* UXW-01: أنماطُ شاشةِ المواقعِ أصنافًا برموزِ الألوان */
+.trs-lc-tbl{width:100%}
+.trs-lc-on{color:var(--c-1e7e34, #1e7e34)}
+.trs-lc-off{color:var(--c-c0392b, #c0392b)}
+</style>
 <div class="main trs-locations-main ems-unified-page-shell">
     <?php
     $header_title = 'المواقع';
@@ -106,6 +112,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مواقعَ ترحيلٍ معرَّفةً بعدُ', 'عرِّف أولَ موقعٍ بزرِّ «إضافة موقع» في رأسِ الشاشة');
     ?>
 
     <?php trs_msg_banner(); ?>
@@ -119,11 +127,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>اسم الموقع <span class="required">*</span></label>
+                        <label for="l_name">اسم الموقع <span class="required">*</span></label>
                         <input type="text" name="name" id="l_name" required>
                     </div>
                     <div class="form-group">
-                        <label>نوع الموقع <span class="required">*</span></label>
+                        <label for="l_type">نوع الموقع <span class="required">*</span></label>
                         <select name="location_type" id="l_type" required>
                             <?php foreach ($loc_types as $k => $v): ?>
                                 <option value="<?php echo htmlspecialchars($k); ?>"><?php echo htmlspecialchars($v); ?></option>
@@ -131,14 +139,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                     <div class="form-group" id="l_project_wrap">
-                        <label>المشروع المرتبط (عند نوع «مشروع»)</label>
+                        <label for="l_project">المشروع المرتبط (عند نوع «مشروع»)</label>
                         <select name="project_id" id="l_project">
                             <?php echo trs_project_options($conn, $is_super_admin, $company_id, 0); ?>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>مفعّل؟</label>
-                        <label class="switch-inline"><input type="checkbox" name="active" id="l_active" value="1" checked> نعم، مفعّل</label>
+                        <label class="switch-inline"><input type="checkbox" name="active" id="l_active" aria-label="تفعيلُ الموقع" value="1" checked> نعم، مفعّل</label>
                     </div>
                 </div>
             </div>
@@ -158,7 +166,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <div class="filter-body">
             <div class="filter-field">
                 <label><i class="fa fa-map"></i> نوع الموقع</label>
-                <select id="filterType" class="form-control">
+                <select id="filterType" aria-label="تصفيةُ المواقعِ بالنوع" class="form-control">
                     <option value="">-- كل الأنواع --</option>
                 </select>
             </div>
@@ -171,7 +179,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="trsTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="trsTable" class="display nowrap alltables trs-lc-tbl" data-state-save="false" data-scroll-x="true">
                 <thead><tr>
                     <th>الإجراءات</th><th>الكود</th><th>الاسم</th><th>النوع</th><th>المشروع</th><th>الحالة</th>
                     <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -226,7 +234,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td>" . htmlspecialchars((string)$row['name']) . "</td>";
                         echo "<td>" . htmlspecialchars($type_ar) . "</td>";
                         echo "<td>" . htmlspecialchars((string)($row['project_name'] ?? '—')) . "</td>";
-                        echo "<td>" . ((int)$row['active'] === 1 ? "<span class='action-btn' style='color:#1e7e34'>مفعّل</span>" : "<span class='action-btn' style='color:#c0392b'>معطّل</span>") . "</td>";
+                        echo "<td>" . ((int)$row['active'] === 1 ? "<span class='action-btn trs-lc-on'>مفعّل</span>" : "<span class='action-btn trs-lc-off'>معطّل</span>") . "</td>";
                         echo "</tr>";
                     } }
                     ?>
@@ -245,17 +253,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function () {
     $(document).ready(function () {
-        var trsTable = $('#trsTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
+        // UXW-01 ⑤: التهيئةُ المحليةُ حُذفت — المكوّنُ المركزيُّ (ui-unification.js)
+        // يهيّئ الجدولَ بسماتِ <table>. ونمسك نسختَه حين تجهز لنُبقيَ مرشِّحَ النوعِ عاملًا.
+        function withTrsTable(cb) {
+            if (window.jQuery && $.fn.dataTable && $.fn.dataTable.isDataTable('#trsTable')) {
+                cb($('#trsTable').DataTable());
+                return;
+            }
+            setTimeout(function () { withTrsTable(cb); }, 120);
+        }
 
-        function fillFilterOptions(columnIndex, selectId) {
+        function fillFilterOptions(trsTable, columnIndex, selectId) {
             var select = $(selectId);
             var values = [];
             trsTable.column(columnIndex).data().each(function (value) {
@@ -267,16 +275,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 select.append('<option value="' + val.replace(/"/g, '&quot;') + '">' + val + '</option>');
             });
         }
-        fillFilterOptions(3, '#filterType');
 
-        $('#filterType').on('change', function () {
-            var value = $.fn.dataTable.util.escapeRegex($(this).val());
-            trsTable.column(3).search(value ? '^' + value + '$' : '', true, false).draw();
-        });
-        $('.filter .btn-primary').on('click', function () { trsTable.draw(); });
-        $('.filter .btn-secondary').on('click', function () {
-            $('#filterType').val('');
-            trsTable.column(3).search('').draw();
+        withTrsTable(function (trsTable) {
+            fillFilterOptions(trsTable, 3, '#filterType');
+
+            $('#filterType').on('change', function () {
+                var value = $.fn.dataTable.util.escapeRegex($(this).val());
+                trsTable.column(3).search(value ? '^' + value + '$' : '', true, false).draw();
+            });
+            $('.filter .btn-primary').on('click', function () { trsTable.draw(); });
+            $('.filter .btn-secondary').on('click', function () {
+                $('#filterType').val('');
+                trsTable.column(3).search('').draw();
+            });
         });
 
         // إظهار/إخفاء حقل المشروع حسب النوع

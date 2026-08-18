@@ -63,10 +63,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                          'icon' => 'fas fa-arrow-right', 'label' => 'اقتصاد دورة الحياة');
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا عقودَ نافذةً في نافذةِ اللوحةِ الحالية',
+                           'افتح «كلُّ العقود» من زرِّ النطاقِ أعلاه أو اعتمد خطَّ أساسٍ لعقدٍ نافذ');
     ?>
 
+    <style>
+    .cb-note{color:var(--c-4b5563, #4b5563);line-height:1.8;margin:0}
+    .cb-actions{margin-top:10px}
+    .cb-badge-pad{padding:6px 12px}
+    .cb-badge-link{padding:6px 12px;text-decoration:none}
+    .cb-totals{display:flex;gap:12px;flex-wrap:wrap}
+    .cb-total-card{border:1px solid var(--c-d1d5db, #d1d5db);border-radius:8px;padding:12px 18px;min-width:280px}
+    .cb-total-cur{font-weight:700;margin-bottom:6px}
+    .cb-table{width:100%}
+    .cb-row-review{background:var(--c-fff7ed, #fff7ed)}
+    .cb-wrap{white-space:normal}
+    </style>
+
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;line-height:1.8;margin:0">
+        <p class="cb-note">
             <i class="fas fa-circle-info"></i>
             <strong>المخططُ · المنفَّذُ · المفوترُ · المحصَّل</strong> في سطرٍ واحدٍ لكل عقدٍ نافذ —
             <strong>وكلُّ فجوةٍ بمالكها</strong>.
@@ -77,11 +93,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             و<strong>مصداقيةُ السطر تُعلَن مع أرقامه</strong>: وحدةٌ غيرُ موصولةٍ تعني
             <strong>منفَّذًا ناقصًا يبدو تامًّا</strong> — فيُوسَم السطرُ ولا يُقرأ على أنه تام.
         </p>
-        <div style="margin-top:10px">
-            <span class="badge <?php echo $cl['ok'] ? 'badge-success' : 'badge-warning'; ?>"
-                style="padding:6px 12px"><?php
+        <div class="cb-actions">
+            <span class="cb-badge-pad badge <?php echo $cl['ok'] ? 'badge-success' : 'badge-warning'; ?>"
+                ><?php
                 echo htmlspecialchars(str_replace('**', '', (string)$cl['reason'])); ?></span>
-            <a class="badge badge-secondary" style="padding:6px 12px;text-decoration:none"
+            <a class="badge badge-secondary cb-badge-link"
                href="?all=<?php echo $ALL ? '0' : '1'; ?>">
                <?php echo $ALL ? 'النافذةُ فقط' : 'كلُّ العقود'; ?></a>
         </div>
@@ -90,10 +106,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php if ($tot): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-calculator"></i>
         المجاميع — <strong>بعملةٍ عملة، ولا تُجمع عملتان</strong></h5></div>
-    <div class="card-body"><div style="display:flex;gap:12px;flex-wrap:wrap">
+    <div class="card-body"><div class="cb-totals">
         <?php foreach ($tot as $cur => $t): ?>
-            <div style="border:1px solid #d1d5db;border-radius:8px;padding:12px 18px;min-width:280px">
-                <div style="font-weight:700;margin-bottom:6px"><?php echo htmlspecialchars((string)$cur); ?>
+            <div class="cb-total-card">
+                <div class="cb-total-cur"><?php echo htmlspecialchars((string)$cur); ?>
                     — <?php echo intval($t['contracts']); ?> عقدًا</div>
                 <div>مخطَّط: <strong><?php echo $t['planned']; ?></strong></div>
                 <div>منفَّذ: <strong><?php echo $t['executed']; ?></strong></div>
@@ -107,7 +123,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-chart-line"></i>
         سطرٌ لكل عقد — <?php echo count($rows); ?></h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable cb-table" data-no-dt="1">
             <thead><tr>
                 <th>#</th><th>العميل</th><th>حالُ العقد</th><th>خطُّ الأساس</th>
                 <th>مخطَّط</th><th>منفَّذ</th><th>مفوتَر</th><th>محصَّل</th>
@@ -127,9 +143,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tr></thead>
             <tbody>
             <?php foreach ($rows as $r): ?>
-                <tr<?php echo $r['credible'] ? '' : " style='background:#fff7ed'"; ?>>
+                <tr<?php echo $r['credible'] ? '' : " class='cb-row-review'"; ?>>
                     <td>#<?php echo intval($r['contract_id']); ?></td>
-                    <td style="white-space:normal"><?php
+                    <td class="cb-wrap"><?php
                         echo htmlspecialchars((string)($r['second_party'] ?? '')); ?></td>
                     <td><?php echo htmlspecialchars((string)($r['contract_status'] ?? '')); ?></td>
                     <td><?php echo $r['baseline'] !== null
@@ -138,7 +154,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                            . htmlspecialchars($STATE_AR[(string)$r['baseline']]) . '</span>')
                         : '<span class="badge badge-warning">غيرُ مفتوح</span>'; ?></td>
                     <?php if (!$r['ok']): ?>
-                        <td colspan="7" style="white-space:normal"><em><?php
+                        <td colspan="7" class="cb-wrap"><em><?php
                             echo htmlspecialchars(str_replace('**', '', (string)$r['note'])); ?></em></td>
                         <td><span class="badge badge-warning">ممتنع</span></td>
                     <?php else: ?>
@@ -173,7 +189,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-user-tie"></i>
         <strong>وكلُّ فجوةٍ بمالكها</strong> — والسؤالُ الذي يُسأل عنه</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable cb-table" data-no-dt="1">
             <thead><tr><th>الفجوة</th><th>حسابُها</th><th>مالكُها</th><th>الدور</th><th>السؤال</th></tr></thead>
             <tbody>
                 <tr><td><strong>فجوةُ التنفيذ</strong></td><td>منفَّذ − مخطَّط</td>

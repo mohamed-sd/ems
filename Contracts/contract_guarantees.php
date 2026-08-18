@@ -116,10 +116,38 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                          'icon' => 'fas fa-arrow-right', 'label' => 'خطة الدفع');
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أدواتِ ضمانٍ مسجَّلةً على هذا العقد بعدُ',
+                           'اختر عقدًا من جدولِ العقود ثم سجّل أولَ أداةٍ بنموذجِ «أداةُ ضمانٍ جديدة»');
     ?>
 
+    <style>
+    .cg-note{color:var(--c-4b5563, #4b5563);line-height:1.8;margin:0}
+    .cg-table{width:100%}
+    .cg-wrap{white-space:normal}
+    .cg-cards{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+    .cg-card{border:1px solid var(--c-d1d5db, #d1d5db);border-radius:8px;padding:10px 16px;min-width:230px}
+    .cg-card-label{color:var(--c-ink-500, #6b7280);font-size:.85em}
+    .cg-card-value{font-size:1.4em;font-weight:700}
+    .cg-card-side{align-self:center}
+    .cg-badge-pad{padding:8px 14px}
+    .cg-row-review{background:var(--c-fff7ed, #fff7ed)}
+    .cg-inline-form{display:flex;gap:4px}
+    .cg-add-form{margin-top:14px}
+    .cg-add-grid{display:flex;gap:8px;flex-wrap:wrap}
+    .cg-w80{width:80px}
+    .cg-w100{width:100px}
+    .cg-w110{width:110px}
+    .cg-w130{width:130px}
+    .cg-w140{width:140px}
+    .cg-w150{width:150px}
+    .cg-w200{width:200px}
+    .cg-mw220{min-width:220px}
+    .cg-mw260{min-width:260px}
+    </style>
+
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;line-height:1.8;margin:0">
+        <p class="cg-note">
             <i class="fas fa-circle-info"></i>
             <strong>فصلٌ إلزامي</strong>: المحتجَزُ النقديُّ <strong>أصلٌ لدى العميل</strong> يُخصم من
             المستخلص ويُتابَع بذمةٍ مؤجَّلةٍ <strong>وتاريخِ ردّ</strong>؛
@@ -132,15 +160,15 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-file-contract"></i> العقود</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable cg-table" data-no-dt="1">
             <thead><tr><th>#</th><th>العميل</th><th>الحال</th><th>احتجاز%</th><th>نصُّ الضمانات (الأصلي)</th><th></th></tr></thead>
             <tbody>
             <?php foreach ($contracts as $c): ?>
                 <tr><td>#<?php echo intval($c['id']); ?></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars((string)$c['second_party']); ?></td>
+                    <td class="cg-wrap"><?php echo htmlspecialchars((string)$c['second_party']); ?></td>
                     <td><?php echo htmlspecialchars((string)$c['contract_status']); ?></td>
                     <td><?php echo htmlspecialchars((string)$c['retention_pct']); ?></td>
-                    <td style="white-space:normal"><small><?php
+                    <td class="cg-wrap"><small><?php
                         echo htmlspecialchars(mb_substr((string)($c['guarantees'] ?? ''), 0, 80)); ?></small></td>
                     <td><a class="action-btn" href="?contract=<?php echo intval($c['id']); ?>">
                         <i class="fa fa-shield-halved"></i> الضمانات</a></td></tr>
@@ -153,30 +181,30 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-shield-halved"></i>
         ضماناتُ العقد #<?php echo $CID; ?> — <?php echo htmlspecialchars((string)$head['second_party']); ?></h5></div>
     <div class="card-body">
-        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px">
-            <div style="border:1px solid #d1d5db;border-radius:8px;padding:10px 16px;min-width:230px">
-                <div style="color:#6b7280;font-size:.85em">أصلٌ لدى العميل — <strong>محتجزٌ نقديٌّ فعليّ</strong></div>
-                <div style="font-size:1.4em;font-weight:700"><?php echo $exp['asset']; ?>
+        <div class="cg-cards">
+            <div class="cg-card">
+                <div class="cg-card-label">أصلٌ لدى العميل — <strong>محتجزٌ نقديٌّ فعليّ</strong></div>
+                <div class="cg-card-value"><?php echo $exp['asset']; ?>
                     <?php echo htmlspecialchars((string)$exp['currency']); ?></div>
                 <small><?php echo htmlspecialchars((string)($bal['note'] ?? '')); ?></small>
             </div>
-            <div style="border:1px solid #d1d5db;border-radius:8px;padding:10px 16px;min-width:230px">
-                <div style="color:#6b7280;font-size:.85em"><strong>التزامٌ محتملٌ خارج الميزانية</strong></div>
-                <div style="font-size:1.4em;font-weight:700"><?php echo $exp['off_balance']; ?>
+            <div class="cg-card">
+                <div class="cg-card-label"><strong>التزامٌ محتملٌ خارج الميزانية</strong></div>
+                <div class="cg-card-value"><?php echo $exp['off_balance']; ?>
                     <?php echo htmlspecialchars((string)$exp['currency']); ?></div>
                 <small><strong>لا يظهر أصلًا ولا يُخصم من مستخلص</strong></small>
             </div>
-            <div style="align-self:center">
-                <span class="badge badge-warning" style="padding:8px 14px"><strong>رقمان لا يُجمعان</strong></span>
+            <div class="cg-card-side">
+                <span class="badge badge-warning cg-badge-pad"><strong>رقمان لا يُجمعان</strong></span>
                 <?php if (($exp['expiring'] ?? 0) > 0): ?>
-                    <span class="badge badge-warning" style="padding:8px 14px">
+                    <span class="badge badge-warning cg-badge-pad">
                         <?php echo intval($exp['expiring']); ?> أداةً انقضى سريانُها</span>
                 <?php endif; ?>
             </div>
         </div>
 
         <div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable cg-table" data-no-dt="1">
             <thead><tr><th>#</th><th>النوع</th><th>الطبيعة</th><th>يُخصم؟</th><th>القيمة</th><th>%</th>
                 <th>المُصدر</th><th>المرجع</th><th>انتهاءُ السريان</th><th>ردُّ المحتجَز</th>
                 <th>الحال</th><th>النصُّ الأصلي</th><th></th>
@@ -192,7 +220,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 </tr></thead>
             <tbody>
             <?php foreach ($rows as $r): $nat = (string) $r['nature']; ?>
-                <tr<?php echo (int)$r['needs_review'] === 1 ? " style='background:#fff7ed'" : ''; ?>>
+                <tr<?php echo (int)$r['needs_review'] === 1 ? ' class="cg-row-review"' : ''; ?>>
                     <td><?php echo intval($r['id']); ?></td>
                     <td><?php echo htmlspecialchars($KIND_AR[(string)$r['kind']] ?? (string)$r['kind']); ?>
                         <?php echo (int)$r['needs_review'] === 1
@@ -204,10 +232,10 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <td><?php echo htmlspecialchars((string)$r['amount']); ?></td>
                     <td><?php echo $r['percent_value'] !== null
                         ? htmlspecialchars((string)$r['percent_value']) : '—'; ?></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars((string)($r['issuer'] ?? '—')); ?></td>
+                    <td class="cg-wrap"><?php echo htmlspecialchars((string)($r['issuer'] ?? '—')); ?></td>
                     <td><?php echo htmlspecialchars((string)($r['instrument_ref'] ?? '—')); ?></td>
                     <td><?php echo htmlspecialchars((string)($r['expiry_date'] ?? '—')); ?></td>
-                    <td style="white-space:normal"><?php echo $r['due_release_date'] !== null
+                    <td class="cg-wrap"><?php echo $r['due_release_date'] !== null
                         ? htmlspecialchars((string)$r['due_release_date'])
                         : ('<em>' . htmlspecialchars((string)($r['release_condition'] ?? '—')) . '</em>'); ?></td>
                     <td><span class="badge <?php echo (string)$r['state'] === 'active'
@@ -215,20 +243,20 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <?php echo htmlspecialchars($STATE_AR[(string)$r['state']] ?? (string)$r['state']); ?></span>
                         <?php echo $r['state_reason'] !== null
                             ? ('<br><small>' . htmlspecialchars((string)$r['state_reason']) . '</small>') : ''; ?></td>
-                    <td style="white-space:normal"><small><?php
+                    <td class="cg-wrap"><small><?php
                         echo htmlspecialchars((string)($r['source_text'] ?? '—')); ?></small></td>
                     <td><?php if ($can_edit && !in_array((string)$r['state'], array('released','called'), true)): ?>
-                        <form method="post" style="display:flex;gap:4px">
+                        <form method="post" class="cg-inline-form">
         <?php echo csrf_field(); ?>
                             <input type="hidden" name="g_action" value="state">
                             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                             <input type="hidden" name="gid" value="<?php echo intval($r['id']); ?>">
-                            <select name="state" style="width:110px">
+                            <select name="state" class="cg-w110" aria-label="الحالُ الجديدُ لأداةِ الضمان">
                                 <?php foreach ($STATE_AR as $k => $v): ?>
                                     <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                                 <?php endforeach; ?></select>
-                            <input type="text" name="state_reason" placeholder="السبب" style="width:130px" aria-label="السبب">
-                            <input type="date" name="state_at" style="width:140px">
+                            <input type="text" name="state_reason" class="cg-w130" placeholder="سببُ تغييرِ الحال" aria-label="سببُ تغييرِ حالِ الأداة">
+                            <input type="date" name="state_at" class="cg-w140" aria-label="تاريخُ تغييرِ حالِ الأداة">
                             <button type="submit" class="action-btn"><i class="fa fa-check"></i></button>
                         </form>
                     <?php else: ?>—<?php endif; ?></td></tr>
@@ -239,38 +267,38 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         </div>
 
         <?php if ($can_edit): ?>
-        <form method="post" class="ems-form" style="margin-top:14px">
+        <form method="post" class="ems-form cg-add-form">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="g_action" value="add">
             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
             <h6><i class="fa fa-plus"></i> أداةُ ضمانٍ جديدة —
                 <strong>والنوعُ يحسم الطبيعةَ وقابليةَ الخصم</strong></h6>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div class="cg-add-grid">
                 <div class="form-group"><label for="emsf_35_741f3">النوع</label>
                     <select name="kind" id="emsf_35_741f3">
                         <?php foreach ($KIND_AR as $k => $v): ?>
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
                 <div class="form-group"><label for="emsf_36_4f9e4">القيمة</label>
-                    <input type="number" step="0.01" name="amount" style="width:130px" id="emsf_36_4f9e4"></div>
+                    <input type="number" step="0.01" name="amount" class="cg-w130" id="emsf_36_4f9e4"></div>
                 <div class="form-group"><label for="emsf_37_afa0b">النسبة %</label>
-                    <input type="number" step="0.001" name="percent_value" style="width:100px" id="emsf_37_afa0b"></div>
+                    <input type="number" step="0.001" name="percent_value" class="cg-w100" id="emsf_37_afa0b"></div>
                 <div class="form-group"><label for="emsf_38_b0f47">العملة</label>
-                    <input type="text" name="currency" maxlength="8" style="width:80px"
-                           value="<?php echo htmlspecialchars((string)$head['price_currency_contract']); ?>" id="emsf_38_b0f47"></div>
+                    <input type="text" name="currency" maxlength="8" class="cg-w80" id="emsf_38_b0f47"
+                           value="<?php echo htmlspecialchars((string)$head['price_currency_contract']); ?>"></div>
                 <div class="form-group"><label for="emsf_39_1693c">المُصدر</label>
-                    <input type="text" name="issuer" maxlength="190" style="width:200px" id="emsf_39_1693c"></div>
+                    <input type="text" name="issuer" maxlength="190" class="cg-w200" id="emsf_39_1693c"></div>
                 <div class="form-group"><label for="emsf_40_d6e85">رقمُ الخطاب/الوثيقة</label>
-                    <input type="text" name="instrument_ref" maxlength="120" style="width:150px" id="emsf_40_d6e85"></div>
+                    <input type="text" name="instrument_ref" maxlength="120" class="cg-w150" id="emsf_40_d6e85"></div>
                 <div class="form-group"><label for="emsf_41_c32f3">تاريخُ الإصدار</label>
                     <input type="date" name="issue_date" id="emsf_41_c32f3"></div>
                 <div class="form-group"><label for="emsf_42_def6e">انتهاءُ السريان <small>(لغير المحتجَز)</small></label>
                     <input type="date" name="expiry_date" id="emsf_42_def6e"></div>
                 <div class="form-group"><label for="emsf_43_97f1d">تاريخُ ردِّ المحتجَز</label>
                     <input type="date" name="due_release_date" id="emsf_43_97f1d"></div>
-                <div class="form-group" style="min-width:260px"><label for="emsf_44_7e7b1">أو شرطُ الرد</label>
+                <div class="form-group cg-mw260"><label for="emsf_44_7e7b1">أو شرطُ الرد</label>
                     <input type="text" name="release_condition" maxlength="200" id="emsf_44_7e7b1"></div>
-                <div class="form-group" style="min-width:220px"><label for="emsf_45_cd491">ملاحظة</label>
+                <div class="form-group cg-mw220"><label for="emsf_45_cd491">ملاحظة</label>
                     <input type="text" name="note" maxlength="255" id="emsf_45_cd491"></div>
             </div>
             <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> سجّل الأداة</button>

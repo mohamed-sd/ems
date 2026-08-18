@@ -35,6 +35,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php $header_title='سجل الأحداث التشغيلية المجمَّع'; $header_icon='fas fa-clock-rotate-left'; $header_actions=array();
     $header_back=array('href'=>'worker_register.php','class'=>'','icon'=>'fas fa-arrow-right','label'=>'سجل العامل');
     include('../includes/page_header.php'); ?>
+    <?php // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا سجلَّ أحداثٍ تشغيليةً مجمَّعةً للعاملين بعدُ', 'سجّلِ العاملين في «سجل العامل» وارصدْ عملياتِهم لتظهرَ حصيلتُهم هنا'); ?>
+    <style>
+        .wl-kpi-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--space-3); margin: 14px 0; }
+        .wl-kpi-card { padding: 14px; text-align: center; }
+        .wl-kpi-num { font-size: 1.6rem; font-weight: var(--weight-bold); }
+        .wl-kpi-num.is-critical { color: var(--c-c0392b, #c0392b); }
+        .wl-kpi-num.is-due { color: var(--c-b9770e, #b9770e); }
+        .wl-rotation-card { margin: 0 0 14px; }
+        .wl-table-full { width: 100%; }
+        .wl-empty-cell { text-align: center; color: var(--c-888, #888); padding: 18px; }
+    </style>
 
     <?php
     // مؤشّرات سريعة (كل استعلامٍ معزولٌ عبر البوابة؛ CURDATE() → تاريخ PHP لخلوّ نص البوابة من دوالّ زمن الخادم)
@@ -55,18 +67,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         if($q4){$kpi['expired_critical']=intval($q4[0]['c']);}
     } catch (\Throwable $t) { error_log('worker_worklog.php kpi: ' . $t->getMessage()); }
     ?>
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:14px 0;">
-        <div class="allforms" style="padding:14px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;"><?= $kpi['workers'] ?></div><div>الموظفون</div></div>
-        <div class="allforms" style="padding:14px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;"><?= $kpi['allocated'] ?></div><div>مخصَّصون (نشط)</div></div>
-        <div class="allforms" style="padding:14px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;"><?= $kpi['on_leave'] ?></div><div>في إجازة/غياب</div></div>
-        <div class="allforms" style="padding:14px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;color:#c0392b;"><?= $kpi['expired_critical'] ?></div><div>اعتماد حرج منتهٍ</div></div>
-        <div class="allforms" style="padding:14px;text-align:center;"><div style="font-size:1.6rem;font-weight:700;color:#b9770e;"><?= count($rotation_due) ?></div><div>اقترب تدويرهم (14 يوم)</div></div>
+    <div class="wl-kpi-grid">
+        <div class="allforms wl-kpi-card"><div class="wl-kpi-num"><?= $kpi['workers'] ?></div><div>الموظفون</div></div>
+        <div class="allforms wl-kpi-card"><div class="wl-kpi-num"><?= $kpi['allocated'] ?></div><div>مخصَّصون (نشط)</div></div>
+        <div class="allforms wl-kpi-card"><div class="wl-kpi-num"><?= $kpi['on_leave'] ?></div><div>في إجازة/غياب</div></div>
+        <div class="allforms wl-kpi-card"><div class="wl-kpi-num is-critical"><?= $kpi['expired_critical'] ?></div><div>اعتماد حرج منتهٍ</div></div>
+        <div class="allforms wl-kpi-card"><div class="wl-kpi-num is-due"><?= count($rotation_due) ?></div><div>اقترب تدويرهم (14 يوم)</div></div>
     </div>
 
     <?php if (!empty($rotation_due)): ?>
-    <div class="allforms" style="margin:0 0 14px;">
+    <div class="allforms wl-rotation-card">
         <div class="card-header"><h5><i class="fas fa-rotate"></i> عقودٌ اقترب موعد تدويرها (محرّك التناوب)</h5></div>
-        <table class="data-table" style="width:100%;">
+        <table class="data-table wl-table-full">
             <thead><tr><th>العامل</th><th>كود العقد</th><th>النمط</th><th>الاستحقاق القادم</th><th>المتبقّي (يوم)</th></tr></thead><tbody>
             <?php foreach ($rotation_due as $rd): $dl = intval($rd['days_left']); ?>
                 <tr><td><strong><?= htmlspecialchars($rd['worker_name'] ?: '-') ?></strong></td>
@@ -80,7 +92,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
     <?php endif; ?>
 
-    <div class="table-wrap"><table class="data-table" style="width:100%;">
+    <div class="table-wrap"><table class="data-table wl-table-full">
         <thead><tr><th>عرض</th><th>#</th><th>الموظف</th><th>الفئة</th><th>الحالة</th><th>الحالة الميدانية</th><th>العمليات</th><th>ساعات مؤهَّلة</th><th>إجازات/غياب</th><th>تحرّكات</th><th>تقييمات</th><th>حوافز (معتمدة)</th><th>جزاءات (معتمدة)</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -130,7 +142,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             $ev = $events_map[intval($r['employee_id'])] ?? ['incentive'=>0,'penalty'=>0]; ?>
             <td><?= intval($r['evaluation_count']) ?></td><td><?= number_format(floatval($ev['incentive']),2) ?></td>
             <td><?= number_format(floatval($ev['penalty']),2) ?></td></tr>
-        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="13" style="text-align:center;color:#888;padding:18px;">لا توجد بياناتٌ بعد (طبّق التهجيرات وأضف موظفين).</td></tr><?php endif; ?>
+        <?php endforeach; } if(!$list||$i===1): ?><tr><td colspan="13" class="wl-empty-cell">لا توجد بياناتٌ بعد (طبّق التهجيرات وأضف موظفين).</td></tr><?php endif; ?>
         </tbody></table></div>
 </div>
 <?php ems_wf_view_modal($WF_VIEW); ?>

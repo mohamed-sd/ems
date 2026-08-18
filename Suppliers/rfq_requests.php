@@ -151,10 +151,32 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                          'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا طلبَ عروضٍ مفتوحًا بعدُ', 'افتح طلبًا من التزاماتِ عقدِ العميل، أو عن طلبِ شراءٍ معتمدٍ من النموذجِ أعلاه');
     ?>
+    <style>
+        .sup-rfq-lead         { color: var(--c-4b5563, #4b5563); line-height: 1.8; margin: 0 0 10px; }
+        .sup-rfq-req          { color: var(--c-state-danger-strong, #c00); }
+        .sup-rfq-actions      { margin-top: 12px; }
+        .sup-rfq-actions-sm   { margin-top: 8px; }
+        .sup-rfq-second-door  { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--c-s-ddd, #ddd); }
+        .sup-rfq-muted-warn   { color: var(--c-s-8a6d00, #8a6d00); }
+        .sup-rfq-table        { width: 100%; }
+        .sup-rfq-state-bar    { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+        .sup-rfq-inline-form  { display: inline; }
+        .sup-rfq-line-card    { margin-bottom: 14px; }
+        .sup-rfq-line-title   { margin: 0 0 8px; }
+        .sup-rfq-line-meta    { margin-bottom: 8px; }
+        .sup-rfq-award-qty    { width: 110px; }
+        .sup-rfq-award-form   { margin-top: 10px; }
+        .sup-rfq-award-reason { width: 260px; }
+        .sup-rfq-quote-form   { margin-top: 10px; }
+        .sup-rfq-awards-title { margin: 14px 0 8px; }
+        .sup-rfq-wrap-cell    { white-space: normal; }
+    </style>
 
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;line-height:1.8;margin:0 0 10px">
+        <p class="sup-rfq-lead">
             <i class="fas fa-circle-info"></i>
             <strong>بنودُ الاحتياج تُشتق من التزامات عقد العميل</strong> — ولا حقلَ لكتابة كمية.
             و<strong>عقدٌ بلا التزاماتٍ لا يُفتح له طلب</strong> · <strong>ولا عرضَ بعد الإقفال</strong> ·
@@ -165,14 +187,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?= csrf_field() ?>
             <input type="hidden" name="rfq_action" value="open">
             <div class="form-grid">
-                <div class="form-group"><label for="emsf_1379_7d57e">عقدُ العميل <span style="color:#c00">*</span>
+                <div class="form-group"><label for="emsf_1379_7d57e">عقدُ العميل <span class="sup-rfq-req">*</span>
                     <small>— «فتحُ الاحتياج» من العقد</small></label>
                     <input type="number" name="contract_id" min="1" required id="emsf_1379_7d57e"></div>
-                <div class="form-group"><label for="emsf_1380_f9346">موعدُ الإقفال <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_1380_f9346">موعدُ الإقفال <span class="sup-rfq-req">*</span></label>
                     <input type="date" name="due_date" required id="emsf_1380_f9346"></div>
                 <div class="form-group"><label for="emsf_1381_01a35">عنوانٌ</label><input type="text" name="title" maxlength="160" id="emsf_1381_01a35"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-primary">
+            <div class="sup-rfq-actions"><button type="submit" class="btn-primary">
                 <i class="fa fa-file-circle-plus"></i> افتح طلبًا من التزامات العقد</button></div>
         </form>
 
@@ -196,11 +218,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             if (\App\Services\Workflow\ChainLinkService::requestApproved($__p)) { $__approved[] = $__p; }
         }
         ?>
-        <form method="post" class="ems-form" style="margin-top:14px;padding-top:12px;border-top:1px dashed #ddd">
+        <form method="post" class="ems-form sup-rfq-second-door">
         <?= csrf_field() ?>
             <input type="hidden" name="rfq_action" value="open_from_request">
             <div class="form-grid">
-                <div class="form-group"><label for="emsf_rfq_pr">طلبُ شراءٍ معتمد <span style="color:#c00">*</span>
+                <div class="form-group"><label for="emsf_rfq_pr">طلبُ شراءٍ معتمد <span class="sup-rfq-req">*</span>
                     <small>— «الاحتياجُ أوّلُ السلسلة» (INJ-0091)</small></label>
                     <select name="request_id" required id="emsf_rfq_pr">
                         <option value="">— اختر طلبًا معتمدًا بلا طلبِ عروض —</option>
@@ -212,13 +234,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php endforeach; ?>
                     </select>
                     <?php if (!$__approved): ?>
-                        <small style="color:#8a6d00">لا طلبَ شراءٍ معتمدًا ينتظر — أو كلُّها فُتحت لها عروضٌ سلفًا</small>
+                        <small class="sup-rfq-muted-warn">لا طلبَ شراءٍ معتمدًا ينتظر — أو كلُّها فُتحت لها عروضٌ سلفًا</small>
                     <?php endif; ?>
                 </div>
                 <div class="form-group"><label for="emsf_rfq_pr_t">عنوانٌ</label>
                     <input type="text" name="title" maxlength="160" id="emsf_rfq_pr_t"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-primary">
+            <div class="sup-rfq-actions"><button type="submit" class="btn-primary">
                 <i class="fa fa-arrow-right-to-bracket"></i> افتح طلبَ عروضٍ عن طلبِ شراءٍ معتمد</button></div>
         </form>
         <?php endif; ?>
@@ -226,7 +248,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list"></i> الطلبات</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable sup-rfq-table" data-no-dt="1">
             <thead><tr><th>الرقم</th><th>العقد</th><th>العنوان</th><th>الإقفال</th><th>الحال</th><th></th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -258,10 +280,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <span class="badge badge-info"><?php echo htmlspecialchars($ST[(string)$head['state']] ?? ''); ?></span></h5></div>
     <div class="card-body">
         <?php if ($can_edit): ?>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        <div class="sup-rfq-state-bar">
             <?php foreach (array('send' => 'أرسِل للمؤهلين', 'close' => 'أقفل الطلب',
                                  'contracted' => 'انتقل إلى متعاقَد') as $a => $lbl): ?>
-            <form method="post" style="display:inline">
+            <form method="post" class="sup-rfq-inline-form">
         <?= csrf_field() ?>
                 <input type="hidden" name="rfq_action" value="<?php echo $a; ?>">
                 <input type="hidden" name="rfq_id" value="<?php echo $sel; ?>">
@@ -274,17 +296,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php foreach ($lines as $l):
             $cmp = RFQ::comparison($gate, (int) $l['id']);
             $avail = round((float)$l['qty_required'] - (float)$l['qty_awarded'], 2); ?>
-        <div class="card" style="margin-bottom:14px"><div class="card-body">
-            <h5 style="margin:0 0 8px">بند <?php echo intval($l['line_no']); ?> —
+        <div class="card sup-rfq-line-card"><div class="card-body">
+            <h5 class="sup-rfq-line-title">بند <?php echo intval($l['line_no']); ?> —
                 <?php echo htmlspecialchars((string)$l['description']); ?></h5>
-            <div style="margin-bottom:8px">
+            <div class="sup-rfq-line-meta">
                 <span class="badge badge-secondary">المطلوب <?php echo htmlspecialchars((string)$l['qty_required']); ?>
                     <?php echo htmlspecialchars((string)($l['unit_type'] ?? '')); ?></span>
                 <span class="badge <?php echo $avail > 0 ? 'badge-warning' : 'badge-success'; ?>">
                     المرسى <?php echo htmlspecialchars((string)$l['qty_awarded']); ?> · المتاح <?php echo $avail; ?></span>
             </div>
             <div class="table-container">
-            <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+            <table class="alltables display nowrap no-datatable sup-rfq-table" data-no-dt="1">
                 <thead><tr><th>المورد</th><th>السعر/وحدة</th><th>الجاهزية</th><th>السجل</th>
                     <th>المعروض</th><?php if ($can_edit) echo '<th>اختيارُ الكمية</th>'; ?></tr></thead>
                 <tbody>
@@ -300,9 +322,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <?php echo $q['is_best_record'] ? '<span class="badge badge-info">الأعلى</span>' : ''; ?></td>
                         <td><?php echo htmlspecialchars((string)$q['qty_offered']); ?></td>
                         <?php if ($can_edit): ?>
-                        <td><input form="awardForm<?php echo intval($l['id']); ?>" type="number" step="0.01" min="0"
+                        <td><input aria-label="كميةُ الترسيةِ لهذا المورد" form="awardForm<?php echo intval($l['id']); ?>" type="number" step="0.01" min="0"
                             name="award_qty[<?php echo intval($l['id']); ?>:<?php echo intval($q['supplier_id']); ?>]"
-                            style="width:110px" placeholder="0" aria-label="0"></td>
+                            class="sup-rfq-award-qty" placeholder="0"></td>
                         <?php endif; ?></tr>
                 <?php endforeach; ?>
                 <?php if (!$cmp): ?><tr><td colspan="6"><em>لا عروضَ بعد لهذا البند</em></td></tr><?php endif; ?>
@@ -310,17 +332,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
             </div>
             <?php if ($can_edit && $cmp): ?>
-            <form id="awardForm<?php echo intval($l['id']); ?>" method="post" style="margin-top:10px">
+            <form id="awardForm<?php echo intval($l['id']); ?>" method="post" class="sup-rfq-award-form">
                 <input type="hidden" name="rfq_action" value="award">
                 <input type="hidden" name="rfq_id" value="<?php echo $sel; ?>">
-                <input type="text" name="award_reason" maxlength="200" style="width:260px"
+                <input type="text" name="award_reason" maxlength="200" class="sup-rfq-award-reason"
                        placeholder="حجّةُ الاختيار حين لا يكون الأرخص" aria-label="حجّةُ الاختيار حين لا يكون الأرخص">
                 <button type="submit" class="btn-primary"><i class="fa fa-gavel"></i> ترسية</button>
             </form>
             <?php endif; ?>
 
             <?php if ($can_edit && (string)$head['state'] === 'sent'): ?>
-            <form method="post" class="ems-form" style="margin-top:10px">
+            <form method="post" class="ems-form sup-rfq-quote-form">
         <?= csrf_field() ?>
                 <input type="hidden" name="rfq_action" value="quote">
                 <input type="hidden" name="rfq_id" value="<?php echo $sel; ?>">
@@ -339,7 +361,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-group"><label for="emsf_1386_46935">العملة</label>
                         <input type="text" name="currency" value="SDG" maxlength="8" id="emsf_1386_46935"></div>
                 </div>
-                <div style="margin-top:8px"><button type="submit" class="btn-primary">
+                <div class="sup-rfq-actions-sm"><button type="submit" class="btn-primary">
                     <i class="fa fa-plus"></i> سجّل عرضًا</button></div>
             </form>
             <?php endif; ?>
@@ -347,9 +369,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <?php endforeach; ?>
 
         <?php if ($awards): ?>
-        <h5 style="margin:14px 0 8px"><i class="fa fa-gavel"></i> الترسيات</h5>
+        <h5 class="sup-rfq-awards-title"><i class="fa fa-gavel"></i> الترسيات</h5>
         <div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable sup-rfq-table" data-no-dt="1">
             <thead><tr><th>البند</th><th>المورد</th><th>الكمية</th><th>السعر</th><th>القيمة</th><th>الحجّة</th></tr></thead>
             <tbody>
             <?php foreach ($awards as $a): ?>
@@ -359,7 +381,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?php echo htmlspecialchars((string)$a['unit_price']); ?>
                         <?php echo htmlspecialchars((string)$a['currency']); ?></td>
                     <td><?php echo number_format((float)$a['qty_awarded'] * (float)$a['unit_price'], 2); ?></td>
-                    <td style="white-space:normal"><small><?php echo htmlspecialchars((string)($a['reason'] ?? '')); ?></small></td></tr>
+                    <td class="sup-rfq-wrap-cell"><small><?php echo htmlspecialchars((string)($a['reason'] ?? '')); ?></small></td></tr>
             <?php endforeach; ?>
             </tbody>
         </table>

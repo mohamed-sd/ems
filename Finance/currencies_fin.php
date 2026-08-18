@@ -202,6 +202,24 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
+<style>
+/* UXW-01 ②: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة */
+.fin-cur-lead { color: var(--c-4b5563); margin: 0 0 12px; line-height: 1.8; }
+.fin-cur-hint { color: var(--c-ink-500); margin: 0 0 10px; }
+.fin-cur-chips { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.fin-cur-chip { padding: 6px 12px; }
+.fin-cur-h5 { margin: 0 0 10px; }
+.fin-cur-form { box-shadow: none; padding: 0; }
+.fin-cur-actions { margin-top: 10px; }
+.fin-cur-span-all { grid-column: 1 / -1; }
+.fin-cur-ltr { text-align: left; }
+.fin-cur-upper { text-transform: uppercase; }
+.fin-cur-scroll { overflow-x: auto; }
+.fin-cur-table { width: 100%; }
+.fin-cur-muted { color: var(--c-ink-500); }
+.fin-cur-ok { color: var(--c-state-ok); }
+</style>
+
 <div class="main fin-currencies-main ems-unified-page-shell">
     <?php
     $header_title = 'العملات وأسعار الصرف';
@@ -209,12 +227,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا عملاتٍ مسجَّلةً بعدَ عملةِ الأساس', 'سجّلْ عملةً بنموذجِ «عملةٌ جديدة» ثم أدخلْ سعرَ صرفها بتاريخِ سريانه');
     ?>
 
     <?php fin_msg_banner(); ?>
 
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;margin:0 0 12px;line-height:1.8;">
+        <p class="fin-cur-lead">
             <i class="fas fa-circle-info"></i>
             سجّلْ عملاتِ التعامل وأسعارَ صرفها بتواريخها — تدخلها كلما تغيّر السعر.
             كلُّ مبلغٍ في النظام يُقاس بـ<strong>عملة الأساس</strong>
@@ -223,17 +243,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             وما لا سعرَ لتاريخه يبقى <strong>بلا معادل</strong> ولا يُحسب برقمٍ مفترَض —
             وإدخالُ السعر يُقيّمه فورًا.
         </p>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <span class="badge badge-success" style="padding:6px 12px;">
+        <div class="fin-cur-chips">
+            <span class="badge badge-success fin-cur-chip">
                 <?php echo count($currencies); ?> عملة مسجَّلة
             </span>
             <?php if ($pendingTotal > 0): ?>
-            <span class="badge badge-warning" style="padding:6px 12px;">
+            <span class="badge badge-warning fin-cur-chip">
                 <i class="fas fa-hourglass-half"></i>
                 <?php echo $pendingTotal; ?> صفًّا بانتظار سعرِ صرفٍ لتاريخه
             </span>
             <?php else: ?>
-            <span class="badge badge-success" style="padding:6px 12px;">
+            <span class="badge badge-success fin-cur-chip">
                 <i class="fas fa-check"></i> لا صفَّ ينتظر سعرًا
             </span>
             <?php endif; ?>
@@ -242,8 +262,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($can_edit): ?>
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-plus"></i> سعرُ صرفٍ جديد</h5>
-        <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;">
+        <h5 class="fin-cur-h5"><i class="fas fa-plus"></i> سعرُ صرفٍ جديد</h5>
+        <form action="" method="post" class="allforms allforms-visible fin-cur-form">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="add_rate" value="1">
             <div class="form-section"><div class="form-grid">
@@ -264,23 +284,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                          الهندية بصمتٍ فيبدو أنه لا يقبل الكسور. inputmode=decimal
                          يبقي لوحةَ الأرقام على الهاتف، والتطبيعُ في ems_parse_decimal. -->
                     <input type="text" name="rate_to_base" inputmode="decimal" required
-                           dir="ltr" style="text-align:left;"
+                           dir="ltr" class="fin-cur-ltr"
                            placeholder="مثال: 0.00166667">
                 </div>
                 <div class="form-group">
                     <label>يسري من *</label>
-                    <input type="date" name="effective_from" required value="<?php echo date('Y-m-d'); ?>">
+                    <input type="date" name="effective_from" required aria-label="تاريخُ بدءِ سريانِ السعر" value="<?php echo date('Y-m-d'); ?>">
                 </div>
                 <div class="form-group">
                     <label for="emsf_230_40a3b">المصدر</label>
                     <input type="text" name="source" maxlength="32" placeholder="بنك مركزي · قرار إداري" id="emsf_230_40a3b">
                 </div>
-                <div class="form-group" style="grid-column:1/-1;">
+                <div class="form-group fin-cur-span-all">
                     <label for="emsf_231_486e6">ملاحظة</label>
                     <input type="text" name="note" maxlength="255" id="emsf_231_486e6">
                 </div>
             </div></div>
-            <div style="margin-top:10px;">
+            <div class="fin-cur-actions">
                 <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> حفظ السعر</button>
             </div>
         </form>
@@ -288,9 +308,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-coins"></i> العملات وأسعارها</h5>
-        <div style="overflow-x:auto;">
-        <table class="table table-striped" style="width:100%;">
+        <h5 class="fin-cur-h5"><i class="fas fa-coins"></i> العملات وأسعارها</h5>
+        <div class="fin-cur-scroll">
+        <table class="table table-striped fin-cur-table">
             <thead>
                 <tr>
                     <th>من عملة</th><th>الرمز</th><th>الحالة</th>
@@ -338,7 +358,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </td>
                     <td>
                         <?php if ($isBase): ?>
-                            <span style="color:#6b7280;">1 (نفسُها)</span>
+                            <span class="fin-cur-muted">1 (نفسُها)</span>
                         <?php elseif ($current !== null): ?>
                             <strong><?php echo htmlspecialchars(rtrim(rtrim((string) $current['rate_to_base'], '0'), '.')); ?></strong>
                         <?php else: ?>
@@ -351,7 +371,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php if ($waitE + $waitD > 0): ?>
                             <span class="badge badge-warning"><?php echo $waitE; ?> حدثًا · <?php echo $waitD; ?> ذمّة</span>
                         <?php else: ?>
-                            <span style="color:#16a34a;">—</span>
+                            <span class="fin-cur-ok">—</span>
                         <?php endif; ?>
                     </td>
                 </tr>
@@ -363,22 +383,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($can_edit): ?>
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-plus"></i> عملةٌ جديدة</h5>
-        <p style="color:#6b7280;margin:0 0 10px;">
+        <h5 class="fin-cur-h5"><i class="fas fa-plus"></i> عملةٌ جديدة</h5>
+        <p class="fin-cur-hint">
             عملةُ الأساس تُعلَن في بيانات الشركة ولا تُختار هنا — وما يُسجَّل هنا يُقاس بها.
         </p>
-        <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;">
+        <form action="" method="post" class="allforms allforms-visible fin-cur-form">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="add_currency" value="1">
             <div class="form-section"><div class="form-grid">
                 <div class="form-group"><label for="emsf_232_537f9">الرمز (ISO) *</label>
-                    <input type="text" name="code" required maxlength="3" placeholder="EUR" style="text-transform:uppercase;" id="emsf_232_537f9"></div>
+                    <input type="text" name="code" required maxlength="3" placeholder="EUR" class="fin-cur-upper" id="emsf_232_537f9"></div>
                 <div class="form-group"><label for="emsf_233_f36df">الاسم *</label>
                     <input type="text" name="name_ar" required maxlength="64" placeholder="اليورو" id="emsf_233_f36df"></div>
                 <div class="form-group"><label for="emsf_234_171ec">الرمز المختصر</label>
                     <input type="text" name="symbol" maxlength="8" placeholder="€" id="emsf_234_171ec"></div>
             </div></div>
-            <div style="margin-top:10px;">
+            <div class="fin-cur-actions">
                 <button type="submit" class="btn btn-secondary"><i class="fas fa-save"></i> تسجيل العملة</button>
             </div>
         </form>

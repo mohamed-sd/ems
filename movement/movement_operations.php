@@ -825,9 +825,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     .movement-unified-page .section-title {
         font-size: 18px;
         font-weight: 700;
-        color: #0b4c8c;
+        color: var(--c-0b4c8c, #0b4c8c);
         margin: 20px 0 12px 0;
-        border-right: 4px solid #0b4c8c;
+        border-right: 4px solid var(--c-0b4c8c, #0b4c8c);
         padding-right: 12px;
         display: flex;
         align-items: center;
@@ -836,22 +836,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     .movement-unified-page .card {
         margin-bottom: 20px;
-        border: 1px solid #dae5f1;
+        border: 1px solid var(--c-dae5f1, #dae5f1);
         border-radius: 12px;
-        background: #fff;
+        background: var(--c-fff, #fff);
     }
 
     .movement-unified-page .card-header {
-        background: #f8fbff;
+        background: var(--c-f8fbff, #f8fbff);
         padding: 12px 15px;
-        border-bottom: 1px solid #dae5f1;
+        border-bottom: 1px solid var(--c-dae5f1, #dae5f1);
         border-radius: 12px 12px 0 0;
     }
 
     .movement-unified-page .card-header h5 {
         margin: 0;
         font-size: 16px;
-        color: #0b4c8c;
+        color: var(--c-0b4c8c, #0b4c8c);
         font-weight: 700;
     }
 
@@ -862,21 +862,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     .movement-unified-page table {
         width: 100%;
         border-collapse: collapse;
-        background: #fff;
+        background: var(--c-fff, #fff);
     }
 
     .movement-unified-page table th {
-        background: #f0f5fa;
-        color: #0b4c8c;
+        background: var(--c-f0f5fa, #f0f5fa);
+        color: var(--c-0b4c8c, #0b4c8c);
         font-weight: 700;
         padding: 10px;
         text-align: right;
-        border-bottom: 2px solid #d0deec;
+        border-bottom: 2px solid var(--c-d0deec, #d0deec);
     }
 
     .movement-unified-page table td {
         padding: 10px;
-        border-bottom: 1px solid #e6edf5;
+        border-bottom: 1px solid var(--c-e6edf5, #e6edf5);
         text-align: right;
     }
 
@@ -884,21 +884,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     .movement-unified-page table select {
         min-width: 100px;
         padding: 6px;
-        border: 1px solid #cfe0f2;
+        border: 1px solid var(--c-cfe0f2, #cfe0f2);
         border-radius: 6px;
         font-size: 13px;
     }
 
     .movement-unified-page table input:disabled,
     .movement-unified-page table select:disabled {
-        background: #f5f9ff;
+        background: var(--c-f5f9ff, #f5f9ff);
         cursor: not-allowed;
-        color: #999;
+        color: var(--c-999, #999);
     }
 
     .movement-unified-page .status-running {
-        background: #d4edda;
-        color: #155724;
+        background: var(--c-d4edda, #d4edda);
+        color: var(--c-155724, #155724);
         padding: 3px 8px;
         border-radius: 4px;
         font-size: 12px;
@@ -906,8 +906,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .status-idle {
-        background: #e8eef5;
-        color: #666;
+        background: var(--c-e8eef5, #e8eef5);
+        color: var(--c-666, #666);
         padding: 3px 8px;
         border-radius: 4px;
         font-size: 12px;
@@ -915,9 +915,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .status-maint {
-        background: #fde7c8;
-        color: #92400e;
-        border: 1px solid #f0c98a;
+        background: var(--c-fde7c8, #fde7c8);
+        color: var(--c-92400e, #92400e);
+        border: 1px solid var(--c-f0c98a, #f0c98a);
         padding: 3px 8px;
         border-radius: 4px;
         font-size: 12px;
@@ -930,8 +930,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .btn-primary {
-        background: #0b4c8c;
-        color: #fff;
+        background: var(--c-0b4c8c, #0b4c8c);
+        color: var(--c-fff, #fff);
         border: none;
         padding: 6px 12px;
         border-radius: 6px;
@@ -941,12 +941,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .btn-primary:hover {
-        background: #083a63;
+        background: var(--c-083a63, #083a63);
     }
 
     .movement-unified-page .btn-secondary {
-        background: #dc2626;
-        color: #fff;
+        background: var(--c-dc2626, #dc2626);
+        color: var(--c-fff, #fff);
         border: none;
         padding: 5px 10px;
         border-radius: 6px;
@@ -957,12 +957,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .btn-secondary:hover {
-        background: #b91c1c;
+        background: var(--c-b91c1c, #b91c1c);
     }
 
     .movement-unified-page .btn-secondary {
-        background: #d97706;
-        color: #fff;
+        background: var(--c-d97706, #d97706);
+        color: var(--c-fff, #fff);
         border: none;
         padding: 6px 12px;
         border-radius: 6px;
@@ -973,7 +973,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .btn-secondary:hover {
-        background: #b45309;
+        background: var(--c-b45309, #b45309);
     }
 
     /* حاوية أزرار الإجراء (حفظ / صيانة / إنهاء) جنبًا إلى جنب */
@@ -1003,9 +1003,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        color: #92400e;
-        background: #fde7c8;
-        border: 1px solid #f0c98a;
+        color: var(--c-92400e, #92400e);
+        background: var(--c-fde7c8, #fde7c8);
+        border: 1px solid var(--c-f0c98a, #f0c98a);
         padding: 5px 12px;
         border-radius: 6px;
         font-size: 12px;
@@ -1024,25 +1024,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .op-state-badge.op-state-working {
-        background: #d4edda;
-        color: #155724;
+        background: var(--c-d4edda, #d4edda);
+        color: var(--c-155724, #155724);
     }
 
     .movement-unified-page .op-state-badge.op-state-ready {
-        background: #fde7c8;
-        color: #92400e;
-        border: 1px solid #f0c98a;
+        background: var(--c-fde7c8, #fde7c8);
+        color: var(--c-92400e, #92400e);
+        border: 1px solid var(--c-f0c98a, #f0c98a);
     }
 
     .movement-unified-page .op-state-badge.op-state-broken {
-        background: #f8d7da;
-        color: #b91c1c;
-        border: 1px solid #f1aeb5;
+        background: var(--c-f8d7da, #f8d7da);
+        color: var(--c-b91c1c, #b91c1c);
+        border: 1px solid var(--c-f1aeb5, #f1aeb5);
     }
 
     .movement-unified-page #monitoringMap {
         height: 400px;
-        border: 1px solid #d5e2ef;
+        border: 1px solid var(--c-d5e2ef, #d5e2ef);
         border-radius: 12px;
         margin-bottom: 20px;
     }
@@ -1061,21 +1061,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     .movement-unified-page .form-group label {
         font-size: 13px;
         font-weight: 600;
-        color: #0b4c8c;
+        color: var(--c-0b4c8c, #0b4c8c);
         margin-bottom: 4px;
     }
 
     .movement-unified-page .form-group input,
     .movement-unified-page .form-group select {
         padding: 8px;
-        border: 1px solid #cfe0f2;
+        border: 1px solid var(--c-cfe0f2, #cfe0f2);
         border-radius: 6px;
         font-size: 13px;
     }
 
     .movement-unified-page .btn-primary {
-        background: #28a745;
-        color: #fff;
+        background: var(--c-28a745, #28a745);
+        color: var(--c-fff, #fff);
         border: none;
         padding: 12px 24px;
         border-radius: 6px;
@@ -1086,7 +1086,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .btn-primary:hover {
-        background: #218838;
+        background: var(--c-218838, #218838);
     }
 
     .movement-unified-page .success-message {
@@ -1099,15 +1099,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .success-message.is-success {
-        background: #d4edda;
-        color: #155724;
-        border: 1px solid #c3e6cb;
+        background: var(--c-d4edda, #d4edda);
+        color: var(--c-155724, #155724);
+        border: 1px solid var(--c-c3e6cb, #c3e6cb);
     }
 
     .movement-unified-page .success-message.is-error {
-        background: #f8d7da;
-        color: #721c24;
-        border: 1px solid #f5c6cb;
+        background: var(--c-f8d7da, #f8d7da);
+        color: var(--c-721c24, #721c24);
+        border: 1px solid var(--c-f5c6cb, #f5c6cb);
     }
 
     .movement-unified-page .table-scroll {
@@ -1124,8 +1124,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .collapse-btn {
-        background: #0b4c8c;
-        color: #fff;
+        background: var(--c-0b4c8c, #0b4c8c);
+        color: var(--c-fff, #fff);
         border: none;
         padding: 8px 16px;
         border-radius: 6px;
@@ -1136,14 +1136,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .collapse-btn:hover {
-        background: #083a63;
+        background: var(--c-083a63, #083a63);
     }
 
     /* صفوف السائقين المدمجة */
     .movement-unified-page .drivers-sub-row > td {
-        background: #f4f8fd;
+        background: var(--c-f4f8fd, #f4f8fd);
         padding: 0;
-        border-bottom: 2px solid #c0d4ea;
+        border-bottom: 2px solid var(--c-c0d4ea, #c0d4ea);
     }
 
     .movement-unified-page .sub-drivers-wrap {
@@ -1160,24 +1160,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .sub-drivers-table th {
-        background: #dce9f6;
-        color: #0b4c8c;
+        background: var(--c-dce9f6, #dce9f6);
+        color: var(--c-0b4c8c, #0b4c8c);
         font-weight: 700;
         padding: 8px 10px;
         text-align: right;
-        border-bottom: 1px solid #b8ceea;
+        border-bottom: 1px solid var(--c-b8ceea, #b8ceea);
         font-size: 12px;
     }
 
     .movement-unified-page .sub-drivers-table td {
         padding: 8px 10px;
-        border-bottom: 1px solid #e6edf5;
-        background: #fff;
+        border-bottom: 1px solid var(--c-e6edf5, #e6edf5);
+        background: var(--c-fff, #fff);
     }
 
     .movement-unified-page .btn-secondary {
-        background: #0b4c8c;
-        color: #fff;
+        background: var(--c-0b4c8c, #0b4c8c);
+        color: var(--c-fff, #fff);
         border: none;
         padding: 5px 11px;
         border-radius: 20px;
@@ -1192,7 +1192,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .btn-secondary:hover {
-        background: #083a63;
+        background: var(--c-083a63, #083a63);
     }
 
     .movement-unified-page .btn-secondary .toggle-icon {
@@ -1205,8 +1205,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .add-driver-inline {
-        background: #eef6ff;
-        border: 1px dashed #7aadd4;
+        background: var(--c-eef6ff, #eef6ff);
+        border: 1px dashed var(--c-7aadd4, #7aadd4);
         border-radius: 8px;
         padding: 12px 16px;
         margin-top: 6px;
@@ -1214,7 +1214,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     .movement-unified-page .add-driver-inline > strong {
         display: block;
-        color: #0b4c8c;
+        color: var(--c-0b4c8c, #0b4c8c);
         margin-bottom: 10px;
         font-size: 13px;
     }
@@ -1236,14 +1236,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        border-bottom: 2px solid #dae5f1;
+        border-bottom: 2px solid var(--c-dae5f1, #dae5f1);
         margin-bottom: 18px;
     }
 
     .movement-unified-page .ems-tab-btn {
-        background: #f0f5fa;
-        color: #0b4c8c;
-        border: 1px solid #dae5f1;
+        background: var(--c-f0f5fa, #f0f5fa);
+        color: var(--c-0b4c8c, #0b4c8c);
+        border: 1px solid var(--c-dae5f1, #dae5f1);
         border-bottom: none;
         padding: 11px 26px;
         border-radius: 10px 10px 0 0;
@@ -1258,18 +1258,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .ems-tab-btn:hover {
-        background: #e3eef9;
+        background: var(--c-e3eef9, #e3eef9);
     }
 
     .movement-unified-page .ems-tab-btn.active {
-        background: #0b4c8c;
-        color: #fff;
-        border-color: #0b4c8c;
+        background: var(--c-0b4c8c, #0b4c8c);
+        color: var(--c-fff, #fff);
+        border-color: var(--c-0b4c8c, #0b4c8c);
     }
 
     .movement-unified-page .ems-tab-count {
-        background: rgba(11, 76, 140, 0.12);
-        color: #0b4c8c;
+        background: var(--c-rgba1176140012, rgba(11, 76, 140, 0.12));
+        color: var(--c-0b4c8c, #0b4c8c);
         border-radius: 12px;
         padding: 1px 9px;
         font-size: 12px;
@@ -1279,8 +1279,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 
     .movement-unified-page .ems-tab-btn.active .ems-tab-count {
-        background: #d4a017;
-        color: #fff;
+        background: var(--c-d4a017, #d4a017);
+        color: var(--c-fff, #fff);
     }
 
     .movement-unified-page .ems-tab-panel {
@@ -1289,6 +1289,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     .movement-unified-page .ems-tab-panel.active {
         display: block;
+    }
+
+    /* UXW-01 ②: أنماطٌ ثابتةٌ نُقلت من سماتِ style الموضعيةِ إلى أصنافِ الشاشة */
+    .movement-unified-page td.mvun-empty-cell {
+        text-align: center;
+        color: var(--c-888, #888);
+        padding: 14px;
+    }
+
+    .movement-unified-page td.mvun-empty-cell-sm {
+        text-align: center;
+        color: var(--c-888, #888);
+        padding: 10px;
+    }
+
+    .movement-unified-page .form-group.mvun-fg-end {
+        justify-content: flex-end;
+    }
+
+    .movement-unified-page .btn-primary.mvun-add-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+        margin-top: 0;
+    }
+
+    .movement-unified-page .card-body.mvun-body-flush {
+        padding: 0;
     }
 </style>
 
@@ -1302,6 +1329,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     );
     $header_back = array('href' => '../main/dashboard.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include(__DIR__ . '/../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا معدّاتٍ موزَّعةً على ورديّاتِ هذا المشروعِ بعدُ', 'أضفْ أولَ تشغيلِ آليةٍ من شاشةِ «إدارة التشغيل» ثم عُدْ لمتابعةِ الوردياتِ هنا');
     // TKT-15 · زر الإبلاغ السياقي الغني — التايم شيت والتشغيل اليومي (§2-①)
     require_once __DIR__ . '/../includes/report_button.php';
     require_once __DIR__ . '/../includes/permit_gate.php'; // لدالة موقع المشروع الافتراضي
@@ -1383,7 +1412,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </thead>
                         <tbody>
                             <?php if (empty($sgrp['rows'])): ?>
-                                <tr><td colspan="<?php echo $col_count; ?>" style="text-align:center;color:#888;padding:14px;"><?php echo htmlspecialchars($sgrp['empty']); ?></td></tr>
+                                <tr><td class="mvun-empty-cell" colspan="<?php echo $col_count; ?>"><?php echo htmlspecialchars($sgrp['empty']); ?></td></tr>
                             <?php else: ?>
                                 <?php $idx = 1; foreach ($sgrp['rows'] as $op):
                                     $op_id      = intval($op['id']);
@@ -1404,7 +1433,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                     <td><?php echo htmlspecialchars($op['equipment_type_name'] ?? '-'); ?></td>
                                     <td>
                                         <?php if ($is_running && $can_edit): ?>
-                                            <select class="op_shift" data-op="<?php echo $op_id; ?>">
+                                            <select class="op_shift" aria-label="نظامُ ورديةِ الآلية" data-op="<?php echo $op_id; ?>">
                                                 <option value="D" <?php echo $shift === 'D' ? 'selected' : ''; ?>>نهاري</option>
                                                 <option value="N" <?php echo $shift === 'N' ? 'selected' : ''; ?>>ليلي</option>
                                                 <option value="B" <?php echo $shift === 'B' ? 'selected' : ''; ?>>نهاري + ليلي</option>
@@ -1438,7 +1467,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                             <span class="op-maint-note"><i class="fas fa-wrench"></i> في الصيانة</span>
                                         <?php elseif ($is_running && $can_edit): ?>
                                             <div class="row-actions">
-                                                <select class="op_state_sel" data-op="<?php echo $op_id; ?>" onchange="setOpState(<?php echo $op_id; ?>, this.value)" title="الحالة التشغيلية" aria-label="الحالة التشغيلية">
+                                                <select class="op_state_sel" aria-label="الحالة التشغيلية" title="الحالة التشغيلية" data-op="<?php echo $op_id; ?>" onchange="setOpState(<?php echo $op_id; ?>, this.value)">
                                                     <option value="تعمل" <?php echo $op_state === 'تعمل' ? 'selected' : ''; ?>>تعمل</option>
                                                     <option value="جاهزة" <?php echo $op_state === 'جاهزة' ? 'selected' : ''; ?>>جاهزة</option>
                                                 </select>
@@ -1453,7 +1482,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 </tr>
                                 <?php if ($show_drivers): ?>
                                 <!-- صف السائقين القابل للتوسيع -->
-                                <tr id="op_drivers_<?php echo $tkey; ?>_<?php echo $op_id; ?>" class="drivers-sub-row" style="display:none;">
+                                <tr id="op_drivers_<?php echo $tkey; ?>_<?php echo $op_id; ?>" class="drivers-sub-row is-hidden">
                                     <td colspan="7">
                                         <div class="sub-drivers-wrap">
                                             <table class="sub-drivers-table no-datatable">
@@ -1469,7 +1498,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                 </thead>
                                                 <tbody>
                                                     <?php if (empty($eq_drivers)): ?>
-                                                        <tr><td colspan="6" style="text-align:center;color:#888;padding:10px;">لا يوجد سائقون مرتبطون بهذه الآلية</td></tr>
+                                                        <tr><td class="mvun-empty-cell-sm" colspan="6">لا يوجد سائقون مرتبطون بهذه الآلية</td></tr>
                                                     <?php else: ?>
                                                         <?php $didx = 1; foreach ($eq_drivers as $drv):
                                                             $rel_id     = intval($drv['id']);
@@ -1484,7 +1513,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                             <td><?php echo htmlspecialchars($drv['driver_phone'] ?? '-'); ?></td>
                                                             <td>
                                                                 <?php if ($is_active && $can_edit): ?>
-                                                                    <select class="drv_shift" data-rel="<?php echo $rel_id; ?>" aria-label="وردية السائق">
+                                                                    <select class="drv_shift" aria-label="وردية السائق" data-rel="<?php echo $rel_id; ?>">
                                                                         <option value="D" <?php echo $drv_shift === 'D' ? 'selected' : ''; ?>>نهاري</option>
                                                                         <option value="N" <?php echo $drv_shift === 'N' ? 'selected' : ''; ?>>ليلي</option>
                                                                         <option value="B" <?php echo $drv_shift === 'B' ? 'selected' : ''; ?>>نهاري + ليلي</option>
@@ -1539,15 +1568,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="emsf_739_b2962">بداية التعيين</label>
-                                                            <input type="date" name="start_date" value="<?php echo date('Y-m-d'); ?>" id="emsf_739_b2962">
+                                                            <input type="date" name="start_date" id="emsf_739_b2962" value="<?php echo date('Y-m-d'); ?>">
                                                         </div>
                                                         <div class="form-group">
                                                             <label for="emsf_740_46196">نهاية التعيين</label>
                                                             <input type="date" name="end_date" id="emsf_740_46196">
                                                         </div>
-                                                        <div class="form-group" style="justify-content:flex-end;">
+                                                        <div class="form-group mvun-fg-end">
                                                             <label>&nbsp;</label>
-                                                            <button type="submit" class="btn-primary" style="padding:8px 16px;font-size:13px;margin-top:0;"><i class="fas fa-plus"></i> إضافة</button>
+                                                            <button type="submit" class="btn-primary mvun-add-btn"><i class="fas fa-plus"></i> إضافة</button>
                                                         </div>
                                                     </div>
                                                 </form>
@@ -1574,7 +1603,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="card-header">
                 <h5><i class="fas fa-map-marked-alt"></i> خريطة المراقبة</h5>
             </div>
-            <div class="card-body" style="padding:0;">
+            <div class="card-body mvun-body-flush">
                 <div id="monitoringMap"></div>
             </div>
         </div>
@@ -1589,8 +1618,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         var subRow = document.getElementById('op_drivers_' + tableKey + '_' + opId);
         var btn    = document.getElementById('toggle_btn_' + tableKey + '_' + opId);
         if (!subRow) return;
-        var isOpen = subRow.style.display !== 'none';
-        subRow.style.display = isOpen ? 'none' : 'table-row';
+        var isOpen = !subRow.classList.contains('is-hidden');
+        subRow.classList.toggle('is-hidden', isOpen);
         if (btn) btn.classList.toggle('open', !isOpen);
     }
 

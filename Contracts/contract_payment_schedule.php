@@ -152,10 +152,39 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                          'icon' => 'fas fa-arrow-right', 'label' => 'الجدول الشهري');
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا خطةَ دفعٍ نافذةً على هذا العقد بعدُ',
+                           'اختر عقدًا من جدولِ العقود ثم ولّد الخطةَ من الرأسِ والجدولِ الشهري');
     ?>
 
+    <style>
+    .ps-note{color:var(--c-4b5563, #4b5563);line-height:1.8;margin:0}
+    .ps-table{width:100%}
+    .ps-wrap{white-space:normal}
+    .ps-badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    .ps-badge-pad{padding:6px 12px}
+    .ps-gen-form{margin-bottom:16px}
+    .ps-gen-title{margin:0 0 10px}
+    .ps-grid-10{display:flex;gap:10px;flex-wrap:wrap}
+    .ps-grid-8{display:flex;gap:8px;flex-wrap:wrap}
+    .ps-grid-16{display:flex;gap:16px;flex-wrap:wrap;margin-top:14px}
+    .ps-row-overdue{background:var(--c-fef2f2, #fef2f2)}
+    .ps-inline-form{display:flex;gap:4px}
+    .ps-form-main{flex:1;min-width:340px}
+    .ps-form-end{align-self:flex-end}
+    .ps-w80{width:80px}
+    .ps-w100{width:100px}
+    .ps-w110{width:110px}
+    .ps-w120{width:120px}
+    .ps-w130{width:130px}
+    .ps-w140{width:140px}
+    .ps-mw220{min-width:220px}
+    .ps-mw240{min-width:240px}
+    .ps-mw280{min-width:280px}
+    </style>
+
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;line-height:1.8;margin:0">
+        <p class="ps-note">
             <i class="fas fa-circle-info"></i>
             الخطةُ تقول <strong>ما استُحقّ ومتى</strong> — لا ما قُبض ولا ما فُوتر.
             و<strong>أنواعُ المقدم الأربعة لا تُخلط</strong>: المستهلَكُ <strong>دَينٌ يُستهلك من
@@ -168,12 +197,12 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-file-contract"></i> العقود</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable ps-table" data-no-dt="1">
             <thead><tr><th>#</th><th>الطرفان</th><th>المدة</th><th>الحال</th><th>احتجاز%</th><th></th></tr></thead>
             <tbody>
             <?php foreach ($contracts as $c): ?>
                 <tr><td>#<?php echo intval($c['id']); ?></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars((string)$c['first_party']
+                    <td class="ps-wrap"><?php echo htmlspecialchars((string)$c['first_party']
                         . ' ← ' . (string)$c['second_party']); ?></td>
                     <td><?php echo htmlspecialchars((string)$c['actual_start'] . ' → ' . (string)$c['actual_end']); ?></td>
                     <td><?php echo htmlspecialchars((string)$c['contract_status']); ?></td>
@@ -191,38 +220,38 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         خطةُ العقد #<?php echo $CID; ?> — <?php echo htmlspecialchars((string)$head['second_party']); ?></h5></div>
     <div class="card-body">
         <?php if ($rows): ?>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-            <span class="badge badge-secondary" style="padding:6px 12px">النسخة
+        <div class="ps-badges">
+            <span class="badge badge-secondary ps-badge-pad">النسخة
                 <?php echo intval($sum['version']); ?></span>
-            <span class="badge badge-info" style="padding:6px 12px">متوقَّع
+            <span class="badge badge-info ps-badge-pad">متوقَّع
                 <?php echo $sum['expected'] . ' ' . htmlspecialchars((string)$sum['currency']); ?></span>
-            <span class="badge badge-success" style="padding:6px 12px">مستلم <?php echo $sum['received']; ?></span>
-            <span class="badge badge-secondary" style="padding:6px 12px">متبقٍّ <?php echo $sum['remaining']; ?></span>
+            <span class="badge badge-success ps-badge-pad">مستلم <?php echo $sum['received']; ?></span>
+            <span class="badge badge-secondary ps-badge-pad">متبقٍّ <?php echo $sum['remaining']; ?></span>
             <?php if ($sum['overdue_rows'] > 0): ?>
-                <span class="badge badge-warning" style="padding:6px 12px">
+                <span class="badge badge-warning ps-badge-pad">
                     متأخر <?php echo $sum['overdue']; ?> في <?php echo $sum['overdue_rows']; ?> سطرًا</span>
             <?php endif; ?>
-            <span class="badge badge-secondary" style="padding:6px 12px">
+            <span class="badge badge-secondary ps-badge-pad">
                 مقبوضٌ التزامًا <?php echo $sum['liability']; ?> ·
                 إيرادًا <?php echo $sum['revenue']; ?> — <strong>لا يُجمعان</strong></span>
         </div>
         <?php endif; ?>
 
         <?php if (!$rows && $can_edit): ?>
-        <form method="post" class="ems-form" style="margin-bottom:16px">
+        <form method="post" class="ems-form ps-gen-form">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="ps_action" value="generate">
             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
-            <h6 style="margin:0 0 10px"><i class="fa fa-wand-magic-sparkles"></i>
+            <h6 class="ps-gen-title"><i class="fa fa-wand-magic-sparkles"></i>
                 توليدٌ آليٌّ من الرأس والجدول الشهري</h6>
-            <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <div class="ps-grid-10">
                 <div class="form-group"><label for="emsf_59_524ba">النمط</label>
                     <select name="pattern" id="emsf_59_524ba">
                         <?php foreach ($PATTERN_AR as $k => $v): ?>
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
                 <div class="form-group"><label for="emsf_60_9d874">مهلةُ السداد (يومًا)</label>
-                    <input type="number" name="due_days" value="30" min="0" style="width:110px" id="emsf_60_9d874"></div>
+                    <input type="number" name="due_days" value="30" min="0" class="ps-w110" id="emsf_60_9d874"></div>
                 <div class="form-group"><label for="emsf_61_5e04e">نوعُ المقدم (اختياري)</label>
                     <select name="adv_type" id="emsf_61_5e04e">
                         <option value="">— بلا مقدم —</option>
@@ -230,7 +259,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
                 <div class="form-group"><label for="emsf_62_d9bbb">نسبتُه %</label>
-                    <input type="number" step="0.001" name="adv_percent" style="width:100px" id="emsf_62_d9bbb"></div>
+                    <input type="number" step="0.001" name="adv_percent" class="ps-w100" id="emsf_62_d9bbb"></div>
                 <div class="form-group"><label for="emsf_63_7a62a">تاريخُ استحقاقه</label>
                     <input type="date" name="adv_due" id="emsf_63_7a62a"></div>
                 <div class="form-group"><label for="emsf_64_f5a33">معالجتُه (للتعبئة وحدَها)</label>
@@ -239,7 +268,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <option value="liability">التزام (دَين)</option>
                         <option value="revenue">إيراد</option>
                     </select></div>
-                <div class="form-group" style="min-width:280px"><label for="emsf_65_00dd6">نصُّ العقد الحاكم (للتعبئة)</label>
+                <div class="form-group ps-mw280"><label for="emsf_65_00dd6">نصُّ العقد الحاكم (للتعبئة)</label>
                     <input type="text" name="adv_basis_text" maxlength="255"
                            placeholder="البند 7-3: رسومُ التعبئة غيرُ مستردة…" id="emsf_65_00dd6"></div>
             </div>
@@ -249,7 +278,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
         <?php if ($rows): ?>
         <div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable ps-table" data-no-dt="1">
             <thead><tr><th>#</th><th>النوع</th><th>المقدمُ ومعالجتُه</th><th>الأساس</th><th>المتوقَّع</th>
                 <th>المستلم</th><th>المتبقي</th><th>الاستحقاق</th><th>الشهر</th><th>الحال</th>
                 <th>مرجعُ التحصيل</th><th></th>
@@ -266,10 +295,10 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <tbody>
             <?php foreach ($rows as $r):
                 $st = (string) $r['state']; ?>
-                <tr<?php echo $st === 'overdue' ? " style='background:#fef2f2'" : ''; ?>>
+                <tr<?php echo $st === 'overdue' ? ' class="ps-row-overdue"' : ''; ?>>
                     <td><?php echo intval($r['seq']); ?></td>
                     <td><?php echo htmlspecialchars($KIND_AR[(string)$r['payment_kind']] ?? (string)$r['payment_kind']); ?></td>
-                    <td style="white-space:normal"><?php
+                    <td class="ps-wrap"><?php
                         if ($r['advance_type'] !== null) {
                             echo htmlspecialchars($ADV_AR[(string)$r['advance_type']] ?? (string)$r['advance_type']);
                             echo ' <span class="badge ' . ((string)$r['treatment'] === 'liability'
@@ -284,7 +313,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <td><?php echo htmlspecialchars((string)$r['amount_expected']); ?></td>
                     <td><?php echo htmlspecialchars((string)$r['received_amount']); ?></td>
                     <td><?php echo htmlspecialchars((string)$r['remaining_amount']); ?></td>
-                    <td style="white-space:normal"><?php echo $r['due_date'] !== null
+                    <td class="ps-wrap"><?php echo $r['due_date'] !== null
                         ? htmlspecialchars((string)$r['due_date'])
                         : ('<em>' . htmlspecialchars((string)$r['due_condition']) . '</em>'); ?></td>
                     <td><?php echo htmlspecialchars((string)($r['period_month'] ?? '—')); ?></td>
@@ -293,14 +322,14 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                         <?php echo htmlspecialchars($STATE_AR[$st] ?? $st); ?></span></td>
                     <td><?php echo htmlspecialchars((string)($r['collection_ref'] ?? '—')); ?></td>
                     <td><?php if ($can_edit && (float) $r['remaining_amount'] > 0.004): ?>
-                        <form method="post" style="display:flex;gap:4px">
+                        <form method="post" class="ps-inline-form">
         <?php echo csrf_field(); ?>
                             <input type="hidden" name="ps_action" value="receive">
                             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                             <input type="hidden" name="row_id" value="<?php echo intval($r['id']); ?>">
-                            <input type="number" step="0.01" name="amount" placeholder="المبلغ" required style="width:100px" aria-label="المبلغ">
-                            <input type="date" name="received_date" required style="width:140px">
-                            <input type="text" name="doc_ref" placeholder="سندُ القبض" required style="width:130px" aria-label="سندُ القبض">
+                            <input type="number" step="0.01" name="amount" class="ps-w100" placeholder="المبلغُ المقبوض" required aria-label="المبلغُ المقبوض">
+                            <input type="date" name="received_date" class="ps-w140" required aria-label="تاريخُ القبض">
+                            <input type="text" name="doc_ref" class="ps-w130" placeholder="سندُ القبض" required aria-label="سندُ القبض">
                             <button type="submit" class="action-btn"><i class="fa fa-hand-holding-dollar"></i> اقبض</button>
                         </form>
                     <?php else: ?>—<?php endif; ?></td></tr>
@@ -310,13 +339,13 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         </div>
 
         <?php if ($can_edit): ?>
-        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:14px">
-            <form method="post" class="ems-form" style="flex:1;min-width:340px">
+        <div class="ps-grid-16">
+            <form method="post" class="ems-form ps-form-main">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="ps_action" value="add_row">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
                 <h6><i class="fa fa-plus"></i> سطرٌ يدويّ — <strong>للمعالم والدفعات الخاصة</strong></h6>
-                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <div class="ps-grid-8">
                     <div class="form-group"><label for="emsf_66_2cc1e">النوع</label>
                         <select name="kind" id="emsf_66_2cc1e">
                             <option value="milestone">معلَم</option>
@@ -325,13 +354,13 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <option value="advance">مقدَّم</option>
                         </select></div>
                     <div class="form-group"><label for="emsf_67_a326d">المبلغ</label>
-                        <input type="number" step="0.01" name="amount" style="width:120px" id="emsf_67_a326d"></div>
+                        <input type="number" step="0.01" name="amount" class="ps-w120" id="emsf_67_a326d"></div>
                     <div class="form-group"><label for="emsf_68_1dc6e">العملة</label>
-                        <input type="text" name="currency" maxlength="8" style="width:80px"
-                               value="<?php echo htmlspecialchars((string)$rows[0]['currency']); ?>" id="emsf_68_1dc6e"></div>
+                        <input type="text" name="currency" maxlength="8" class="ps-w80" id="emsf_68_1dc6e"
+                               value="<?php echo htmlspecialchars((string)$rows[0]['currency']); ?>"></div>
                     <div class="form-group"><label for="emsf_69_10456">تاريخُ الاستحقاق</label>
                         <input type="date" name="due_date" id="emsf_69_10456"></div>
-                    <div class="form-group" style="min-width:220px"><label for="emsf_70_a103a">أو شرطُه</label>
+                    <div class="form-group ps-mw220"><label for="emsf_70_a103a">أو شرطُه</label>
                         <input type="text" name="due_condition" maxlength="200" id="emsf_70_a103a"></div>
                     <div class="form-group"><label for="emsf_71_e8e8a">نوعُ المقدم (إن كان مقدمًا)</label>
                         <select name="row_adv_type" id="emsf_71_e8e8a">
@@ -345,13 +374,13 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                             <option value="liability">التزام</option>
                             <option value="revenue">إيراد</option>
                         </select></div>
-                    <div class="form-group" style="min-width:240px"><label for="emsf_73_ddeb5">نصُّ العقد الحاكم</label>
+                    <div class="form-group ps-mw240"><label for="emsf_73_ddeb5">نصُّ العقد الحاكم</label>
                         <input type="text" name="row_adv_basis" maxlength="255" id="emsf_73_ddeb5"></div>
                 </div>
                 <button type="submit" class="btn-primary"><i class="fa fa-plus"></i> أضف السطر</button>
             </form>
 
-            <form method="post" class="ems-form" style="min-width:280px">
+            <form method="post" class="ems-form ps-mw280">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="ps_action" value="new_version">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
@@ -359,12 +388,12 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <div class="form-group"><label for="emsf_74_2ae97">سريانُها</label>
                     <input type="date" name="effective_from" required id="emsf_74_2ae97"></div>
                 <div class="form-group"><label for="emsf_75_d54e3">رقمُ الملحق (اختياري)</label>
-                    <input type="number" name="amendment_id" style="width:120px" id="emsf_75_d54e3"></div>
+                    <input type="number" name="amendment_id" class="ps-w120" id="emsf_75_d54e3"></div>
                 <button type="submit" class="btn-primary"><i class="fa fa-code-branch"></i>
                     افتح نسخةً — <strong>والقديمةُ محفوظة</strong></button>
             </form>
 
-            <form method="post" style="align-self:flex-end">
+            <form method="post" class="ps-form-end">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="ps_action" value="refresh">
                 <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
@@ -381,7 +410,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-clock-rotate-left"></i>
         النسخُ — <strong>والقديمةُ محفوظة</strong></h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable ps-table" data-no-dt="1">
             <thead><tr><th>النسخة</th><th>من</th><th>إلى</th><th>الأسطر</th><th>المتوقَّع</th></tr></thead>
             <tbody>
             <?php foreach ($vers as $v): ?>

@@ -64,3 +64,14 @@ admin/org_permits.php	محمد
 Finance/acc_	FIN-CTRL@equipation.sd
 Finance/ctrl_	FIN-CTRL@equipation.sd
 Finance/tre_	FIN-CTRL@equipation.sd
+Workforce/worker_contract.php	مشرف الموارد
+Workforce/worker_register.php	مشرف الموارد
+Workforce/worker_worklog.php	مشرف الموارد
+Workforce/workforce_requirement.php	مشرف الموارد
+Workforce/employee_advances.php	مشرف الموارد
+Workforce/employee_settlements.php	مشرف الموارد
+Workforce/payroll_runs.php	مشرف الموارد
+Workforce/worker_settlement.php	مشرف الموارد
+movement/	موقع
+Equipments/equipments_drivers.php	اروينا
+Equipments/fleet_failures.php	يسن

@@ -158,6 +158,24 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ شاشةِ تعرفةِ الترحيلِ أصنافًا برموزِ الألوان */
+.trs-tf-lead{color:var(--c-4b5563, #4b5563);line-height:1.8;margin:0 0 10px}
+.trs-tf-badge-pad{padding:6px 12px}
+.trs-tf-req{color:var(--c-state-danger-strong, #c00)}
+.trs-tf-mt12{margin-top:12px}
+.trs-tf-tbl{width:100%}
+.trs-tf-ended{opacity:.55}
+.trs-tf-ltr{direction:ltr}
+.trs-tf-inline{display:inline}
+.trs-tf-btn{border:0;padding:5px 10px}
+.trs-tf-btn-sm{border:0;padding:5px 8px}
+.trs-tf-row{display:flex;gap:5px}
+.trs-tf-rowc{display:flex;gap:5px;align-items:center}
+.trs-tf-km{width:80px}
+.trs-tf-reason{width:140px}
+.trs-tf-wrap{white-space:normal}
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'تعرفة الترحيل وتسعير الأوامر'; $header_icon = 'fa fa-money-bill-transfer';
@@ -165,13 +183,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => 'transfer_orders_list.php', 'class' => '',
                          'icon' => 'fas fa-arrow-right', 'label' => 'أوامر الترحيل');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا تعرفةَ ترحيلٍ مكتوبةً في هذه البيئةِ بعدُ', 'اكتب أولَ تعرفةٍ من نموذجِ «تعرفةٌ جديدة» أعلاه ليصيرَ التسعيرُ ممكنًا');
     if (isset($_GET['msg'])) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     ?>
 
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;line-height:1.8;margin:0 0 10px;">
+        <p class="trs-tf-lead">
             <i class="fas fa-circle-info"></i>
             <strong>أمرُ الترحيل المسلَّم بتعرفته</strong> هو مصدرُ تحميل النقل على المورد (ENT-02 §3-④).
             و<strong>لا تحميلَ بلا تعرفةٍ مكتوبة</strong>: بلا تعرفةٍ منطبقةٍ يُرفض التسعيرُ بسببه —
@@ -179,7 +199,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             و<strong>الأخصُّ يغلب</strong>: موردٌ بعينه ← مسارٌ ← نوعٌ ← الأعمّ.
         </p>
         <?php if ($unpriced > 0): ?>
-            <span class="badge badge-warning" style="padding:6px 12px;">
+            <span class="badge badge-warning trs-tf-badge-pad">
                 <i class="fas fa-triangle-exclamation"></i>
                 <?php echo $unpriced; ?> أمرًا مسلَّمًا على مورد <strong>بلا تسعير</strong> — لا يدخل أيٌّ منها تسويةً
             </span>
@@ -213,12 +233,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <?php foreach ($locs as $l): ?>
                             <option value="<?php echo intval($l['id']); ?>"><?php echo htmlspecialchars((string)$l['name']); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label for="emsf_1609_7338d">نموذجُ التسعير <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_1609_7338d">نموذجُ التسعير <span class="trs-tf-req">*</span></label>
                     <select name="pricing_model" required id="emsf_1609_7338d">
                         <?php foreach ($MODELS as $k => $v): ?>
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label for="emsf_1610_85521">المعدّل <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_1610_85521">المعدّل <span class="trs-tf-req">*</span></label>
                     <input type="number" name="rate" step="0.0001" min="0.0001" required id="emsf_1610_85521"></div>
                 <div class="form-group"><label for="emsf_1611_d2458">العملة</label>
                     <input type="text" name="currency" value="SDG" maxlength="8" id="emsf_1611_d2458"></div>
@@ -226,21 +246,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <input type="number" name="min_amount" step="0.01" min="0" id="emsf_1612_f8b14"></div>
                 <div class="form-group"><label for="emsf_1613_68f63">حدٌّ أقصى</label>
                     <input type="number" name="max_amount" step="0.01" min="0" id="emsf_1613_68f63"></div>
-                <div class="form-group"><label for="emsf_1614_de312">سريان من <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_1614_de312">سريان من <span class="trs-tf-req">*</span></label>
                     <input type="date" name="effective_from" required id="emsf_1614_de312"></div>
                 <div class="form-group"><label for="emsf_1615_7b9b2">سريان إلى</label>
                     <input type="date" name="effective_to" id="emsf_1615_7b9b2"></div>
                 <div class="form-group"><label for="emsf_1616_b27a1">مرجعُ التعرفة</label>
                     <input type="text" name="note" maxlength="200" placeholder="بندُ العقد أو مرجعُ الاعتماد" id="emsf_1616_b27a1"></div>
             </div>
-            <div style="margin-top:12px"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> أضف التعرفة</button></div>
+            <div class="trs-tf-mt12"><button type="submit" class="btn-primary"><i class="fa fa-save"></i> أضف التعرفة</button></div>
         </form>
     </div></div>
     <?php endif; ?>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-table-list"></i> التعرفات</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap" style="width:100%">
+        <table class="alltables display nowrap trs-tf-tbl">
             <thead><tr><th>#</th><th>المورد</th><th>نوع الترحيل</th><th>المسار</th><th>النموذج</th>
                 <th>المعدّل</th><th>الحدود</th><th>تاريخ السريان</th><th>الحالة</th>
                 <?php if ($can_edit) echo '<th>إجراء</th>'; ?>
@@ -274,7 +294,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                      . (($t['min_amount'] !== null && $t['max_amount'] !== null) ? ' · ' : '')
                      . ($t['max_amount'] !== null ? '≤' . $t['max_amount'] : '');
             ?>
-                <tr<?php echo (string)$t['state'] === 'ended' ? " style='opacity:.55'" : ''; ?>>
+                <tr<?php echo (string)$t['state'] === 'ended' ? " class='trs-tf-ended'" : ''; ?>>
                     <td><?php echo intval($t['id']); ?></td>
                     <td><?php echo $t['supplier_id'] !== null
                         ? htmlspecialchars((string)($t['supplier_name'] ?? ('#' . intval($t['supplier_id']))))
@@ -286,18 +306,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><strong><?php echo rtrim(rtrim(number_format((float)$t['rate'], 4, '.', ''), '0'), '.'); ?></strong>
                         <?php echo htmlspecialchars((string)$t['currency']); ?></td>
                     <td><?php echo $lim !== '' ? htmlspecialchars($lim) : '—'; ?></td>
-                    <td style="direction:ltr"><?php echo htmlspecialchars((string)$t['effective_from']); ?>
+                    <td class="trs-tf-ltr"><?php echo htmlspecialchars((string)$t['effective_from']); ?>
                         → <?php echo htmlspecialchars((string)($t['effective_to'] ?? '…')); ?></td>
                     <td><?php echo (string)$t['state'] === 'active'
                         ? '<span class="badge badge-success">سارية</span>'
                         : '<span class="badge badge-secondary">منتهية</span>'; ?></td>
                     <?php if ($can_edit): ?>
                     <td><?php if ((string)$t['state'] === 'active'): ?>
-                        <form method="post" style="display:inline">
+                        <form method="post" class="trs-tf-inline">
         <?= csrf_field() ?>
                             <input type="hidden" name="tar_action" value="end">
                             <input type="hidden" name="tariff_id" value="<?php echo intval($t['id']); ?>">
-                            <button type="submit" class="badge badge-danger" style="border:0;padding:5px 10px"
+                            <button type="submit" class="badge badge-danger trs-tf-btn"
                                 onclick="return confirm('إنهاءُ التعرفة؟ تبقى في السجل حاكمةً لما سُعّر بها.');">
                                 <i class="fa fa-stop"></i> أنهِ</button>
                         </form>
@@ -312,7 +332,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-truck-fast"></i>
         الأوامرُ المسلَّمة — وتسعيرُها بالتعرفة</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable trs-tf-tbl" data-no-dt="1">
             <thead><tr><th>الأمر</th><th>المرحلة</th><th>المورد المحمَّل</th><th>تاريخ الإنشاء</th>
                 <th>المسافة كم</th><th>التسعير</th><?php if ($can_edit) echo '<th>إجراء</th>'; ?></tr></thead>
             <tbody>
@@ -327,16 +347,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <td><?php if ($o['distance_km'] !== null): ?>
                             <?php echo htmlspecialchars((string)$o['distance_km']); ?> كم
                         <?php elseif ($can_edit): ?>
-                            <form method="post" style="display:flex;gap:5px">
+                            <form method="post" class="trs-tf-row">
         <?= csrf_field() ?>
                                 <input type="hidden" name="tar_action" value="distance">
                                 <input type="hidden" name="order_id" value="<?php echo intval($o['id']); ?>">
                                 <input type="number" name="distance_km" step="0.01" min="0.01"
-                                       style="width:80px" placeholder="كم" aria-label="كم">
-                                <button type="submit" class="badge badge-secondary" style="border:0;padding:5px 8px">حفظ</button>
+                                       class="trs-tf-km" placeholder="كم" aria-label="كم">
+                                <button type="submit" class="badge badge-secondary trs-tf-btn-sm">حفظ</button>
                             </form>
                         <?php else: ?>—<?php endif; ?></td>
-                    <td style="white-space:normal"><?php echo $o['tariff_amount'] !== null
+                    <td class="trs-tf-wrap"><?php echo $o['tariff_amount'] !== null
                         ? ('<strong>' . htmlspecialchars((string)$o['tariff_amount']) . ' '
                            . htmlspecialchars((string)$o['tariff_currency']) . '</strong><div><small>'
                            . htmlspecialchars((string)$o['tariff_note']) . '</small></div>')
@@ -344,21 +364,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <?php if ($can_edit): ?>
                     <td><?php if ($o['charge_supplier_id'] === null): ?>—
                         <?php elseif ($o['tariff_amount'] === null): ?>
-                        <form method="post" style="display:inline">
+                        <form method="post" class="trs-tf-inline">
         <?= csrf_field() ?>
                             <input type="hidden" name="tar_action" value="price">
                             <input type="hidden" name="order_id" value="<?php echo intval($o['id']); ?>">
-                            <button type="submit" class="badge badge-success" style="border:0;padding:5px 10px">
+                            <button type="submit" class="badge badge-success trs-tf-btn">
                                 <i class="fa fa-calculator"></i> سعّر بالتعرفة</button>
                         </form>
                         <?php else: ?>
-                        <form method="post" style="display:flex;gap:5px;align-items:center">
+                        <form method="post" class="trs-tf-rowc">
         <?= csrf_field() ?>
                             <input type="hidden" name="tar_action" value="price">
                             <input type="hidden" name="order_id" value="<?php echo intval($o['id']); ?>">
                             <input type="text" name="reprice_reason" maxlength="90" required
-                                   placeholder="حجّةُ إعادة التسعير" style="width:140px" aria-label="حجّةُ إعادة التسعير">
-                            <button type="submit" class="badge badge-warning" style="border:0;padding:5px 10px">
+                                   placeholder="حجّةُ إعادة التسعير" class="trs-tf-reason" aria-label="حجّةُ إعادة التسعير">
+                            <button type="submit" class="badge badge-warning trs-tf-btn">
                                 أعِد التسعير</button>
                         </form>
                         <?php endif; ?></td>

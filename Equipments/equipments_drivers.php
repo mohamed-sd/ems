@@ -321,20 +321,28 @@ include __DIR__ . '/../includes/page_header.php';
             <?php if ($_SESSION['user']['role'] != "10") { ?>
             <!-- أزرار Excel الموحّدة (نموذج + تصدير + استيراد متعدد الخطوات) -->
             <?php $__xlBase = function_exists('ems_excel_endpoint_url') ? ems_excel_endpoint_url() : '../excel.php'; ?>
-            <a href="<?php echo htmlspecialchars($__xlBase, ENT_QUOTES, 'UTF-8'); ?>?entity=equipments&action=template" class="btn" style="background: linear-gradient(135deg, #16a34a 0%, #059669 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25); transition: all 0.3s ease;">
+            <a href="<?php echo htmlspecialchars($__xlBase, ENT_QUOTES, 'UTF-8'); ?>?entity=equipments&action=template" class="btn eqd-xl-tpl">
                 <i class="fas fa-file-excel"></i> تحميل النموذج
             </a>
-            <a href="<?php echo htmlspecialchars($__xlBase, ENT_QUOTES, 'UTF-8'); ?>?entity=equipments&action=export" class="btn" style="background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25); transition: all 0.3s ease;">
+            <a href="<?php echo htmlspecialchars($__xlBase, ENT_QUOTES, 'UTF-8'); ?>?entity=equipments&action=export" class="btn eqd-xl-exp">
                 <i class="fas fa-file-export"></i> تصدير Excel
             </a>
-            <button type="button" data-ems-excel-import="equipments" data-ems-excel-title="المعدات" class="btn" style="background: linear-gradient(135deg, #e8b800 0%, #d4a800 100%); color: #0c1c3e; padding: 10px 20px; border-radius: 8px; font-weight: 600; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(232, 184, 0, 0.25); transition: all 0.3s ease;">
+            <button type="button" data-ems-excel-import="equipments" data-ems-excel-title="المعدات" class="btn eqd-xl-imp">
                 <i class="fas fa-file-import"></i> استيراد من Excel
             </button>
             <?php } ?>
         </div>
     </div>
 
-    <?php if (!empty($success_msg)): 
+    <?php
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    if (function_exists('ems_states_bundle')) {
+        echo ems_states_bundle('لا معدةَ مرتبطةً بسائقٍ في هذا العرضِ بعدُ',
+                               'أضف معدةً بزرِّ «إضافة» في رأسِ الشاشة، أو وسِّع فلاترَ المورِّدِ والنوعِ والحالة');
+    }
+    ?>
+
+    <?php if (!empty($success_msg)):
         $isSuccess = strpos($success_msg, '✅') !== false;
     ?>
         <div class="success-message <?= $isSuccess ? 'is-success' : 'is-error' ?>">
@@ -345,8 +353,8 @@ include __DIR__ . '/../includes/page_header.php';
 
     <?php if ($_SESSION['user']['role'] != "10") { ?>
     <!-- فورم إضافة / تعديل معدة -->
-    <form id="projectForm" action="" method="post" class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>
-        <?= csrf_field() ?>">
+    <form id="projectForm" action="" method="post" class="allforms<?php echo !empty($editData) ? ' allforms-visible' : ''; ?>">
+        <?= csrf_field() ?>
         <div class="card">
             <div class="card-header">
                 <h5>
@@ -814,7 +822,7 @@ include __DIR__ . '/../includes/page_header.php';
                     </div>
                 </div>
                 
-                <div class="filters-summary" id="filtersSummary" style="display: none;">
+                <div class="filters-summary is-hidden" id="filtersSummary">
                     <span class="summary-icon"><i class="fas fa-check-circle"></i></span>
                     <span class="summary-text"></span>
                 </div>
@@ -822,22 +830,22 @@ include __DIR__ . '/../includes/page_header.php';
             
             <!-- أزرار إظهار/إخفاء المجموعات -->
             <div class="column-groups-toggle">
-                <button type="button" class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
+                <button type="button" class="ems-btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
                     <i class="fas fa-info-circle"></i> أساسية
                 </button>
-                <button type="button" class="btn-group-toggle active" data-group="identification" title="بيانات التعريف">
+                <button type="button" class="ems-btn-group-toggle active" data-group="identification" title="بيانات التعريف">
                     <i class="fas fa-id-card"></i> التعريف
                 </button>
-                <button type="button" class="btn-group-toggle" data-group="manufacturing" title="بيانات الصنع">
+                <button type="button" class="ems-btn-group-toggle" data-group="manufacturing" title="بيانات الصنع">
                     <i class="fas fa-industry"></i> الصنع
                 </button>
-                <button type="button" class="btn-group-toggle" data-group="technical" title="الحالة الفنية">
+                <button type="button" class="ems-btn-group-toggle" data-group="technical" title="الحالة الفنية">
                     <i class="fas fa-wrench"></i> فنية
                 </button>
-                <button type="button" class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
+                <button type="button" class="ems-btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
                     <i class="fas fa-toggle-on"></i> الحالة
                 </button>
-                <button type="button" class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
+                <button type="button" class="ems-btn-group-toggle-all" title="إظهار/إخفاء الكل">
                     <i class="fas fa-eye"></i> الكل
                 </button>
             </div>
@@ -1148,7 +1156,7 @@ include __DIR__ . '/../includes/page_header.php';
         </div>
         <div class="modal-footer">
             <?php if ($_SESSION['user']['role'] != "3" && $_SESSION['user']['role'] != "10") { ?>
-            <a id="viewEquipmentEditBtn" class="btn-secondary btn-primary" style="text-decoration: none;">
+            <a id="viewEquipmentEditBtn" class="btn-secondary btn-primary eqd-plain-link">
                 <i class="fas fa-edit"></i> تعديل المعدة
             </a>
             <?php } ?>
@@ -1173,20 +1181,14 @@ include __DIR__ . '/../includes/page_header.php';
 <script>
     (function () {
         $(document).ready(function () {
-            var table = $('#projectsTable').DataTable({
-                dom: 'Bfrtip',
-                buttons: [
-                    { extend: 'copy', text: 'نسخ' },
-                    { extend: 'excel', text: 'تصدير Excel' },
-                    { extend: 'csv', text: 'تصدير CSV' },
-                    { extend: 'pdf', text: 'تصدير PDF' },
-                    { extend: 'print', text: 'طباعة' }
-                ],
-                "language": {
-                    "url": "https:/ems/assets/i18n/datatables/ar.json"
-                }
-            });
-            
+            /* UXW-01 بوابة ٥: تهيئةُ جدولِ المعدات انتقلت إلى المكوّنِ المركزي
+               (assets/js/ui-unification.js — initializeMissingDataTables):
+               اللغةُ العربيةُ وزرُّ إكسل الموحَّد. وهنا يُربَط ما يخصُّ الشاشةَ
+               (الفلاتر ومجموعاتُ الأعمدة) بعد التهيئةِ المركزية — فإن سبقت
+               التهيئةُ رُبط فورًا، وإلا انتظرنا حدثَ init.dt. */
+            function bindEquipmentDriversTable() {
+            var table = $('#projectsTable').DataTable();
+
             // نظام إظهار/إخفاء المجموعات — خريطة الفهارس تُمرّر للوحدة الموحّدة.
             // الحالة الافتراضية تؤخذ من كلاس active على الأزرار (الصنع/الفنية مخفيتان).
             var columnGroups = {
@@ -1322,12 +1324,21 @@ include __DIR__ . '/../includes/page_header.php';
                             storageKey: 'equipmentDriversGroupStates',
                             mode: 'datatable',
                             table: table,
-                            columnMap: columnGroups
+                            columnMap: columnGroups,
+                            buttons: '.ems-btn-group-toggle[data-group]',
+                            allButton: '.ems-btn-group-toggle-all'
                         });
                     }
                 }
                 if (window.EmsColumnGroups) { go(); } else { window.addEventListener('DOMContentLoaded', go); }
             })();
+            }
+
+            if ($.fn.dataTable && $.fn.dataTable.isDataTable('#projectsTable')) {
+                bindEquipmentDriversTable();
+            } else {
+                $('#projectsTable').one('init.dt', bindEquipmentDriversTable);
+            }
         });
 
         const toggleFormBtn = document.getElementById('toggleForm');
@@ -1490,9 +1501,43 @@ include __DIR__ . '/../includes/page_header.php';
 <!-- استيراد المعدات يتم عبر معالج إطار Excel الموحّد (يُطبع في نهاية الصفحة عبر ems_excel_render). -->
 
 <style>
+/* UXW-01 بوابتا ١·٢: أنماطُ أزرارِ إكسل في الرأس ورابطِ التعديلِ في النافذة —
+   أصنافٌ ببادئةِ الشاشة بدل style=، والألوانُ برموزٍ ذاتِ ردمٍ حرفيٍّ يحفظ
+   المظهرَ كما كان: var(--c-<hex>, #<hex>) */
+.eqd-xl-tpl,
+.eqd-xl-exp,
+.eqd-xl-imp {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+.eqd-xl-tpl {
+    background: linear-gradient(135deg, var(--c-state-ok, #16a34a) 0%, var(--c-059669, #059669) 100%);
+    color: var(--white);
+    box-shadow: 0 2px 8px var(--c-16a34a-sh, rgba(22, 163, 74, 0.25));
+}
+.eqd-xl-exp {
+    background: linear-gradient(135deg, var(--c-state-info, #2563eb) 0%, var(--c-1d4ed8, #1d4ed8) 100%);
+    color: var(--white);
+    box-shadow: 0 2px 8px var(--c-2563eb-sh, rgba(37, 99, 235, 0.25));
+}
+.eqd-xl-imp {
+    background: linear-gradient(135deg, var(--c-e8b800, #e8b800) 0%, var(--c-d4a800, #d4a800) 100%);
+    color: var(--c-0c1c3e, #0c1c3e);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 8px var(--c-e8b800-sh, rgba(232, 184, 0, 0.25));
+}
+.eqd-plain-link { text-decoration: none; }
+
 /* نظام الفلترة الاحترافي */
 .filters-container {
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    background: linear-gradient(135deg, var(--c-f8fafc, #f8fafc) 0%, var(--c-f1f5f9, #f1f5f9) 100%);
     border: 1.5px solid var(--border);
     border-radius: var(--radius-lg);
     padding: 20px;
@@ -1531,7 +1576,7 @@ include __DIR__ . '/../includes/page_header.php';
     padding: 8px 18px;
     background: var(--red-soft);
     color: var(--red);
-    border: 1.5px solid rgba(220,38,38,.18);
+    border: 1.5px solid var(--c-rgba2203838018, rgba(220,38,38,.18));
     border-radius: 50px;
     font-weight: 700;
     font-size: 0.82rem;
@@ -1544,7 +1589,7 @@ include __DIR__ . '/../includes/page_header.php';
     background: var(--red);
     color: white;
     transform: translateY(-2px);
-    box-shadow: 0 5px 16px rgba(220,38,38,.35);
+    box-shadow: 0 5px 16px var(--c-rgba2203838035, rgba(220,38,38,.35));
 }
 
 .btn-secondary {
@@ -1610,7 +1655,7 @@ include __DIR__ . '/../includes/page_header.php';
     gap: 12px;
     padding: 14px 18px;
     background: var(--blue-soft);
-    border: 1.5px solid rgba(37,99,235,.25);
+    border: 1.5px solid var(--c-rgba379923025, rgba(37,99,235,.25));
     border-radius: var(--radius);
     margin-top: 16px;
     animation: slideDown 0.3s ease;
@@ -1669,18 +1714,18 @@ include __DIR__ . '/../includes/page_header.php';
 }
 
 #importExcelModal input[type="file"]:hover {
-    border-color: #94a3b8;
-    background: #f1f5f9;
+    border-color: var(--c-94a3b8, #94a3b8);
+    background: var(--c-f1f5f9, #f1f5f9);
 }
 
 #importExcelModal button[type="submit"]:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(22,163,74,0.35);
+    box-shadow: 0 4px 16px var(--c-16a34a-sh35, rgba(22,163,74,0.35));
 }
 
 #importExcelModal button[type="button"]:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
+    background: var(--c-f8fafc, #f8fafc);
+    border-color: var(--c-cbd5e1, #cbd5e1);
 }
 </style>
 

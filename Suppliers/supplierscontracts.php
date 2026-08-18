@@ -182,6 +182,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fa-solid fa-house', 'label' => 'الرئيسية'),
   );
   include('../includes/page_header.php');
+  // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+  echo ems_states_bundle('لا عقودَ مورِّدين مسجَّلةً بعدُ', 'أضف أولَ عقدِ مورِّدٍ بزرِّ «عقد جديد» في رأسِ الشاشة');
   ?>
 
   <!-- فورم إضافة عقد -->
@@ -208,7 +210,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="field md-3 sm-6">
                   <label>المورد <font color="red">*</font></label>
                   <div class="control">
-                    <select name="supplier_id" id="supplier_id_select" required>
+                    <select name="supplier_id" id="supplier_id_select" aria-label="المورد" required>
                       <option value="">— اختر المورد —</option>
                       <?php foreach ($active_suppliers_options as $supplier_option): ?>
                         <option value="<?php echo intval($supplier_option['id']); ?>">
@@ -222,7 +224,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <div class="field md-3 sm-6">
                 <label>اسم المشروع <font color="red">*</font></label>
                 <div class="control">
-                  <select name="project_id" id="project_id" required>
+                  <select name="project_id" id="project_id" aria-label="اسم المشروع" required>
                     <option value="">— اختر المشروع —</option>
                     <?php
 
@@ -242,7 +244,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <div class="field md-3 sm-6">
                 <label>عقد المشروع <font color="red">*</font></label>
                 <div class="control">
-                  <select name="project_contract_id" id="project_contract_id" required disabled>
+                  <select name="project_contract_id" id="project_contract_id" aria-label="عقد المشروع المرتبط" required disabled>
                     <option value="">— اختر المشروع أولاً —</option>
                   </select>
                 </div>
@@ -253,7 +255,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           <!-- عرض معلومات ساعات العقد -->
           <div class="form-section">
             <h6><i class="fas fa-file-contract"></i> إجماليات الساعات (يومياً وللعقد)</h6>
-            <div id="projectHoursInfo" class="project-hours-info" style="display:none;">
+            <div id="projectHoursInfo" class="project-hours-info sc-is-hidden">
               <div class="project-hours-grid">
                 <div class="project-hours-card">
                   <strong class="project-hours-label project-hours-label-blue">
@@ -320,7 +322,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <!-- صف 1: 3 خانات -->
               <div class="field md-3 sm-6">
                 <label>تاريخ توقيع العقد </label>
-                <div class="control"><input name="contract_signing_date" id="contract_signing_date" type="date"></div>
+                <div class="control"><input name="contract_signing_date" id="contract_signing_date" aria-label="تاريخ توقيع العقد" type="date"></div>
               </div>
 
               <div class="field md-3 sm-6">
@@ -331,13 +333,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
               <div class="field md-3 sm-6">
                 <label>بداية التنفيذ الفعلي المتفق عليه</label>
-                <div class="control"><input name="actual_start" id="actual_start" type="date"></div>
+                <div class="control"><input name="actual_start" id="actual_start" aria-label="بداية التنفيذ الفعلي المتفق عليه" type="date"></div>
               </div>
 
 
               <div class="field md-3 sm-6">
                 <label>نهاية التنفيذ الفعلي المتفق عليه</label>
-                <div class="control"><input name="actual_end" id="actual_end" type="date"></div>
+                <div class="control"><input name="actual_end" id="actual_end" aria-label="نهاية التنفيذ الفعلي المتفق عليه" type="date"></div>
               </div>
 
 
@@ -360,7 +362,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <div class="field md-3 sm-6">
                 <label>العملة</label>
                 <div class="control">
-                  <select name="price_currency_contract" id="price_currency_contract">
+                  <select name="price_currency_contract" id="price_currency_contract" aria-label="عملة العقد">
                     <option value="">— اختر —</option>
                     <option value="دولار">دولار</option>
                     <option value="جنيه">جنيه</option>
@@ -369,13 +371,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               </div>
               <div class="field md-3 sm-6">
                 <label>المبلغ المدفوع</label>
-                <div class="control"><input name="paid_contract" type="text"></div>
+                <div class="control"><input name="paid_contract" aria-label="المبلغ المدفوع من قيمة العقد" type="text"></div>
               </div>
 
               <div class="field md-3 sm-6">
                 <label>وقت الدفع</label>
                 <div class="control">
-                  <select name="payment_time" id="payment_time">
+                  <select name="payment_time" id="payment_time" aria-label="وقت الدفع — مقدم أو مؤخر">
                     <option value="">— اختر —</option>
                     <option value="مقدم">مقدم</option>
                     <option value=" مؤخر">مؤخر </option>
@@ -386,12 +388,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
               <div class="field md-3 sm-6">
                 <label> الضمانات</label>
-                <div class="control"><input name="guarantees" type="text"></div>
+                <div class="control"><input name="guarantees" aria-label="الضمانات المتفق عليها في العقد" type="text"></div>
               </div>
 
               <div class="field md-3 sm-6">
                 <label> تاريخ الدفع</label>
-                <div class="control"><input name="payment_date" id="payment_date" type="date"></div>
+                <div class="control"><input name="payment_date" id="payment_date" aria-label="تاريخ الدفع" type="date"></div>
               </div>
 
 
@@ -412,7 +414,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
               <div class="field md-3 sm-6">
                 <label> ساعات الوردية للعقد</label>
-                <div class="control"><input name="shift_contract" type="number" min="0"></div>
+                <div class="control"><input name="shift_contract" aria-label="ساعات الوردية للعقد" type="number" min="0"></div>
               </div>
               <div class="field md-3 sm-6">
                 <label>إجمالي الوحدات يومياً للعقد </label>
@@ -420,7 +422,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               </div>
               <div class="field md-3 sm-6">
                 <label>وحدات العمل في الشهر للعقد</label>
-                <div class="control"><input name="total_contract_permonth" type="number" min="0"></div>
+                <div class="control"><input name="total_contract_permonth" aria-label="وحدات العمل في الشهر للعقد" type="number" min="0"></div>
               </div>
 
 
@@ -440,7 +442,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <div class="field md-3 sm-6">
                 <label>الترحيل (Transportation)</label>
                 <div class="control">
-                  <select name="transportation" id="transportation">
+                  <select name="transportation" id="transportation" aria-label="الترحيل — الجهة المسؤولة عنه">
                     <option value="">— اختر —</option>
                     <option value="مالك المعدة">مالك المعدة</option>
                     <option value="مالك المشروع">مالك المشروع</option>
@@ -452,7 +454,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <div class="field md-3 sm-6">
                 <label>السكن (Place for Living)</label>
                 <div class="control">
-                  <select name="place_for_living" id="place_for_living">
+                  <select name="place_for_living" id="place_for_living" aria-label="السكن — الجهة المسؤولة عنه">
                     <option value="">— اختر —</option>
                     <option value="مالك المعدة">مالك المعدة</option>
                     <option value="مالك المشروع">مالك المشروع</option>
@@ -464,7 +466,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <div class="field md-3 sm-6">
                 <label>الإعاشة (Accommodation)</label>
                 <div class="control">
-                  <select name="accommodation" id="accommodation">
+                  <select name="accommodation" id="accommodation" aria-label="الإعاشة — الجهة المسؤولة عنها">
                     <option value="">— اختر —</option>
                     <option value="مالك المعدة">مالك المعدة</option>
                     <option value="مالك المشروع">مالك المشروع</option>
@@ -476,7 +478,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               <div class="field md-3 sm-6">
                 <label>الصيانة (Workshop)</label>
                 <div class="control">
-                  <select name="workshop" id="workshop">
+                  <select name="workshop" id="workshop" aria-label="الصيانة — الجهة المسؤولة عنها">
                     <option value="">— اختر —</option>
                     <option value="مالك المعدة">مالك المعدة</option>
                     <option value="مالك المشروع">مالك المشروع</option>
@@ -496,43 +498,42 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div id="equipmentSections">
               <div class="equipment-section" data-index="1">
-                <div
-                  style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
-                  <h6 style="margin: 0 0 15px 0;">المعدات رقم 1</h6>
+                <div class="sc-equip-box">
+                  <h6 class="sc-equip-box-title">المعدات رقم 1</h6>
                   <div class="form-grid">
                     <div class="field md-3 sm-6">
                       <label>نوع المعدة</label>
                       <div class="control">
-                        <select name="equip_type_1" class="equip-type">
+                        <select name="equip_type_1" aria-label="نوع المعدة للمعدة رقم 1" class="equip-type">
                           <?php echo $equipmentTypeOptionsHtml; ?>
                         </select>
                       </div>
                     </div>
                     <div class="field md-3 sm-6">
                       <label>عدد المعدات</label>
-                      <div class="control"><input name="equip_count_1" type="number" min="0"></div>
+                      <div class="control"><input name="equip_count_1" aria-label="عدد المعدات للمعدة رقم 1" type="number" min="0"></div>
                     </div>
 
                     <div class="field md-3 sm-6">
-                      <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
+                      <label><span class="sc-dot-basic">■</span> المعدات الأساسية</label>
                       <div class="control"><input name="equip_count_basic_1" type="number" min="0"
-                          style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+                          aria-label="عدد المعدات الأساسية للمعدة رقم 1" class="sc-input-basic"></div>
                     </div>
 
                     <div class="field md-3 sm-6">
-                      <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
+                      <label><span class="sc-dot-backup">■</span> المعدات الاحتياطية</label>
                       <div class="control"><input name="equip_count_backup_1" type="number" min="0"
-                          style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
+                          aria-label="عدد المعدات الاحتياطية للمعدة رقم 1" class="sc-input-backup"></div>
                     </div>
                     <div class="field md-3 sm-6">
                       <label>عدد المشغلين</label>
-                      <div class="control"><input name="equip_operators_1" type="number" min="0"></div>
+                      <div class="control"><input name="equip_operators_1" aria-label="عدد المشغلين للمعدة رقم 1" type="number" min="0"></div>
                     </div>
 
 
                     <div class="field md-3 sm-6">
                       <label>عدد المساعدين</label>
-                      <div class="control"><input name="equip_assistants_1" type="number" min="0"></div>
+                      <div class="control"><input name="equip_assistants_1" aria-label="عدد المساعدين للمعدة رقم 1" type="number" min="0"></div>
                     </div>
 
 
@@ -560,7 +561,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="field md-3 sm-6">
                       <label>وحدة القياس</label>
                       <div class="control">
-                        <select name="equip_unit_1" class="equip-unit">
+                        <select name="equip_unit_1" aria-label="وحدة القياس للمعدة رقم 1" class="equip-unit">
                           <option value="">— اختر —</option>
                           <option value="ساعة">ساعة</option>
                           <option value="طن">طن</option>
@@ -572,7 +573,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                     <div class="field md-3 sm-6">
                       <label>ساعات الوردية</label>
-                      <div class="control"><input name="shift_hours_1" type="number" min="0"></div>
+                      <div class="control"><input name="shift_hours_1" aria-label="ساعات الوردية للمعدة رقم 1" type="number" min="0"></div>
                     </div>
                     <div class="field md-3 sm-6">
                       <label>إجمالي الوحدات يومياً</label>
@@ -581,7 +582,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </div>
                     <div class="field md-3 sm-6">
                       <label>وحدات العمل في الشهر</label>
-                      <div class="control"><input name="equip_target_per_month_1" type="number" min="0"></div>
+                      <div class="control"><input name="equip_target_per_month_1" aria-label="وحدات العمل في الشهر للمعدة رقم 1" type="number" min="0"></div>
                     </div>
 
 
@@ -595,7 +596,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="field md-3 sm-6">
                       <label>العملة</label>
                       <div class="control">
-                        <select name="equip_price_currency_1">
+                        <select name="equip_price_currency_1" aria-label="عملة سعر الوحدة للمعدة رقم 1">
                           <option value="">— اختر —</option>
                           <option value="دولار">دولار</option>
                           <option value="جنيه">جنيه</option>
@@ -614,12 +615,12 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                     <div class="field md-3 sm-6">
                       <label>عدد المشرفين</label>
-                      <div class="control"><input name="equip_supervisors_1" type="number" min="0"></div>
+                      <div class="control"><input name="equip_supervisors_1" aria-label="عدد المشرفين للمعدة رقم 1" type="number" min="0"></div>
                     </div>
 
                     <div class="field md-3 sm-6">
                       <label>عدد الفنيين</label>
-                      <div class="control"><input name="equip_technicians_1" type="number" min="0"></div>
+                      <div class="control"><input name="equip_technicians_1" aria-label="عدد الفنيين للمعدة رقم 1" type="number" min="0"></div>
                     </div>
                     <!-- إكمال الصف بثلاث خانات -->
                     <div class="field md-3 sm-6"></div>
@@ -630,9 +631,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             </div>
 
-            <div style="margin: 15px 0; display: flex; gap: 10px;">
-              <button type="button" class="primary" id="addEquipmentBtn"
-                style="padding: 0.75rem 1.5rem; font-size: 0.95rem;">
+            <div class="sc-add-equip-row">
+              <button type="button" class="primary sc-add-equip-btn" id="addEquipmentBtn">
                 <i class="fas fa-plus-circle"></i> إضافة مزيد من المعدات
               </button>
             </div>
@@ -643,7 +643,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="form-grid">
 
-              <div class="field md-3 sm-6" style="display: none;">
+              <div class="field md-3 sm-6 sc-is-hidden">
                 <label>عدد ساعات العمل اليومية <font color="red"> * مهم </font></label>
                 <div class="control"><input type="number" id="daily_work_hours" name="daily_work_hours" min="0"
                     placeholder="مثال: 8" value="20"></div>
@@ -699,16 +699,15 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   <?php endif; ?>
   <div class="card">
     <!-- أزرار التحكم في المجموعات -->
-    <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0; background: #f8f9fa;">
-      <form method="get" action="supplierscontracts.php"
-        style="display:flex; flex-wrap:wrap; gap:12px; align-items:end;">
+    <div class="card-body sc-filter-bar">
+      <form method="get" action="supplierscontracts.php" class="sc-filter-form">
         <?php if ($has_supplier_filter): ?>
           <input type="hidden" name="id" value="<?php echo intval($supplier_id); ?>">
         <?php endif; ?>
 
-        <div style="min-width:220px;">
-          <label style="font-weight:700; margin-bottom:6px; display:block;">فلتر المورد</label>
-          <select name="filter_supplier_id" class="form-control" <?php echo $has_supplier_filter ? 'disabled' : ''; ?>>
+        <div class="sc-filter-col">
+          <label class="sc-filter-label" for="sc_filter_supplier_select">فلتر المورد</label>
+          <select name="filter_supplier_id" id="sc_filter_supplier_select" aria-label="فلتر المورد" class="form-control" <?php echo $has_supplier_filter ? 'disabled' : ''; ?>>
             <option value="0">كل الموردين</option>
             <?php foreach ($suppliers_filter_options as $supplier_option_id => $supplier_option_name): ?>
               <option value="<?php echo intval($supplier_option_id); ?>" <?php echo ($filter_supplier_id === intval($supplier_option_id)) ? 'selected' : ''; ?>>
@@ -721,8 +720,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
           <?php endif; ?>
         </div>
 
-        <div style="min-width:220px;">
-          <label style="font-weight:700; margin-bottom:6px; display:block;" for="sc_filter_project_select">فلتر المشروع</label>
+        <div class="sc-filter-col">
+          <label class="sc-filter-label" for="sc_filter_project_select">فلتر المشروع</label>
           <select name="filter_project_id" id="sc_filter_project_select" class="form-control">
             <option value="0">كل المشاريع</option>
             <?php foreach ($projects_filter_options as $project_option_id => $project_option_name): ?>
@@ -740,40 +739,40 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <!-- أزرار التحكم في المجموعات -->
-    <div class="card-body" style="padding: 1rem 2rem; border-bottom: 1px solid #e0e0e0;">
-      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
-        <span style="font-weight: 700; color: var(--navy); margin-left: 10px;">
+    <div class="card-body sc-group-bar">
+      <div class="sc-group-toolbar">
+        <span class="sc-group-toolbar-label">
           <i class="fas fa-layer-group"></i> عرض المجموعات:
         </span>
-        <button class="btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
+        <button class="ems-btn-group-toggle active" data-group="basic" title="المعلومات الأساسية">
           <i class="fas fa-info-circle"></i> أساسية
         </button>
-        <button class="btn-group-toggle active" data-group="dates" title="التواريخ والمدد">
+        <button class="ems-btn-group-toggle active" data-group="dates" title="التواريخ والمدد">
           <i class="far fa-calendar"></i> تواريخ
         </button>
-        <button class="btn-group-toggle active" data-group="hours" title="الساعات والأهداف">
+        <button class="ems-btn-group-toggle active" data-group="hours" title="الساعات والأهداف">
           <i class="fas fa-clock"></i> ساعات
         </button>
-        <button class="btn-group-toggle" data-group="parties" title="أطراف العقد">
+        <button class="ems-btn-group-toggle" data-group="parties" title="أطراف العقد">
           <i class="fas fa-users"></i> أطراف
         </button>
-        <button class="btn-group-toggle" data-group="services" title="الخدمات المقدمة">
+        <button class="ems-btn-group-toggle" data-group="services" title="الخدمات المقدمة">
           <i class="fas fa-hands-helping"></i> خدمات
         </button>
-        <button class="btn-group-toggle" data-group="operations" title="التشغيل اليومي">
+        <button class="ems-btn-group-toggle" data-group="operations" title="التشغيل اليومي">
           <i class="fas fa-cogs"></i> تشغيل
         </button>
-        <button class="btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
+        <button class="ems-btn-group-toggle active" data-group="status" title="الحالة والإجراءات">
           <i class="fas fa-check-circle"></i> حالة
         </button>
-        <button class="btn-group-toggle-all" title="إظهار/إخفاء الكل">
+        <button class="ems-btn-group-toggle-all" title="إظهار/إخفاء الكل">
           <i class="fas fa-eye"></i> الكل
         </button>
       </div>
     </div>
 
-    <div class="card-body table-container" style="padding: 2rem; overflow-x: auto;">
-      <table id="projectsTable" class="display nowrap contracts-table-nowrap" style="width:100%; margin-top: 20px;">
+    <div class="card-body table-container sc-table-wrap">
+      <table id="projectsTable" class="display nowrap contracts-table-nowrap sc-table">
         <thead>
           <tr>
             <th class="group-status"> الإجراءات</th>
@@ -1211,32 +1210,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <script>
   (function () {
-    // تشغيل DataTable بالعربية
-
+    // تهيئةُ جدولِ عقودِ الموردين انتقلت إلى المكوّنِ المركزي
+    // (assets/js/ui-unification.js — initializeMissingDataTables):
+    // لغةٌ عربية وضبطُ أعمدةٍ وزرُّ إكسل موحَّد. والتمريرُ الأفقيُّ من
+    // القاعدةِ الصفحية .contracts-main .table-container (overflow-x:auto).
 
     $(document).ready(function () {
-      $('#projectsTable').DataTable({
-        dom: 'Bfrtip', // Buttons + Search + Pagination
-        scrollX: true,
-        autoWidth: false,
-        buttons: [
-          { extend: 'copy', text: 'نسخ' },
-          { extend: 'excel', text: 'تصدير Excel' },
-          { extend: 'csv', text: 'تصدير CSV' },
-          { extend: 'pdf', text: 'تصدير PDF' },
-          { extend: 'print', text: 'طباعة' }
-        ],
-        "language": {
-          "url": "/ems/assets/i18n/datatables/ar.json"
-        }
-      });
-
       // ==================== Group Toggle (unified) ====================
       // موحّد عبر assets/js/column-groups.js — مفتاح مستقل خاص بعقود الموردين.
+      // الأصنافُ اعتُمدت باسمِ العائلةِ المؤسسية ems-btn — المحدِّدان يمرَّران صراحةً
       (function () {
         function go() {
           if (window.EmsColumnGroups) {
-            EmsColumnGroups.init({ storageKey: 'supplierContractGroupStates', mode: 'classic' });
+            EmsColumnGroups.init({
+              storageKey: 'supplierContractGroupStates', mode: 'classic',
+              buttons: '.ems-btn-group-toggle[data-group]',
+              allButton: '.ems-btn-group-toggle-all'
+            });
           }
         }
         if (window.EmsColumnGroups) { go(); } else { window.addEventListener('DOMContentLoaded', go); }
@@ -1318,36 +1308,365 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
   }
 
   #projectsTable .action-btn.view {
-    background: rgba(232, 184, 0, .18);
-    color: #9a7b00;
+    background: var(--c-e8b800-18, rgba(232, 184, 0, .18));
+    color: var(--c-9a7b00);
   }
 
   #projectsTable .action-btn.edit {
-    background: rgba(12, 28, 62, .08);
-    color: #0c1c3e;
+    background: var(--c-0c1c3e-08, rgba(12, 28, 62, .08));
+    color: var(--c-0c1c3e);
   }
 
   #projectsTable .action-btn.delete {
-    background: rgba(220, 38, 38, .12);
-    color: #b91c1c;
+    background: var(--c-dc2626-12, rgba(220, 38, 38, .12));
+    color: var(--c-b91c1c);
   }
 
   #projectsTable .action-btn.view:hover {
-    background: #e8b800;
-    color: #0c1c3e;
+    background: var(--c-e8b800);
+    color: var(--c-0c1c3e);
     transform: translateY(-2px);
   }
 
   #projectsTable .action-btn.edit:hover {
-    background: #0c1c3e;
-    color: #fff;
+    background: var(--c-0c1c3e);
+    color: var(--c-surface);
     transform: translateY(-2px);
   }
 
   #projectsTable .action-btn.delete:hover {
-    background: #dc2626;
-    color: #fff;
+    background: var(--c-dc2626, #dc2626);
+    color: var(--c-surface);
     transform: translateY(-2px);
+  }
+
+  /* ══ UXW-01 ② — الأنماطُ الموضعيةُ الثابتةُ نُقلت أصنافًا ببادئةِ الشاشة sc- ══
+     والألوانُ كلُّها رموزٌ من assets/css/design-tokens.css (① لونٌ مثبَّت).
+     وما بقي نمطًا موضعيًّا فمحسوبٌ لحظيًّا من البيانات ويحمل سمةَ التصريح. */
+
+  /* الإخفاءُ الابتدائيُّ — يُبدَّل بجافاسكربت */
+  .ems-site .main.supplier-contracts-page .sc-is-hidden {
+    display: none;
+  }
+
+  /* شريطُ المرشِّحات */
+  .ems-site .main.supplier-contracts-page .sc-filter-bar {
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--c-e0e0e0);
+    background: var(--c-f8f9fa);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: end;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-filter-col {
+    min-width: 220px;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-filter-label {
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  /* شريطُ مجموعاتِ الأعمدة */
+  .ems-site .main.supplier-contracts-page .sc-group-bar {
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--c-e0e0e0);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-group-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-group-toolbar-label {
+    font-weight: 700;
+    color: var(--navy);
+    margin-left: 10px;
+  }
+
+  /* غلافُ الجدولِ والجدول */
+  .ems-site .main.supplier-contracts-page .sc-table-wrap {
+    padding: 2rem;
+    overflow-x: auto;
+  }
+
+  #projectsTable.sc-table {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  /* أقسامُ المعدات */
+  .ems-site .main.supplier-contracts-page .sc-equip-box {
+    border: 1px solid var(--c-dddddd);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: var(--c-f9f9f9);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-equip-box-title {
+    margin: 0 0 15px 0;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-equip-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-equip-head-title {
+    margin: 0;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-equip-remove-btn {
+    background: var(--c-dc3545);
+    color: var(--c-surface);
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-dot-basic {
+    color: var(--c-007bff);
+    font-weight: 600;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-dot-backup {
+    color: var(--c-ffc107);
+    font-weight: 600;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-input-basic {
+    background: var(--c-e3f2fd);
+    border-right: 3px solid var(--c-007bff);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-input-backup {
+    background: var(--c-fffde7);
+    border-right: 3px solid var(--c-ffc107);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-add-equip-row {
+    margin: 15px 0;
+    display: flex;
+    gap: 10px;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-add-equip-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  /* تفصيلُ الساعاتِ والموردين — يحقنه جافاسكربت من استجابةِ الخادم */
+  .ems-site .main.supplier-contracts-page .sc-bd {
+    color: var(--c-555555);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bd-title-blue {
+    color: var(--c-1976d2);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bd-title-red {
+    color: var(--c-d32f2f);
+    display: block;
+    margin-bottom: 0.5rem;
+    margin-top: 0.8rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bd-title-green {
+    color: var(--c-43a047, #43a047);
+    display: block;
+    margin-bottom: 0.5rem;
+    margin-top: 0.8rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bd-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.6rem;
+    padding: 0.5rem;
+    background: var(--c-f8f9fa);
+    border-radius: 6px;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-sup-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.6rem;
+    padding: 0.5rem;
+    background: var(--c-ffebee, #ffebee);
+    border-radius: 6px;
+    border-left: 4px solid var(--c-d32f2f);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-rem-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.6rem;
+    padding: 0.5rem;
+    background: var(--c-e8f5e9, #e8f5e9);
+    border-radius: 6px;
+    border-left: 4px solid var(--c-999999);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bd-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.3rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bd-sub {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    padding-top: 0.3rem;
+    border-top: 1px dashed var(--c-dddddd);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-sup-sub {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    padding-top: 0.3rem;
+    border-top: 1px dashed var(--c-ffcdd2, #ffcdd2);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-rem-sub {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    padding-top: 0.3rem;
+    border-top: 1px dashed var(--c-c8e6c9, #c8e6c9);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-ic-blue {
+    color: var(--c-1976d2);
+    margin-left: 0.3rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-ic-red {
+    color: var(--c-d32f2f);
+    margin-left: 0.3rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-ic-dyn {
+    margin-left: 0.3rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-ic-red-plain {
+    color: var(--c-d32f2f);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-ic-green {
+    color: var(--c-2e7d32);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-ic-crimson {
+    color: var(--c-c62828);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bd-val-blue {
+    font-weight: 600;
+    color: var(--c-0d47a1);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-sup-val {
+    font-weight: 600;
+    color: var(--c-c62828);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-rem-val {
+    font-weight: 600;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-chip-basic {
+    background: var(--c-007bff);
+    color: var(--c-surface);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-chip-backup {
+    background: var(--c-ffc107);
+    color: var(--c-surface);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-chip-total {
+    background: var(--c-667eea);
+    color: var(--c-surface);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-meta {
+    color: var(--c-666666);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-tone-blue {
+    color: var(--c-1976d2);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-tone-red {
+    color: var(--c-d32f2f);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bar-wrap {
+    margin-top: 0.4rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bar-track {
+    background: var(--c-e0e0e0);
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bar-fill {
+    height: 100%;
+    transition: width 0.3s;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bar-fill-red {
+    background: var(--c-d32f2f);
+    height: 100%;
+    transition: width 0.3s;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bar-note {
+    font-size: 0.75rem;
+    color: var(--c-666666);
+    display: block;
+    margin-top: 0.2rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-empty-note {
+    color: var(--c-999999);
+    font-style: italic;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-empty-note-block {
+    color: var(--c-999999);
+    font-style: italic;
+    margin-top: 0.5rem;
+    display: block;
   }
 </style>
 
@@ -1440,11 +1759,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     newSection.className = 'equipment-section';
     newSection.setAttribute('data-index', equipmentIndex);
     newSection.innerHTML = `
-        <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h6 style="margin: 0;">المعدات رقم ${equipmentIndex}</h6>
-            <button type="button" class="removeEquipmentBtn" data-index="${equipmentIndex}"
-              style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+        <div class="sc-equip-box">
+          <div class="sc-equip-head">
+            <h6 class="sc-equip-head-title">المعدات رقم ${equipmentIndex}</h6>
+            <button type="button" class="removeEquipmentBtn sc-equip-remove-btn" data-index="${equipmentIndex}">
               <i class="fa fa-trash"></i> حذف
             </button>
           </div>
@@ -1452,28 +1770,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="field md-3 sm-6">
               <label>نوع المعدة</label>
               <div class="control">
-                <select name="equip_type_${equipmentIndex}" class="equip-type">
+                <select name="equip_type_${equipmentIndex}" aria-label="نوع المعدة للمعدة رقم ${equipmentIndex}" class="equip-type">
                   <?php echo $equipmentTypeOptionsHtml; ?>
                 </select>
               </div>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد المعدات</label>
-              <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_count_${equipmentIndex}" aria-label="عدد المعدات للمعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
 
             <div class="field md-3 sm-6">
-              <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
-              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;"></div>
+              <label><span class="sc-dot-basic">■</span> المعدات الأساسية</label>
+              <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" aria-label="عدد المعدات الأساسية للمعدة رقم ${equipmentIndex}" class="sc-input-basic"></div>
             </div>
 
             <div class="field md-3 sm-6">
-              <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
-              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;"></div>
+              <label><span class="sc-dot-backup">■</span> المعدات الاحتياطية</label>
+              <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" aria-label="عدد المعدات الاحتياطية للمعدة رقم ${equipmentIndex}" class="sc-input-backup"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد المساعدين</label>
-              <div class="control"><input name="equip_assistants_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_assistants_${equipmentIndex}" aria-label="عدد المساعدين للمعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
 
             <div class="field md-3 sm-6">
@@ -1502,7 +1820,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="field md-3 sm-6">
               <label>وحدة القياس</label>
               <div class="control">
-                <select name="equip_unit_${equipmentIndex}" class="equip-unit">
+                <select name="equip_unit_${equipmentIndex}" aria-label="وحدة القياس للمعدة رقم ${equipmentIndex}" class="equip-unit">
                   <option value="">— اختر —</option>
                   <option value="ساعة">ساعة</option>
                   <option value="طن">طن</option>
@@ -1514,7 +1832,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="field md-3 sm-6">
               <label>ساعات الوردية</label>
-              <div class="control"><input name="shift_hours_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="shift_hours_${equipmentIndex}" aria-label="ساعات الوردية للمعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>إجمالي الساعات يومياً</label>
@@ -1522,7 +1840,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <div class="field md-3 sm-6">
               <label>وحدات العمل في الشهر</label>
-              <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_target_per_month_${equipmentIndex}" aria-label="وحدات العمل في الشهر للمعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
 
             <div class="field md-3 sm-6">
@@ -1532,7 +1850,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <div class="field md-3 sm-6">
               <label>العملة</label>
               <div class="control">
-                <select name="equip_price_currency_${equipmentIndex}">
+                <select name="equip_price_currency_${equipmentIndex}" aria-label="عملة سعر الوحدة للمعدة رقم ${equipmentIndex}">
                   <option value="">— اختر —</option>
                   <option value="دولار">دولار</option>
                   <option value="جنيه">جنيه</option>
@@ -1546,11 +1864,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
             <div class="field md-3 sm-6">
               <label>عدد المشرفين</label>
-              <div class="control"><input name="equip_supervisors_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_supervisors_${equipmentIndex}" aria-label="عدد المشرفين للمعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
             <div class="field md-3 sm-6">
               <label>عدد الفنيين</label>
-              <div class="control"><input name="equip_technicians_${equipmentIndex}" type="number" min="0"></div>
+              <div class="control"><input name="equip_technicians_${equipmentIndex}" aria-label="عدد الفنيين للمعدة رقم ${equipmentIndex}" type="number" min="0"></div>
             </div>
           </div>
         </div>
@@ -1730,19 +2048,19 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             breakdownDiv.empty();
 
             if (response.equipment_breakdown && response.equipment_breakdown.length > 0) {
-              var breakdownHtml = '<div style="color: #555;"><strong style="color: #1976d2; display: block; margin-bottom: 0.5rem;">تفصيل الساعات:</strong>';
+              var breakdownHtml = '<div class="sc-bd"><strong class="sc-bd-title-blue">تفصيل الساعات:</strong>';
 
               response.equipment_breakdown.forEach(function (item) {
                 var percentage = ((item.hours / response.contract_total_hours) * 100).toFixed(1);
-                breakdownHtml += '<div style="display: flex; flex-direction: column; margin-bottom: 0.6rem; padding: 0.5rem; background: #f8f9fa; border-radius: 6px;">';
-                breakdownHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">';
-                breakdownHtml += '<span><i class="fas fa-tools" style="color: #1976d2; margin-left: 0.3rem;"></i>' + item.type + '</span>';
-                breakdownHtml += '<span style="font-weight: 600; color: #0d47a1;">' + new Intl.NumberFormat('ar-EG').format(item.hours) + ' ساعة (' + percentage + '%)</span>';
+                breakdownHtml += '<div class="sc-bd-item">';
+                breakdownHtml += '<div class="sc-bd-row">';
+                breakdownHtml += '<span><i class="fas fa-tools sc-ic-blue"></i>' + item.type + '</span>';
+                breakdownHtml += '<span class="sc-bd-val-blue">' + new Intl.NumberFormat('ar-EG').format(item.hours) + ' ساعة (' + percentage + '%)</span>';
                 breakdownHtml += '</div>';
-                breakdownHtml += '<div style="display: flex; gap: 1rem; font-size: 0.85rem; padding-top: 0.3rem; border-top: 1px dashed #ddd;">';
-                breakdownHtml += '<span><span style="background: #007bff; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600;">أساسية</span> ' + item.count_basic + '</span>';
-                breakdownHtml += '<span><span style="background: #ffc107; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600;">احتياطية</span> ' + item.count_backup + '</span>';
-                breakdownHtml += '<span><span style="background: #667eea; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600;">إجمالي</span> ' + item.count + '</span>';
+                breakdownHtml += '<div class="sc-bd-sub">';
+                breakdownHtml += '<span><span class="sc-chip-basic">أساسية</span> ' + item.count_basic + '</span>';
+                breakdownHtml += '<span><span class="sc-chip-backup">احتياطية</span> ' + item.count_backup + '</span>';
+                breakdownHtml += '<span><span class="sc-chip-total">إجمالي</span> ' + item.count + '</span>';
                 breakdownHtml += '</div>';
                 breakdownHtml += '</div>';
               });
@@ -1750,7 +2068,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               breakdownHtml += '</div>';
               breakdownDiv.html(breakdownHtml);
             } else {
-              breakdownDiv.html('<span style="color: #999; font-style: italic;">لا توجد معدات مسجلة لهذا العقد</span>');
+              breakdownDiv.html('<span class="sc-empty-note">لا توجد معدات مسجلة لهذا العقد</span>');
             }
 
             // عرض تفصيل الموردين وساعاتهم التعاقدية
@@ -1758,38 +2076,38 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             suppliersDiv.empty();
 
             if (response.suppliers_list && response.suppliers_list.length > 0) {
-              var suppliersHtml = '<div style="color: #555;"><strong style="color: #d32f2f; display: block; margin-bottom: 0.5rem; margin-top: 0.8rem;">تفصيل الموردين:</strong>';
+              var suppliersHtml = '<div class="sc-bd"><strong class="sc-bd-title-red">تفصيل الموردين:</strong>';
 
               response.suppliers_list.forEach(function (supplier) {
                 var percentage = response.suppliers_contracted_hours > 0 ? ((supplier.hours / response.suppliers_contracted_hours) * 100).toFixed(1) : 0;
 
-                suppliersHtml += '<div style="display: flex; flex-direction: column; margin-bottom: 0.6rem; padding: 0.5rem; background: #ffebee; border-radius: 6px; border-left: 4px solid #d32f2f;">';
-                suppliersHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">';
-                suppliersHtml += '<span><i class="fas fa-building" style="color: #d32f2f; margin-left: 0.3rem;"></i>' + supplier.name + '</span>';
-                suppliersHtml += '<span style="font-weight: 600; color: #c62828;">' + new Intl.NumberFormat('ar-EG').format(supplier.hours) + ' ساعة (' + percentage + '%)</span>';
+                suppliersHtml += '<div class="sc-sup-item">';
+                suppliersHtml += '<div class="sc-bd-row">';
+                suppliersHtml += '<span><i class="fas fa-building sc-ic-red"></i>' + supplier.name + '</span>';
+                suppliersHtml += '<span class="sc-sup-val">' + new Intl.NumberFormat('ar-EG').format(supplier.hours) + ' ساعة (' + percentage + '%)</span>';
                 suppliersHtml += '</div>';
 
                 // معلومات العقد
                 if (supplier.contract_date || supplier.start_date || supplier.end_date) {
-                  suppliersHtml += '<div style="display: flex; gap: 1rem; font-size: 0.85rem; padding-top: 0.3rem; border-top: 1px dashed #ffcdd2;">';
+                  suppliersHtml += '<div class="sc-sup-sub">';
                   if (supplier.contract_date) {
-                    suppliersHtml += '<span style="color: #666;"><i class="fas fa-calendar-check" style="color: #d32f2f;"></i> توقيع: ' + supplier.contract_date + '</span>';
+                    suppliersHtml += '<span class="sc-meta"><i class="fas fa-calendar-check sc-ic-red-plain"></i> توقيع: ' + supplier.contract_date + '</span>';
                   }
                   if (supplier.start_date) {
-                    suppliersHtml += '<span style="color: #666;"><i class="fas fa-play-circle" style="color: #2e7d32;"></i> بداية: ' + supplier.start_date + '</span>';
+                    suppliersHtml += '<span class="sc-meta"><i class="fas fa-play-circle sc-ic-green"></i> بداية: ' + supplier.start_date + '</span>';
                   }
                   if (supplier.end_date) {
-                    suppliersHtml += '<span style="color: #666;"><i class="fas fa-stop-circle" style="color: #c62828;"></i> نهاية: ' + supplier.end_date + '</span>';
+                    suppliersHtml += '<span class="sc-meta"><i class="fas fa-stop-circle sc-ic-crimson"></i> نهاية: ' + supplier.end_date + '</span>';
                   }
                   suppliersHtml += '</div>';
                 }
 
-                // شريط نسبة المساهمة
-                suppliersHtml += '<div style="margin-top: 0.4rem;">';
-                suppliersHtml += '<div style="background: #e0e0e0; height: 6px; border-radius: 3px; overflow: hidden;">';
-                suppliersHtml += '<div style="background: #d32f2f; height: 100%; width: ' + percentage + '%; transition: width 0.3s;"></div>';
+                // شريط نسبة المساهمة — العرضُ محسوبٌ لحظيًّا من الاستجابة
+                suppliersHtml += '<div class="sc-bar-wrap">';
+                suppliersHtml += '<div class="sc-bar-track">';
+                suppliersHtml += '<div class="sc-bar-fill-red" data-allow-style style="width: ' + percentage + '%;"></div>';
                 suppliersHtml += '</div>';
-                suppliersHtml += '<span style="font-size: 0.75rem; color: #666; display: block; margin-top: 0.2rem;">نسبة المساهمة: ' + percentage + '%</span>';
+                suppliersHtml += '<span class="sc-bar-note">نسبة المساهمة: ' + percentage + '%</span>';
                 suppliersHtml += '</div>';
 
                 suppliersHtml += '</div>';
@@ -1798,7 +2116,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               suppliersHtml += '</div>';
               suppliersDiv.html(suppliersHtml);
             } else {
-              suppliersDiv.html('<span style="color: #999; font-style: italic; margin-top: 0.5rem; display: block;">لا توجد عقود موردين لهذا المشروع</span>');
+              suppliersDiv.html('<span class="sc-empty-note-block">لا توجد عقود موردين لهذا المشروع</span>');
             }
 
             // عرض تفصيل الساعات المتبقية حسب نوع الآلية
@@ -1806,33 +2124,34 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             remainingDiv.empty();
 
             if (response.remaining_breakdown && response.remaining_breakdown.length > 0) {
-              var remainingHtml = '<div style="color: #555;"><strong style="color: #43a047; display: block; margin-bottom: 0.5rem; margin-top: 0.8rem;">تفصيل الساعات المتبقية:</strong>';
+              var remainingHtml = '<div class="sc-bd"><strong class="sc-bd-title-green">تفصيل الساعات المتبقية:</strong>';
 
               response.remaining_breakdown.forEach(function (item) {
                 var percentage = response.remaining_hours > 0 ? ((item.remaining_hours / response.remaining_hours) * 100).toFixed(1) : 0;
-                var statusColor = item.remaining_hours > 0 ? '#43a047' : (item.remaining_hours < 0 ? '#d32f2f' : '#999');
+                // لونُ الحالةِ محسوبٌ من الرصيدِ المتبقي — رموزُ design-tokens مع احتياطيٍّ حرفي
+                var statusColor = item.remaining_hours > 0 ? 'var(--c-43a047, #43a047)' : (item.remaining_hours < 0 ? 'var(--c-d32f2f, #d32f2f)' : 'var(--c-999999, #999999)');
                 var statusIcon = item.remaining_hours > 0 ? 'fa-check-circle' : (item.remaining_hours < 0 ? 'fa-exclamation-triangle' : 'fa-minus-circle');
 
-                remainingHtml += '<div style="display: flex; flex-direction: column; margin-bottom: 0.6rem; padding: 0.5rem; background: #e8f5e9; border-radius: 6px; border-left: 4px solid ' + statusColor + ';">';
-                remainingHtml += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">';
-                remainingHtml += '<span><i class="fas ' + statusIcon + '" style="color: ' + statusColor + '; margin-left: 0.3rem;"></i>' + item.type + '</span>';
-                remainingHtml += '<span style="font-weight: 600; color: ' + statusColor + ';">' + new Intl.NumberFormat('ar-EG').format(item.remaining_hours) + ' ساعة</span>';
+                remainingHtml += '<div class="sc-rem-item" data-allow-style style="border-left-color: ' + statusColor + ';">';
+                remainingHtml += '<div class="sc-bd-row">';
+                remainingHtml += '<span><i class="fas ' + statusIcon + ' sc-ic-dyn" data-allow-style style="color: ' + statusColor + ';"></i>' + item.type + '</span>';
+                remainingHtml += '<span class="sc-rem-val" data-allow-style style="color: ' + statusColor + ';">' + new Intl.NumberFormat('ar-EG').format(item.remaining_hours) + ' ساعة</span>';
                 remainingHtml += '</div>';
-                remainingHtml += '<div style="display: flex; gap: 1rem; font-size: 0.85rem; padding-top: 0.3rem; border-top: 1px dashed #c8e6c9;">';
-                remainingHtml += '<span style="color: #1976d2;"><i class="fas fa-calculator"></i> إجمالي: ' + new Intl.NumberFormat('ar-EG').format(item.total_hours) + '</span>';
-                remainingHtml += '<span style="color: #d32f2f;"><i class="fas fa-handshake"></i> متعاقد: ' + new Intl.NumberFormat('ar-EG').format(item.suppliers_hours) + '</span>';
-                remainingHtml += '<span style="color: ' + statusColor + ';"><i class="fas fa-balance-scale"></i> متبقي: ' + new Intl.NumberFormat('ar-EG').format(item.remaining_hours) + '</span>';
+                remainingHtml += '<div class="sc-rem-sub">';
+                remainingHtml += '<span class="sc-tone-blue"><i class="fas fa-calculator"></i> إجمالي: ' + new Intl.NumberFormat('ar-EG').format(item.total_hours) + '</span>';
+                remainingHtml += '<span class="sc-tone-red"><i class="fas fa-handshake"></i> متعاقد: ' + new Intl.NumberFormat('ar-EG').format(item.suppliers_hours) + '</span>';
+                remainingHtml += '<span data-allow-style style="color: ' + statusColor + ';"><i class="fas fa-balance-scale"></i> متبقي: ' + new Intl.NumberFormat('ar-EG').format(item.remaining_hours) + '</span>';
                 remainingHtml += '</div>';
 
-                // إضافة شريط تقدم
+                // إضافة شريط تقدم — اللونُ والعرضُ محسوبان لحظيًّا من نسبةِ التعاقد
                 if (item.total_hours > 0) {
                   var progressPercentage = Math.min(100, (item.suppliers_hours / item.total_hours) * 100);
-                  var progressColor = progressPercentage >= 90 ? '#d32f2f' : (progressPercentage >= 70 ? '#ffa000' : '#43a047');
-                  remainingHtml += '<div style="margin-top: 0.4rem;">';
-                  remainingHtml += '<div style="background: #e0e0e0; height: 6px; border-radius: 3px; overflow: hidden;">';
-                  remainingHtml += '<div style="background: ' + progressColor + '; height: 100%; width: ' + progressPercentage.toFixed(1) + '%; transition: width 0.3s;"></div>';
+                  var progressColor = progressPercentage >= 90 ? 'var(--c-d32f2f, #d32f2f)' : (progressPercentage >= 70 ? 'var(--c-ffa000, #ffa000)' : 'var(--c-43a047, #43a047)');
+                  remainingHtml += '<div class="sc-bar-wrap">';
+                  remainingHtml += '<div class="sc-bar-track">';
+                  remainingHtml += '<div class="sc-bar-fill" data-allow-style style="background: ' + progressColor + '; width: ' + progressPercentage.toFixed(1) + '%;"></div>';
                   remainingHtml += '</div>';
-                  remainingHtml += '<span style="font-size: 0.75rem; color: #666; display: block; margin-top: 0.2rem;">نسبة التعاقد: ' + progressPercentage.toFixed(1) + '%</span>';
+                  remainingHtml += '<span class="sc-bar-note">نسبة التعاقد: ' + progressPercentage.toFixed(1) + '%</span>';
                   remainingHtml += '</div>';
                 }
 
@@ -1842,7 +2161,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               remainingHtml += '</div>';
               remainingDiv.html(remainingHtml);
             } else {
-              remainingDiv.html('<span style="color: #999; font-style: italic; margin-top: 0.5rem; display: block;">لا توجد تفاصيل</span>');
+              remainingDiv.html('<span class="sc-empty-note-block">لا توجد تفاصيل</span>');
             }
 
             $('#projectHoursInfo').fadeIn();
@@ -1986,11 +2305,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
               newSection.className = 'equipment-section';
               newSection.setAttribute('data-index', equipmentIndex);
               newSection.innerHTML = `
-                  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; background-color: #f9f9f9;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                      <h6 style="margin: 0;">المعدات رقم ${equipmentIndex}</h6>
-                      <button type="button" class="removeEquipmentBtn" data-index="${equipmentIndex}"
-                        style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                  <div class="sc-equip-box">
+                    <div class="sc-equip-head">
+                      <h6 class="sc-equip-head-title">المعدات رقم ${equipmentIndex}</h6>
+                      <button type="button" class="removeEquipmentBtn sc-equip-remove-btn" data-index="${equipmentIndex}">
                         <i class="fa fa-trash"></i> حذف
                       </button>
                     </div>
@@ -1998,28 +2316,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                       <div class="field md-3 sm-6">
                         <label>نوع المعدة</label>
                         <div class="control">
-                          <select name="equip_type_${equipmentIndex}" class="equip-type">
+                          <select name="equip_type_${equipmentIndex}" aria-label="نوع المعدة للمعدة رقم ${equipmentIndex}" class="equip-type">
                             <?php echo $equipmentTypeOptionsHtml; ?>
                           </select>
                         </div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المعدات</label>
-                        <div class="control"><input name="equip_count_${equipmentIndex}" type="number" min="0" value="${equip.equip_count}"></div>
+                        <div class="control"><input name="equip_count_${equipmentIndex}" aria-label="عدد المعدات للمعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.equip_count}"></div>
                       </div>
 
                       <div class="field md-3 sm-6">
-                        <label><span style="color: #007bff; font-weight: 600;">■</span> المعدات الأساسية</label>
-                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" style="background: #e3f2fd; border-right: 3px solid #007bff;" value="${equip.equip_count_basic || 0}"></div>
+                        <label><span class="sc-dot-basic">■</span> المعدات الأساسية</label>
+                        <div class="control"><input name="equip_count_basic_${equipmentIndex}" type="number" min="0" aria-label="عدد المعدات الأساسية للمعدة رقم ${equipmentIndex}" class="sc-input-basic" value="${equip.equip_count_basic || 0}"></div>
                       </div>
 
                       <div class="field md-3 sm-6">
-                        <label><span style="color: #ffc107; font-weight: 600;">■</span> المعدات الاحتياطية</label>
-                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" style="background: #fffde7; border-right: 3px solid #ffc107;" value="${equip.equip_count_backup || 0}"></div>
+                        <label><span class="sc-dot-backup">■</span> المعدات الاحتياطية</label>
+                        <div class="control"><input name="equip_count_backup_${equipmentIndex}" type="number" min="0" aria-label="عدد المعدات الاحتياطية للمعدة رقم ${equipmentIndex}" class="sc-input-backup" value="${equip.equip_count_backup || 0}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد المساعدين</label>
-                        <div class="control"><input name="equip_assistants_${equipmentIndex}" type="number" min="0" value="${equip.equip_assistants}"></div>
+                        <div class="control"><input name="equip_assistants_${equipmentIndex}" aria-label="عدد المساعدين للمعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.equip_assistants}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد الورديات</label>
@@ -2029,25 +2347,25 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                       <!-- أوقات الورديات -->
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> بداية الوردية الأولى</label>
-                        <div class="control"><input name="shift1_start_${equipmentIndex}" type="time" value="${equip.shift1_start || ''}"></div>
+                        <div class="control"><input name="shift1_start_${equipmentIndex}" aria-label="بداية الوردية الأولى للمعدة رقم ${equipmentIndex}" type="time" value="${equip.shift1_start || ''}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> نهاية الوردية الأولى</label>
-                        <div class="control"><input name="shift1_end_${equipmentIndex}" type="time" value="${equip.shift1_end || ''}"></div>
+                        <div class="control"><input name="shift1_end_${equipmentIndex}" aria-label="نهاية الوردية الأولى للمعدة رقم ${equipmentIndex}" type="time" value="${equip.shift1_end || ''}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> بداية الوردية الثانية</label>
-                        <div class="control"><input name="shift2_start_${equipmentIndex}" type="time" value="${equip.shift2_start || ''}"></div>
+                        <div class="control"><input name="shift2_start_${equipmentIndex}" aria-label="بداية الوردية الثانية للمعدة رقم ${equipmentIndex}" type="time" value="${equip.shift2_start || ''}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label><i class="fas fa-clock"></i> نهاية الوردية الثانية</label>
-                        <div class="control"><input name="shift2_end_${equipmentIndex}" type="time" value="${equip.shift2_end || ''}"></div>
+                        <div class="control"><input name="shift2_end_${equipmentIndex}" aria-label="نهاية الوردية الثانية للمعدة رقم ${equipmentIndex}" type="time" value="${equip.shift2_end || ''}"></div>
                       </div>
 
                       <div class="field md-3 sm-6">
                         <label>وحدة القياس</label>
                         <div class="control">
-                          <select name="equip_unit_${equipmentIndex}" class="equip-unit">
+                          <select name="equip_unit_${equipmentIndex}" aria-label="وحدة القياس للمعدة رقم ${equipmentIndex}" class="equip-unit">
                             <option value="">— اختر —</option>
                             <option value="ساعة" ${equip.equip_unit === 'ساعة' ? 'selected' : ''}>ساعة</option>
                             <option value="طن" ${equip.equip_unit === 'طن' ? 'selected' : ''}>طن</option>
@@ -2059,7 +2377,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                       <div class="field md-3 sm-6">
                         <label>ساعات الوردية</label>
-                        <div class="control"><input name="shift_hours_${equipmentIndex}" type="number" min="0" value="${equip.shift_hours}"></div>
+                        <div class="control"><input name="shift_hours_${equipmentIndex}" aria-label="ساعات الوردية للمعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.shift_hours}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي الساعات يومياً</label>
@@ -2067,7 +2385,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                       </div>
                       <div class="field md-3 sm-6">
                         <label>وحدات العمل في الشهر</label>
-                        <div class="control"><input name="equip_target_per_month_${equipmentIndex}" type="number" min="0" value="${equip.equip_monthly_target || 0}"></div>
+                        <div class="control"><input name="equip_target_per_month_${equipmentIndex}" aria-label="وحدات العمل في الشهر للمعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.equip_monthly_target || 0}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>إجمالي ساعات العقد</label>
@@ -2076,7 +2394,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                       <div class="field md-3 sm-6">
                         <label>العملة</label>
                         <div class="control">
-                          <select name="equip_price_currency_${equipmentIndex}">
+                          <select name="equip_price_currency_${equipmentIndex}" aria-label="عملة سعر الوحدة للمعدة رقم ${equipmentIndex}">
                             <option value="">— اختر —</option>
                             <option value="دولار" ${equip.equip_price_currency === 'دولار' ? 'selected' : ''}>دولار</option>
                             <option value="جنيه" ${equip.equip_price_currency === 'جنيه' ? 'selected' : ''}>جنيه</option>
@@ -2090,11 +2408,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                       <div class="field md-3 sm-6">
                         <label>عدد المشرفين</label>
-                        <div class="control"><input name="equip_supervisors_${equipmentIndex}" type="number" min="0" value="${equip.equip_supervisors}"></div>
+                        <div class="control"><input name="equip_supervisors_${equipmentIndex}" aria-label="عدد المشرفين للمعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.equip_supervisors}"></div>
                       </div>
                       <div class="field md-3 sm-6">
                         <label>عدد الفنيين</label>
-                        <div class="control"><input name="equip_technicians_${equipmentIndex}" type="number" min="0" value="${equip.equip_technicians}"></div>
+                        <div class="control"><input name="equip_technicians_${equipmentIndex}" aria-label="عدد الفنيين للمعدة رقم ${equipmentIndex}" type="number" min="0" value="${equip.equip_technicians}"></div>
                       </div>
                     </div>
                   </div>

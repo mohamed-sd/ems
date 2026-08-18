@@ -397,6 +397,28 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 : أنماطُ الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة */
+.trs-of-mb14{margin-bottom:14px}
+.trs-of-flow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.trs-of-arrow{color:var(--c-adb5bd, #adb5bd)}
+.trs-of-badge-cancel{background:var(--c-dc3545, #dc3545);color:var(--c-surface, #ffffff);border-radius:14px;padding:3px 12px;font-size:13px;font-weight:700}
+.trs-of-acts{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start}
+.trs-of-proof{display:flex;gap:6px;align-items:center;background:var(--c-f8f9fa, #f8f9fa);border:1px solid var(--c-e0e0e0, #e0e0e0);border-radius:10px;padding:8px 10px}
+.trs-of-lbl{font-weight:600;font-size:13px}
+.trs-of-file{max-width:190px}
+.trs-of-gps{width:90px}
+.trs-of-inline{display:inline}
+.trs-of-row{display:flex;gap:6px;align-items:center}
+.trs-of-reason{width:200px}
+.trs-of-muted{color:var(--c-6c757d, #6c757d);font-size:13px}
+.trs-of-tabs{display:flex;gap:8px;flex-wrap:wrap}
+.trs-of-full{grid-column:1/-1}
+.trs-of-tbl{width:100%}
+.trs-of-total{font-weight:700;background:var(--c-brand-gold-soft, #fff8e6)}
+.trs-of-tal{text-align:left}
+.is-hidden{display:none}
+</style>
 <div class="main trs-order-main ems-unified-page-shell">
     <?php
     $header_title = $order ? ('أمر الترحيل — ' . htmlspecialchars($order['order_no'])) : 'أمر ترحيل جديد';
@@ -408,6 +430,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع'),
     );
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بياناتِ أمرِ ترحيلٍ لعرضها بعدُ', 'املأ رأسَ الأمرِ واحفظه لتُفتحَ تبويباتُ العناصرِ والتكاليفِ والتصاريح');
     ?>
     <?php trs_msg_banner(); ?>
 
@@ -422,27 +446,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     foreach ($trans_map as $k => $tt) { if ($tt['from'] === $cur) { $avail[$k] = $tt; } }
     $stages_ar = trs_stages();
     ?>
-    <div class="card" style="margin-bottom:14px"><div class="card-body">
-        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+    <div class="card trs-of-mb14"><div class="card-body">
+        <div class="trs-of-flow">
             <?php foreach ($stage_flow as $i => $st):
                 $pos_cur = array_search($cur, $stage_flow, true);
                 $done = ($pos_cur !== false && $i < $pos_cur);
                 $isnow = ($st === $cur);
-                $bg = $isnow ? '#0d6efd' : ($done ? '#198754' : '#e9ecef');
-                $fg = ($isnow || $done) ? '#fff' : '#6c757d';
+                $bg = $isnow ? 'var(--c-0d6efd, #0d6efd)' : ($done ? 'var(--c-198754, #198754)' : 'var(--c-e9ecef, #e9ecef)');
+                $fg = ($isnow || $done) ? 'var(--c-surface, #ffffff)' : 'var(--c-6c757d, #6c757d)';
             ?>
-                <?php if ($i > 0): ?><i class="fa fa-angle-left" style="color:#adb5bd"></i><?php endif; ?>
-                <span style="background:<?php echo $bg; ?>;color:<?php echo $fg; ?>;border-radius:14px;padding:3px 12px;font-size:13px;font-weight:600">
+                <?php if ($i > 0): ?><i class="fa fa-angle-left trs-of-arrow"></i><?php endif; ?>
+                <span data-allow-style style="background:<?php echo $bg; ?>;color:<?php echo $fg; ?>;border-radius:14px;padding:3px 12px;font-size:13px;font-weight:600">
                     <?php echo htmlspecialchars($stages_ar[$st]); ?>
                 </span>
             <?php endforeach; ?>
             <?php if ($cur === 'cancelled'): ?>
-                <span style="background:#dc3545;color:#fff;border-radius:14px;padding:3px 12px;font-size:13px;font-weight:700">ملغى</span>
+                <span class="trs-of-badge-cancel">ملغى</span>
             <?php endif; ?>
         </div>
 
         <?php if ($can_edit || $can_delete): ?>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start">
+        <div class="trs-of-acts">
             <?php foreach ($avail as $k => $tt):
                 $needs_proof = in_array($k, array('confirm_departure', 'confirm_arrival'), true);
                 if ($tt['need'] === 'delete' && !$can_delete) continue;
@@ -450,48 +474,48 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             ?>
                 <?php if ($needs_proof): ?>
                 <form action="transfer_order_form.php?id=<?php echo intval($order_id); ?>" method="post" enctype="multipart/form-data"
-                      style="display:flex;gap:6px;align-items:center;background:#f8f9fa;border:1px solid #e0e0e0;border-radius:10px;padding:8px 10px">
+                      class="trs-of-proof">
                     <input type="hidden" name="action" value="transition">
                     <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
                     <input type="hidden" name="trans" value="<?php echo $k; ?>">
-                    <label style="font-weight:600;font-size:13px"><i class="fa <?php echo $tt['icon']; ?>" style="color:<?php echo $tt['color']; ?>"></i> <?php echo htmlspecialchars($tt['label']); ?></label>
-                    <input type="file" name="proof" accept="image/*,application/pdf" required style="max-width:190px">
+                    <label class="trs-of-lbl"><i class="fa <?php echo $tt['icon']; ?>" data-allow-style style="color:<?php echo $tt['color']; ?>"></i> <?php echo htmlspecialchars($tt['label']); ?></label>
+                    <input type="file" name="proof" aria-label="إثباتُ التنفيذ — صورةٌ أو ملفُّ PDF" accept="image/*,application/pdf" required class="trs-of-file">
                     <?php if ($k === 'confirm_arrival'): ?>
-                        <input type="text" name="gps_lat" placeholder="GPS lat" style="width:90px" aria-label="GPS lat">
-                        <input type="text" name="gps_lng" placeholder="GPS lng" style="width:90px" aria-label="GPS lng">
+                        <input type="text" name="gps_lat" placeholder="GPS lat" aria-label="إحداثيُّ خطِّ العرضِ عند الوصول" class="trs-of-gps">
+                        <input type="text" name="gps_lng" placeholder="GPS lng" aria-label="إحداثيُّ خطِّ الطولِ عند الوصول" class="trs-of-gps">
                     <?php endif; ?>
-                    <button type="submit" class="btn-primary" style="background:<?php echo $tt['color']; ?>"><i class="fa fa-check"></i> تأكيد</button>
+                    <button type="submit" class="btn-primary" data-allow-style style="background:<?php echo $tt['color']; ?>"><i class="fa fa-check"></i> تأكيد</button>
                 </form>
                 <?php else: ?>
-                <form action="transfer_order_form.php?id=<?php echo intval($order_id); ?>" method="post" style="display:inline"
+                <form action="transfer_order_form.php?id=<?php echo intval($order_id); ?>" method="post" class="trs-of-inline"
                       onsubmit="return confirm('<?php echo htmlspecialchars($tt['label']); ?>؟');">
                     <input type="hidden" name="action" value="transition">
                     <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
                     <input type="hidden" name="trans" value="<?php echo $k; ?>">
-                    <button type="submit" class="btn-primary" style="background:<?php echo $tt['color']; ?>"><i class="fa <?php echo $tt['icon']; ?>"></i> <?php echo htmlspecialchars($tt['label']); ?></button>
+                    <button type="submit" class="btn-primary" data-allow-style style="background:<?php echo $tt['color']; ?>"><i class="fa <?php echo $tt['icon']; ?>"></i> <?php echo htmlspecialchars($tt['label']); ?></button>
                 </form>
                 <?php endif; ?>
             <?php endforeach; ?>
 
             <?php if ($can_delete && !in_array($cur, array('closed', 'cancelled'), true)): ?>
             <form action="transfer_order_form.php?id=<?php echo intval($order_id); ?>" method="post"
-                  style="display:flex;gap:6px;align-items:center" onsubmit="return confirm('إلغاء الأمر نهائياً (مع تسجيل السبب)؟');">
+                  class="trs-of-row" onsubmit="return confirm('إلغاء الأمر نهائياً (مع تسجيل السبب)؟');">
                 <input type="hidden" name="action" value="cancel">
                 <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
-                <input type="text" name="reason" placeholder="سبب الإلغاء (إلزامي)" required style="width:200px" aria-label="سبب الإلغاء (إلزامي)">
+                <input type="text" name="reason" placeholder="سبب الإلغاء (إلزامي)" aria-label="سبب الإلغاء (إلزامي)" required class="trs-of-reason">
                 <button type="submit" class="btn-secondary"><i class="fa fa-ban"></i> إلغاء الأمر</button>
             </form>
             <?php endif; ?>
 
             <?php if (empty($avail) && !in_array($cur, array('closed', 'cancelled'), true)): ?>
-                <span style="color:#6c757d;font-size:13px">لا إجراء متاح لدورك في هذه المرحلة.</span>
+                <span class="trs-of-muted">لا إجراء متاح لدورك في هذه المرحلة.</span>
             <?php endif; ?>
         </div>
         <?php endif; ?>
     </div></div>
 
     <!-- تبويبات -->
-    <div class="card" style="margin-bottom:14px"><div class="card-body" style="display:flex;gap:8px;flex-wrap:wrap">
+    <div class="card trs-of-mb14"><div class="card-body trs-of-tabs">
         <button type="button" class="btn-primary trs-tab-btn" data-tab="header"><i class="fa fa-circle-info"></i> الرأس والتجهيز</button>
         <button type="button" class="btn-primary trs-tab-btn" data-tab="lines"><i class="fa fa-boxes-stacked"></i> العناصر المنقولة</button>
         <button type="button" class="btn-primary trs-tab-btn" data-tab="costs"><i class="fa fa-hand-holding-dollar"></i> بنود التكلفة</button>
@@ -502,7 +526,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <!-- ════ تبويب الرأس ════ -->
     <div class="trs-tab" id="tab-header">
-    <form action="transfer_order_form.php<?php echo $order ? ('?id=' . intval($order_id)) : ''; ?>" method="post" class="allforms allforms-visible" style="display:block">
+    <form action="transfer_order_form.php<?php echo $order ? ('?id=' . intval($order_id)) : ''; ?>" method="post" class="allforms allforms-visible">
         <input type="hidden" name="action" value="save_header">
         <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> رأس أمر الترحيل والتجهيز</h5></div>
@@ -530,9 +554,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-group"><label for="emsf_536_dba8e">إلى موقع <span class="required">*</span></label>
                         <select name="to_location_id" required id="emsf_536_dba8e"><?php echo $loc_opt_to; ?></select></div>
                     <div class="form-group"><label for="emsf_537_dbb06">تاريخ الطلب <span class="required">*</span></label>
-                        <input type="date" name="request_date" value="<?php echo htmlspecialchars($order['request_date'] ?? date('Y-m-d')); ?>" required id="emsf_537_dbb06"></div>
+                        <input type="date" name="request_date" id="emsf_537_dbb06" required value="<?php echo htmlspecialchars($order['request_date'] ?? date('Y-m-d')); ?>"></div>
                     <div class="form-group"><label for="emsf_538_2e819">التاريخ المخطط</label>
-                        <input type="date" name="planned_date" value="<?php echo htmlspecialchars($order['planned_date'] ?? ''); ?>" id="emsf_538_2e819"></div>
+                        <input type="date" name="planned_date" id="emsf_538_2e819" value="<?php echo htmlspecialchars($order['planned_date'] ?? ''); ?>"></div>
                     <div class="form-group"><label for="emsf_539_4a4e4">الأولوية</label>
                         <select name="priority" id="emsf_539_4a4e4"><?php foreach ($prios as $k => $v) { $sel = ($order && $order['priority'] === $k) ? ' selected' : ''; echo "<option value='$k'$sel>" . htmlspecialchars($v) . "</option>"; } ?></select></div>
                     <div class="form-group"><label for="emsf_540_85f72">المركبة الناقلة</label>
@@ -544,20 +568,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <div class="form-group"><label for="emsf_543_f0948">السائق</label>
                         <select name="driver_id" id="emsf_543_f0948"><?php echo $drv_opt; ?></select></div>
                     <div class="form-group"><label for="emsf_544_93fc1">المسار</label>
-                        <input type="text" name="route" value="<?php echo htmlspecialchars($order['route'] ?? ''); ?>" placeholder="عطبرة ← الموقع" id="emsf_544_93fc1"></div>
+                        <input type="text" name="route" id="emsf_544_93fc1" placeholder="عطبرة ← الموقع" value="<?php echo htmlspecialchars($order['route'] ?? ''); ?>"></div>
                     <div class="form-group"><label for="emsf_545_b25c5">مركز التكلفة</label>
-                        <input type="text" name="analytic_cost_center" value="<?php echo htmlspecialchars($order['analytic_cost_center'] ?? ''); ?>" placeholder="المشروع/الإدارة/المكتب" id="emsf_545_b25c5"></div>
-                    <div class="form-group" style="grid-column:1/-1"><label for="emsf_546_968bb">ملاحظات</label>
-                        <input type="text" name="notes" value="<?php echo htmlspecialchars($order['notes'] ?? ''); ?>" id="emsf_546_968bb"></div>
+                        <input type="text" name="analytic_cost_center" id="emsf_545_b25c5" placeholder="المشروع/الإدارة/المكتب" value="<?php echo htmlspecialchars($order['analytic_cost_center'] ?? ''); ?>"></div>
+                    <div class="form-group trs-of-full"><label for="emsf_546_968bb">ملاحظات</label>
+                        <input type="text" name="notes" id="emsf_546_968bb" value="<?php echo htmlspecialchars($order['notes'] ?? ''); ?>"></div>
                 </div>
             </div>
             <?php if ($order): ?>
             <div class="form-section">
                 <div class="form-grid">
-                    <div class="form-group"><label for="emsf_547_7b262">كود الحركة (محسوب)</label><input type="text" value="<?php echo htmlspecialchars($order['order_no']); ?>" disabled id="emsf_547_7b262"></div>
-                    <div class="form-group"><label for="emsf_548_7bc79">مدة المشروع (يوم — محسوب)</label><input type="text" value="<?php echo htmlspecialchars((string)($order['project_days'] ?? '—')); ?>" disabled id="emsf_548_7bc79"></div>
-                    <div class="form-group"><label for="emsf_549_761eb">المتحمِّل (محسوب من القواعد)</label><input type="text" value="<?php echo htmlspecialchars($order['cost_bearer'] ? trs_label($bearers, $order['cost_bearer']) : '—'); ?>" disabled id="emsf_549_761eb"></div>
-                    <div class="form-group"><label for="emsf_550_1b8a2">التكلفة الفعلية (USD — محسوب)</label><input type="text" value="<?php echo number_format((float)($order['actual_cost_usd'] ?? 0), 2); ?>" disabled id="emsf_550_1b8a2"></div>
+                    <div class="form-group"><label for="emsf_547_7b262">كود الحركة (محسوب)</label><input type="text" id="emsf_547_7b262" disabled value="<?php echo htmlspecialchars($order['order_no']); ?>"></div>
+                    <div class="form-group"><label for="emsf_548_7bc79">مدة المشروع (يوم — محسوب)</label><input type="text" id="emsf_548_7bc79" disabled value="<?php echo htmlspecialchars((string)($order['project_days'] ?? '—')); ?>"></div>
+                    <div class="form-group"><label for="emsf_549_761eb">المتحمِّل (محسوب من القواعد)</label><input type="text" id="emsf_549_761eb" disabled value="<?php echo htmlspecialchars($order['cost_bearer'] ? trs_label($bearers, $order['cost_bearer']) : '—'); ?>"></div>
+                    <div class="form-group"><label for="emsf_550_1b8a2">التكلفة الفعلية (USD — محسوب)</label><input type="text" id="emsf_550_1b8a2" disabled value="<?php echo number_format((float)($order['actual_cost_usd'] ?? 0), 2); ?>"></div>
                 </div>
             </div>
             <?php endif; ?>
@@ -571,9 +595,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($order): ?>
     <!-- ════ تبويب العناصر ════ -->
-    <div class="trs-tab" id="tab-lines" style="display:none">
+    <div class="trs-tab is-hidden" id="tab-lines">
         <?php if ($can_edit): ?>
-        <form action="transfer_order_form.php?id=<?php echo intval($order_id); ?>" method="post" class="allforms allforms-visible" style="display:block">
+        <form action="transfer_order_form.php?id=<?php echo intval($order_id); ?>" method="post" class="allforms allforms-visible">
             <input type="hidden" name="action" value="add_line">
             <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
             <div class="card-header"><h5><i class="fas fa-plus"></i> إضافة عنصر منقول</h5></div>
@@ -585,14 +609,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_554_385e4">الصنف (مخزون)</label><select name="product_id" id="emsf_554_385e4"><?php echo trs_item_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
                 <div class="form-group"><label for="emsf_555_5038e">الموظف/المشغّل</label><select name="employee_id" id="emsf_555_5038e"><?php echo trs_employee_options($conn, $is_super_admin, $company_id, 0); ?></select></div>
                 <div class="form-group"><label for="emsf_556_6252b">الكمية</label><input type="number" step="0.01" name="quantity" value="" id="emsf_556_6252b"></div>
-                <div class="form-group" style="grid-column:1/-1"><label for="emsf_557_419d9">ملاحظة</label><input type="text" name="line_note" id="emsf_557_419d9"></div>
+                <div class="form-group trs-of-full"><label for="emsf_557_419d9">ملاحظة</label><input type="text" name="line_note" id="emsf_557_419d9"></div>
             </div></div>
             <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> إضافة</button></div>
             </div></div>
         </form>
         <?php endif; ?>
         <div class="card"><div class="card-body"><div class="table-container">
-            <table class="display nowrap alltables no-datatable" style="width:100%"><thead><tr>
+            <table class="display nowrap alltables no-datatable trs-of-tbl"><thead><tr>
                 <th>الإجراءات</th><th>النوع</th><th>المعدة</th><th>المرفق</th><th>الصنف</th><th>الموظف</th><th>الكمية</th><th>ملاحظة</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
                 <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -619,7 +643,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             );
             foreach ($line_rows as $x) {
                 echo "<tr><td><div class='action-btns'>";
-                if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' style='display:inline' onsubmit='return confirm(\"حذف العنصر؟\")'>
+                if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' class='trs-of-inline' onsubmit='return confirm(\"حذف العنصر؟\")'>
         <?= csrf_field() ?><input type='hidden' name='action' value='del_line'><input type='hidden' name='id' value='" . intval($order_id) . "'><input type='hidden' name='line_id' value='" . intval($x['id']) . "'><button class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></button></form>";
                 echo "</div></td>";
                 echo "<td>" . htmlspecialchars(trs_label($item_types, $x['item_type'])) . "</td>";
@@ -636,9 +660,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <!-- ════ تبويب التكاليف ════ -->
-    <div class="trs-tab" id="tab-costs" style="display:none">
+    <div class="trs-tab is-hidden" id="tab-costs">
         <?php if ($can_edit): ?>
-        <form action="transfer_order_form.php?id=<?php echo intval($order_id); ?>" method="post" class="allforms allforms-visible" style="display:block">
+        <form action="transfer_order_form.php?id=<?php echo intval($order_id); ?>" method="post" class="allforms allforms-visible">
             <input type="hidden" name="action" value="add_cost">
             <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
             <div class="card-header"><h5><i class="fas fa-plus"></i> إضافة بند تكلفة</h5></div>
@@ -650,14 +674,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_561_21354">سعر الصرف → USD</label><input type="number" step="0.000001" name="fx_rate" placeholder="مثال: 0.00166" id="emsf_561_21354"></div>
                 <div class="form-group"><label for="emsf_562_00122">المتحمِّل <span class="required">*</span></label>
                     <select name="cost_bearer" required id="emsf_562_00122"><?php foreach ($bearers as $k => $v) { $sel = ($order['cost_bearer'] === $k) ? ' selected' : ''; echo "<option value='$k'$sel>" . htmlspecialchars($v) . "</option>"; } ?></select></div>
-                <div class="form-group"><label for="emsf_563_d49af">مركز التكلفة</label><input type="text" name="cl_center" value="<?php echo htmlspecialchars($order['analytic_cost_center'] ?? ''); ?>" id="emsf_563_d49af"></div>
+                <div class="form-group"><label for="emsf_563_d49af">مركز التكلفة</label><input type="text" name="cl_center" id="emsf_563_d49af" value="<?php echo htmlspecialchars($order['analytic_cost_center'] ?? ''); ?>"></div>
             </div></div>
             <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> إضافة</button></div>
             </div></div>
         </form>
         <?php endif; ?>
         <div class="card"><div class="card-body"><div class="table-container">
-            <table class="display nowrap alltables no-datatable" style="width:100%"><thead><tr>
+            <table class="display nowrap alltables no-datatable trs-of-tbl"><thead><tr>
                 <th>الإجراءات</th><th>النوع</th><th>المبلغ المحلي</th><th>العملة</th><th>سعر الصرف</th><th>USD</th><th>المتحمِّل</th><th>مركز التكلفة</th>
             </tr></thead><tbody>
             <?php
@@ -668,7 +692,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             foreach ($cost_rows as $x) {
                 $sum += (float)$x['amount_usd'];
                 echo "<tr><td><div class='action-btns'>";
-                if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' style='display:inline' onsubmit='return confirm(\"حذف البند؟\")'>
+                if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' class='trs-of-inline' onsubmit='return confirm(\"حذف البند؟\")'>
         <?= csrf_field() ?><input type='hidden' name='action' value='del_cost'><input type='hidden' name='id' value='" . intval($order_id) . "'><input type='hidden' name='cost_id' value='" . intval($x['id']) . "'><button class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></button></form>";
                 echo "</div></td>";
                 echo "<td>" . htmlspecialchars(trs_label($cost_types, $x['cost_type'])) . "</td>";
@@ -679,16 +703,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 echo "<td>" . htmlspecialchars(trs_label($bearers, $x['cost_bearer'])) . "</td>";
                 echo "<td>" . htmlspecialchars((string)($x['analytic_cost_center'] ?? '—')) . "</td></tr>";
             }
-            echo "<tr style='font-weight:700;background:#fff8e6'><td colspan='5' style='text-align:left'>الإجمالي (USD)</td><td>" . number_format($sum, 2) . "</td><td colspan='2'></td></tr>";
+            echo "<tr class='trs-of-total'><td colspan='5' class='trs-of-tal'>الإجمالي (USD)</td><td>" . number_format($sum, 2) . "</td><td colspan='2'></td></tr>";
             ?>
             </tbody></table>
         </div></div></div>
     </div>
 
     <!-- ════ تبويب التصاريح ════ -->
-    <div class="trs-tab" id="tab-permits" style="display:none">
+    <div class="trs-tab is-hidden" id="tab-permits">
         <?php if ($can_edit): ?>
-        <form action="transfer_order_form.php?id=<?php echo intval($order_id); ?>" method="post" class="allforms allforms-visible" style="display:block">
+        <form action="transfer_order_form.php?id=<?php echo intval($order_id); ?>" method="post" class="allforms allforms-visible">
             <input type="hidden" name="action" value="add_permit">
             <input type="hidden" name="id" value="<?php echo intval($order_id); ?>">
             <div class="card-header"><h5><i class="fas fa-plus"></i> إضافة تصريح</h5></div>
@@ -706,7 +730,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </form>
         <?php endif; ?>
         <div class="card"><div class="card-body"><div class="table-container">
-            <table class="display nowrap alltables no-datatable" style="width:100%"><thead><tr>
+            <table class="display nowrap alltables no-datatable trs-of-tbl"><thead><tr>
                 <th>الإجراءات</th><th>النوع</th><th>الجهة</th><th>الإصدار</th><th>الانتهاء</th><th>الحالة</th>
             </tr></thead><tbody>
             <?php
@@ -715,7 +739,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             ));
             foreach ($permit_rows as $x) {
                 echo "<tr><td><div class='action-btns'>";
-                if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' style='display:inline' onsubmit='return confirm(\"حذف التصريح؟\")'>
+                if ($can_delete) echo "<form action='transfer_order_form.php?id=" . intval($order_id) . "' method='post' class='trs-of-inline' onsubmit='return confirm(\"حذف التصريح؟\")'>
         <?= csrf_field() ?><input type='hidden' name='action' value='del_permit'><input type='hidden' name='id' value='" . intval($order_id) . "'><input type='hidden' name='permit_id' value='" . intval($x['id']) . "'><button class='action-btn delete' title='حذف'><i class='fas fa-trash-alt'></i></button></form>";
                 echo "</div></td>";
                 echo "<td>" . htmlspecialchars(trs_label($permit_types, $x['permit_type'])) . "</td>";
@@ -730,9 +754,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div>
 
     <!-- ════ تبويب الأحداث ════ -->
-    <div class="trs-tab" id="tab-events" style="display:none">
+    <div class="trs-tab is-hidden" id="tab-events">
         <div class="card"><div class="card-body"><div class="table-container">
-            <table class="display nowrap alltables no-datatable" style="width:100%"><thead><tr>
+            <table class="display nowrap alltables no-datatable trs-of-tbl"><thead><tr>
                 <th>التاريخ</th><th>النوع</th><th>الوصف</th><th>قبل</th><th>بعد</th>
             </tr></thead><tbody>
             <?php
@@ -758,9 +782,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 (function () {
     var active = <?php echo json_encode($active_tab); ?>;
     function showTab(t) {
-        document.querySelectorAll('.trs-tab').forEach(function (el) { el.style.display = 'none'; });
+        document.querySelectorAll('.trs-tab').forEach(function (el) { el.classList.add('is-hidden'); });
         var target = document.getElementById('tab-' + t);
-        if (target) target.style.display = 'block'; else { var h = document.getElementById('tab-header'); if (h) h.style.display = 'block'; }
+        if (target) target.classList.remove('is-hidden'); else { var h = document.getElementById('tab-header'); if (h) h.classList.remove('is-hidden'); }
         document.querySelectorAll('.trs-tab-btn').forEach(function (b) { b.style.opacity = (b.getAttribute('data-tab') === t) ? '1' : '0.6'; });
     }
     document.querySelectorAll('.trs-tab-btn').forEach(function (b) {

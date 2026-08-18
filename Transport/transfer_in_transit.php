@@ -53,16 +53,24 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ شاشةِ الحركةِ في الطريقِ أصنافًا برموزِ الألوان */
+.trs-it-count{background:var(--c-fd7e14, #fd7e14)}
+.trs-it-late{background:var(--c-fff3f3, #fff3f3)}
+.trs-it-inline{display:inline}
+</style>
 <div class="main" dir="rtl">
   <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
    شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
 $header_icon = 'fa fa-truck-moving';
 $header_title_html = htmlspecialchars('الحركةُ في الطريق', ENT_QUOTES, 'UTF-8');
-ob_start(); ?><span class="badge" style="background:#fd7e14"><?= count($rows) ?> في الطريق</span><?php
+ob_start(); ?><span class="badge trs-it-count"><?= count($rows) ?> في الطريق</span><?php
 $header_actions = array(array('raw' => trim((string) ob_get_clean())));
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا حركةَ في الطريقِ الآن', 'أكّدِ المغادرةَ من أمرِ الترحيلِ لتظهرَ الرحلةُ في هذه الشاشة');
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
@@ -98,14 +106,14 @@ include __DIR__ . '/../includes/page_header.php';
     <?php foreach ($rows as $o):
         $dep = $o['departure_datetime'] ? strtotime($o['departure_datetime']) : null;
         $hrs = $dep ? round((time() - $dep) / 3600, 1) : null; ?>
-      <tr<?= ($hrs !== null && $hrs > 48) ? ' style="background:#fff3f3"' : '' ?>>
+      <tr<?= ($hrs !== null && $hrs > 48) ? ' class="trs-it-late"' : '' ?>>
         <td><?= htmlspecialchars($o['order_no'], ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars(($o['from_loc'] ?: '؟') . ' ← ' . ($o['to_loc'] ?: '؟'), ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($o['vehicle'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($o['driver'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= htmlspecialchars($o['departure_datetime'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td><?= $hrs !== null ? $hrs . ' ساعة' : '—' ?></td>
-        <td><form method="post" style="display:inline">
+        <td><form method="post" class="trs-it-inline">
         <?= csrf_field() ?><input type="hidden" name="arrive_id" value="<?= intval($o['id']) ?>">
             <button class="action-btn" type="submit"><i class="fa fa-flag-checkered"></i> وصلت</button></form></td>
       </tr>

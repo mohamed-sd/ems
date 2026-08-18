@@ -200,16 +200,39 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا تسويةَ مورّدٍ مولَّدةً بعدُ', 'اختر المورّدَ والفترةَ من نموذجِ «تسويةٌ جديدة» واضغط «ولّد التسوية» — البنودُ تُجلب من مصادرها');
     ?>
+    <style>
+        .sup-set-msg-body      { padding: 12px 16px; }
+        .sup-set-lead          { color: var(--c-4b5563, #4b5563); margin: 0; line-height: 1.8; }
+        .sup-set-h5            { margin: 0 0 10px; }
+        .sup-set-gen-form      { box-shadow: none; padding: 0; }
+        .sup-set-actions-sm    { margin-top: 10px; }
+        .sup-set-actions       { margin-top: 12px; }
+        .sup-set-scroll        { overflow-x: auto; }
+        .sup-set-table         { width: 100%; }
+        .sup-set-empty-cell    { text-align: center; color: var(--c-ink-500, #6b7280); padding: 18px; }
+        .sup-set-row-open      { background: var(--c-fffbeb, #fffbeb); }
+        .sup-set-row-objected  { background: var(--c-fef2f2, #fef2f2); }
+        .sup-set-net-due       { color: var(--c-b91c1c, #b91c1c); }
+        .sup-set-net-ok        { color: var(--c-15803d, #15803d); }
+        .sup-set-danger-note   { color: var(--c-b91c1c, #b91c1c); }
+        .sup-set-muted         { color: var(--c-ink-500, #6b7280); }
+        .sup-set-nowrap        { white-space: nowrap; }
+        .sup-set-inline-form   { display: inline; }
+        .sup-set-req           { color: var(--c-state-danger-strong, #c00); }
+        .sup-set-obj-input     { width: 150px; padding: 3px 6px; font-size: 12px; }
+    </style>
 
     <?php if (isset($_GET['msg'])): ?>
-    <div class="card"><div class="card-body" style="padding:12px 16px;">
+    <div class="card"><div class="card-body sup-set-msg-body">
         <?php echo htmlspecialchars(strval($_GET['msg'])); ?>
     </div></div>
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;margin:0;line-height:1.8;">
+        <p class="sup-set-lead">
             <i class="fas fa-circle-info"></i>
             اختر المورّدَ والفترة، والنظامُ <strong>يجلب البنودَ من مصادرها</strong> —
             استحقاقُه من دفتر ذممه، وتحميلاتُه (وقود · قطع · صيانة · نقل · سلف · جزاءات)
@@ -222,8 +245,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($can_edit): ?>
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-plus"></i> تسويةٌ جديدة</h5>
-        <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;">
+        <h5 class="sup-set-h5"><i class="fas fa-plus"></i> تسويةٌ جديدة</h5>
+        <form action="" method="post" class="allforms allforms-visible sup-set-gen-form">
         <?= csrf_field() ?>
             <input type="hidden" name="generate" value="1">
             <div class="form-section"><div class="form-grid">
@@ -242,7 +265,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_472_bb57c">إلى *</label>
                     <input type="date" name="period_to" required id="emsf_472_bb57c"></div>
             </div></div>
-            <div style="margin-top:10px;">
+            <div class="sup-set-actions-sm">
                 <button type="submit" class="btn btn-primary"><i class="fas fa-wand-magic-sparkles"></i> ولّد التسوية</button>
             </div>
         </form>
@@ -250,9 +273,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-list"></i> التسويات</h5>
-        <div style="overflow-x:auto;">
-        <table class="table table-striped" style="width:100%;">
+        <h5 class="sup-set-h5"><i class="fas fa-list"></i> التسويات</h5>
+        <div class="sup-set-scroll">
+        <table class="table table-striped sup-set-table">
             <thead><tr>
                 <th>رقم التسوية</th><th>المورّد</th><th>الفترة</th>
                 <th>الأولي</th><th>تحميلات علينا</th><th>صافي الساعات المستحقة</th>
@@ -290,7 +313,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tr></thead>
             <tbody>
             <?php if (!$settlements): ?>
-                <tr><td colspan="9" style="text-align:center;color:#6b7280;padding:18px;">
+                <tr><td colspan="9" class="sup-set-empty-cell">
                     لا تسويةَ بعد — ابدأ بتوليد واحدةٍ من النموذج أعلاه.
                 </td></tr>
             <?php endif; ?>
@@ -298,18 +321,18 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 $net = (float) $s['net_amount'];
                 $isRecv = ((string) $s['net_direction'] === 'receivable');
             ?>
-                <tr<?php echo (intval($s['id']) === $open) ? ' style="background:#fffbeb;"' : ''; ?>>
+                <tr<?php echo (intval($s['id']) === $open) ? ' class="sup-set-row-open"' : ''; ?>>
                     <td><code><?php echo htmlspecialchars((string) $s['settlement_no']); ?></code></td>
                     <td><?php echo htmlspecialchars((string) $s['party_name']); ?></td>
                     <td><?php echo htmlspecialchars($s['period_from'] . ' → ' . $s['period_to']); ?></td>
                     <td><?php echo number_format((float) $s['gross_amount'], 2); ?></td>
                     <td><?php echo number_format((float) $s['charges_amount'], 2); ?></td>
                     <td>
-                        <strong style="color:<?php echo $isRecv ? '#b91c1c' : '#15803d'; ?>;">
+                        <strong class="<?php echo $isRecv ? 'sup-set-net-due' : 'sup-set-net-ok'; ?>">
                             <?php echo number_format($net, 2) . ' ' . htmlspecialchars((string) $s['currency']); ?>
                         </strong>
                         <?php if ($isRecv): ?>
-                            <br><small style="color:#b91c1c;">دَينٌ على المورد</small>
+                            <br><small class="sup-set-danger-note">دَينٌ على المورد</small>
                         <?php endif; ?>
                     </td>
                     <td><span class="badge badge-secondary">
@@ -324,7 +347,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <?php echo htmlspecialchars($rq !== null ? $rq : ('#' . intval($s['payment_request_id']))); ?> ↗
                             </a>
                         <?php elseif ($isRecv): ?>
-                            <small style="color:#6b7280;">لا دفعَ — دَينٌ عليه</small>
+                            <small class="sup-set-muted">لا دفعَ — دَينٌ عليه</small>
                         <?php else: ?>—<?php endif; ?>
                     </td>
                     <td>
@@ -332,10 +355,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <span class="badge badge-warning"><?php echo intval($s['open_objections']); ?></span>
                         <?php else: ?>—<?php endif; ?>
                     </td>
-                    <td style="white-space:nowrap;">
+                    <td class="sup-set-nowrap">
                         <a class="btn btn-sm btn-secondary" href="?open=<?php echo intval($s['id']); ?>">البنود</a>
                         <?php if ($can_edit && (string) $s['state'] === 'draft'): ?>
-                        <form action="" method="post" style="display:inline;">
+                        <form action="" method="post" class="sup-set-inline-form">
         <?= csrf_field() ?>
                             <input type="hidden" name="action" value="submit">
                             <input type="hidden" name="sid" value="<?php echo intval($s['id']); ?>">
@@ -343,7 +366,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </form>
                         <?php endif; ?>
                         <?php if ($can_approve && (string) $s['state'] === 'review'): ?>
-                        <form action="" method="post" style="display:inline;">
+                        <form action="" method="post" class="sup-set-inline-form">
         <?= csrf_field() ?>
                             <input type="hidden" name="action" value="approve">
                             <input type="hidden" name="sid" value="<?php echo intval($s['id']); ?>">
@@ -356,7 +379,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         <a class="btn btn-sm btn-secondary" href="?open=<?php echo intval($s['id']); ?>&invoice=1">فاتورة</a>
                         <?php endif; ?>
                         <?php if ($can_approve && (string) $s['state'] === 'paid'): ?>
-                        <form action="" method="post" style="display:inline;"
+                        <form action="" method="post" class="sup-set-inline-form"
                               onsubmit="return confirm('الإقفال نهائيّ — والتصحيحُ بعده بعكسٍ موثَّقٍ لا بتعديل. متابعة؟');">
         <?= csrf_field() ?>
                             <input type="hidden" name="action" value="close">
@@ -382,9 +405,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if ($openRow !== null && !empty($_GET['invoice']) && $can_edit
         && in_array((string) $openRow['state'], array('approved', 'payment_requested'), true)): ?>
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-file-invoice-dollar"></i>
+        <h5 class="sup-set-h5"><i class="fas fa-file-invoice-dollar"></i>
             فاتورةُ المورد للتسوية #<?php echo $open; ?></h5>
-        <p style="color:#6b7280">
+        <p class="sup-set-muted">
             الصافي المعتمد: <strong><?php echo number_format((float) $openRow['net_amount'], 2); ?></strong>
             <?php echo htmlspecialchars((string) $openRow['currency']); ?> —
             والفاتورةُ <strong>مستندٌ ضريبيٌّ يُطابَق به لا مصدرُ اعتراف</strong>:
@@ -395,21 +418,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <input type="hidden" name="action" value="invoice">
             <input type="hidden" name="sid" value="<?php echo $open; ?>">
             <div class="form-grid">
-                <div class="form-group"><label for="emsf_473_3a766">رقم الفاتورة <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_473_3a766">رقم الفاتورة <span class="sup-set-req">*</span></label>
                     <input type="text" name="invoice_no" required maxlength="64" id="emsf_473_3a766"></div>
-                <div class="form-group"><label for="emsf_474_de030">تاريخ الفاتورة <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_474_de030">تاريخ الفاتورة <span class="sup-set-req">*</span></label>
                     <input type="date" name="invoice_date" required id="emsf_474_de030"></div>
-                <div class="form-group"><label for="emsf_475_e17b1">مبلغ الفاتورة <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_475_e17b1">مبلغ الفاتورة <span class="sup-set-req">*</span></label>
                     <input type="number" step="0.01" min="0" name="invoice_amount" required id="emsf_475_e17b1"></div>
                 <div class="form-group"><label for="emsf_476_5bec7">العملة</label>
-                    <input type="text" name="invoice_currency" maxlength="8"
-                           value="<?php echo htmlspecialchars((string) $openRow['currency']); ?>" id="emsf_476_5bec7"></div>
+                    <input type="text" name="invoice_currency" id="emsf_476_5bec7" maxlength="8"
+                           value="<?php echo htmlspecialchars((string) $openRow['currency']); ?>"></div>
                 <div class="form-group"><label for="emsf_477_7d79c">سبب الفرق <small>— إلزاميٌّ متى اختلفت</small></label>
                     <input type="text" name="diff_reason" maxlength="255" id="emsf_477_7d79c"></div>
                 <div class="form-group"><label for="emsf_478_9a61b">مستند الفرق <small>— إلزاميٌّ متى اختلفت</small></label>
                     <input type="text" name="diff_doc_ref" maxlength="120" id="emsf_478_9a61b"></div>
             </div>
-            <div style="margin-top:12px">
+            <div class="sup-set-actions">
                 <button class="btn btn-sm btn-secondary" type="submit">تسجيلُ الفاتورة ومطابقتُها</button>
             </div>
         </form>
@@ -418,7 +441,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($openRow !== null && $openRow['invoice_no'] !== null): ?>
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-file-invoice"></i> الفاتورةُ والمطابقة</h5>
+        <h5 class="sup-set-h5"><i class="fas fa-file-invoice"></i> الفاتورةُ والمطابقة</h5>
         <p>
             رقمُها <strong><?php echo htmlspecialchars((string) $openRow['invoice_no']); ?></strong>
             بتاريخ <?php echo htmlspecialchars((string) $openRow['invoice_date']); ?>
@@ -438,21 +461,21 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($open > 0): ?>
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-list-ul"></i> بنودُ التسوية #<?php echo $open; ?></h5>
-        <div style="overflow-x:auto;">
-        <table class="table table-striped" style="width:100%;">
+        <h5 class="sup-set-h5"><i class="fas fa-list-ul"></i> بنودُ التسوية #<?php echo $open; ?></h5>
+        <div class="sup-set-scroll">
+        <table class="table table-striped sup-set-table">
             <thead><tr>
                 <th>النوع</th><th>البيان</th><th>الأصل</th><th>تاريخ الإنشاء</th>
                 <th>المبلغ</th><th>المعادل بعملة الدفاتر</th><th>الاعتراض</th><th></th>
             </tr></thead>
             <tbody>
             <?php if (!$lines): ?>
-                <tr><td colspan="8" style="text-align:center;color:#6b7280;padding:18px;">لا بنود.</td></tr>
+                <tr><td colspan="8" class="sup-set-empty-cell">لا بنود.</td></tr>
             <?php endif; ?>
             <?php foreach ($lines as $l):
                 $isCharge = ((string) $l['line_kind'] === 'charge');
             ?>
-                <tr<?php echo intval($l['objected']) === 1 ? ' style="background:#fef2f2;"' : ''; ?>>
+                <tr<?php echo intval($l['objected']) === 1 ? ' class="sup-set-row-objected"' : ''; ?>>
                     <td>
                         <?php if ($isCharge): ?>
                             <span class="badge badge-warning">تحميل<?php
@@ -474,22 +497,22 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     </td>
                     <td>
                         <?php if (intval($l['objected']) === 1): ?>
-                            <span style="color:#b91c1c;"><?php echo htmlspecialchars((string) $l['objection_note']); ?></span>
+                            <span class="sup-set-danger-note"><?php echo htmlspecialchars((string) $l['objection_note']); ?></span>
                         <?php else: ?>—<?php endif; ?>
                     </td>
-                    <td style="white-space:nowrap;">
+                    <td class="sup-set-nowrap">
                         <?php if ($can_edit && intval($l['objected']) === 0): ?>
-                        <form action="" method="post" style="display:inline;">
+                        <form action="" method="post" class="sup-set-inline-form">
         <?= csrf_field() ?>
                             <input type="hidden" name="action" value="object">
                             <input type="hidden" name="sid" value="<?php echo $open; ?>">
                             <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                             <input type="text" name="note" placeholder="سبب الاعتراض" required
-                                   style="width:150px;padding:3px 6px;font-size:12px;" aria-label="سبب الاعتراض">
+                                   class="sup-set-obj-input" aria-label="سبب الاعتراض">
                             <button class="btn btn-sm btn-secondary" type="submit">اعتراض</button>
                         </form>
                         <?php elseif ($can_edit): ?>
-                        <form action="" method="post" style="display:inline;">
+                        <form action="" method="post" class="sup-set-inline-form">
         <?= csrf_field() ?>
                             <input type="hidden" name="action" value="resolve">
                             <input type="hidden" name="sid" value="<?php echo $open; ?>">

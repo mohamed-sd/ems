@@ -109,6 +109,20 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة */
+.fin-oppay-lead { color: var(--c-4b5563); margin: 0 0 12px; line-height: 1.7; }
+.fin-oppay-chips { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.fin-oppay-chip { padding: 6px 12px; }
+.fin-oppay-chip-lg { font-size: 13px; padding: 6px 12px; }
+.fin-oppay-form { box-shadow: none; padding: 0; margin-top: 10px; }
+.fin-oppay-locked { color: var(--c-9ca3af); margin-top: 8px; }
+.fin-oppay-h5 { margin: 0 0 10px; }
+.fin-oppay-table { width: 100%; }
+.fin-oppay-toggle { text-decoration: none; padding: 5px 10px; }
+.fin-oppay-empty { color: var(--c-ink-500); text-align: center; padding: 16px; }
+</style>
+
 <div class="main fin-oppay-main ems-unified-page-shell">
     <?php
     $header_title = 'قواعد مستحقات المشغّلين';
@@ -116,33 +130,35 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+    echo ems_states_bundle('لا مشغّلين في سجلّ الدوام بعدُ', 'سجّلْ ساعاتِ دوامٍ للمشغّلين ثم اضبطْ وضعَ كلِّ مشغّلٍ من هذه الشاشة');
     ?>
 
     <?php fin_msg_banner(); ?>
 
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;margin:0 0 12px;line-height:1.7;">
+        <p class="fin-oppay-lead">
             <i class="fas fa-circle-info"></i>
             لكل مشغّلٍ وضعٌ تقرّره: <strong>«بالراتب»</strong> (تدفعه الرواتب — لا مستحقَ من محرك الآثار)، أو
             <strong>«بالمستحق»</strong> (محرك الآثار المالية يدفعه: <code>ساعات المشغّل × المعدّل</code>، تصنيف «إضافي»).
             الافتراض «بالراتب» حتى تُفعّل مشغّلًا صراحةً وتضبط المعدّل — فلا يُحتسب رقمٌ قبل ذلك.
         </p>
-        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <span class="badge badge-<?php echo $cur_active ? 'success' : 'secondary'; ?>" style="font-size:13px;padding:6px 12px;">
+        <div class="fin-oppay-chips">
+            <span class="badge badge-<?php echo $cur_active ? 'success' : 'secondary'; ?> fin-oppay-chip-lg">
                 <i class="fas fa-<?php echo $cur_active ? 'circle-check' : 'circle-pause'; ?>"></i>
                 المعدّل <?php echo $cur_active ? 'مفعّل' : 'غير مفعّل (فارغ)'; ?>
             </span>
-            <span class="badge badge-info" style="padding:6px 12px;"><?php echo $cnt_due; ?> بالمستحق</span>
-            <span class="badge badge-secondary" style="padding:6px 12px;"><?php echo $cnt_salary; ?> بالراتب</span>
+            <span class="badge badge-info fin-oppay-chip"><?php echo $cnt_due; ?> بالمستحق</span>
+            <span class="badge badge-secondary fin-oppay-chip"><?php echo $cnt_salary; ?> بالراتب</span>
         </div>
 
         <?php if ($can_edit): ?>
-        <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;margin-top:10px;">
+        <form action="" method="post" class="allforms allforms-visible fin-oppay-form">
         <?php echo csrf_field(); ?>
             <div class="form-section"><div class="form-grid">
                 <div class="form-group">
                     <label for="emsf_239_29635">معدّل مستحق المشغّل لكل ساعة (SDG)</label>
-                    <input type="number" name="rate" step="0.0001" min="0" value="<?php echo htmlspecialchars($cur_rate_display); ?>" placeholder="فارغ = معطّل — اكتب المعدّل لتفعيله" id="emsf_239_29635">
+                    <input type="number" name="rate" step="0.0001" min="0" aria-label="معدّلُ مستحقِّ المشغّلِ لكلِّ ساعة" value="<?php echo htmlspecialchars($cur_rate_display); ?>" placeholder="فارغ = معطّل — اكتب المعدّل لتفعيله" id="emsf_239_29635">
                 </div>
             </div></div>
             <div class="form-actions">
@@ -150,14 +166,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
         </form>
         <?php else: ?>
-            <p style="color:#9ca3af;margin-top:8px;"><i class="fas fa-lock"></i> العرض فقط — ضبط السياسة من صلاحية المدير المالي.</p>
+            <p class="fin-oppay-locked"><i class="fas fa-lock"></i> العرض فقط — ضبط السياسة من صلاحية المدير المالي.</p>
         <?php endif; ?>
     </div></div>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-users"></i> المشغّلون وأوضاعهم</h5>
+        <h5 class="fin-oppay-h5"><i class="fas fa-users"></i> المشغّلون وأوضاعهم</h5>
         <div class="table-container">
-            <table id="opTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="opTable" class="display nowrap alltables fin-oppay-table">
                 <thead><tr>
                     <?php if ($can_edit) echo '<th>تبديل</th>'; ?>
                     <th>المشغّل</th><th>الوضع</th>
@@ -181,7 +197,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             $target = $isDue ? 'salary' : 'due';
                             $tlabel = $isDue ? 'اجعله بالراتب' : 'اجعله بالمستحق';
                             $ticon  = $isDue ? 'fa-money-check-dollar' : 'fa-hand-holding-dollar';
-                            echo "<td><a href='?toggle_emp=" . $eid . "&mode=" . $target . "' class='badge badge-" . ($isDue ? 'secondary' : 'info') . "' style='text-decoration:none;padding:5px 10px;'><i class='fas " . $ticon . "'></i> " . $tlabel . "</a></td>";
+                            echo "<td><a href='?toggle_emp=" . $eid . "&mode=" . $target . "' class='badge fin-oppay-toggle badge-" . ($isDue ? 'secondary' : 'info') . "'><i class='fas " . $ticon . "'></i> " . $tlabel . "</a></td>";
                         }
                         echo "<td>" . htmlspecialchars($op['name'] !== null && $op['name'] !== '' ? $op['name'] : ('#' . $eid)) . "</td>";
                         echo "<td><span class='badge badge-" . ($isDue ? 'success' : 'secondary') . "'>" . ($isDue ? 'بالمستحق' : 'بالراتب') . "</span></td>";
@@ -191,7 +207,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
         <?php if (empty($operators)): ?>
-            <p style="color:#6b7280;text-align:center;padding:16px;"><i class="fas fa-circle-info"></i> لا مشغّلين في سجلّ الدوام بعد.</p>
+            <p class="fin-oppay-empty"><i class="fas fa-circle-info"></i> لا مشغّلين في سجلّ الدوام بعد.</p>
         <?php endif; ?>
     </div></div>
 </div>
@@ -200,8 +216,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function () {
-    $('#opTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, pageLength: 25, order: [],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    // جدولُ العرضِ يهيّئُه المكوّنُ المركزيُّ (assets/js/ui-unification.js)
 });
 </script>
 </body>

@@ -98,6 +98,19 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ②: أنماطٌ موضعيةٌ نُقلت أصنافًا صفحيةً ببادئةِ الشاشة jt- */
+.is-hidden { display: none; }
+.jt-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 14px; }
+.jt-field-inline { display: flex; align-items: center; gap: 8px; }
+.jt-lbl-flush { margin: 0; }
+.jt-actions { padding: 0 14px 16px; display: flex; gap: 10px; }
+.jt-btn-cancel { background: var(--c-6b7280, #6b7280); }
+.jt-table-wrap { margin-top: 14px; }
+.jt-table-full { width: 100%; }
+.jt-badge-muted { opacity: .6; }
+.jt-empty-cell { text-align: center; color: var(--c-888888, #888); padding: 18px; }
+</style>
 <div class="main">
     <?php
     $header_title   = 'المسميات الوظيفية';
@@ -108,6 +121,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => 'employees.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'سجل الموظفين');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا مسمّياتِ وظيفيةً مسجَّلةً بعدُ', 'أضف أولَ مسمًّى وظيفيٍّ بزرِّ «إضافة مسمى وظيفي» في رأسِ الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])): $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
@@ -121,11 +136,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <!-- فورم إضافة/تعديل -->
-    <form id="jtForm" action="" method="post" class="allforms" style="<?= $editData ? '' : 'display:none;' ?>
-        <?= csrf_field() ?>">
+    <form id="jtForm" action="" method="post" class="allforms<?= $editData ? '' : ' is-hidden' ?>">
+        <?= csrf_field() ?>
         <input type="hidden" name="edit_id" id="edit_id" value="<?= $editData ? intval($editData['id']) : '' ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $editData ? 'تعديل مسمى وظيفي' : 'إضافة مسمى وظيفي' ?></h5></div>
-        <div class="form-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:14px;">
+        <div class="form-grid jt-grid-3">
             <div class="field">
                 <label for="name"><i class="fas fa-tag"></i> اسم المسمى *</label>
                 <input type="text" name="name" id="name" required value="<?= htmlspecialchars($editData['name'] ?? '') ?>" placeholder="مثال: مهندس، فني، سائق">
@@ -138,27 +153,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <label for="sort_order"><i class="fas fa-sort-numeric-down"></i> ترتيب العرض</label>
                 <input type="number" name="sort_order" id="sort_order" value="<?= intval($editData['sort_order'] ?? 0) ?>">
             </div>
-            <div class="field" style="display:flex;align-items:center;gap:8px;">
+            <div class="field jt-field-inline">
                 <input type="checkbox" name="is_operator" id="is_operator" value="1" <?= (!empty($editData['is_operator'])) ? 'checked' : '' ?>>
-                <label for="is_operator" style="margin:0;">مشغّل معدات (سائق/مشغّل)</label>
+                <label for="is_operator" class="jt-lbl-flush">مشغّل معدات (سائق/مشغّل)</label>
             </div>
             <div class="field">
-                <label><i class="fas fa-toggle-on"></i> الحالة *</label>
+                <label for="status"><i class="fas fa-toggle-on"></i> الحالة *</label>
                 <select name="status" id="status" required>
                     <option value="1" <?= (($editData['status'] ?? 1) == 1) ? 'selected' : '' ?>>نشط ✅</option>
                     <option value="0" <?= (($editData['status'] ?? 1) == 0) ? 'selected' : '' ?>>غير نشط ⏸</option>
                 </select>
             </div>
         </div>
-        <div style="padding:0 14px 16px;display:flex;gap:10px;">
+        <div class="jt-actions">
             <button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button>
-            <a href="job_titles.php" class="add-btn" style="background:#6b7280;"><i class="fas fa-times"></i> إلغاء</a>
+            <a href="job_titles.php" class="add-btn jt-btn-cancel"><i class="fas fa-times"></i> إلغاء</a>
         </div>
     </form>
 
     <!-- جدول المسميات -->
-    <div class="table-wrap" style="margin-top:14px;">
-        <table class="data-table" id="jtTable" style="width:100%;">
+    <div class="table-wrap jt-table-wrap">
+        <table class="data-table jt-table-full" id="jtTable">
             <thead>
                 <tr><th>إجراءات</th><th>#</th><th>المسمى</th><th>الوصف</th><th>مشغّل؟</th><th>الموظفون</th><th>النطاق</th><th>الحالة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -194,7 +209,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <a href="javascript:void(0);" class="action-btn delete" title="حذف"
                                onclick="confirmDel(<?= intval($row['id']) ?>, '<?= htmlspecialchars($row['name'], ENT_QUOTES) ?>', <?= intval($row['used_count']) ?>)"><i class="fas fa-trash"></i></a>
                         <?php endif; ?>
-                        <?php if (!$can_manage): ?><span class="badge" style="opacity:.6;">عامّ</span><?php endif; ?>
+                        <?php if (!$can_manage): ?><span class="badge jt-badge-muted">عامّ</span><?php endif; ?>
                     </div></td>
                     <td><?= $i++ ?></td>
                     <td><strong><?= htmlspecialchars($row['name']) ?></strong></td>
@@ -206,7 +221,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tr>
             <?php endforeach; }
             if (empty($jt_rows)): ?>
-                <tr><td colspan="8" style="text-align:center;color:#888;padding:18px;">لا توجد مسمّيات بعد.</td></tr>
+                <tr><td colspan="8" class="jt-empty-cell">لا توجد مسمّيات بعد.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>
@@ -216,10 +231,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function(){
     var btn = document.getElementById('toggleForm'), form = document.getElementById('jtForm');
-    if (btn && form) btn.addEventListener('click', function(){ form.style.display = (form.style.display === 'none' || !form.style.display) ? 'block' : 'none'; });
+    if (btn && form) btn.addEventListener('click', function(){ form.classList.toggle('is-hidden'); });
 })();
 function editJT(d){
-    var f = document.getElementById('jtForm'); f.style.display = 'block';
+    var f = document.getElementById('jtForm'); f.classList.remove('is-hidden');
     document.getElementById('edit_id').value = d.id;
     document.getElementById('name').value = d.name || '';
     document.getElementById('description').value = d.description || '';

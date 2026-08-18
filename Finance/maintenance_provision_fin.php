@@ -80,6 +80,19 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة */
+.fin-mprov-chips { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.fin-mprov-chip-lg { font-size: 13px; padding: 6px 12px; }
+.fin-mprov-rate { color: var(--c-374151); }
+.fin-mprov-lead { color: var(--c-4b5563); margin: 0 0 14px; line-height: 1.7; }
+.fin-mprov-form { box-shadow: none; padding: 0; }
+.fin-mprov-locked { color: var(--c-9ca3af); }
+.fin-mprov-h5 { margin: 0 0 10px; }
+.fin-mprov-table { width: 100%; }
+.fin-mprov-reason { color: var(--c-ink-500); font-size: 12px; }
+</style>
+
 <div class="main fin-mprov-main ems-unified-page-shell">
     <?php
     $header_title = 'قواعد مخصص الصيانة';
@@ -87,21 +100,23 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+    echo ems_states_bundle('لا آثارَ مخصّصِ صيانةٍ مولّدةً بعدُ', 'اكتبِ معدّلَ المخصّصِ لكلِّ ساعةِ تشغيلٍ ليبدأَ توليدُ الآثارِ من سجلِّ الساعات');
     ?>
 
     <?php fin_msg_banner(); ?>
 
     <div class="card"><div class="card-body">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-            <span class="badge badge-<?php echo $cur_active ? 'success' : 'secondary'; ?>" style="font-size:13px;padding:6px 12px;">
+        <div class="fin-mprov-chips">
+            <span class="badge badge-<?php echo $cur_active ? 'success' : 'secondary'; ?> fin-mprov-chip-lg">
                 <i class="fas fa-<?php echo $cur_active ? 'circle-check' : 'circle-pause'; ?>"></i>
                 <?php echo $cur_active ? 'مفعّل' : 'غير مفعّل (الحقل فارغ)'; ?>
             </span>
             <?php if ($cur_active): ?>
-                <span style="color:#374151;">المعدّل الحالي: <strong><?php echo htmlspecialchars($cur_rate_display); ?></strong> لكل ساعة تشغيل</span>
+                <span class="fin-mprov-rate">المعدّل الحالي: <strong><?php echo htmlspecialchars($cur_rate_display); ?></strong> لكل ساعة تشغيل</span>
             <?php endif; ?>
         </div>
-        <p style="color:#4b5563;margin:0 0 14px;line-height:1.7;">
+        <p class="fin-mprov-lead">
             <i class="fas fa-circle-info"></i>
             هذا المعدّل يُحمِّل على كل معدةٍ <strong>مخصّص صيانة</strong> ضمن مروحة يوم الدوام، محسوبًا على
             <strong>ساعات التشغيل الفعلية</strong>: <code>المخصّص = ساعات التشغيل × المعدّل</code> (بعملة الأساس SDG).
@@ -109,13 +124,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </p>
 
         <?php if ($can_edit): ?>
-        <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;">
+        <form action="" method="post" class="allforms allforms-visible fin-mprov-form">
         <?php echo csrf_field(); ?>
             <div class="form-section">
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="emsf_238_562ad">معدّل مخصّص الصيانة لكل ساعة تشغيل (SDG)</label>
-                        <input type="number" name="rate" step="0.0001" min="0" value="<?php echo htmlspecialchars($cur_rate_display); ?>" placeholder="فارغ = معطّل — اكتب المعدّل لتفعيله" id="emsf_238_562ad">
+                        <input type="number" name="rate" step="0.0001" min="0" aria-label="معدّلُ مخصّصِ الصيانةِ لكلِّ ساعةِ تشغيل" value="<?php echo htmlspecialchars($cur_rate_display); ?>" placeholder="فارغ = معطّل — اكتب المعدّل لتفعيله" id="emsf_238_562ad">
                     </div>
                 </div>
             </div>
@@ -127,14 +142,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
         </form>
         <?php else: ?>
-            <p style="color:#9ca3af;"><i class="fas fa-lock"></i> العرض فقط — ضبط المعدّل من صلاحية المدير المالي.</p>
+            <p class="fin-mprov-locked"><i class="fas fa-lock"></i> العرض فقط — ضبط المعدّل من صلاحية المدير المالي.</p>
         <?php endif; ?>
     </div></div>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px;"><i class="fas fa-diagram-project"></i> الآثار المالية المولَّدة وحالتها (للاطّلاع)</h5>
+        <h5 class="fin-mprov-h5"><i class="fas fa-diagram-project"></i> الآثار المالية المولَّدة وحالتها (للاطّلاع)</h5>
         <div class="table-container">
-            <table id="effTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="effTable" class="display nowrap alltables fin-mprov-table">
                 <thead><tr>
                     <th>المصدر</th><th>درجة الأثر</th><th>الحالة</th><th>المعدّل</th><th>السبب/الملاحظة</th>
                     <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -179,7 +194,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td>" . htmlspecialchars((string)$e['effect_label']) . "</td>";
                         echo "<td><span class='badge badge-" . ($act ? 'success' : 'secondary') . "'>" . ($act ? 'مفعّل' : 'معطّل') . "</span></td>";
                         echo "<td>" . $pv . "</td>";
-                        echo "<td style='color:#6b7280;font-size:12px;'>" . htmlspecialchars((string)($e['unavailable_reason'] ?? '')) . "</td>";
+                        echo "<td class='fin-mprov-reason'>" . htmlspecialchars((string)($e['unavailable_reason'] ?? '')) . "</td>";
                         echo "</tr>";
                     }
                     ?>
@@ -193,8 +208,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>
 <script>
 $(document).ready(function () {
-    $('#effTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, paging: false, searching: false, info: false, order: [],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
+    // جدولُ العرضِ يهيّئُه المكوّنُ المركزيُّ (assets/js/ui-unification.js)
 });
 </script>
 </body>

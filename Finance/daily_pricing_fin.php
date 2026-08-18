@@ -196,6 +196,19 @@ ems_shell_axes(isset($perms) ? $perms : null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+<style>
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة */
+.fin-dp-errcard { border-inline-start: 4px solid var(--c-dc3545); }
+.fin-dp-errtitle { margin: 0 0 6px; color: var(--c-dc3545); }
+.fin-dp-errlist { margin: 0; padding-inline-start: 18px; }
+.fin-dp-flat { margin: 0; }
+.fin-dp-h6 { margin: 0 0 10px; }
+.fin-dp-note { margin: 0 0 8px; }
+.fin-dp-form { box-shadow: none; padding: 0; }
+.fin-dp-span-all { grid-column: 1 / -1; }
+.fin-dp-rowform { margin: 0; display: flex; gap: 6px; }
+.fin-dp-day { max-width: 150px; }
+</style>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
     $header_title = 'التسعير اليومي — من الإدارة المالية';
@@ -204,17 +217,19 @@ include '../insidebar.php';
     $header_back = false;
     include '../includes/page_header.php';
     if (isset($conn)) { ems_screen_about_auto($conn); }
+    // UXW-01 ٩: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضيًا
+    echo ems_states_bundle('لا أسعارَ أيامٍ مسجّلةً بعدُ', 'سجّلْ سعرَ اليومِ بمرجعِ قرارِه من نموذجِ «تسجيلُ سعرِ يومٍ» أعلاه');
     ?>
 
     <?php if ($qErrors): ?>
     <?php /* ◆ استعلامُ عرضٍ فشل: يُعلَن **على الشاشة** لا يُدفَن، وإلا قُرئ الجدولُ
              الفارغُ «لا بيانات» وهو خطأُ استعلامٍ. */ ?>
-    <div class="card"><div class="card-body" style="border-inline-start:4px solid #dc3545">
-        <h6 style="margin:0 0 6px;color:#dc3545">
+    <div class="card"><div class="card-body fin-dp-errcard">
+        <h6 class="fin-dp-errtitle">
             <i class="fas fa-triangle-exclamation"></i>
             استعلامُ عرضٍ فشل — الجدولُ الفارغُ أدناه <strong>خطأٌ لا غيابُ بيانات</strong>
         </h6>
-        <ul style="margin:0;padding-inline-start:18px">
+        <ul class="fin-dp-errlist">
             <?php foreach ($qErrors as $e): ?>
             <li><code><?php echo htmlspecialchars($e); ?></code></li>
             <?php endforeach; ?>
@@ -223,7 +238,7 @@ include '../insidebar.php';
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <p class="text-muted" style="margin:0">
+        <p class="text-muted fin-dp-flat">
             <i class="fas fa-info-circle"></i>
             <strong>سعرُ اليومِ يسري على معاملاتِ يومِه</strong> — وواقعةُ الأمسِ تبقى بسعرِ أمسِها
             (لا رجعية). والسعرُ الأساسيُّ في العقدِ لا يُمَسّ: المراجعةُ طبقةٌ بتاريخها فوقَه.
@@ -235,14 +250,14 @@ include '../insidebar.php';
 
     <?php if ($can_add): ?>
     <div class="card"><div class="card-body">
-        <h6 style="margin:0 0 10px"><i class="fas fa-plus-circle"></i> تسجيلُ سعرِ يومٍ</h6>
+        <h6 class="fin-dp-h6"><i class="fas fa-plus-circle"></i> تسجيلُ سعرِ يومٍ</h6>
         <?php if (!$codes): ?>
-            <p class="text-muted" style="margin:0">
+            <p class="text-muted fin-dp-flat">
                 لا بندَ تسعيرٍ <strong>يوميٍّ</strong> في الشركة بعد — يُنشئه مالكُ العقودِ في
                 «شروط تعديل السعر» بدوريةٍ «يومي»، ثم تُسعّر الماليةُ هنا.
             </p>
         <?php else: ?>
-        <form action="" method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0;">
+        <form action="" method="post" class="allforms allforms-visible fin-dp-form">
             <?php echo csrf_field(); ?>
             <input type="hidden" name="record_price" value="1">
             <div class="form-section"><div class="form-grid">
@@ -267,7 +282,7 @@ include '../insidebar.php';
                     <input type="text" id="dp_ref" name="source_ref" maxlength="160" required
                            placeholder="رقمُ محضرٍ أو تعميمٍ ماليٍّ — لا رقمَ بلا مرجع">
                 </div>
-                <div class="form-group" style="grid-column:1/-1">
+                <div class="form-group fin-dp-span-all">
                     <label for="dp_note">ملاحظة</label>
                     <input type="text" id="dp_note" name="note" maxlength="255"
                            placeholder="سببُ التغيير — ارتفاعُ وقودٍ · تغيُّرُ صرفٍ …">
@@ -280,7 +295,7 @@ include '../insidebar.php';
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <h6 style="margin:0 0 10px">
+        <h6 class="fin-dp-h6">
             <i class="fas fa-list"></i> بنودُ التسعيرِ اليوميِّ وسعرُ اليومِ لكلٍّ
             <span class="badge bg-secondary"><?php echo count($terms); ?></span>
         </h6>
@@ -307,7 +322,7 @@ include '../insidebar.php';
                     <td><?php echo htmlspecialchars((string) $t['valid_from']); ?><?php echo $t['valid_to'] ? ' ← ' . htmlspecialchars((string) $t['valid_to']) : ''; ?></td>
                     <td>
                         <?php if ($can_edit): ?>
-                        <form action="" method="post" style="margin:0;display:flex;gap:6px">
+                        <form action="" method="post" class="fin-dp-rowform">
                             <?php echo csrf_field(); ?>
                             <input type="hidden" name="run_day" value="1">
                             <input type="hidden" name="contract_id" value="<?php echo (int) $t['contract_id']; ?>">
@@ -315,8 +330,8 @@ include '../insidebar.php';
                                      تخطيطِ الصف — فيُوسَم وصفيًّا، وهو ما يقبله المعيارُ نصًّا
                                      («بعنوانٍ أو وسمٍ وصفيّ»). وكان الحقلَ الوحيدَ الناقصَ في
                                      الشجرةِ كلِّها: 3859 من 3860. */ ?>
-                            <input type="date" name="day" value="<?php echo $TODAY; ?>" style="max-width:150px"
-                                   aria-label="يومُ توليدِ سعرِ العقد" title="يومُ توليدِ سعرِ العقد">
+                            <input type="date" name="day" aria-label="يومُ توليدِ سعرِ العقد" title="يومُ توليدِ سعرِ العقد"
+                                   class="fin-dp-day" value="<?php echo $TODAY; ?>">
                             <button type="submit" class="btn btn-sm btn-outline-primary">ولّد</button>
                         </form>
                         <?php else: ?>—<?php endif; ?>
@@ -329,11 +344,11 @@ include '../insidebar.php';
     </div></div>
 
     <div class="card"><div class="card-body">
-        <h6 style="margin:0 0 10px">
+        <h6 class="fin-dp-h6">
             <i class="fas fa-hourglass-half"></i> مراجعاتٌ تنتظر الاعتماد
             <span class="badge bg-warning"><?php echo count($pending); ?></span>
         </h6>
-        <p class="text-muted" style="margin:0 0 8px">
+        <p class="text-muted fin-dp-note">
             من ولَّد المراجعةَ لا يعتمدها — فإن كنتَ مولِّدَها فسيُردُّ فعلُك 403، وهذا مقصود.
         </p>
         <div class="table-responsive">
@@ -359,7 +374,7 @@ include '../insidebar.php';
                     ?></td>
                     <td>
                         <?php if ($can_edit && in_array((string) $p['outcome'], array('amended', 'capped'), true)): ?>
-                        <form action="" method="post" style="margin:0">
+                        <form action="" method="post" class="fin-dp-flat">
                             <?php echo csrf_field(); ?>
                             <input type="hidden" name="approve_rev" value="1">
                             <input type="hidden" name="revision_id" value="<?php echo (int) $p['id']; ?>">
@@ -375,7 +390,7 @@ include '../insidebar.php';
     </div></div>
 
     <div class="card"><div class="card-body">
-        <h6 style="margin:0 0 10px">
+        <h6 class="fin-dp-h6">
             <i class="fas fa-history"></i> أسعارُ الأيامِ المسجَّلةُ ومن سجّلها
             <span class="badge bg-secondary"><?php echo count($readings); ?></span>
         </h6>

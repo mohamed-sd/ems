@@ -36,6 +36,11 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ قائمةِ أوامرِ الترحيلِ أصنافًا برموزِ الألوان */
+.trs-ol-tbl{width:100%}
+.trs-ol-late{color:var(--c-c0392b, #c0392b)}
+</style>
 <div class="main trs-orders-main ems-unified-page-shell">
     <?php
     $header_title = 'أوامر الترحيل';
@@ -46,6 +51,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا أوامرَ ترحيلٍ في هذه الفترةِ أو بهذه الفلاتر', 'وسّع مدى التاريخِ أو أنشئ أمرًا جديدًا بزرِّ «أمر جديد» في رأسِ الشاشة');
     ?>
     <?php trs_msg_banner(); ?>
 
@@ -99,7 +106,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <div class="card"><div class="card-body">
         <div class="table-container">
-            <table id="ordTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="ordTable" class="display nowrap alltables trs-ol-tbl" data-order='[[1,"desc"]]' data-state-save="false" data-scroll-x="true">
                 <thead><tr>
                     <th>الإجراءات</th><th>كود الحركة</th><th>نوع الترحيل</th><th>اتجاه الحركة</th><th>المرحلة</th>
                     <th>المشروع</th><th>من</th><th>التاريخ المخطط</th><th>المتحمل للتكلفة</th><th>التكلفة (USD)</th><th>متأخّر</th>
@@ -171,7 +178,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     echo "<td>" . htmlspecialchars((string)($row['planned_date'] ?? '—')) . "</td>";
                     echo "<td>" . htmlspecialchars($bearer_ar) . "</td>";
                     echo "<td>" . $cost . "</td>";
-                    echo "<td>" . ($delayed ? "<span class='action-btn' style='color:#c0392b'>متأخّر</span>" : "—") . "</td>";
+                    echo "<td>" . ($delayed ? "<span class='action-btn trs-ol-late'>متأخّر</span>" : "—") . "</td>";
                     echo "</tr>";
                 } }
                 ?>
@@ -190,16 +197,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function () {
     $(document).ready(function () {
-        var t = $('#ordTable').DataTable({
-            scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip', order: [[1, 'desc']],
-            buttons: [
-                { extend: 'copy', text: '📋 نسخ' },
-                { extend: 'excel', text: '📊 Excel' },
-                { extend: 'print', text: '🖨️ طباعة' }
-            ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-        });
-        function fill(col, sel) {
+        // UXW-01 ⑤: التهيئةُ المحليةُ حُذفت — المكوّنُ المركزيُّ (ui-unification.js)
+        // يهيّئ الجدولَ بسماتِ <table>. ونمسك نسختَه حين تجهز لتبقى الفلاترُ الخمسُ عاملة.
+        function withOrdTable(cb) {
+            if (window.jQuery && $.fn.dataTable && $.fn.dataTable.isDataTable('#ordTable')) {
+                cb($('#ordTable').DataTable());
+                return;
+            }
+            setTimeout(function () { withOrdTable(cb); }, 120);
+        }
+        function fill(t, col, sel) {
             var s = $(sel), vals = [];
             t.column(col).data().each(function (v) {
                 var x = $('<div>').html(v).text().trim();
@@ -207,18 +214,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             });
             vals.sort(); vals.forEach(function (v) { s.append('<option value="' + v.replace(/"/g, '&quot;') + '">' + v + '</option>'); });
         }
-        fill(2, '#fType'); fill(3, '#fDir'); fill(4, '#fStage'); fill(5, '#fProject'); fill(8, '#fBearer');
-        function bindCol(sel, col) {
-            $(sel).on('change', function () {
-                var v = $.fn.dataTable.util.escapeRegex($(this).val());
-                t.column(col).search(v ? '^' + v + '$' : '', true, false).draw();
+        withOrdTable(function (t) {
+            fill(t, 2, '#fType'); fill(t, 3, '#fDir'); fill(t, 4, '#fStage'); fill(t, 5, '#fProject'); fill(t, 8, '#fBearer');
+            function bindCol(sel, col) {
+                $(sel).on('change', function () {
+                    var v = $.fn.dataTable.util.escapeRegex($(this).val());
+                    t.column(col).search(v ? '^' + v + '$' : '', true, false).draw();
+                });
+            }
+            bindCol('#fType', 2); bindCol('#fDir', 3); bindCol('#fStage', 4); bindCol('#fProject', 5); bindCol('#fBearer', 8);
+            $('.filter .btn-primary').on('click', function () { t.draw(); });
+            $('.filter .btn-secondary').on('click', function () {
+                $('#fType,#fDir,#fStage,#fProject,#fBearer').val('');
+                t.column(2).search('').column(3).search('').column(4).search('').column(5).search('').column(8).search('').draw();
             });
-        }
-        bindCol('#fType', 2); bindCol('#fDir', 3); bindCol('#fStage', 4); bindCol('#fProject', 5); bindCol('#fBearer', 8);
-        $('.filter .btn-primary').on('click', function () { t.draw(); });
-        $('.filter .btn-secondary').on('click', function () {
-            $('#fType,#fDir,#fStage,#fProject,#fBearer').val('');
-            t.column(2).search('').column(3).search('').column(4).search('').column(5).search('').column(8).search('').draw();
         });
     });
 })();

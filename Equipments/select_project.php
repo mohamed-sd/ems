@@ -19,11 +19,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     @import url('/ems/assets/css/local-fonts.css');
 
     :root {
-        --primary-color: #01072a;
-        --secondary-color: #e2ae03;
-        --gold-color: #debf0f;
-        --light-color: #f5f5f5;
-        --shadow-color: rgba(0, 0, 0, 0.1);
+        --primary-color: var(--c-01072a, #01072a);
+        --secondary-color: var(--c-e2ae03, #e2ae03);
+        --gold-color: var(--c-debf0f, #debf0f);
+        --light-color: var(--c-f5f5f5, #f5f5f5);
+        --shadow-color: var(--c-rgba00001, rgba(0, 0, 0, 0.1));
     }
     
     * {
@@ -59,7 +59,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     
     .page-description {
         text-align: center;
-        color: #6c757d;
+        color: var(--c-6c757d, #6c757d);
         font-size: 1.1rem;
         margin-bottom: 3rem;
         font-weight: 500;
@@ -100,7 +100,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     
     .project-card:hover {
         transform: translateY(-10px);
-        box-shadow: 0 15px 50px rgba(226, 174, 3, 0.3);
+        box-shadow: 0 15px 50px var(--c-e2ae03-30, rgba(226, 174, 3, 0.3));
         border-color: var(--secondary-color);
     }
     
@@ -115,7 +115,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         margin: 0 auto;
         font-size: 2.5rem;
         color: var(--primary-color);
-        box-shadow: 0 5px 15px rgba(226, 174, 3, 0.4);
+        box-shadow: 0 5px 15px var(--c-e2ae03-40, rgba(226, 174, 3, 0.4));
     }
     
     .project-name {
@@ -128,10 +128,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     
     .project-code {
         font-size: 1rem;
-        color: #6c757d;
+        color: var(--c-6c757d, #6c757d);
         text-align: center;
         font-family: monospace;
-        background: rgba(226, 174, 3, 0.1);
+        background: var(--c-e2ae03-10, rgba(226, 174, 3, 0.1));
         padding: 8px 15px;
         border-radius: 10px;
         font-weight: 600;
@@ -148,7 +148,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         display: flex;
         align-items: center;
         gap: 10px;
-        color: #495057;
+        color: var(--c-495057, #495057);
         font-size: 0.95rem;
     }
     
@@ -176,13 +176,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     
     .action-button:hover {
         transform: scale(1.05);
-        box-shadow: 0 5px 15px rgba(226, 174, 3, 0.4);
+        box-shadow: 0 5px 15px var(--c-e2ae03-40, rgba(226, 174, 3, 0.4));
     }
     
     .no-projects {
         text-align: center;
         padding: 4rem 2rem;
-        color: #6c757d;
+        color: var(--c-6c757d, #6c757d);
         font-size: 1.2rem;
     }
     
@@ -227,6 +227,11 @@ $header_title_html = htmlspecialchars('Select Project', ENT_QUOTES, 'UTF-8');
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+if (function_exists('ems_states_bundle')) {
+    echo ems_states_bundle('لا مشروعَ نشطًا متاحًا لإدارةِ معداتِه',
+                           'فعِّل مشروعًا من شاشةِ المشاريع أو راجع صلاحيةَ إسنادِك للمشاريع');
+}
 ?>
 
     <h2>

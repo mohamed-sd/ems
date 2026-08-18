@@ -98,6 +98,11 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01: أنماطُ شاشةِ إقفالِ الأمرِ وتحميلِ التكلفةِ أصنافًا */
+.trs-cc-row{display:flex;gap:6px}
+.trs-cc-cost{max-width:130px}
+</style>
 <div class="main" dir="rtl">
   <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
@@ -107,6 +112,8 @@ $header_title_html = htmlspecialchars('إقفالُ الأمر وتحميلُ ا
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا أوامرَ بانتظارِ الإقفالِ وتحميلِ التكلفة', 'وثّقِ التسليمَ في شاشةِ «الوصولُ والتسليم» ليصيرَ الأمرُ قابلًا للإقفال');
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
@@ -147,12 +154,12 @@ include __DIR__ . '/../includes/page_header.php';
         </td>
         <td>—</td>
           <?php else: ?>
-          <form method="post" style="display:flex;gap:6px">
+          <form method="post" class="trs-cc-row">
         <?= csrf_field() ?>
             <input type="hidden" name="close_id" value="<?= $rid ?>">
             <label class="visually-hidden" for="cls_cost_<?= $rid ?>">التكلفةُ الفعلية</label>
-            <input id="cls_cost_<?= $rid ?>" type="number" step="0.01" min="0.01" name="actual_cost" class="form-control form-control-sm"
-                   value="<?= htmlspecialchars($o['actual_cost_usd'] ?: $o['estimated_cost_usd'], ENT_QUOTES, 'UTF-8') ?>" style="max-width:130px" required>
+            <input aria-label="التكلفةُ الفعليةُ بالدولار" id="cls_cost_<?= $rid ?>" type="number" step="0.01" min="0.01" name="actual_cost" class="form-control form-control-sm trs-cc-cost"
+                   value="<?= htmlspecialchars($o['actual_cost_usd'] ?: $o['estimated_cost_usd'], ENT_QUOTES, 'UTF-8') ?>" required>
             <small class="text-muted">سند: <?= htmlspecialchars($o['doc_ref'], ENT_QUOTES, 'UTF-8') ?></small>
         </td>
         <td><button class="action-btn" type="submit"><i class="fa fa-lock"></i> أقفل وحمّل</button></form></td>

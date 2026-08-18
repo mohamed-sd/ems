@@ -247,20 +247,54 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا كشوفَ بنكيةً مستوردةً لهذا الحساب', 'استورد كشفًا من نموذجِ «كشوفُ البنك ودورةُ المطابقة» أعلاه أو اختر حسابًا آخر');
     ?>
+    <style>
+        /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
+        .fin-bank-h5 { margin: 0 0 8px; }
+        .fin-bank-h5-tight { margin: 0; }
+        .fin-bank-h5-list { margin: 0 0 10px; }
+        .fin-bank-intro { color: var(--c-4b5563); line-height: 1.8; margin: 0 0 10px; }
+        .fin-bank-form-flat { box-shadow: none; padding: 0; }
+        .fin-bank-mt10 { margin-top: 10px; }
+        .fin-bank-mt12 { margin-top: 12px; }
+        .fin-bank-raw { width: 100%; direction: ltr; }
+        .fin-bank-hint { color: var(--c-ink-500); }
+        .fin-bank-tbl { width: 100%; }
+        .fin-bank-ltr { direction: ltr; }
+        .fin-bank-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+        .fin-bank-chip { padding: 6px 12px; }
+        .fin-bank-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+        .fin-bank-inline { display: inline; }
+        .fin-bank-wrap { white-space: normal; }
+        .fin-bank-diff { color: var(--c-state-danger-strong); }
+        .fin-bank-row-form { display: flex; gap: 4px; }
+        .fin-bank-row-form-wrap { display: flex; gap: 4px; flex-wrap: wrap; }
+        .fin-bank-why-130 { width: 130px; }
+        .fin-bank-why-120 { width: 120px; }
+        .fin-bank-mini-btn { border: 0; padding: 5px 8px; }
+        .fin-bank-note { color: var(--c-ink-500); margin: 6px 0 0; }
+        .fin-bank-filter { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .fin-bank-select { min-width: 240px; }
+        .fin-bank-plain-link { text-decoration: none; }
+        .fin-bank-kpi { text-align: center; }
+        .fin-bank-kpi-value { font-size: 20px; font-weight: 700; }
+        .fin-bank-full { grid-column: 1 / -1; }
+    </style>
     <?php fin_msg_banner(); ?>
 
     <!-- ═══ H-13 · الدورةُ الكاملة (SPEC-01 #19) ═══ -->
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 8px"><i class="fas fa-file-import"></i> كشوفُ البنك ودورةُ المطابقة</h5>
-        <p style="color:#4b5563;line-height:1.8;margin:0 0 10px">
+        <h5 class="fin-bank-h5"><i class="fas fa-file-import"></i> كشوفُ البنك ودورةُ المطابقة</h5>
+        <p class="fin-bank-intro">
             <strong>استيرادٌ لا يكرر</strong> (بصمةُ السطر: كشف × مرجع × تاريخ × اتجاه × مبلغ — والملفُّ
             نفسُه يُستورد مرارًا بصفر سطرٍ مكرر) · <strong>ومضاهاةٌ بقاعدتها</strong> (المرجعُ أولًا ثم
             المبلغُ والتاريخُ ± 3 أيام — والقاعدةُ تُحفظ) · <strong>وفرقٌ يُفتح بسببٍ ويُحسم بقيدِ تسويةٍ
             بمرجعه</strong> والسندُ الأصليُّ لا يُمسّ · <strong>ولا إقفالَ وفرقٌ مفتوح</strong>.
         </p>
         <?php if ($can_edit): ?>
-        <form method="post" class="allforms allforms-visible" style="box-shadow:none;padding:0">
+        <form method="post" class="allforms allforms-visible fin-bank-form-flat">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="h13" value="import">
             <div class="form-section"><div class="form-grid">
@@ -283,20 +317,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <div class="form-group"><label for="emsf_212_024c7">رصيدٌ ختامي</label>
                     <input type="number" step="0.01" name="closing_balance" value="0" id="emsf_212_024c7"></div>
             </div>
-            <div class="form-group" style="margin-top:10px">
+            <div class="form-group fin-bank-mt10">
                 <label for="emsf_213_646db">أسطرُ الكشف — سطرٌ لكل حركة:
                     <code>التاريخ | الوصف | deposit أو withdrawal | المبلغ | المرجع البنكي</code></label>
-                <textarea name="lines_raw" rows="5" style="width:100%;direction:ltr"
+                <textarea name="lines_raw" rows="5" class="fin-bank-raw"
                     placeholder="2026-07-01 | تحصيل عميل | deposit | 1000.00 | REF-001" id="emsf_213_646db"></textarea>
-                <small style="color:#6b7280">سطرٌ <strong>بلا مرجعٍ بنكيٍّ يُرفض ويُعلَن</strong> — ولا يُخترع له مفتاح.</small>
+                <small class="fin-bank-hint">سطرٌ <strong>بلا مرجعٍ بنكيٍّ يُرفض ويُعلَن</strong> — ولا يُخترع له مفتاح.</small>
             </div></div>
             <div class="form-actions"><button type="submit" class="btn-primary">
                 <i class="fas fa-file-import"></i> استورد الكشف</button></div>
         </form>
         <?php endif; ?>
 
-        <div class="table-container" style="margin-top:12px">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <div class="table-container fin-bank-mt12">
+        <table class="alltables display nowrap no-datatable fin-bank-tbl" data-no-dt="hard">
             <thead><tr><th>#</th><th>رقم الحساب</th><th>المرجع</th><th>المدى</th><th>الأسطر</th>
                 <th>الحالة</th><th></th></tr></thead>
             <tbody>
@@ -304,7 +338,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <tr><td><?php echo intval($s['id']); ?></td>
                     <td><?php echo htmlspecialchars((string)($s['account_name'] ?? '—')); ?></td>
                     <td><strong><?php echo htmlspecialchars((string)$s['statement_ref']); ?></strong></td>
-                    <td style="direction:ltr"><?php echo htmlspecialchars((string)$s['period_from']); ?>
+                    <td class="fin-bank-ltr"><?php echo htmlspecialchars((string)$s['period_from']); ?>
                         → <?php echo htmlspecialchars((string)$s['period_to']); ?></td>
                     <td><?php echo intval($s['lines_count']); ?></td>
                     <td><?php
@@ -324,25 +358,24 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($h13_head): ?>
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 8px"><i class="fas fa-scale-balanced"></i>
+        <h5 class="fin-bank-h5"><i class="fas fa-scale-balanced"></i>
             كشف <?php echo htmlspecialchars((string)$h13_head['statement_ref']); ?></h5>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-            <span class="badge badge-success" style="padding:6px 12px">نسبةُ المطابقة
+        <div class="fin-bank-chips">
+            <span class="badge badge-success fin-bank-chip">نسبةُ المطابقة
                 <?php echo htmlspecialchars((string)$h13_stats['rate']); ?>٪</span>
-            <span class="badge <?php echo $h13_stats['open_diff'] > 0 ? 'badge-danger' : 'badge-success'; ?>"
-                style="padding:6px 12px">فروقٌ مفتوحة <?php echo intval($h13_stats['open_diff']); ?></span>
-            <span class="badge badge-secondary" style="padding:6px 12px">بلا نظير
+            <span class="badge fin-bank-chip <?php echo $h13_stats['open_diff'] > 0 ? 'badge-danger' : 'badge-success'; ?>">فروقٌ مفتوحة <?php echo intval($h13_stats['open_diff']); ?></span>
+            <span class="badge badge-secondary fin-bank-chip">بلا نظير
                 <?php echo intval($h13_stats['none']); ?></span>
         </div>
         <?php if ($can_edit && (string)$h13_head['state'] !== 'closed'): ?>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
-            <form method="post" style="display:inline">
+        <div class="fin-bank-actions">
+            <form method="post" class="fin-bank-inline">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="h13" value="automatch">
                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
                 <button type="submit" class="btn-primary"><i class="fa fa-wand-magic-sparkles"></i> مضاهاةٌ آلية</button>
             </form>
-            <form method="post" style="display:inline">
+            <form method="post" class="fin-bank-inline">
         <?php echo csrf_field(); ?>
                 <input type="hidden" name="h13" value="close">
                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
@@ -351,7 +384,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
         <?php endif; ?>
         <div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable fin-bank-tbl" data-no-dt="hard">
             <thead><tr><th>#</th><th>تاريخ الإقفال</th><th>الوصف</th><th>الاتجاه</th><th>المبلغ</th>
                 <th>المرجع</th><th>النظير</th><th>القاعدة</th><th>الفرق</th><th>الحال</th>
                 <?php if ($can_edit) echo '<th>القرار</th>'; ?>
@@ -382,50 +415,50 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             ?>
                 <tr><td><?php echo intval($l['line_no']); ?></td>
                     <td><?php echo htmlspecialchars((string)$l['txn_date']); ?></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars((string)($l['description'] ?? '')); ?></td>
+                    <td class="fin-bank-wrap"><?php echo htmlspecialchars((string)($l['description'] ?? '')); ?></td>
                     <td><?php echo (string)$l['direction'] === 'deposit' ? 'إيداع' : 'سحب'; ?></td>
                     <td><strong><?php echo htmlspecialchars((string)$l['amount']); ?></strong></td>
-                    <td style="direction:ltr"><?php echo htmlspecialchars((string)$l['bank_ref']); ?></td>
+                    <td class="fin-bank-ltr"><?php echo htmlspecialchars((string)$l['bank_ref']); ?></td>
                     <td><?php echo $l['payment_id'] !== null ? ('سند #' . intval($l['payment_id'])) : '—'; ?></td>
-                    <td style="white-space:normal"><small><?php echo htmlspecialchars((string)($l['rule_note'] ?? '')); ?></small></td>
+                    <td class="fin-bank-wrap"><small><?php echo htmlspecialchars((string)($l['rule_note'] ?? '')); ?></small></td>
                     <td><?php echo $l['difference'] !== null && abs((float)$l['difference']) > 0.004
-                        ? ('<strong style="color:#c00">' . htmlspecialchars((string)$l['difference']) . '</strong>')
+                        ? ('<strong class="fin-bank-diff">' . htmlspecialchars((string)$l['difference']) . '</strong>')
                         : '—'; ?></td>
                     <td><span class="badge <?php echo $msCls; ?>"><?php echo htmlspecialchars($msLbl[$ms] ?? $ms); ?></span>
                         <?php if ((string)($l['match_row_state'] ?? '') === 'open_difference'): ?>
-                            <div><small style="color:#c00"><?php echo htmlspecialchars((string)$l['difference_reason']); ?></small></div>
+                            <div><small class="fin-bank-diff"><?php echo htmlspecialchars((string)$l['difference_reason']); ?></small></div>
                         <?php elseif ($l['adjustment_event_id'] !== null): ?>
                             <div><small>قيدُ تسويةٍ #<?php echo intval($l['adjustment_event_id']); ?></small></div>
                         <?php endif; ?></td>
                     <?php if ($can_edit && (string)$h13_head['state'] !== 'closed'): ?>
-                    <td style="white-space:normal">
+                    <td class="fin-bank-wrap">
                         <?php $mid = intval($l['match_id']); $mrs = (string)($l['match_row_state'] ?? ''); ?>
                         <?php if ($mid > 0 && $mrs === 'matched' && $ms === 'difference'): ?>
-                            <form method="post" style="display:flex;gap:4px">
+                            <form method="post" class="fin-bank-row-form">
         <?php echo csrf_field(); ?>
                                 <input type="hidden" name="h13" value="open_diff">
                                 <input type="hidden" name="match_id" value="<?php echo $mid; ?>">
                                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
-                                <input type="text" name="why" required maxlength="200" placeholder="سببُ الفرق" style="width:130px" aria-label="سببُ الفرق">
-                                <button type="submit" class="badge badge-warning" style="border:0;padding:5px 8px">افتح فرقًا</button>
+                                <input type="text" name="why" required maxlength="200" placeholder="سببُ الفرق" class="fin-bank-why-130" aria-label="سببُ الفرق">
+                                <button type="submit" class="badge badge-warning fin-bank-mini-btn">افتح فرقًا</button>
                             </form>
                         <?php elseif ($mid > 0 && $mrs === 'open_difference'): ?>
-                            <form method="post" style="display:flex;gap:4px;flex-wrap:wrap">
+                            <form method="post" class="fin-bank-row-form-wrap">
         <?php echo csrf_field(); ?>
                                 <input type="hidden" name="h13" value="resolve">
                                 <input type="hidden" name="match_id" value="<?php echo $mid; ?>">
                                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
-                                <select name="decision"><option value="adjust">قيدُ تسوية</option><option value="reject">رفض</option></select>
-                                <input type="text" name="why" required maxlength="200" placeholder="قرارٌ بسببه" style="width:120px" aria-label="قرارٌ بسببه">
-                                <button type="submit" class="badge badge-success" style="border:0;padding:5px 8px">احسم</button>
+                                <select name="decision" aria-label="قرارُ حسمِ الفرق"><option value="adjust">قيدُ تسوية</option><option value="reject">رفض</option></select>
+                                <input type="text" name="why" required maxlength="200" placeholder="قرارٌ بسببه" class="fin-bank-why-120" aria-label="قرارٌ بسببه">
+                                <button type="submit" class="badge badge-success fin-bank-mini-btn">احسم</button>
                             </form>
                         <?php elseif ($ms !== 'matched'): ?>
-                            <form method="post" style="display:inline">
+                            <form method="post" class="fin-bank-inline">
         <?php echo csrf_field(); ?>
                                 <input type="hidden" name="h13" value="accept">
                                 <input type="hidden" name="line_id" value="<?php echo intval($l['id']); ?>">
                                 <input type="hidden" name="statement_id" value="<?php echo intval($h13_stmt); ?>">
-                                <button type="submit" class="badge badge-secondary" style="border:0;padding:5px 8px">اقبل المضاهاة</button>
+                                <button type="submit" class="badge badge-secondary fin-bank-mini-btn">اقبل المضاهاة</button>
                             </form>
                         <?php else: ?>—<?php endif; ?>
                     </td>
@@ -440,26 +473,26 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0"><i class="fas fa-clock-rotate-left"></i> الدورةُ القديمة (تبقى للقراءة والتاريخ)</h5>
-        <p style="color:#6b7280;margin:6px 0 0">
+        <h5 class="fin-bank-h5-tight"><i class="fas fa-clock-rotate-left"></i> الدورةُ القديمة (تبقى للقراءة والتاريخ)</h5>
+        <p class="fin-bank-note">
             `fin_bank_statement_lines` ومطابقتُها بالمبلغ والاتجاه — <strong>لا تُحذف ولا تُرحَّل قسرًا</strong>،
             والانتقالُ إلى الدورة أعلاه قرارُ مالك.</p>
     </div></div>
 
     <div class="card"><div class="card-body">
-        <form method="get" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <form method="get" class="fin-bank-filter">
             <strong><i class="fas fa-building-columns"></i> الحساب البنكي:</strong>
-            <select name="acct" onchange="this.form.submit()" style="min-width:240px"><?php echo fin_bank_account_options($conn, $is_super_admin, $company_id, $sel_acct); ?></select>
+            <select name="acct" aria-label="الحساب البنكي المعروضة بنودُه" class="fin-bank-select" onchange="this.form.submit()"><?php echo fin_bank_account_options($conn, $is_super_admin, $company_id, $sel_acct); ?></select>
             <?php if ($sel_acct > 0 && $can_edit): ?>
-                <a href="?acct=<?php echo $sel_acct; ?>&automatch=1&_t=<?php echo fin_action_token(); ?>" class="btn-primary" style="text-decoration:none" onclick="return confirm('مطابقة آلية بالمبلغ والاتجاه؟')"><i class="fas fa-wand-magic-sparkles"></i> مطابقة آلية</a>
+                <a href="?acct=<?php echo $sel_acct; ?>&automatch=1&_t=<?php echo fin_action_token(); ?>" class="btn-primary fin-bank-plain-link" onclick="return confirm('مطابقة آلية بالمبلغ والاتجاه؟')"><i class="fas fa-wand-magic-sparkles"></i> مطابقة آلية</a>
             <?php endif; ?>
         </form>
         <?php if ($sel_acct > 0): ?>
-        <div class="form-grid" style="margin-top:12px">
-            <div class="card" style="text-align:center"><div class="card-body"><div class="text-muted">رصيد الكشف البنكي</div><div style="font-size:20px;font-weight:700"><?php echo number_format($bank_balance, 2); ?></div></div></div>
-            <div class="card" style="text-align:center"><div class="card-body"><div class="text-muted">بنود مُطابَقة</div><div style="font-size:20px;font-weight:700"><span class="badge badge-success"><?php echo $rec_lines; ?></span></div></div></div>
-            <div class="card" style="text-align:center"><div class="card-body"><div class="text-muted">بنود غير مُطابَقة</div><div style="font-size:20px;font-weight:700"><span class="badge badge-<?php echo $unrec_lines > 0 ? 'danger' : 'success'; ?>"><?php echo $unrec_lines; ?></span></div></div></div>
-            <div class="card" style="text-align:center"><div class="card-body"><div class="text-muted">مدفوعات غير مُطابَقة</div><div style="font-size:20px;font-weight:700"><span class="badge badge-<?php echo $unmatched_pay > 0 ? 'warn' : 'success'; ?>"><?php echo $unmatched_pay; ?></span></div></div></div>
+        <div class="form-grid fin-bank-mt12">
+            <div class="card fin-bank-kpi"><div class="card-body"><div class="text-muted">رصيد الكشف البنكي</div><div class="fin-bank-kpi-value"><?php echo number_format($bank_balance, 2); ?></div></div></div>
+            <div class="card fin-bank-kpi"><div class="card-body"><div class="text-muted">بنود مُطابَقة</div><div class="fin-bank-kpi-value"><span class="badge badge-success"><?php echo $rec_lines; ?></span></div></div></div>
+            <div class="card fin-bank-kpi"><div class="card-body"><div class="text-muted">بنود غير مُطابَقة</div><div class="fin-bank-kpi-value"><span class="badge badge-<?php echo $unrec_lines > 0 ? 'danger' : 'success'; ?>"><?php echo $unrec_lines; ?></span></div></div></div>
+            <div class="card fin-bank-kpi"><div class="card-body"><div class="text-muted">مدفوعات غير مُطابَقة</div><div class="fin-bank-kpi-value"><span class="badge badge-<?php echo $unmatched_pay > 0 ? 'warn' : 'success'; ?>"><?php echo $unmatched_pay; ?></span></div></div></div>
         </div>
         <?php endif; ?>
     </div></div>
@@ -484,10 +517,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         <input type="hidden" name="bank_account_id" value="<?php echo $sel_acct; ?>">
         <div class="card-header"><h5><i class="fas fa-file-lines"></i> بند كشف حساب</h5></div>
         <div class="card"><div class="card-body"><div class="form-section"><div class="form-grid">
-            <div class="form-group"><label for="emsf_218_edc49">التاريخ</label><input type="date" name="txn_date" value="<?php echo date('Y-m-d'); ?>" id="emsf_218_edc49"></div>
+            <div class="form-group"><label for="emsf_218_edc49">التاريخ</label><input type="date" name="txn_date" id="emsf_218_edc49" value="<?php echo date('Y-m-d'); ?>"></div>
             <div class="form-group"><label for="emsf_219_5b23f">النوع</label><select name="direction" id="emsf_219_5b23f"><option value="deposit">إيداع</option><option value="withdrawal">سحب</option></select></div>
             <div class="form-group"><label for="emsf_220_77d51">المبلغ <span class="required">*</span></label><input type="number" step="0.01" min="0" name="amount" required id="emsf_220_77d51"></div>
-            <div class="form-group" style="grid-column:1/-1"><label for="emsf_221_2b7d1">الوصف</label><input type="text" name="description" id="emsf_221_2b7d1"></div>
+            <div class="form-group fin-bank-full"><label for="emsf_221_2b7d1">الوصف</label><input type="text" name="description" id="emsf_221_2b7d1"></div>
         </div></div>
         <div class="form-actions"><button type="submit" class="btn-primary"><i class="fas fa-save"></i> حفظ</button>
             <button type="button" class="btn-secondary" onclick="$('#lineForm').removeClass('allforms-visible')">إلغاء</button></div>
@@ -495,9 +528,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
 
     <div class="card"><div class="card-body">
-        <h5 style="margin:0 0 10px"><i class="fas fa-list"></i> بنود كشف الحساب</h5>
+        <h5 class="fin-bank-h5-list"><i class="fas fa-list"></i> بنود كشف الحساب</h5>
         <div class="table-container">
-            <table id="finTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="finTable" class="display nowrap alltables fin-bank-tbl" data-state-save="false">
                 <thead><tr><th>الإجراءات</th><th>التاريخ</th><th>الوصف</th><th>النوع</th><th>المبلغ</th><th>طابقه</th></tr></thead>
                 <tbody>
                 <?php
@@ -533,11 +566,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 <script>
 $(document).ready(function () {
-    if (document.getElementById('finTable')) {
-        $('#finTable').DataTable({ scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-            buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-            "language": { "url": "/ems/assets/i18n/datatables/ar.json" } });
-    }
+    /* UXW-01 ⑤: التهيئةُ المحليةُ أُزيلت — المكوّنُ المركزيُّ في assets/js/ui-unification.js
+       يلتقط #finTable آليًّا، وجدولا الكشوفِ والأسطرِ يبقيان ساكنَين بسمةِ الخروجِ الصريحة. */
     $('#toggleAcct').on('click', function () { $('#acctForm').toggleClass('allforms-visible'); });
     $('#toggleLine').on('click', function () { $('#lineForm').toggleClass('allforms-visible'); });
 });

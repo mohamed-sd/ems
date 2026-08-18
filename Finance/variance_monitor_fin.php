@@ -122,24 +122,47 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_actions = array();
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا انحرافاتِ موازنةٍ مطابقةً للتصفيةِ الحالية', 'بدّل التصفيةَ إلى «الكل» أو اعتمد موازنةً لتظهرَ بنودُها');
     ?>
+    <style>
+        /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
+        .fin-var-stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+        .fin-var-kpi { flex: 1; min-width: 160px; }
+        .fin-var-kpi-body { padding: 12px 14px; }
+        .fin-var-kpi-label { font-size: 12px; color: var(--c-ink-500); }
+        .fin-var-kpi-value { font-size: 24px; font-weight: 800; }
+        .fin-var-kpi-danger { color: var(--c-b91c1c); }
+        .fin-var-kpi-warn { color: var(--c-b45309); }
+        .fin-var-kpi-info { color: var(--c-state-info); }
+        .fin-var-kpi-ok { color: var(--c-166534); }
+        .fin-var-edit-note { margin: 0 0 10px; color: var(--c-374151); }
+        .fin-var-full { grid-column: 1 / -1; }
+        .fin-var-toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 10px; }
+        .fin-var-toolbar-title { margin: 0; }
+        .fin-var-chips { display: flex; gap: 6px; }
+        .fin-var-chip { text-decoration: none; padding: 6px 12px; }
+        .fin-var-table { width: 100%; }
+        .fin-var-dash { color: var(--c-9ca3af); }
+        .fin-var-emptynote { color: var(--c-ink-500); text-align: center; padding: 16px; }
+    </style>
 
     <?php fin_msg_banner(); ?>
     <?php fin_notifications_panel($conn, $ctx, 'variance_monitor_fin.php'); ?>
 
     <!-- بطاقات موجزة -->
-    <div class="stats-row" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
+    <div class="stats-row fin-var-stats">
         <?php
         $cards = array(
-            array('تجاوزات فوق 10%', $sum_breach, '#b91c1c', 'fa-triangle-exclamation'),
-            array('مفتوحة', $sum_open, '#b45309', 'fa-folder-open'),
-            array('قيد المعالجة', $sum_prog, '#2563eb', 'fa-spinner'),
-            array('مغلقة', $sum_closed, '#166534', 'fa-circle-check'),
+            array('تجاوزات فوق 10%', $sum_breach, 'fin-var-kpi-danger', 'fa-triangle-exclamation'),
+            array('مفتوحة', $sum_open, 'fin-var-kpi-warn', 'fa-folder-open'),
+            array('قيد المعالجة', $sum_prog, 'fin-var-kpi-info', 'fa-spinner'),
+            array('مغلقة', $sum_closed, 'fin-var-kpi-ok', 'fa-circle-check'),
         );
         foreach ($cards as $c) {
-            echo '<div class="card" style="flex:1;min-width:160px;"><div class="card-body" style="padding:12px 14px;">';
-            echo '<div style="font-size:12px;color:#6b7280;"><i class="fas ' . $c[3] . '"></i> ' . $c[0] . '</div>';
-            echo '<div style="font-size:24px;font-weight:800;color:' . $c[2] . ';">' . intval($c[1]) . '</div>';
+            echo '<div class="card fin-var-kpi"><div class="card-body fin-var-kpi-body">';
+            echo '<div class="fin-var-kpi-label"><i class="fas ' . $c[3] . '"></i> ' . $c[0] . '</div>';
+            echo '<div class="fin-var-kpi-value ' . $c[2] . '">' . intval($c[1]) . '</div>';
             echo '</div></div>';
         }
         ?>
@@ -147,13 +170,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
     <?php if ($can_edit): ?>
     <!-- نموذج المعالجة (يظهر عند التحرير) -->
-    <form id="finForm" action="" method="post" class="allforms<?php echo $editLine ? ' allforms-visible' : ''; ?>" . csrf_field()>
+    <form id="finForm" action="" method="post" class="allforms<?php echo $editLine ? ' allforms-visible' : ''; ?>">
+        <?php echo csrf_field(); ?>
         <div class="card-header"><h5><i class="fas fa-notes-medical"></i> معالجة انحراف بند الموازنة</h5></div>
         <div class="card"><div class="card-body">
             <input type="hidden" name="line_id" value="<?php echo $editLine ? intval($editLine['id']) : ''; ?>">
             <div class="form-section">
                 <?php if ($editLine): ?>
-                <p style="margin:0 0 10px;color:#374151;">
+                <p class="fin-var-edit-note">
                     <i class="fas fa-info-circle"></i>
                     الفئة: <strong><?php echo htmlspecialchars($categories[$editLine['category']] ?? $editLine['category']); ?></strong>
                     · الانحراف: <strong><?php echo number_format((float)$editLine['variance'], 2); ?></strong>
@@ -161,13 +185,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </p>
                 <?php endif; ?>
                 <div class="form-grid">
-                    <div class="form-group" style="grid-column:1/-1">
+                    <div class="form-group fin-var-full">
                         <label for="emsf_272_3ca83">سبب الانحراف</label>
-                        <input type="text" name="cause" maxlength="200" value="<?php echo htmlspecialchars($editLine['cause'] ?? ''); ?>" placeholder="ما الذي سبّب الفرق بين المخطّط والفعلي؟" id="emsf_272_3ca83">
+                        <input type="text" name="cause" maxlength="200" id="emsf_272_3ca83" placeholder="ما الذي سبّب الفرق بين المخطّط والفعلي؟" aria-label="سبب الانحراف" value="<?php echo htmlspecialchars($editLine['cause'] ?? ''); ?>">
                     </div>
-                    <div class="form-group" style="grid-column:1/-1">
+                    <div class="form-group fin-var-full">
                         <label for="emsf_273_0f631">الإجراء التصحيحي</label>
-                        <input type="text" name="corrective_action" maxlength="200" value="<?php echo htmlspecialchars($editLine['corrective_action'] ?? ''); ?>" placeholder="ما الإجراء المتّخذ لمعالجته؟" id="emsf_273_0f631">
+                        <input type="text" name="corrective_action" maxlength="200" id="emsf_273_0f631" placeholder="ما الإجراء المتّخذ لمعالجته؟" aria-label="الإجراء التصحيحي لمعالجة الانحراف" value="<?php echo htmlspecialchars($editLine['corrective_action'] ?? ''); ?>">
                     </div>
                     <div class="form-group">
                         <label for="emsf_274_dcb83">المسؤول (المالك)</label>
@@ -197,20 +221,20 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
 
     <div class="card"><div class="card-body">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin:0 0 10px;">
-            <h5 style="margin:0"><i class="fas fa-list"></i> انحرافات الموازنات المعتمدة</h5>
-            <div class="var-filters" style="display:flex;gap:6px;">
+        <div class="fin-var-toolbar">
+            <h5 class="fin-var-toolbar-title"><i class="fas fa-list"></i> انحرافات الموازنات المعتمدة</h5>
+            <div class="var-filters fin-var-chips">
                 <?php
                 $chips = array('all' => 'الكل', 'breaches' => 'تجاوزات > 10%', 'unresolved' => 'غير المُغلقة');
                 foreach ($chips as $k => $lbl) {
                     $active = ($flt === $k) ? ' badge-primary' : ' badge-secondary';
-                    echo "<a href='?flt=" . $k . "' class='badge" . $active . "' style='text-decoration:none;padding:6px 12px;'>" . htmlspecialchars($lbl) . "</a>";
+                    echo "<a href='?flt=" . $k . "' class='badge fin-var-chip" . $active . "'>" . htmlspecialchars($lbl) . "</a>";
                 }
                 ?>
             </div>
         </div>
         <div class="table-container">
-            <table id="varTable" class="display nowrap alltables no-datatable" style="width:100%;">
+            <table id="varTable" class="display nowrap alltables fin-var-table" data-order='[]' data-state-save="false">
                 <thead><tr>
                     <?php if ($can_edit) echo '<th>إجراء المعالجة</th>'; ?>
                     <th>الميزانية</th><th>الإدارة</th><th>الفئة</th><th>النوع</th>
@@ -251,8 +275,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         echo "<td>" . number_format((float)$l['actual_amount'], 2) . "</td>";
                         echo "<td><span class='badge badge-" . $tone . "'>" . number_format($var, 2) . "</span></td>";
                         echo "<td>" . $pct . "</td>";
-                        echo "<td>" . ($l['cause'] !== null && $l['cause'] !== '' ? htmlspecialchars($l['cause']) : "<span style='color:#9ca3af'>—</span>") . "</td>";
-                        echo "<td>" . ($l['corrective_action'] !== null && $l['corrective_action'] !== '' ? htmlspecialchars($l['corrective_action']) : "<span style='color:#9ca3af'>—</span>") . "</td>";
+                        echo "<td>" . ($l['cause'] !== null && $l['cause'] !== '' ? htmlspecialchars($l['cause']) : "<span class='fin-var-dash'>—</span>") . "</td>";
+                        echo "<td>" . ($l['corrective_action'] !== null && $l['corrective_action'] !== '' ? htmlspecialchars($l['corrective_action']) : "<span class='fin-var-dash'>—</span>") . "</td>";
                         echo "<td>" . htmlspecialchars($owner) . "</td>";
                         echo "<td><span class='badge badge-" . ($var_tone[$st] ?? 'secondary') . "'>" . htmlspecialchars($var_states[$st] ?? $st) . "</span></td>";
                         echo "</tr>";
@@ -261,7 +285,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </table>
         </div>
         <?php if (empty($var_rows)): ?>
-            <p style="color:#6b7280;text-align:center;padding:16px;"><i class="fas fa-circle-info"></i> لا بنودَ مطابقةً للتصفية الحالية. (تظهر بنود الموازنات المعتمدة/النشطة فقط.)</p>
+            <p class="fin-var-emptynote"><i class="fas fa-circle-info"></i> لا بنودَ مطابقةً للتصفية الحالية. (تظهر بنود الموازنات المعتمدة/النشطة فقط.)</p>
         <?php endif; ?>
     </div></div>
 </div>
@@ -274,15 +298,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
 <script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
-<script>
-$(document).ready(function () {
-    $('#varTable').DataTable({
-        scrollX: true, autoWidth: false, stateSave: false, dom: 'Bfrtip',
-        order: [],
-        buttons: [ { extend: 'copy', text: '📋 نسخ' }, { extend: 'excel', text: '📊 Excel' }, { extend: 'print', text: '🖨️ طباعة' } ],
-        "language": { "url": "/ems/assets/i18n/datatables/ar.json" }
-    });
-});
-</script>
+<!-- UXW-01 ⑤: التهيئةُ المحليةُ أُزيلت — المكوّنُ المركزيُّ في assets/js/ui-unification.js
+     يلتقط الجدولَ آليًّا (تعريبٌ وأزرارُ تصدير)، والسلوكُ المحفوظُ معلَنٌ بسماتِ <table>. -->
 </body>
 </html>

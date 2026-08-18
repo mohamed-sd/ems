@@ -154,6 +154,18 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
+<style>
+/* UXW-01 ②: أنماطٌ موضعيةٌ نُقلت أصنافًا صفحيةً ببادئةِ الشاشة eop- */
+.is-hidden { display: none; }
+.eop-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 14px; }
+.eop-hint { color: var(--c-888888, #888); display: block; margin-top: 4px; }
+.eop-field-wide { grid-column: 1 / -1; }
+.eop-actions { padding: 0 14px 16px; display: flex; gap: 10px; }
+.eop-btn-cancel { background: var(--c-6b7280, #6b7280); }
+.eop-table-wrap { margin-top: 14px; }
+.eop-table-full { width: 100%; }
+.eop-empty-cell { text-align: center; color: var(--c-888888, #888); padding: 18px; }
+</style>
 <div class="main">
     <?php
     $header_title   = 'المشغّلون والسائقون';
@@ -162,6 +174,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     if ($can_add) $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'تسجيل مشغّل');
     $header_back = array('href' => 'employees.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'سجل الموظفين');
     include('../includes/page_header.php');
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا سائقين ولا مشغّلين مسجَّلين بعدُ', 'سجِّلْ أولَ مشغّلٍ بزرِّ «تسجيل مشغّل» في رأسِ الشاشة');
     ?>
 
     <?php if (!empty($_GET['msg'])): $isSuccess = strpos($_GET['msg'], '✅') !== false; ?>
@@ -171,17 +185,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     <?php endif; ?>
 
-    <form id="opForm" action="" method="post" class="allforms" style="<?= $edit ? '' : 'display:none;' ?>
-        <?= csrf_field() ?>">
+    <form id="opForm" action="" method="post" class="allforms<?= $edit ? '' : ' is-hidden' ?>">
+        <?= csrf_field() ?>
         <input type="hidden" name="id" value="<?= $edit ? intval($edit['id']) : 0 ?>">
         <div class="card-header"><h5><i class="fas fa-edit"></i> <?= $edit ? 'تعديل بيانات المشغّل' : 'تسجيل سائق/مشغّل' ?></h5></div>
-        <div class="form-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:14px;">
+        <div class="form-grid eop-grid-3">
             <div class="field">
-                <label><i class="fas fa-user"></i> الموظف</label>
+                <label for="employee_select"><i class="fas fa-user"></i> الموظف</label>
                 <?php if ($edit): ?>
-                    <input type="text" value="<?= htmlspecialchars($edit['emp_name'] ?? '-') ?>" disabled>
+                    <input type="text" aria-label="اسمُ الموظفِ المسجَّلِ مشغّلًا (غيرُ قابلٍ للتعديل)" value="<?= htmlspecialchars($edit['emp_name'] ?? '-') ?>" disabled>
                 <?php else: ?>
-                    <select name="employee_id" id="employee_select" required onchange="emsOpPick(this)">
+                    <select name="employee_id" id="employee_select" aria-label="الموظفُ الذي يُسجَّل مشغّلًا" required onchange="emsOpPick(this)">
                         <option value="">— اختر موظفاً —</option>
                         <?php foreach ($avail as $a): $reg = !empty($a['op_id']); ?>
                             <option value="<?= intval($a['id']) ?>" data-opid="<?= $reg ? intval($a['op_id']) : '' ?>">
@@ -189,17 +203,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <small style="color:#888;display:block;margin-top:4px;">غير المسجّلين أولاً؛ اختيار موظفٍ «مسجّل» ينقلك لتعديل بياناته.</small>
+                    <small class="eop-hint">غير المسجّلين أولاً؛ اختيار موظفٍ «مسجّل» ينقلك لتعديل بياناته.</small>
                 <?php endif; ?>
             </div>
-            <div class="field"><label><i class="fas fa-hashtag"></i> رقم الرخصة</label><input type="text" name="license_number" value="<?= htmlspecialchars($edit['license_number'] ?? '') ?>"></div>
-            <div class="field"><label for="emsf_89_b5109"><i class="fas fa-id-card"></i> نوع/فئة الرخصة</label><input type="text" name="license_type" value="<?= htmlspecialchars($edit['license_type'] ?? '') ?>" id="emsf_89_b5109"></div>
-            <div class="field"><label for="emsf_90_50da8"><i class="fas fa-ranking-star"></i> درجة الرخصة</label><input type="text" name="license_grade" value="<?= htmlspecialchars($edit['license_grade'] ?? '') ?>" id="emsf_90_50da8"></div>
-            <div class="field"><label for="emsf_91_17293"><i class="fas fa-building-shield"></i> جهة الإصدار</label><input type="text" name="license_issuer" value="<?= htmlspecialchars($edit['license_issuer'] ?? '') ?>" id="emsf_91_17293"></div>
-            <div class="field"><label for="emsf_92_847b4"><i class="fas fa-calendar-plus"></i> تاريخ الإصدار</label><input type="date" name="license_issue_date" value="<?= htmlspecialchars($edit['license_issue_date'] ?? '') ?>" id="emsf_92_847b4"></div>
-            <div class="field"><label for="emsf_93_771d1"><i class="fas fa-calendar-xmark"></i> تاريخ الانتهاء</label><input type="date" name="license_expiry_date" value="<?= htmlspecialchars($edit['license_expiry_date'] ?? '') ?>" id="emsf_93_771d1"></div>
-            <div class="field"><label for="emsf_94_02c94"><i class="fas fa-truck-monster"></i> فئات التشغيل/المعدات</label><input type="text" name="operating_categories" value="<?= htmlspecialchars($edit['operating_categories'] ?? '') ?>" placeholder="مثال: حفّارات، شيولات" id="emsf_94_02c94"></div>
-            <div class="field"><label for="emsf_95_4c8c5"><i class="fas fa-key"></i> صلاحيات القيادة/التشغيل</label><input type="text" name="driving_authorizations" value="<?= htmlspecialchars($edit['driving_authorizations'] ?? '') ?>" id="emsf_95_4c8c5"></div>
+            <div class="field"><label for="emsf_88_lnum"><i class="fas fa-hashtag"></i> رقم الرخصة</label><input type="text" name="license_number" id="emsf_88_lnum" aria-label="رقمُ رخصةِ القيادة/التشغيل" value="<?= htmlspecialchars($edit['license_number'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_89_b5109"><i class="fas fa-id-card"></i> نوع/فئة الرخصة</label><input type="text" name="license_type" id="emsf_89_b5109" aria-label="نوعُ الرخصةِ أو فئتُها" value="<?= htmlspecialchars($edit['license_type'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_90_50da8"><i class="fas fa-ranking-star"></i> درجة الرخصة</label><input type="text" name="license_grade" id="emsf_90_50da8" aria-label="درجةُ الرخصة" value="<?= htmlspecialchars($edit['license_grade'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_91_17293"><i class="fas fa-building-shield"></i> جهة الإصدار</label><input type="text" name="license_issuer" id="emsf_91_17293" aria-label="الجهةُ المُصدِرةُ للرخصة" value="<?= htmlspecialchars($edit['license_issuer'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_92_847b4"><i class="fas fa-calendar-plus"></i> تاريخ الإصدار</label><input type="date" name="license_issue_date" id="emsf_92_847b4" aria-label="تاريخُ إصدارِ الرخصة" value="<?= htmlspecialchars($edit['license_issue_date'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_93_771d1"><i class="fas fa-calendar-xmark"></i> تاريخ الانتهاء</label><input type="date" name="license_expiry_date" id="emsf_93_771d1" aria-label="تاريخُ انتهاءِ الرخصة" value="<?= htmlspecialchars($edit['license_expiry_date'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_94_02c94"><i class="fas fa-truck-monster"></i> فئات التشغيل/المعدات</label><input type="text" name="operating_categories" id="emsf_94_02c94" aria-label="فئاتُ المعدّاتِ التي يشغّلها" placeholder="مثال: حفّارات، شيولات" value="<?= htmlspecialchars($edit['operating_categories'] ?? '') ?>"></div>
+            <div class="field"><label for="emsf_95_4c8c5"><i class="fas fa-key"></i> صلاحيات القيادة/التشغيل</label><input type="text" name="driving_authorizations" id="emsf_95_4c8c5" aria-label="صلاحياتُ القيادةِ والتشغيلِ الممنوحة" value="<?= htmlspecialchars($edit['driving_authorizations'] ?? '') ?>"></div>
             <div class="field">
                 <label for="emsf_96_2c24f"><i class="fas fa-toggle-on"></i> الحالة</label>
                 <select name="status" id="emsf_96_2c24f">
@@ -207,16 +221,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <option value="0" <?= (($edit['status'] ?? 1) == 0) ? 'selected' : '' ?>>غير نشط ⏸</option>
                 </select>
             </div>
-            <div class="field" style="grid-column:1/-1;"><label for="emsf_97_fae6a"><i class="fas fa-align-right"></i> ملاحظات</label><textarea name="notes" rows="2" id="emsf_97_fae6a"><?= htmlspecialchars($edit['notes'] ?? '') ?></textarea></div>
+            <div class="field eop-field-wide"><label for="emsf_97_fae6a"><i class="fas fa-align-right"></i> ملاحظات</label><textarea name="notes" rows="2" id="emsf_97_fae6a"><?= htmlspecialchars($edit['notes'] ?? '') ?></textarea></div>
         </div>
-        <div style="padding:0 14px 16px;display:flex;gap:10px;">
+        <div class="eop-actions">
             <button type="submit" class="add-btn"><i class="fas fa-save"></i> حفظ</button>
-            <a href="equipment_operators.php" class="add-btn" style="background:#6b7280;"><i class="fas fa-times"></i> إلغاء</a>
+            <a href="equipment_operators.php" class="add-btn eop-btn-cancel"><i class="fas fa-times"></i> إلغاء</a>
         </div>
     </form>
 
-    <div class="table-wrap" style="margin-top:14px;">
-        <table class="data-table" id="opTable" style="width:100%;">
+    <div class="table-wrap eop-table-wrap">
+        <table class="data-table eop-table-full" id="opTable">
             <thead>
                 <tr><th>إجراءات</th><th>#</th><th>كود المشغّل</th><th>المسمى</th><th>الرخصة</th><th>فئة الرخصة</th><th>تاريخ انتهاء الرخصة</th><th>الصلاحية</th><th>الحالة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
@@ -278,7 +292,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tr>
             <?php endforeach; }
             if (empty($op_rows)): ?>
-                <tr><td colspan="9" style="text-align:center;color:#888;padding:18px;">لا يوجد مشغّلون مسجّلون بعد.</td></tr>
+                <tr><td colspan="9" class="eop-empty-cell">لا يوجد مشغّلون مسجّلون بعد.</td></tr>
             <?php endif; ?>
             </tbody>
         </table>
@@ -288,13 +302,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script>
 (function(){
     var btn = document.getElementById('toggleForm'), form = document.getElementById('opForm');
-    if (btn && form) btn.addEventListener('click', function(){ form.style.display = (form.style.display === 'none' || !form.style.display) ? 'block' : 'none'; });
+    if (btn && form) btn.addEventListener('click', function(){ form.classList.toggle('is-hidden'); });
 })();
 <?php if ($edit): ?>
 // وضع التعديل: افتح الفورم المملوء بالبيانات وانتقل إليه (لا يُغلَق)
 document.addEventListener('DOMContentLoaded', function(){
     var f = document.getElementById('opForm');
-    if (f) { f.style.display = 'block'; window.scrollTo({ top: Math.max(0, f.offsetTop - 90), behavior: 'smooth' }); }
+    if (f) { f.classList.remove('is-hidden'); window.scrollTo({ top: Math.max(0, f.offsetTop - 90), behavior: 'smooth' }); }
 });
 <?php endif; ?>
 function emsOpPick(sel){

@@ -34,8 +34,11 @@ include('../insidebar.php'); ?>
 
 <div class="main">
 
+    <style>
+      .sup-shc-head-row { display: flex; align-items: center; gap: 12px; }
+    </style>
     <div class="header">
-        <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="sup-shc-head-row">
             <div class="title-icon"><i class="fas fa-file-contract"></i></div>
             <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ العنوانِ اليدويّ. */
@@ -44,6 +47,8 @@ $header_title_html = htmlspecialchars('تفاصيل عقد المورد', ENT_QU
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا تفاصيلَ لهذا العقدِ — العقدُ غيرُ موجودٍ أو خارجَ نطاقِ شركتك', 'ارجِع إلى سجلِّ عقودِ الموردين واختر عقدًا قائمًا');
 ?>
         </div>
         <a href="javascript:history.back()" class="back-btn">

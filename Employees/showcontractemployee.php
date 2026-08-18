@@ -24,9 +24,13 @@ include __DIR__ . '/../inheader.php';
 <link rel="stylesheet" type="text/css" href="../assets/css/style.css"/>
 <link rel="stylesheet" href="../assets/css/main_admin_style.css" />
 <link rel="stylesheet" href="/ems/assets/css/site-identity.css">
+<style>
+/* UXW-01 ②: أنماطٌ موضعيةٌ نُقلت أصنافًا صفحيةً ببادئةِ الشاشة sce- */
+.sce-title-row { display: flex; align-items: center; gap: 12px; }
+</style>
 
 
-<?php 
+<?php
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
@@ -36,7 +40,7 @@ include('../insidebar.php'); ?>
 <div class="main">
 
     <div class="header">
-        <div style="display: flex; align-items: center; gap: 12px;">
+        <div class="sce-title-row">
             <div class="title-icon"><i class="fas fa-id-card"></i></div>
             <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ العنوانِ اليدويّ. */
@@ -45,6 +49,8 @@ $header_title_html = htmlspecialchars('تفاصيل عقد السائق', ENT_QU
 $header_actions = array();
 $header_back = false;
 include __DIR__ . '/../includes/page_header.php';
+// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+echo ems_states_bundle('لا بياناتِ عقدِ سائقٍ بهذا الرقم', 'عُدْ إلى قائمةِ عقودِ السائقين واختر عقدًا مسجَّلًا');
 ?>
         </div>
         <a href="javascript:history.back()" class="back-btn">

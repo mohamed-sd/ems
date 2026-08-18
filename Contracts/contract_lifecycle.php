@@ -101,10 +101,32 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                          'icon' => 'fas fa-arrow-right', 'label' => 'خط أساس العقد');
     include('../includes/page_header.php');
     if (isset($_GET['msg'])) { echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>'; }
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا وقائعَ دورةِ حياةٍ مسجَّلةً على هذا العقد بعدُ',
+                           'اختر عقدًا من جدولِ العقود ثم سجّل الواقعةَ بتاريخِ أثرِها ومرجعِ قرارِها');
     ?>
 
+    <style>
+    .lc-note{color:var(--c-4b5563, #4b5563);line-height:1.8;margin:0}
+    .lc-req{color:var(--c-state-danger-strong, #c00)}
+    .lc-table{width:100%}
+    .lc-wrap{white-space:normal}
+    .lc-filter-form{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+    .lc-badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+    .lc-badge-pad{padding:6px 12px}
+    .lc-row-warn{background:var(--c-fff7ed, #fff7ed)}
+    .lc-add-form{margin-top:14px}
+    .lc-grid-8{display:flex;gap:8px;flex-wrap:wrap}
+    .lc-w80{width:80px}
+    .lc-w130{width:130px}
+    .lc-w150{width:150px}
+    .lc-w170{width:170px}
+    .lc-mw220{min-width:220px}
+    .lc-mw280{min-width:280px}
+    </style>
+
     <div class="card"><div class="card-body">
-        <p style="color:#4b5563;line-height:1.8;margin:0">
+        <p class="lc-note">
             <i class="fas fa-circle-info"></i>
             لكلِّ حالةٍ <strong>أثرٌ ماليٌّ محدد</strong> على خمسة عناصر — و<strong>الأثرُ محكومٌ بالحالة لا يُختار</strong>:
             من أراد أثرًا مخالفًا <strong>يلزمه تغييرُ الحالة</strong>.
@@ -119,7 +141,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-table"></i>
         جدولُ §6 — <strong>الحالاتُ الثماني بأثرها الخماسي</strong></h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable lc-table" data-no-dt="1">
             <thead><tr><th>الحالة</th><th>المقدَّم</th><th>الضمان</th>
                 <th>المنفَّذُ غيرُ المفوتر</th><th>الغرامات</th><th>الحاويات</th>
                 <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
@@ -134,11 +156,11 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
             <tbody>
             <?php foreach ($MTX as $s => $e): ?>
                 <tr><td><strong><?php echo htmlspecialchars($STATE_AR[$s]); ?></strong></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars($strip($EFF['advance'][$e['advance']])); ?></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars($strip($EFF['retention'][$e['retention']])); ?></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars($strip($EFF['unbilled'][$e['unbilled']])); ?></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars($strip($EFF['penalty'][$e['penalty']])); ?></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars($strip($EFF['container'][$e['container']])); ?></td></tr>
+                    <td class="lc-wrap"><?php echo htmlspecialchars($strip($EFF['advance'][$e['advance']])); ?></td>
+                    <td class="lc-wrap"><?php echo htmlspecialchars($strip($EFF['retention'][$e['retention']])); ?></td>
+                    <td class="lc-wrap"><?php echo htmlspecialchars($strip($EFF['unbilled'][$e['unbilled']])); ?></td>
+                    <td class="lc-wrap"><?php echo htmlspecialchars($strip($EFF['penalty'][$e['penalty']])); ?></td>
+                    <td class="lc-wrap"><?php echo htmlspecialchars($strip($EFF['container'][$e['container']])); ?></td></tr>
             <?php endforeach; ?>
             </tbody>
         </table>
@@ -146,12 +168,12 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-file-contract"></i> العقود</h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable lc-table" data-no-dt="1">
             <thead><tr><th>#</th><th>العميل</th><th>المدة</th><th>حالُ العقد</th><th></th></tr></thead>
             <tbody>
             <?php foreach ($contracts as $c): ?>
                 <tr><td>#<?php echo intval($c['id']); ?></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars((string)$c['second_party']); ?></td>
+                    <td class="lc-wrap"><?php echo htmlspecialchars((string)$c['second_party']); ?></td>
                     <td><?php echo htmlspecialchars((string)$c['actual_start'] . ' → ' . (string)$c['actual_end']); ?></td>
                     <td><?php echo htmlspecialchars((string)$c['contract_status']); ?></td>
                     <td><a class="action-btn" href="?contract=<?php echo intval($c['id']); ?>">
@@ -165,7 +187,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-clipboard-list"></i>
         خطةُ العمل بأرقام العقد #<?php echo $CID; ?> الحيّة</h5></div>
     <div class="card-body">
-        <form method="get" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px">
+        <form method="get" class="lc-filter-form">
             <input type="hidden" name="contract" value="<?php echo $CID; ?>">
             <div class="form-group"><label for="emsf_63_75fee">الحالة</label>
                 <select name="state" id="emsf_63_75fee">
@@ -177,27 +199,27 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         </form>
 
         <?php if ($plan !== null && $plan['ok']): ?>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
-            <span class="badge badge-secondary" style="padding:6px 12px">رصيدُ المقدَّم
+        <div class="lc-badges">
+            <span class="badge badge-secondary lc-badge-pad">رصيدُ المقدَّم
                 <?php echo $plan['figures']['advance_balance']; ?></span>
-            <span class="badge badge-secondary" style="padding:6px 12px">المحتجَز
+            <span class="badge badge-secondary lc-badge-pad">المحتجَز
                 <?php echo $plan['figures']['retention_balance']; ?></span>
-            <span class="badge badge-info" style="padding:6px 12px">منفَّذ
+            <span class="badge badge-info lc-badge-pad">منفَّذ
                 <?php echo $plan['figures']['executed']; ?></span>
-            <span class="badge badge-success" style="padding:6px 12px">مفوتَر
+            <span class="badge badge-success lc-badge-pad">مفوتَر
                 <?php echo $plan['figures']['billed']; ?></span>
-            <span class="badge <?php echo $plan['figures']['unbilled'] > 0.004
-                ? 'badge-warning' : 'badge-secondary'; ?>" style="padding:6px 12px">
+            <span class="badge lc-badge-pad <?php echo $plan['figures']['unbilled'] > 0.004
+                ? 'badge-warning' : 'badge-secondary'; ?>">
                 منفَّذٌ غيرُ مفوتر <?php echo $plan['figures']['unbilled']; ?></span>
         </div>
         <div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable lc-table" data-no-dt="1">
             <thead><tr><th>المجال</th><th>القاعدة</th><th>الرقمُ الحيّ</th><th>بيتُ التنفيذ</th></tr></thead>
             <tbody>
             <?php foreach ($plan['actions'] as $a): ?>
-                <tr<?php echo mb_strpos((string)$a['area'], '⚠') !== false ? " style='background:#fff7ed'" : ''; ?>>
+                <tr<?php echo mb_strpos((string)$a['area'], '⚠') !== false ? ' class="lc-row-warn"' : ''; ?>>
                     <td><strong><?php echo htmlspecialchars((string)$a['area']); ?></strong></td>
-                    <td style="white-space:normal"><?php echo htmlspecialchars($strip($a['rule'])); ?></td>
+                    <td class="lc-wrap"><?php echo htmlspecialchars($strip($a['rule'])); ?></td>
                     <td><?php echo $a['figure'] !== null ? htmlspecialchars((string)$a['figure']) : '—'; ?></td>
                     <td><small><?php echo htmlspecialchars((string)$a['home']); ?></small></td></tr>
             <?php endforeach; ?>
@@ -207,31 +229,31 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
         <?php endif; ?>
 
         <?php if ($can_edit): ?>
-        <form method="post" class="ems-form" style="margin-top:14px">
+        <form method="post" class="ems-form lc-add-form">
         <?php echo csrf_field(); ?>
             <input type="hidden" name="lc_action" value="record">
             <input type="hidden" name="contract_id" value="<?php echo $CID; ?>">
             <h6><i class="fa fa-plus"></i> سجّل واقعةً — <strong>وأثرُها يُكتب من الجدول لا من الطلب</strong></h6>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div class="lc-grid-8">
                 <div class="form-group"><label for="emsf_64_c388f">الحالة</label>
                     <select name="state" id="emsf_64_c388f">
                         <?php foreach ($STATE_AR as $k => $v): ?>
                             <option value="<?php echo $k; ?>"><?php echo htmlspecialchars($v); ?></option>
                         <?php endforeach; ?></select></div>
-                <div class="form-group"><label for="emsf_65_20b95">تاريخُ الأثر <span style="color:#c00">*</span></label>
+                <div class="form-group"><label for="emsf_65_20b95">تاريخُ الأثر <span class="lc-req">*</span></label>
                     <input type="date" name="effect_date" required id="emsf_65_20b95"></div>
                 <div class="form-group"><label for="emsf_66_8f235">مرجعُ القرار <small>(إلزاميٌّ للإنهاء والإلغاء)</small></label>
-                    <input type="text" name="decision_ref" maxlength="120" style="width:170px" id="emsf_66_8f235"></div>
+                    <input type="text" name="decision_ref" maxlength="120" class="lc-w170" id="emsf_66_8f235"></div>
                 <div class="form-group"><label for="emsf_67_6fd1a">تعويض/غرامة</label>
-                    <input type="number" step="0.01" name="claim_amount" style="width:130px" id="emsf_67_6fd1a"></div>
+                    <input type="number" step="0.01" name="claim_amount" class="lc-w130" id="emsf_67_6fd1a"></div>
                 <div class="form-group"><label for="emsf_68_a0e1a">العملة</label>
-                    <input type="text" name="claim_currency" maxlength="8" style="width:80px" id="emsf_68_a0e1a"></div>
-                <div class="form-group" style="min-width:280px"><label for="emsf_69_47131">مادةُ العقد الحاكمة
+                    <input type="text" name="claim_currency" maxlength="8" class="lc-w80" id="emsf_68_a0e1a"></div>
+                <div class="form-group lc-mw280"><label for="emsf_69_47131">مادةُ العقد الحاكمة
                     <small>(إلزاميةٌ مع أيِّ مبلغ)</small></label>
                     <input type="text" name="contract_article" maxlength="200" id="emsf_69_47131"></div>
                 <div class="form-group"><label for="emsf_70_c95a7">مستندُ الحساب</label>
-                    <input type="text" name="claim_doc_ref" maxlength="120" style="width:150px" id="emsf_70_c95a7"></div>
-                <div class="form-group" style="min-width:220px"><label for="emsf_71_96ae0">ملاحظة</label>
+                    <input type="text" name="claim_doc_ref" maxlength="120" class="lc-w150" id="emsf_70_c95a7"></div>
+                <div class="form-group lc-mw220"><label for="emsf_71_96ae0">ملاحظة</label>
                     <input type="text" name="note" maxlength="255" id="emsf_71_96ae0"></div>
             </div>
             <button type="submit" class="btn-primary"><i class="fa fa-save"></i> سجّل الواقعة</button>
@@ -242,7 +264,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     <div class="card"><div class="card-header"><h5><i class="fa fa-clock-rotate-left"></i>
         وقائعُ العقد — <?php echo count($events); ?></h5></div>
     <div class="card-body"><div class="table-container">
-        <table class="alltables display nowrap no-datatable" data-no-dt="1" style="width:100%">
+        <table class="alltables display nowrap no-datatable lc-table" data-no-dt="1">
             <thead><tr><th>الحالة</th><th>تاريخُ الأثر</th><th>مرجعُ القرار</th>
                 <th>الأثرُ الخماسي</th><th>المطالبة</th><th>المادة</th></tr></thead>
             <tbody>
@@ -250,7 +272,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <tr><td><strong><?php echo htmlspecialchars($STATE_AR[(string)$e['state']]); ?></strong></td>
                     <td><?php echo htmlspecialchars((string)$e['effect_date']); ?></td>
                     <td><?php echo htmlspecialchars((string)($e['decision_ref'] ?? '—')); ?></td>
-                    <td style="white-space:normal"><small>
+                    <td class="lc-wrap"><small>
                         <?php echo htmlspecialchars($strip($EFF['advance'][(string)$e['advance_effect']])); ?> ·
                         <?php echo htmlspecialchars($strip($EFF['retention'][(string)$e['retention_effect']])); ?> ·
                         <?php echo htmlspecialchars($strip($EFF['unbilled'][(string)$e['unbilled_effect']])); ?> ·
@@ -260,7 +282,7 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                     <td><?php echo $e['claim_amount'] !== null
                         ? (htmlspecialchars((string)$e['claim_amount']) . ' ' . htmlspecialchars((string)$e['claim_currency']))
                         : '—'; ?></td>
-                    <td style="white-space:normal"><small><?php
+                    <td class="lc-wrap"><small><?php
                         echo htmlspecialchars((string)($e['contract_article'] ?? '—')); ?></small></td></tr>
             <?php endforeach; ?>
             <?php if (!$events): ?><tr><td colspan="6"><em>لا وقائع</em></td></tr><?php endif; ?>

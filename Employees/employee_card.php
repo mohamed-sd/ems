@@ -54,6 +54,22 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
+<style>
+/* UXW-01 ②: أنماطٌ موضعيةٌ نُقلت أصنافًا صفحيةً ببادئةِ الشاشة ecard- */
+.ecard-idbar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.ecard-name { font-size: 1.1rem; }
+.ecard-tabs { margin-inline-start: auto; }
+.ecard-tab {
+    border: 1px solid var(--c-dddddd, #ddd);
+    border-radius: 6px;
+    padding: 4px 10px;
+    margin: 0 2px;
+}
+.ecard-tab.is-active { background: var(--c-e2b93b, #e2b93b); font-weight: 800; }
+.ecard-table { width: 100%; }
+.ecard-chips { display: flex; gap: 12px; flex-wrap: wrap; }
+.ecard-chip { font-size: 15px; padding: 10px 16px; }
+</style>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'بطاقة الموظف'; $header_icon = 'fa fa-id-card';
@@ -63,17 +79,18 @@ include '../insidebar.php';
     include('../includes/page_header.php');
     ems_screen_about('بطاقةُ الموظف بتبويباتها السبعة — قراءةٌ من مالكيها؛ والحساسُ (راتبٌ وسلف) '
         . 'يمرّ بحارس الظهور الثلاثي: صفةُ المشاهد ثم علاقتُه بالمعروض ثم مفتاحُ HR.', array());
+    // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
+    echo ems_states_bundle('لا بياناتِ بطاقةٍ لهذا الموظف', 'اختر موظفًا من سجلِّ الموظفين لتفتحَ بطاقتَه بتبويباتها السبعة');
     ?>
 
     <?php if (!$emp): ems_state_empty('اختر موظفًا', 'إلى الموظفين', 'employees.php'); ?>
     <?php else: ?>
-    <div class="card"><div class="card-body" style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
-        <strong style="font-size:1.1rem"><?php echo htmlspecialchars((string)$emp['name']); ?></strong>
+    <div class="card"><div class="card-body ecard-idbar">
+        <strong class="ecard-name"><?php echo htmlspecialchars((string)$emp['name']); ?></strong>
         <span class="badge badge-secondary"><?php echo htmlspecialchars((string)($emp['employee_code'] ?? '')); ?></span>
-        <span style="margin-inline-start:auto">
+        <span class="ecard-tabs">
         <?php foreach ($TABS as $tk => $tl): ?>
-            <a class="btn btn-sm" style="border:1px solid #ddd;border-radius:6px;padding:4px 10px;margin:0 2px;<?php
-                echo $tk === $tab ? 'background:#e2b93b;font-weight:800' : ''; ?>"
+            <a class="btn btn-sm ecard-tab<?php echo $tk === $tab ? ' is-active' : ''; ?>"
                href="?id=<?php echo $eid; ?>&tab=<?php echo $tk; ?>"><?php echo $tl; ?></a>
         <?php endforeach; ?></span>
     </div></div>
@@ -82,7 +99,7 @@ include '../insidebar.php';
     <?php
     switch ($tab) {
         case '1':
-            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%"><tbody>';
+            echo '<div class="table-container"><table class="alltables display ecard-table" data-no-dt="1"><tbody>';
             foreach (array('name' => 'الاسم', 'employee_code' => 'الكود', 'employee_type' => 'النوع',
                            'employment_classification' => 'التصنيف', 'phone' => 'الهاتف',
                            'nationality' => 'الجنسية', 'license_number' => 'الرخصة',
@@ -102,7 +119,7 @@ include '../insidebar.php';
                                   AND COALESCE(is_deleted,0)=0 ORDER BY start_date DESC");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
             if (!$rows) { ems_state_empty('لا عقودَ في السجل الموحّد (H-08)', 'إلى السجل', '../Workforce/contract_registry.php'); break; }
-            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+            echo '<div class="table-container"><table class="alltables display ecard-table" data-no-dt="1">'
                . '<thead><tr><th>#</th><th>الفئة</th><th>العلاقة</th><th>المدة</th><th>الحال</th><th>نسخة</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
@@ -132,7 +149,7 @@ include '../insidebar.php';
                                 WHERE company_id={$co} AND person_id={$eid} ORDER BY id");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
             if (!$rows) { ems_state_empty('لا صفاتٍ مشتقةً — الاشتقاقُ في شاشة 182', 'إليها', '../user_capacities.php'); break; }
-            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+            echo '<div class="table-container"><table class="alltables display ecard-table" data-no-dt="1">'
                . '<thead><tr><th>الصفة</th><th>الدور</th><th>النطاق</th><th>السريان</th><th>الحال</th></tr></thead><tbody>';
             foreach ($rows as $x) {
                 echo '<tr><td>' . htmlspecialchars((string)$x['capacity_type']) . '</td>'
@@ -151,10 +168,10 @@ include '../insidebar.php';
                                 WHERE company_id={$co} AND party='employee' AND party_ref={$eid}
                                   AND deleted_at IS NULL GROUP BY award_unit_type");
             $any = false;
-            echo '<div style="display:flex;gap:12px;flex-wrap:wrap">';
+            echo '<div class="ecard-chips">';
             while ($r && ($x = $r->fetch_assoc())) {
                 $any = true;
-                echo '<div class="badge badge-secondary" style="font-size:15px;padding:10px 16px">'
+                echo '<div class="badge badge-secondary ecard-chip">'
                    . htmlspecialchars($x['award_unit_type'] . ': ' . $x['q'] . ' (' . $x['n'] . ' حكمًا)') . '</div>';
             }
             echo '</div>';
@@ -203,7 +220,7 @@ include '../insidebar.php';
                                 ORDER BY id DESC LIMIT 50");
             while ($r && ($x = $r->fetch_assoc())) { $rows[] = $x; }
             if (!$rows) { ems_state_empty('لا عهدَ مسلَّمةً باسمه'); break; }
-            echo '<div class="table-container"><table class="alltables display" data-no-dt="1" style="width:100%">'
+            echo '<div class="table-container"><table class="alltables display ecard-table" data-no-dt="1">'
                . '<thead><tr><th>الصنف</th><th>مصروف</th><th>مُرجَع</th><th>الحال</th><th>التاريخ</th></tr></thead><tbody>';
             foreach ($rows as $x) {
                 echo '<tr><td>' . htmlspecialchars((string)$x['item_name']) . '</td>'
