@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-18 14:01:32
--- الجداول: 573 · المناظير: 23
+-- المصدر: equipation_manage · التوليد: 2026-08-18 14:38:56
+-- الجداول: 575 · المناظير: 23
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -7538,15 +7538,41 @@ CREATE TABLE `nav_canonical` (
   `sort_no` int(11) NOT NULL DEFAULT 999 COMMENT 'الترتيبُ داخل المجموعة — من الدورةِ المستندية',
   `nature` varchar(60) DEFAULT NULL,
   `owner_dept` varchar(120) DEFAULT NULL COMMENT 'الإدارةُ المالكةُ للمفهوم',
-  `status` enum('APPROVED','PENDING_OWNER','PENDING_DEDUP','TECHNICAL_ONLY','MERGED','RETIRED') NOT NULL,
+  `status` enum('APPROVED','PENDING_OWNER','PENDING_DEDUP','PENDING_OWNER_MERGE','TECHNICAL_ONLY','MERGED','RETIRED') NOT NULL,
   `old_names` text DEFAULT NULL COMMENT 'المسمياتُ الملغاة — مرادفاتٌ تاريخية',
   `derivation` varchar(190) DEFAULT NULL COMMENT 'مصدرُ الاشتقاق (بند ٤ — إلزاميّ)',
+  `view_of` varchar(255) DEFAULT NULL COMMENT 'علاقةُ المنظر/الارتباط بمسارٍ داخل الـ359',
+  `merge_into` varchar(255) DEFAULT NULL,
+  `retirement_status` varchar(40) DEFAULT NULL,
+  `current_label` varchar(190) DEFAULT NULL COMMENT 'اسمُ الانتقالِ للمعلَّق — من الصفِّ لا من إرث',
+  `current_parent` varchar(255) DEFAULT NULL,
   `matrix_row` smallint(6) DEFAULT NULL COMMENT 'رقمُ الصفِّ في الدفترِ المعتمَد',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_route` (`route`),
   KEY `ix_status_level` (`status`,`level_no`,`sort_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01: سجلُّ التنقلِ المعياريُّ — صورةُ مصفوفةِ الـ359 المعتمَدة';
+
+-- ── Table: nav_canonical_current ──
+CREATE TABLE `nav_canonical_current` (
+  `route` varchar(160) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `cur_label` varchar(190) NOT NULL,
+  `cur_group` varchar(190) NOT NULL,
+  `cur_order` int(11) NOT NULL COMMENT 'تسلسلُ الظهورِ الحيُّ في الدور — من uxui_live_positions.tsv',
+  PRIMARY KEY (`route`,`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01 v3: موضعُ الانتقالِ الحاليُّ للمعلَّقِ لكلِّ دور — المصفوفةُ وحدَها مصدرًا';
+
+-- ── Table: nav_canonical_variants ──
+CREATE TABLE `nav_canonical_variants` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `canonical_route` varchar(160) NOT NULL,
+  `variant_key` varchar(120) NOT NULL COMMENT '#مرساة أو ?view=منظر',
+  `variant_type` enum('anchor','declared_view') NOT NULL,
+  `variant_purpose` varchar(190) NOT NULL COMMENT 'الاسمُ الظاهرُ للمدخلِ الثاني',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_variant` (`canonical_route`,`variant_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01 v3: سجلُّ المداخلِ الثانية — المرساةُ والمنظرُ المعلَن';
 
 -- ── Table: nav_items ──
 CREATE TABLE `nav_items` (

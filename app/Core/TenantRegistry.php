@@ -561,6 +561,8 @@ class TenantRegistry
         'nav_items' => array('type' => self::T_GLOBAL, 'soft' => false),
         // UXUI-01: سجلُّ التنقلِ المعياريُّ (مصفوفةُ الـ359) — تعريفُ نظامٍ لا بياناتُ شركة
         'nav_canonical' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'nav_canonical_current' => array('type' => self::T_GLOBAL, 'soft' => false),
+        'nav_canonical_variants' => array('type' => self::T_GLOBAL, 'soft' => false),
         // تعريفُ الشاشة خاصيةُ الشاشة لا بياناتُ شركة — مرجعٌ عامٌّ كأخواته
         'screen_about' => array('type' => self::T_GLOBAL, 'soft' => false),
         'nav_redirects' => array('type' => self::T_GLOBAL, 'soft' => false),

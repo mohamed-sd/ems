@@ -78,26 +78,93 @@ function neg_pending_dir()
     return $d;
 }
 
+/* ═══ التعافي — يرفض ويُعلن ولا يدوس (إعادةُ تصميمٍ 2026-08-18) ══════════════
+   ◆ الخطرُ الذي وقع فعلًا: الذمّةُ كانت تُستعاد **عمياءَ** — تكتب نصَّها فوقَ
+     الملفِّ الحيِّ أيًّا كان حالُه. وذمّةٌ عمرُها يومٌ قيست فوجدتها أقدمَ بـ2752
+     بايتًا من الحيّ، فتشغيلُ الحزامِ كان يمحو عملَ يومٍ كامل بلا إنذار.
+   ◆ التصميمُ الجديدُ ثلاثيُّ الشرط: البصمةُ (sha1 لحظةَ الإفساد) + الوقتُ
+     (عمرُ الذمّة) + مرجعُ الالتزام (HEAD وقتَها). ولا يُستعاد إلا ما كانت
+     بصمتُه الحيّةُ **مطابقةً للمُفسَدِ حرفًا** — أي أن الإفسادَ ما زال قائمًا
+     ولم يلمس أحدٌ الملفَّ بعده. وما عدا ذلك: يُحجَر ويُعلَن ويرسّب التشغيل. */
+define('NEG_STALE_HOURS', 6);
+
+function neg_quarantine_dir()
+{
+    $d = dirname(__DIR__) . '/storage/quarantine/neg_pending_' . date('Ymd');
+    if (!is_dir($d)) { @mkdir($d, 0777, true); }
+    return $d;
+}
+
+function neg_head_ref()
+{
+    $h = @file_get_contents(dirname(__DIR__) . '/.git/HEAD');
+    if (!is_string($h)) { return ''; }
+    if (preg_match('~ref:\s*(\S+)~', $h, $m)) {
+        $p = @file_get_contents(dirname(__DIR__) . '/.git/' . $m[1]);
+        return is_string($p) ? substr(trim($p), 0, 12) : trim($m[1]);
+    }
+    return substr(trim($h), 0, 12);
+}
+
+/** @return array{restored:int,blocked:int,notes:string[]} */
 function neg_recover_stale()
 {
-    $n = 0;
+    $restored = 0; $blocked = 0; $notes = array();
     foreach ((array) glob(neg_pending_dir() . '/*.json') as $f) {
         $rec = json_decode((string) @file_get_contents($f), true);
-        if (is_array($rec) && !empty($rec['abs']) && array_key_exists('orig', $rec)) {
-            file_put_contents($rec['abs'], $rec['orig']);
-            echo "  ↺ استُرجع من جولةٍ ماتت: " . basename($rec['abs']) . "\n";
-            $n++;
+        if (!is_array($rec) || empty($rec['abs']) || !array_key_exists('orig', $rec)) {
+            $notes[] = 'ذمّةٌ غيرُ مقروءةٍ حُجرت: ' . basename($f);
+            @rename($f, neg_quarantine_dir() . '/' . basename($f));
+            $blocked++;
+            continue;
         }
+        $abs = $rec['abs'];
+        $liveSha = is_file($abs) ? sha1((string) file_get_contents($abs)) : '';
+        $ageH = (time() - (int) (isset($rec['at']) ? $rec['at'] : filemtime($f))) / 3600;
+        $why = '';
+        if (!is_file($abs)) {
+            $why = 'الملفُّ الهدفُ غيرُ موجود';
+        } elseif (empty($rec['broken_sha1'])) {
+            $why = 'ذمّةٌ بلا بصمةِ إفسادٍ (صيغةٌ قديمة) — لا يُتحقق أن الإفسادَ ما زال قائمًا';
+        } elseif ($liveSha !== $rec['broken_sha1']) {
+            $why = 'بصمةُ الحيِّ لا تطابق المُفسَدَ — الملفُّ تغيّر بعدَ الذمّة (الاستعادةُ تدوس عملًا)';
+        } elseif ($ageH > NEG_STALE_HOURS) {
+            $why = 'عمرُ الذمّة ' . round($ageH, 1) . ' ساعةً > ' . NEG_STALE_HOURS . ' — قديمةٌ لا يُوثَق بها';
+        } elseif (!empty($rec['head']) && neg_head_ref() !== '' && $rec['head'] !== neg_head_ref()) {
+            $why = 'مرجعُ الالتزامِ تغيّر (' . $rec['head'] . ' ⇐ ' . neg_head_ref() . ')';
+        }
+        if ($why !== '') {
+            $q = neg_quarantine_dir() . '/' . basename($f);
+            @rename($f, $q);
+            @file_put_contents($q . '.reason.txt',
+                "الهدف: {$abs}\nالسبب: {$why}\nبصمةُ الحيِّ: {$liveSha}\nالمُفسَدُ المسجَّل: "
+                . (isset($rec['broken_sha1']) ? $rec['broken_sha1'] : '—') . "\nالأصلُ المسجَّل: "
+                . (isset($rec['orig_sha1']) ? $rec['orig_sha1'] : sha1((string) $rec['orig'])) . "\n"
+                . "وقتُ الحجر: " . date('Y-m-d H:i:s') . "\nالسياسة: حجرٌ ثلاثين يومًا ثم حذف\n");
+            $notes[] = "⛔ حُجرت ولم تُستعد: " . basename($abs) . " — {$why}";
+            $blocked++;
+            continue;
+        }
+        file_put_contents($abs, $rec['orig']);
         @unlink($f);
+        $notes[] = '↺ استُرجع بأمان (البصمةُ تطابق المُفسَدَ): ' . basename($abs);
+        $restored++;
     }
-    return $n;
+    return array('restored' => $restored, 'blocked' => $blocked, 'notes' => $notes);
 }
 
 function neg_swap($abs, $newContent)
 {
     $orig = (string) file_get_contents($abs);
     $tag  = neg_pending_dir() . '/' . sha1($abs) . '.json';
-    file_put_contents($tag, json_encode(array('abs' => $abs, 'orig' => $orig)));
+    file_put_contents($tag, json_encode(array(
+        'abs'         => $abs,
+        'orig'        => $orig,
+        'orig_sha1'   => sha1($orig),
+        'broken_sha1' => sha1($newContent),   /* شرطُ الاستعادةِ: الحيُّ = المُفسَد */
+        'at'          => time(),
+        'head'        => neg_head_ref(),
+    ), JSON_UNESCAPED_UNICODE));
     file_put_contents($abs, $newContent);
     return function () use ($abs, $orig, $tag) {
         file_put_contents($abs, $orig);
@@ -118,10 +185,20 @@ if (!$__lock || !flock($__lock, LOCK_EX | LOCK_NB)) {
 }
 register_shutdown_function(function () use ($__lock) { @flock($__lock, LOCK_UN); @fclose($__lock); });
 
-$__recovered = neg_recover_stale();
-if ($__recovered > 0) {
-    echo "◆ استُرجع {$__recovered} ملفًّا من جولةٍ سابقةٍ ماتت قبل استعادتِها.\n\n";
+$__rec = neg_recover_stale();
+foreach ($__rec['notes'] as $__n) { echo "  {$__n}\n"; }
+if ($__rec['restored'] > 0) {
+    echo "◆ استُرجع {$__rec['restored']} ملفًّا من جولةٍ سابقةٍ ماتت قبل استعادتِها.\n";
 }
+if ($__rec['blocked'] > 0) {
+    /* الرفضُ يُعلَن ويرسّب: ذمّةٌ لا يُوثَق بها تعني أن حالةَ الشجرةِ مجهولة،
+       وتشغيلُ حزامٍ يُفسد الملفاتِ فوق حالةٍ مجهولةٍ مخاطرةٌ لا اختبار. */
+    echo "\n⛔ {$__rec['blocked']} ذمّةً حُجرت ولم تُستعد — راجِعها في storage/quarantine/ قبل التشغيل.\n";
+    echo "   (السياسة: حجرٌ ثلاثين يومًا ثم حذف · ولا استعادةَ تدوس عملًا)\n";
+    /* القفلُ يفكُّه خطّافُ الإغلاقِ المسجَّل — وإغلاقُه هنا يجعل المقبضَ باطلًا فيرمي */
+    exit(2);
+}
+if ($__rec['restored'] > 0) { echo "\n"; }
 
 /* ── ① AC-F1 · الفشلُ مغلقًا: أعِدْ فرعًا سامحًا وأثبتْ رسوبَ الفحص ─────── */
 neg('AC-F1', 'حارسٌ يفشل مغلقًا — يرسب إن عاد فرعٌ سامح',

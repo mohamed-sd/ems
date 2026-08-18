@@ -1,0 +1,9 @@
+{
+    "quarantined_at": "2026-08-18 11:32:57",
+    "reason": "ذمّةٌ قديمةٌ (2026-08-17 00:32) تحمل نسخةً أقدمَ بـ2752 بايتًا من الحيّ — واستعادةٌ عمياءُ كانت ستدوس عملَ يومٍ كامل على Contracts\/contracts.php",
+    "target": "C:\\wamp64\\www\\ems\/Contracts\/contracts.php",
+    "ledger_orig_sha1": "666628f13d24a075d5491bef19019a8326605813",
+    "live_sha1_at_quarantine": "e2c4a9672b234dcaa849168a41149910645a8f88",
+    "purge_after": "2026-09-17",
+    "policy": "حجرٌ ثلاثين يومًا ثم حذف — لا حذفَ مدمِّرٌ فوريّ"
+}

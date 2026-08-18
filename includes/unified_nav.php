@@ -288,15 +288,27 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
         if (!$hdrPrinted) {
             $hdrPrinted = true;
             /* المفتاحُ بصيغةِ «المسار||التسمية» — نفسِ صيغةِ `printNavLinkItem`،
-               وإلا لم يتعرَّف الحارسُ على المحقونِ فطُبع مرتين من مصدرين. */
-            ems_nav_mark_printed('main/role_board.php||الرئيسية');
-            echo '<li><a href="' . $basePrefix . 'main/role_board.php">'
-               . '<i class="fa fa-house"></i> <span>الرئيسية</span></a></li>' . "\n";
-            ems_nav_mark_printed('chats/index.php||المراسلات');
-            echo '<li><a href="' . $basePrefix . 'chats/index.php" id="sidebarChatLink">'
-               . '<i class="fa fa-comments"></i> <span>المراسلات</span>'
-               . '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>'
-               . '</a></li>' . "\n";
+               وإلا لم يتعرَّف الحارسُ على المحقونِ فطُبع مرتين من مصدرين.
+               ◆ UXUI-01 v3: ما يولّده سجلُّ التنقلِ لهذا الدورِ لا يُحقن هنا —
+                 «لا سايدبارَ موروثٌ خلفَ المصفوفة». والحقنُ يبقى للأدوارِ التي
+                 لا قياسَ current لها (الفرعيةُ ومن خارجِ نطاقِ القياس). */
+            $navFromRegistry = function ($route) {
+                if (!isset($GLOBALS['__uxui_cur_role'])) { return false; }
+                $cur = uxuiCurrentMap($GLOBALS['conn'], $GLOBALS['__uxui_cur_role']);
+                return isset($cur[$route]);
+            };
+            if (!$navFromRegistry('main/role_board.php')) {
+                ems_nav_mark_printed('main/role_board.php||الرئيسية');
+                echo '<li><a href="' . $basePrefix . 'main/role_board.php">'
+                   . '<i class="fa fa-house"></i> <span>الرئيسية</span></a></li>' . "\n";
+            }
+            if (!$navFromRegistry('chats/index.php')) {
+                ems_nav_mark_printed('chats/index.php||المراسلات');
+                echo '<li><a href="' . $basePrefix . 'chats/index.php" id="sidebarChatLink">'
+                   . '<i class="fa fa-comments"></i> <span>المراسلات</span>'
+                   . '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>'
+                   . '</a></li>' . "\n";
+            }
         }
 
         $byGroup = array();
@@ -485,15 +497,92 @@ function uxuiNavBaseRoute($route) {
 }
 
 function uxuiCanonicalMap($conn) {
+    /* v3 (تفويض 2026-08-18): السجلُّ كلُّه بحالاتِه — «المولّدُ يقرأ من المصفوفةِ
+       وحدَها ويتصرف بالحالة: APPROVED يأخذ المعياريَّ · PENDING_OWNER يأخذ الحاليَّ
+       من الصفِّ نفسِه · PENDING_OWNER_MERGE يبقى بمسارِه حتى تنفيذِ الدمج —
+       لا سايدبارَ موروثٌ خلفَ المصفوفةِ أبدًا». */
     static $map = null;
     if ($map !== null) { return $map; }
     $map = array();
     if (function_exists('ems_env') && strtolower((string) ems_env('EMS_UXUI_NAV')) === 'off') { return $map; }
-    $res = @mysqli_query($conn, "SELECT route, canonical_ar, level_no, group_name, sort_no
-                                   FROM nav_canonical WHERE status = 'APPROVED'");
+    $res = @mysqli_query($conn, "SELECT route, canonical_ar, level_no, group_name, sort_no, status, current_label
+                                   FROM nav_canonical");
     if (!$res) { return $map; } /* الجدولُ لم يُبذر بعدُ = الوضعُ القديمُ كما هو (fail-open للعرض) */
     while ($row = mysqli_fetch_assoc($res)) { $map[strtolower(trim($row['route']))] = $row; }
     return $map;
+}
+
+/** موضعُ المعلَّقِ الحاليُّ لكلِّ دور — من nav_canonical_current (المصفوفةُ وحدَها) */
+function uxuiCurrentMap($conn, $roleId) {
+    static $byRole = array();
+    $rid = (int) $roleId;
+    if (isset($byRole[$rid])) { return $byRole[$rid]; }
+    $byRole[$rid] = array();
+    $res = @mysqli_query($conn, "SELECT route, cur_label, cur_group, cur_order FROM nav_canonical_current WHERE role_id = {$rid}");
+    if ($res) { while ($row = mysqli_fetch_assoc($res)) { $byRole[$rid][strtolower(trim($row['route']))] = $row; } }
+    return $byRole[$rid];
+}
+
+/** كتلةُ المعلَّقِ بموضعِه الحاليِّ من السجل — مجموعاتُه الحيّةُ بترتيبِ ظهورِها.
+ *  $mode: 'flat' يطبع بنودَ «— خارج التبويب» وحدَها (الرئيسيةُ أولَ ما يُرى) ·
+ *         'groups' يطبع المجموعاتِ وحدَها — فيحيط المسطّحُ القائمةَ من أولِها
+ *         والمجموعاتُ المعلَّقةُ تلحق الكتلةَ المعيارية */
+function printUxuiCurrentNav($items, $curMap, $basePrefix, $badges, $mode = 'groups') {
+    if (empty($items)) { return; }
+    $rows = array(); $flat = array();
+    foreach ($items as $idx => $it) {
+        $raw = (string) $it['route'];
+        $base = uxuiNavBaseRoute($raw);
+        $isVariant = (strpbrk($raw, '#?') !== false);
+        $cur = isset($curMap[$base]) ? $curMap[$base] : null;
+        $grp = $cur ? $cur['cur_group'] : '— خارج التبويب';
+        $ord = $cur ? (int) $cur['cur_order'] : 999;
+        $lbl = $isVariant ? $it['label_ar'] : ($cur ? $cur['cur_label'] : $it['label_ar']);
+        $row = array('code' => $raw, 'name' => $lbl, 'icon' => $it['icon'],
+                     'group' => $grp, 'sort' => $ord, 'variant' => $isVariant ? 1 : 0, 'idx' => $idx);
+        if ($grp === '— خارج التبويب' || $grp === '') { $flat[] = $row; } else { $rows[] = $row; }
+    }
+    if ($mode === 'flat') {
+        usort($flat, function ($a, $b) { return ($a['sort'] !== $b['sort']) ? $a['sort'] - $b['sort'] : $a['idx'] - $b['idx']; });
+        foreach ($flat as $r) {
+            printNavLinkItem(array('code' => $r['code'], 'name' => $r['name'], 'icon' => $r['icon']), $basePrefix, $badges);
+        }
+        return;
+    }
+    if (empty($rows)) { return; }
+    $groups = array();
+    foreach ($rows as $r) { $groups[$r['group']]['items'][] = $r; }
+    foreach ($groups as $gname => &$G) {
+        $ms = PHP_INT_MAX;
+        foreach ($G['items'] as $r) { if ($r['sort'] < $ms) { $ms = $r['sort']; } }
+        $G['minsort'] = $ms; $G['name'] = $gname;
+        usort($G['items'], function ($a, $b) {
+            if ($a['sort'] !== $b['sort']) { return $a['sort'] - $b['sort']; }
+            if ($a['variant'] !== $b['variant']) { return $a['variant'] - $b['variant']; }
+            return $a['idx'] - $b['idx'];
+        });
+    }
+    unset($G);
+    $list = array_values($groups);
+    usort($list, function ($a, $b) { return ($a['minsort'] !== $b['minsort']) ? $a['minsort'] - $b['minsort'] : strcmp($a['name'], $b['name']); });
+    $seq = 0;
+    foreach ($list as $G) {
+        $seq++;
+        $key = 'uxp-' . $seq;
+        $total = 0;
+        foreach ($G['items'] as $r) { $total += isset($badges[$r['code']]) ? intval($badges[$r['code']]) : 0; }
+        $badge = $total > 0 ? ' <span class="nav-count-badge nav-group-badge">' . ($total > 99 ? '99+' : $total) . '</span>' : '';
+        echo '<li class="nav-group open" data-group-key="' . $key . '">' . "\n";
+        echo '  <button type="button" class="nav-group-head" aria-expanded="true" aria-controls="navgrp-' . $key . '">'
+           . '<i class="fa fa-folder"></i> <span class="nav-group-name">'
+           . htmlspecialchars($G['name'], ENT_QUOTES, 'UTF-8') . '</span>' . $badge
+           . '<i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>' . "\n";
+        echo '  <ul class="nav-group-items" id="navgrp-' . $key . '">' . "\n";
+        foreach ($G['items'] as $r) {
+            printNavLinkItem(array('code' => $r['code'], 'name' => $r['name'], 'icon' => $r['icon']), $basePrefix, $badges);
+        }
+        echo '  </ul>' . "\n" . '</li>' . "\n";
+    }
 }
 
 /** طباعةُ الكتلةِ المعيارية: مجموعاتٌ بترتيبِ (المستوى ثم الدورةِ) — بهيكلِ nav-group نفسِه */
@@ -567,18 +656,47 @@ function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges 
     if (empty($items)) { return false; }
     emsNavLandingAnchors($items);
 
-    /* ── UXUI-01: فرزُ المعتمَدِ عن الباقي — المعتمَدُ للكتلةِ المعياريةِ
-       والباقي (PENDING + ما لا صفَّ له) يسلك مسارَه القائمَ بلا مساس.
-       والكتلةُ المعياريةُ تُطبع **بعد** القائمِ: فتبقى «الرئيسية» أولَ ما
-       يُرى، ويبقى المعلَّقُ في موضعِه الحاليِّ حرفًا بنصِّ العقد (ف١٥-٢). ── */
+    /* ── UXUI-01 v3 (تفويض 2026-08-18): المصفوفةُ وحدَها مصدرُ التنقل ──
+       APPROVED ⇐ الكتلةُ المعيارية · PENDING_OWNER وPENDING_OWNER_MERGE ⇐
+       موضعُهما الحاليُّ من nav_canonical_current (لا من إرثِ link_groups) ·
+       وما لا قياسَ current لدورِه (الأدوارُ الفرعية) أو لا صفَّ له يسلك
+       المسارَ القائمَ كما هو. الترتيب: المعلَّقُ المسطّحُ («الرئيسية» أولَ
+       ما يُرى) ⇐ القائمُ للفرعيةِ ⇐ المراسلاتُ ⇐ المعياريُّ ⇐ مجموعاتُ المعلَّق. */
     $uxMap = uxuiCanonicalMap($conn);
-    $uxItems = array();
+    $uxItems = array();          // APPROVED — الكتلةُ المعيارية
+    $uxPendItems = array();      // المعلَّقُ بموضعِه الحاليِّ من السجل
+    $uxCurMap = array();
+    $GLOBALS['__uxui_cur_role'] = (int) $roleId; /* تعرفه حقنةُ printStageNav فلا تزدوج */
     if (!empty($uxMap)) {
-        $rest = array();
+        $uxCurMap = uxuiCurrentMap($conn, (int) $roleId);
+        $rest = array(); $covered = array();
         foreach ($items as $it) {
-            if (isset($uxMap[uxuiNavBaseRoute($it['route'])])) { $uxItems[] = $it; } else { $rest[] = $it; }
+            $base = uxuiNavBaseRoute($it['route']);
+            if (!isset($uxMap[$base])) { $rest[] = $it; continue; }
+            $covered[$base] = true;
+            $st = $uxMap[$base]['status'];
+            if ($st === 'APPROVED') { $uxItems[] = $it; }
+            elseif (!empty($uxCurMap)) { $uxPendItems[] = $it; }
+            else { $rest[] = $it; } /* دورٌ بلا قياسِ current — سلوكُه القائمُ حرفًا */
         }
+        /* ما كان **ثابتًا صلبًا** في المصيِّرِ القديم (الرئيسية · المراسلات …) لا صفَّ
+           تبعيةٍ له في nav_items لبعضِ الأدوار — والسجلُّ الحيُّ current يحمله.
+           «لا سايدبارَ موروثٌ خلفَ المصفوفة»: يُصطنع رابطُه من السجلِّ نفسِه،
+           بحرفِ مسارِه المعياريِّ (لا الصغيرِ) — وحارسُ التوأمِ يمنع أيَّ ازدواج. */
+        foreach ($uxCurMap as $base => $cur) {
+            if (isset($covered[$base]) || !isset($uxMap[$base])) { continue; }
+            $properRoute = $uxMap[$base]['route'];
+            $icon = ($base === 'main/role_board.php') ? 'fa fa-home'
+                  : (($base === 'chats/index.php') ? 'fa fa-comments' : 'fa fa-link');
+            $synth = array('route' => $properRoute, 'label_ar' => $cur['cur_label'], 'icon' => $icon);
+            if ($uxMap[$base]['status'] === 'APPROVED') { $uxItems[] = $synth; } else { $uxPendItems[] = $synth; }
+        }
+        /* حقنةُ المراسلاتِ الخامُ (afterHome من insidebar) لا تمرُّ بحارسِ التوأم —
+           فمتى ولَّدها السجلُّ لهذا الدورِ تُسقَط الحقنةُ منعًا للازدواج. */
+        if (isset($uxCurMap['chats/index.php'])) { $afterHome = ''; }
         $items = $rest;
+        /* المعلَّقُ المسطّح (— خارج التبويب): «الرئيسية» وأخواتُها أولَ القائمة */
+        printUxuiCurrentNav($uxPendItems, $uxCurMap, $basePrefix, $badges, 'flat');
     }
 
     // NAV-09: للدور المولَّد (مجموعاتٌ مرحلية) وضعُ المراحل يلغي كرومَ الأبواب،
@@ -593,6 +711,7 @@ function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges 
         printStageNav($roleId, $staged, $basePrefix, $badges);
         if (empty($doored)) {
             printUxuiCanonicalNav($uxItems, $uxMap, $basePrefix, $badges);
+            printUxuiCurrentNav($uxPendItems, $uxCurMap, $basePrefix, $badges, 'groups');
             return true;
         }
         $items = $doored; $afterHome = '';
@@ -615,7 +734,8 @@ function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges 
     }
     // دورٌ بلا باب HOME (لا يقع اليوم — محروسٌ باختبار): لا تُفقد الثوابت
     if ($afterHome !== '' && !$injected) { echo $afterHome; }
-    // UXUI-01: الكتلةُ المعياريةُ (APPROVED) بعد القائمِ — والمعلَّقُ لم يُمَسَّ موضعُه
+    // UXUI-01 v3: المعياريُّ (APPROVED) ثم مجموعاتُ المعلَّقِ بموضعِها الحاليِّ من السجل
     printUxuiCanonicalNav($uxItems, $uxMap, $basePrefix, $badges);
+    printUxuiCurrentNav($uxPendItems, $uxCurMap, $basePrefix, $badges, 'groups');
     return true;
 }
