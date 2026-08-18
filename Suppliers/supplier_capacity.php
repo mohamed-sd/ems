@@ -152,6 +152,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     }
     echo ems_states_bundle('لا بطاقاتِ طاقةٍ لهذا العقدِ في الفترة', 'أضف بطاقةَ طاقةٍ لكلِّ معدةٍ مخصَّصة، أو غيّرِ العقدَ والفترة');
     ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'التأهيلُ والقدرة'); ?>
 
     <div class="card"><div class="card-body">
         <form method="get" class="scap-filter">

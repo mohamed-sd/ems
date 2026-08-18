@@ -184,3 +184,33 @@
   border-bottom: 2px solid var(--brand-amber);
 }
 .ems-imp-strip .ems-imp-strip-form { display: inline-flex; margin: 0; }
+
+/* شريطُ رحلةِ الكيان (UXW-01 §8-2) — الملفُّ الأمُّ وأبناؤه جسدٌ واحد */
+.ems-entity-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  margin-block: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--gray-50);
+  font-size: var(--text-caption);
+}
+.ems-entity-tabs .ems-entity-tabs-label { color: var(--gray-500); margin-inline-end: var(--space-1); }
+.ems-entity-tab {
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--gray-700);
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+.ems-entity-tab:hover { background: var(--white); border-color: var(--gray-300); }
+.ems-entity-tab.is-active {
+  background: var(--white);
+  border-color: var(--brand-amber);
+  color: var(--gray-900);
+  font-weight: var(--weight-semi);
+}
+.ems-entity-tab.is-unbuilt { color: var(--gray-500); opacity: 0.55; cursor: help; }

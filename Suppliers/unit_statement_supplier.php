@@ -42,6 +42,7 @@ $st->close();
 $page_title = 'إيكوبيشن | كشفُ وحداتِ المورد';
 include __DIR__ . '/../inheader.php';
 include __DIR__ . '/../insidebar.php';
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'التنفيذُ والاستحقاق');
 require_once __DIR__ . '/../includes/screen_contract.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>

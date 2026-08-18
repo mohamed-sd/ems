@@ -285,6 +285,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'نظرةٌ عامة'); ?>
 
     <?php if (!empty($_GET['msg'])):
         $isSuccess = strpos($_GET['msg'], '✅') !== false;
@@ -380,7 +381,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
                     <!-- أنواع المعدات (يمكن اختيار أكثر من نوع) -->
                     <div class="form-group allforms-span-full">
-                        <label for="commercial_registration">المعدات (يمكن اختيار أكثر من نوع)</label>
+                        <label>المعدات (يمكن اختيار أكثر من نوع)</label>
                         <div class="checkbox-grid">
                             <label class="checkbox-label">
                                 <input type="checkbox" name="equipment_types[]" value="حفارات" aria-label="حفارات" checked>
@@ -430,7 +431,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <h6><i class="fas fa-file-contract"></i> البيانات القانونية والتعريفية</h6>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>رقم التسجيل التجاري/الرخصة</label>
+                            <label for="commercial_registration">رقم التسجيل التجاري/الرخصة</label>
                         <div class="checkbox-grid">
                             <label class="checkbox-label">
                                 <input type="checkbox" name="equipment_types[]" value="حفارات" aria-label="حفارات" checked>
@@ -480,7 +481,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <h6><i class="fas fa-file-contract"></i> البيانات القانونية والتعريفية</h6>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>رقم التسجيل التجاري/الرخصة</label>
+                            <label for="commercial_registration">رقم التسجيل التجاري/الرخصة</label>
                             <input type="text" name="commercial_registration" id="commercial_registration" />
                         </div>
                         <div class="form-group">

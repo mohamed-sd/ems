@@ -340,6 +340,7 @@ ob_start(); ?><a href="../main/dashboard.php" class="back-btn">
 $header_back = array('raw' => trim((string) ob_get_clean()));
 include __DIR__ . '/../includes/page_header.php';
 ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('equipment', 'نظرةٌ عامة'); ?>
 
     <?php if (!empty($success_msg)):
         $isSuccess = strpos($success_msg, '✅') !== false;

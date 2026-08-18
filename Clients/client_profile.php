@@ -189,6 +189,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => 'clients.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('client', 'نظرةٌ عامة'); ?>
 
     <div class="profile-card" style="margin-bottom:12px;">
         <div class="identity-head">

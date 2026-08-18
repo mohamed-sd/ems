@@ -537,6 +537,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     $header_back = array('href' => 'equipments.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('equipment', 'نظرةٌ عامة'); ?>
 
     <?php
     // حالة الكرت (حوكمة خفيفة) + الحالة التشغيلية

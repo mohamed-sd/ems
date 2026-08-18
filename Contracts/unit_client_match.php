@@ -64,6 +64,7 @@ $st->close();
 $page_title = 'إيكوبيشن | مطابقةُ العميلِ على الوحدات';
 include __DIR__ . '/../inheader.php';
 include __DIR__ . '/../insidebar.php';
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('client', 'العقود');
 require_once __DIR__ . '/../includes/screen_contract.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 $canWrite = !empty($PERMS['can_edit']) || !empty($PERMS['can_add']);
