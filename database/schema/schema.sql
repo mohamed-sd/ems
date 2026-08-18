@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-18 20:34:31
--- الجداول: 585 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-18 20:49:51
+-- الجداول: 587 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6561,6 +6561,23 @@ CREATE TABLE `gov_policy_changes` (
   PRIMARY KEY (`id`),
   KEY `ix_key_date` (`policy_key`,`changed_on`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='تاريخُ الأحكامِ الحاكمة — القديمُ يبقى بتاريخِه وسببِه';
+
+-- ── Table: gov_pollution_findings ──
+CREATE TABLE `gov_pollution_findings` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `table_name` varchar(64) NOT NULL,
+  `column_name` varchar(64) NOT NULL,
+  `marker` varchar(24) NOT NULL COMMENT 'UAT · TEST · SEED · DEMO · SAMPLE · NOTE_IN_CODE',
+  `hits` int(10) unsigned NOT NULL,
+  `sample_value` varchar(255) DEFAULT NULL,
+  `column_role` varchar(40) DEFAULT NULL COMMENT 'خانةُ رمزٍ/تعدادٍ أم حقلٌ نصيٌّ مشروع',
+  `verdict` enum('UNCLASSIFIED','LEGIT_PRODUCTION','TEST_POLLUTION','SUSPECT') NOT NULL DEFAULT 'UNCLASSIFIED' COMMENT 'التصنيفُ الثلاثيُّ — والافتراضُ «غيرُ مصنَّف» لا «تلوث»',
+  `action_taken` enum('NONE','QUARANTINED','FIXED') NOT NULL DEFAULT 'NONE',
+  `scanned_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_tcm` (`table_name`,`column_name`,`marker`),
+  KEY `ix_verdict` (`verdict`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جردُ التلوثِ — الجولةُ الأولى قراءةٌ فقط ولا كتابةَ في بيانات';
 
 -- ── Table: gov_profile_items ──
 CREATE TABLE `gov_profile_items` (
@@ -13574,6 +13591,27 @@ CREATE TABLE `uat_runs` (
   PRIMARY KEY (`run_id`),
   KEY `idx_uat_phase` (`company_id`,`phase`,`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UAT-01: جولات التجربة — التحصين قبل كل تجربة';
+
+-- ── Table: ui_surfaces ──
+CREATE TABLE `ui_surfaces` (
+  `surface_id` varchar(80) NOT NULL COMMENT 'معرِّفُ السطحِ — قد يتعدد للملفِّ الواحد',
+  `source_file` varchar(190) NOT NULL COMMENT 'الملفُّ المُنتِج — وقد يشترك سطحان في ملف',
+  `extra_files` text DEFAULT NULL COMMENT 'ملفاتٌ أخرى يتركب منها السطحُ (شركاءُ التصيير)',
+  `canonical_name` varchar(190) DEFAULT NULL COMMENT 'الاسمُ المعياريُّ من nav_canonical إن وُجد',
+  `owner_dept` varchar(120) DEFAULT NULL,
+  `surface_type` enum('NAVIGABLE','CHILD_RECORD','ACTION_TARGET','MODAL_DRAWER','DRILLDOWN','TECHNICAL_ONLY','DEPRECATED') DEFAULT NULL COMMENT 'NULL = لم يُصنَّف بعد — ولا يُخمَّن',
+  `parent_surface` varchar(80) DEFAULT NULL COMMENT 'السطحُ الأمُّ للتبويبِ والتعمُّقِ والدرج',
+  `entry_method` varchar(60) DEFAULT NULL COMMENT 'كيف يُبلَغ: sidebar · tab · row_action · modal · post_handler · direct_url',
+  `renderable` tinyint(1) DEFAULT NULL COMMENT '1 = يُصيَّر صفحةً — وهو **مقامُ النسب**',
+  `evidence` varchar(255) DEFAULT NULL COMMENT 'شاهدُ التصنيفِ — لا تصنيفَ بلا شاهد',
+  `classified_by` varchar(60) DEFAULT NULL,
+  `classified_at` datetime DEFAULT NULL,
+  `first_seen_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`surface_id`),
+  KEY `ix_file` (`source_file`),
+  KEY `ix_type` (`surface_type`),
+  KEY `ix_parent` (`parent_surface`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='سجلُّ أسطحِ العرض — المقامُ أسطحٌ قابلةٌ للتصييرِ لا عددُ ملفات';
 
 -- ── Table: unit_approvals ──
 CREATE TABLE `unit_approvals` (
