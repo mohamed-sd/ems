@@ -93,28 +93,7 @@ include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main ems-unified-page-shell">
-    <style>
-    /* UXW-01 · أنماطُ الشاشةِ المصنَّفة (بوابة ٢) — ألوانُها من الرموز (بوابة ١) */
-    .rskg-alert-bad{padding:12px;margin:10px 0;border-inline-start:4px solid var(--c-dc3545)}
-    .rskg-alert-ok{padding:10px;margin:10px 0;border-inline-start:4px solid var(--c-198754)}
-    .rskg-text-bad{color:var(--c-b02a37, #b02a37)}
-    .rskg-text-ok{color:var(--c-146c43, #146c43)}
-    .rskg-list{font-size:.84rem;margin:6px 0 0;padding-inline-start:20px}
-    .rskg-soft{font-size:.82rem;opacity:.8}
-    .rskg-wfull{width:100%}
-    .rskg-mt{margin-top:12px}
-    .rskg-mono{font-size:.78rem;font-family:monospace}
-    .rskg-mono74{font-family:monospace;font-size:.74rem}
-    .rskg-xs{font-size:.76rem}
-    .rskg-sm{font-size:.82rem}
-    .rskg-fs78{font-size:.78rem}
-    .rskg-dim{opacity:.5}
-    .rskg-note{font-size:.78rem;opacity:.75;margin-top:6px}
-    .rskg-hint{font-size:.76rem;opacity:.75}
-    .rskg-missing{font-size:.85rem;color:var(--c-b02a37, #b02a37)}
-    .rskg-desc{font-size:.82rem;opacity:.85}
-    .rskg-msg{margin-inline-start:10px;font-size:.82rem}
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <?php
     $header_title = 'حوكمة إدارة المخاطر المؤسسية';
     $header_icon = 'fas fa-scale-unbalanced';

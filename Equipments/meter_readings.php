@@ -123,20 +123,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01 بوابتا ١·٢: أنماطُ شاشةِ قراءاتِ العدّادات — أصنافٌ ببادئةِ الشاشة
-   بدل style=، والألوانُ برموزٍ ذاتِ ردمٍ حرفيٍّ يحفظ المظهرَ كما كان */
-.mrd-filter      { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.mrd-eq-select   { min-width: 300px; }
-.mrd-now         { margin-top: 14px; font-size: 1.05em; }
-.mrd-now-value   { font-size: 1.4em; font-weight: 700; }
-.mrd-now-note    { color: var(--c-s-666, #666); margin-top: 4px; }
-.mrd-req         { color: var(--c-state-danger-strong, #c00); }
-.mrd-actions     { margin-top: 12px; }
-.mrd-table       { width: 100%; }
-.mrd-row-reset   { background: var(--c-fff7e6, #fff7e6); }
-.mrd-caution     { color: var(--c-a15c00, #a15c00); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'قراءات العدّادات'; $header_icon = 'fa fa-gauge-high';

@@ -80,18 +80,7 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
-<style>
-/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة */
-.fin-mprov-chips { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.fin-mprov-chip-lg { font-size: 13px; padding: 6px 12px; }
-.fin-mprov-rate { color: var(--c-374151); }
-.fin-mprov-lead { color: var(--c-4b5563); margin: 0 0 14px; line-height: 1.7; }
-.fin-mprov-form { box-shadow: none; padding: 0; }
-.fin-mprov-locked { color: var(--c-9ca3af); }
-.fin-mprov-h5 { margin: 0 0 10px; }
-.fin-mprov-table { width: 100%; }
-.fin-mprov-reason { color: var(--c-ink-500); font-size: 12px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <div class="main fin-mprov-main ems-unified-page-shell">
     <?php

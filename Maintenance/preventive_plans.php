@@ -690,60 +690,6 @@ function mnt_opt($value, $label, $selected) {
     $('#cancelPlanCreateForm').on('click', closeCreateForm);
 })();
 </script>
-<style>
-    /* UXW-01 ①: الألوانُ كلُّها برموزِ اللوحة — وما لا رمزَ له بعدُ يُعلَن باسمِ
-       قيمتِه مع قيمتِه الاحتياطيةِ حرفًا بحرفٍ فلا يتغيّر بكسلٌ واحد. */
-
-    /* UXW-01 ②: أصنافٌ محلَّ الأنماطِ الموضعيةِ التي كانت مبثوثةً في الوسوم */
-    .mnt-plans-main .mnt-pl-mb12 { margin-bottom:12px; }
-    .mnt-plans-main .mnt-pl-w100 { width:100%; }
-    .mnt-plans-main .mnt-pl-w56 { width:56px; }
-    .mnt-plans-main .mnt-pl-w130 { width:130px; }
-    .mnt-plans-main .mnt-pl-inline { display:inline; }
-    .mnt-plans-main .mnt-pl-filters { margin-inline-start:12px; }
-    .mnt-plans-main .mnt-pl-postpone { display:inline-flex; gap:4px; margin-inline-start:6px; }
-    .mnt-plans-main .mnt-pl-chip { border:1px solid var(--c-s-ddd); border-radius:6px; padding:2px 8px; }
-    .mnt-plans-main .mnt-pl-chip.is-active { background:var(--c-e2b93b, #e2b93b); font-weight:800; }
-
-    /* ملخص العدّادات */
-    .mnt-plans-main .mnt-cost-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
-    .mnt-plans-main .mnt-cost-box { background:var(--s1,#fff); border:1px solid var(--bdr,#ece6d8); border-radius:14px; padding:14px; text-align:center; box-shadow:0 2px 8px var(--c-rgba26188006); }
-    .mnt-plans-main .mnt-cost-box span { display:block; color:var(--t2,#8a7a5c); font-size:.8rem; font-weight:700; margin-bottom:7px; }
-    .mnt-plans-main .mnt-cost-box strong { font-size:1.4rem; font-variant-numeric:tabular-nums; color:var(--t1,#1a1208); }
-
-    /* ══ لوحة مهام الخطة — تصميم قوي متّسق مع هوية الفورمات ══ */
-    .mnt-plans-main .mnt-lines-card { overflow:hidden; }
-    .mnt-plans-main .mnt-lines-card > .card-header.mnt-lines-head {
-        display:flex; align-items:center; justify-content:space-between; gap:10px;
-        background:linear-gradient(135deg,var(--c-1f4f7a),var(--c-2f6fa5)); color:var(--c-s-fff); padding:13px 16px; border:none;
-    }
-    .mnt-plans-main .mnt-lines-head h5 { display:flex; align-items:center; gap:8px; margin:0; color:var(--c-s-fff); font-weight:800; font-size:1rem; }
-    .mnt-plans-main .mnt-lines-head h5 i { color:var(--c-ffd98a, #ffd98a); }
-    .mnt-plans-main .mnt-count { display:inline-flex; align-items:center; justify-content:center; min-width:24px; height:24px; padding:0 8px; border-radius:999px; background:var(--c-rgba255255255022); color:var(--c-s-fff); font-size:.76rem; font-weight:800; }
-    .mnt-plans-main .mnt-add-toggle {
-        display:inline-flex; align-items:center; gap:6px; border:none; cursor:pointer;
-        padding:7px 15px; border-radius:999px; font-weight:800; font-size:.82rem; color:var(--c-1a1208, #1a1208);
-        background:linear-gradient(135deg,var(--c-e0ae2e),var(--c-f5d27e, #f5d27e)); box-shadow:0 2px 8px var(--c-rgba2241744604, rgba(224,174,46,.4)); transition:transform .15s, box-shadow .15s;
-    }
-    .mnt-plans-main .mnt-add-toggle:hover { transform:translateY(-1px); box-shadow:0 6px 16px var(--c-rgba2241744605, rgba(224,174,46,.5)); }
-    .mnt-plans-main .mnt-line-form { background:linear-gradient(180deg,var(--c-fffdf7),var(--c-fbf6ea, #fbf6ea)); border:1px solid var(--bdr,#e7dcc4); border-radius:16px; padding:14px; margin-bottom:14px; box-shadow:inset 0 1px 0 var(--c-s-fff), 0 2px 8px var(--c-rgba26188005, rgba(26,18,8,.05)); }
-    .mnt-plans-main .mnt-line-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; align-items:end; }
-    .mnt-plans-main .mnt-line-grid .form-group { margin:0; }
-    .mnt-plans-main .mnt-line-actions { display:flex; align-items:center; gap:10px; margin-top:14px; flex-wrap:wrap; padding-top:12px; border-top:1px dashed var(--bdr,#e7dcc4); }
-    .mnt-plans-main .mnt-line-cancel { display:inline-flex; align-items:center; gap:6px; cursor:pointer; }
-
-    /* جدول المهام */
-    .mnt-plans-main .mnt-line-table { width:100%; border-collapse:separate; border-spacing:0; }
-    .mnt-plans-main .mnt-line-table thead th { background:var(--c-f3ede0, #f3ede0); color:var(--c-6b5d3e, #6b5d3e); font-weight:800; font-size:.82rem; padding:10px 12px; border-bottom:2px solid var(--c-e7dcc4, #e7dcc4); }
-    .mnt-plans-main .mnt-line-table tbody td { font-size:.88rem; padding:10px 12px; border-bottom:1px solid var(--c-f0e9da, #f0e9da); }
-    .mnt-plans-main .mnt-line-table tbody tr:hover { background:var(--c-rgba22417446007, rgba(224,174,46,.07)); }
-    .mnt-plans-main .mnt-line-table .mnt-num { font-variant-numeric:tabular-nums; font-weight:700; }
-    .mnt-plans-main .mnt-line-table td:last-child, .mnt-plans-main .mnt-line-table th:last-child { text-align:center; }
-    .mnt-plans-main .mnt-empty-line { display:flex; flex-direction:column; align-items:center; gap:8px; color:var(--c-b0a489, #b0a489); padding:24px 10px; }
-    .mnt-plans-main .mnt-empty-line i { font-size:1.9rem; opacity:.5; }
-    .mnt-plans-main .mnt-empty-line span { font-size:.9rem; font-weight:600; }
-
-    @media (max-width:900px){ .mnt-plans-main .mnt-cost-summary{ grid-template-columns:1fr;} }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 </body>
 </html>

@@ -78,22 +78,7 @@ function ems_org_unit_card($u)
         . '</div>';
 }
 ?>
-<style>
-    /* UXW-01 ①+②: بطاقاتُ المخططِ التفاعليِّ بأصنافٍ ورموزِ لوحةٍ — لا أنماطَ موضعية */
-    .orgst-card { border: 1px solid var(--c-s-ddd); border-radius: 8px; padding: 10px 14px; min-width: 220px; }
-    .orgst-alert { color: var(--c-c0392b); }
-    .orgst-code { color: var(--c-s-888); }
-    .orgst-row { display: flex; gap: 12px; flex-wrap: wrap; }
-    .orgst-children {
-        margin-top: 8px;
-        margin-inline-start: 22px;
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
-        border-inline-start: 2px solid var(--c-f0c419, #f0c419);
-        padding-inline-start: 12px;
-    }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'الهيكل التنظيمي — الطبقتان والمجالان'; $header_icon = 'fa fa-sitemap';

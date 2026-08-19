@@ -259,19 +259,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا أوامرَ شراءٍ بلغت طورَ المطابقة',
         'يظهر الأمرُ هنا بعد تسجيلِ الاستلام — سجِّلِ الاستلامَ ثم طابِقْ فاتورةَ المورد');
     ?>
-    <style>
-        .pom-badge-ok { color: var(--c-state-ok-deep); font-weight: 700; }
-        .pom-badge-warn { color: var(--c-badge-warning-b); font-weight: 700; }
-        .pom-badge-danger { color: var(--c-state-danger-deep); font-weight: 700; }
-        .pom-badge-muted { color: var(--c-s-888); }
-        .pom-meta { margin: 0 0 10px; }
-        .pom-var-amount { color: var(--c-badge-warning-b); }
-        .pom-span-full { grid-column: 1 / -1; }
-        .pom-w100 { width: 100%; }
-        .pom-act-btn { padding: 4px 10px; }
-        .pom-act-btn-warn { background: var(--c-badge-warning-b); }
-        .pom-act-gap { margin-inline-start: 4px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php proc_msg_banner(); ?>
 

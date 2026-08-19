@@ -80,18 +80,7 @@ ems_shell_axes(isset($pp) ? $pp : null);
 include '../inheader.php'; include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01 ①②: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة — واللونُ برمزٍ باحتياطٍ حرفيّ */
-.wf-la-grid        { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 14px; }
-.wf-la-full        { grid-column: 1 / -1; }
-.wf-la-actions     { padding: 0 14px 16px; }
-.wf-la-tablewrap   { margin-top: 14px; }
-.wf-la-table       { width: 100%; }
-.wf-la-actionbtns  { gap: 4px; align-items: center; }
-.wf-la-inline-form { display: inline; }
-.wf-la-state-sel   { padding: 2px; }
-.wf-la-empty       { text-align: center; color: var(--c-888, #888); padding: 18px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main">
     <?php $header_title='الإجازات والغياب'; $header_icon='fas fa-plane-departure'; $header_actions=array();
     if($can_add) $header_actions[]=array('id'=>'toggleForm','class'=>'add-btn','icon'=>'fas fa-plus-circle','label'=>'تسجيل إجازة/غياب');

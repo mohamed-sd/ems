@@ -143,30 +143,7 @@ if (isset($_GET['msg'])) {
 <!-- Font Awesome من CDN لضمان ظهور الأيقونات بشكل صحيح -->
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-<style>
-/* UXW-01 بوابتا ١·٢: أنماطُ زرَّي إكسل في الرأس — أصنافٌ بدل style=،
-   والألوانُ برموزٍ ذاتِ ردمٍ حرفيٍّ يحفظ المظهرَ كما كان (var(--c-<hex>, #<hex>)) */
-.eq-xl-tpl,
-.eq-xl-exp {
-    color: var(--white);
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-}
-.eq-xl-tpl {
-    background: linear-gradient(135deg, var(--c-16a34a, #16a34a) 0%, var(--c-059669, #059669) 100%);
-    box-shadow: 0 2px 8px var(--c-16a34a-sh, rgba(22, 163, 74, 0.25));
-}
-.eq-xl-exp {
-    background: linear-gradient(135deg, var(--c-2563eb, #2563eb) 0%, var(--c-1d4ed8, #1d4ed8) 100%);
-    box-shadow: 0 2px 8px var(--c-2563eb-sh, rgba(37, 99, 235, 0.25));
-}
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <?php
 

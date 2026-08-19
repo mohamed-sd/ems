@@ -105,26 +105,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     // UXW-01 ⑨: حالاتُ الشاشةِ الثلاثُ من المكوّنِ المركزيّ
     echo ems_states_bundle('لا وقائعَ ولا محاضرَ لهذه الفترة', 'غيِّر الفترةَ أو تحققْ من اعتمادِ الوقائع');
     ?>
-    <style>
-        /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
-        .ent-toolbar-filter { align-items: flex-end; }
-        .ent-filter-label { font-size: .8rem; }
-        .ent-w100 { width: 100%; }
-        .ent-mono { font-family: monospace; }
-        .ent-mono-sm { font-family: monospace; font-size: .7rem; }
-        .ent-mono-xs { font-family: monospace; font-size: .72rem; }
-        .ent-fs78 { font-size: .78rem; }
-        .ent-fs76 { font-size: .76rem; }
-        .ent-fs72 { font-size: .72rem; }
-        .ent-nowrap { white-space: nowrap; }
-        .ent-dim { opacity: .7; }
-        .ent-readonly-hint { opacity: .6; font-size: .76rem; }
-        .ent-reject-card { padding: 12px; margin: 10px 0; border-inline-start: 4px solid var(--c-dc3545); }
-        .ent-reject-title { color: var(--c-state-danger-deep); }
-        .ent-reject-note { color: var(--c-state-danger-deep); }
-        .ent-mt6 { margin-top: 6px; }
-        .ent-mt12 { margin-top: 12px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <form method="get" class="ems-toolbar ent-toolbar-filter">
         <label class="ent-filter-label" for="ent_period_input">الفترة

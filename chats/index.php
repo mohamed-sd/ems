@@ -137,49 +137,7 @@ include '../insidebar.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
 echo ems_states_bundle('لا مراسلاتٍ بعد', 'اختر زميلًا من قائمةِ جهاتِ الاتصالِ على اليمينِ لبدءِ محادثة');
 ?>
-<style>
-/* إصلاح رأس المراسلات: نظام «التوحيد» العام يجعل .contacts-header شبكة (grid) بثلاثة
-   أعمدة مع overflow:hidden، فيتداخل صندوق البحث ويتحوّل زر البثّ لدائرة. نُعيده هنا
-   لتخطيط عمودي طبيعي وصندوق بحث بعرض كامل (خاص بشاشة المراسلات فقط). */
-body.ems-site .main #contactsPanel .contacts-header {
-    display: block !important;
-    overflow: visible !important;
-    min-height: 0 !important;
-    direction: rtl !important;
-}
-body.ems-site .main #contactsPanel .contacts-header > * { width: auto !important; justify-self: auto !important; }
-body.ems-site .main #contactsPanel .contacts-header .search-box { display: block !important; width: 100% !important; margin-top: 10px !important; }
-body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 100% !important; box-sizing: border-box !important; }
-
-/* UXW-01 ①②: أصنافُ الشاشةِ بدلَ الأنماطِ الموضعيةِ والقيمِ المثبَّتة — البادئةُ chat- */
-.chat-role-c1  { background: var(--c-1b2f6e); }
-.chat-role-c2  { background: var(--c-28a745, #28a745); }
-.chat-role-c3  { background: var(--c-fd7e14, #fd7e14); }
-.chat-role-c4  { background: var(--c-6f42c1); }
-.chat-role-c5  { background: var(--c-20c997); }
-.chat-role-c6  { background: var(--c-17a2b8, #17a2b8); }
-.chat-role-c7  { background: var(--c-e83e8c, #e83e8c); }
-.chat-role-c8  { background: var(--c-f59e0b); }
-.chat-role-c9  { background: var(--c-343a40); }
-.chat-role-c10 { background: var(--c-dc3545); }
-.chat-role-c11 { background: var(--c-0c1c3e); }
-.chat-role-c12 { background: var(--c-6c757d); }
-
-.chat-contacts-titlebar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.chat-contacts-title { margin: 0; }
-.chat-nocontacts-icon { font-size: 2rem; margin-bottom: 8px; display: block; }
-.chat-contact-account { font-size: .72rem; color: var(--c-999999); }
-.chat-broadcast-msg-label { margin-top: 20px; }
-.chat-active-pane { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-
-.chat-msgs-error { text-align: center; padding: 40px; color: var(--c-ef4444); }
-.chat-msgs-error-icon { font-size: 2rem; display: block; margin-bottom: 10px; }
-.chat-retry-btn { padding: 8px 16px; background: var(--c-3b82f6); color: var(--c-surface); border: none; border-radius: 4px; cursor: pointer; }
-.chat-msgs-empty { text-align: center; padding: 40px; color: var(--c-94a3b8); font-size: 0.85rem; }
-
-/* يُبدَّل بجافاسكربت — ويأتي أخيرًا ليغلبَ display الخاصَّ بالمكوّنات أعلاه */
-.is-hidden { display: none; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="chat-wrapper">
 
     <!-- ===== لوحة جهات الاتصال ===== -->

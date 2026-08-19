@@ -81,22 +81,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
               'المقامُ معلَنٌ في كلِّ رقمٍ — ولا رقمَ بلا مقامٍ يُفسِّره'));
     echo ems_states_bundle('لا حصيلةَ مخاطرَ في نطاقك بعد', 'الحصيلةُ تُبنى من السجلِّ المفتوحِ غيرِ المدموجِ — وتتّسع باتساعِ نطاقِك');
     ?>
-    <style>
-        .rsk-stat-row { margin-bottom: 12px; }
-        .rsk-stat-card { padding: 10px; text-align: center; }
-        .rsk-stat-num { font-size: 1.5rem; font-weight: 700; }
-        .rsk-stat-label { font-size: .78rem; opacity: .8; }
-        .rsk-mt12 { margin-top: 12px; }
-        .rsk-mt8 { margin-top: 8px; }
-        .rsk-w100 { width: 100%; }
-        .rsk-maxw520 { max-width: 520px; }
-        .rsk-empty-note { font-size: .85rem; opacity: .75; }
-        .rsk-msg { margin-inline-start: 10px; font-size: .82rem; }
-        .rsk-fs76 { font-size: .76rem; }
-        .rsk-fs72 { font-size: .72rem; }
-        .rsk-cell-w220 { font-size: .72rem; max-width: 220px; }
-        .rsk-blocked-cell { font-size: .72rem; color: var(--c-b02a37, #b02a37); }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="row rsk-stat-row">
         <?php foreach (array('محظور' => 'badge-danger', 'حرج' => 'badge-danger', 'مرتفع' => 'badge-warning',

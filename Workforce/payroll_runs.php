@@ -207,25 +207,7 @@ $__money = function ($v, $fmt = true) use ($__maySeePay) {
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     ?>
-    <style>
-        .pr-notice { margin-bottom: 14px; }
-        .pr-required-mark { color: var(--c-state-danger-strong); }
-        .pr-submit-row { margin-top: var(--space-3); }
-        .pr-filter-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .pr-run-select { min-width: 380px; }
-        .pr-inline-form { display: inline; }
-        .pr-transition-row { margin-top: var(--space-3); display: flex; gap: var(--space-2); align-items: center; flex-wrap: wrap; }
-        .pr-payref-input { max-width: 200px; }
-        .pr-muted { color: var(--c-s-666); }
-        .pr-hint { color: var(--c-s-666); margin-bottom: 10px; }
-        .pr-alert-gap { margin-top: 10px; }
-        .pr-summary-row { margin-top: 14px; line-height: 1.9; }
-        .pr-table-full { width: 100%; }
-        .pr-row-red { background: var(--c-ffecec, #ffecec); }
-        .pr-layer-title { margin-top: var(--space-3); }
-        .pr-layer-list { line-height: 1.8; }
-        .pr-net-emph { font-size: 1.2em; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="alert alert-warning pr-notice">
         <i class="fa fa-circle-info"></i>

@@ -98,11 +98,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ شاشةِ إقفالِ الأمرِ وتحميلِ التكلفةِ أصنافًا */
-.trs-cc-row{display:flex;gap:6px}
-.trs-cc-cost{max-width:130px}
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main" dir="rtl">
   <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —

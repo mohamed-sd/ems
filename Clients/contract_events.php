@@ -787,32 +787,7 @@ function evt_state_tone($state)
     });
 </script>
 
-<style>
-    .evt-main .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: 12px; }
-    .evt-main .stats-section {
-        border: 1px solid var(--bdr); border-radius: var(--rl);
-        background: linear-gradient(180deg, var(--c-rgba255255255095, rgba(255,255,255,.95)) 0%, var(--s2) 100%);
-        box-shadow: var(--sh); padding: 14px; margin-bottom: 14px;
-    }
-    .evt-main .stats-card { background: var(--c-eeeeee, #eee); border: 1px solid var(--c-aaaaaa, #aaa); border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px var(--c-rgba26188007, rgba(26,18,8,.07)); position: relative; overflow: hidden; }
-    .evt-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-surface); color:var(--c-ink-max); }
-    .evt-main .stats-card .stats-title { color: var(--c-555555, #555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
-    .evt-main .stats-card .stats-value { color: var(--c-222222, #222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
-    @media (max-width: 900px) { .evt-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
-    @media (max-width: 560px) { .evt-main .stats-grid { grid-template-columns: 1fr; } }
-
-    .evt-main .evt-hidden { display: none; }
-    .evt-main .evt-col-full { grid-column: 1 / -1; }
-    .evt-main .table-container { overflow-x: auto; }
-    #evtTable.evt-table-nowrap, #evtTable.evt-table-nowrap th, #evtTable.evt-table-nowrap td { white-space: nowrap; }
-    #evtTable .action-btns { flex-wrap: nowrap; white-space: nowrap; }
-    .evt-main .evt-num { font-variant-numeric: tabular-nums; font-weight: 700; }
-    .evt-main .evt-muted { color: var(--c-ink-400); }
-    .evt-main .evt-badge { display:inline-block; padding:2px 10px; border-radius:999px; font-size:.75rem; font-weight:800; border:1px solid transparent; }
-    .evt-main .evt-badge-open { background:var(--c-rgba24515811014, rgba(245,158,11,.14)); color:var(--c-b45309); border-color:var(--c-rgba2451581103, rgba(245,158,11,.3)); }
-    .evt-main .evt-badge-progress { background:var(--c-rgba5913024614, rgba(59,130,246,.14)); color:var(--c-state-info-deep); border-color:var(--c-rgba591302463, rgba(59,130,246,.3)); }
-    .evt-main .evt-badge-closed { background:var(--c-rgba341979414, rgba(34,197,94,.14)); color:var(--c-state-ok-deep); border-color:var(--c-rgba34197943, rgba(34,197,94,.3)); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 </body>
 

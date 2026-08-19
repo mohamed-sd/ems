@@ -201,9 +201,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا معاونين مسجَّلين في الشركة بعدُ', 'أضف أولَ معاونٍ بزرِّ «إضافة معاون» في رأسِ الشاشة');
     ?>
-    <style>
-      .aas-head-sub { color: var(--c-surface); }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <?php if (!empty($_GET['msg'])): $ok = strpos($_GET['msg'], '✅') !== false; ?>
         <div class="success-message <?= $ok?'is-success':'is-error' ?>"><i class="fas <?= $ok?'fa-check-circle':'fa-exclamation-circle' ?>"></i> <?= htmlspecialchars($_GET['msg']) ?></div>
     <?php endif; ?>

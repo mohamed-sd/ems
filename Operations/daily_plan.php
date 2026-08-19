@@ -162,16 +162,7 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('operator', 'التكليفُ على المعدات');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا */
-.dp-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.dp-project-select { min-width: 220px; }
-.dp-inline { display: inline; }
-.dp-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
-.dp-inline-flex { display: inline-flex; gap: 4px; }
-.dp-reason { width: 160px; }
-.dp-table-full { width: 100%; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'خطة عمل الغد — مساحة التوزيع'; $header_icon = 'fa fa-calendar-day';

@@ -128,10 +128,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
-.ems-fnd-form-actions { margin-top:12px; display:flex; gap:10px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
     $header_title = 'وضع التأسيس وإغلاقه';

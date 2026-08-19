@@ -36,11 +36,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ قائمةِ أوامرِ الترحيلِ أصنافًا برموزِ الألوان */
-.trs-ol-tbl{width:100%}
-.trs-ol-late{color:var(--c-c0392b, #c0392b)}
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main trs-orders-main ems-unified-page-shell">
     <?php
     $header_title = 'أوامر الترحيل';

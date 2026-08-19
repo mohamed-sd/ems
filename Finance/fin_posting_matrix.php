@@ -27,13 +27,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                         ORDER BY rule_code");
     if ($r) { while ($x = $r->fetch_assoc()) { $rows[] = $x; } }
 ?>
-    <style>
-        .fa-mono{font-family:monospace}
-        .fa-fs78{font-size:.78rem}
-        .fa-fs76{font-size:.76rem}
-        .fa-fs74{font-size:.74rem}
-        .fa-table-full{width:100%}
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <?php echo ems_states_bundle('لا صفوفَ نشطةً في مصفوفةِ الترحيل', 'تُزرع المصفوفةُ مع تهيئةِ الشركةِ — وتعديلُها نسخةٌ جديدةٌ من هذه الشاشة'); ?>
     <div class="card"><div class="card-body table-responsive">
         <table class="alltables display nowrap fa-table-full">

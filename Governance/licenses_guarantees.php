@@ -111,15 +111,7 @@ include '../inheader.php';
 include '../insidebar.php';
 ?>
 
-<style>
-/* UXW-01 ②: أنماطُ الشاشةِ الموضعيةُ نُقلت أصنافًا — التراخيصُ والكفالات */
-.gov-lic-table { width: 100%; }
-.gov-lic-renew { display: flex; gap: 4px; }
-.gov-lic-doc   { width: 120px; }
-.gov-lic-row   { display: flex; gap: 14px; flex-wrap: wrap; }
-.gov-lic-col   { flex: 1; min-width: 340px; }
-.gov-lic-grid  { display: grid; gap: 8px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'التراخيص والكفالات'; $header_icon = 'fa fa-certificate';

@@ -84,10 +84,7 @@ include __DIR__ . '/../includes/page_header.php';
 echo ems_states_bundle('لا تحويلاتٍ بين المخازن بعد',
     'سجِّلِ التحويلَ من النموذج أعلاه — حركتان ذريّتان بمرجعٍ واحدٍ فلا يظهر الصنفُ في مخزنين');
 ?>
-  <style>
-    .wht-form { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; margin-bottom: 16px; }
-    .wht-qty-input { max-width: 110px; }
-  </style>
+  <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <form method="post" class="ems-form wht-form">
         <?= csrf_field() ?>

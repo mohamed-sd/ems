@@ -237,13 +237,7 @@ include '../insidebar.php';
     </div></div></div>
 </div>
 
-<style>
-    /* UXW-01 ①+②: أصنافٌ محلَّ الأنماطِ الموضعية — والألوانُ برموزِ اللوحة */
-    .orgprm-grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .orgprm-w100 { width: 100%; }
-    .orgprm-inline { display: inline; }
-    .orgprm-muted { color: var(--c-s-888); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script>
 document.getElementById('toggleForm')?.addEventListener('click', function () {

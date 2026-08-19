@@ -119,19 +119,7 @@ include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الثلاثُ من المكوّنِ المركزيّ
 echo ems_states_bundle('لا أثرَ أوليًّا ينتظر البوابة', 'ما يكتمل من سلاسلِ الاستحقاقِ يظهر هنا فورَ اقتراحِ أثرِه');
 ?>
-  <style>
-    /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
-    .eg-badge-pending { background: var(--c-badge-warning-a); font-size: .95em; }
-    .eg-badge-blocked { background: var(--c-6c757d); }
-    .eg-note { font-size: .9em; }
-    .eg-blocked-note { font-size: .8em; max-width: 230px; }
-    .eg-action-form { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
-    .eg-mt4 { margin-top: 4px; }
-    .eg-w110 { max-width: 110px; }
-    .eg-w100 { max-width: 100px; }
-    .eg-w190 { max-width: 190px; }
-    .eg-inbox-link { margin-top: 4px; display: inline-block; }
-  </style>
+  <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <p class="text-muted eg-note">الأثرُ الأوليُّ ينتظر اعتمادَ مدير الإدارة + المالية — ولا يصير Posted قبلهما (POL-01).</p>
   <?php if ($msg !== ''): ?>
     <div class="alert <?= (mb_strpos($msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">

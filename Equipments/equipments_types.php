@@ -56,18 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 ?>
 
-<style>
-    /* خلفية الصفحة بيضاء */
-    body:has(.equipments-types-main) {
-        background: var(--c-surface) !important;
-    }
-
-    /* منطقة المحتوى الرئيسية: خلفية بيضاء + هامش 10 */
-    .ems-site .main.equipments-types-main {
-        background: var(--c-surface) !important;
-        margin: 10px !important;
-    }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <div class="main equipments-types-main">
 

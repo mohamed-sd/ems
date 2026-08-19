@@ -48,19 +48,7 @@ include '../insidebar.php';
         'وسّعِ الترشيحَ بحقلَي المشروعِ والنوعِ أعلاه أو اتركهما فارغَين لإظهارِ الكل');
     ?>
 
-    <style>
-    .fl-rb-bar    { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-    .fl-rb-filter { display:flex; gap:8px;  align-items:center; }
-    .fl-rb-w90    { width:90px; }
-    .fl-rb-w120   { width:120px; }
-    .fl-rb-pct    { font-size:16px; padding:8px 16px; }
-    .fl-rb-legend { margin-inline-start:auto; }
-    .fl-rb-swatch { display:inline-block; width:12px; height:12px; border-radius:3px; }
-    .fl-rb-grid   { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; }
-    .fl-rb-cell   { display:block; border-radius:10px; padding:12px; color:var(--c-surface); text-decoration:none; }
-    .fl-rb-name   { font-weight:800; }
-    .fl-rb-cert   { margin-top:-6px; margin-bottom:6px; font-size:11px; color:var(--c-555555); }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card"><div class="card-body fl-rb-bar">
         <form method="get" class="fl-rb-filter">

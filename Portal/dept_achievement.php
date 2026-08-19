@@ -109,14 +109,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
-.ems-dach-filter { display:flex; gap:8px; align-items:flex-end; margin-bottom:14px; }
-.ems-dach-cards { display:flex; flex-wrap:wrap; gap:12px; }
-.ems-dach-card { min-width:200px; padding:14px; border:1px solid var(--c-dee2e6); border-radius:8px; background:var(--c-f8f9fa); }
-.ems-dach-num { font-size:1.6em; font-weight:bold; }
-.ems-dach-note { font-size:.85em; margin-top:12px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main" dir="rtl">
   <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —

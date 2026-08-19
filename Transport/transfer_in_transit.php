@@ -53,12 +53,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ شاشةِ الحركةِ في الطريقِ أصنافًا برموزِ الألوان */
-.trs-it-count{background:var(--c-fd7e14, #fd7e14)}
-.trs-it-late{background:var(--c-fff3f3, #fff3f3)}
-.trs-it-inline{display:inline}
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main" dir="rtl">
   <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —

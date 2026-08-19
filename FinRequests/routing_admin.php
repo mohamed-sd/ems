@@ -102,14 +102,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
     echo ems_states_bundle('لا صفوفَ توجيهٍ بعد', 'أضف توجيهَ إدارةٍ من نموذج «إضافة/تعديل توجيه إدارة» أدناه');
     ?>
-    <style>
-        /* UXW-01 ①/②: الأنماطُ الموضعيةُ صارت أصنافًا صفحية — والألوانُ برموزِ اللوحة حصرًا */
-        .fra-alert { margin-bottom:14px; font-weight:700; }
-        .fra-card { margin-bottom:14px; }
-        .fra-self-end { align-self:end; }
-        .fra-check { display:flex; gap:8px; align-items:center; }
-        .fra-hint { margin-top:10px; color:var(--c-6b4e2a); }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if (isset($_GET['msg']) && trim($_GET['msg']) !== ''): ?>
         <div class="alert alert-info fra-alert"><?php echo htmlspecialchars($_GET['msg']); ?></div>

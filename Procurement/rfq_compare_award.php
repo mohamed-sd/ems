@@ -236,14 +236,4 @@ echo ems_states_bundle('لا عروضَ مقدَّمةً لطلبِ العروض
   <?php endif; ?>
 </div>
 
-<style>
-    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — والألوانُ برموزِ اللوحةِ بقيمِها الاحتياطية */
-    .proc-rfq-filter { margin-bottom: 14px; }
-    .proc-rfq-select { max-width: 420px; }
-    .proc-rfq-best { background: var(--c-f0fff4, #f0fff4); }
-    .proc-rfq-best-badge { background: var(--c-198754); }
-    .proc-rfq-eq { font-size: .76rem; opacity: .75; }
-    .proc-rfq-eq-warn { font-size: .76rem; color: var(--c-b58900, #b58900); }
-    .proc-rfq-award-form { display: flex; gap: 6px; }
-    .proc-rfq-reason { max-width: 160px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>

@@ -159,12 +159,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
-.ems-pts-note { font-size:.9em; }
-.ems-pts-th-key { width:220px; }
-.ems-pts-stamp { font-family:var(--font-mono); font-size:1.15em; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell" dir="rtl">
     <?php
     $header_title = 'بصمة الإصدار وتقرير النشر';

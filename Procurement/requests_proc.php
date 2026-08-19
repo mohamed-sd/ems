@@ -666,18 +666,6 @@ function proc_req_line_row($conn, $is_super_admin, $company_id, $classifications
 })();
 </script>
 
-<style>
-    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — واللونُ برمزِ اللوحة */
-    .proc-req-line { align-items: end; margin-bottom: 8px; }
-    .proc-req-genform { margin-bottom: 12px; }
-    .proc-req-genbtn { background: var(--c-166534); }
-    .proc-req-full { grid-column: 1 / -1; }
-    .proc-req-addline { margin-top: 6px; }
-    .proc-req-table { width: 100%; }
-    .proc-req-decide { display: flex; gap: 3px; margin-top: 4px; flex-wrap: wrap; }
-    .proc-req-decide-form { display: inline; }
-    .proc-req-decide-reason { display: inline-flex; gap: 2px; }
-    .proc-req-reason { width: 90px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 </body>
 </html>

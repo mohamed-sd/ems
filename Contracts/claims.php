@@ -851,30 +851,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
 })();
 </script>
-<style>
-    /* UXW-01 ①+②: الأنماطُ الموضعيةُ صارت أصنافًا والألوانُ من الرموز — القيمُ ذاتُها بلا style= */
-    .clm-m4-12 { margin:4px 2px 12px; }
-    .clm-alert { margin-bottom:14px; font-weight:700; }
-    .clm-mt6 { margin-top:6px; }
-    .clm-mt8 { margin-top:8px; }
-    .clm-mt10 { margin-top:10px; }
-    .clm-mt12 { margin-top:12px; }
-    .clm-mb10 { margin-bottom:10px; }
-    .clm-mb14 { margin-bottom:14px; }
-    .clm-m6-2 { margin:6px 2px; }
-    .clm-m2-10 { margin:2px 2px 10px; }
-    .clm-m10-2 { margin:10px 2px; }
-    .clm-w100 { width:100%; }
-    .clm-dim60 { opacity:.6; }
-    .clm-dim55 { opacity:.55; }
-    .clm-nowrap { white-space:nowrap; }
-    .clm-inline { display:inline; }
-    .clm-flexform { display:flex; gap:6px; flex-wrap:wrap; }
-    .clm-subform { box-shadow:none; padding:0; }
-    .clm-adv-note { margin:0 0 8px; line-height:1.9; }
-    .clm-neg { color:var(--c-b91c1c, #b91c1c); }
-    .clm-pos { color:var(--c-15803d, #15803d); }
-    .clm-tax-select { width:auto; display:inline-block; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 </body>
 </html>

@@ -154,18 +154,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01 ②: أنماطٌ موضعيةٌ نُقلت أصنافًا صفحيةً ببادئةِ الشاشة eop- */
-.is-hidden { display: none; }
-.eop-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 14px; }
-.eop-hint { color: var(--c-888888, #888); display: block; margin-top: 4px; }
-.eop-field-wide { grid-column: 1 / -1; }
-.eop-actions { padding: 0 14px 16px; display: flex; gap: 10px; }
-.eop-btn-cancel { background: var(--c-6b7280, #6b7280); }
-.eop-table-wrap { margin-top: 14px; }
-.eop-table-full { width: 100%; }
-.eop-empty-cell { text-align: center; color: var(--c-888888, #888); padding: 18px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main">
     <?php
     $header_title   = 'المشغّلون والسائقون';

@@ -194,19 +194,7 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
 $method_label = function ($m) { return $m === 'sl' ? 'زمني (سنوات)' : 'بالساعة التشغيلية'; };
 ?>
 
-<style>
-/* UXW-01 ①②: الأنماطُ الموضعيةُ صارت أصنافًا برموزِ اللون — القيمُ ذاتُها حرفًا */
-.fdp-main { padding:15px; background:var(--c-surface); }
-.fdp-msg { margin:10px 0; }
-.fdp-note { background:var(--c-eef6ff, #eef6ff); border:1px solid var(--c-cfe3fb, #cfe3fb); border-radius:8px; padding:10px 14px; margin:10px 0; font-size:13px; color:var(--c-1c4e80, #1c4e80); }
-.fdp-form { margin:10px; }
-.fdp-badge-gap { margin-inline-start:10px; }
-.fdp-ro { background:var(--c-f5f5f5); }
-.fdp-ro-muted { background:var(--c-f5f5f5); color:var(--c-888888, #888); }
-.fdp-req { color:var(--c-c0392b); }
-.fdp-span-all { grid-column:1/-1; }
-.fdp-approve { color:var(--c-1f9d55, #1f9d55); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <div class="main fleet-dep-main fdp-main">
 

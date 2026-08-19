@@ -80,13 +80,7 @@ include '../inheader.php';
 include '../insidebar.php';
 ?>
 
-<style>
-/* UXW-01 ②: أنماطُ الشاشةِ الموضعيةُ نُقلت أصنافًا — أنماطُ التفعيل */
-.gov-act-table { width: 100%; }
-.gov-act-grid  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-.gov-act-span2 { grid-column: span 2; }
-.gov-act-span3 { grid-column: span 3; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'أنماط التفعيل'; $header_icon = 'fa fa-toggle-on';

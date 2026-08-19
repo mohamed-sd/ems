@@ -138,17 +138,7 @@ include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
 echo ems_states_bundle('لا متقدمين في دورةِ التوظيفِ الآن', 'افتحْ شاغرًا بنموذجِ «① طلبُ شاغرٍ جديد» ثم سجّلْ سيرةَ متقدمٍ عليه');
 ?>
-  <style>
-    .rec-forms-row { display: flex; gap: var(--space-6); flex-wrap: wrap; margin-bottom: 16px; }
-    .rec-inline-form { display: flex; gap: var(--space-2); align-items: end; }
-    .rec-row-form { display: flex; gap: 6px; }
-    .rec-row-form-tight { display: flex; gap: var(--space-1); }
-    .rec-w-90 { max-width: 90px; }
-    .rec-w-110 { max-width: 110px; }
-    .rec-w-130 { max-width: 130px; }
-    .rec-stage-badge { background: var(--c-0d6efd, #0d6efd); }
-    .rec-reject-btn { color: var(--c-dc3545, #dc3545); }
-  </style>
+  <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
 
   <div class="rec-forms-row">

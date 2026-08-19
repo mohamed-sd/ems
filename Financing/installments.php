@@ -193,12 +193,4 @@ echo ems_states_bundle('لا أقساطَ ضمنَ هذا النطاق', 'تُو
     </tbody>
   </table>
 </div>
-<style>
-    /* UXW-01 ①+②: الأنماطُ الموضعيةُ صارت أصنافًا والألوانُ من الرموز — القيمُ ذاتُها */
-    .inst-row-late { background:var(--c-fff3f3,#fff3f3); }
-    .inst-badge-late { background:var(--c-dc3545,#dc3545); }
-    .inst-badge-paid { background:var(--c-198754,#198754); }
-    .inst-badge-due { background:var(--c-fd7e14,#fd7e14); }
-    .inst-pay-form { display:flex; gap:6px; }
-    .inst-pay-ref { max-width:130px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>

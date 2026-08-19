@@ -142,22 +142,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ شاشةِ موافقاتِ الترحيلِ أصنافًا برموزِ الألوان */
-.trs-rq-full{grid-column:1/-1}
-.trs-rq-tbl{width:100%}
-.trs-rq-actgap{gap:4px}
-.trs-rq-inline{display:inline}
-.trs-rq-ok{color:var(--c-198754, #198754)}
-.trs-rq-link{color:var(--c-0d6efd, #0d6efd)}
-.trs-rq-chip{color:var(--c-surface, #ffffff);border-radius:12px;padding:2px 10px}
-.trs-rq-modal{display:none;position:fixed;inset:0;background:var(--c-rgba00005, rgba(0,0,0,.5));z-index:9999;align-items:center;justify-content:center}
-.trs-rq-modal.is-open{display:flex}
-.trs-rq-modal-box{background:var(--c-surface, #ffffff);border-radius:12px;padding:24px;min-width:320px;max-width:90%}
-.trs-rq-modal-title{margin-top:0}
-.trs-rq-dirsel{width:100%;padding:8px}
-.trs-rq-modal-actions{display:flex;gap:8px;margin-top:16px}
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main trs-requests-main ems-unified-page-shell">
     <?php
     $header_title = 'موافقات الترحيل';

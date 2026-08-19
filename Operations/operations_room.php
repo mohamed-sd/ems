@@ -28,21 +28,7 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
-.opr-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.opr-filter { display: flex; gap: 8px; align-items: center; }
-.opr-tabs { margin-inline-start: auto; }
-.opr-tab { border: 1px solid var(--c-s-ddd); border-radius: 6px; padding: 4px 10px; margin: 0 2px; }
-.opr-tab.is-current { background: var(--c-e2b93b, #e2b93b); font-weight: 800; }
-.opr-table-full { width: 100%; }
-.opr-row-late { background: var(--c-fff3f0, #fff3f0); }
-.opr-chips { display: flex; gap: 14px; flex-wrap: wrap; }
-.opr-chip { font-size: 15px; padding: 10px 16px; text-decoration: none; }
-.opr-hint { color: var(--c-s-666); margin-top: 10px; }
-.opr-gap-neg { color: var(--c-state-danger-strong); }
-.opr-gap-ok { color: var(--c-0a7, #0a7); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'غرفة عمليات التشغيل'; $header_icon = 'fa fa-tower-control';

@@ -76,16 +76,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
               'التصحيحُ واقعةٌ جديدةٌ بمرجعِ الأصلِ — ولا حذفَ إطلاقًا'));
     echo ems_states_bundle('لا وقائعَ مسجَّلةً في نطاقك', 'الواقعةُ تُسجَّل بوقتِ وقوعِها لا بوقتِ تسجيلِها — و«كادت تقع» تولّد إشارةَ فرزٍ آليًّا');
     ?>
-    <style>
-        .rsk-filter-form { align-items: flex-end; }
-        .rsk-filter-label { font-size: .8rem; }
-        .rsk-minw190 { min-width: 190px; }
-        .rsk-w100 { width: 100%; }
-        .rsk-new-card { margin-top: 16px; }
-        .rsk-new-card.is-hidden { display: none; }
-        .rsk-hint { font-size: .72rem; opacity: .7; }
-        .rsk-ms10 { margin-inline-start: 10px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <form method="get" class="ems-toolbar rsk-filter-form">
         <label class="rsk-filter-label">النوع

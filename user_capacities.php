@@ -237,19 +237,7 @@ require_once __DIR__ . '/includes/screen_contract.php'; if (isset($conn)) { ems_
     <?php endif; ?>
 </div>
 
-<style>
-    /* UXW-01 ①+②: أصنافٌ محلَّ الأنماطِ الموضعية — والألوانُ برموزِ اللوحة
-       (المساحةُ الشخصيةُ بنيتُها قياسيةٌ فرُحِّلت كاملةً بلا استثناء) */
-    .uc-note { color: var(--c-s-666); }
-    .uc-w100 { width: 100%; }
-    .uc-empty-cell { text-align: center; color: var(--c-s-888); }
-    .uc-frozen { opacity: .55; }
-    .uc-declared { color: var(--c-a15c00, #a15c00); }
-    .uc-inline { display: inline; }
-    .uc-actions-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    .uc-freeze-form { display: flex; gap: 4px; }
-    .uc-reason-input { width: 120px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <script src="includes/js/jquery-3.7.1.main.js"></script>
 </body>
 </html>

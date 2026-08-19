@@ -48,11 +48,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
     echo ems_states_bundle('لا طلباتٍ مسجَّلةً بعد', 'أنشئ طلبَك الأول من زرِّ «طلب مالي جديد» أعلى الشاشة');
     ?>
-    <style>
-        /* UXW-01 ②: الأنماطُ الموضعيةُ صارت أصنافًا صفحية */
-        .fmr-alert { margin-bottom:14px; font-weight:700; }
-        .fmr-table-full { width:100%; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if (isset($_GET['msg']) && trim($_GET['msg']) !== ''): ?>
         <div class="alert alert-info fmr-alert"><?php echo htmlspecialchars($_GET['msg']); ?></div>

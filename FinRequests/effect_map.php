@@ -119,25 +119,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
     echo ems_states_bundle('لا خيطَ معروضًا بعد', 'أدخل رقمَ الطلب أو الحدث أو كشفِ الوحدة ثم تتبّع الخيط');
     ?>
-    <style>
-        /* UXW-01 ①/②: الأنماطُ الموضعيةُ صارت أصنافًا صفحية — والألوانُ برموزِ اللوحة
-           (ما لا رمزَ له بعدُ يُعلَن باسمِ قيمتِه مع قيمتِه الاحتياطيةِ حرفًا بحرف) */
-        .fem-card { margin-bottom:14px; }
-        .fem-search-form { display:flex; gap:10px; flex-wrap:wrap; align-items:end; }
-        .fem-w280 { min-width:280px; }
-        .fem-facts { display:flex; gap:18px; flex-wrap:wrap; }
-        .fem-note { color:var(--c-6b4e2a); font-weight:600; }
-        .fem-fanout { border-right:3px solid var(--c-d4b06a, #d4b06a); padding-right:16px; }
-        .fem-branch { padding:10px 0; border-bottom:1px dashed var(--c-e3d9c6, #e3d9c6); display:flex; gap:14px; align-items:center; flex-wrap:wrap; }
-        .fem-branch-icon { font-size:1.3rem; }
-        .fem-branch-label { min-width:230px; }
-        .fem-amount-ok { color:var(--c-1a7a3a, #1a7a3a); }
-        .fem-amber-note { color:var(--c-9a6a00, #9a6a00); }
-        .fem-reason-sm { color:var(--c-9a6a00, #9a6a00); font-size:.9rem; }
-        .fem-pending-note { color:var(--c-6b4e2a); font-size:.9rem; }
-        .fem-cols { display:flex; gap:24px; flex-wrap:wrap; }
-        .fem-col { flex:1; min-width:280px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card fem-card">
         <div class="card-body">

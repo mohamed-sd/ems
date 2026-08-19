@@ -913,31 +913,7 @@ function risk_entity_label($type, $map)
     });
 </script>
 
-<style>
-    .risk-main .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: 12px; }
-    .risk-main .stats-section {
-        border: 1px solid var(--bdr); border-radius: var(--rl);
-        background: linear-gradient(180deg, var(--c-rgba255255255095, rgba(255,255,255,.95)) 0%, var(--s2) 100%);
-        box-shadow: var(--sh); padding: 14px; margin-bottom: 14px;
-    }
-    .risk-main .stats-card { background: var(--c-eeeeee, #eee); border: 1px solid var(--c-aaaaaa, #aaa); border-radius: 35px; padding: 18px; box-shadow: 0 2px 8px var(--c-rgba26188007, rgba(26,18,8,.07)); position: relative; overflow: hidden; }
-    .risk-main .stats-card .stats-icon { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 10px; float: left; margin-top: 15px; border: 1px solid var(--c-ink-400); background:var(--c-surface); color:var(--c-ink-max); }
-    .risk-main .stats-card .stats-title { color: var(--c-555555, #555); font-size: .92rem; font-weight: 700; margin-top: 5px; line-height: 1.3; }
-    .risk-main .stats-card .stats-value { color: var(--c-222222, #222); line-height: 1; font-weight: 900; font-variant-numeric: tabular-nums; margin-top: 10px; font-size: 30px; }
-    @media (max-width: 900px) { .risk-main .stats-grid { grid-template-columns: repeat(2, minmax(150px,1fr)); } }
-    @media (max-width: 560px) { .risk-main .stats-grid { grid-template-columns: 1fr; } }
-
-    .risk-main .risk-hidden { display: none; }
-    .risk-main .risk-col-full { grid-column: 1 / -1; }
-    .risk-main .table-container { overflow-x: auto; }
-    #riskTable.risk-table-nowrap, #riskTable.risk-table-nowrap th, #riskTable.risk-table-nowrap td { white-space: nowrap; }
-    #riskTable .action-btns { flex-wrap: nowrap; white-space: nowrap; }
-    .risk-main .risk-muted { color: var(--c-ink-400); }
-    .risk-main .risk-sev-badge { display:inline-block; padding:2px 12px; border-radius:999px; font-size:.78rem; font-weight:800; border:1px solid transparent; }
-    .risk-main .risk-sev-high { background:var(--c-rgba2203838014, rgba(220,38,38,.14)); color:var(--c-b91c1c); border-color:var(--c-rgba2203838035, rgba(220,38,38,.35)); }
-    .risk-main .risk-sev-mid { background:var(--c-rgba24515811016, rgba(245,158,11,.16)); color:var(--c-b45309); border-color:var(--c-rgba24515811035, rgba(245,158,11,.35)); }
-    .risk-main .risk-sev-low { background:var(--c-rgba2216374014, rgba(22,163,74,.14)); color:var(--c-state-ok-deep); border-color:var(--c-rgba2216374035, rgba(22,163,74,.35)); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 </body>
 

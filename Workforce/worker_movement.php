@@ -118,19 +118,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا أوامرَ تحرّكٍ أو نقلٍ للعاملين مسجَّلةً بعدُ', 'أضف أولَ أمرٍ بزرِّ «أمر تحرّك/نقل» في رأسِ الشاشة'); ?>
-    <style>
-        .wm-form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); padding: 14px; }
-        .wm-span-2 { grid-column: span 2; display: flex; align-items: center; gap: var(--space-2); }
-        .wm-span-2 label { margin: 0; }
-        .wm-span-full { grid-column: 1 / -1; }
-        .wm-form-actions { padding: 0 14px 16px; }
-        .wm-table-wrap { margin-top: 14px; }
-        .wm-table-full { width: 100%; }
-        .wm-actions-cell { gap: var(--space-1); align-items: center; }
-        .wm-inline-form { display: inline; }
-        .wm-state-select { padding: 2px; }
-        .wm-empty-cell { text-align: center; color: var(--gray-500); padding: 18px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <form id="mForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="save">

@@ -1004,14 +1004,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 </div>
 
-<style>
-    /* UXW-01 ①: شاراتُ تصنيفِ مسارِ التوظيف — الألوانُ نفسُها برموزِ اللوحة */
-    .emp-class-candidate { background: var(--c-eef2ff, #eef2ff); color: var(--c-3730a3); }
-    .emp-class-trainee { background: var(--c-fff7ed); color: var(--c-9a3412); }
-    .emp-class-accepted { background: var(--c-ecfdf5); color: var(--c-065f46); }
-    .emp-class-resigned { background: var(--c-f3f4f6); color: var(--c-4b5563); }
-    .emp-class-dismissed { background: var(--c-fef2f2); color: var(--c-991b1b); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <!-- jQuery (Required first) -->
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <!-- Bootstrap Bundle -->

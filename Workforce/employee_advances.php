@@ -154,15 +154,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     ?>
-    <style>
-        .adv-note-muted { color: var(--c-s-666); }
-        .adv-required-mark { color: var(--c-state-danger-strong); }
-        .adv-protection-form { display: flex; gap: var(--space-2); align-items: center; margin-top: 10px; flex-wrap: wrap; }
-        .adv-protection-input { max-width: 180px; }
-        .adv-submit-row { margin-top: var(--space-3); }
-        .adv-table-full { width: 100%; }
-        .adv-inline-form { display: inline; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card"><div class="card-body">
         <strong>حدُّ حمايةِ الصافي:</strong>

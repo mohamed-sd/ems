@@ -744,33 +744,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['name'])) {
 
 </div>
 
-<style>
-    /* قاعدة ems-forms.css ':is(.allforms,.ems-form) .form-grid > div { display:block !important }'
-       تتغلّب على '.pu-hidden' بسبب خصوصية أعلى، فتُظهر حقلي المشروع والعقد لكل الأدوار.
-       نعيد الإخفاء بخصوصية أعلى ليظهرا فقط للأدوار ذات role_scope='mine' (مدير الموقع / حركة وتشغيل). */
-    .project-users-main .allforms .form-grid > div.pu-hidden {
-        display: none !important;
-    }
-
-    .project-users-main .table-container {
-        overflow-x: auto;
-    }
-
-    #projectsTable.users-table-nowrap,
-    #projectsTable.users-table-nowrap th,
-    #projectsTable.users-table-nowrap td {
-        white-space: nowrap;
-    }
-
-    #projectsTable .action-btns {
-        flex-wrap: nowrap;
-        white-space: nowrap;
-    }
-
-    /* UXW-01 ①+②: أصنافٌ محلَّ الأنماطِ الموضعية — والألوانُ برموزِ اللوحة */
-    .pu-w100 { width: 100%; }
-    .pu-unlinked { color: var(--c-999999); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <!-- jQuery + DataTables -->
 <script src="../includes/js/jquery-3.7.1.main.js"></script>

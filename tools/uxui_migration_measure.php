@@ -42,6 +42,10 @@ $APPLY = in_array('--apply', $argv, true);
  *   (`u13:generated`) تصييرُها كلُّه في `includes/u13_screen_kit.php`، والعُدّةُ
  *   تستعمل القشرةَ والمكتبةَ وحالاتِ الشاشةِ فعلًا. فقياسُ الملفِّ وحدَه
  *   **يُرسِّب شاشةً سليمةً** لأن بنيتَها ليست فيه.
+ * ◆ **وأسماءُ العُدَدِ تُوسَّع بالقياسِ لا بالحدس**: أولُ صياغةٍ عرفت `_kit`
+ *   وحدَها فأسقطت `eng01_screen_view.php` — وهي عُدّةُ **ثماني** شاشاتٍ تستعمل
+ *   المكتبةَ فعلًا. فأُضيف `_view` و`_screen` بعد جردِ ما تُضمِّنه الشاشاتُ
+ *   المخفِقةُ حقًّا، لا بتخمينِ أسماء.
  * ◆ فتُضمُّ **العُدّةُ المُضمَّنةُ صراحةً** إلى النصِّ المقيس — بحدٍّ واحدٍ من
  *   العمق: لا تتبُّعَ شجرةٍ كاملةٍ فيتضخّم الادّعاءُ ويُقاس ما لا يخصُّ الشاشة.
  * ◆ **ونطاقُ كلِّ معيارٍ مختلفٌ عمدًا** — وخلطُه أفسد القياسَ مرةً:
@@ -57,11 +61,19 @@ function ems_effective_src($ROOT, $route, &$cache) {
     $src = (string) file_get_contents($path);
     $out = $src;
     /* العُدَدُ المركزيةُ المُضمَّنةُ صراحةً — بأسمائها كما تُكتب في الشاشة */
-    if (preg_match_all('~(?:include|require)(?:_once)?[^;\n]{0,120}?[\'"]([^\'"]*(?:_kit|_shell|screen_contract|page_header)[^\'"]*\.php)[\'"]~', $src, $m)) {
+    if (preg_match_all('~(?:include|require)(?:_once)?[^;\n]{0,120}?[\'"]([^\'"]*(?:_kit|_shell|_view|_screen|_space|screen_contract|page_header)[^\'"]*\.php)[\'"]~', $src, $m)) {
         foreach ($m[1] as $inc) {
-            $rel = preg_replace('~^.*?(includes/)~', '$1', $inc);
-            $p = $ROOT . '/' . ltrim(str_replace(chr(92), '/', $rel), '/');
-            if (!is_file($p)) { continue; }
+            /* ◆ **العُدّةُ قد تجاور الشاشةَ لا `includes/` وحدَها**: 16 مغلِّفَ
+                 `Risk/risk_dept_*` تُضمِّن `dept_risk_space.php` **في مجلدِها**.
+                 فيُجرَّب المساران: نسبةً إلى مجلدِ الشاشةِ ثم إلى الجذر. */
+            $cands = array();
+            $clean = ltrim(str_replace(chr(92), '/', $inc), '/');
+            $cands[] = dirname($ROOT . '/' . $route) . '/' . basename($clean);
+            $cands[] = $ROOT . '/' . preg_replace('~^.*?(includes/)~', '$1', $clean);
+            $cands[] = $ROOT . '/' . $clean;
+            $p = null;
+            foreach ($cands as $cand) { $rp = realpath($cand); if ($rp && is_file($rp)) { $p = $rp; break; } }
+            if ($p === null) { continue; }
             if (!isset($cache[$p])) { $cache[$p] = (string) file_get_contents($p); }
             $out .= "\n" . $cache[$p];
         }
@@ -78,9 +90,20 @@ function ac_u1($src) {
     return false;
 }
 
-/** المكوّناتُ المركزية — تستعمل المكتبةَ ولا تُعرِّف نمطًا بنيويًّا محليًّا */
-function ac_u2($src, &$why) {
-    $usesLib = (bool) preg_match('~\b(ems-|ux-|alltables|dataTable|EmsDetailsModal|ems_status_badge)~', $src);
+/**
+ * AC-U2 **شرطان لكلٍّ نطاقُه** — وخلطُهما في نطاقٍ واحدٍ أخطأ مرتَين:
+ * ◆ «تستعمل المكتبةَ المركزية»: يُقاس على **مسارِ التصييرِ** (الشاشة + عُدّتُها)
+ *   — لأن الشاشةَ المولَّدةَ لا تحمل صنفًا واحدًا وكلُّ بنيتِها في العُدّة.
+ *   وقياسُ الملفِّ وحدَه رسَّب **24 شاشةً** عُدّتُها (`u13_screen_kit` ·
+ *   `eng01_screen_view`) تستعمل المكتبةَ فعلًا.
+ * ◆ «صفرُ نمطٍ محليٍّ في الشاشة»: يُقاس على **ملفِّ الشاشةِ وحدَه** — فأنماطُ
+ *   العُدّةِ المركزيةِ ليست محليةً بحال.
+ * فيأخذ كلُّ شرطٍ نصَّه المناسب، ولا يُرسَّب أحدُهما بنطاقِ الآخر.
+ */
+function ac_u2($own, &$why, $eff = null) {
+    $forLib = ($eff === null) ? $own : $eff;
+    $usesLib = (bool) preg_match('~\b(ems-|ux-|alltables|dataTable|EmsDetailsModal|ems_status_badge)~', $forLib);
+    $src = $own;
     /* نمطٌ محليٌّ بنيويٌّ: قاعدةٌ في <style> فيها خلفيةٌ أو حدٌّ أو شبكة */
     $localStruct = 0;
     if (preg_match_all('~<style[^>]*>(.*?)</style>~si', $src, $m)) {
@@ -141,7 +164,7 @@ foreach ($rows as $row) {
             $w2 = ''; $w3 = '';
             /* U2 على ملفِّ الشاشةِ وحدَه — والباقي على مسارِ التصيير */
             $own = (string) @file_get_contents($path);
-            $u1 = ac_u1($src); $u2 = ac_u2($own, $w2); $u3 = ac_u3($src, $w3);
+            $u1 = ac_u1($src); $u2 = ac_u2($own, $w2, $src); $u3 = ac_u3($src, $w3);
             if (!$u1) { $acFail['u1']++; }
             if (!$u2) { $acFail['u2']++; }
             if (!$u3) { $acFail['u3']++; }

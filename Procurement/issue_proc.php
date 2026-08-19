@@ -548,16 +548,6 @@ function proc_iss_line_row($conn, $is_super_admin, $company_id, $line = null)
 })();
 </script>
 
-<style>
-    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — والألوانُ برموزِ اللوحة */
-    .proc-iss-line { align-items: end; margin-bottom: 8px; }
-    .proc-iss-shortage { border-inline-start: 4px solid var(--c-c62828); }
-    .proc-iss-shortage-btn { margin: 0 4px; }
-    .proc-iss-full { grid-column: 1 / -1; }
-    .proc-iss-addline { margin-top: 6px; }
-    .proc-iss-total { margin-top: 10px; font-weight: 700; }
-    .proc-iss-rule { margin-top: 6px; color: var(--c-s-666); }
-    .proc-iss-table { width: 100%; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 </body>
 </html>

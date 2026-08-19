@@ -91,10 +91,7 @@ include '../insidebar.php';
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا كياناتٍ مسجَّلةً بصفةِ «مموِّل»', 'أنشئ الكيانَ في سجلِّ الكياناتِ ثم امنحه صفةَ «مموِّل» ليظهرَ هنا');
     ?>
-    <style>
-      .fin-fr-table { width: 100%; }
-      .fin-fr-cta { margin-top: 10px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <div class="card"><div class="card-body">
         <div class="table-container"><table class="alltables display fin-fr-table" data-no-dt="1">
         <thead><tr><th>كود الممول</th><th>عدد العمليات</th><th>عدد الأعيان</th><th>مدة العلاقة</th><th>الاستحقاق القائم<?php echo $canTerms ? '' : ' (خلف صلاحية الشروط)'; ?></th><th>الحالة</th>

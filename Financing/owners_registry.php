@@ -76,9 +76,7 @@ include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
 echo ems_states_bundle('لا معداتٍ مسجَّلةً في سجلِّ المُلّاكِ والحصص', 'سجِّلْ ملكيةَ المعدةِ وحصةَ مموِّلِها لتظهرَ في هذا السجلّ');
 ?>
-  <style>
-    .fin-own-badge-audit { background: var(--c-dc3545); }
-  </style>
+  <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>كود المعدة</th><th>نوعُ المالك</th><th>مرجع التفويض</th><th>الممولُ الحالي</th><th>حصتُه ٪</th><th>سريانُها</th><th>ملاحظة</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->

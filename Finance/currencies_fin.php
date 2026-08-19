@@ -202,23 +202,7 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 
-<style>
-/* UXW-01 ②: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة */
-.fin-cur-lead { color: var(--c-4b5563); margin: 0 0 12px; line-height: 1.8; }
-.fin-cur-hint { color: var(--c-ink-500); margin: 0 0 10px; }
-.fin-cur-chips { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.fin-cur-chip { padding: 6px 12px; }
-.fin-cur-h5 { margin: 0 0 10px; }
-.fin-cur-form { box-shadow: none; padding: 0; }
-.fin-cur-actions { margin-top: 10px; }
-.fin-cur-span-all { grid-column: 1 / -1; }
-.fin-cur-ltr { text-align: left; }
-.fin-cur-upper { text-transform: uppercase; }
-.fin-cur-scroll { overflow-x: auto; }
-.fin-cur-table { width: 100%; }
-.fin-cur-muted { color: var(--c-ink-500); }
-.fin-cur-ok { color: var(--c-state-ok); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <div class="main fin-currencies-main ems-unified-page-shell">
     <?php

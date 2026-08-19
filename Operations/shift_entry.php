@@ -50,14 +50,14 @@ enforce_current_page_view_permission($conn, '../main/dashboard.php');
 $PERM = check_page_permissions($conn, 'Operations/shift_entry.php');
 if (empty($PERM['can_view'])) {
     http_response_code(403);
-    echo '<style>.se-deny{font-family:var(--font-ar, Tahoma);padding:24px}</style>'
+    echo '<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>'
        . '<div dir="rtl" class="se-deny">'
        . 'لا تملك صلاحيةَ فتحِ شاشةِ قيدِ الوردية — راجِعْ مديرَك.</div>';
     exit();
 }
 if (!$is_super_admin && $company_id <= 0) {
     http_response_code(403);
-    echo '<style>.se-deny{font-family:var(--font-ar, Tahoma);padding:24px}</style>'
+    echo ''
        . '<div dir="rtl" class="se-deny">'
        . 'جلستُك بلا كيانٍ محدَّد — سجّلْ خروجًا ثم دخولًا، فإن تكرّر راجِعْ مديرَك.</div>';
     exit();
@@ -263,43 +263,7 @@ include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — الألوانُ رموزٌ من design-tokens.css
-   (المطابقُ حرفيًّا بالرمزِ القائم، وما لا رمزَ له فبنمطِ var(--c-hex, قيمته)) */
-.se-wrap{max-width:1180px;margin:0 auto;padding:14px}
-.se-card{background:var(--white);border:1px solid var(--c-e3e6ea);border-radius:10px;padding:16px;margin-bottom:14px}
-.se-card h2{font-size:17px;margin:0 0 4px}
-.se-hint{color:var(--c-5b6572, #5b6572);font-size:13px;margin:0 0 14px}
-.se-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
-.se-f label{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
-.se-f input,.se-f select{width:100%;padding:8px 10px;border:1px solid var(--c-cfd6dd, #cfd6dd);border-radius:7px;font-size:14px;font-family:inherit}
-.se-req{color:var(--c-a12622, #a12622);font-weight:700}
-.se-unit{color:var(--c-5b6572, #5b6572);font-weight:400;font-size:12px}
-.se-flash{padding:11px 14px;border-radius:8px;margin-bottom:14px;font-size:14px;border:1px solid}
-.se-ok{background:var(--c-e8f5ee, #e8f5ee);border-color:var(--c-0b6b3a, #0b6b3a);color:var(--c-0b4a28, #0b4a28)}
-.se-warn{background:var(--c-fdf6e3, #fdf6e3);border-color:var(--c-b8860b, #b8860b);color:var(--c-7a5a06, #7a5a06)}
-.se-err{background:var(--c-fdeaea);border-color:var(--c-a12622, #a12622);color:var(--c-7a1a17, #7a1a17)}
-.se-btn{background:var(--c-0b6b3a, #0b6b3a);color:var(--white);border:0;border-radius:8px;padding:10px 20px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
-.se-btn[disabled]{background:var(--c-adb5bd);cursor:not-allowed}
-.se-btn2{background:var(--white);color:var(--c-33405a, #33405a);border:1px solid var(--c-cfd6dd, #cfd6dd);border-radius:8px;padding:10px 18px;font-size:14px;cursor:pointer;font-family:inherit}
-.se-btn2-sm{padding:5px 12px}
-.se-tbl{width:100%;border-collapse:collapse;font-size:13px}
-.se-tbl th,.se-tbl td{border:1px solid var(--c-e3e6ea);padding:7px 9px;text-align:right}
-.se-tbl th{background:var(--c-f5f7f9, #f5f7f9);font-weight:700}
-.se-badge{display:inline-block;padding:2px 9px;border-radius:11px;font-size:12px;font-weight:700;color:var(--white)}
-.se-b-muted{background:var(--c-6c757d)}
-.se-b-warn{background:var(--c-b8860b, #b8860b)}
-.se-b-ok{background:var(--c-0b6b3a, #0b6b3a)}
-.se-b-err{background:var(--c-a12622, #a12622)}
-.se-hrow{display:grid;grid-template-columns:1.5fr .7fr 1fr 1.6fr auto;gap:8px;margin-bottom:8px;align-items:end}
-.se-empty{text-align:center;color:var(--c-5b6572, #5b6572);padding:26px}
-.se-h2b{margin-top:20px;font-size:15px}
-.se-mt12{margin-top:12px}
-.se-mt18{margin-top:18px}
-.se-void-form{display:flex;gap:6px}
-.se-void-input{width:130px;padding:5px 7px;border:1px solid var(--c-cfd6dd, #cfd6dd);border-radius:6px;font-family:inherit}
-@media(max-width:760px){.se-hrow{grid-template-columns:1fr}}
-</style>
+
 
 <div class="se-wrap ems-doc-cycle" dir="rtl">
 <?php

@@ -126,19 +126,7 @@ ems_log_sensitive_read($conn, 'final_settlement', 'screen:list', 'Workforce/fina
     require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا تصفياتِ إنهاءِ خدمةٍ ضمن هذا النطاق', 'التصفيةُ يفتحها إنهاءُ العقد — راجع سجلَّ عقودِ الموظفين');
     ?>
-    <style>
-        .fs-note-muted { color: var(--gray-500); }
-        .fs-table-full { width: 100%; }
-        .fs-preview-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; }
-        .fs-src-cell { white-space: normal; }
-        .fs-open-form { margin-top: 14px; }
-        .fs-card-item { margin-bottom: 14px; }
-        .fs-meta-row { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 10px; }
-        .fs-approve-form { margin-top: 12px; }
-        .fs-cancel-form { margin-top: 8px; }
-        .fs-required { color: var(--danger-600); }
-        .fs-alert-gap { margin-top: 10px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card"><div class="card-header"><h5><i class="fa fa-list-check"></i>
         عقودٌ منتهيةٌ تنتظر التصفية</h5></div>

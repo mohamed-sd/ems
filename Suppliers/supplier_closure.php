@@ -114,13 +114,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 $sf_supplier_id = intval($_GET['supplier_id'] ?? $_GET['id'] ?? 0); $sf_active = 'closure';
 if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php';
 ?>
-<style>
-    /* أنماطُ الشاشةِ الصفحية — الألوانُ رموزٌ من design-tokens.css حصرًا */
-    .scl-note { color: var(--c-s-666); }
-    .scl-table-full { width: 100%; }
-    .scl-form-inline { margin: 0; }
-    .scl-form-flex { margin: 0; display: flex; gap: 6px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'تصفية إنهاء عقد المورد'; $header_icon = 'fa fa-file-circle-check';

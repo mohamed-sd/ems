@@ -83,16 +83,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
-.ems-ptc-note { color:var(--c-666666); }
-.ems-ptc-filter { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-.ems-ptc-issue-row { display:flex; gap:10px; align-items:center; margin-bottom:8px; }
-.ems-ptc-w100 { width:100%; }
-.ems-ptc-cert-body { text-align:center; padding:40px; }
-.ems-ptc-cert-metrics { text-align:right; max-width:560px; margin:16px auto; }
-.ems-ptc-print-row { margin:10px 0; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'شهادة الإنجاز'; $header_icon = 'fa fa-certificate';

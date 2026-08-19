@@ -96,10 +96,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارتْ أصنافًا ببادئةِ الشاشة */
-.fin-acc-tbl { width: 100%; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <div class="main fin-accounts-main ems-unified-page-shell">
     <?php

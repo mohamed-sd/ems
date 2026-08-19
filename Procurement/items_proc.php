@@ -325,12 +325,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <script src="/ems/assets/vendor/jszip/jszip.min.js"></script>
 <script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
 <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
-<style>
-    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — واللونُ برمزِ اللوحة */
-    .proc-itm-full { grid-column: 1 / -1; }
-    .proc-itm-table { width: 100%; }
-    .proc-itm-crit { color: var(--c-c0392b); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <script>
 (function () {

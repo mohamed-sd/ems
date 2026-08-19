@@ -56,15 +56,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
               'نافذةُ التكرار تُقاس بالوحدة: الاستراتيجيةُ أطولُ والتشغيليةُ أقصر (ورقة 32)'));
     echo ems_states_bundle('لا وحداتِ مخاطرَ مبذورةً لهذا الكيان', 'البذرةُ المرجعيةُ للوحداتِ الإحدى عشرةَ شرطُ تسجيلِ أيِّ خطر');
     ?>
-    <style>
-        .rsk-w100 { width: 100%; }
-        .rsk-fs78 { font-size: .78rem; }
-        .rsk-coverage { font-size: .72rem; opacity: .7; max-width: 420px; }
-        .rsk-new-card { margin-top: 16px; }
-        .rsk-new-card.is-hidden { display: none; }
-        .rsk-note-sm { font-size: .8rem; opacity: .8; }
-        .rsk-ms10 { margin-inline-start: 10px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if (empty($rows)): ?>
     <div class="ems-card" id="ruEmpty"></div>

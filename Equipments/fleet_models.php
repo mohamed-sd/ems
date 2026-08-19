@@ -656,57 +656,7 @@ $e = function ($v) { return htmlspecialchars((string) $v, ENT_QUOTES, 'UTF-8'); 
     </div>
 </div>
 
-<style>
-    /* UXW-01 ①②: الأنماطُ الموضعيةُ صارت أصنافًا برموزِ اللون — القيمُ ذاتُها حرفًا */
-    .fm-page { background-color: var(--c-surface); padding: 10px; }
-    .fm-msg { margin: 10px 0; }
-    .fm-required { color: var(--c-c0392b); }
-    .fm-hint { color: var(--c-777777, #777); }
-    .fm-qty-cell { max-width: 90px; }
-    .fm-uom-cell { max-width: 100px; }
-
-    /* مساحة خارجية حول منطقة المحتوى الرئيسية + خلفية بيضاء للصفحة */
-    .fleet-models-main { margin: 10px; background: var(--c-surface); }
-
-    /* خلفية بطاقة الجدول رمادي فاتح (نفس درجة --light-gray في صفحة المشاريع).
-       محدّد عالي الأولوية لتجاوز القاعدة العامة التي تصبغ البطاقات بلونِ السطحِ الأبيض */
-    body.ems-site .main.fleet-models-main .models-list-card { background: var(--c-f2f3f5, #F2F3F5) !important; }
-
-    /* عمود الإجراءات: الأزرار الثلاثة في صفّ واحد بجانب بعضها */
-    .fleet-models-table th:first-child,
-    .fleet-models-table td:first-child { white-space: nowrap; }
-    .fleet-models-table .action-btns {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: 6px;
-        align-items: center;
-        justify-content: center;
-    }
-    .fleet-models-table .action-btns .delete-model-form { display: inline-flex; margin: 0; }
-
-    .spec-section { margin-top: 18px; border-top: 1px dashed var(--c-d8d8d8, #d8d8d8); padding-top: 14px; }
-    .spec-section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-    .spec-section-head h6 { margin: 0; font-weight: 700; }
-    .spec-table th, .spec-table td { vertical-align: middle; padding: 6px; }
-    .spec-table input[type="text"], .spec-table input[type="number"] { width: 100%; }
-    .spec-thumb { width: 38px; height: 38px; object-fit: cover; border-radius: 6px; display: block; margin-bottom: 4px; }
-    .spec-file { font-size: 11px; max-width: 130px; }
-    .delete-model-form { margin: 0; }
-
-    /* نافذة عرض المواصفات */
-    .fm-modal-overlay { position: fixed; inset: 0; background: var(--c-rgba00005, rgba(0,0,0,.5)); z-index: 20000; display: none; align-items: center; justify-content: center; padding: 20px; }
-    .fm-modal { background: var(--c-surface); border-radius: 12px; max-width: 920px; width: 100%; max-height: 88vh; overflow: auto; box-shadow: 0 10px 40px var(--c-rgba00003, rgba(0,0,0,.3)); }
-    .fm-modal-head { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--c-eeeeee, #eee); position: sticky; top: 0; background: var(--c-surface); z-index: 1; }
-    .fm-modal-head h5 { margin: 0; font-weight: 800; }
-    .fm-modal-close { background: none; border: none; font-size: 26px; line-height: 1; cursor: pointer; color: var(--c-888888, #888); }
-    .fm-modal-body { padding: 16px 18px; }
-    .fm-info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; margin-bottom: 16px; }
-    .fm-chip { background: var(--c-f7f7f9, #f7f7f9); border: 1px solid var(--c-ececf0, #ececf0); border-radius: 8px; padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; }
-    .fm-chip span { font-size: 11px; color: var(--c-888888, #888); }
-    .fm-chip b { font-size: 13px; color: var(--c-222222, #222); }
-    .fm-spec-h { font-weight: 800; margin: 6px 0 10px; }
-    .fm-empty { color: var(--c-888888, #888); padding: 16px; text-align: center; background: var(--c-fafafa, #fafafa); border-radius: 8px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <!-- نافذة عرض المواصفات القياسية -->
 <div id="specViewModal" class="fm-modal-overlay">

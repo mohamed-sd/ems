@@ -402,28 +402,7 @@ $bearerCell = function ($ownerType, $ownerId) use (&$view_bearers, &$vc_editable
     require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا عقودَ في سجلِّ العقودِ الموحَّدِ ضمن هذا النطاق', 'أنشئ رأسَ عقدٍ بزرِّ «رأس عقد جديد» أو وسِّع الفلاتر');
     ?>
-    <style>
-        .cr-required { color: var(--danger-600); }
-        .cr-inline-block { display: inline-block; }
-        .cr-pointer { cursor: pointer; }
-        .cr-mt6 { margin-top: 6px; }
-        .cr-mt10 { margin-top: 10px; }
-        .cr-mt14 { margin-top: 14px; }
-        .cr-mt18 { margin-top: 18px; }
-        .cr-flex-row { display: flex; gap: var(--space-1); margin-bottom: var(--space-1); }
-        .cr-inline-flex { display: inline-flex; gap: var(--space-1); align-items: center; }
-        .cr-inline { display: inline; }
-        .cr-w60 { width: 60px; }
-        .cr-w70 { width: 70px; }
-        .cr-w90 { width: 90px; }
-        .cr-w110 { width: 110px; }
-        .cr-w120 { width: 120px; }
-        .cr-table-full { width: 100%; }
-        .cr-close-link { float: left; }
-        .cr-span-full { grid-column: 1 / -1; }
-        .cr-flag-label { margin-inline-end: 12px; font-weight: var(--weight-regular); }
-        .cr-filter-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if ($view_contract): ?>
     <div class="card">

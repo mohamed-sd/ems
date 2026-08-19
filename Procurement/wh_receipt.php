@@ -87,12 +87,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا عُهَدَ استلامٍ مؤقتٍ بانتظارِ الوجهة',
         'كلُّ استلامٍ لم يبلغ وجهتَه يظهر هنا بعمرِه — والتسليمُ يُسجَّل من شاشةِ العهدة فيغادر الصفُّ القائمة');
     ?>
-    <style>
-        .whr-note { color: var(--c-4b5563); margin: 0 0 10px; }
-        .whr-w100 { width: 100%; }
-        .whr-overdue > td { background: var(--c-fff7ed); }
-        .whr-act-btn { padding: 4px 10px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php proc_msg_banner(); ?>
 

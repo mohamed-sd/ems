@@ -88,21 +88,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
               'إغلاقُ الإجراءِ بقبولِ المتحقِّقِ لا بتنفيذك'));
     echo ems_states_bundle('لا مهامَّ ميدانيةً في عهدتك بعد', 'الميدانيُّ يرفع إشارةً ويسجّل دليلَ ضابطِه ودليلَ إنجازِ إجرائِه — لا أكثر');
     ?>
-    <style>
-        .rsk-syncbar { padding: 10px; margin: 8px 0; }
-        .rsk-syncbar.is-hidden { display: none; }
-        .rsk-ms10 { margin-inline-start: 10px; }
-        .rsk-msg { margin-inline-start: 10px; font-size: .82rem; }
-        .rsk-note-sm { font-size: .8rem; opacity: .8; }
-        .rsk-empty-note { font-size: .85rem; opacity: .75; }
-        .rsk-mt12 { margin-top: 12px; }
-        .rsk-w100 { width: 100%; }
-        .rsk-fs76 { font-size: .76rem; }
-        .rsk-late-row { background: var(--warning-100); }
-        .rsk-plan-cell { font-size: .8rem; max-width: 280px; }
-        .rsk-mono-sm { font-family: monospace; font-size: .7rem; }
-        .rsk-ev-card.is-hidden { display: none; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div id="fieldSyncBar" class="ems-card rsk-syncbar is-hidden">
         <span id="fieldPendCount"></span>

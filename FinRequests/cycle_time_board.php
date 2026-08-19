@@ -139,19 +139,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا انتقالاتِ دورةٍ مسجَّلةً بعدُ ليُقاسَ زمنُها', 'افتحْ «بوابة المالية» من رأسِ الشاشةِ وسيِّرْ طلبًا ليبدأ سجلُّ الانتقالاتِ بالتراكم');
     ?>
-    <style>
-    .fcb-mb14        { margin-bottom: 14px; }
-    .fcb-stat-sm     { font-size: 1.05rem; }
-    .fcb-danger      { color: var(--c-state-danger); }
-    .fcb-warn        { color: var(--c-b45309); }
-    .fcb-ok          { color: var(--c-state-ok); }
-    .fcb-note        { font-size: .8em; color: var(--c-6b4e2a); }
-    .fcb-card-warn   { margin-bottom: 14px; border-right: 4px solid var(--c-b45309); }
-    .fcb-card-danger { border-right: 4px solid var(--c-state-danger); }
-    .fcb-lead        { font-weight: 700; color: var(--c-92400e); }
-    .fcb-row         { padding: 6px 0; border-bottom: 1px dashed var(--c-e3d9c6, #e3d9c6); }
-    .fcb-link        { margin-right: 8px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="stats-grid fcb-mb14">
         <div class="stat-card"><div class="stat-label">الالتزام بـSLA (النشط الآن)</div>

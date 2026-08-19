@@ -75,14 +75,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا وحداتِ سكنٍ مسجَّلةً بعدُ', 'أضف أولَ وحدةٍ بزرِّ «وحدة سكن» في رأسِ الشاشة'); ?>
-    <style>
-        .hu-form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); padding: 14px; }
-        .hu-span-wide { grid-column: 2 / -1; }
-        .hu-form-actions { padding: 0 14px 16px; }
-        .hu-table-wrap { margin-top: 14px; }
-        .hu-table-full { width: 100%; }
-        .hu-empty-cell { text-align: center; color: var(--gray-500); padding: 18px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <form id="hForm" action="" method="post" class="allforms">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="0">

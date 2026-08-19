@@ -97,18 +97,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
               'تعديلُ التصنيفِ ونوافذِه من شاشةِ وحداتِ المخاطر — والتعديلُ بترحيلٍ لا بحذف'));
     echo ems_states_bundle('لا إعداداتِ تصنيفٍ مبذورةً لهذا الكيان', 'الإطارُ الحاكمُ يُقرأ من مصادرِه الحيةِ — والبذرةُ المرجعيةُ شرطُ التشغيل');
     ?>
-    <style>
-        .rsk-w100 { width: 100%; }
-        .rsk-mt12 { margin-top: 12px; }
-        .rsk-forbidden-row { background: var(--danger-100); }
-        .rsk-list { font-size: .84rem; margin: 0; padding-inline-start: 20px; }
-        .rsk-danger-text { color: var(--c-b02a37, #b02a37); }
-        .rsk-mono74 { font-size: .74rem; font-family: monospace; }
-        .rsk-mono76 { font-family: monospace; font-size: .76rem; }
-        .rsk-fs82 { font-size: .82rem; }
-        .rsk-empty-note { font-size: .85rem; opacity: .75; }
-        .rsk-footnote { font-size: .78rem; opacity: .75; margin-top: 6px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card"><div class="card-body table-responsive">
         <h6>مصفوفة الاعتماد والتصعيد (§14-2) — تُقرأ من ثابت RiskService</h6>

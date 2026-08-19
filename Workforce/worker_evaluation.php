@@ -181,22 +181,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endif; ?>
     <?php require_once __DIR__ . '/../includes/ux_components.php';
     echo ems_states_bundle('لا تقييماتِ عاملين مسجَّلةً بعدُ', 'أضف أولَ تقييمٍ بزرِّ «تقييم جديد» في رأسِ الشاشة'); ?>
-    <style>
-        .ev-form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3); padding: 14px; }
-        .ev-span-3end { grid-column: 3 / -1; }
-        .ev-span-full { grid-column: 1 / -1; }
-        .ev-form-actions { padding: 0 14px 16px; display: flex; gap: 10px; }
-        .ev-btn-muted { background: var(--gray-500); }
-        .ev-weight-note { font-weight: var(--weight-regular); color: var(--gray-500); }
-        .ev-kpi-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 2fr auto; gap: var(--space-3); padding: 14px; align-items: flex-end; }
-        .ev-table-wrap { margin-top: 14px; }
-        .ev-table-full { width: 100%; }
-        .ev-actions-cell { gap: var(--space-1); align-items: center; }
-        .ev-inline-form { display: inline; }
-        .ev-state-select { padding: 2px; }
-        .ev-empty-cell { text-align: center; color: var(--gray-500); padding: 18px; }
-        .ev-empty-cell-sm { text-align: center; color: var(--gray-500); }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <form id="eForm" action="" method="post" class="allforms<?= $edit?' allforms-visible':'' ?>">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="save"><input type="hidden" name="id" value="<?= $edit?intval($edit['id']):0 ?>">

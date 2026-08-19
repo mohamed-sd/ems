@@ -61,15 +61,7 @@ include __DIR__ . '/../includes/page_header.php';
 echo ems_states_bundle('لا مستودعاتٍ مسجَّلةً بعد',
     'تُعرَّف المستودعاتُ وأنواعُها من بياناتِ المشترياتِ المرجعية — فتظهر هنا فورَ تسجيلِها');
 ?>
-  <style>
-    .whx-alert-gap { margin: 10px 0; }
-    .whx-kpi { padding: 10px 14px; margin: 10px 0; border-inline-start: 4px solid var(--c-0d6efd); display: inline-block; }
-    .whx-kpi-label { font-size: .78rem; opacity: .75; }
-    .whx-kpi-value { font-size: 1.4rem; font-weight: 700; }
-    .whx-w100 { width: 100%; }
-    .whx-empty-cell { text-align: center; opacity: .7; }
-    .whx-foot-note { font-size: .8rem; margin-top: 8px; }
-  </style>
+  <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <?php if ($failed): ?>
   <div class="alert alert-danger whx-alert-gap">
     <strong>تعذّرت قراءةُ البيانات.</strong>

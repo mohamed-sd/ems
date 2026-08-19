@@ -105,9 +105,7 @@ include __DIR__ . '/../includes/page_header.php';
 echo ems_states_bundle('لا أصنافَ للجردِ في هذا الاختيار',
     'اخترِ المخزنَ وفترةَ الحركات — فيُعرضُ الرصيدُ الدفتريُّ المحسوبُ من الحركاتِ ويُجرى الجردُ عليه');
 ?>
-  <style>
-    .whc-qty-input { max-width: 110px; }
-  </style>
+  <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <?php /* INJ-0561: كان الترشيحُ بالمخزنِ وحدَه — بلا فترةٍ رغم أن كلَّ حركةٍ
            تحمل `moved_at`. فأُضيف مدى تاريخٍ يُطبَّق في وصلِ الحركاتِ نفسِه،

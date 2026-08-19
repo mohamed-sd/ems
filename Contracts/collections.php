@@ -148,29 +148,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                            'سجّل أولَ قبضٍ بمرجعٍ بنكيٍّ من نموذجِ «تسجيلُ قبض» أعلاه');
     ?>
 
-    <style>
-    .col-note-muted{color:var(--c-666666, #666)}
-    .col-note{color:var(--c-4b5563, #4b5563);line-height:1.8}
-    .col-req{color:var(--c-state-danger-strong, #c00)}
-    .col-actions{margin-top:12px}
-    .col-filter-form{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
-    .col-table{width:100%}
-    .col-cards{display:flex;gap:12px;flex-wrap:wrap}
-    .col-fx-card{border:1px solid var(--c-d1d5db, #d1d5db);border-radius:8px;padding:10px 16px;min-width:190px}
-    .col-fx-card-lg{min-width:210px}
-    .col-fx-label{color:var(--c-ink-500, #6b7280);font-size:.85em}
-    .col-fx-value{font-size:1.15em;font-weight:700}
-    .col-mt12{margin-top:12px}
-    .col-mb14{margin-bottom:14px}
-    .col-mb10{margin-bottom:10px}
-    .col-wrap{white-space:normal}
-    .col-row-unalloc{background:var(--c-fff7ed, #fff7ed)}
-    .col-badges{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-    .col-badge-pad{padding:6px 12px}
-    .col-alloc-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;margin-bottom:6px}
-    .col-w120{width:120px}
-    .col-mw200{min-width:200px}
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if ($can_add): ?>
     <div class="card"><div class="card-header"><h5><i class="fa fa-money-check-dollar"></i> تسجيلُ قبض</h5></div>

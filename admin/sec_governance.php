@@ -314,34 +314,7 @@ include '../insidebar.php';
     </div></div>
 </div>
 
-<style>
-    /* UXW-01 ①+②: أصنافٌ محلَّ الأنماطِ الموضعية — والألوانُ برموزِ اللوحة
-       (ما لا رمزَ حرفيًّا له يُعلَن باسمِ قيمتِه مع قيمتِه الاحتياطيةِ حرفًا بحرف) */
-    .secg-flexwrap { display: flex; gap: 14px; flex-wrap: wrap; }
-    .secg-kpi { font-size: 14px; padding: 8px 14px; }
-    .secg-form-inline { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
-    .secg-json {
-        direction: ltr;
-        text-align: left;
-        background: var(--c-f7f7f7);
-        padding: 12px;
-        border-radius: 8px;
-        max-height: 320px;
-        overflow: auto;
-    }
-    .secg-w100 { width: 100%; }
-    .secg-inline { display: inline; }
-    .secg-grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .secg-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .secg-scroll-list { max-height: 160px; overflow: auto; }
-    .secg-scroll-list-lg { max-height: 220px; }
-    .secg-muted { color: var(--c-s-888); }
-    .secg-mt10 { margin-top: 10px; }
-    .secg-founding { font-size: 13px; padding: 6px 12px; margin-inline-end: 8px; }
-    .secg-dot-never { color: var(--c-c0392b); }
-    .secg-dot-bg { color: var(--c-e67e22, #e67e22); }
-    .secg-dot-comp { color: var(--c-s-2980b9); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 </body>
 </html>

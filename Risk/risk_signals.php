@@ -55,16 +55,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         : 'الفرزُ بيدِ إدارةِ المخاطر — وإشارتُك تدخل الصندوقَ وتنتظر قرارَها');
     echo ems_states_bundle('لا إشاراتٍ بهذه الحالة', 'الإشارةُ تُفرز قبل أن تصيرَ خطرًا — بدّل تبويبَ الحالةِ أو سجّل إشارةً جديدة');
     ?>
-    <style>
-        .rsk-w100 { width: 100%; }
-        .rsk-triage-cell { min-width: 330px; }
-        .rsk-inline-auto { display: inline-block; width: auto; }
-        .rsk-inline-110 { display: inline-block; width: 110px; }
-        .rsk-inline-150 { display: inline-block; width: 150px; }
-        .rsk-inline-160 { display: inline-block; width: 160px; }
-        .rsk-new-card { margin-top: 16px; }
-        .rsk-new-card.is-hidden { display: none; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="ems-toolbar">
         <?php foreach (array('pending' => 'تنتظر', 'converted' => 'حُوّلت', 'linked' => 'رُبطت', 'dismissed' => 'أُهملت بوسم', 'escalated' => 'صُعِّدت') as $k => $v): ?>

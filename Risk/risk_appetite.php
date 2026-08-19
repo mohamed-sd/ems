@@ -33,12 +33,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         array('حد التحمل أضيق من الشهية وأدق منها — وعنده يبدأ التصعيد'));
     echo ems_states_bundle('لا مجالاتِ شهيةٍ مبذورةً لهذا الكيان', 'شهيةُ المخاطرِ تُبذر بقرارِ الرئيسِ — والأرضياتُ الثلاثُ لا تتغير بحال');
     ?>
-    <style>
-        .rsk-w100 { width: 100%; }
-        .rsk-floor-row { background: var(--danger-100); }
-        .rsk-plans-card { margin-top: 16px; }
-        .rsk-plans-list { font-size: .86rem; color: var(--gray-700); }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <div class="card"><div class="card-body table-responsive">
         <table class="table table-striped rsk-w100">
             <thead><tr><th>المجال</th><th>الشهية</th><th>حد التحمل</th><th>المخوَّل</th><th>التغيّر</th><th>أرضية ثابتة</th></tr></thead>

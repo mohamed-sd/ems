@@ -125,27 +125,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا انحرافاتِ موازنةٍ مطابقةً للتصفيةِ الحالية', 'بدّل التصفيةَ إلى «الكل» أو اعتمد موازنةً لتظهرَ بنودُها');
     ?>
-    <style>
-        /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
-        .fin-var-stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
-        .fin-var-kpi { flex: 1; min-width: 160px; }
-        .fin-var-kpi-body { padding: 12px 14px; }
-        .fin-var-kpi-label { font-size: 12px; color: var(--c-ink-500); }
-        .fin-var-kpi-value { font-size: 24px; font-weight: 800; }
-        .fin-var-kpi-danger { color: var(--c-b91c1c); }
-        .fin-var-kpi-warn { color: var(--c-b45309); }
-        .fin-var-kpi-info { color: var(--c-state-info); }
-        .fin-var-kpi-ok { color: var(--c-166534); }
-        .fin-var-edit-note { margin: 0 0 10px; color: var(--c-374151); }
-        .fin-var-full { grid-column: 1 / -1; }
-        .fin-var-toolbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin: 0 0 10px; }
-        .fin-var-toolbar-title { margin: 0; }
-        .fin-var-chips { display: flex; gap: 6px; }
-        .fin-var-chip { text-decoration: none; padding: 6px 12px; }
-        .fin-var-table { width: 100%; }
-        .fin-var-dash { color: var(--c-9ca3af); }
-        .fin-var-emptynote { color: var(--c-ink-500); text-align: center; padding: 16px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php fin_msg_banner(); ?>
     <?php fin_notifications_panel($conn, $ctx, 'variance_monitor_fin.php'); ?>

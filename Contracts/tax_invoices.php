@@ -260,15 +260,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 </div>
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
-<style>
-    /* UXW-01 ①+②: الأنماطُ الموضعيةُ صارت أصنافًا والألوانُ من الرموز — القيمُ ذاتُها بلا style= */
-    .ti-note { color:var(--c-666, #666); }
-    .ti-muted { color:var(--c-666, #666); }
-    .ti-w100 { width:100%; }
-    .ti-mt14 { margin-top:14px; }
-    .ti-actions { margin-top:12px; display:flex; gap:10px; flex-wrap:wrap; }
-    .ti-req { color:var(--c-c00, #c00); }
-    .ti-warn { color:var(--c-a15c00, #a15c00); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 </body>
 </html>

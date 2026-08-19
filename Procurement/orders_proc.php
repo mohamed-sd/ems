@@ -705,26 +705,6 @@ function proc_ord_line_row($conn, $is_super_admin, $company_id, $classifications
 })();
 </script>
 
-<style>
-    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — والألوانُ برموزِ اللوحة */
-    .proc-ord-line { align-items: end; margin-bottom: 8px; }
-    .proc-ord-block { margin-bottom: 14px; }
-    .proc-ord-lead { margin: 0 0 10px; }
-    .proc-ord-status { margin-bottom: 10px; }
-    .proc-ord-tone { font-weight: 800; }
-    .proc-ord-tone-ok { color: var(--c-166534); }
-    .proc-ord-tone-bad { color: var(--c-991b1b); }
-    .proc-ord-tone-mute { color: var(--c-78716c); }
-    .proc-ord-note { margin: 0; }
-    .proc-ord-inline-form { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
-    .proc-ord-inline { display: inline; }
-    .proc-ord-tablewrap { margin-bottom: 10px; }
-    .proc-ord-table { width: 100%; }
-    .proc-ord-btn-xs { padding: 2px 8px; }
-    .proc-ord-full { grid-column: 1 / -1; }
-    .proc-ord-addline { margin-top: 6px; }
-    .proc-ord-total { margin-top: 10px; font-weight: 700; }
-    .proc-ord-maintable { width: 100%; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 </body>
 </html>

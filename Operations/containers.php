@@ -530,38 +530,7 @@ function cnt_node($n, $depth, $byParent, $can_manage, $CSRF, $LEVEL_NEXT, $ROLES
     <?php endif; ?>
 </div>
 
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
-    .cnt-main .cnt-table td { vertical-align: middle; }
-    .cnt-main .cnt-num { text-align: left; direction: ltr; font-variant-numeric: tabular-nums; }
-    .cnt-main .cnt-small { font-size: 12px; color: var(--c-ink-500); }
-    .cnt-main .cnt-no { font-size: 11px; color: var(--c-ink-500); margin: 0 6px; }
-    .cnt-main .cnt-party { font-weight: 600; margin-inline-end: 6px; }
-    .cnt-main .cnt-branch { color: var(--c-9ca3af); }
-    .cnt-main .cnt-derived { background: var(--c-note-bg); }
-    .cnt-main .cnt-note { font-size: 12px; color: var(--c-note-ink); margin-top: 3px; }
-    .cnt-main .is-hidden { display: none; }
-    .cnt-main .cnt-rem-ok { color: var(--c-state-ok-deep); }
-    .cnt-main .cnt-rem-low { color: var(--c-badge-danger-b); }
-    .cnt-main .cnt-nowrap { white-space: nowrap; }
-    .cnt-main .cnt-inline { display: inline; }
-    .cnt-main .cnt-inline-block { display: inline-block; }
-    .cnt-main .cnt-pointer { cursor: pointer; }
-    .cnt-main .cnt-rot-form { margin-top: 6px; display: flex; gap: 4px; flex-wrap: wrap; }
-    .cnt-main .cnt-w80 { width: 80px; }
-    .cnt-main .cnt-w100 { width: 100px; }
-    .cnt-main .cnt-msg-body { padding: 12px 16px; }
-    .cnt-main .cnt-intro { margin: 0 0 10px; line-height: 1.9; }
-    .cnt-main .cnt-filter { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; }
-    .cnt-main .cnt-contract-group { min-width: 280px; }
-    .cnt-main .cnt-tight { margin: 0 0 10px; }
-    .cnt-main .cnt-gen-actions { margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
-    .cnt-main .cnt-scroll-x { overflow-x: auto; }
-    .cnt-main .cnt-mb14 { margin-bottom: 14px; }
-    .cnt-main .cnt-table-full { width: 100%; }
-    .cnt-main .cnt-form-plain { box-shadow: none; padding: 0; }
-    .cnt-main .cnt-form-actions { margin-top: 10px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <script>
 // بلا jQuery ولا ready — فلا يُسقطه عطبُ مُعالجٍ آخر (گوتشا `_DT_CellIndex`)

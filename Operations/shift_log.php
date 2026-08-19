@@ -143,9 +143,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     echo ems_states_bundle('لا سجلاتِ ورديّاتٍ مسجَّلةً بعدُ', 'أضف أولَ صفٍّ بزرِّ «إضافة» في رأسِ الشاشة');
     ?>
-    <style>
-        .cmp03-form-actions { margin-top: 12px; display: flex; gap: 10px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <!-- فورم الإضافة الموحد (ems-forms) — مطويٌّ حتى زرِّ الرأس -->
     <form method="post" action="" class="allforms" id="cmp03AddForm">

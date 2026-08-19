@@ -250,38 +250,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا كشوفَ بنكيةً مستوردةً لهذا الحساب', 'استورد كشفًا من نموذجِ «كشوفُ البنك ودورةُ المطابقة» أعلاه أو اختر حسابًا آخر');
     ?>
-    <style>
-        /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
-        .fin-bank-h5 { margin: 0 0 8px; }
-        .fin-bank-h5-tight { margin: 0; }
-        .fin-bank-h5-list { margin: 0 0 10px; }
-        .fin-bank-intro { color: var(--c-4b5563); line-height: 1.8; margin: 0 0 10px; }
-        .fin-bank-form-flat { box-shadow: none; padding: 0; }
-        .fin-bank-mt10 { margin-top: 10px; }
-        .fin-bank-mt12 { margin-top: 12px; }
-        .fin-bank-raw { width: 100%; direction: ltr; }
-        .fin-bank-hint { color: var(--c-ink-500); }
-        .fin-bank-tbl { width: 100%; }
-        .fin-bank-ltr { direction: ltr; }
-        .fin-bank-chips { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
-        .fin-bank-chip { padding: 6px 12px; }
-        .fin-bank-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-        .fin-bank-inline { display: inline; }
-        .fin-bank-wrap { white-space: normal; }
-        .fin-bank-diff { color: var(--c-state-danger-strong); }
-        .fin-bank-row-form { display: flex; gap: 4px; }
-        .fin-bank-row-form-wrap { display: flex; gap: 4px; flex-wrap: wrap; }
-        .fin-bank-why-130 { width: 130px; }
-        .fin-bank-why-120 { width: 120px; }
-        .fin-bank-mini-btn { border: 0; padding: 5px 8px; }
-        .fin-bank-note { color: var(--c-ink-500); margin: 6px 0 0; }
-        .fin-bank-filter { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .fin-bank-select { min-width: 240px; }
-        .fin-bank-plain-link { text-decoration: none; }
-        .fin-bank-kpi { text-align: center; }
-        .fin-bank-kpi-value { font-size: 20px; font-weight: 700; }
-        .fin-bank-full { grid-column: 1 / -1; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <?php fin_msg_banner(); ?>
 
     <!-- ═══ H-13 · الدورةُ الكاملة (SPEC-01 #19) ═══ -->

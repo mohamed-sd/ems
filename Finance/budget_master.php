@@ -39,12 +39,7 @@ include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الثلاثُ من المكوّنِ المركزيّ
 echo ems_states_bundle('لا ميزانياتَ معتمدةً لهذه السنة', 'تحققْ من اعتمادِ ميزانياتِ الإداراتِ للسنةِ المالية');
 ?>
-  <style>
-    /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
-    .bm-var-over  { color: var(--c-dc3545); }
-    .bm-var-under { color: var(--c-198754); }
-    .bm-total-row { font-weight: bold; background: var(--c-f8f9fa); }
-  </style>
+  <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <table class="table table-striped" data-no-dt>
     <thead><tr><th>الإدارة</th><th>ميزانيات</th><th>المخطط</th><th>الفعلي</th><th>الانحراف</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->

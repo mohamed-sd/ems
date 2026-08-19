@@ -64,20 +64,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ)
     echo ems_states_bundle('لا مهامَّ تنتظر دورَك', 'ستظهر المعاملاتُ الواردةُ هنا فورَ إحالتِها');
     ?>
-    <style>
-        /* UXW-01 ②: الأنماطُ الموضعيةُ صارت أصنافًا صفحية — والألوانُ برموزِ اللوحة حصرًا */
-        .fad-alert { margin-bottom:14px; font-weight:700; }
-        .fad-card { margin-bottom:14px; }
-        .fad-card-head { display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; }
-        .fad-facts { display:flex; gap:18px; flex-wrap:wrap; margin-bottom:10px; }
-        .fad-warn { margin-bottom:10px; font-weight:700; }
-        .fad-self-end { align-self:end; }
-        .fad-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-        .fad-inline-form { display:flex; gap:8px; }
-        .fad-w240 { min-width:240px; }
-        .fad-w160 { min-width:160px; }
-        .fad-w150 { min-width:150px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if (isset($_GET['msg']) && trim($_GET['msg']) !== ''): ?>
         <div class="alert alert-info fad-alert"><?php echo htmlspecialchars($_GET['msg']); ?></div>

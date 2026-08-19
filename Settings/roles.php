@@ -131,19 +131,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
 
-<style>
-/* UXW-01 ②: أنماطُ شاشةِ الأدوار — ثابتةٌ منقولةٌ من السماتِ الموضعية */
-.rls-save-btn { grid-column: 1 / -1; justify-self: center; }
-.rls-role-link { color: var(--navy); text-decoration: none; font-weight: 600; transition: all var(--ease); }
-.rls-role-link:hover { color: var(--gold); text-decoration: underline; }
-.rls-root-note { color: var(--gold); font-weight: 600; }
-.rls-parent-link { color: var(--blue); text-decoration: none; font-weight: 600; transition: all var(--ease); }
-.rls-parent-link:hover { color: var(--navy); text-decoration: underline; }
-.rls-muted { color: var(--sub); }
-.rls-level-badge { background: var(--c-rgba3799235012, rgba(37,99,235,.12)); color: var(--blue); }
-.rls-edit-btn { background: var(--blue-soft); color: var(--blue); border: 1.5px solid var(--c-rgba379923518, rgba(37,99,235,.18)); }
-.rls-del-btn { background: var(--red-soft); color: var(--red); border: 1.5px solid var(--c-s-rgba220383818, rgba(220,38,38,.18)); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <div class="main">
     <!-- Unified header: pre-built final structure (data-ems-unified-header skips the JS rebuild). Styling: ems.main.all.style.css (.header) -->

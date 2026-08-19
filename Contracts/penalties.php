@@ -476,50 +476,7 @@ $(function () {
 });
 </script>
 
-<style>
-    /* UXW-01 ①: الألوانُ من الرموزِ حصرًا — var(--c-<hex>, <hex>) بردمِ القيمةِ الأصلية */
-    .pen-main .pen-rule { display:flex; gap:12px; align-items:flex-start; border:1px solid var(--c-ce93d8,#ce93d8);
-        border-right:5px solid var(--c-7b1fa2,#7b1fa2); border-radius:10px; background:var(--c-faf5fc,#faf5fc); padding:12px 14px; margin-bottom:14px; line-height:1.75; }
-    .pen-main .pen-rule i { color:var(--c-7b1fa2,#7b1fa2); font-size:1.25rem; margin-top:3px; }
-    .pen-main .pen-summary { display:flex; gap:18px; align-items:center; flex-wrap:wrap; background:var(--white,#fff);
-        border:1px solid var(--bdr); border-radius:12px; padding:12px 14px; margin-bottom:14px; }
-    .pen-main .pen-note { border:1px solid var(--c-ffe082,#ffe082); background:var(--c-fffbe9,#fffbe9); border-radius:10px; padding:11px 13px; margin-bottom:12px; }
-    .pen-main .pen-ret-note { font-size:.8rem; color:var(--c-a06b00,#a06b00); margin-inline-start:6px; }
-    .pen-main .pen-ret-note.is-done { color:var(--c-2e7d32,#2e7d32); font-weight:700; }
-    .pen-main .pen-release { background:var(--c-e8f5e9,#e8f5e9); border-color:var(--c-a5d6a7,#a5d6a7); }
-    /* مظهرُ الشارات يخرج مع مكوِّنها (includes/contract_badges.php) — فلا يفترق بين شاشتين */
-    .pen-main .pen-inline { display:inline; margin:0; }
-    .pen-main .pen-kind { padding:3px 10px; border-radius:20px; font-size:.83rem; font-weight:700; white-space:nowrap; }
-    .pen-main .pen-kind-penalty { background:var(--c-ffebee,#ffebee); color:var(--c-c62828,#c62828); border:1px solid var(--c-ef9a9a,#ef9a9a); }
-    .pen-main .pen-kind-incentive { background:var(--c-e8f5e9,#e8f5e9); color:var(--c-2e7d32,#2e7d32); border:1px solid var(--c-a5d6a7,#a5d6a7); }
-    .pen-main .pen-kind-min_guarantee { background:var(--c-e3f2fd,#e3f2fd); color:var(--c-1565c0,#1565c0); border:1px solid var(--c-90caf9,#90caf9); }
-    .pen-main .pen-state { padding:2px 8px; border-radius:12px; font-size:.8rem; font-weight:700; }
-    .pen-main .pen-state-computed { background:var(--c-eceff1,#eceff1); color:var(--c-546e7a,#546e7a); }
-    .pen-main .pen-state-reviewed { background:var(--c-fff8e1,#fff8e1); color:var(--c-a06b00,#a06b00); }
-    .pen-main .pen-state-posted { background:var(--c-e8f5e9,#e8f5e9); color:var(--c-2e7d32,#2e7d32); }
-    .pen-main .pen-state-waived { background:var(--c-f3e5f5,#f3e5f5); color:var(--c-6a1b9a,#6a1b9a); }
-    .pen-main .pen-row-waived { opacity:.62; }
-    .pen-main .pen-num { font-variant-numeric:tabular-nums; text-align:left; }
-    .pen-main .pen-amount { font-weight:900; }
-    .pen-main .pen-amount.is-neg { color:var(--c-c62828,#c62828); }
-    .pen-main .pen-amount.is-pos { color:var(--c-2e7d32,#2e7d32); }
-    .pen-main .pen-capped { color:var(--c-a06b00,#a06b00); font-size:.78rem; font-weight:700; }
-    .pen-main .pen-small { font-size:.84rem; }
-    .pen-main .pen-nowrap { white-space:nowrap; }
-    .pen-main .pen-muted { color:var(--c-999,#999); font-size:.82rem; }
-    .pen-main .pen-empty { text-align:center; color:var(--c-888,#888); padding:22px; }
-    .pen-main .pen-btn { background:var(--c-f5f5f5,#f5f5f5); border:1px solid var(--c-ccc,#ccc); border-radius:8px; padding:3px 9px;
-        cursor:pointer; font-size:.82rem; margin:1px; white-space:nowrap; }
-    .pen-main .pen-btn.is-ok { background:var(--c-e8f5e9,#e8f5e9); border-color:var(--c-a5d6a7,#a5d6a7); }
-    .pen-main .pen-btn.is-warn { background:var(--c-f3e5f5,#f3e5f5); border-color:var(--c-ce93d8,#ce93d8); }
-    .pen-main .table-container { overflow-x:auto; }
-    .pen-modal { position:fixed; inset:0; background:var(--c-black-45, rgba(0,0,0,.45)); display:flex; align-items:center; justify-content:center; z-index:9999; }
-    .pen-modal[hidden] { display:none; }
-    .pen-modal-card { background:var(--white,#fff); border-radius:14px; padding:20px; width:min(520px,92vw); box-shadow:0 10px 40px var(--c-black-30, rgba(0,0,0,.3)); }
-    .pen-modal-card label { display:block; margin:10px 0 4px; font-weight:700; }
-    .pen-modal-card textarea { width:100%; }
-    .pen-modal-actions { display:flex; gap:10px; margin-top:16px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 </body>
 

@@ -281,12 +281,7 @@ include '../insidebar.php';
     <?php endif; ?>
 </div>
 
-<style>
-    /* UXW-01 ②: أصنافٌ محلَّ الأنماطِ الموضعيةِ التي كانت مبثوثةً في الوسوم */
-    .orgasg-grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-    .orgasg-w100 { width: 100%; }
-    .orgasg-inline { display: inline; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
 <script>
 document.getElementById('toggleForm')?.addEventListener('click', function () {

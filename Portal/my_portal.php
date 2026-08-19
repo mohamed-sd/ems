@@ -72,22 +72,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
-.ems-ptp-grid-sm { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; }
-.ems-ptp-grid-lg { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
-.ems-ptp-cardlink { text-decoration:none; color:inherit; }
-.ems-ptp-tile { border:1px solid var(--c-e5e0d5, #e5e0d5); border-radius:10px; padding:12px; background:var(--c-fffdf7); text-align:center; }
-.ems-ptp-tile-num { font-size:1.5rem; font-weight:800; }
-.ems-ptp-tile-lbl { color:var(--gray-500); font-size:.85rem; }
-.ems-ptp-card { border:1px solid var(--c-e5e0d5, #e5e0d5); border-radius:10px; padding:14px; background:var(--c-fffdf7); }
-.ems-ptp-card-title { color:var(--gray-500); font-size:.85rem; }
-.ems-ptp-card-value { font-size:1.15rem; font-weight:800; margin:6px 0; }
-.ems-ptp-card-foot { display:flex; justify-content:space-between; align-items:center; }
-.ems-ptp-period { color:var(--c-aaaaaa); }
-.ems-ptp-hidden-note { color:var(--c-a15c00, #a15c00); margin-top:12px; }
-.ems-ptp-w100 { width:100%; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'بوابتي'; $header_icon = 'fa fa-id-card';

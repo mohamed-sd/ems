@@ -87,16 +87,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
-.ems-pte-filter { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-.ems-pte-note { color:var(--c-666666); margin-top:8px; }
-.ems-pte-muted { color:var(--gray-500); }
-.ems-pte-actions { margin-top:10px; display:flex; gap:8px; }
-.ems-pte-actions-solo { margin-top:10px; }
-.ems-pte-form-follow { margin-top:8px; }
-.ems-pte-step-title { margin-top:14px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'التقييم الثنائي'; $header_icon = 'fa fa-user-check';

@@ -209,12 +209,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </div></div>
 </div>
 
-<style>
-    /* UXW-01 ①②: أصنافٌ محلَّ الأنماطِ الموضعيةِ — والألوانُ برموزِ اللوحةِ بقيمِها الاحتياطية */
-    .proc-stk-note { background: var(--c-eef6ff, #eef6ff); color: var(--c-245, #245); }
-    .proc-stk-table { width: 100%; }
-    .proc-stk-neg { color: var(--c-c0392b); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <script src="/ems/assets/vendor/jquery-3.7.1.min.js"></script>
 <script src="/ems/assets/vendor/datatables/js/jquery.dataTables.min.js"></script>

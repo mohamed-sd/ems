@@ -78,11 +78,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا مفاتيحَ ظهورٍ مضبوطةً بعدُ', 'اضبط أولَ مفتاحٍ من نموذجِ «ضبطُ مفتاح» أعلاه — ويُعلَن عددُ المتأثرين قبلَ الحفظ');
     ?>
 
-    <style>
-    .vkey-note      { color: var(--c-s-666); }
-    .vkey-table     { width: 100%; }
-    .vkey-form-foot { margin-top: 10px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card"><div class="card-body"><p class="vkey-note">
         المفاتيحُ <strong>تمنح ظهورًا لا صلاحيةَ عمل</strong> — بستة نطاقاتٍ وأولويةٍ محسومة:

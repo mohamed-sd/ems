@@ -67,25 +67,7 @@ include '../inheader.php';
 include '../insidebar.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ شاشةِ سجلِّ الرفض — من الرموزِ حصرًا (بوابتا ١ و٢) */
-.dnr-repeat-card { padding: 12px; margin: 10px 0; border-inline-start: 4px solid var(--warning-600); }
-.dnr-repeat-title { color: var(--c-b45309); }
-.dnr-repeat-list { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
-.dnr-fs-8 { font-size: .8rem; }
-.dnr-fs-76 { font-size: .76rem; }
-.dnr-fs-74 { font-size: .74rem; }
-.dnr-fs-72 { font-size: .72rem; }
-.dnr-mono { font-family: monospace; }
-.dnr-muted { opacity: .7; }
-.dnr-table-full { width: 100%; }
-.dnr-card-gap { margin-top: 12px; }
-.dnr-field { font-size: .8rem; display: block; margin-top: 8px; }
-.dnr-actions { display: flex; gap: 8px; margin-top: 12px; }
-.dnr-modal { position: fixed; inset: 0; background: var(--c-rgba000045); z-index: 1200; display: flex; align-items: center; justify-content: center; }
-.dnr-modal.is-hidden { display: none; }
-.dnr-modal-card { max-width: 520px; width: 94%; margin: auto; margin-top: 8vh; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'المحاولات الممنوعة';

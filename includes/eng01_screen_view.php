@@ -40,11 +40,32 @@ if (function_exists('ems_states_bundle')) {
     );
 }
 ?>
+<?php
+/* ═══════════════════════════════════════════════════════════════════════════
+ * AC-U1 — **القشرةُ الموحَّدةُ والترويسةُ المركزية**
+ * ───────────────────────────────────────────────────────────────────────────
+ * ◆ كشفه قياسٌ حيٌّ على `Governance/bus_board.php`: الشاشةُ تُصيَّر **بلا
+ *   `.main_head` ولا `.ems-unified-page-shell` ولا عنوانِ صفحةٍ أصلًا** —
+ *   فتبدو صفحةً عاريةً بعنوانٍ محليٍّ `<h4>` لا يشبه أختَها.
+ * ◆ **وثمانُ شاشاتٍ تُصيَّر بهذه العُدّة**، فالإصلاحُ فيها **واحدٌ يعالج ثمانيًا**
+ *   — لا ثمانيةُ ترقيعاتٍ يعود العيبُ بعد أولِ توليد.
+ * ◆ **والنمطُ منسوخٌ حرفًا من عُدّةِ `u13_screen_kit`** (السطر 324) وشاشاتِ
+ *   `dept_risk_space` — فلا يُخترع نمطٌ تاسعٌ لثامنِ شاشة.
+ * ◆ **واسمُ الشاشةِ التقنيُّ (`$SCREEN`) لم يعد يُطبع**: بوابةُ اللغةِ U8 تمنع
+ *   «مسارَ ملفٍّ أو معرِّفًا تقنيًّا» في واجهةٍ نهائية. وكان يُعرض `small` بجوارِ
+ *   العنوان — فحُذف عرضُه، والقيمةُ باقيةٌ في المتغيّرِ لمن يحتاجها برمجيًّا.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+$header_title   = $PAGE_TITLE;
+$header_icon    = isset($SCREEN_ICON) ? $SCREEN_ICON : 'fa fa-diagram-project';
+$header_actions = array();
+$header_back    = false;
+?>
+<div class="main ems-unified-page-shell" dir="rtl">
+<?php
+$__ph = __DIR__ . '/page_header.php';
+if (is_readable($__ph)) { include $__ph; }
+?>
 <div class="container-fluid ems-eng01" dir="rtl">
-  <div class="d-flex align-items-center justify-content-between flex-wrap mb-3">
-    <h4 class="mb-0"><?= htmlspecialchars($PAGE_TITLE, ENT_QUOTES, 'UTF-8') ?></h4>
-    <small class="text-muted"><?= htmlspecialchars($SCREEN ?? '', ENT_QUOTES, 'UTF-8') ?></small>
-  </div>
 
 <?php if (!empty($flash)): ?>
   <div class="alert alert-<?= $flashKind === 'success' ? 'success' : ($flashKind === 'error' ? 'danger' : 'info') ?>">
@@ -111,6 +132,9 @@ foreach ($headers as $h) {
     وترتيبُ الحرّاسِ فيها: جلسة ← إعداد ← حارسُ شاشة ← حارسُ فعل ← رمزُ حماية ← معالجُ POST ← عرض.
   </p>
 </div>
+</div><!-- .main.ems-unified-page-shell — تُغلَق هنا لا في الشاشة، فالغلافُ
+          يفتحها ويغلقها معًا. ووسمٌ مفتوحٌ في عُدّةٍ يُخرج المحتوى إلى `body`
+          فينكمش العرض — عيبٌ مسجَّلٌ سابقًا في بطاقاتِ الكيانات. -->
 <?php
 $__foot = __DIR__ . '/../includes/footer.php';
 if (is_readable($__foot)) { include $__foot; }

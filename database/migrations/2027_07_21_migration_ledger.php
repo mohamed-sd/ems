@@ -127,6 +127,19 @@ foreach (file($src, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
             if ($L !== '' && isset($byLabel[$L])) { $cands = array_keys($byLabel[$L]); break; }
         }
     }
+    /* ◆ **التعدُّدُ يُحسم بالاسمِ المعياريِّ لا بالتقدير**: `approvals_inbox.php`
+         في مجلدَين (`Finance/` و`Portal/`) فتعدَّد مطابقُه لـ42 صفًّا. والاسمُ
+         المعياريُّ في الدفترِ «صندوق ما ينتظر اعتمادي» يطابق **واحدًا** في
+         السجل — فيَحسم. وما بقي متعدِّدًا بعد الترجيحِ يبقى `AMBIGUOUS`. */
+    if (count($cands) > 1) {
+        $narrow = array();
+        foreach (array(trim($c[4]), trim($c[3])) as $L) {
+            if ($L === '' || !isset($byLabel[$L])) { continue; }
+            $narrow = array_values(array_intersect($cands, array_keys($byLabel[$L])));
+            if (count($narrow) === 1) { break; }
+        }
+        if (count($narrow) === 1) { $cands = $narrow; }
+    }
     if (count($cands) === 1)      { $route = $cands[0]; $rs = 'RESOLVED'; }
     elseif (count($cands) > 1)    { $route = null;      $rs = 'AMBIGUOUS'; }
     else                          { $route = null;      $rs = 'NOT_FOUND'; }
