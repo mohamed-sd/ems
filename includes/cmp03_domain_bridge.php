@@ -70,6 +70,9 @@ if (!function_exists('cmp03_bridged_screens')) {
             /* ⇐ INJ-0370 · الإذنُ يبقى في جدولِه — والجسرُ يربطه بسجلَّيه
                  ويشتقُّ معتمِدَه، فلا نصوصَ حرّةً في موضعِ مفاتيح. */
             'site_gate_equip.php' => 'scr_site_gate_equip',
+            /* ⇐ ثامنًا-٤ · توأمُ الإذنِ للأشخاص — النمطُ نفسُه حرفًا:
+                 الإذنُ في جدولِه والمفاتيحُ تُشتقُّ، والمعتمِدُ من الجلسة. */
+            'site_gate_person.php' => 'scr_site_gate_person',
         );
     }
 }
@@ -91,6 +94,8 @@ if (!function_exists('cmp03_bridge_write')) {
             case 'fin_assets.php':  return cmp03_bridge_fin_asset($conn, $companyId, $payload, $uid);
             case 'site_gate_equip.php':
                                     return cmp03_bridge_site_gate($conn, $companyId, $payload, $status, $uid);
+            case 'site_gate_person.php':
+                                    return cmp03_bridge_site_gate_person($conn, $companyId, $payload, $status, $uid);
         }
         return null;
     }
@@ -439,6 +444,138 @@ if (!function_exists('cmp03_bridge_fin_asset')) {
         $out['ok'] = true; $out['id'] = (int) $conn->insert_id; $out['code'] = 'FAS-201';
         $out['msg'] = 'رُبطت العينُ بحصةِ ' . $pct . '٪ للمموِّلِ #' . $ent
                     . ($op ? (' في العمليةِ #' . $op) : '') . ' — تظهر في حصصِ الملكيةِ فورًا';
+        return $out;
+    }
+}
+
+if (!function_exists('cmp03_bridge_site_gate_person')) {
+    /**
+     * ⇐ ثامنًا-٤ · توأمُ `cmp03_bridge_site_gate` للأشخاص.
+     *
+     * ◆ **الإذنُ يبقى في جدولِه** — فهو مستندُ الموقعِ لا نسخةٌ من غيرِه؛ والناقصُ
+     *   كان **مفاتيحَه**: شخصٌ نصًّا وموقعٌ نصًّا ومورِّدٌ نصًّا ومعتمِدٌ بيدِ المُدخِل.
+     * ◆ **ولا يُقبل إذنٌ بمرجعٍ لا يقابله صفّ**: رمزُ مشغِّلٍ أو اسمُ موقعٍ مجهولٌ
+     *   ⇒ رفضٌ معلَنٌ برمز — **فالمفتاحُ المخترَعُ أسوأُ من النصِّ الحرّ**.
+     * ◆ **والمورِّدُ اختياريٌّ قصدًا**: «التبعية» قد تكون الشركةَ نفسَها فلا مورِّدَ
+     *   لها. فيُحلُّ إن ذُكر، ويبقى NULL إن لم يُذكرْ — **ولا يُرفض لأجلِه إذن**.
+     *   وهذا فرقٌ عن المعدةِ والموقعِ: هذانِ شرطان وذاك وصفٌ.
+     * ◆ والمعتمِدُ **من الجلسة** ولا يُقرأ من الحقل: «لا يُوقَّع باسمِ أحدٍ».
+     */
+    function cmp03_bridge_site_gate_person(mysqli $conn, $companyId, array $payload, $status, $uid)
+    {
+        $out = array('ok' => false, 'id' => 0, 'code' => 'SGP-422', 'msg' => '');
+        $companyId = (int) $companyId; $uid = (int) $uid;
+
+        /* ── الشخصُ من سجلِّ الموظفين: بالرمزِ أو بالاسم ── */
+        $opCode = cmp03_bridge_pick($payload, array('كود المشغل', 'كود المشغّل', 'المشغل'));
+        $opName = cmp03_bridge_pick($payload, array('الاسم', 'اسم المشغل'));
+        $emp = 0;
+        if ($opCode !== '' || $opName !== '') {
+            $st = $conn->prepare('SELECT id FROM employees
+                                   WHERE company_id = ?
+                                     AND (employee_code = ? OR name = ? OR id = ?) LIMIT 1');
+            if ($st) {
+                $needle = ($opCode !== '') ? $opCode : $opName;
+                $n = ctype_digit($needle) ? (int) $needle : 0;
+                $st->bind_param('issi', $companyId, $needle, $opName, $n);
+                $st->execute();
+                $r = $st->get_result()->fetch_row();
+                $st->close();
+                $emp = $r ? (int) $r[0] : 0;
+            }
+        }
+        if ($emp <= 0) {
+            $out['msg'] = 'SGP-422: «' . ($opCode !== '' ? $opCode : $opName)
+                        . '» لا يقابله صفٌّ في سجلِّ الموظفين — ولا يُصدَر إذنٌ لشخصٍ مجهول';
+            return $out;
+        }
+
+        /* ── الموقعُ من سجلِّ المواقع ── */
+        $siteName = cmp03_bridge_pick($payload, array('الموقع', 'اسم الموقع'));
+        $site = 0;
+        if ($siteName !== '') {
+            $st = $conn->prepare('SELECT id FROM project
+                                   WHERE company_id = ? AND (name = ? OR id = ?) LIMIT 1');
+            if ($st) {
+                $n = ctype_digit($siteName) ? (int) $siteName : 0;
+                $st->bind_param('isi', $companyId, $siteName, $n);
+                $st->execute();
+                $r = $st->get_result()->fetch_row();
+                $st->close();
+                $site = $r ? (int) $r[0] : 0;
+            }
+        }
+        if ($site <= 0) {
+            $out['msg'] = 'SGP-422: الموقعُ «' . $siteName . '» لا يقابله موقعٌ في سجلِّ المواقع';
+            return $out;
+        }
+
+        /* ── المورِّدُ وصفٌ لا شرط: يُحلُّ إن ذُكر ويبقى NULL إن لم يُذكر ── */
+        $supName = cmp03_bridge_pick($payload, array('المورد التابع له', 'المورد', 'المورّد'));
+        $sup = null;
+        if ($supName !== '') {
+            $st = $conn->prepare('SELECT id FROM suppliers
+                                   WHERE company_id = ? AND (name = ? OR supplier_code = ? OR id = ?) LIMIT 1');
+            if ($st) {
+                $n = ctype_digit($supName) ? (int) $supName : 0;
+                $st->bind_param('issi', $companyId, $supName, $supName, $n);
+                $st->execute();
+                $r = $st->get_result()->fetch_row();
+                $st->close();
+                $sup = $r ? (int) $r[0] : null;
+            }
+        }
+
+        /* ── المعتمِدُ من الجلسةِ — والحقلُ النصيُّ يُهمَل إن كُتب ── */
+        $approver = '';
+        $st = $conn->prepare('SELECT name FROM users WHERE id = ? LIMIT 1');
+        if ($st) {
+            $st->bind_param('i', $uid);
+            $st->execute();
+            $r = $st->get_result()->fetch_row();
+            $st->close();
+            $approver = $r ? (string) $r[0] : '';
+        }
+
+        $st = $conn->prepare("INSERT INTO scr_site_gate_person
+                (company_id, no_permit, type_permit, site_name, code_operator, name_ar,
+                 affiliation, supplier_belongs_has, reason_movement, cycle_rotation,
+                 date_start_work, date_end_work, trip_entry_or_exit, housing_allocated,
+                 state_license, state_check_medical, attestation_security,
+                 approval_manager_site, approval_manager_operations, approved_date,
+                 employee_id, site_project_id, supplier_entity_id, approved_by_user,
+                 status, is_seed, created_by, created_by_name, created_at, updated_at)
+              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?,NOW(),NOW())");
+        if (!$st) { $out['code'] = 'SGP-500'; $out['msg'] = 'SGP-500: ' . $conn->error; return $out; }
+
+        $g = function ($labels) use ($payload) { return cmp03_bridge_pick($payload, (array) $labels); };
+        $v = array(
+            $g('رقم الإذن'), $g('نوع الإذن'), $siteName, $opCode, $opName,
+            $g('التبعية'), $supName, $g('سبب الحركة'), $g('دورة التناوب'),
+            $g('تاريخ بداية العمل'), $g('تاريخ نهاية العمل'),
+            $g('رحلة الدخول أو الخروج'), $g('السكن المخصص'),
+            $g('حالة الرخصة'), $g('حالة الفحص الطبي'), $g('المصادقة الأمنية'),
+            $approver, $approver, date('Y-m-d'),
+        );
+        /* نوعُ الربطِ يُبنى بالعدِّ لا يُكتب بيد — حرفٌ ناقصٌ يُزيح القيمَ كلَّها */
+        $types = 'i' . str_repeat('s', 19) . 'iiii' . 's' . 'i' . 's';
+        $st->bind_param($types,
+            $companyId, $v[0], $v[1], $v[2], $v[3], $v[4], $v[5], $v[6], $v[7], $v[8],
+            $v[9], $v[10], $v[11], $v[12], $v[13], $v[14], $v[15], $v[16], $v[17], $v[18],
+            $emp, $site, $sup, $uid, $status, $uid, $approver);
+        $ok  = $st->execute();
+        $err = (string) $st->error;
+        $st->close();
+        if (!$ok) {
+            $out['code'] = 'SGP-500';
+            $out['msg']  = 'SGP-500: تعذّر إصدارُ الإذن — ' . mb_substr($err, 0, 110);
+            return $out;
+        }
+        $out['ok'] = true; $out['id'] = (int) $conn->insert_id; $out['code'] = 'SGP-201';
+        $out['msg'] = 'صدر الإذنُ مرتبطًا بالشخصِ #' . $emp . ' والموقعِ #' . $site
+                    . ($sup ? ' والمورِّدِ #' . $sup : ' (بلا مورِّدٍ — تبعيةٌ داخلية)')
+                    . ' — والمعتمِدُ «' . ($approver !== '' ? $approver : ('حساب #' . $uid))
+                    . '» من حسابِك لا من الكتابة';
         return $out;
     }
 }

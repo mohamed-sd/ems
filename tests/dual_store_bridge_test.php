@@ -240,7 +240,19 @@ foreach (array('scr_attendance' => 20, 'scr_deductions' => 20, 'scr_fin_assets' 
 }
 require_once $ROOT . '/includes/cmp03_domain_bridge.php';
 $br = cmp03_bridged_screens();
-$ok(count($br) === 4, 'وسجلُّ الجسورِ يُعلن أربعَ شاشاتٍ محوَّلة: ' . implode(' · ', array_keys($br)));
+/* ◆ كان هنا رقمٌ مجمَّد (`=== 4`) فرسبَ الفاحصُ لحظةَ إضافةِ الجسرِ الخامس —
+     **وهو نجاحٌ يُقرأ رسوبًا**. والدرسُ مسجَّلٌ في هذا المستودع: لا رقمَ مجمَّدًا
+     في فاحص. فيُقاس **الخاصيةُ** لا العدد: كلُّ شاشةٍ مُعلَنةٍ في السجلِّ لها
+     مُوجِّهٌ فعليٌّ في `cmp03_bridge_write` — وإلا فالإعلانُ دعوى. */
+$declaredNoHandler = array();
+$bridgeSrc = (string) @file_get_contents($ROOT . '/includes/cmp03_domain_bridge.php');
+foreach (array_keys($br) as $screen) {
+    if (strpos($bridgeSrc, "case '" . $screen . "':") === false) { $declaredNoHandler[] = $screen; }
+}
+$ok(count($br) >= 4 && !$declaredNoHandler,
+    'كلُّ شاشةٍ مُعلَنةٍ في سجلِّ الجسورِ لها مُوجِّه — المُعلَنُ الآن ' . count($br) . ': '
+    . implode(' · ', array_keys($br))
+    . ($declaredNoHandler ? ' ✘ بلا مُوجِّه: ' . implode(' · ', $declaredNoHandler) : ''));
 
 $say("\n── الكنسُ البعديّ");
 $ok($sweep() === 0, 'كُنست عائلةُ الوسمِ كاملةً');
