@@ -63,6 +63,44 @@ $COMPONENTS = array(
     'نظامُ النماذج'    => array('src' => 'assets/css/ems-forms.css',      'needle' => 'allforms|ems-form'),
 );
 
+/* ═══════════════════════════════════════════════════════════════════════════
+ * المقامُ **لكلِّ قالبٍ** لا اثنا عشرَ للجميع (قرارُ المالك · خامسًا)
+ * ───────────────────────────────────────────────────────────────────────────
+ * ◆ نصُّه: «المصفوفةُ تقيس كلَّ سطحٍ بـ12 مكوّنًا **مهما كان قالبُه** — واللوحةُ
+ *   لا تحتاج نظامَ نماذجَ ولا جدولًا موحَّدًا. ولذلك `sites_board` تظهر **4/12**
+ *   وهي بصفرِ نمطٍ منفردٍ وصفرِ تجاوز. **اجعلِ المقامَ لكلِّ قالب: المتبنّى ÷
+ *   ما يحتاجه هذا القالب**».
+ *
+ * ◆ **والحاجةُ تُقرأ من بنيةِ القالبِ في ف٨-١ حرفًا** — لا من تقديرٍ:
+ *   · صفحةُ السجل: «ترويسةٌ ← شريطٌ موحَّدٌ ← مرشِّحاتٌ ← الجدولُ ← التصفيح»
+ *   · بطاقةُ الكيان: «ترويسةٌ بهويةِ الكيانِ وحالتِه ← تبويباتٌ ← محتوًى ← إجراءات»
+ *   · النموذج: «ترويسةٌ ← أقسامٌ ← شبكةُ حقولٍ ← شريطُ حفظ»
+ *   · اللوحة: «ترويسةٌ ← بطاقاتُ قرارٍ ← رسومٌ ← جدولُ تفصيلٍ واحد»
+ *   · صندوقُ الاعتماد: «ترويسةٌ ← تبويباتُ الأنواعِ ← جدولٌ واحدٌ بشريطٍ واحد»
+ *
+ * ◆ **وخمسةٌ مشترَكةٌ لكلِّ قالبٍ بلا استثناء** — لأنها قشرةٌ لا محتوى:
+ *   ترويسةُ الصفحة · حالاتُ الشاشة · الرسائلُ العابرة · نظامُ الأزرار ·
+ *   تعريفُ الشاشة. فما من قالبٍ يُعفى منها.
+ *
+ * ◆ **ولا يُطرح مكوّنٌ لأن الشاشةَ لا تستعمله** — يُطرح لأن **قالبَها لا يقتضيه**.
+ *   والفرقُ جوهريّ: الأولُ يُخفي نقصًا، والثاني يُصحّح مقامًا.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+$TEMPLATE_NEEDS = array(
+    /* المشترَكُ في الخمسةِ كلِّها */
+    '_shared' => array('ترويسةُ الصفحة', 'حالاتُ الشاشة', 'الرسائلُ العابرة',
+                       'نظامُ الأزرار', 'تعريفُ الشاشة'),
+    'صفحةُ السجل'      => array('INJAZ DataGrid', 'قائمةُ الأعمدة', 'وسمُ الحالة'),
+    'بطاقةُ الكيان'     => array('شريطُ الرحلة', 'وسمُ الحالة', 'الخطوةُ التالية', 'محاورُ القشرة'),
+    'النموذج'          => array('نظامُ النماذج', 'الخطوةُ التالية'),
+    'اللوحة'           => array('INJAZ DataGrid', 'وسمُ الحالة'),
+    'صندوقُ الاعتماد'   => array('INJAZ DataGrid', 'وسمُ الحالة', 'الخطوةُ التالية'),
+);
+
+/** ما يقتضيه القالبُ — المشترَكُ + خاصَّتُه. وقالبٌ مجهولٌ يأخذ الاثنَي عشرَ كلَّها. */
+function ems_template_needs($tpl, $TEMPLATE_NEEDS, $COMPONENTS) {
+    if (!isset($TEMPLATE_NEEDS[$tpl])) { return array_keys($COMPONENTS); }
+    return array_values(array_unique(array_merge($TEMPLATE_NEEDS['_shared'], $TEMPLATE_NEEDS[$tpl])));
+}
 /* ── الأنماطُ القابلةُ لإعادةِ الاستعمالِ — إن ظهرت منفردةً فهي غيرُ مبرَّرة ── */
 $REUSABLE_HINTS = array('badge', 'card', 'btn', 'toolbar', 'chip', 'table', 'modal', 'drawer',
                         'tab', 'alert', 'empty', 'loading', 'header', 'filter', 'grid', 'row');
@@ -125,10 +163,28 @@ foreach ($screens as $s) {
 
     /* ① المكوّناتُ المتبنّاةُ ومصدرُ كلٍّ */
     $used = array(); $missing = array();
+    /* ◆ **القالبُ يُحسب هنا لا عند بناءِ الصفّ** — لأن المقامَ يعتمد عليه.
+         وحسابُه متأخّرًا جعل الخريطةَ تُستدعى باسمٍ فارغٍ فرجعت الاثنَي عشرَ
+         كلَّها، ثم رجعت 0/0 حين وُصلت — **وكلاهما رقمٌ بلا معنى**. */
+    $tplName = isset($TEMPLATES[$s['category']]) ? $TEMPLATES[$s['category']] : ($s['category'] ?: '—');
+    $needs = ems_template_needs($tplName, $TEMPLATE_NEEDS, $COMPONENTS);
+    $notNeeded = array();
     foreach ($COMPONENTS as $name => $def) {
-        if (preg_match('~(' . $def['needle'] . ')~i', $src)) { $used[$name] = $def['src']; }
-        else { $missing[] = $name; }
+        $isNeeded = in_array($name, $needs, true);
+        if (preg_match('~(' . $def['needle'] . ')~i', $src)) {
+            /* المتبنّى يُحسب وإن لم يقتضِه القالبُ — وتبنٍّ زائدٌ ليس عيبًا،
+               لكنّه لا يُضخّم المقامَ ولا يُنقصه. */
+            $used[$name] = $def['src'];
+            if (!$isNeeded) { $notNeeded[] = $name; }
+        } elseif ($isNeeded) {
+            $missing[] = $name;
+        }
+        /* وما لم يُتبنَّ ولم يقتضِه القالبُ: **خارجَ المقامِ تمامًا** — لا نقصًا
+           ولا تبنّيًا. وهو عينُ تصحيحِ المالك (خامسًا). */
     }
+    $needCount = count($needs);
+    $usedNeeded = 0;
+    foreach ($needs as $n) { if (isset($used[$n])) { $usedNeeded++; } }
 
     /* ② القواعدُ المنفردةُ — محدِّدٌ لا يستعمله إلا هذا السطح */
     $pfx = prefixes_of($src);
@@ -171,7 +227,8 @@ foreach ($screens as $s) {
 
     $rows[] = array(
         'file' => $file, 'title' => $s['title_ar'],
-        'template' => isset($TEMPLATES[$s['category']]) ? $TEMPLATES[$s['category']] : ($s['category'] ?: '—'),
+        'template' => $tplName,
+        'needCount' => $needCount, 'usedNeeded' => $usedNeeded, 'notNeeded' => $notNeeded,
         'used' => $used, 'missing' => $missing,
         'inline' => preg_match_all('~\sstyle\s*=\s*["\']~i', $src),
         'blocks' => preg_match_all('~<style\b~i', $src),
@@ -183,11 +240,22 @@ foreach ($screens as $s) {
 echo "════ مصفوفةُ تبنّي المكوّنات — ⑥ الحقيقيّ ════\n\n";
 $adoptSum = 0; $compSum = 0;
 foreach ($rows as $r) {
-    $adopt = count($r['used']); $tot = $adopt + count($r['missing']);
+    /* ◆ **المقامُ ما يقتضيه القالبُ** لا الاثنَي عشرَ للجميع (قرارُ المالك · خامسًا) */
+    $adopt = (int) $r['usedNeeded']; $tot = (int) $r['needCount'];
     $adoptSum += $adopt; $compSum += $tot;
     printf("▐ %s — %s\n", $r['file'], $r['title']);
     printf("   القالب: %s · مكوّناتٌ مركزية: %d/%d · تجاوزٌ محليّ: كتل=%d سطرية=%d\n",
         $r['template'], $adopt, $tot, $r['blocks'], $r['inline']);
+    if (!empty($r['notNeeded'])) {
+        printf("     ◆ متبنًّى زيادةً على ما يقتضيه القالب (%d): %s
+",
+               count($r['notNeeded']), implode(' · ', array_slice($r['notNeeded'], 0, 4)));
+    }
+    if (!empty($r['missing'])) {
+        printf("     ✗ ناقصٌ **ويقتضيه القالب** (%d): %s
+",
+               count($r['missing']), implode(' · ', array_slice($r['missing'], 0, 4)));
+    }
     printf("   قواعدُ CSS منفردة: %d — مبرَّرة=%d · **غيرُ مبرَّرة=%d**\n",
         $r['single'], count($r['just']), count($r['unjust']));
     if ($r['unjust']) {

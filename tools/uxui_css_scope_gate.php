@@ -44,4 +44,26 @@ foreach ($m as $blk) {
 echo "قواعدُ بمحدِّدٍ عامٍّ بعد النقل: " . count($hits) . "\n";
 foreach ($hits as $h) { printf("  · %-38s ⇐ %s\n", $h[0], mb_substr($h[1], 0, 46)); }
 
-exit(count($hits) === 0 ? 0 : 1);
+/* ═══════════════════════════════════════════════════════════════════════════
+ * توسعةٌ: متغيّراتُ بطاقةِ الإحصاءِ **ثلاثةٌ لا رابعَ لها**
+ * ───────────────────────────────────────────────────────────────────────────
+ * ◆ شرطُ المالك (رابعًا): «المتغيّراتُ ثلاثةٌ مسمّاةٌ لا رابعَ لها، **وأيُّ
+ *   جديدٍ قرارٌ لا إضافةٌ صامتة**». فالحارسُ يعدُّها ويرفض الرابع.
+ * ◆ **وتوسعةٌ لفحصٍ قائمٍ لا أداةٌ جديدة** — بقاعدةِ «القائمةُ مجمّدة».
+ * ═══════════════════════════════════════════════════════════════════════════ */
+$SC_ALLOWED = array('--statcard-radius', '--statcard-pad', '--statcard-shadow');
+$scCss = (string) @file_get_contents(dirname(__DIR__) . '/assets/css/uxui-components.css');
+$scFound = array();
+if (preg_match_all('~(--statcard-[a-z0-9-]+)~i', $scCss, $mSC)) {
+    $scFound = array_values(array_unique($mSC[1]));
+}
+$scExtra = array_diff($scFound, $SC_ALLOWED);
+echo "
+متغيّراتُ بطاقةِ الإحصاء: " . count($scFound) . " · المسموحُ 3
+";
+foreach ($scFound as $v) { echo '  ' . (in_array($v, $SC_ALLOWED, true) ? '✔' : '✗') . " {$v}
+"; }
+if ($scExtra) { echo '  ✗ متغيّرٌ رابعٌ بلا قرار: ' . implode(' · ', $scExtra) . "
+"; }
+
+exit((count($hits) === 0 && empty($scExtra)) ? 0 : 1);

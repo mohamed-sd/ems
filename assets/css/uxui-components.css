@@ -220,17 +220,35 @@ a.ux-chip:hover { background: var(--ux-accent); color: var(--white, #fff); }
      عرضٍ من المالك. فلا تُدمج صامتةً هنا.
    ◆ والمكوّنُ المركزيُّ أدناه هو **الهدفُ المعلَن** الذي تُرحَّل إليه في موجتِها:
      شكلٌ واحدٌ بثلاثةِ متغيّراتٍ مصرَّحةٍ بدل ثلاثةِ تصاميمَ متفرقة. */
+/* ◆ **قرارُ المالك (رابعًا): الخيار (ب) — توحيدٌ بمتغيّراتٍ مصرَّحة.**
+     وبشرطِه: **ثلاثةُ متغيّراتٍ مسمّاةٌ لا رابعَ لها**، وأيُّ جديدٍ قرارٌ
+     لا إضافةٌ صامتة. فالثلاثةُ هي محاورُ الاختلافِ الحقيقيةُ بين العائلاتِ
+     الثلاثِ المرصودة (`.stat-card` · `.stats-card` · `.kpi-card`):
+       ① `--statcard-radius`  نصفُ القطر
+       ② `--statcard-pad`     الحشوة
+       ③ `--statcard-shadow`  الظلّ
+     وما عداها (الخلفيةُ والحدُّ والخطُّ) **موحَّدٌ بلا متغيّر** — فاختلافُه
+     لم يكن قرارًا بل تراكمًا.
+   ◆ **والقيمُ الافتراضيةُ من الرموزِ لا أرقامًا** — فتوحيدُ السلّمِ لاحقًا يسري.
+   ◆ **ونصفُ القطر 35px في شاشةِ العملاءِ لا يُوحَّد الآن**: رجّح المالكُ أنه
+     سهوٌ قديمٌ لا هوية، **وتوحيدُه البصريُّ يُجدوَل مع موجةِ التعميمِ بخطِّ
+     أساسِه الخاص**. فيبقى الآن قابلًا للضبطِ بالمتغيّرِ ولا يُفرَض عليه شيء. */
 .ux-statcard {
+  --statcard-radius: var(--ux-radius-card);
+  --statcard-pad:    var(--ux-sp-3);
+  --statcard-shadow: var(--ux-shadow-card);
+
   background: var(--ux-surface-card);
   border: var(--ux-border);
-  border-radius: var(--ux-radius-card);
-  padding: var(--ux-sp-3);
-  box-shadow: var(--ux-shadow-card);
+  border-radius: var(--statcard-radius);
+  padding: var(--statcard-pad);
+  box-shadow: var(--statcard-shadow);
   position: relative; overflow: hidden;
   font-family: var(--ux-font);
 }
-.ux-statcard--roomy   { padding: var(--ux-sp-4); }
-.ux-statcard--flat    { box-shadow: none; }
+/* والمُعدِّلاتُ تضبط المتغيّرَ لا الخاصيةَ — فتبقى نقطةُ التحكّمِ واحدة */
+.ux-statcard--roomy   { --statcard-pad: var(--ux-sp-4); }
+.ux-statcard--flat    { --statcard-shadow: none; }
 .ux-statcard__grid    { display: grid; grid-template-columns: repeat(4, minmax(170px, 1fr)); gap: var(--ux-sp-3); }
 .ux-statcard__grid--fit { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
 
