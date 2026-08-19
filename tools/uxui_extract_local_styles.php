@@ -41,10 +41,31 @@ foreach (array_slice($argv, 1) as $a) {
 $TARGET_CSS = $ROOT . '/assets/css/ems-screens.css';
 $BACKUP_DIR = $ROOT . '/storage/backups/uxui_local_styles';
 
-/* الشاشاتُ الذهبيةُ من سجلِّ المالك */
+/* ═══════════════════════════════════════════════════════════════════════════
+ * النطاقُ: الذهبيةُ **أو موجةٌ من سجلِّ الترحيل** بترتيبِ الشدة
+ * ───────────────────────────────────────────────────────────────────────────
+ * ◆ نصُّ ف١٣-١ الخطوة ٥: «الترحيلُ بموجاتٍ إدارية — **بترتيبِ الشدةِ من دفترِ
+ *   التدقيق**». فالأداةُ كانت محصورةً في العشرِ الذهبيةِ وقد فرغت منها، والباقي
+ *   **86 ملفًّا بـ430 قاعدةً** لا تبلغها.
+ * ◆ فيُفتح النطاقُ بـ`--wave=<الشدة>` من `gov_migration_ledger` — والموجةُ
+ *   تُنفَّذ وحدَها فتُقاس وتُراجَع قبلَ التي تليها، ولا تُكنس المئاتُ دفعةً.
+ * ◆ **والنسخُ الاحتياطيُّ يشمل ما يُمَسُّ فعلًا** — فالعكسُ يبقى بأمرٍ واحد.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+$wave = isset($args['wave']) ? $args['wave'] : '';
 $screens = array();
-$q = $conn->query("SELECT screen_file FROM gov_golden_approvals ORDER BY id");
-while ($q && ($x = $q->fetch_assoc())) { $screens[] = $x['screen_file']; }
+if ($wave === '') {
+    $q = $conn->query("SELECT screen_file FROM gov_golden_approvals ORDER BY id");
+    while ($q && ($x = $q->fetch_assoc())) { $screens[] = $x['screen_file']; }
+} else {
+    $w = '';
+    if ($wave !== 'all') {
+        $w = " AND severity = '" . $conn->real_escape_string($wave) . "'";
+    }
+    $q = $conn->query("SELECT DISTINCT route FROM gov_migration_ledger
+                        WHERE resolve_state = 'RESOLVED' AND route IS NOT NULL {$w}
+                        ORDER BY route");
+    while ($q && ($x = $q->fetch_assoc())) { $screens[] = $x['route']; }
+}
 
 /* ── الاستعادة ── */
 if (isset($args['revert'])) {
@@ -70,7 +91,7 @@ foreach ($screens as $rel) {
     $plan[$rel] = $blocks;
 }
 
-if (!$plan) { exit("لا كتلَ نمطٍ محليةً في الذهبية\n"); }
+if (!$plan) { exit("لا كتلَ نمطٍ محليةً في هذا النطاق\n"); }
 
 echo "════ نقلُ الأنماطِ المحليةِ إلى المركز ════\n";
 $totalLines = 0;

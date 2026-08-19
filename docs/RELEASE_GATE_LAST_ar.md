@@ -1,9 +1,9 @@
 # شهادة بوابات التسليم — آخر عبور
 
-**التاريخ:** 2026-08-19 10:41 · **الحكم:** ✘ توقف عند ② التكامل: tools/e02_checks.php
+**التاريخ:** 2026-08-19 15:26 · **الحكم:** ✘ توقف عند ② التكامل: tools/e02_checks.php
 
 ```
-════ بوابات التسليم الخمس — 2026-08-19 10:39 ════
+════ بوابات التسليم الخمس — 2026-08-19 15:24 ════
 
 ▌ البوابة ① — اختبار الوحدة (يشهد: المطوّر)
   ✔ tests/wfm_engine_test.php — ✔ صفّا خطوتين في approval_links (الأولى مختومة)
@@ -22,15 +22,14 @@
   ✘ tools/se03_ten_checks.php — المخالف: CK-04=5 ·
 ══════════════════════════════════════════════════════════════════════
   ✔ tools/fin01_posting_verify.php — ✔ الترحيلُ سليمٌ — صفرُ مخالفٍ في الثمانية
-  ✘ tools/uxw_visual_baseline.php — ✔ مطابق: main/user_profile.php
-✘ فرق: Governance/authority_caps.php — كُتب Governance__authority_caps.diff.txt (يعتمده --capture بعد توثيقِ السبب)
-  ✘ tools/uxw_gates.php — [١٠ فرق بصري] Suppliers__supplier_profile.diff.txt — فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح
-  [١٠ فرق بصري] Suppliers__unit_statement_supplier.diff.txt — فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح
+  ✘ tools/uxw_visual_baseline.php — 84.3149  101837000   3. preg_replace_callback($pattern = '~<([a-zA-Z][a-zA-Z0-9-]*)((?:\\s+[^<>]*?)?)/?>~su', $callback = class Closure { public $static = ['lines' => [...]]; public $parameter = ['$t' => '<required>'] }, $subject = '\n<!-- AC-U8 · SH-08: رابطُ التخطّي — أولُ ما تبلغه لوحةُ المفاتيح.\n     بدونَه تُجبَر الدورةُ على المرورِ بالشريطِ الجانبيِّ كلِّه (عشراتُ الروابط)\n     قبلَ بلوغِ المحتوى، فتصير الدورةُ «كاملةً» ورقيًّا لا عمليًّا. مخفيٌّ حتى\n     يُركَّز عليه — لا يزاحم البصرَ ويحضر للوحةِ المفاتيح. -->\n<a class="em'...) C:\wamp64\www\ems\tools\uxw_visual_baseline.php:76
+  ✘ tools/uxw_gates.php — [١٠ فرق بصري] movement__project_drivers.diff.txt — فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح
+  [١٠ فرق بصري] user_capacities.diff.txt — فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح
   ✔ tools/govauth_checks.php — ✔ فحوصُ GOV-AUTH-01 نافذةُ النطاقِ مجتازة
   ✘ tools/govauth_parity_probe.php — ✘ view	fin.deptmgr@equipation.sd (دور 19)	Finance/ob_due_soon.php	قائم=0 قالب=1
-  … و338 أخرى
+  … و350 أخرى
   ✔ tools/uxw_a11y_contrast.php — ════ فحصُ التضادِّ — أزواجُ المكوّناتِ المعلنة ════
-أزواجٌ مقيسة: 29 · مجتازة ≥4.5: 29 (100.0٪) · راسبة: 0 · معطَّلةٌ مستثناةٌ بنصِّ WCAG 1.4.3: 1 · متعذرُ الحلِّ (تدرجات/شفافيات): 63
+أزواجٌ مقيسة: 30 · مجتازة ≥4.5: 30 (100.0٪) · راسبة: 0 · معطَّلةٌ مستثناةٌ بنصِّ WCAG 1.4.3: 1 · متعذرُ الحلِّ (تدرجات/شفافيات): 65
 
 ▌ البوابة ③ — لم تُفتح
 

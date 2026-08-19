@@ -552,13 +552,20 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
                         <label for="generated_cmt_code"><i class="fas fa-magic"></i> كود الالتزام المولد <i class="fas fa-info-circle cmt-info-icon"></i></label>
-                        <input type="text" id="generated_cmt_code" class="generated-code-field" value="<?php echo cmt_e($next_cmt_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل كود الالتزام" />
+                        <input type="text" id="generated_cmt_code" class="generated-code-field" value="<?php echo cmt_e($next_cmt_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، يمكنك نسخه واستخدامه في حقل كود الالتزام" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
                         <label for="commitment_code"><i class="fas fa-barcode"></i> كود الالتزام *</label>
-                        <input type="text" name="commitment_code" id="commitment_code" placeholder="مثال: CMT-001" required pattern="[A-Za-z0-9_\-]+" />
+                        <!-- مكتوبٌ سلفًا بالكودِ المولَّد **وقابلٌ للتعديل** (نظيرُ كودِ العميلِ والمشروع):
+                             أكثرُ الحالاتِ تقبله كما هو، ومَن أراد كودَه الخاصَّ كتبه فوقه. ووضعُه في
+                             السمةِ `value` لا بجافاسكربت مقصود: `resetForm()` تستدعي `reset()` الأصليَّ
+                             وهو يعيد كلَّ حقلٍ إلى سمتِه — فيعود الكودُ المولَّدُ تلقائيًّا بعد كلِّ
+                             إلغاءٍ أو خروجٍ من وضعِ التعديل. -->
+                        <input type="text" name="commitment_code" id="commitment_code" placeholder="مثال: CMT-001" required
+                            value="<?php echo cmt_e($next_cmt_code); ?>"
+                            pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label for="contract_ref"><i class="fas fa-file-contract"></i> العقد المرتبط *</label>
@@ -904,8 +911,31 @@ if ($cf_contract_id > 0) include __DIR__ . '/../includes/contract_file_tabs.php'
     const statsToggleBtn = $('#toggleStats');
     const statsSection = $('#cmtStatsSection');
 
-    function setAddMode() { formTitle.text('إضافة التزام جديد'); submitBtnText.text('حفظ الالتزام'); generatedCodeWrapper.show(); }
-    function setEditMode() { formTitle.text('تعديل الالتزام'); submitBtnText.text('تحديث الالتزام'); generatedCodeWrapper.hide(); }
+    /**
+     * إظهارُ حقلِ الكودِ المولَّد وإخفاؤه.
+     *
+     * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
+     *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
+     * والغلافُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقةِ الأنماطِ تهزم
+     * الإخفاءَ السطريَّ **بلا أولوية**: السمةُ تُكتب فعلًا والحقلُ يبقى ظاهرًا، بلا
+     * خطأٍ في وحدةِ التحكم ولا سطرٍ في أيِّ سجل. (نظيرُ شاشتَي العملاءِ والمشاريع.)
+     */
+    function setGeneratedCodeShown(shown) {
+        var el = generatedCodeWrapper[0];
+        if (!el) { return; }
+        if (shown) { el.style.removeProperty('display'); }
+        else       { el.style.setProperty('display', 'none', 'important'); }
+    }
+    function setAddMode() {
+        formTitle.text('إضافة التزام جديد'); submitBtnText.text('حفظ الالتزام');
+        setGeneratedCodeShown(true);
+        // الكودُ المولَّدُ يعود إلى خانتِه كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
+        // العرضِ نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
+        // للإلغاء، لكنَّ الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا reset.
+        var genCode = $('#generated_cmt_code').val();
+        if (genCode) { $('#commitment_code').val(genCode); }
+    }
+    function setEditMode() { formTitle.text('تعديل الالتزام'); submitBtnText.text('تحديث الالتزام'); setGeneratedCodeShown(false); }
     function resetForm() { if (!cmtForm.length) return; cmtForm[0].reset(); $('#cmt_id').val(''); setAddMode(); if (window.EmsSelect) EmsSelect.refresh(); }
 
     function updateFormToggleState(isOpen) {

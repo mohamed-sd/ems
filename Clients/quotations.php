@@ -474,13 +474,20 @@ function quo_state_tone($state)
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
                         <label for="generated_quo_code"><i class="fas fa-magic"></i> كود العرض المولد <i class="fas fa-info-circle quo-info-icon"></i></label>
-                        <input type="text" id="generated_quo_code" class="generated-code-field" value="<?php echo quo_e($next_quo_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل كود العرض" />
+                        <input type="text" id="generated_quo_code" class="generated-code-field" value="<?php echo quo_e($next_quo_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، يمكنك نسخه واستخدامه في حقل كود العرض" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
                         <label for="quotation_code"><i class="fas fa-barcode"></i> كود العرض *</label>
-                        <input type="text" name="quotation_code" id="quotation_code" placeholder="مثال: QUO-001" required pattern="[A-Za-z0-9_\-]+" />
+                        <!-- مكتوبٌ سلفًا بالكودِ المولَّد **وقابلٌ للتعديل** (نظيرُ كودِ العميلِ والمشروع):
+                             أكثرُ الحالاتِ تقبله كما هو، ومَن أراد كودَه الخاصَّ كتبه فوقه. ووضعُه في
+                             السمةِ `value` لا بجافاسكربت مقصود: `resetForm()` تستدعي `reset()` الأصليَّ
+                             وهو يعيد كلَّ حقلٍ إلى سمتِه — فيعود الكودُ المولَّدُ تلقائيًّا بعد كلِّ
+                             إلغاءٍ أو خروجٍ من وضعِ التعديل. -->
+                        <input type="text" name="quotation_code" id="quotation_code" placeholder="مثال: QUO-001" required
+                            value="<?php echo quo_e($next_quo_code); ?>"
+                            pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label for="client_id"><i class="fas fa-user-tie"></i> العميل</label>
@@ -752,8 +759,31 @@ function quo_state_tone($state)
     const statsToggleBtn = $('#toggleStats');
     const statsSection = $('#quoStatsSection');
 
-    function setAddMode() { formTitle.text('إضافة عرض جديد'); submitBtnText.text('حفظ العرض'); generatedCodeWrapper.show(); }
-    function setEditMode() { formTitle.text('تعديل العرض'); submitBtnText.text('تحديث العرض'); generatedCodeWrapper.hide(); }
+    /**
+     * إظهارُ حقلِ الكودِ المولَّد وإخفاؤه.
+     *
+     * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
+     *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
+     * والغلافُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقةِ الأنماطِ تهزم
+     * الإخفاءَ السطريَّ **بلا أولوية**: السمةُ تُكتب فعلًا والحقلُ يبقى ظاهرًا، بلا
+     * خطأٍ في وحدةِ التحكم ولا سطرٍ في أيِّ سجل. (نظيرُ شاشتَي العملاءِ والمشاريع.)
+     */
+    function setGeneratedCodeShown(shown) {
+        var el = generatedCodeWrapper[0];
+        if (!el) { return; }
+        if (shown) { el.style.removeProperty('display'); }
+        else       { el.style.setProperty('display', 'none', 'important'); }
+    }
+    function setAddMode() {
+        formTitle.text('إضافة عرض جديد'); submitBtnText.text('حفظ العرض');
+        setGeneratedCodeShown(true);
+        // الكودُ المولَّدُ يعود إلى خانتِه كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
+        // العرضِ نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
+        // للإلغاء، لكنَّ الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا reset.
+        var genCode = $('#generated_quo_code').val();
+        if (genCode) { $('#quotation_code').val(genCode); }
+    }
+    function setEditMode() { formTitle.text('تعديل العرض'); submitBtnText.text('تحديث العرض'); setGeneratedCodeShown(false); }
     function resetForm() { if (!quoForm.length) return; quoForm[0].reset(); $('#quo_id').val(''); setAddMode(); if (window.EmsSelect) EmsSelect.refresh(); }
 
     function updateFormToggleState(isOpen) {

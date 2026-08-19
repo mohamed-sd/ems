@@ -99,6 +99,33 @@ foreach ($SCOPE as $rel) {
     $src = read_src($ROOT, $rel);
     if ($src === null) { v($violations, 'نطاق', $rel, 'ملفٌ في النطاقِ غيرُ موجود'); continue; }
 
+    /* ══ مُحوِّلٌ لا شاشة: البواباتُ الشاشيةُ لا تنطبق على مسارٍ يُعيد التوجيه ══
+       ◆ **العطبُ المقيس**: `Tickets/dept_inbox.php` دُمج تبويبًا في
+         `tickets_list.php?tab=dept` وبقي ملفُّه **مُحوِّلًا** (لا يُحذف: 34 صفَّ
+         تنقلٍ ومرجعياتُ `modules` والإشاراتُ المحفوظةُ تقصده). فرسّبته أربعُ
+         مخالفات: ④ «لا يُحمِّل inheader» و⑨ «بلا حالةِ فراغ/خطأ/تحميل» — وكلُّها
+         تسأل شاشةً عن شاشيّتِها، والملفُّ ليس شاشة.
+       ◆ **والتعريفُ ضيّقٌ ثلاثيًّا** كي لا يصير بابًا للتملّص — والشرطُ الثالثُ
+         وُلد من قياسٍ: بالشرطَين الأولَين وحدَهما وقع **26 ملفًّا** في الإعفاء،
+         وفحصُ أولِها (`Governance/gov_dept_gov.php`) كشف أنها **شاشاتٌ حقيقية**:
+         ترميزُها في `dept_gov_space.php` المُضمَّن، و`header('Location:` فيها
+         حارسُ جلسةٍ وصلاحيةٍ لا تحويلُ مسار. فلو مرَّ الشرطان لأعفيتُ 25 شاشةً
+         من بواباتِها كلِّها — وذلك نقضُ الحزامِ لا إصلاحُه.
+         ① صفرُ HTML حرفيٍّ خارجَ PHP · ② فيه `header('Location: …')`
+         · ③ **ولا يُضمِّن قشرةً ولا فضاءً** يُصيَّر عنه.
+       ◆ ولا يُترك بلا حراسة: الحارسُ الحقيقيُّ ينفُذ في الوجهةِ نفسِها. */
+    $__emits = '';
+    foreach (@token_get_all($src) as $__t) {
+        if (is_array($__t) && $__t[0] === T_INLINE_HTML) { $__emits .= $__t[1]; }
+    }
+    $isRouter = (trim($__emits) === '')
+             && (bool) preg_match('/header\s*\(\s*[\'"]\s*Location\s*:/i', $src)
+             && !preg_match('/(require|include)(_once)?\s*[( ].*(inheader\.php|insidebar\.php|dept_gov_space\.php|dept_risk_space\.php|u13_screen_kit\.php|eng01_screen_view\.php|fin_analysis_shell\.php)/u', $src);
+    if ($isRouter) {
+        $report['مُحوِّلات'] = (isset($report['مُحوِّلات']) ? $report['مُحوِّلات'] . ' · ' : 'مساراتٌ مُحوِّلةٌ لا شاشات: ') . $rel;
+        continue;
+    }
+
     /* ① لونٌ مثبَّتٌ خارجَ الرموز — hex أو rgb() في وسومِ/كتلِ الأنماطِ والـPHP */
     if (preg_match_all('/(?:#[0-9a-fA-F]{3,8}\b|rgba?\s*\()/u', $src, $m, PREG_OFFSET_CAPTURE)) {
         $n = 0;

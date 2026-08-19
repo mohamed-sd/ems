@@ -1,0 +1,693 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ems-profile.css — نظامُ «بطاقةِ الكِيان» الموحَّد · مصدرٌ واحدٌ لكلِّ البطاقات
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * ◆ **لماذا مكوّنٌ لا نسخةٌ لكلِّ شاشة**
+ *   كانت بطاقةُ العميلِ تحمل ١٣٠ سطرَ `<style>` داخلَ الصفحة، وبطاقةُ الموظفِ
+ *   ٣٢٠ سطرًا مُنطاقةً بـ`.driver-profile-page` في `ems.main.all.style.css`.
+ *   والمعنى واحدٌ في الاثنتين: هويّةٌ ← مؤشراتٌ ← مجموعاتٌ ← أقسامٌ ← شارات.
+ *   فنسخُ اللغةِ البصريةِ مرّتين يعني نسختين من كلِّ عيبٍ يُكتشف لاحقًا، وثالثةً
+ *   عند بطاقةِ المشروعِ، ورابعةً عند المورِّد، وخامسةً عند المعدّة.
+ *
+ * ◆ **العقد**: هذا الملفُّ هو المصدرُ الوحيدُ لتصميمِ بطاقاتِ الكيانات.
+ *   ١. لا كتلةَ `<style>` في صفحةِ بطاقةٍ — ولا سمةَ `style=`.
+ *   ٢. لا لونَ حرفيًّا هنا: كلُّ قيمةٍ رمزٌ من `design-tokens.css`.
+ *   ٣. الأصنافُ **محايدةُ الكِيان** (`ems-profile__*` لا `client-*`/`driver-*`)
+ *      — فبطاقةُ المشروعِ تُبنى بالتأليفِ لا بنسخِ CSS.
+ *   ٤. الدلالةُ نغمةٌ لا لون: الشاشةُ تُسند «مرحلةَ فرصة» إلى `--info`، ولا
+ *      تعرّف أزرقَها بنفسِها. فمعجمُ النغماتِ ثمانٍ ولا تاسعةَ.
+ *
+ * ◆ **الاتجاه**: خصائصُ منطقيةٌ حصرًا (`inline-start` لا `left`) — فالبطاقةُ
+ *   تعمل في RTL وLTR بلا قاعدةٍ ثانية.
+ *
+ * ◆ **الترتيب**: تُحمَّل بعد `ems-screens.css` في `inheader.php` فتغلب بقايا
+ *   الأنماطِ الصفحيةِ إن وُجدت، ولا تنازعُ الجداولَ ولا النماذجَ (لا تشترك في
+ *   مُحدِّدٍ واحدٍ معها).
+ *
+ * الاستعمالُ من PHP: `includes/profile_kit.php` — لا تُكتب هذه الأصنافُ يدويًّا.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ══ ٠ · رموزُ الطبقة ═══════════════════════════════════════════════════════
+   ◆ رموزٌ **مشتقّةٌ** لا لوحةٌ جديدة: كلُّ قيمةٍ هنا تشير إلى رمزٍ قائمٍ في
+     `design-tokens.css`، والاحتياطيُّ الحرفيُّ شبكةُ أمانٍ لا مصدر.
+   ◆ ولِمَ طبقةٌ وسيطةٌ أصلًا: كي يُغيَّر مظهرُ **كلِّ** البطاقاتِ من ثمانيةِ
+     أسطرٍ — لا من ثلاثِ مئةِ قاعدةٍ متفرقة. */
+:root {
+    /* الأسطحُ والحدود */
+    --emsp-surface:        var(--c-surface, #ffffff);
+    --emsp-surface-soft:   var(--gray-50, #fafaf9);
+    --emsp-surface-warm:   var(--brand-cream-light, #fff5e8);
+    --emsp-line:           var(--gray-200, #e7e5e4);
+    --emsp-line-soft:      var(--gray-100, #f5f5f4);
+
+    /* الحبرُ ودرجاتُه */
+    --emsp-ink:            var(--gray-900, #1c1917);
+    --emsp-ink-soft:       var(--gray-700, #44403c);
+    --emsp-ink-muted:      var(--gray-500, #78716c);
+
+    /* لكنةُ العلامة: ذهبُ إيكوبيشن ونيلُها */
+    --emsp-accent:         var(--c-brand-gold, #f4c542);
+    --emsp-accent-deep:    var(--c-brand-gold-deep, #d4a500);
+    --emsp-accent-ink:     var(--c-brand-gold-ink-deep, #6b5200);
+    --emsp-anchor:         var(--c-brand-navy, #1e3a5f);
+
+    /* الهندسة — من مقاييسِ النظامِ لا من أرقامٍ مخترعة */
+    --emsp-radius:         var(--radius-lg, 12px);
+    --emsp-radius-lg:      var(--radius-xl, 16px);
+    --emsp-radius-pill:    var(--radius-pill, 9999px);
+    --emsp-gap:            var(--space-3, 12px);
+    --emsp-gap-lg:         var(--space-4, 16px);
+    --emsp-pad:            var(--space-4, 16px);
+    --emsp-shadow:         var(--shadow-sm, 0 1px 2px rgba(0, 0, 0, .04));
+    --emsp-shadow-lift:    var(--shadow-md, 0 4px 8px rgba(0, 0, 0, .06));
+
+    /* ── معجمُ النغماتِ الثماني ──────────────────────────────────────────
+       الشاشةُ تُسند معنًى إلى نغمةٍ، والنغمةُ وحدَها تعرف لونَها. فإضافةُ
+       حالةٍ جديدةٍ في الأعمالِ لا تضيف لونًا في CSS. */
+    --emsp-t-neutral-bg:  var(--gray-100, #f5f5f4);
+    --emsp-t-neutral-ink: var(--gray-700, #44403c);
+    --emsp-t-neutral-ln:  var(--gray-300, #d6d3d1);
+
+    --emsp-t-ok-bg:       var(--success-100, #ecf1de);
+    --emsp-t-ok-ink:      var(--success-deep, #365314);
+    --emsp-t-ok-ln:       var(--success-600, #5b7f1e);
+
+    --emsp-t-warn-bg:     var(--warning-100, #f4e5d3);
+    --emsp-t-warn-ink:    var(--warning-deep, #7c2d12);
+    --emsp-t-warn-ln:     var(--warning-600, #a8541c);
+
+    --emsp-t-danger-bg:   var(--danger-100, #f5dcdc);
+    --emsp-t-danger-ink:  var(--danger-deep, #7f1d1d);
+    --emsp-t-danger-ln:   var(--danger-600, #991b1b);
+
+    --emsp-t-info-bg:     var(--info-100, #e5e8ee);
+    --emsp-t-info-ink:    var(--info-deep, #334155);
+    --emsp-t-info-ln:     var(--info-600, #475569);
+
+    --emsp-t-gold-bg:     var(--c-brand-gold-soft, #fff8e6);
+    --emsp-t-gold-ink:    var(--c-brand-gold-ink-deep, #6b5200);
+    --emsp-t-gold-ln:     var(--c-brand-gold-line, #d9b44a);
+
+    --emsp-t-purple-bg:   var(--c-f3e8ff, #f3e8ff);
+    --emsp-t-purple-ink:  var(--c-badge-purple-b, #6d28d9);
+    --emsp-t-purple-ln:   var(--c-badge-purple-a, #7c3aed);
+
+    --emsp-t-cyan-bg:     var(--c-e0f2fe, #e0f2fe);
+    --emsp-t-cyan-ink:    var(--c-badge-info-b, #0e7490);
+    --emsp-t-cyan-ln:     var(--c-badge-info-a, #0891b2);
+}
+
+/* ══ ١ · نطاقُ الصفحة ═══════════════════════════════════════════════════════
+   صنفٌ واحدٌ على الغلافِ يفتح الطبقةَ كلَّها — ولا يتسرّب شيءٌ خارجَه. */
+.ems-profile {
+    color: var(--emsp-ink);
+}
+
+/* ══ ٢ · لوحُ الهوية (Hero) ═══════════════════════════════════════════════
+   رأسُ البطاقة: مَن هذا الكِيان · ما حالتُه · وأبرزُ حقائقِه في نظرةٍ واحدة.
+   الشريطُ الذهبيُّ على حافةِ البدايةِ توقيعُ العلامةِ لا زينة — به تُعرف
+   بطاقةُ الكِيانِ من بين الشاشاتِ قبل قراءةِ حرف. */
+.ems-profile__hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--emsp-gap-lg);
+    align-items: start;
+    padding: var(--space-5, 20px);
+    padding-inline-start: calc(var(--space-5, 20px) + 4px);
+    margin-bottom: var(--emsp-gap-lg);
+    background:
+        linear-gradient(180deg, var(--emsp-surface) 0%, var(--emsp-surface-warm) 100%);
+    border: 1px solid var(--emsp-line);
+    border-radius: var(--emsp-radius-lg);
+    box-shadow: var(--emsp-shadow);
+    overflow: hidden;
+}
+.ems-profile__hero::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--emsp-accent) 0%, var(--emsp-accent-deep) 100%);
+}
+
+/* الصورةُ أو الحرفُ البديل — مربّعٌ ثابتٌ فلا يتذبذب التخطيطُ بوجودِ صورةٍ أو غيابها */
+.ems-profile__hero-media {
+    width: 104px;
+    height: 104px;
+    border-radius: var(--emsp-radius);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--emsp-surface);
+    border: 1px solid var(--emsp-line);
+    box-shadow: var(--emsp-shadow);
+}
+.ems-profile__hero-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+/* البديلُ أيقونةُ الكِيانِ لا صورةٌ رماديةٌ صامتة */
+.ems-profile__monogram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--emsp-t-gold-bg) 0%, var(--emsp-surface) 100%);
+    color: var(--emsp-accent-deep);
+    font-size: 2.4rem;
+}
+
+.ems-profile__hero-body {
+    min-width: 0;
+}
+.ems-profile__hero-top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-2, 8px);
+}
+.ems-profile__name {
+    margin: 0;
+    font-size: var(--text-h2, 20px);
+    font-weight: var(--weight-bold, 700);
+    line-height: var(--leading-snug, 1.4);
+    color: var(--emsp-ink);
+}
+/* سطرُ الهُويّةِ الثاني: الكودُ والنوعُ شرائحَ لا نصًّا مفصولًا بشُرَط */
+.ems-profile__ident {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-3, 12px);
+}
+.ems-profile__ident-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: var(--emsp-radius-pill);
+    background: var(--emsp-surface);
+    border: 1px solid var(--emsp-line);
+    color: var(--emsp-ink-soft);
+    font-size: var(--text-caption, 12px);
+    font-weight: var(--weight-semi, 600);
+    white-space: nowrap;
+}
+.ems-profile__ident-item i {
+    color: var(--emsp-accent-deep);
+}
+/* الكودُ رقمٌ يُقرأ يسارًا-يمينًا ولو كان السياقُ عربيًّا */
+.ems-profile__ident-item--code {
+    font-family: var(--font-mono, monospace);
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+/* ══ ٣ · شبكةُ الحقائق ════════════════════════════════════════════════════
+   عنوانٌ فوقَ قيمةٍ — بديلُ `.id-meta .item` و`.info-grid .info-item` معًا. */
+.ems-profile__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: var(--space-2, 8px);
+}
+.ems-profile__facts--wide {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--emsp-gap);
+}
+.ems-profile__fact {
+    padding: 9px 12px;
+    background: var(--emsp-surface);
+    border: 1px solid var(--emsp-line);
+    border-radius: var(--radius-md, 8px);
+    min-width: 0;
+}
+.ems-profile__fact-label {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--emsp-ink-muted);
+    font-size: var(--text-caption, 12px);
+    font-weight: var(--weight-semi, 600);
+}
+.ems-profile__fact-value {
+    display: block;
+    color: var(--emsp-ink);
+    font-size: var(--text-body, 14px);
+    font-weight: var(--weight-semi, 600);
+    line-height: var(--leading-normal, 1.5);
+    overflow-wrap: anywhere;
+}
+/* قيمةٌ غائبةٌ تُعلَن غيابَها ولا تتنكّر في هيئةِ قيمة */
+.ems-profile__fact-value--empty {
+    color: var(--emsp-ink-muted);
+    font-weight: var(--weight-regular, 400);
+}
+
+/* ══ ٤ · شارةُ الحالة ═════════════════════════════════════════════════════
+   مكوّنٌ واحدٌ يخدم: حالةَ الكِيانِ · مرحلةَ الفرصةِ · نتيجةَ المناقصةِ ·
+   مصدرَ الوصل. والفرقُ نغمةٌ لا قاعدةٌ جديدة. */
+.ems-profile__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 11px;
+    border-radius: var(--emsp-radius-pill);
+    border: 1px solid transparent;
+    font-size: var(--text-caption, 12px);
+    font-weight: var(--weight-bold, 700);
+    line-height: 1.7;
+    white-space: nowrap;
+}
+.ems-profile__pill--lg {
+    padding: 5px 14px;
+    font-size: var(--text-body, 14px);
+}
+.ems-profile__pill--neutral { background: var(--emsp-t-neutral-bg); color: var(--emsp-t-neutral-ink); border-color: var(--emsp-t-neutral-ln); }
+.ems-profile__pill--ok      { background: var(--emsp-t-ok-bg);      color: var(--emsp-t-ok-ink);      border-color: var(--emsp-t-ok-ln); }
+.ems-profile__pill--warn    { background: var(--emsp-t-warn-bg);    color: var(--emsp-t-warn-ink);    border-color: var(--emsp-t-warn-ln); }
+.ems-profile__pill--danger  { background: var(--emsp-t-danger-bg);  color: var(--emsp-t-danger-ink);  border-color: var(--emsp-t-danger-ln); }
+.ems-profile__pill--info    { background: var(--emsp-t-info-bg);    color: var(--emsp-t-info-ink);    border-color: var(--emsp-t-info-ln); }
+.ems-profile__pill--gold    { background: var(--emsp-t-gold-bg);    color: var(--emsp-t-gold-ink);    border-color: var(--emsp-t-gold-ln); }
+.ems-profile__pill--purple  { background: var(--emsp-t-purple-bg);  color: var(--emsp-t-purple-ink);  border-color: var(--emsp-t-purple-ln); }
+.ems-profile__pill--cyan    { background: var(--emsp-t-cyan-bg);    color: var(--emsp-t-cyan-ink);    border-color: var(--emsp-t-cyan-ln); }
+
+/* ══ ٥ · شريطُ المؤشرات ═══════════════════════════════════════════════════
+   بطاقاتُ عدٍّ متساويةُ الوزنِ — والخطُّ العلويُّ يظهر بلونِ النغمةِ عند
+   التحويم، فالتلوينُ الدائمُ يُغرِق الشريطَ ويُفقده معناه. */
+.ems-profile__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: var(--emsp-gap);
+    margin-bottom: var(--emsp-gap-lg);
+}
+.ems-profile__stat {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    padding: 14px var(--emsp-pad);
+    background: var(--emsp-surface);
+    border: 1px solid var(--emsp-line);
+    border-radius: var(--emsp-radius);
+    box-shadow: var(--emsp-shadow);
+    overflow: hidden;
+    transition: box-shadow .15s ease, border-color .15s ease, transform .15s ease;
+}
+.ems-profile__stat::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    height: 3px;
+    background: var(--emsp-stat-tone, var(--emsp-accent));
+    opacity: 0;
+    transition: opacity .15s ease;
+}
+.ems-profile__stat:hover {
+    border-color: var(--emsp-accent-deep);
+    box-shadow: var(--emsp-shadow-lift);
+    transform: translateY(-1px);
+}
+.ems-profile__stat:hover::before { opacity: 1; }
+
+.ems-profile__stat-value {
+    font-size: 1.5rem;
+    font-weight: var(--weight-bold, 700);
+    line-height: 1.25;
+    color: var(--emsp-anchor);
+    direction: ltr;
+    unicode-bidi: isolate;
+    text-align: start;
+}
+.ems-profile__stat-label {
+    color: var(--emsp-ink-muted);
+    font-size: var(--text-caption, 12px);
+    font-weight: var(--weight-semi, 600);
+    line-height: var(--leading-snug, 1.4);
+}
+/* لاحقةُ الوحدةِ لا تنافس الرقمَ في الحجم */
+.ems-profile__stat-unit {
+    font-size: .72em;
+    font-weight: var(--weight-semi, 600);
+    color: var(--emsp-ink-muted);
+}
+/* رقمٌ نقديٌّ أطولُ من عدّاد، وقد يتكرَّر سطرًا لكلِّ عملة — فلا يُجمَع رقمان
+   بعملتين، ولا يُقاس بحجمِ العدّاد */
+.ems-profile__stat--money .ems-profile__stat-value { font-size: 1.06rem; line-height: 1.5; }
+.ems-profile__stat--date  .ems-profile__stat-value { font-size: 1.06rem; }
+
+/* نغماتُ المؤشر: تصبغ الرقمَ والخطَّ العلويَّ معًا */
+.ems-profile__stat--ok     { --emsp-stat-tone: var(--emsp-t-ok-ln); }
+.ems-profile__stat--ok     .ems-profile__stat-value { color: var(--emsp-t-ok-ink); }
+.ems-profile__stat--warn   { --emsp-stat-tone: var(--emsp-t-warn-ln); }
+.ems-profile__stat--warn   .ems-profile__stat-value { color: var(--emsp-t-warn-ink); }
+.ems-profile__stat--danger { --emsp-stat-tone: var(--emsp-t-danger-ln); }
+.ems-profile__stat--danger .ems-profile__stat-value { color: var(--emsp-t-danger-ink); }
+.ems-profile__stat--gold   { --emsp-stat-tone: var(--emsp-accent-deep); }
+.ems-profile__stat--muted  .ems-profile__stat-value { color: var(--emsp-ink-muted); }
+
+/* مؤشرٌ يقود إلى تفصيلِه — رابطٌ بلا زخرفةِ رابط */
+a.ems-profile__stat { text-decoration: none; }
+a.ems-profile__stat:hover { text-decoration: none; }
+
+/* ══ ٦ · المجموعة ═════════════════════════════════════════════════════════
+   محطّةٌ من رحلةِ الكِيان (مسارٌ تجاريّ · تنفيذ · مالٌ · علاقة). سطحُها أهدأُ
+   من سطحِ الأقسامِ داخلَها — فالتدرُّجُ يقول أيُّهما سياقٌ وأيُّهما محتوى.
+   ◆ ومجموعةٌ بلا مصدرٍ **لا تُصيَّر أصلًا**: لا عنوانَ فوقَ فراغ. */
+.ems-profile__group {
+    padding: var(--emsp-pad);
+    margin-bottom: var(--space-5, 20px);
+    background: var(--emsp-surface-soft);
+    border: 1px solid var(--emsp-line);
+    border-radius: var(--emsp-radius-lg);
+}
+.ems-profile__group-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    flex-wrap: wrap;
+    padding-bottom: var(--space-3, 12px);
+    margin-bottom: var(--emsp-pad);
+    border-bottom: 1px solid var(--emsp-line);
+}
+/* أيقونةُ المجموعةِ في مربّعٍ ذهبيٍّ — علامةُ بدايةِ محطّةٍ لا حِلية */
+.ems-profile__group-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 30px;
+    border-radius: var(--radius-md, 8px);
+    background: var(--emsp-t-gold-bg);
+    border: 1px solid var(--emsp-t-gold-ln);
+    color: var(--emsp-accent-ink);
+    font-size: var(--text-body, 14px);
+}
+.ems-profile__group-title {
+    margin: 0;
+    font-size: var(--text-h3, 16px);
+    font-weight: var(--weight-bold, 700);
+    color: var(--emsp-ink);
+}
+/* شرحُ المحطّةِ يُزاح إلى الطرفِ الآخرِ فلا يزاحم العنوان */
+.ems-profile__group-meta {
+    margin-inline-start: auto;
+    color: var(--emsp-ink-muted);
+    font-size: var(--text-caption, 12px);
+    font-weight: var(--weight-medium, 500);
+}
+
+/* ══ ٧ · القسم ════════════════════════════════════════════════════════════
+   وحدةُ المحتوى: جدولٌ أو شبكةُ حقائقَ أو رسم. */
+.ems-profile__section {
+    background: var(--emsp-surface);
+    border: 1px solid var(--emsp-line);
+    border-radius: var(--emsp-radius);
+    box-shadow: var(--emsp-shadow);
+    margin-bottom: var(--emsp-gap);
+    overflow: hidden;
+}
+.ems-profile__section:last-child { margin-bottom: 0; }
+.ems-profile__section-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    flex-wrap: wrap;
+    padding: 11px var(--emsp-pad);
+    background: linear-gradient(135deg, var(--emsp-t-gold-bg) 0%, var(--emsp-surface) 100%);
+    border-bottom: 1px solid var(--emsp-line);
+}
+.ems-profile__section-title {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    margin: 0;
+    font-size: var(--text-body, 14px);
+    font-weight: var(--weight-bold, 700);
+    color: var(--emsp-ink);
+}
+.ems-profile__section-title i { color: var(--emsp-accent-deep); }
+.ems-profile__section-meta {
+    margin-inline-start: auto;
+    color: var(--emsp-ink-muted);
+    font-size: var(--text-caption, 12px);
+    font-weight: var(--weight-medium, 500);
+}
+.ems-profile__section-body { padding: var(--emsp-pad); }
+/* سطرُ تفسيرٍ تحت العنوان: ما الذي يشمله هذا القسمُ وما لا يشمله */
+.ems-profile__section-note {
+    margin: 0 0 var(--space-3, 12px);
+    color: var(--emsp-ink-muted);
+    font-size: var(--text-caption, 12px);
+    line-height: var(--leading-normal, 1.5);
+}
+.ems-profile__section-note strong { color: var(--emsp-ink-soft); }
+/* تنبيهٌ داخلَ قسمٍ — لافتةٌ سطريةٌ لا توست */
+.ems-profile__note {
+    padding: 9px 12px;
+    margin-bottom: var(--space-3, 12px);
+    border-radius: var(--radius-md, 8px);
+    border: 1px solid var(--emsp-t-warn-ln);
+    background: var(--emsp-t-warn-bg);
+    color: var(--emsp-t-warn-ink);
+    font-size: var(--text-caption, 12px);
+    font-weight: var(--weight-semi, 600);
+}
+.ems-profile__note--info {
+    border-color: var(--emsp-t-info-ln);
+    background: var(--emsp-t-info-bg);
+    color: var(--emsp-t-info-ink);
+}
+/* الجدولُ داخلَ قسمٍ يأخذ عرضَ القسمِ ويمرَّر أفقيًّا لا يفيض */
+.ems-profile__section-body > .table-responsive,
+.ems-profile__section-body > .dataTables_wrapper { overflow-x: auto; }
+.ems-profile__section-body table.display { width: 100%; }
+
+/* لاحقةُ وحدةٍ داخلَ خليةِ جدولٍ أو سطرِ نصّ: العملةُ أو «ساعة» أو «سجل».
+   أصغرُ من الرقمِ وأهدأُ لونًا — فالرقمُ يُقرأ أولًا والوحدةُ تُفسِّره. */
+.ems-profile__unit {
+    font-size: .78em;
+    font-weight: var(--weight-semi, 600);
+    color: var(--emsp-ink-muted);
+    white-space: nowrap;
+}
+
+/* ══ ٨ · شبكةُ المستنداتِ المصوَّرة ═══════════════════════════════════════ */
+.ems-profile__docs {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: var(--emsp-gap);
+}
+.ems-profile__doc {
+    padding: 10px;
+    background: var(--emsp-surface);
+    border: 1px solid var(--emsp-line);
+    border-radius: var(--radius-md, 8px);
+    text-align: center;
+}
+.ems-profile__doc img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: var(--radius-sm, 6px);
+    margin-bottom: var(--space-2, 8px);
+    background: var(--emsp-surface-soft);
+}
+.ems-profile__doc-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    height: 180px;
+    margin-bottom: var(--space-2, 8px);
+    border: 1px dashed var(--emsp-t-neutral-ln);
+    border-radius: var(--radius-sm, 6px);
+    color: var(--emsp-ink-muted);
+    font-size: var(--text-caption, 12px);
+    font-weight: var(--weight-semi, 600);
+}
+.ems-profile__doc-empty i { font-size: 1.4rem; color: var(--emsp-accent); }
+.ems-profile__doc-caption {
+    color: var(--emsp-ink-soft);
+    font-size: var(--text-caption, 12px);
+    font-weight: var(--weight-semi, 600);
+}
+
+/* ══ ٩ · شبكةُ الرسوم ═════════════════════════════════════════════════════ */
+.ems-profile__charts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--emsp-gap);
+}
+.ems-profile__chart {
+    padding: var(--space-3, 12px);
+    background: var(--emsp-surface-soft);
+    border: 1px solid var(--emsp-line);
+    border-radius: var(--radius-md, 8px);
+    min-width: 0;
+}
+
+/* ══ ١٠ · الخطُّ الزمني ═══════════════════════════════════════════════════ */
+.ems-profile__timeline {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.ems-profile__timeline-item {
+    position: relative;
+    padding: 10px 12px;
+    padding-inline-start: 14px;
+    margin-bottom: var(--space-2, 8px);
+    background: var(--emsp-surface);
+    border: 1px solid var(--emsp-line);
+    border-radius: var(--radius-md, 8px);
+    overflow: hidden;
+}
+.ems-profile__timeline-item::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 3px;
+    background: var(--emsp-accent);
+}
+.ems-profile__timeline-item:last-child { margin-bottom: 0; }
+.ems-profile__timeline-top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    flex-wrap: wrap;
+    font-weight: var(--weight-semi, 600);
+    color: var(--emsp-ink);
+    font-size: var(--text-body, 14px);
+}
+.ems-profile__timeline-meta {
+    margin-top: 4px;
+    color: var(--emsp-ink-muted);
+    font-size: var(--text-caption, 12px);
+}
+
+/* ══ ١١ · صفُّ أفعالٍ داخلَ قسم ═══════════════════════════════════════════ */
+.ems-profile__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    flex-wrap: wrap;
+    margin-top: var(--space-3, 12px);
+}
+.ems-profile__actions form { display: inline; margin: 0; }
+
+/* ══ ١٢ · الانكسارات ══════════════════════════════════════════════════════
+   القيمُ حرفيةٌ لأن `var()` لا تعمل داخلَ `@media` — ومرجعُها الرموزُ
+   `--bp-tablet` و`--bp-mobile` في design-tokens.css. */
+@media (max-width: 1024px) {
+    .ems-profile__hero { grid-template-columns: 1fr; }
+    .ems-profile__hero-media { width: 88px; height: 88px; }
+    .ems-profile__stats { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+}
+@media (max-width: 768px) {
+    .ems-profile__hero { padding: var(--space-3, 12px); gap: var(--space-3, 12px); }
+    .ems-profile__group { padding: var(--space-3, 12px); }
+    .ems-profile__section-body { padding: var(--space-3, 12px); }
+    .ems-profile__stats { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: var(--space-2, 8px); }
+    .ems-profile__stat-value { font-size: 1.28rem; }
+    .ems-profile__facts { grid-template-columns: 1fr 1fr; }
+    .ems-profile__group-meta,
+    .ems-profile__section-meta { margin-inline-start: 0; flex-basis: 100%; }
+}
+@media (max-width: 480px) {
+    .ems-profile__facts { grid-template-columns: 1fr; }
+}
+
+/* ══ ١٣ · الطباعة ═════════════════════════════════════════════════════════
+   البطاقةُ تُطبع فتُسلَّم ورقةً: لا ظلالَ ولا تدرّجاتٍ تُهدر الحبر، والحدودُ
+   تبقى فالبِنيةُ هي ما يُقرأ على الورق. */
+@media print {
+    .ems-profile__hero,
+    .ems-profile__section-head { background: none; }
+    .ems-profile__hero,
+    .ems-profile__stat,
+    .ems-profile__section { box-shadow: none; }
+    .ems-profile__group,
+    .ems-profile__section { break-inside: avoid; }
+}
+
+/* ══ ١٤ · تفضيلُ تقليلِ الحركة ════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+    .ems-profile__stat { transition: none; }
+    .ems-profile__stat:hover { transform: none; }
+}
+
+/* ══ ١٥ · حارسُ التتالي ═══════════════════════════════════════════════════
+ * ◆ **المقيسُ حيًّا** في `Clients/client_profile.php`: كلُّ نصوصِ المكوّنِ صُيِّرت
+ *   سوداءَ صرفًا (`#000`) وشارةُ الحالةِ بلا خلفية. والسببُ ليس خطأً في هذا
+ *   الملفِّ بل طبقةٌ عامةٌ في `ems.main.all.style.css` عنوانُها
+ *   «FINAL GLOBAL THEME STANDARDIZATION LAYER»:
+ *
+ *       .ems-site .main span, … .ems-site .main h2 { color: var(--text-black); }
+ *
+ *   وزنُها (0,2,1) يغلب أيَّ مُحدِّدٍ بصنفٍ واحدٍ مهما تأخّر ترتيبُه — فترتيبُ
+ *   التحميلِ لا ينفع، والوزنُ وحدَه يحسم.
+ *
+ * ◆ **لِمَ حارسٌ لا `!important`**: `!important` يُنهي النقاشَ ويمنع أيَّ شاشةٍ
+ *   من ضبطِ لونٍ لاحقًا. والحارسُ يرفع الوزنَ إلى (0,3,0) بمقدارِ ما يلزم
+ *   ولا يزيد — فالمكوّنُ يغلب الطبقةَ العامة، ويبقى قابلًا للغلبةِ بدورِه.
+ *
+ * ◆ **لِمَ `.ems-site` في الحارس**: الطبقةُ المُغلَبةُ نفسُها مُنطاقةٌ بها. فحيث
+ *   لا `.ems-site` لا خصمَ أصلًا، والقواعدُ الأساسيةُ أعلاه تكفي وحدَها.
+ *
+ * ◆ **ولِمَ لا يحمل المكوّنُ اسمَي `badge` أو `chip` أو `tag`**: ثلاثةُ مُحدِّداتٍ
+ *   عامةٍ تُطابق **بالسلسلةِ لا بالمعنى** — `span[class*="badge-"]` في
+ *   `ems-tables.css`، و`[class*="chip"]`/`[class*="tag"]` في الطبقةِ العامةِ
+ *   بـ`!important`. فصنفٌ اسمُه `…__badge--ok` يقع في شِباكِها فيُمحى تصميمُه
+ *   (مقيسٌ: الخلفيةُ صارت شفافةً والحدُّ برتقاليًّا). ولذلك سُمِّي `__pill`
+ *   و`__ident-item` — والاسمُ هنا قرارُ هندسةٍ لا ذوق. */
+.ems-site .ems-profile .ems-profile__name,
+.ems-site .ems-profile .ems-profile__group-title,
+.ems-site .ems-profile .ems-profile__section-title,
+.ems-site .ems-profile .ems-profile__fact-value { color: var(--emsp-ink); }
+
+.ems-site .ems-profile .ems-profile__fact-label,
+.ems-site .ems-profile .ems-profile__stat-label,
+.ems-site .ems-profile .ems-profile__stat-unit,
+.ems-site .ems-profile .ems-profile__unit,
+.ems-site .ems-profile .ems-profile__group-meta,
+.ems-site .ems-profile .ems-profile__section-meta,
+.ems-site .ems-profile .ems-profile__section-note,
+.ems-site .ems-profile .ems-profile__doc-empty,
+.ems-site .ems-profile .ems-profile__fact-value--empty,
+.ems-site .ems-profile .ems-profile__timeline-meta { color: var(--emsp-ink-muted); }
+
+.ems-site .ems-profile .ems-profile__ident-item { color: var(--emsp-ink-soft); }
+.ems-site .ems-profile .ems-profile__ident-item i,
+.ems-site .ems-profile .ems-profile__section-title i { color: var(--emsp-accent-deep); }
+.ems-site .ems-profile .ems-profile__monogram { color: var(--emsp-accent-deep); }
+.ems-site .ems-profile .ems-profile__group-icon { color: var(--emsp-accent-ink); }
+.ems-site .ems-profile .ems-profile__doc-caption { color: var(--emsp-ink-soft); }
+.ems-site .ems-profile .ems-profile__timeline-top { color: var(--emsp-ink); }
+.ems-site .ems-profile .ems-profile__stat-value { color: var(--emsp-anchor); }
+.ems-site .ems-profile .ems-profile__stat--ok     .ems-profile__stat-value { color: var(--emsp-t-ok-ink); }
+.ems-site .ems-profile .ems-profile__stat--warn   .ems-profile__stat-value { color: var(--emsp-t-warn-ink); }
+.ems-site .ems-profile .ems-profile__stat--danger .ems-profile__stat-value { color: var(--emsp-t-danger-ink); }
+.ems-site .ems-profile .ems-profile__stat--muted  .ems-profile__stat-value { color: var(--emsp-ink-muted); }
+
+.ems-site .ems-profile .ems-profile__pill--neutral { background: var(--emsp-t-neutral-bg); color: var(--emsp-t-neutral-ink); border-color: var(--emsp-t-neutral-ln); }
+.ems-site .ems-profile .ems-profile__pill--ok      { background: var(--emsp-t-ok-bg);      color: var(--emsp-t-ok-ink);      border-color: var(--emsp-t-ok-ln); }
+.ems-site .ems-profile .ems-profile__pill--warn    { background: var(--emsp-t-warn-bg);    color: var(--emsp-t-warn-ink);    border-color: var(--emsp-t-warn-ln); }
+.ems-site .ems-profile .ems-profile__pill--danger  { background: var(--emsp-t-danger-bg);  color: var(--emsp-t-danger-ink);  border-color: var(--emsp-t-danger-ln); }
+.ems-site .ems-profile .ems-profile__pill--info    { background: var(--emsp-t-info-bg);    color: var(--emsp-t-info-ink);    border-color: var(--emsp-t-info-ln); }
+.ems-site .ems-profile .ems-profile__pill--gold    { background: var(--emsp-t-gold-bg);    color: var(--emsp-t-gold-ink);    border-color: var(--emsp-t-gold-ln); }
+.ems-site .ems-profile .ems-profile__pill--purple  { background: var(--emsp-t-purple-bg);  color: var(--emsp-t-purple-ink);  border-color: var(--emsp-t-purple-ln); }
+.ems-site .ems-profile .ems-profile__pill--cyan    { background: var(--emsp-t-cyan-bg);    color: var(--emsp-t-cyan-ink);    border-color: var(--emsp-t-cyan-ln); }
+
+.ems-site .ems-profile .ems-profile__note          { color: var(--emsp-t-warn-ink); }
+.ems-site .ems-profile .ems-profile__note--info    { color: var(--emsp-t-info-ink); }

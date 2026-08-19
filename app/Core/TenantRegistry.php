@@ -349,6 +349,10 @@ class TenantRegistry
         'fin_internal_allocations' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_journal_entries' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_journal_lines' => array('type' => self::T_TENANT, 'soft' => false),
+        // M-10 الشاشة ١٦: كشفُ حسابِ العميل — مستأجرٌ بـcompany_id وبلا حذفٍ ناعم
+        // (العكسُ نسخةٌ جديدةٌ بحالة superseded لا حذف). سُجِّل 2026-08-19 حين
+        // احتاجته بطاقةُ العميلِ عبرَ البوابة، وكان غيرَ مسجَّلٍ فتردُّه scopedQuery.
+        'fin_client_statements' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_notifications' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_payments' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_receivables' => array('type' => self::T_TENANT, 'soft' => true),

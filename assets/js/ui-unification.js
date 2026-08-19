@@ -215,13 +215,50 @@
             window.jQuery.fn.dataTable.isDataTable && window.jQuery.fn.dataTable.isDataTable(tableEl)) return;
         var headerRow = tableEl.tHead.rows[tableEl.tHead.rows.length - 1];
         var govIdx = [];
+        var boundIdx = [];     /* رؤوسٌ تُعلن مصدرًا صفّيًّا (`data-fn-src`) */
         for (var i = 0; i < headerRow.cells.length; i++) {
             if ((headerRow.cells[i].colSpan || 1) !== 1) return; // ترويسة مجمّعة — لا نتدخل
+            var hc = headerRow.cells[i];
+            /* ══ XF-01 · عمودٌ **موصولٌ بمصدرٍ صفّيّ** — لا يُحشى ولا يُوسَم ═════
+             * ◆ `data-fn-src` عقدٌ تُعلنه الشاشةُ: «أنا أطبع خليةَ هذا العمودِ
+             *   من الصفِّ نفسِه». وحينها التدخُّلُ هنا **ضارٌّ لا نافع**:
+             *   ① الحشوُ يزيد خليةً على صفٍّ مكتملٍ فينكسر العدّ.
+             *   ② والوسمُ «بلا مصدر» يكذب على عمودٍ مصدرُه قائم.
+             * ◆ ولا يُنزع `data-fn` من الرأس: هو أثرُ المطلبِ في وثيقةِ الأعمدة،
+             *   وأدواتُ الجردِ تقرؤه. فالوصلُ **يُضاف** ولا يُستبدل.
+             * ◆ ويُعلَن `emsHasValue` هنا صراحةً — فحلقةُ الوسمِ في آخرِ الدالة
+             *   لا تمرُّ على هذا العمودِ أصلًا، ولو مرَّت لوجدته موصولًا. */
+            if (hc.hasAttribute('data-fn-src')) { hc.dataset.emsHasValue = '1'; boundIdx.push(i); continue; }
             // الحوكمة (الموجة ②) والوظيفي المحقون (الموجة ⑤) كلاهما يُحشى
-            if (headerRow.cells[i].hasAttribute('data-gov') || headerRow.cells[i].hasAttribute('data-fn')) govIdx.push(i);
+            if (hc.hasAttribute('data-gov') || hc.hasAttribute('data-fn')) govIdx.push(i);
         }
-        if (!govIdx.length) return;
         var expected = headerRow.cells.length;
+
+        /* ══ شبكةُ أمانِ الترحيلِ الجزئيّ ═══════════════════════════════════════
+         * ◆ ترحيلُ شاشةٍ خطوتان: وسمُ الرؤوسِ ثم طبعُ الخلايا في حلقةِ الصفوف.
+         *   ولو وقعت الأولى وحدَها (أداةُ التطبيقِ لم تتعرّف على شكلِ الحلقة،
+         *   أو تدخُّلٌ يدويٌّ ناقص) لصار الصفُّ **أقصرَ من ترويستِه** — فيسقط
+         *   شرطُ الحشوِ أدناه، فلا تُحشى أعمدةُ الحوكمةِ أيضًا، **فتنزاح كلُّ
+         *   قيمةٍ عن رأسِها** ويقرأ المستخدمُ بياناتٍ تحت عناوينَ ليست لها.
+         * ◆ فيُقاس الواقعُ من أوّلِ صفٍّ حقيقيّ: إن كان قصيرًا بمقدارِ الموصولةِ
+         *   تمامًا فالشاشةُ لم تطبعها ⇒ تُحشى هنا — من `data-xf` الصفّيِّ إن
+         *   وُجد، وإلّا «—». والوسمُ يبقى «له مصدر» لأن المصدرَ قائمٌ فعلًا
+         *   في القاعدة؛ الناقصُ طبعُه لا وجودُه.
+         * ⇒ فالخطوةُ الأولى **آمنةٌ وحدَها**، والثانيةُ تحسينٌ لا شرطُ سلامة. */
+        if (boundIdx.length) {
+            var probe = null;
+            for (var pb = 0; pb < tableEl.tBodies.length && !probe; pb++) {
+                for (var pr = 0; pr < tableEl.tBodies[pb].rows.length; pr++) {
+                    var cand = tableEl.tBodies[pb].rows[pr];
+                    if (cand.cells.length > 1) { probe = cand; break; }
+                }
+            }
+            if (probe && probe.cells.length === expected - govIdx.length - boundIdx.length) {
+                govIdx = govIdx.concat(boundIdx).sort(function (a, b) { return a - b; });
+            }
+        }
+
+        if (!govIdx.length) return;
         var ctxValues = (window.emsGovCtx && window.emsGovCtx.values) || {};
         var sections = [];
         for (var s = 0; s < tableEl.tBodies.length; s++) sections.push(tableEl.tBodies[s]);
@@ -235,14 +272,21 @@
                     continue;
                 }
                 if (row.cells.length !== expected - govIdx.length) continue; // ليس صفًّا قابلًا للحشو
+                /* قيمُ الصفِّ الإضافيةُ إن بثَّتها الشاشةُ في `data-xf` (JSON) */
+                var rowXf = null;
+                if (row.dataset && row.dataset.xf) {
+                    try { rowXf = JSON.parse(row.dataset.xf); } catch (e) { rowXf = null; }
+                }
                 for (var g = 0; g < govIdx.length; g++) {
                     var pos = govIdx[g];
                     var th = headerRow.cells[pos];
+                    var srcKey = th.getAttribute('data-fn-src');
                     var key = th.getAttribute('data-gov');
                     var cell = row.insertCell(Math.min(pos, row.cells.length));
-                    cell.className = 'ems-gov-cell';
+                    cell.className = srcKey ? 'ems-xf-cell' : 'ems-gov-cell';
                     if (section.tagName === 'TFOOT') { cell.textContent = ''; continue; }
-                    var v = ctxValues[key];
+                    /* الموصولُ مصدرُه الصفُّ لا السياقُ العام — والسياقُ لا يعرفه أصلًا */
+                    var v = srcKey ? (rowXf ? rowXf[srcKey] : undefined) : ctxValues[key];
                     if (v === undefined || v === null || v === '') {
                         cell.textContent = '—';
                         cell.classList.add('ems-gov-empty');
@@ -250,6 +294,10 @@
                         cell.textContent = v;
                         th.dataset.emsHasValue = '1';   /* لهذا العمودِ مصدرٌ فعلًا */
                     }
+                    /* ◆ الموصولُ **لا يُوسَم «بلا مصدر» وإن خلا**: خلوُّ حقلٍ
+                         اختياريٍّ حالةٌ صحيحةٌ لا غيابُ مصدر. والوسمُ هنا كان
+                         سيُخفي العمودَ عن كلِّ الشاشةِ لأن أوّلَ صفٍّ لم يملأه. */
+                    if (srcKey) { th.dataset.emsHasValue = '1'; }
                 }
             }
         });

@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-17 06:20:09
--- الجداول: 590 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-19 13:29:17
+-- الجداول: 594 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -421,7 +421,8 @@ CREATE TABLE `approval_requests` (
   PRIMARY KEY (`id`),
   KEY `idx_approval_entity` (`entity_type`,`entity_id`),
   KEY `idx_approval_status` (`status`),
-  KEY `idx_approval_user` (`requested_by`)
+  KEY `idx_approval_user` (`requested_by`),
+  CONSTRAINT `chk_nopollute_7a64618103b0238d` CHECK (`approved_at` <= '2026-08-10 20:24:28' or `entity_type` is null or `entity_type`  not like '% %' or octet_length(`entity_type`) <= char_length(`entity_type`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: approval_rules_quarantine ──
@@ -493,7 +494,8 @@ CREATE TABLE `approval_workflow_rules` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uniq_workflow_rule` (`entity_type`,`action`,`step_order`),
   KEY `idx_workflow_rule_lookup` (`entity_type`,`action`,`is_active`),
-  CONSTRAINT `chk_rules_retired` CHECK (`is_active` = 0)
+  CONSTRAINT `chk_rules_retired` CHECK (`is_active` = 0),
+  CONSTRAINT `chk_nopollute_d662685283921e14` CHECK (`created_at` <= '2026-08-10 19:39:36' or `entity_type` is null or `entity_type`  not like '% %' or octet_length(`entity_type`) <= char_length(`entity_type`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: asset_hour_reconciliations ──
@@ -855,7 +857,8 @@ CREATE TABLE `capacity_outbox` (
   `published_at` datetime DEFAULT NULL,
   PRIMARY KEY (`obx_id`),
   UNIQUE KEY `uq_obx_idem` (`idempotency_key`),
-  KEY `ix_obx_pending` (`company_id`,`state`,`next_attempt_at`)
+  KEY `ix_obx_pending` (`company_id`,`state`,`next_attempt_at`),
+  CONSTRAINT `chk_nopollute_838b22d8f3f9992d` CHECK (`next_attempt_at` <= '2026-08-12 05:55:26' or `entity_type` is null or `entity_type`  not like '% %' or octet_length(`entity_type`) <= char_length(`entity_type`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CAP-01 §14 · DEC-CAP-B — صادرُ مجال القدرات: صفٌّ داخل المعاملة والنشرُ بعد COMMIT؛ الفشلُ يُعاد تصاعديًّا بلا استهلاكٍ ثانٍ (C28)';
 
 -- ── Table: capacity_shadow_diffs ──
@@ -1035,6 +1038,16 @@ CREATE TABLE `clients` (
   `company_id` int(11) DEFAULT NULL,
   `client_code` varchar(50) NOT NULL COMMENT 'كود العميل',
   `client_name` varchar(255) NOT NULL COMMENT 'اسم العميل',
+  `legal_name` varchar(255) DEFAULT NULL COMMENT 'الاسم القانوني الكامل',
+  `legal_form` varchar(100) DEFAULT NULL COMMENT 'الشكل النظامي',
+  `registration_country` varchar(100) DEFAULT NULL COMMENT 'بلد التسجيل',
+  `commercial_reg_no` varchar(100) DEFAULT NULL COMMENT 'رقم السجل التجاري',
+  `tax_id` varchar(100) DEFAULT NULL COMMENT 'الرقم الضريبي',
+  `registered_address` varchar(500) DEFAULT NULL COMMENT 'العنوان المسجَّل',
+  `contact_person` varchar(255) DEFAULT NULL COMMENT 'جهة الاتصال',
+  `contact_title` varchar(150) DEFAULT NULL COMMENT 'المنصب',
+  `client_classification` varchar(100) DEFAULT NULL COMMENT 'تصنيف العميل',
+  `importance_tier` varchar(50) DEFAULT NULL COMMENT 'شريحة الأهمية',
   `entity_type` varchar(100) DEFAULT NULL COMMENT 'نوع الكيان',
   `sector_category` varchar(100) DEFAULT NULL COMMENT 'تصنيف القطاع',
   `phone` varchar(50) DEFAULT NULL COMMENT 'رقم الهاتف',
@@ -1050,7 +1063,9 @@ CREATE TABLE `clients` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_clients_company_code` (`company_id`,`client_code`),
   KEY `idx_client_name` (`client_name`),
-  KEY `idx_status` (`status`)
+  KEY `idx_status` (`status`),
+  KEY `idx_clients_commercial_reg` (`commercial_reg_no`),
+  KEY `idx_clients_tax_id` (`tax_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول العملاء';
 
 -- ── Table: cmp03_idempotency ──
@@ -3523,7 +3538,8 @@ CREATE TABLE `fin_approval_chain` (
   UNIQUE KEY `uq_doc_type` (`company_id`,`source_kind`,`source_ref`,`apr_code`),
   KEY `ix_doc` (`company_id`,`source_kind`,`source_ref`),
   KEY `ix_actor` (`actor_user_id`),
-  KEY `ix_when` (`company_id`,`decided_at`)
+  KEY `ix_when` (`company_id`,`decided_at`),
+  CONSTRAINT `chk_nopollute_7b8cd6a7119ecbfa` CHECK (`decided_at` <= '2026-05-24 13:26:24' or `source_kind` is null or `source_kind`  not like '% %' or octet_length(`source_kind`) <= char_length(`source_kind`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-ACC-01 §4-7 — سلسلةُ الاعتمادِ الحيةُ بأنواعِها الأربعة';
 
 -- ── Table: fin_approval_conflicts ──
@@ -3671,7 +3687,8 @@ CREATE TABLE `fin_backflow_log` (
   KEY `ix_src` (`company_id`,`source_kind`,`source_ref`),
   KEY `ix_state` (`company_id`,`state`,`fired_at`),
   KEY `ix_to` (`to_user_id`),
-  KEY `ix_code` (`notice_code`)
+  KEY `ix_code` (`notice_code`),
+  CONSTRAINT `chk_nopollute_19124b40815128d7` CHECK (`fired_at` <= '2026-05-24 13:26:24' or `source_kind` is null or `source_kind`  not like '% %' or octet_length(`source_kind`) <= char_length(`source_kind`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-OBL-01 §4-2/§4-3 — سجلُّ المرتجَعِ الحيُّ وشاهدُ عدمِ الصمت';
 
 -- ── Table: fin_backflow_notices ──
@@ -4232,7 +4249,8 @@ CREATE TABLE `fin_cycle_time_metrics` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_cyc_code` (`company_id`,`metric_code`),
   UNIQUE KEY `uq_cyc_idem` (`company_id`,`idempotency_key`),
-  KEY `ix_cyc_period` (`company_id`,`period`,`request_type`)
+  KEY `ix_cyc_period` (`company_id`,`period`,`request_type`),
+  CONSTRAINT `chk_nopollute_86f2495b13da0fe7` CHECK (`created_at` <= TIMESTAMP/*WITH LOCAL TIME ZONE*/'2026-05-24 13:26:24' or `request_type` is null or `request_type`  not like '% %' or octet_length(`request_type`) <= char_length(`request_type`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-10 الشاشة ٢٣: قياسُ زمن الدورة بالحلقة والمعتمِد — والتقريرُ دوري';
 
 -- ── Table: fin_depreciation ──
@@ -4949,7 +4967,8 @@ CREATE TABLE `fin_obl_avoidance` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_contract` (`company_id`,`contract_kind`,`contract_ref`),
   KEY `ix_verdict` (`company_id`,`verdict`),
-  KEY `ix_review` (`next_review_at`)
+  KEY `ix_review` (`next_review_at`),
+  CONSTRAINT `chk_nopollute_8427208b5440487a` CHECK (`decided_at` <= '2026-05-24 13:26:24' or `contract_kind` is null or `contract_kind`  not like '% %' or octet_length(`contract_kind`) <= char_length(`contract_kind`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-OBL-01 §4-5/§4-6 — اختبارُ التجنبِ بأعمدتِه الاثني عشرَ الإلزامية';
 
 -- ── Table: fin_obl_avoidance_tests ──
@@ -4993,8 +5012,10 @@ CREATE TABLE `fin_obl_recognition` (
   `guard_text` varchar(400) NOT NULL DEFAULT '',
   `doc_ref` varchar(24) NOT NULL DEFAULT '',
   `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp() COMMENT 'مرساةُ قيدِ منعِ التلوث — القائمُ قبلَها مُعفًى والوارِدُ بعدَها ملزَم',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_rec` (`company_id`,`contract_kind`)
+  UNIQUE KEY `uq_rec` (`company_id`,`contract_kind`),
+  CONSTRAINT `chk_nopollute_21d771d04489fb32` CHECK (`created_at` <= '2026-08-19 11:58:32' or `contract_kind` is null or `contract_kind`  not like '% %' or octet_length(`contract_kind`) <= char_length(`contract_kind`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-OBL-01 §4-12 — شرطُ الاعترافِ بمعيارِ كلِّ نوع';
 
 -- ── Table: fin_obl_register ──
@@ -5033,7 +5054,8 @@ CREATE TABLE `fin_obl_register` (
   UNIQUE KEY `uq_no` (`company_id`,`obligation_no`),
   KEY `ix_contract` (`company_id`,`contract_kind`,`contract_ref`,`state`),
   KEY `ix_type` (`ob_type`,`state`),
-  KEY `ix_super` (`supersedes_id`)
+  KEY `ix_super` (`supersedes_id`),
+  CONSTRAINT `chk_nopollute_509cacda05d78344` CHECK (`generated_at` <= '2026-05-24 13:26:24' or `contract_kind` is null or `contract_kind`  not like '% %' or octet_length(`contract_kind`) <= char_length(`contract_kind`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-OBL-01 §4-16 — سجلُّ الالتزاماتِ المولَّدةِ عند نفاذِ العقد';
 
 -- ── Table: fin_obl_rules ──
@@ -5529,7 +5551,8 @@ CREATE TABLE `fin_routing_log` (
   KEY `ix_spec_time` (`company_id`,`target_spec`,`routed_at`),
   KEY `ix_acc` (`accountant_id`),
   KEY `ix_src` (`source_kind`,`source_ref`),
-  KEY `ix_fev` (`financial_event_id`)
+  KEY `ix_fev` (`financial_event_id`),
+  CONSTRAINT `chk_nopollute_0bf7f89390a47c39` CHECK (`routed_at` <= '2026-08-16 12:23:02' or `source_kind` is null or `source_kind`  not like '% %' or octet_length(`source_kind`) <= char_length(`source_kind`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-OBL-01 §4-15 — سجلُّ التوجيهِ الحيُّ وشاهدُ عدمِ التخطي';
 
 -- ── Table: fin_routing_matrix ──
@@ -6086,6 +6109,22 @@ CREATE TABLE `founding_mode` (
   CONSTRAINT `chk_fm_ends` CHECK (`enabled` = 0 or `ends_at` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: gov_a11y_measurements ──
+CREATE TABLE `gov_a11y_measurements` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `screen_file` varchar(190) NOT NULL,
+  `component_version` varchar(32) NOT NULL COMMENT 'قياسٌ بإصدارٍ سابقٍ لا يُقرأ — المكتبةُ تغيّرت فالقياسُ لاغٍ',
+  `checks_total` tinyint(3) unsigned NOT NULL DEFAULT 12,
+  `violations_total` smallint(5) unsigned NOT NULL,
+  `keyboard_modality` tinyint(1) NOT NULL COMMENT 'أضُغطت Tab حقيقيةٌ قبل القياس؟ بلا ذلك فحصُ التركيزِ لاغٍ',
+  `detail_json` text NOT NULL COMMENT 'مخرَجُ المسبارِ كما هو — لا ملخَّصٌ مُعاد صوغُه',
+  `measured_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_screen_ver` (`screen_file`,`component_version`),
+  KEY `ix_ver` (`component_version`),
+  CONSTRAINT `chk_a11y_modality` CHECK (`keyboard_modality` = 1 or `violations_total` > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='الاثنا عشرَ فحصًا مقيسةً حيًّا — بإصدارِ المكوّنِ وشرطِ القياس';
+
 -- ── Table: gov_alternate_authority ──
 CREATE TABLE `gov_alternate_authority` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -6355,6 +6394,28 @@ CREATE TABLE `gov_doc_variance` (
   KEY `ix_doc` (`doc_code`,`state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='update0013 — مخالفاتُ الوثائقِ وحسمُها بأساسٍ مكتوبٍ يُفحص كلَّ بوابة';
 
+-- ── Table: gov_dup_semantics ──
+CREATE TABLE `gov_dup_semantics` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `similarity` decimal(5,3) NOT NULL COMMENT 'درجةُ التشابهِ المحسوبة — مؤشِّرٌ لا حكم',
+  `route_a` varchar(190) NOT NULL,
+  `label_a` varchar(190) NOT NULL,
+  `route_b` varchar(190) NOT NULL,
+  `label_b` varchar(190) NOT NULL,
+  `owner_dept` varchar(120) DEFAULT NULL,
+  `nature` varchar(60) DEFAULT NULL,
+  `shared_concepts` varchar(190) DEFAULT NULL,
+  `machine_hint` varchar(190) DEFAULT NULL COMMENT 'الترجيحُ الآليّ — **اقتراحٌ لا حكم** (ف١٥-١ بند ٤)',
+  `human_verdict` enum('SAME_FUNCTION','DIFFERENT_ANGLE','INDEPENDENT') DEFAULT NULL COMMENT 'الحكمُ البشريُّ الثلاثيُّ — ولا يُملأ آليًّا بحال',
+  `human_by` varchar(120) DEFAULT NULL,
+  `decision` varchar(190) DEFAULT NULL COMMENT 'دمجٌ · منظرٌ محفوظ · إبقاءٌ منفصلًا',
+  `decided_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_pair` (`route_a`,`route_b`),
+  KEY `ix_verdict` (`human_verdict`),
+  CONSTRAINT `chk_dupsem_human` CHECK (`decision` is null or `human_verdict` is not null and `human_by` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='أزواجُ ازدواجِ المعنى — الترجيحُ الآليُّ والحكمُ البشريُّ عمودانِ لا عمود';
+
 -- ── Table: gov_elevations ──
 CREATE TABLE `gov_elevations` (
   `elevation_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -6488,9 +6549,12 @@ CREATE TABLE `gov_independent_reviews` (
   `verdict` enum('PASS','FAIL') DEFAULT NULL,
   `minutes_ref` varchar(190) DEFAULT NULL COMMENT 'مرجعُ المحضرِ — لا حكمَ بلا شاهد',
   `component_version` varchar(24) DEFAULT NULL,
+  `commit_hash` varchar(40) NOT NULL DEFAULT '' COMMENT 'التزامُ الشيفرةِ الذي رآه المراجِعُ — لا الذي يُقرأ اليوم',
+  `visual_baseline_version` varchar(40) NOT NULL DEFAULT '' COMMENT 'وسمُ خطِّ الأساسِ البصريِّ لحظةَ المراجعة',
   `recorded_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_screen_kind_ver` (`screen_file`,`review_kind`,`component_version`)
+  UNIQUE KEY `uq_screen_kind_ver` (`screen_file`,`review_kind`,`component_version`),
+  CONSTRAINT `chk_review_version_triple` CHECK (`component_version` <> '' and `visual_baseline_version` <> '' and char_length(`commit_hash`) >= 7)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='المراجعةُ البشريةُ المستقلةُ وجولةُ العرض — ينفّذهما مستقلٌّ عن البانِي';
 
 -- ── Table: gov_inheritance_denials ──
@@ -6560,6 +6624,39 @@ CREATE TABLE `gov_ladders` (
   KEY `ix_ld_cycle` (`cycle_no`),
   CONSTRAINT `chk_ld_cap` CHECK (`cap_state` <> 'resolved' or `cap_kind` <> 'amount' or `cap_amount` is not null and `cap_currency` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LAD-01: سلاليمُ الاعتماد — والسقفُ غيرُ المحسومِ يوقف السلّم';
+
+-- ── Table: gov_migration_ledger ──
+CREATE TABLE `gov_migration_ledger` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `dept` varchar(120) NOT NULL,
+  `layer` varchar(60) DEFAULT NULL,
+  `stage` varchar(190) DEFAULT NULL,
+  `screen_label` varchar(190) DEFAULT NULL,
+  `proposed_label` varchar(190) DEFAULT NULL,
+  `file_base` varchar(120) NOT NULL COMMENT 'كما في الدفتر — اسمٌ مجرَّدٌ لا مسار',
+  `route` varchar(190) DEFAULT NULL COMMENT 'المسارُ المحلولُ — NULL إن تعذّر أو تعدَّد',
+  `resolve_state` enum('RESOLVED','AMBIGUOUS','NOT_FOUND') NOT NULL DEFAULT 'NOT_FOUND' COMMENT 'وما تعدَّد مطابقُه لا يُخمَّن',
+  `is_duplicate` varchar(20) DEFAULT NULL,
+  `entity` varchar(120) DEFAULT NULL,
+  `parent_file` varchar(120) DEFAULT NULL,
+  `target_type` varchar(120) DEFAULT NULL,
+  `target_template` varchar(120) DEFAULT NULL,
+  `required_components` varchar(400) DEFAULT NULL,
+  `nature` varchar(120) DEFAULT NULL,
+  `official_doc` varchar(190) DEFAULT NULL,
+  `problems` text DEFAULT NULL,
+  `severity` varchar(30) DEFAULT NULL COMMENT 'عالٍ · متوسط · — · ويُرتَّب الترحيلُ بها',
+  `decision` varchar(190) DEFAULT NULL,
+  `acceptance_test` varchar(190) DEFAULT NULL,
+  `migration_state` enum('NOT_STARTED','IN_PROGRESS','TECHNICALLY_ELIGIBLE','GOLDEN_SCREEN_FINAL','BLOCKED_EXTERNAL_INPUT') NOT NULL DEFAULT 'NOT_STARTED' COMMENT 'مفرداتُ الإغلاقِ المعتمَدةُ — ولا «CLOSED» ولا «100٪»',
+  `measured_at` datetime DEFAULT NULL,
+  `measure_note` varchar(400) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_dept_file_stage` (`dept`,`file_base`,`stage`),
+  KEY `ix_route` (`route`),
+  KEY `ix_sev` (`severity`),
+  KEY `ix_state` (`migration_state`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='سجلُّ الترحيلِ — 663 موضعًا بأعمدةِ الدفترِ التسعةَ عشرَ وحالةٍ مقيسة';
 
 -- ── Table: gov_orphan_links ──
 CREATE TABLE `gov_orphan_links` (
@@ -6706,6 +6803,29 @@ CREATE TABLE `gov_stage_outputs` (
   UNIQUE KEY `uq_stage` (`role_id`,`stage_no`),
   KEY `ix_src` (`output_source`,`next_source`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='⑨ المستندُ الناتجُ والحالةُ التالية — ولكلِّ خانةٍ مصدرُها المعلَن';
+
+-- ── Table: gov_test_data_isolation ──
+CREATE TABLE `gov_test_data_isolation` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `table_name` varchar(64) NOT NULL,
+  `pk_column` varchar(64) NOT NULL,
+  `pk_value` varchar(64) NOT NULL,
+  `column_name` varchar(64) NOT NULL,
+  `original_value` text NOT NULL COMMENT 'النصُّ الأصليُّ محفوظًا — لا يُفقد',
+  `source_ref` varchar(190) NOT NULL COMMENT 'مرجعُ النصِّ كما وُجد',
+  `reason` varchar(190) NOT NULL,
+  `column_nullable` tinyint(1) NOT NULL COMMENT 'أيقبل الحقلُ NULL؟ يحدّد العلاجَ الممكن',
+  `policy_domain` enum('NAVIGATION_NAMING_POSITION','PERMISSIONS','APPROVAL_LADDERS','FINANCIAL_CAPS','SEGREGATION_OF_DUTIES','LEGAL_OBLIGATIONS','FINANCIAL_DECISIONS','OPERATIONAL_DATA') NOT NULL DEFAULT 'OPERATIONAL_DATA',
+  `resolution` enum('PENDING_SOURCE','PENDING_OWNER','QUARANTINED','RESOLVED') NOT NULL DEFAULT 'PENDING_SOURCE',
+  `registered_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `resolved_value` varchar(190) DEFAULT NULL COMMENT 'لا تُملأ إلا من مصدرٍ حاكمٍ — والتخمينُ ممنوع',
+  `resolved_source` varchar(190) DEFAULT NULL COMMENT 'المصدرُ الحاكمُ الذي أعطى القيمة — بلا مصدرٍ لا حسم',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_row_col` (`table_name`,`pk_value`,`column_name`),
+  KEY `ix_res` (`resolution`),
+  KEY `ix_dom` (`policy_domain`),
+  CONSTRAINT `chk_resolved_needs_source` CHECK (`resolution` <> 'RESOLVED' or `resolved_value` is not null and `resolved_source` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='عزلٌ بتسجيلٍ — النصُّ محفوظٌ وبياناتُ العملِ لم تُمَسّ';
 
 -- ── Table: gov_visual_measurements ──
 CREATE TABLE `gov_visual_measurements` (
@@ -7704,6 +7824,9 @@ CREATE TABLE `nav_canonical` (
   `current_parent` varchar(255) DEFAULT NULL,
   `matrix_row` smallint(6) DEFAULT NULL COMMENT 'رقمُ الصفِّ في الدفترِ المعتمَد',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `output_doc` varchar(190) DEFAULT NULL COMMENT 'المستندُ الناتجُ — من دفترِ التدقيقِ حصرًا، ولا يُكتب تخمينًا',
+  `state_transition` varchar(190) DEFAULT NULL COMMENT 'وسمُ انتقالِ الحالةِ الصريحُ — مقروءٌ من الشيفرةِ لا مؤلَّف',
+  `ops_source` varchar(190) DEFAULT NULL COMMENT 'من أين جاء أيٌّ منهما — فلا رقمَ بلا مصدر',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_route` (`route`),
   KEY `ix_status_level` (`status`,`level_no`,`sort_no`)
@@ -10646,7 +10769,8 @@ CREATE TABLE `scr_fin_assets` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  KEY `ix_fin_assets_live` (`company_id`,`status`)
+  KEY `ix_fin_assets_live` (`company_id`,`status`),
+  CONSTRAINT `chk_nopollute_33fe84c0716621cf` CHECK (`created_at` <= '2026-07-28 14:46:00' or `status` is null or `status`  not like '% %' or octet_length(`status`) <= char_length(`status`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة fin_assets.php';
 
 -- ── Table: scr_fin_changes ──
@@ -10682,7 +10806,8 @@ CREATE TABLE `scr_fin_changes` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  KEY `ix_fin_changes_live` (`company_id`,`status`)
+  KEY `ix_fin_changes_live` (`company_id`,`status`),
+  CONSTRAINT `chk_nopollute_d58ab42470e50acd` CHECK (`created_at` <= '2026-07-28 14:46:00' or `status` is null or `status`  not like '% %' or octet_length(`status`) <= char_length(`status`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة fin_changes.php';
 
 -- ── Table: scr_fin_models ──
@@ -10711,7 +10836,8 @@ CREATE TABLE `scr_fin_models` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  KEY `ix_fin_models_live` (`company_id`,`status`)
+  KEY `ix_fin_models_live` (`company_id`,`status`),
+  CONSTRAINT `chk_nopollute_66a00d8ffeecf30e` CHECK (`created_at` <= '2026-07-28 14:46:00' or `status` is null or `status`  not like '% %' or octet_length(`status`) <= char_length(`status`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة fin_models.php';
 
 -- ── Table: scr_founding_mode ──
@@ -11455,7 +11581,8 @@ CREATE TABLE `scr_transfer_permits` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
-  KEY `ix_transfer_permits_live` (`company_id`,`status`)
+  KEY `ix_transfer_permits_live` (`company_id`,`status`),
+  CONSTRAINT `chk_nopollute_c2649c3504db26ec` CHECK (`created_at` <= '2026-07-28 14:46:00' or `status` is null or `status`  not like '% %' or octet_length(`status`) <= char_length(`status`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة transfer_permits.php';
 
 -- ── Table: scr_unbilled ──

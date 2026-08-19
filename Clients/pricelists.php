@@ -399,13 +399,20 @@ function pl_revenue_label($model, $map)
                 <div class="form-grid">
                     <div id="generated_code_wrapper" class="auto">
                         <label for="generated_pl_code"><i class="fas fa-magic"></i> الكود المولد <i class="fas fa-info-circle pl-info-icon"></i></label>
-                        <input type="text" id="generated_pl_code" class="generated-code-field" value="<?php echo pl_e($next_pl_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، انسخه إلى حقل الكود" />
+                        <input type="text" id="generated_pl_code" class="generated-code-field" value="<?php echo pl_e($next_pl_code); ?>" readonly tabindex="-1" title="هذا الكود للعرض فقط، يمكنك نسخه واستخدامه في حقل الكود" />
                         <div class="generated-code-hint"></div>
                     </div>
 
                     <div>
                         <label for="pricelist_code"><i class="fas fa-barcode"></i> الكود *</label>
-                        <input type="text" name="pricelist_code" id="pricelist_code" placeholder="مثال: PL-001" required pattern="[A-Za-z0-9_\-]+" />
+                        <!-- مكتوبٌ سلفًا بالكودِ المولَّد **وقابلٌ للتعديل** (نظيرُ كودِ العميلِ والمشروع):
+                             أكثرُ الحالاتِ تقبله كما هو، ومَن أراد كودَه الخاصَّ كتبه فوقه. ووضعُه في
+                             السمةِ `value` لا بجافاسكربت مقصود: `resetForm()` تستدعي `reset()` الأصليَّ
+                             وهو يعيد كلَّ حقلٍ إلى سمتِه — فيعود الكودُ المولَّدُ تلقائيًّا بعد كلِّ
+                             إلغاءٍ أو خروجٍ من وضعِ التعديل. -->
+                        <input type="text" name="pricelist_code" id="pricelist_code" placeholder="مثال: PL-001" required
+                            value="<?php echo pl_e($next_pl_code); ?>"
+                            pattern="[A-Za-z0-9_\-]+" />
                     </div>
                     <div>
                         <label for="name"><i class="fas fa-heading"></i> اسم قائمة الأسعار *</label>
@@ -628,8 +635,31 @@ function pl_revenue_label($model, $map)
     const statsToggleBtn = $('#toggleStats');
     const statsSection = $('#plStatsSection');
 
-    function setAddMode() { formTitle.text('إضافة قائمة أسعار جديدة'); submitBtnText.text('حفظ القائمة'); generatedCodeWrapper.show(); }
-    function setEditMode() { formTitle.text('تعديل قائمة الأسعار'); submitBtnText.text('تحديث القائمة'); generatedCodeWrapper.hide(); }
+    /**
+     * إظهارُ حقلِ الكودِ المولَّد وإخفاؤه.
+     *
+     * ⚠️ **لا تستعمل `jQuery.hide()` هنا** — `assets/css/ems-forms.css` يحمل:
+     *     :is(.allforms, .ems-form) .form-grid > div { display: block !important }
+     * والغلافُ ابنٌ مباشرٌ لـ`.form-grid`، فـ`!important` من ورقةِ الأنماطِ تهزم
+     * الإخفاءَ السطريَّ **بلا أولوية**: السمةُ تُكتب فعلًا والحقلُ يبقى ظاهرًا، بلا
+     * خطأٍ في وحدةِ التحكم ولا سطرٍ في أيِّ سجل. (نظيرُ شاشتَي العملاءِ والمشاريع.)
+     */
+    function setGeneratedCodeShown(shown) {
+        var el = generatedCodeWrapper[0];
+        if (!el) { return; }
+        if (shown) { el.style.removeProperty('display'); }
+        else       { el.style.setProperty('display', 'none', 'important'); }
+    }
+    function setAddMode() {
+        formTitle.text('إضافة قائمة أسعار جديدة'); submitBtnText.text('حفظ القائمة');
+        setGeneratedCodeShown(true);
+        // الكودُ المولَّدُ يعود إلى خانتِه كلَّما دخلنا وضعَ الإضافة — ومصدرُه حقلُ
+        // العرضِ نفسُه لا نسخةٌ ثانيةٌ منه (مصدرُ حقيقةٍ واحد). و`reset()` يكفي
+        // للإلغاء، لكنَّ الانتقالَ من «تعديل» إلى «إضافة» قد يقع بلا reset.
+        var genCode = $('#generated_pl_code').val();
+        if (genCode) { $('#pricelist_code').val(genCode); }
+    }
+    function setEditMode() { formTitle.text('تعديل قائمة الأسعار'); submitBtnText.text('تحديث القائمة'); setGeneratedCodeShown(false); }
     function resetForm() { if (!plForm.length) return; plForm[0].reset(); $('#pl_id').val(''); setAddMode(); if (window.EmsSelect) EmsSelect.refresh(); }
 
     function updateFormToggleState(isOpen) {

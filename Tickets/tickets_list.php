@@ -49,6 +49,18 @@ if (!$is_super_admin) {
     }
 }
 
+/* ══ `?open=` كان معامَلًا ميّتًا ═══════════════════════════════════════════
+     `dept_inbox.php` و`includes/related_tickets_tab.php` يوجِّهان رقمَ البلاغِ
+     إلى `tickets_list.php?open=<id>` — وهذه الشاشةُ **لا تقرأ المعامَلَ إطلاقًا**،
+     فالضغطُ يُنزل المستخدمَ على التبويبِ الافتراضيِّ بلا فتحٍ ولا تمييز. ويُقرأ
+     ذلك عطلًا صامتًا لا حدًّا معلَنًا. فيُشرَّف المعامَلُ بوجهتِه الطبيعية:
+     البلاغُ نفسُه — وهي وجهةُ زرِّ «فتح التذكرة» في الصفِّ ذاتِه. */
+$__open = isset($_GET['open']) ? intval($_GET['open']) : 0;
+if ($__open > 0) {
+    header('Location: ticket_form.php?id=' . $__open);
+    exit();
+}
+
 $stages_map = tkt_stages();
 $natures    = tkt_natures();
 $roles_map  = tkt_roles_map();
@@ -62,6 +74,33 @@ if (!$is_super_admin && !$is_tickets_mgr) {
     $scope_sql = " AND (t.owner_role_id IN ($in) OR t.reporter_user_id = $uid OR t.created_by = $uid)";
 }
 
+/* ══ صندوقُ الإدارة يصير تبويبًا (دمجُ Tickets/dept_inbox.php) ═══════════════
+     كانت شاشةً مستقلّةً مربوطةً بـ34 دورًا، وهي في حقيقتها **مرشِّحٌ** على
+     `ticket_workstreams` بوحدةِ دورِ المستخدم — بأعمدةٍ أقلَّ من لوحةِ المسارات
+     وبلا حارسِ صلاحيةٍ إطلاقًا. فتُنقل هنا لتَرِثَ حارسَ `can_view` أعلاه
+     والفلاترَ وزرَّ Excel، ويبقى للمستخدمِ **بابٌ واحدٌ** للبلاغات.
+
+   ◆ ولماذا قائمةُ معرِّفاتٍ لا `EXISTS` داخلَ الاستعلام: `scopedQuery` تلزم
+     إعلانَ كلِّ جدولٍ مستأجرٍ يظهر بعد FROM/JOIN، وإعلانُ `ticket_workstreams`
+     في `scope` يحقن `ws.company_id = ?` في الشرطِ **العلوي** — واسمٌ مستعارٌ
+     داخلَ استعلامٍ فرعيٍّ لا يُرى من هناك. فالعزلُ يُطبَّق على استعلامِ
+     المساراتِ وحدَه، وتُمرَّر ثمرتُه معرِّفاتٍ. */
+$dept_unit = 0;
+$dept_ids  = array();
+if (!$is_super_admin) {
+    require_once __DIR__ . '/dept_inbox_map.php';
+    $dept_unit = ems_dept_unit_of_role($current_role_id);
+}
+if ($dept_unit > 0) {
+    $ws_rows = tkt_gate($is_super_admin)->scopedQuery(
+        array('scope' => array('ws' => 'ticket_workstreams')),
+        "SELECT DISTINCT ws.tk_id FROM ticket_workstreams ws
+          WHERE {TENANT_SCOPE} AND ws.org_unit_id = " . intval($dept_unit));
+    foreach ($ws_rows as $__w) { $dept_ids[] = intval($__w['tk_id']); }
+}
+// القائمةُ الفارغةُ تُكتب (0) لا () — فـIN () خطأُ صياغةٍ يُسقط الشاشة
+$dept_in = $dept_ids ? implode(',', $dept_ids) : '0';
+
 // E-13 (UX-07 §5.1): **التبويباتُ الأربعة بدل الفلاتر المنسدلة وحدَها** —
 // وتبويبُ «تنتظر اعتمادًا» (done) كان غائبًا؛ و«بلاغاتي» هو M-37 (UX-07 §4):
 // المرشَّحُ على المستلم لكل الأدوار لا لدور 24 وحده.
@@ -73,6 +112,23 @@ $TABS = array(
                        . ' OR t.created_by = ' . intval($current_user_id) . ')'),
     'closed'   => array('مغلقة', " AND t.stage IN ('closed','cancelled')"),
 );
+// التبويبُ يظهر لمن له وحدةٌ تنظيميةٌ فقط — والمديرُ الأعلى يرى الكلَّ أصلًا
+if ($dept_unit > 0) {
+    $TABS['dept'] = array('موجَّهة لإدارتي', ' AND t.id IN (' . $dept_in . ')');
+}
+
+/* ══ «موجَّهة لإدارتي» لا تخضع لشجرةِ الأدوار ═══════════════════════════════
+     قِيس حيًّا أنّ إخضاعَها يُفرغها: مساراتُ المخازنِ الستةَ عشرَ كلُّها على
+     بلاغاتٍ **رأسُها مملوكٌ لإدارةِ الصيانة**، وأمينُ المستودعِ ليس في ذرّيّةِ
+     الصيانة — فيُرشَّح كلُّ شيءٍ ويصير التبويبُ صفرًا. وهذا بعينُه العطبُ الذي
+     جاء الدمجُ ليرفعه.
+   ◆ والقاعدةُ التي تحسم: **توجيهُ المسارِ إلى وحدتِك هو الإذنُ**، لا ملكيةُ
+     الرأس. وهو ما كانت تفعله `dept_inbox.php` (ترشِّح بـ`ws.org_unit_id` وحدَه).
+   ◆ والعزلُ لا ينخرم: قائمةُ المعرِّفاتِ نفسُها خرجت من `scopedQuery` محكومةً
+     بكيانِ المستخدم، و`{TENANT_SCOPE}` يبقى نافذًا على `tickets`. */
+$tab_scope = function ($key) use ($scope_sql) {
+    return $key === 'dept' ? '' : $scope_sql;
+};
 $tab = isset($_GET['tab']) && isset($TABS[$_GET['tab']]) ? strval($_GET['tab']) : 'open';
 // مرشِّحُ التبويب منفصلٌ عن شرط النطاق: بطاقاتُ اللمحة تصف مركزَ البلاغات كلَّه
 // ولا تتبع التبويبَ المفتوح — خلطُهما كان يجعل «مفتوحة الآن» تعني «مفتوحة ضمن
@@ -185,7 +241,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             // ازدواجُ التعريف هو ما جعل الأرقام تتفارق أصلًا.
             $cnt_row = tkt_gate($is_super_admin)->scopedQuery(
                 array('scope' => array('t' => 'tickets')),
-                "SELECT COUNT(*) n FROM tickets t WHERE {TENANT_SCOPE}" . $scope_sql . $tv[1]);
+                "SELECT COUNT(*) n FROM tickets t WHERE {TENANT_SCOPE}" . $tab_scope($tk) . $tv[1]);
             $cnt = $cnt_row ? intval($cnt_row[0]['n']) : 0;
         ?>
             <a href="?tab=<?php echo $tk; ?>" class="btn btn-sm tkt-list-tab<?php echo $tk === $tab ? ' is-active' : ''; ?>">
@@ -251,7 +307,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                      LEFT JOIN ticket_types tt ON tt.id = t.ticket_type_id
                      LEFT JOIN equipments e ON e.id = t.equipment_id
                      LEFT JOIN project p ON p.id = t.project_id
-                     WHERE {TENANT_SCOPE}" . $scope_sql . $tab_sql . "
+                     WHERE {TENANT_SCOPE}" . $tab_scope($tab) . $tab_sql . "
                      ORDER BY t.id DESC"
                 );
                 foreach ($rows as $row) {

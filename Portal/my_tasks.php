@@ -42,6 +42,13 @@ if (!$is_super_admin && empty($__pp['can_view'])) {
     exit();
 }
 
+/* ◆ «مهامي» تملك `?view=` — تاباتُها العشرُ معناه، لا سجلُّ المناظرِ المركزي.
+     والإعلانُ **قبلَ** `page_header.php` وإلّا ردَّ المُخنِقُ كلَّ نقرةِ تابٍ إلى
+     الرابطِ العاري (302) فعادت الشاشةُ إلى «اليوم» أبدًا — وهو العطبُ المقيسُ
+     الذي شُرح في ذيلِ `includes/nav_views.php`. */
+require_once __DIR__ . '/../includes/nav_views.php';
+ems_nav_view_claim();
+
 $VIEW = isset($_GET['view']) ? preg_replace('/[^a-z_]/', '', (string) $_GET['view']) : 'today';
 
 /* ── الأفعال: انتقالات المحرّك بمخوَّليها — الحارس في الخدمة لا في الواجهة ── */
@@ -123,6 +130,13 @@ $r = mysqli_query($conn,
       ORDER BY FIELD(wi.priority,'P0','P1','P2','P3','P4'), wi.due_at IS NULL, wi.due_at ASC
       LIMIT 300");
 while ($r && ($x = mysqli_fetch_assoc($r))) { $rows[] = $x; }
+
+/* ── سقفُ الثلاثمئةِ يُعلَن ولا يُسكت عنه ─────────────────────────────────────
+   الشارةُ تعدُّ **كلَّ** صفوفِ العرضِ والجدولُ يُصيِّر 300 منها. فكان المديرُ
+   يقرأ «فريقي 1406» ويجد 300 صفًّا **بلا أيِّ إشارةٍ إلى ما سقط** — و«صمتُ
+   الاقتطاع» يُقرأ تغطيةً كاملةً وهو نقصُ 1,106 صفًّا. فيُعلَن الفارقُ برقمِه. */
+$ROW_CAP   = 300;
+$truncated = max(0, intval($counts[$VIEW]) - count($rows));
 
 /* تسميات الحالات — مرادفات طقم الحالات السبعة (ui-unification) */
 $STATE_AR = array(
@@ -214,6 +228,16 @@ include '../insidebar.php';
                     · حتى <?php echo htmlspecialchars((string) $d['ends_at']); ?></div>
             <?php endforeach; endif; ?>
         </div>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($truncated > 0): ?>
+    <div class="alert alert-warning" role="status">
+        <i class="fa fa-scissors" aria-hidden="true"></i>
+        هذا العرضُ فيه <strong><?php echo intval($counts[$VIEW]); ?></strong> عنصرًا،
+        والمعروضُ هنا <strong><?php echo count($rows); ?></strong> فقط (سقفُ الصفحة <?php echo $ROW_CAP; ?>)
+        — <strong><?php echo $truncated; ?></strong> لا تظهر.
+        ضيِّقِ العرضَ بتابٍ أدقَّ حتى لا تُبنى قراءةٌ على قائمةٍ ناقصة.
     </div>
     <?php endif; ?>
 

@@ -161,13 +161,17 @@ class TicketRouter
                     ? "DATE_ADD(NOW(), INTERVAL " . intval($w['response_sla_minutes']) . " MINUTE)" : 'NULL';
                 $resolveDue = $isImmediate && $w['resolve_sla_minutes'] !== null
                     ? "DATE_ADD(NOW(), INTERVAL " . intval($w['resolve_sla_minutes']) . " MINUTE)" : 'NULL';
+                // company_id يُكتب هنا ولا يُترك لـDEFAULT: العمودُ فارغًا يجعل
+                // `TenantDb::scopedQuery()` تُسقط المسارَ صامتًا (قيدُ العزلِ
+                // `ws.company_id = ?` لا يطابق NULL)، فيختفي من صندوقِ الإدارة
+                // بلا رسالةِ خطأ — عيبٌ رُدم في 2027_07_23 ويُقفل جذرُه هنا.
                 $conn->query(
                     "INSERT INTO ticket_workstreams (tk_id, workstream_type, seq_no, org_unit_id, assignee_person_id,
-                        mandatory, state, activation_state, response_due_at, resolve_due_at)
+                        mandatory, state, activation_state, response_due_at, resolve_due_at, company_id)
                      VALUES ({$tkId}, '" . $conn->real_escape_string($w['workstream_type']) . "', " . intval($w['seq_no']) . ",
                         " . ($unitId !== null ? $unitId : 'NULL') . ", " . ($assignee !== null ? intval($assignee) : 'NULL') . ",
                         " . intval($w['mandatory']) . ", 'new', '" . ($isImmediate ? 'opened' : 'pending') . "',
-                        {$respDue}, {$resolveDue})");
+                        {$respDue}, {$resolveDue}, " . intval($co) . ")");
                 $wsId = intval($conn->insert_id);
                 if ($isImmediate) {
                     $out['routed'][] = array('ws_id' => $wsId, 'type' => $w['workstream_type'],

@@ -1949,3 +1949,34 @@ body.ems-site,
         .fin-inbox-badge-total { font-size: 16px; padding: 8px 14px; }
         .fin-inbox-owner { color: var(--c-s-888); }
         .fin-w100 { width: 100%; }
+
+/* ── بطاقةُ الموظف · Employees/employee_profile.php ─────────────────────────
+   ◆ ما بقي هنا **خاصٌّ بالشاشةِ وحدَها** — وبِنيةُ البطاقةِ نفسُها انتقلت إلى
+     `ems-profile.css` مكوّنًا مشتركًا مع بطاقةِ العميلِ وما يليها.
+   ◆ ولوحةُ ألوانِ الرسومِ رموزٌ لا قيمٌ مثبَّتةٌ في جافاسكربت: الرسمُ يقرأها
+     من CSS، فتغييرُ لونِ عمودٍ لا يمسُّ شيفرةً. */
+:root {
+    --eprof-bar-total:    var(--c-rgba37992350780, rgba(37, 99, 235, 0.78));
+    --eprof-bar-operator: var(--c-rgba1618512950780, rgba(16, 185, 129, 0.78));
+    --eprof-bar-standby:  var(--c-rgba245158110780, rgba(245, 158, 11, 0.78));
+    --eprof-slice-1: var(--c-1d4ed8, #1d4ed8);
+    --eprof-slice-2: var(--c-0ea5e9, #0ea5e9);
+    --eprof-slice-3: var(--c-22c55e, #22c55e);
+    --eprof-slice-4: var(--c-f59e0b, #f59e0b);
+    --eprof-slice-5: var(--c-ef4444, #ef4444);
+    --eprof-slice-6: var(--c-8b5cf6, #8b5cf6);
+    --eprof-slice-7: var(--c-14b8a6, #14b8a6);
+    --eprof-slice-8: var(--c-f97316, #f97316);
+    --eprof-slice-none:  var(--c-cbd5e1, #cbd5e1);
+    --eprof-line-hours:      var(--c-0f172a, #0f172a);
+    --eprof-line-hours-fill: var(--c-rgba1523420150, rgba(15, 23, 42, 0.15));
+    --eprof-line-shifts:      var(--c-e11d48, #e11d48);
+    --eprof-line-shifts-fill: var(--c-rgba22529720, rgba(225, 29, 72, 0.2));
+}
+
+/* زرُّ سحبِ الحساب: فعلٌ هادمٌ فلونُه أحمرُ صريحٌ لا لونُ الأزرارِ الافتراضيّ */
+.employee-profile-page .eprof-btn-revoke {
+    background: var(--c-c81f24, #c81f24);
+    border-color: var(--c-c81f24, #c81f24);
+}
+.employee-profile-page .eprof-flash { margin-bottom: 14px; font-weight: 700; }

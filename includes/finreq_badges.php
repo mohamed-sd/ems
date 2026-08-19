@@ -184,11 +184,22 @@ if (!function_exists('ems_nav_counter_dictionary')) {
     function ems_nav_counter_dictionary()
     {
         return array(
-            /* البلاغاتُ المتأخرةُ على إدارةِ المستخدم */
-            'dept_tickets_late' => function ($g) {
-                return (int) $g->count('tickets', array(
-                    'whereRaw' => "state IN ('open','in_progress') AND due_at IS NOT NULL AND due_at < NOW()",
-                    'params' => array(),
+            /* البلاغاتُ المتأخرةُ على إدارةِ المستخدم
+               ◆ كان يستعلم عن `state` و`due_at` من `tickets` — وهما عمودا
+                 `ticket_workstreams` لا الرؤوس (فيها `stage` و`resolution_due_at`).
+                 فالاستعلامُ يرمي «Unknown column» فيبتلعه الـcatch أعلاه، وتظهر
+                 الشارةُ **صفرًا دائمًا**: عطبٌ صامتٌ يُقرأ «لا تأخّر».
+               ◆ ولم يكن يرشِّح إدارةَ المستخدمِ أصلًا رغم اسمِه — فيعدُّ
+                 بلاغاتِ الشركةِ كلَّها. والعدُّ الآن على مسارِ وحدتِه هو،
+                 مطابقًا لتبويبِ «موجَّهة لإدارتي» الذي تحمله الشارة. */
+            'dept_tickets_late' => function ($g, $roleId = 0) {
+                require_once dirname(__DIR__) . '/Tickets/dept_inbox_map.php';
+                $unit = ems_dept_unit_of_role(intval($roleId));
+                if ($unit <= 0) { return 0; }
+                return (int) $g->count('ticket_workstreams', array(
+                    'whereRaw' => "org_unit_id = ? AND state NOT IN ('closed','admin_closed')
+                                   AND resolve_due_at IS NOT NULL AND resolve_due_at < NOW()",
+                    'params' => array($unit),
                 ));
             },
             /* أيامُ عملٍ تنتظر اعتمادَ سلسلةِ الساعات */
@@ -260,7 +271,10 @@ if (!function_exists('ems_nav_counter_badges')) {
                 $route = trim(strval($r['route']));
                 if ($key === '' || $route === '' || !isset($dict[$key])) { continue; }
                 if (!array_key_exists($key, $memo)) {
-                    try { $memo[$key] = (int) call_user_func($dict[$key], $g); }
+                    // الدورُ يُمرَّر ثانيًا: عدّادٌ «على إدارتي» يلزمه صاحبُ
+                    // الإدارة، و`$roleId` قد يخالف دورَ الجلسةِ عند الطلبِ
+                    // الصريح. والدوالُّ التي لا تعلنه تتجاهله (PHP يقبل الزائد).
+                    try { $memo[$key] = (int) call_user_func($dict[$key], $g, intval($role)); }
                     catch (\Throwable $t) {
                         ems_catch_ignored($t, __METHOD__, 'شارةٌ واحدةٌ تسقط ولا تُسقط الشجرة');
                         $memo[$key] = 0;

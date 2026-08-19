@@ -930,3 +930,162 @@
     font-size: 0.85rem;
     font-weight: 600;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * XF-01 — «البياناتُ الإضافية»: قسمُ «المزيد» داخلَ الفورم
+ * ───────────────────────────────────────────────────────────────────────────
+ * ◆ **القاعدةُ الحاكمة: لا لغةَ بصريةً جديدة.** هذا القسمُ يرث حرفيًّا لغةَ
+ *   «قسمِ الفورم» القائمةَ أعلاه في هذا الملفِّ نفسِه (`.form-section`):
+ *     · لوحٌ **أبيضُ** بحوافَ 25px وحشوةِ 10px — لا لونَ تنبيهٍ ولا خلفيةَ كريم.
+ *     · رأسٌ **حبّةٌ بيضاءُ** بحدٍّ `1px var(--c-999999)` وحوافَ 25px ووزنِ 800.
+ *     · أيقونتُه في **صندوقٍ مستديرٍ بحدّ** 30px — كأيقونةِ رأسِ القسم تمامًا.
+ *     · وحبّةُ العدِّ أقصى اليسار — موضعُ شارةِ الرقم `01` في الأقسامِ المرقَّمة.
+ *   فالنتيجةُ أن القسمَ **يبدو جزءًا من الفورمِ لا لافتةً مُلصقةً عليه**.
+ *
+ * ◆ **وإشارةُ التفاعلِ هي إشارةُ النظام**: الحقلُ هنا يتحوّل حدُّه إلى الذهبيِّ
+ *   عند التمرير (القاعدةُ 7 أعلاه)، فكذلك هذا الرأس. ولا يُخترع لونٌ لفعلٍ
+ *   له لونٌ متّفقٌ عليه سلفًا.
+ *
+ * ◆ **ولا وسمَ «اختياري» على كلِّ تسمية**: عرفُ النظامِ أن الإلزامَ يُعلَن بـ`*`
+ *   في التسمية — و«الهاتف» و«البريد» و«واتساب» في هذا النموذجِ نفسِه اختياريةٌ
+ *   بلا وسم. فتكرارُ الكلمةِ عشرَ مراتٍ ضجيجٌ يخالف العرفَ ولا يضيف معنًى.
+ *   تُقال **مرّةً واحدةً** في حبّةِ العدّ وسطرِ الإرشاد، وهذا أوضحُ وأهدأ.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── اللوحُ الخارجيّ — نسخةُ `.form-section` ───────────────────────────────── */
+:is(.allforms, .ems-form) .ems-xf-more {
+    margin: 14px 0 0 !important;
+    padding: 10px !important;
+    border-radius: 25px !important;
+    background: var(--c-surface) !important;
+    border: none !important;
+}
+
+/* ── الرأسُ — نسخةُ `.form-section > h6` ──────────────────────────────────── */
+:is(.allforms, .ems-form) .ems-xf-more-summary {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    background: var(--c-surface) !important;
+    border: 1px solid var(--c-999999) !important;
+    border-radius: 25px !important;
+    padding: 5px !important;
+    margin: 0 !important;
+    color: var(--c-ink-max) !important;
+    font-size: 1.05rem;
+    font-weight: 800;
+    cursor: pointer;
+    user-select: none;
+    list-style: none;
+    transition: border-color 0.18s ease;
+}
+:is(.allforms, .ems-form) .ems-xf-more-summary::-webkit-details-marker { display: none; }
+:is(.allforms, .ems-form) .ems-xf-more-summary::marker { content: ''; }
+
+/* التمرير والفتح: الحدُّ الذهبيُّ — إشارةُ التفاعلِ نفسُها التي للحقول */
+:is(.allforms, .ems-form) .ems-xf-more-summary:focus-visible {
+    outline: 2px solid var(--emsf-yellow);
+    outline-offset: 2px;
+}
+
+/* الأيقونةُ في صندوقٍ مستديرٍ بحدّ — كأيقونةِ رأسِ القسم */
+:is(.allforms, .ems-form) .ems-xf-more-icon {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 30px !important;
+    height: 30px !important;
+    flex: 0 0 auto;
+    border: 1px solid var(--c-999999) !important;
+    border-radius: 20px !important;
+    color: var(--c-ink-max) !important;
+    font-size: 0.9rem !important;
+    transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+:is(.allforms, .ems-form) .ems-xf-more-title { flex: 0 1 auto; }
+
+/* حبّةُ العدِّ أقصى اليسار — موضعُ شارةِ الرقمِ وشكلُها */
+:is(.allforms, .ems-form) .ems-xf-more-count {
+    margin-right: auto;                     /* RTL: تدفعها إلى أقصى اليسار */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--c-999999);
+    border-radius: 20px;
+    padding: 5px 12px;
+    line-height: 1;
+    background: var(--c-surface);
+    color: var(--c-ink-600);
+    font-size: 0.72rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+:is(.allforms, .ems-form) .ems-xf-more-chevron {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    flex: 0 0 auto;
+    color: var(--c-ink-500);
+    font-size: 0.8rem;
+    transition: transform 0.2s ease;
+}
+
+/* ── الجسم ───────────────────────────────────────────────────────────────── */
+:is(.allforms, .ems-form) .ems-xf-more-body {
+    padding: 4px 2px 0;
+}
+
+/* سطرُ الإرشاد — يقولها مرّةً واحدةً بلونِ النصِّ الخافتِ لا بلونِ تنبيه */
+:is(.allforms, .ems-form) .ems-xf-more-hint {
+    margin: 10px 4px 2px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--c-ink-500);
+}
+:is(.allforms, .ems-form) .ems-xf-more-hint i { color: var(--emsf-yellow); }
+
+/* ◆ الحقلُ العريض: `.form-grid > *` يفرض `flex-basis` بـ`!important`،
+     فالتمدّدُ لا يقع إلا بأولويةٍ مثلِها. */
+:is(.allforms, .ems-form) .form-grid > .ems-xf-wide {
+    flex-basis: 100% !important;
+    flex-grow: 1 !important;
+}
+
+/* ── خلايا الأعمدةِ الإضافيةِ في الجدول ─────────────────────────────────────
+     الفارغُ يرث مظهرَ الفراغِ المركزيَّ (`.ems-gov-empty` في ems-tables.css)،
+     فلا يُميَّز فراغُ حقلٍ اختياريٍّ عن فراغِ الحوكمة. */
+body.ems-site table td.ems-xf-cell { white-space: nowrap; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ملاحظةٌ عن نافذةِ التفاصيل — **بلا سطرِ CSS واحد**
+ * ───────────────────────────────────────────────────────────────────────────
+ * قسمُ «بيانات إضافية» في `EmsDetailsModal` يُبنى بأصنافِ النافذةِ نفسِها
+ * (`.ems-dmodal__grid` · `.ems-dcard` · `.ems-dcard__head` · `.ems-dcard__value`)
+ * المعرَّفةِ في `ems.main.all.style.css`. فهو **يطابق بقيةَ بطاقاتِ التفاصيلِ
+ * تلقائيًّا**، وأيُّ تغييرٍ في سمةِ النافذةِ لاحقًا يسري عليه بلا لمسِه.
+ * وقاعدةٌ خاصةٌ به كانت ستفرّقه عنها عند أوّلِ تعديل.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── حالاتُ الرأس (تمريرٌ · مفتوح) — تُكتب بعدَ قواعدِ الأساس ─────────────────
+   ◆ الترتيبُ عرفٌ لا ضرورة: تخصيصُ هاتين أعلى فتغلبان حيثما وُضعتا، لكنَّ جمعَ
+     الحالاتِ في ذيلِ القسمِ يجعل قراءةَ «ما الأساسُ وما الحالة» فورية.
+   ◆ واللونُ ليس جديدًا: الحدُّ الذهبيُّ هو **إشارةُ التفاعلِ نفسُها** التي
+     يستعملها كلُّ حقلٍ هنا عند التمرير (القاعدة ٧ أعلاه). */
+:is(.allforms, .ems-form) .ems-xf-more-summary:hover,
+:is(.allforms, .ems-form) .ems-xf-more[open] .ems-xf-more-summary {
+    border-color: var(--emsf-yellow) !important;
+}
+:is(.allforms, .ems-form) .ems-xf-more[open] .ems-xf-more-icon {
+    background: var(--emsf-yellow) !important;
+    border-color: var(--emsf-yellow) !important;
+    color: var(--c-ink-900) !important;
+}
+:is(.allforms, .ems-form) .ems-xf-more[open] .ems-xf-more-chevron {
+    transform: rotate(180deg);
+}

@@ -182,9 +182,19 @@ class BreakGlassService
         $id = $ok ? intval($conn->insert_id) : 0;
         $stmt->close();
         // مسار حوكمة واحد — فكل بلاغ في النموذج الجديد له رأس ومسار (TKT-04)
+        // ◆ `org_unit_id` و`company_id` يُكتبان هنا ولا يُتركان فارغَين: المسارُ
+        //   بلا وحدةٍ لا يصل صندوقَ أيِّ إدارة، وبلا كيانٍ تُسقطه بوابةُ العزل
+        //   صامتةً. وكسرُ الزجاجِ أولى ما يجب أن يصل الحوكمةَ لا أن يختفي.
         if ($id > 0) {
-            $conn->query("INSERT INTO ticket_workstreams (tk_id, workstream_type, seq_no, mandatory, state, activation_state)
-                          VALUES ({$id}, 'governance', 1, 1, 'new', 'opened')");
+            $unitRow = $conn->query("SELECT unit_id FROM org_units
+                                      WHERE company_id = " . intval($co) . " AND unit_code = 'governance'
+                                      LIMIT 1");
+            $unitRow = $unitRow ? $unitRow->fetch_assoc() : null;
+            $unitSql = $unitRow ? intval($unitRow['unit_id']) : 'NULL';
+            $conn->query("INSERT INTO ticket_workstreams
+                            (tk_id, workstream_type, seq_no, org_unit_id, mandatory, state,
+                             activation_state, company_id)
+                          VALUES ({$id}, 'governance', 1, {$unitSql}, 1, 'new', 'opened', " . intval($co) . ")");
         }
         return $id;
     }

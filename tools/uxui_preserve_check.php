@@ -67,6 +67,26 @@ while ($res && ($x = mysqli_fetch_assoc($res))) {
     $canon[strtolower(trim($x['route']))] = array('canon' => trim($x['canonical_ar']), 'old' => $olds);
 }
 
+/* ── الدمجُ المُعلَن: مسارٌ ذاب في آخرَ ليس فقدًا — بشرطَين مقيسَين ─────────
+   ◆ **الثغرةُ التي يسدُّها** — وقعت فعلًا: `Tickets/dept_inbox.php` دُمج تبويبًا
+     في `Tickets/tickets_list.php?tab=dept` (هجرة 2027_07_24)، فاختفى ملفُّه من
+     سايدبارِ سبعةَ عشرَ دورًا. وقاعدةُ هذه الأداةِ «ملفٌّ اختفى من الدور = فقدٌ
+     صريح» لا تعرف الدمجَ فرسّبت التسليمَ — والوصولُ لم ينقص حرفًا: كلُّ دورٍ
+     منها يحمل التبويبَ الوارثَ في المكانِ نفسِه.
+   ◆ **ولا يُفتح البابُ على مصراعَيه**: الدمجُ يُقبل بشرطَين معًا —
+     ① أن يكون **مُعلَنًا في القاعدة** (`nav_redirects` النشط: قديم ⇐ جديد)،
+     ② وأن يكون **الوارثُ حاضرًا فعلًا في سايدبارِ الدورِ نفسِه** وقتَ القياس.
+     فالإعلانُ وحدَه لا يكفي — والغيابُ الفعليُّ يبقى فقدًا يُرسِّب.
+   ◆ فالقاعدةُ تصير: «لا يُحذف رابطٌ **إلا إلى وارثٍ مُعلَنٍ حاضر»، وهي القاعدةُ
+     نفسُها لا تخفيفٌ لها. */
+$mergeInto = array();   // old_file_lc => new_file_lc
+$rr = @mysqli_query($conn, "SELECT old_route, new_route FROM nav_redirects WHERE active = 1");
+while ($rr && ($x = mysqli_fetch_assoc($rr))) {
+    $of = strtolower(preg_replace('/[?#].*$/u', '', preg_replace('~^(\.\./)+~', '', trim($x['old_route']))));
+    $nf = strtolower(preg_replace('/[?#].*$/u', '', preg_replace('~^(\.\./)+~', '', trim($x['new_route']))));
+    if ($of !== '' && $nf !== '' && $of !== $nf) { $mergeInto[$of] = $nf; }
+}
+
 /** هويةُ البند: (الملفُّ الأمُّ صغيرًا) + الاسمُ المعروض */
 function upc_key($href, $label)
 {
@@ -87,7 +107,7 @@ foreach ($lines as $l) {
 }
 
 /* ── الحاضرُ: التصييرُ الحيُّ نفسُه ── */
-$fails = 0; $totPre = 0; $totNow = 0; $renamed = 0; $merged = 0; $resurfaced = 0;
+$fails = 0; $totPre = 0; $totNow = 0; $renamed = 0; $merged = 0; $resurfaced = 0; $absorbed = 0;
 echo "════ مصفوفةُ الحفظِ — بنودُ السايدبارِ الظاهرةُ قبلًا وبعدًا ════\n";
 foreach (uxp_root_roles() as $rid) {
     if (isset($archivedRoles[$rid])) {
@@ -108,9 +128,15 @@ foreach (uxp_root_roles() as $rid) {
     $preF = array(); $nowF = array();
     foreach ($p as $k => $c)   { list($f, $l) = explode('||', $k, 2); $preF[$f]['labels'][$l] = ($preF[$f]['labels'][$l] ?? 0) + $c; $preF[$f]['n'] = ($preF[$f]['n'] ?? 0) + $c; }
     foreach ($now as $k => $c) { list($f, $l) = explode('||', $k, 2); $nowF[$f]['labels'][$l] = ($nowF[$f]['labels'][$l] ?? 0) + $c; $nowF[$f]['n'] = ($nowF[$f]['n'] ?? 0) + $c; }
-    $missing = array(); $renamedHere = 0; $mergedHere = 0;
+    $missing = array(); $renamedHere = 0; $mergedHere = 0; $absorbedHere = 0;
     foreach ($preF as $f => $P) {
-        if (!isset($nowF[$f])) { $missing[] = 'الملفُّ كلُّه: ' . $f; continue; }          /* ملفٌّ اختفى من الدور = فقدٌ صريح */
+        /* ملفٌّ اختفى من الدور = فقدٌ صريح — إلا أن يكون **ذاب في وارثٍ مُعلَنٍ
+           حاضرٍ في الدورِ نفسِه**: الإعلانُ من nav_redirects والحضورُ مقيسٌ الآن. */
+        if (!isset($nowF[$f]) && isset($mergeInto[$f]) && isset($nowF[$mergeInto[$f]])) {
+            $absorbedHere += $P['n'];
+            continue;
+        }
+        if (!isset($nowF[$f])) { $missing[] = 'الملفُّ كلُّه: ' . $f; continue; }
         $N = $nowF[$f];
         $canonName = isset($canon[$f]) ? $canon[$f]['canon'] : null;
         foreach ($P['labels'] as $l => $c) {
@@ -132,15 +158,17 @@ foreach (uxp_root_roles() as $rid) {
         }
     }
     $renamed += $renamedHere; $merged += $mergedHere; $resurfaced += count($added);
+    $absorbed += $absorbedHere;
     $ok = empty($missing);
     if (!$ok) { $fails++; }
     echo ($ok ? '  ✔' : '  ✗') . " دور {$rid}: قبل={$cntPre} · بعد={$cntNow}"
+        . ($absorbedHere ? " · ذاب في وارثٍ مُعلَنٍ حاضر={$absorbedHere}" : '')
         . ($renamedHere ? " · أُعيدت تسميتُه بالسجل={$renamedHere}" : '')
         . ($mergedHere ? " · توأمٌ مندمجٌ باسمٍ واحد={$mergedHere}" : '')
         . ($missing ? ' · ناقص: ' . implode(' ، ', array_slice($missing, 0, 6)) : '')
         . ($added ? ' · جديدُ الظهور: ' . implode(' ، ', array_slice($added, 0, 4)) : '') . "\n";
 }
-echo "الإجمالي: قبل={$totPre} · بعد={$totNow} · أُعيدت تسميتُه بالسجل={$renamed} · توأمٌ مندمج={$merged} · جديدُ الظهور={$resurfaced}\n";
+echo "الإجمالي: قبل={$totPre} · بعد={$totNow} · أُعيدت تسميتُه بالسجل={$renamed} · ذاب في وارثٍ مُعلَن={$absorbed} · توأمٌ مندمج={$merged} · جديدُ الظهور={$resurfaced}\n";
 if ($fails === 0) { echo "✔ صفرُ فقدٍ غيرِ مصرَّح — كلُّ بندٍ قبليٍّ موجودٌ بهويتِه أو باسمِه المعياريِّ المسجَّل\n"; exit(0); }
 echo "✗ {$fails} دورًا فيه نقصٌ غيرُ مصرَّح — " . ($GATE ? 'التسليمُ مرسَّب' : 'راجِع قبل أيِّ تسليم') . "\n";
 exit($GATE ? 1 : 0);

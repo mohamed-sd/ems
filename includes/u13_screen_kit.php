@@ -181,6 +181,13 @@ if (count($u13Sibs) > 1) {
     $u13Host = null;
     foreach ($u13Sibs as $code => $e) { $u13Host = $code; break; }   /* الأولى مضيفة */
     $u13Self = isset($U13['screen']) ? $U13['screen'] : '';
+    /* ◆ العُدّةُ تملك `?view=` — رمزُه **رمزُ أختٍ** لا رمزُ سجلِّ المناظر. وهي
+         مطلوبةٌ في 18 سطحًا قبلَ `page_header.php`، فإعلانٌ واحدٌ هنا يغطّيها
+         جميعًا. ولولاه لَنقض المُخنِقُ تحويلَ العُدّةِ نفسِه: تُحوِّل إلى
+         `host.php?view=sibling` فيُنزع المعاملُ فورًا وتُفتح المضيفةُ عاريةً. */
+    require_once $u13Root . '/includes/nav_views.php';
+    ems_nav_view_claim();
+
     $u13View = isset($_GET['view']) ? preg_replace('~[^a-z0-9_]~i', '', (string) $_GET['view']) : '';
 
     /* أختٌ فُتحت مباشرةً ⇒ تُحوَّل إلى المضيفةِ منظرًا */

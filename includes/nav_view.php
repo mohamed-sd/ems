@@ -48,6 +48,13 @@ function ems_nav_view_resolve()
     $code = isset($_GET['view']) ? trim((string) $_GET['view']) : '';
     if ($code === '') { return null; }
 
+    /* ◆ صاحبُ المعاملِ أولى به — والمُخنِقُ يتنحّى لا يحكم.
+         شاشةٌ أعلنت ملكيتَها (`ems_nav_view_claim` قبلَ `page_header.php`)
+         تتولّى الرمزَ بنفسِها، فلا يُقاس رمزُها بسجلٍّ ليس سجلَّه ولا يُردُّ
+         زائرُها. وبدونِ هذا كانت تاباتُ «مهامي» العشرُ تُصيَّر ولا تفتح —
+         الشرحُ الكاملُ والقياسُ في ذيلِ `nav_views.php`. */
+    if (ems_nav_view_claimed()) { return null; }
+
     $file = ems_nav_view_script();
     $decl = ems_nav_view_declared($file, $code);
 

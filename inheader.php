@@ -79,6 +79,10 @@ if (!function_exists('ems_css_ver')) {
     <link rel="stylesheet" href="/ems/assets/css/ems-screens.css<?php echo ems_css_ver('ems-screens.css'); ?>">
     <!-- شاشةُ التذكرة — مكوّناتُها مُنطاقةٌ تحت .tkt-form-main فلا تتسرّب لغيرها -->
     <link rel="stylesheet" href="/ems/assets/css/ems-ticket.css<?php echo ems_css_ver('ems-ticket.css'); ?>">
+    <!-- بطاقاتُ الكيانات (عميل · موظف · مشروع · مورِّد · معدّة) — مصدرٌ واحدٌ
+         لتصميمِها كلِّها، مُنطاقٌ تحت .ems-profile فلا يتسرّب لشاشةٍ أخرى.
+         يُحمَّل بعد ems-screens.css فيغلب أيَّ بقيةٍ صفحيةٍ لم تُرحَّل بعدُ. -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-profile.css<?php echo ems_css_ver('ems-profile.css'); ?>">
     <!-- INJ-0378 · INJ-0548: صندوقُ الإرسالِ دونَ اتصالٍ وعاملُ الخدمة —
          الطابورُ يعمل على النماذجِ الموسومةِ صراحةً وحدَها، والعاملُ يخزّن
          الأصولَ الساكنةَ لا صفحاتِ PHP (صفحةٌ محفوظةٌ ببياناتٍ قديمةٍ أخطرُ

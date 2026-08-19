@@ -269,48 +269,24 @@ ems_shell_axes(null);
 include("../inheader.php");
 include("../insidebar.php");
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
+/* ── عُدّةُ بطاقةِ الكِيان — المصدرُ نفسُه الذي تستعمله بطاقةُ العميل ─────────
+   وكانت بِنيةُ هذه الشاشةِ ٣٢٠ سطرًا مُنطاقةً بـ`.driver-profile-page` في
+   `ems.main.all.style.css`: لغةٌ بصريةٌ ثانيةٌ تقول ما تقوله الأولى بمفرداتٍ
+   أخرى. أُسقطت، وصارت الشاشتانِ مكوّنًا واحدًا. */
+require_once __DIR__ . '/../includes/profile_kit.php';
 ?>
 
 <script src="/ems/assets/vendor/chartjs/chart.umd.min.js"></script>
-<style>
-/* UXW-01 ②: أنماطٌ موضعيةٌ نُقلت أصنافًا صفحيةً ببادئةِ الشاشة eprof- */
-.eprof-flash { margin-bottom: 14px; font-weight: 700; }
-.eprof-acct-actions { margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap; }
-.eprof-inline-form { display: inline; margin: 0; }
-.eprof-btn-revoke { background: var(--c-c81f24, #c81f24); border-color: var(--c-c81f24, #c81f24); }
-.eprof-acct-create { margin-top: 12px; }
 
-/* UXW-01 ①: لوحةُ ألوانِ الرسومِ صارت رموزًا تُقرأ من CSS لا قيمًا مثبَّتةً في
-   جافاسكربت — والاحتياطيُّ الحرفيُّ يضمن صفرَ تغييرٍ مرئيّ. */
-:root {
-    --eprof-bar-total:    var(--c-rgba37992350780, rgba(37, 99, 235, 0.78));
-    --eprof-bar-operator: var(--c-rgba1618512950780, rgba(16, 185, 129, 0.78));
-    --eprof-bar-standby:  var(--c-rgba245158110780, rgba(245, 158, 11, 0.78));
-    --eprof-slice-1: var(--c-1d4ed8, #1d4ed8);
-    --eprof-slice-2: var(--c-0ea5e9, #0ea5e9);
-    --eprof-slice-3: var(--c-22c55e, #22c55e);
-    --eprof-slice-4: var(--c-f59e0b, #f59e0b);
-    --eprof-slice-5: var(--c-ef4444, #ef4444);
-    --eprof-slice-6: var(--c-8b5cf6, #8b5cf6);
-    --eprof-slice-7: var(--c-14b8a6, #14b8a6);
-    --eprof-slice-8: var(--c-f97316, #f97316);
-    --eprof-slice-none:  var(--c-cbd5e1, #cbd5e1);
-    --eprof-line-hours:      var(--c-0f172a, #0f172a);
-    --eprof-line-hours-fill: var(--c-rgba1523420150, rgba(15, 23, 42, 0.15));
-    --eprof-line-shifts:      var(--c-e11d48, #e11d48);
-    --eprof-line-shifts-fill: var(--c-rgba22529720, rgba(225, 29, 72, 0.2));
-}
-</style>
-
-<div class="main driver-profile-page ems-unified-page-shell">
+<div class="main employee-profile-page ems-profile ems-unified-page-shell">
 
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)
     $header_title   = 'بطاقة وبيانات السائق التفصيلية';
     $header_icon    = 'fas fa-id-card-alt';
     $header_actions = array(
-        array('href' => 'employee_contracts.php?id=' . intval($employee_id), 'class' => 'add-btn driver-profile-link-btn', 'icon' => 'fas fa-file-contract', 'label' => 'عقود السائق'),
-        array('href' => 'employee_equipment_history.php?id=' . intval($employee_id), 'class' => 'add-btn driver-profile-link-btn', 'icon' => 'fas fa-history', 'label' => 'سجل حركة الآليات'),
+        array('href' => 'employee_contracts.php?id=' . intval($employee_id), 'class' => 'add-btn', 'icon' => 'fas fa-file-contract', 'label' => 'عقود السائق'),
+        array('href' => 'employee_equipment_history.php?id=' . intval($employee_id), 'class' => 'add-btn', 'icon' => 'fas fa-history', 'label' => 'سجل حركة الآليات'),
     );
     $header_back = array('href' => 'employees.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
@@ -324,113 +300,81 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     <?php endif; ?>
 
-    <div class="identity-card">
-        <div class="id-grid">
-            <div class="photo-box">
-                <?php if (!empty($driver['employee_photo'])): ?>
-                    <img src="<?php echo htmlspecialchars($driver['employee_photo']); ?>" alt="صورة السائق">
-                <?php else: ?>
-                    <div class="photo-placeholder">
-                        <i class="fas fa-user-circle"></i>
-                        صورة السائق
-                        <div class="driver-profile-photo-note">قيد التفعيل</div>
-                    </div>
-                <?php endif; ?>
-            </div>
-            <div>
-                <div class="id-head">
-                    <h2><?php echo htmlspecialchars($driver['name']); ?></h2>
-                    <span
-                        class="driver-badge <?php echo $driver_status_class; ?>"><?php echo htmlspecialchars($driver_status_text); ?></span>
-                </div>
-                <div class="driver-profile-id-note">بطاقة تعريف الموظف داخل النظام</div>
-                <div class="id-meta">
-                    <div class="item">
-                        <div class="label">نوع الموظف</div>
-                        <div class="value">
-                            <?php echo htmlspecialchars(!empty($driver['employee_type']) ? $driver['employee_type'] : 'سائق/مشغّل'); ?>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="label">كود الموظف</div>
-                        <div class="value">
-                            <?php echo htmlspecialchars($driver['employee_code'] ? $driver['employee_code'] : 'غير محدد'); ?>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="label">رقم الهاتف</div>
-                        <div class="value"><?php echo htmlspecialchars($driver['phone'] ? $driver['phone'] : '-'); ?>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="label">نوع الهوية / رقمها</div>
-                        <div class="value">
-                            <?php echo htmlspecialchars(($driver['identity_type'] ? $driver['identity_type'] : '-') . ' / ' . ($driver['identity_number'] ? $driver['identity_number'] : '-')); ?>
-                        </div>
-                    </div>
-                    <?php
-                    $__pf = function ($k) use ($driver) {
-                        return htmlspecialchars((isset($driver[$k]) && $driver[$k] !== '' && $driver[$k] !== null) ? $driver[$k] : '-');
-                    };
-                    ?>
-                    <div class="item"><div class="label">الجنسية</div><div class="value"><?php echo $__pf('nationality'); ?></div></div>
-                    <div class="item"><div class="label">تاريخ الميلاد</div><div class="value"><?php echo $__pf('birth_date'); ?></div></div>
-                    <div class="item"><div class="label">فصيلة الدم</div><div class="value"><?php echo $__pf('blood_type'); ?></div></div>
-                    <div class="item"><div class="label">واتساب</div><div class="value"><?php echo $__pf('whatsapp'); ?></div></div>
-                    <div class="item"><div class="label">جهة الطوارئ</div><div class="value"><?php echo htmlspecialchars(trim(((isset($driver['emergency_contact_name']) ? $driver['emergency_contact_name'] : '') . ' ' . (isset($driver['emergency_contact_phone']) ? $driver['emergency_contact_phone'] : ''))) ?: '-'); ?></div></div>
-                    <div class="item">
-                        <div class="label">المورد</div>
-                        <div class="value">
-                            <?php echo htmlspecialchars($driver['supplier_name'] ? $driver['supplier_name'] : '-'); ?>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="label">مستوى الكفاءة</div>
-                        <div class="value">
-                            <?php echo htmlspecialchars($driver['skill_level'] ? $driver['skill_level'] : 'غير محدد'); ?>
-                        </div>
-                    </div>
-                    <div class="item">
-                        <div class="label">تاريخ بداية العمل</div>
-                        <div class="value">
-                            <?php echo htmlspecialchars($driver['start_date'] ? $driver['start_date'] : '-'); ?></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php
+    /* ══ لوحُ الهوية ═══════════════════════════════════════════════════════
+       نفسُ مكوّنِ بطاقةِ العميلِ حرفًا (`ems_profile_hero`) — فالبطاقتانِ لا
+       تتشابهان بالمصادفةِ بل لأنهما **المكوّنُ نفسُه**، وأيُّ تحسينٍ يقع على
+       إحداهما يقع على الأخرى وعلى ما يأتي بعدَهما بلا نسخ. */
+    $ep_facts = array();
+    $ep_pf = function ($k) use ($driver) {
+        return (isset($driver[$k]) && $driver[$k] !== '' && $driver[$k] !== null) ? $driver[$k] : '';
+    };
+    $ep_facts[] = array('label' => 'نوع الهوية / رقمها',
+        'value' => trim(($ep_pf('identity_type') ?: '—') . ' / ' . ($ep_pf('identity_number') ?: '—')));
+    $ep_facts[] = array('label' => 'رقم الهاتف',        'value' => $ep_pf('phone'));
+    $ep_facts[] = array('label' => 'واتساب',            'value' => $ep_pf('whatsapp'));
+    $ep_facts[] = array('label' => 'الجنسية',           'value' => $ep_pf('nationality'));
+    $ep_facts[] = array('label' => 'تاريخ الميلاد',     'value' => $ep_pf('birth_date'));
+    $ep_facts[] = array('label' => 'فصيلة الدم',        'value' => $ep_pf('blood_type'));
+    /* جهةُ الطوارئ اسمٌ ورقمٌ في حقلَين — يُدمجان سطرًا واحدًا، والفارغُ يُعلَن */
+    $ep_facts[] = array('label' => 'جهة الطوارئ',
+        'value' => trim($ep_pf('emergency_contact_name') . ' ' . $ep_pf('emergency_contact_phone')));
+    $ep_facts[] = array('label' => 'المورد',            'value' => $ep_pf('supplier_name'));
+    $ep_facts[] = array('label' => 'مستوى الكفاءة',     'value' => $ep_pf('skill_level'));
+    $ep_facts[] = array('label' => 'تاريخ بداية العمل', 'value' => $ep_pf('start_date'));
+
+    $ep_active = ($driver_status_class === 'active');
+    echo ems_profile_hero(array(
+        'name'   => $driver['name'],
+        'photo'  => !empty($driver['employee_photo']) ? $driver['employee_photo'] : '',
+        'alt'    => 'صورة الموظف ' . $driver['name'],
+        'icon'   => 'fas fa-user-tie',
+        'note'   => 'بطاقة تعريف الموظف داخل النظام',
+        'status' => array(
+            'text' => $driver_status_text,
+            'tone' => $ep_active ? 'ok' : 'danger',
+            'icon' => $ep_active ? 'fas fa-circle-check' : 'fas fa-circle-minus',
+        ),
+        'chips'  => array(
+            array('text' => $ep_pf('employee_code'), 'icon' => 'fas fa-hashtag', 'mono' => true),
+            array('text' => $ep_pf('employee_type') ?: 'سائق/مشغّل', 'icon' => 'fas fa-user-gear'),
+            array('text' => $ep_pf('nickname'), 'icon' => 'fas fa-quote-right'),
+        ),
+        'facts'  => $ep_facts,
+    ));
+    ?>
 
     <?php if ($users_has_employee_link): ?>
-    <div class="section-card">
-        <div class="section-head">
-            <h3 class="section-title"><i class="fas fa-user-shield"></i> حساب الدخول للنظام</h3>
+    <section class="ems-profile__section">
+        <div class="ems-profile__section-head">
+            <h3 class="ems-profile__section-title"><i class="fas fa-user-shield"></i> حساب الدخول للنظام</h3>
         </div>
-        <div class="section-body">
+        <div class="ems-profile__section-body">
             <?php if ($linked_user): ?>
                 <?php
                 $acc_active = in_array(strtolower(trim((string) $linked_user['status'])), array('1', 'active', 'true', 'نشط'), true);
                 $acc_role_name = isset($roles_map[(string) $linked_user['role']]) ? $roles_map[(string) $linked_user['role']] : ('دور #' . $linked_user['role']);
                 ?>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <div class="label">اسم المستخدم</div>
-                        <div class="value"><?php echo htmlspecialchars($linked_user['username']); ?></div>
+                <div class="ems-profile__facts ems-profile__facts--wide">
+                    <div class="ems-profile__fact">
+                        <span class="ems-profile__fact-label">اسم المستخدم</span>
+                        <span class="ems-profile__fact-value"><?php echo htmlspecialchars($linked_user['username']); ?></span>
                     </div>
-                    <div class="info-item">
-                        <div class="label">الدور / الصلاحية</div>
-                        <div class="value"><?php echo htmlspecialchars($acc_role_name); ?></div>
+                    <div class="ems-profile__fact">
+                        <span class="ems-profile__fact-label">الدور / الصلاحية</span>
+                        <span class="ems-profile__fact-value"><?php echo htmlspecialchars($acc_role_name); ?></span>
                     </div>
-                    <div class="info-item">
-                        <div class="label">حالة الحساب</div>
-                        <div class="value">
-                            <span class="assignment-status <?php echo $acc_active ? 'active' : 'old'; ?>">
+                    <div class="ems-profile__fact">
+                        <span class="ems-profile__fact-label">حالة الحساب</span>
+                        <span class="ems-profile__fact-value">
+                            <span class="ems-profile__pill ems-profile__pill--<?php echo $acc_active ? 'ok' : 'neutral'; ?>">
                                 <?php echo $acc_active ? 'نشط' : 'موقوف'; ?>
                             </span>
-                        </div>
+                        </span>
                     </div>
                 </div>
                 <?php if ($can_manage_accounts): ?>
-                    <div class="eprof-acct-actions">
+                    <div class="ems-profile__actions">
                         <a href="../main/users.php?employee_id=<?php echo intval($employee_id); ?>" class="add-btn">
                             <i class="fas fa-user-gear"></i> إدارة الحساب / تغيير الدور
                         </a>
@@ -448,7 +392,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <?php else: ?>
                 <div class="alert alert-warning mb-0">لا يملك هذا الموظف حساب دخول للنظام حالياً.</div>
                 <?php if ($can_manage_accounts): ?>
-                    <div class="eprof-acct-create">
+                    <div class="ems-profile__actions">
                         <a href="../main/users.php?employee_id=<?php echo intval($employee_id); ?>" class="add-btn">
                             <i class="fas fa-user-plus"></i> إنشاء حساب لهذا الموظف
                         </a>
@@ -456,227 +400,216 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 <?php endif; ?>
             <?php endif; ?>
         </div>
-    </div>
+    </section>
     <?php endif; ?>
 
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-label">إجمالي ساعات التنفيذ</div>
-            <div class="stat-value">
-                <?php echo number_format(floatval(isset($stats['total_operator_hours']) ? $stats['total_operator_hours'] : 0), 2); ?>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">ساعات الاستعداد</div>
-            <div class="stat-value">
-                <?php echo number_format(floatval(isset($stats['total_standby_hours']) ? $stats['total_standby_hours'] : 0), 2); ?>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">مرات التشغيل (عدد الورديات)</div>
-            <div class="stat-value"><?php echo intval(isset($stats['shifts_count']) ? $stats['shifts_count'] : 0); ?>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">عدد الآليات التي عمل عليها</div>
-            <div class="stat-value"><?php echo intval($equipments_count_row['equipments_count']); ?></div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">عدد المشاريع التي عمل بها</div>
-            <div class="stat-value"><?php echo intval($projects_row['projects_count']); ?></div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">عدد العمليات المختلفة</div>
-            <div class="stat-value">
-                <?php echo intval(isset($stats['operations_count']) ? $stats['operations_count'] : 0); ?></div>
-        </div>
-    </div>
+    <?php
+    /* شريطُ المؤشرات — نفسُ مكوّنِ بطاقةِ العميل: القيمةُ فوقَ عنوانِها،
+       والوحدةُ لاحقةٌ أصغرُ فلا يُقرأ «١٢٤ ساعة» رقمًا واحدًا طويلًا. */
+    $ep_op_hours = floatval(isset($stats['total_operator_hours']) ? $stats['total_operator_hours'] : 0);
+    $ep_sb_hours = floatval(isset($stats['total_standby_hours']) ? $stats['total_standby_hours'] : 0);
+    echo ems_profile_stats(array(
+        array('value' => number_format($ep_op_hours, 2), 'unit' => 'ساعة',
+              'label' => 'إجمالي ساعات التنفيذ', 'tone' => $ep_op_hours > 0 ? 'ok' : 'muted'),
+        /* ساعةُ استعدادٍ ليست ساعةَ تنفيذ — تُعرض على حِدةٍ ولا تُجمع معها */
+        array('value' => number_format($ep_sb_hours, 2), 'unit' => 'ساعة',
+              'label' => 'ساعات الاستعداد', 'tone' => $ep_sb_hours > 0 ? 'warn' : 'muted'),
+        array('value' => intval(isset($stats['shifts_count']) ? $stats['shifts_count'] : 0),
+              'label' => 'مرات التشغيل (عدد الورديات)', 'unit' => 'وردية'),
+        array('value' => intval($equipments_count_row['equipments_count']),
+              'label' => 'عدد الآليات التي عمل عليها'),
+        array('value' => intval($projects_row['projects_count']),
+              'label' => 'عدد المشاريع التي عمل بها'),
+        array('value' => intval(isset($stats['operations_count']) ? $stats['operations_count'] : 0),
+              'label' => 'عدد العمليات المختلفة'),
+    ));
+    ?>
 
-    <div class="section-card">
-        <div class="section-head">
-            <h3 class="section-title"><i class="fas fa-trophy"></i> أفضل آلية حقق عليها السائق أعلى ساعات</h3>
+    <section class="ems-profile__section">
+        <div class="ems-profile__section-head">
+            <h3 class="ems-profile__section-title"><i class="fas fa-trophy"></i> أفضل آلية حقق عليها السائق أعلى ساعات</h3>
         </div>
-        <div class="section-body">
+        <div class="ems-profile__section-body">
             <?php if ($top_equipment): ?>
-                <div class="info-grid">
-                    <div class="info-item">
-                        <div class="label">الآلية</div>
-                        <div class="value">
-                            <?php echo htmlspecialchars($top_equipment['name'] ? $top_equipment['name'] : '-'); ?></div>
+                <div class="ems-profile__facts ems-profile__facts--wide">
+                    <div class="ems-profile__fact">
+                        <span class="ems-profile__fact-label">الآلية</span>
+                        <span class="ems-profile__fact-value">
+                            <?php echo htmlspecialchars($top_equipment['name'] ? $top_equipment['name'] : '-'); ?></span>
                     </div>
-                    <div class="info-item">
-                        <div class="label">كود الآلية</div>
-                        <div class="value">
-                            <?php echo htmlspecialchars($top_equipment['code'] ? $top_equipment['code'] : '-'); ?></div>
+                    <div class="ems-profile__fact">
+                        <span class="ems-profile__fact-label">كود الآلية</span>
+                        <span class="ems-profile__fact-value">
+                            <?php echo htmlspecialchars($top_equipment['code'] ? $top_equipment['code'] : '-'); ?></span>
                     </div>
-                    <div class="info-item">
-                        <div class="label">إجمالي الساعات عليها</div>
-                        <div class="value"><?php echo number_format(floatval($top_equipment['total_hours']), 2); ?></div>
+                    <div class="ems-profile__fact">
+                        <span class="ems-profile__fact-label">إجمالي الساعات عليها</span>
+                        <span class="ems-profile__fact-value"><?php echo number_format(floatval($top_equipment['total_hours']), 2); ?></span>
                     </div>
-                    <div class="info-item">
-                        <div class="label">عدد مرات التشغيل عليها</div>
-                        <div class="value"><?php echo intval($top_equipment['times_used']); ?></div>
+                    <div class="ems-profile__fact">
+                        <span class="ems-profile__fact-label">عدد مرات التشغيل عليها</span>
+                        <span class="ems-profile__fact-value"><?php echo intval($top_equipment['times_used']); ?></span>
                     </div>
                 </div>
             <?php else: ?>
                 <div class="alert alert-warning mb-0">لا توجد بيانات تشغيل كافية لاستخراج أفضل آلية حالياً.</div>
             <?php endif; ?>
         </div>
-    </div>
+    </section>
 
-    <div class="section-card">
-        <div class="section-head">
-            <h3 class="section-title"><i class="fas fa-id-card"></i> البيانات التفصيلية (مقسمة حسب الأقسام)</h3>
+    <section class="ems-profile__section">
+        <div class="ems-profile__section-head">
+            <h3 class="ems-profile__section-title"><i class="fas fa-id-card"></i> البيانات التفصيلية (مقسمة حسب الأقسام)</h3>
         </div>
-        <div class="section-body">
-            <div class="info-grid driver-profile-info-grid-gap">
-                <div class="info-item">
-                    <div class="label">1) البيانات الأساسية</div>
-                    <div class="value">الاسم: <?php echo htmlspecialchars($driver['name']); ?><br>الكنية:
+        <div class="ems-profile__section-body">
+            <div class="ems-profile__facts ems-profile__facts--wide">
+                <div class="ems-profile__fact">
+                    <span class="ems-profile__fact-label">1) البيانات الأساسية</span>
+                    <span class="ems-profile__fact-value">الاسم: <?php echo htmlspecialchars($driver['name']); ?><br>الكنية:
                         <?php echo htmlspecialchars($driver['nickname'] ? $driver['nickname'] : '-'); ?><br>الكود:
-                        <?php echo htmlspecialchars($driver['employee_code'] ? $driver['employee_code'] : '-'); ?></div>
+                        <?php echo htmlspecialchars($driver['employee_code'] ? $driver['employee_code'] : '-'); ?></span>
                 </div>
-                <div class="info-item">
-                    <div class="label">2) الهوية والتوثيق</div>
-                    <div class="value">النوع:
+                <div class="ems-profile__fact">
+                    <span class="ems-profile__fact-label">2) الهوية والتوثيق</span>
+                    <span class="ems-profile__fact-value">النوع:
                         <?php echo htmlspecialchars($driver['identity_type'] ? $driver['identity_type'] : '-'); ?><br>الرقم:
                         <?php echo htmlspecialchars($driver['identity_number'] ? $driver['identity_number'] : '-'); ?><br>انتهاء
                         الهوية:
                         <?php echo htmlspecialchars($driver['identity_expiry_date'] ? $driver['identity_expiry_date'] : '-'); ?>
-                    </div>
+                    </span>
                 </div>
-                <div class="info-item">
-                    <div class="label">3) الرخصة</div>
-                    <div class="value">رقم الرخصة:
+                <div class="ems-profile__fact">
+                    <span class="ems-profile__fact-label">3) الرخصة</span>
+                    <span class="ems-profile__fact-value">رقم الرخصة:
                         <?php echo htmlspecialchars($driver['license_number'] ? $driver['license_number'] : '-'); ?><br>النوع:
                         <?php echo htmlspecialchars($driver['license_type'] ? $driver['license_type'] : '-'); ?><br>انتهاء
                         الرخصة:
                         <?php echo htmlspecialchars($driver['license_expiry_date'] ? $driver['license_expiry_date'] : '-'); ?>
-                    </div>
+                    </span>
                 </div>
-                <div class="info-item">
-                    <div class="label">4) التخصص والخبرة</div>
-                    <div class="value">المعدات المتخصصة:
+                <div class="ems-profile__fact">
+                    <span class="ems-profile__fact-label">4) التخصص والخبرة</span>
+                    <span class="ems-profile__fact-value">المعدات المتخصصة:
                         <?php echo htmlspecialchars($driver['specialized_equipment'] ? $driver['specialized_equipment'] : '-'); ?><br>سنوات
                         المجال:
                         <?php echo htmlspecialchars($driver['years_in_field'] !== null && $driver['years_in_field'] !== '' ? $driver['years_in_field'] : '-'); ?><br>سنوات
                         على المعدة:
                         <?php echo htmlspecialchars($driver['years_on_equipment'] !== null && $driver['years_on_equipment'] !== '' ? $driver['years_on_equipment'] : '-'); ?>
-                    </div>
+                    </span>
                 </div>
-                <div class="info-item">
-                    <div class="label">5) العلاقة الوظيفية</div>
-                    <div class="value">المشرف:
+                <div class="ems-profile__fact">
+                    <span class="ems-profile__fact-label">5) العلاقة الوظيفية</span>
+                    <span class="ems-profile__fact-value">المشرف:
                         <?php echo htmlspecialchars($driver['owner_supervisor'] ? $driver['owner_supervisor'] : '-'); ?><br>التبعية:
                         <?php echo htmlspecialchars($driver['employment_affiliation'] ? $driver['employment_affiliation'] : '-'); ?><br>نوع
                         الراتب: <?php echo htmlspecialchars($driver['salary_type'] ? $driver['salary_type'] : '-'); ?>
-                    </div>
+                    </span>
                 </div>
-                <div class="info-item">
-                    <div class="label">6) التواصل</div>
-                    <div class="value">الهاتف الأساسي:
+                <div class="ems-profile__fact">
+                    <span class="ems-profile__fact-label">6) التواصل</span>
+                    <span class="ems-profile__fact-value">الهاتف الأساسي:
                         <?php echo htmlspecialchars($driver['phone'] ? $driver['phone'] : '-'); ?><br>الهاتف البديل:
                         <?php echo htmlspecialchars($driver['phone_alternative'] ? $driver['phone_alternative'] : '-'); ?><br>البريد:
-                        <?php echo htmlspecialchars($driver['email'] ? $driver['email'] : '-'); ?></div>
+                        <?php echo htmlspecialchars($driver['email'] ? $driver['email'] : '-'); ?></span>
                 </div>
-                <div class="info-item">
-                    <div class="label">7) الأداء والسلوك</div>
-                    <div class="value">تقييم الأداء:
+                <div class="ems-profile__fact">
+                    <span class="ems-profile__fact-label">7) الأداء والسلوك</span>
+                    <span class="ems-profile__fact-value">تقييم الأداء:
                         <?php echo htmlspecialchars($driver['performance_rating'] ? $driver['performance_rating'] : '-'); ?><br>سجل
                         السلوك:
                         <?php echo htmlspecialchars($driver['behavior_record'] ? $driver['behavior_record'] : '-'); ?><br>سجل
                         الحوادث:
                         <?php echo htmlspecialchars($driver['accident_record'] ? $driver['accident_record'] : '-'); ?>
-                    </div>
+                    </span>
                 </div>
-                <div class="info-item">
-                    <div class="label">8) الصحة والسلامة</div>
-                    <div class="value">الحالة الصحية:
+                <div class="ems-profile__fact">
+                    <span class="ems-profile__fact-label">8) الصحة والسلامة</span>
+                    <span class="ems-profile__fact-value">الحالة الصحية:
                         <?php echo htmlspecialchars($driver['health_status'] ? $driver['health_status'] : '-'); ?><br>المشاكل
                         الصحية:
                         <?php echo htmlspecialchars($driver['health_issues'] ? $driver['health_issues'] : '-'); ?><br>التطعيمات:
                         <?php echo htmlspecialchars($driver['vaccinations_status'] ? $driver['vaccinations_status'] : '-'); ?>
-                    </div>
+                    </span>
                 </div>
-                <div class="info-item">
-                    <div class="label">9) المراجع</div>
-                    <div class="value">جهة سابقة:
+                <div class="ems-profile__fact">
+                    <span class="ems-profile__fact-label">9) المراجع</span>
+                    <span class="ems-profile__fact-value">جهة سابقة:
                         <?php echo htmlspecialchars($driver['previous_employer'] ? $driver['previous_employer'] : '-'); ?><br>مدة
                         العمل:
                         <?php echo htmlspecialchars($driver['employment_duration'] ? $driver['employment_duration'] : '-'); ?><br>مرجع
                         اتصال:
                         <?php echo htmlspecialchars($driver['reference_contact'] ? $driver['reference_contact'] : '-'); ?>
-                    </div>
+                    </span>
                 </div>
-                <div class="info-item">
-                    <div class="label">10) ملاحظات عامة</div>
-                    <div class="value">
+                <div class="ems-profile__fact">
+                    <span class="ems-profile__fact-label">10) ملاحظات عامة</span>
+                    <span class="ems-profile__fact-value">
                         <?php echo nl2br(htmlspecialchars($driver['general_notes'] ? $driver['general_notes'] : '-')); ?>
-                    </div>
+                    </span>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div class="section-card">
-        <div class="section-head">
-            <h3 class="section-title"><i class="fas fa-images"></i> صور السائق والمستندات (تجهيز مبدئي)</h3>
+    <section class="ems-profile__section">
+        <div class="ems-profile__section-head">
+            <h3 class="ems-profile__section-title"><i class="fas fa-images"></i> صور السائق والمستندات (تجهيز مبدئي)</h3>
         </div>
-        <div class="section-body">
-            <div class="photo-grid">
-                <div class="doc-photo">
+        <div class="ems-profile__section-body">
+            <div class="ems-profile__docs">
+                <div class="ems-profile__doc">
                     <?php if (!empty($driver['employee_photo'])): ?>
                         <img src="<?php echo htmlspecialchars($driver['employee_photo']); ?>" alt="صورة السائق">
                     <?php else: ?>
-                        <div class="doc-placeholder"><i class="fas fa-camera"></i>صورة السائق<br>قيد التفعيل حالياً</div>
+                        <div class="ems-profile__doc-empty"><i class="fas fa-camera"></i>صورة السائق<br>قيد التفعيل حالياً</div>
                     <?php endif; ?>
-                    <span class="doc-caption">صورة السائق</span>
+                    <span class="ems-profile__doc-caption">صورة السائق</span>
                 </div>
-                <div class="doc-photo">
+                <div class="ems-profile__doc">
                     <?php if (!empty($driver['identity_photo'])): ?>
                         <img src="<?php echo htmlspecialchars($driver['identity_photo']); ?>" alt="صورة هوية السائق">
                     <?php else: ?>
-                        <div class="doc-placeholder"><i class="fas fa-id-card"></i>صورة الهوية<br>قيد التفعيل حالياً</div>
+                        <div class="ems-profile__doc-empty"><i class="fas fa-id-card"></i>صورة الهوية<br>قيد التفعيل حالياً</div>
                     <?php endif; ?>
-                    <span class="doc-caption">صورة الهوية</span>
+                    <span class="ems-profile__doc-caption">صورة الهوية</span>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div class="section-card">
-        <div class="section-head">
-            <h3 class="section-title"><i class="fas fa-chart-pie"></i> مخططات إحصائية سريعة</h3>
+    <section class="ems-profile__section">
+        <div class="ems-profile__section-head">
+            <h3 class="ems-profile__section-title"><i class="fas fa-chart-pie"></i> مخططات إحصائية سريعة</h3>
         </div>
-        <div class="section-body">
-            <div class="charts-grid">
-                <div>
+        <div class="ems-profile__section-body">
+            <div class="ems-profile__charts">
+                <div class="ems-profile__chart">
                     <canvas id="monthlyHoursChart" height="170"></canvas>
                 </div>
-                <div>
+                <div class="ems-profile__chart">
                     <canvas id="equipmentHoursChart" height="170"></canvas>
                 </div>
-                <div>
+                <div class="ems-profile__chart">
                     <canvas id="projectsChart" height="170"></canvas>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 
-    <div class="section-card">
-        <div class="section-head">
-            <h3 class="section-title"><i class="fas fa-route"></i> حركة السائق داخل المشاريع (من مشروع لآخر)</h3>
+    <section class="ems-profile__section">
+        <div class="ems-profile__section-head">
+            <h3 class="ems-profile__section-title"><i class="fas fa-route"></i> حركة السائق داخل المشاريع (من مشروع لآخر)</h3>
         </div>
-        <div class="section-body">
-            <ul class="timeline-list">
+        <div class="ems-profile__section-body">
+            <ul class="ems-profile__timeline">
                 <?php if ($movement_result && count($movement_result) > 0): ?>
                     <?php foreach ($movement_result as $mv): ?>
-                        <li class="timeline-item">
-                            <div class="timeline-top">
+                        <li class="ems-profile__timeline-item">
+                            <div class="ems-profile__timeline-top">
                                 <span><?php echo htmlspecialchars($mv['date'] ? $mv['date'] : '-'); ?></span>
                                 <span><?php echo htmlspecialchars($mv['shift'] ? $mv['shift'] : '-'); ?></span>
                             </div>
-                            <div class="timeline-meta">
+                            <div class="ems-profile__timeline-meta">
                                 مشروع: <?php echo htmlspecialchars($mv['project_name']); ?> |
                                 منجم: <?php echo htmlspecialchars($mv['mine_name']); ?> |
                                 آلية: <?php echo htmlspecialchars($mv['equipment_name']); ?>
@@ -687,17 +620,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </li>
                     <?php endforeach; ?>
                 <?php else: ?>
-                    <li class="timeline-item">لا توجد بيانات حركة داخل المشاريع لهذا السائق حتى الآن.</li>
+                    <li class="ems-profile__timeline-item">لا توجد بيانات حركة داخل المشاريع لهذا السائق حتى الآن.</li>
                 <?php endif; ?>
             </ul>
         </div>
-    </div>
+    </section>
 
-    <div class="section-card">
-        <div class="section-head">
-            <h3 class="section-title"><i class="fas fa-truck"></i> آخر ربط للآليات مع السائق</h3>
+    <section class="ems-profile__section">
+        <div class="ems-profile__section-head">
+            <h3 class="ems-profile__section-title"><i class="fas fa-truck"></i> آخر ربط للآليات مع السائق</h3>
         </div>
-        <div class="section-body table-responsive">
+        <div class="ems-profile__section-body table-responsive">
             <table class="table table-striped table-bordered align-middle text-center">
                 <thead>
                     <tr>
@@ -727,7 +660,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <td><?php echo htmlspecialchars($as['start_date'] ? $as['start_date'] : '-'); ?></td>
                                 <td><?php echo htmlspecialchars(ems_format_open_end($as['end_date'])); ?></td>
                                 <td>
-                                    <span class="assignment-status <?php echo $is_active_assignment ? 'active' : 'old'; ?>">
+                                    <span class="ems-profile__pill ems-profile__pill--<?php echo $is_active_assignment ? 'ok' : 'neutral'; ?>">
                                         <?php echo $is_active_assignment ? 'يعمل حالياً' : 'سابق'; ?>
                                     </span>
                                 </td>
@@ -741,7 +674,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 </tbody>
             </table>
         </div>
-    </div>
+    </section>
 </div>
 
 <script>

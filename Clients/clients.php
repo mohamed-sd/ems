@@ -9,6 +9,10 @@ if (!isset($_SESSION['user'])) {
 
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/extra_fields.php'; // XF-01 — طبقةُ البياناتِ الإضافيةِ المركزية
+
+// هويةُ الشاشةِ في سجلِّ البياناتِ الإضافية — تُكتب مرّةً وتُقرأ في كلِّ نداء
+$XF_SCREEN = 'Clients/clients.php';
 
 // ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
 // كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
@@ -275,6 +279,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
     $whatsapp_raw = trim($_POST['whatsapp']);
     $created_by = intval($_SESSION['user']['id']);
 
+    // ── XF-01 · البياناتُ الإضافيةُ الاختيارية ──────────────────────────────
+    // تُجمَع من السجلِّ المركزيِّ لا من حمولةِ الطلب: مفتاحٌ ليس في السجلِّ لا
+    // يُكتب، وقائمةٌ خارجَ خياراتِها تُردُّ NULL. والغيابُ ليس محوًا (انظر
+    // ems_xf_collect) — فحفظٌ من نموذجٍ لا يحمل الحقلَ لا يمحو ما أدخله غيرُه.
+    $xf_values = ems_xf_collect($XF_SCREEN, $_POST);
+
     if ($client_id > 0) {
         // ── تعديل عميل موجود ────────────────────────────────────────────────
 
@@ -303,7 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
         // (إعادة ختم company_id في الأصل كانت لا-عمل بنفس القيمة — البوابة تمنع
         //  تمريره في التعديل أصلًا وتضمن بقاءه بشرط النطاق)
         try {
-            $clients_gate->update('clients', array(
+            $clients_gate->update('clients', array_merge(array(
                 'client_code'     => $client_code_raw,
                 'client_name'     => $client_name_raw,
                 'entity_type'     => $entity_type_raw,
@@ -312,7 +322,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
                 'email'           => $email_raw,
                 'whatsapp'        => $whatsapp_raw,
                 'status'          => $status_raw,
-            ), array('id' => $client_id), 'is_deleted = 0');
+            ), $xf_values), array('id' => $client_id), 'is_deleted = 0');
             \App\Services\ActivityLogService::logUpdate(
                 'clients',
                 'clients',
@@ -342,7 +352,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
         }
 
         try {
-            $new_client_id = (int) $clients_gate->insert('clients', array(
+            $new_client_id = (int) $clients_gate->insert('clients', array_merge(array(
                 'client_code'     => $client_code_raw,
                 'client_name'     => $client_name_raw,
                 'entity_type'     => $entity_type_raw,
@@ -352,7 +362,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['client_name'])) {
                 'whatsapp'        => $whatsapp_raw,
                 'status'          => $status_raw,
                 'created_by'      => $created_by,
-            ));
+            ), $xf_values));
             \App\Services\ActivityLogService::logCreate(
                 'clients',
                 'clients',
@@ -824,6 +834,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                         </select>
                     </div>
                 </div>
+
+                <?php
+                // ══ XF-01 · «المزيد» — بياناتٌ إضافيةٌ اختيارية ══════════════════════
+                // الحقولُ فوقُ هي **الحدُّ الأدنى لإضافةِ عميل**، وهذه تحتُها تُستكمَل
+                // متى توفّرت. مطويةٌ ابتداءً فلا تُطيل النموذجَ على من لا يحتاجها،
+                // وبلا `required` واحدٍ فيها — والقسمُ يُرسم من السجلِّ المركزيِّ
+                // (`includes/extra_fields.php`) لا يُكتب هنا، كي يسريَ أيُّ تصحيحٍ
+                // على كلِّ شاشةٍ تُسجَّل فيه لاحقًا.
+                ems_xf_render_form($XF_SCREEN);
+                ?>
+
                 <div class="pu-form-actions">
                     <button type="submit" class="btn-primary">
                         <i class="fas fa-save"></i> <span id="submitBtnText">حفظ العميل</span>
@@ -882,20 +903,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             <th> عدد المشاريع</th>
                             <th> الهاتف</th>
                             <th> الحالة</th>
-                            <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
-                            <th class="ems-fn-th" data-fn="1">الاسم القانوني الكامل</th>
-                            <th class="ems-fn-th" data-fn="1">الشكل النظامي</th>
-                            <th class="ems-fn-th" data-fn="1">بلد التسجيل</th>
-                            <th class="ems-fn-th" data-fn="1">رقم السجل التجاري</th>
-                            <th class="ems-fn-th" data-fn="1">الرقم الضريبي</th>
-                            <th class="ems-fn-th" data-fn="1">العنوان المسجَّل</th>
-                            <th class="ems-fn-th" data-fn="1">جهة الاتصال</th>
-                            <th class="ems-fn-th" data-fn="1">المنصب</th>
-                            <th class="ems-fn-th" data-fn="1">البريد</th>
-                            <th class="ems-fn-th" data-fn="1">تصنيف العميل</th>
-                            <th class="ems-fn-th" data-fn="1">شريحة الأهمية</th>
-                            <th class="ems-fn-th" data-fn="1">سجّله</th>
-                            <th class="ems-fn-th" data-fn="1">تاريخ التسجيل</th>
+                            <!-- ══ CMP-03 ⑤ · XF-01 — الأعمدةُ الوظيفيةُ بتصميم المستند، **موصولةً بمصدرها** ══
+                                 كانت هذه الثلاثةَ عشرَ رؤوسًا محقونةً بلا مصدر: كلُّ خليةٍ «—» ورأسٌ
+                                 موسومٌ «بلا مصدر» في منتقي الأعمدة. صارت الآن أعمدةً حقيقية:
+                                   · عشرةٌ أُنشئت اختياريةً في الجدول (هجرة 2027_07_16)
+                                   · وثلاثٌ وُصلت بمصدرِها القائم (email · created_by · created_at)
+                                 و`ems_xf_th_attrs()` تطبع `data-fn-src` (فلا يحشوها JS) ووسومَ
+                                 المجموعة (فتُطوى ابتداءً وتُفتح بنقرةٍ من منتقي الأعمدة).
+                                 والنصُّ يبقى مكتوبًا حرفيًّا — أدواتُ جردِ وثيقةِ الأعمدة تقرأ الملفَّ نصًّا. -->
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'legal_name'); ?>>الاسم القانوني الكامل</th>
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'legal_form'); ?>>الشكل النظامي</th>
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'registration_country'); ?>>بلد التسجيل</th>
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'commercial_reg_no'); ?>>رقم السجل التجاري</th>
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'tax_id'); ?>>الرقم الضريبي</th>
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'registered_address'); ?>>العنوان المسجَّل</th>
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'contact_person'); ?>>جهة الاتصال</th>
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'contact_title'); ?>>المنصب</th>
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'email'); ?>>البريد</th>
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'client_classification'); ?>>تصنيف العميل</th>
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'importance_tier'); ?>>شريحة الأهمية</th>
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'created_by'); ?>>سجّله</th>
+                            <th class="ems-fn-th" data-fn="1"<?php echo ems_xf_th_attrs($XF_SCREEN, 'created_at'); ?>>تاريخ التسجيل</th>
                             <!-- CMP-03 ②③④ طبقة الحوكمة المشتركة — الخلايا يحشوها ui-unification.js -->
                             <th class="ems-gov-th" data-gov="base_currency" data-slice="3" title="عملة دفاتر الكيان">العملة الأساسية</th>
                             </tr>
@@ -903,6 +931,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                     <tbody>
                         <?php
                         foreach ($clients_rows as $row) {
+                            // سماتُ `data-xf-*` — منها تُبنى نافذةُ التفاصيلِ ويُملأ الفورمُ عند
+                            // التعديل. تُحسب مرّةً للصفِّ وتُلصق على زرَّي العرضِ والتعديل معًا.
+                            $xf_attrs = ems_xf_data_attrs($XF_SCREEN, $row, array('conn' => $conn));
                             $client_name_cell = "<a class='client-name-link' href='client_profile.php?id=" . urlencode($row['id']) . "'>" . clients_e($row['client_name']) . "</a>";
                             if (intval($row['projects_count']) === 0) {
                                 $client_name_cell .= " <span class='link-alert-chip' title='العميل ليس مشترك في مشروع'><i class='fas fa-exclamation-triangle'></i>تنبيه</span>";
@@ -924,7 +955,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                        data-whatsapp='" . clients_e($row['whatsapp']) . "'
                                        data-status='" . clients_e($row['status']) . "'
                                        data-projects-count='" . intval($row['projects_count']) . "'
-                                       data-created='" . clients_e(ems_actor_label($conn, isset($row['created_by']) ? $row['created_by'] : 0)) . "'
+                                       data-created='" . clients_e(ems_actor_label($conn, isset($row['created_by']) ? $row['created_by'] : 0)) . "'"
+                                       . $xf_attrs . "
                                        title='عرض التفاصيل'>
                                         <i class='fas fa-eye'></i>
                                     </a>
@@ -946,7 +978,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                            data-phone='" . clients_e($row['phone']) . "'
                                            data-email='" . clients_e($row['email']) . "'
                                            data-whatsapp='" . clients_e($row['whatsapp']) . "'
-                                           data-status='" . clients_e($row['status']) . "'
+                                           data-status='" . clients_e($row['status']) . "'"
+                                           . $xf_attrs . "
                                            title='تعديل'>
                                             <i class='fas fa-edit'></i>
                                         </a>";
@@ -987,6 +1020,14 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             } else {
                                 echo "<td><span class='status-inactive'><i class='fas fa-times-circle'></i> متوقف</span></td>";
                             }
+
+                            // ── XF-01 · خلايا البياناتِ الإضافيةِ الثلاثةَ عشرَ ────────────────
+                            // تُطبع **بترتيبِ رؤوسها** ودائمًا وإن كانت فارغة: عددُ الخلايا
+                            // يجب أن يساويَ عددَ الرؤوس وإلّا رمى DataTables «Incorrect column
+                            // count» فسقط الجدولُ كلُّه. والفارغُ «—» بصنفِ `ems-gov-empty` —
+                            // نفسُ مظهرِ الفراغِ في النظام، فلا يُقرأ فراغُ بيانٍ عطلًا.
+                            // ويبقى عمودُ الحوكمةِ الأخير (`base_currency`) يحشوه JS كما كان.
+                            echo ems_xf_tds($XF_SCREEN, $row, array('conn' => $conn));
 
                             echo "</tr>";
                         }
@@ -1122,6 +1163,92 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         clientForm[0].reset();
         $('#client_id').val('');
         setClientFormAddMode();
+        emsXfCollapse();
+    }
+
+    /* ══════════════════════════════════════════════════════════════════════
+     * XF-01 · البياناتُ الإضافية — جسرُ الواجهة
+     * ──────────────────────────────────────────────────────────────────────
+     * الخريطةُ تُبثُّ من السجلِّ المركزيِّ (`includes/extra_fields.php`) ولا تُكتب
+     * هنا: تسميةٌ واحدةٌ للحقلِ في الجدولِ والفورمِ ونافذةِ التفاصيل. فإن أُضيف
+     * حقلٌ أو غُيّرت تسميتُه، تغيّر الثلاثةُ معًا بلا تعديلٍ في هذا الملفّ.
+     * ══════════════════════════════════════════════════════════════════════ */
+    const EMS_XF_MAP  = <?php echo json_encode(ems_xf_js_map($XF_SCREEN), JSON_UNESCAPED_UNICODE); ?>;
+    const EMS_XF_OWN  = <?php
+        $__own = array();
+        foreach (ems_xf_own_columns($XF_SCREEN) as $__c) { $__own[] = $__c['key']; }
+        echo json_encode($__own, JSON_UNESCAPED_UNICODE);
+    ?>;
+
+    /** `legal_name` ⇒ `legal-name` — jQuery `.data()` يُطبّع الشرطاتِ لا الشُّرَط السفلية. */
+    function emsXfDataKey(k) { return String(k).replace(/_/g, '-'); }
+
+    /** قراءةُ كلِّ قيمِ `data-xf-*` من زرٍّ إلى كائنٍ بمفاتيحِ السجلّ. */
+    function emsXfRead($btn) {
+        const o = {};
+        Object.keys(EMS_XF_MAP).forEach(function (k) {
+            const v = $btn.data('xf-' + emsXfDataKey(k));
+            o[k] = (v === undefined || v === null) ? '' : String(v);
+        });
+        return o;
+    }
+
+    /** طيُّ قسمِ «المزيد» — `reset()` يمسح الحقولَ ولا يطوي `<details>`. */
+    function emsXfCollapse() {
+        const d = document.getElementById('emsXfMore');
+        if (d) { d.open = false; }
+    }
+
+    /**
+     * ملءُ حقولِ «المزيد» عند التعديل — **وفتحُ القسمِ إن كان فيه بيان**.
+     * فلو بقي مطويًّا على بياناتٍ موجودةٍ ظنَّ المستخدمُ أنها ضاعت، ولو فُتح
+     * دائمًا أطال النموذجَ على من لا يستعمله. فالفتحُ تابعٌ للمحتوى لا للحالة.
+     */
+    function emsXfFill(o) {
+        let any = false;
+        EMS_XF_OWN.forEach(function (k) {
+            const v = (o && o[k]) ? o[k] : '';
+            const $f = $('#' + k);
+            if (!$f.length) { return; }
+            $f.val(v);
+            if (String(v).trim() !== '') { any = true; }
+        });
+        const d = document.getElementById('emsXfMore');
+        if (d) { d.open = any; }
+    }
+
+    /**
+     * قسمُ «البيانات الإضافية» في نافذةِ التفاصيل.
+     *
+     * ◆ **يُبنى بأصنافِ النافذةِ نفسِها لا بأصنافٍ خاصّةٍ به**: `ems-dmodal__grid`
+     *   و`ems-dcard` و`ems-dcard__head` و`ems-dcard__value` هي البطاقةُ المعتمدةُ
+     *   لكلِّ حقلٍ في هذه النافذة. فيطابق القسمُ بقيةَ البطاقاتِ **تلقائيًّا**،
+     *   وأيُّ تغييرٍ في سمةِ النافذةِ لاحقًا يسري عليه بلا لمسِه. وقاعدةٌ خاصةٌ به
+     *   كانت ستفرّقه عنها عند أوّلِ تعديل.
+     * ◆ ويُبنى **فقط** مما له قيمة — وبطاقةٌ قيمتُها شرطةٌ ليست بيانًا يُعرض.
+     *   وإن خلا كلُّه أُعلن ذلك سطرًا صريحًا لا فراغًا يُقرأ عطلًا.
+     * ◆ والعرضُ تابعٌ لطولِ القيمة (`--w-lg` للعناوين) — وهو منطقُ النافذةِ نفسِه.
+     */
+    function emsXfSection(o) {
+        const cards = [];
+        Object.keys(EMS_XF_MAP).forEach(function (k) {
+            const v = (o && o[k]) ? String(o[k]).trim() : '';
+            if (v === '') { return; }
+            const w = v.length > 28 ? ' ems-dcard--w-lg' : '';
+            cards.push('<div class="ems-dcard' + w + '">'
+                     + '<div class="ems-dcard__head"><i class="' + clientEscapeHtml(EMS_XF_MAP[k].icon) + '"></i>'
+                     + '<span>' + clientEscapeHtml(EMS_XF_MAP[k].label) + '</span></div>'
+                     + '<div class="ems-dcard__value">' + clientEscapeHtml(v) + '</div></div>');
+        });
+        const filled = cards.length, total = Object.keys(EMS_XF_MAP).length;
+        const html = filled
+            ? '<div class="ems-dmodal__grid">' + cards.join('') + '</div>'
+              + '<div class="ems-dsection__pills"><span class="ems-dsection__pill">'
+              + 'مكتمل <strong>' + filled + '</strong> من <strong>' + total + '</strong>'
+              + ' — والباقي اختياري يُضاف متى توفّر</span></div>'
+            : '<div class="ems-dsection__pills"><span class="ems-dsection__pill">'
+              + 'لم تُدخَل بيانات إضافية بعد — كلها اختيارية وتُضاف من زر «تعديل»</span></div>';
+        return { title: 'بيانات إضافية', icon: 'fas fa-circle-plus', html: html };
     }
 
     function updateFormToggleState(isOpen) {
@@ -1231,6 +1358,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $('#email').val(clientData.email);
         $('#whatsapp').val(clientData.whatsapp);
         $('#status').val(clientData.status);
+        emsXfFill(emsXfRead($(this)));      // XF-01 — البياناتُ الإضافيةُ من سماتِ الزرِّ نفسِه
         if (window.EmsSelect) EmsSelect.refresh();
         setClientFormEditMode();
 
@@ -1353,6 +1481,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $('#email').val(c.email);
         $('#whatsapp').val(c.whatsapp);
         $('#status').val(c.status);
+        emsXfFill(c.xf);                    // XF-01 — المسارُ الثاني للتعديل يملأ الإضافيةَ أيضًا
         if (window.EmsSelect) EmsSelect.refresh();
 
         if (!clientForm.is(':visible')) {
@@ -1376,7 +1505,8 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             whatsapp: $(this).data('whatsapp'),
             status: $(this).data('status'),
             projectsCount: $(this).data('projects-count'),
-            created: $(this).data('created')
+            created: $(this).data('created'),
+            xf: emsXfRead($(this))          // XF-01 — تُقرأ مرّةً وتخدم العرضَ والتعديلَ معًا
         };
 
         const statusTone = (c.status === 'نشط') ? 'active' : 'inactive';
@@ -1405,7 +1535,9 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 { label: 'الحالة', value: c.status, icon: 'fas fa-toggle-on', type: 'status', tone: statusTone },
                 { label: 'أضيف بواسطة', value: c.created, icon: 'fas fa-user-plus' }
             ],
-            sections: [buildClientProjectsSection([], true)],
+            // القسمُ الأولُ يُستبدَل لاحقًا بنتيجةِ المشاريع (setSection(0)) — فالإضافيةُ
+            // بعدَه بفهرسٍ ثابت، ولا يدوسها التحديثُ غيرُ المتزامن.
+            sections: [buildClientProjectsSection([], true), emsXfSection(c.xf)],
             actions: actions
         });
 

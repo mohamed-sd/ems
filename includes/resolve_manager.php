@@ -113,15 +113,34 @@ if (!function_exists('ems_manager_scope_user_ids')) {
     /**
      * نطاق رؤية المدير (قرار 9): المستوى المباشر افتراضًا؛ $depth أكبر للتعمّق.
      * يُرجع معرّفات المرؤوسين (بلا المدير نفسه) — من الهيكل لا من قوائم ثابتة.
+     *
+     * ◆ **والهيكلُ يُقرأ داخلَ حدِّ الشركةِ لا عبرَه.** كانت الجولةُ تمشي على
+     *   `parent_id` وحدَه، و`parent_id` **ليس مقيَّدًا بالشركة**: القياسُ يجد
+     *   صفًّا حيًّا واحدًا يعبر الحدَّ (المستخدم 1 في الشركة 1 أبوه 881 في
+     *   الشركة 4). فكان مرؤوسٌ من شركةٍ أخرى يدخل قائمةَ النطاق. ولم يظهر
+     *   أثرُه في «مهامي» لأن الاستعلامَ الخارجيَّ يُرشِّح `company_id` بعدَه —
+     *   لكنَّ **العزلَ لا يُترك لمُرشِّحٍ لاحق**: من يستعمل هذه الدالةَ بلا
+     *   ترشيحٍ خارجيٍّ (`my_kpi` · `dept_board`) كان يعبر الحدَّ فعلًا.
+     *   والقاعدة: *دالةُ نطاقٍ تُرجع هويّاتٍ تعزل بنفسِها — لا تستأمن نداءَها.*
+     *
+     * ◆ ومديرٌ بلا شركةٍ (سوبر) لا يُقيَّد — فسلوكُه كما كان بلا ارتداد.
      */
     function ems_manager_scope_user_ids(mysqli $conn, $managerId, $depth = 1)
     {
+        $managerId = intval($managerId);
         $out = array();
-        $frontier = array(intval($managerId));
+        $frontier = array($managerId);
         $depth = max(1, min(6, intval($depth)));
+
+        /* شركةُ المديرِ من الهيكلِ نفسِه — لا من الجلسة، فتصحُّ الدالةُ في CLI */
+        $co = 0;
+        $rc = mysqli_query($conn, "SELECT company_id FROM users WHERE id = {$managerId} LIMIT 1");
+        if ($rc && ($xc = mysqli_fetch_row($rc))) { $co = intval($xc[0]); }
+        $coClause = $co > 0 ? " AND company_id = {$co}" : '';
+
         for ($i = 0; $i < $depth && $frontier; $i++) {
             $in = implode(',', array_map('intval', $frontier));
-            $r = mysqli_query($conn, "SELECT id FROM users WHERE parent_id IN ($in) AND COALESCE(status,'active')='active'");
+            $r = mysqli_query($conn, "SELECT id FROM users WHERE parent_id IN ($in){$coClause} AND COALESCE(status,'active')='active'");
             $frontier = array();
             while ($r && ($x = mysqli_fetch_row($r))) {
                 $id = intval($x[0]);
