@@ -26,7 +26,12 @@ $M['db_version']  = q($db, 'SELECT VERSION()');
 $M['db_name']     = q($db, 'SELECT DATABASE()');
 $M['tables']      = (int) q($db, "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_TYPE='BASE TABLE'");
 $M['views']       = (int) q($db, "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_TYPE='VIEW'");
-$M['with_company']= (int) q($db, "SELECT COUNT(DISTINCT TABLE_NAME) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND COLUMN_NAME='company_id'");
+/* ◆ عيبٌ مُصحَّح (2026-08-19): كان يعدُّ من `COLUMNS` وحدَها — و`COLUMNS`
+ * تشمل **المناظرَ** لا الجداولَ فقط، فطبع 489 والصادقُ 478 (و11 منظرًا).
+ * والمنظرُ لا «يُعزَل»: عزلُه عزلُ جدولِه. فيُقَيَّد النوعُ صراحةً ويُعلَن الفرق. */
+$M['with_company']= (int) q($db, "SELECT COUNT(DISTINCT c.TABLE_NAME) FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA=c.TABLE_SCHEMA AND t.TABLE_NAME=c.TABLE_NAME WHERE c.TABLE_SCHEMA=DATABASE() AND c.COLUMN_NAME='company_id' AND t.TABLE_TYPE='BASE TABLE'");
+$M['with_company_views'] = (int) q($db, "SELECT COUNT(DISTINCT c.TABLE_NAME) FROM information_schema.COLUMNS c JOIN information_schema.TABLES t ON t.TABLE_SCHEMA=c.TABLE_SCHEMA AND t.TABLE_NAME=c.TABLE_NAME WHERE c.TABLE_SCHEMA=DATABASE() AND c.COLUMN_NAME='company_id' AND t.TABLE_TYPE='VIEW'");
+$M['with_company_raw']   = $M['with_company'] + $M['with_company_views'];
 $M['fks']         = (int) q($db, "SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND CONSTRAINT_TYPE='FOREIGN KEY'");
 $M['checks']      = (int) q($db, "SELECT COUNT(*) FROM information_schema.CHECK_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE()");
 $M['uniques']     = (int) q($db, "SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND CONSTRAINT_TYPE='UNIQUE'");
