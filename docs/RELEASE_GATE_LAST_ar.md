@@ -1,9 +1,9 @@
 # شهادة بوابات التسليم — آخر عبور
 
-**التاريخ:** 2026-08-19 15:26 · **الحكم:** ✘ توقف عند ② التكامل: tools/e02_checks.php
+**التاريخ:** 2026-08-19 17:40 · **الحكم:** ✘ توقف عند ② التكامل: tools/e02_checks.php
 
 ```
-════ بوابات التسليم الخمس — 2026-08-19 15:24 ════
+════ بوابات التسليم الخمس — 2026-08-19 17:38 ════
 
 ▌ البوابة ① — اختبار الوحدة (يشهد: المطوّر)
   ✔ tests/wfm_engine_test.php — ✔ صفّا خطوتين في approval_links (الأولى مختومة)
@@ -22,9 +22,10 @@
   ✘ tools/se03_ten_checks.php — المخالف: CK-04=5 ·
 ══════════════════════════════════════════════════════════════════════
   ✔ tools/fin01_posting_verify.php — ✔ الترحيلُ سليمٌ — صفرُ مخالفٍ في الثمانية
-  ✘ tools/uxw_visual_baseline.php — 84.3149  101837000   3. preg_replace_callback($pattern = '~<([a-zA-Z][a-zA-Z0-9-]*)((?:\\s+[^<>]*?)?)/?>~su', $callback = class Closure { public $static = ['lines' => [...]]; public $parameter = ['$t' => '<required>'] }, $subject = '\n<!-- AC-U8 · SH-08: رابطُ التخطّي — أولُ ما تبلغه لوحةُ المفاتيح.\n     بدونَه تُجبَر الدورةُ على المرورِ بالشريطِ الجانبيِّ كلِّه (عشراتُ الروابط)\n     قبلَ بلوغِ المحتوى، فتصير الدورةُ «كاملةً» ورقيًّا لا عمليًّا. مخفيٌّ حتى\n     يُركَّز عليه — لا يزاحم البصرَ ويحضر للوحةِ المفاتيح. -->\n<a class="em'...) C:\wamp64\www\ems\tools\uxw_visual_baseline.php:76
-  ✘ tools/uxw_gates.php — [١٠ فرق بصري] movement__project_drivers.diff.txt — فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح
-  [١٠ فرق بصري] user_capacities.diff.txt — فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح
+  ✘ tools/uxw_visual_baseline.php — ✔ مطابق: main/user_profile.php
+✔ مطابق: Governance/authority_caps.php
+  ✘ tools/uxw_gates.php — ✗ مخالفات: 1
+  [١٠ فرق بصري] Portal__notifications.diff.txt — فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح
   ✔ tools/govauth_checks.php — ✔ فحوصُ GOV-AUTH-01 نافذةُ النطاقِ مجتازة
   ✘ tools/govauth_parity_probe.php — ✘ view	fin.deptmgr@equipation.sd (دور 19)	Finance/ob_due_soon.php	قائم=0 قالب=1
   … و350 أخرى
