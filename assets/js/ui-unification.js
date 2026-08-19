@@ -966,6 +966,98 @@
         });
         wrap.appendChild(sel); wrap.appendChild(nameIn); wrap.appendChild(saveB); wrap.appendChild(delB);
         host.appendChild(wrap);
+
+        /* ═══════════════════════════════════════════════════════════════════
+         * ف٩-٢ · الأداتانِ الخامسةُ والسادسة — والكثافةُ من ف٩-٣
+         * ───────────────────────────────────────────────────────────────────
+         * ◆ المنصوصُ ستُّ أدواتٍ بترتيبٍ حصريّ: بحثٌ · مرشِّحاتٌ · منظرٌ ·
+         *   أعمدةٌ · تصديرٌ · «المزيد ⋯». والأربعُ الأولى قائمةٌ، والتصديرُ
+         *   يلحق الشريطَ نفسَه، **والسادسةُ كانت غائبة**.
+         * ◆ **و«المزيد» وعاءٌ لما هو قائمٌ لا سلّةٌ لما ليس**: الطباعةُ
+         *   والكثافةُ فيه لأنهما قدرتانِ منصوصتان. والاستيرادُ وتحميلُ النموذجِ
+         *   **يُلحقان إن وُجدا في الشاشة** — ولا يُخترعان لجدولٍ لا يستوردُ شيئًا.
+         * ◆ **والكثافةُ تُحفظ للشاشةِ** لا للجلسةِ كلِّها — فلا يُغيَّر منظرُ
+         *   شاشةٍ بضبطِ أخرى.
+         * ═══════════════════════════════════════════════════════════════════ */
+        var more = document.createElement('details');
+        more.className = 'ems-more';
+        more.style.cssText = 'display:inline-block;position:relative;vertical-align:middle;margin-inline-start:6px';
+        var mSum = document.createElement('summary');
+        mSum.textContent = '⋯ المزيد';
+        mSum.setAttribute('aria-label', 'أدواتٌ إضافيةٌ للجدول');
+        mSum.title = 'أدواتٌ إضافيةٌ للجدول';
+        mSum.style.cssText = 'cursor:pointer;list-style:none;padding:4px 10px;border:1px solid var(--ems-line,#ccc);'
+                           + 'border-radius:6px;font-size:.85rem;user-select:none;background:var(--ems-panel,#fff)';
+        more.appendChild(mSum);
+        var mPanel = document.createElement('div');
+        mPanel.style.cssText = 'position:absolute;z-index:1200;inset-inline-start:0;top:100%;min-width:190px;'
+                             + 'background:var(--ems-panel,#fff);border:1px solid var(--ems-line,#ccc);'
+                             + 'border-radius:8px;padding:8px;box-shadow:0 6px 20px rgba(0,0,0,.14)';
+        more.appendChild(mPanel);
+
+        /* كثافةُ العرض — ثلاثةُ مستوياتٍ بنصِّ ف٩-٣، والقياسيُّ افتراضيّ */
+        var dKey = 'ems.density:' + location.pathname;
+        var dLbl = document.createElement('div');
+        dLbl.textContent = 'كثافةُ العرض';
+        dLbl.style.cssText = 'font-size:.74rem;opacity:.75;margin-bottom:4px';
+        mPanel.appendChild(dLbl);
+        var DENS = { comfortable: 'مريحة', standard: 'قياسية', compact: 'مضغوطة' };
+        var applyDensity = function (d) {
+            var w = api.table().container();
+            if (!w) { return; }
+            Object.keys(DENS).forEach(function (k) { w.classList.remove('ems-density-' + k); });
+            w.classList.add('ems-density-' + d);
+            try { localStorage.setItem(dKey, d); } catch (e) {}
+        };
+        var cur = 'standard';
+        try { cur = localStorage.getItem(dKey) || 'standard'; } catch (e) {}
+        Object.keys(DENS).forEach(function (k) {
+            var b = document.createElement('button');
+            b.type = 'button';
+            b.textContent = DENS[k];
+            b.setAttribute('aria-label', 'كثافةُ العرض: ' + DENS[k]);
+            b.style.cssText = 'display:block;width:100%;text-align:start;padding:4px 6px;margin-bottom:2px;'
+                            + 'font-size:.8rem;cursor:pointer;border:1px solid transparent;border-radius:4px;background:none';
+            if (k === cur) { b.style.borderColor = 'var(--ems-line,#ccc)'; }
+            b.addEventListener('click', function () {
+                applyDensity(k);
+                [].forEach.call(mPanel.querySelectorAll('button'), function (o) { o.style.borderColor = 'transparent'; });
+                b.style.borderColor = 'var(--ems-line,#ccc)';
+            });
+            mPanel.appendChild(b);
+        });
+        applyDensity(cur);
+
+        var hr = document.createElement('div');
+        hr.style.cssText = 'height:1px;background:var(--ems-line,#ddd);margin:6px 0';
+        mPanel.appendChild(hr);
+
+        var prt = document.createElement('button');
+        prt.type = 'button';
+        prt.textContent = '🖨 طباعة';
+        prt.setAttribute('aria-label', 'طباعةُ الجدول');
+        prt.style.cssText = 'display:block;width:100%;text-align:start;padding:4px 6px;font-size:.8rem;'
+                          + 'cursor:pointer;border:none;background:none';
+        prt.addEventListener('click', function () { window.print(); });
+        mPanel.appendChild(prt);
+
+        /* ◆ **ما هو قائمٌ في الشاشةِ يُنقل ولا يُكرَّر**: زرُّ الاستيرادِ
+             (`data-ems-excel-import`) وتحميلُ النموذجِ يُنقلان إلى «المزيد»
+             بنصِّ ف٩-٢، **ولا يُخترعان لشاشةٍ لا تملكهما** — وصفرُ فقد:
+             العنصرُ نفسُه يُنقل بمستمعاتِه لا يُستنسخ. */
+        var moved = 0;
+        [].forEach.call(document.querySelectorAll('[data-ems-excel-import], [data-ems-excel-template]'),
+            function (el) {
+                if (el.closest('.ems-more')) { return; }
+                el.style.display = 'block';
+                el.style.width = '100%';
+                el.style.textAlign = 'start';
+                mPanel.appendChild(el);
+                moved++;
+            });
+        if (moved) { tableEl.dataset.emsMoreMoved = String(moved); }
+
+        host.appendChild(more);
     }
 
     /* ═══════════════════════════════════════════════════════════════════════
@@ -977,6 +1069,47 @@
      * ◆ وقد قِيس: تسعةُ بنودٍ في السجلِّ بقيت مفتوحةً لأنَّ الدالةَ كانت تخرج
      *   مبكّرًا حين يوجد زرُّ تصديرٍ من الشاشة، فلا يُبنى المنتقيان.
      * ═══════════════════════════════════════════════════════════════════════ */
+    /* ═══════════════════════════════════════════════════════════════════════
+     * مضيفُ الشريطِ الموحَّد — **دالّةٌ واحدةٌ يشترك فيها المسلكان**
+     * ───────────────────────────────────────────────────────────────────────
+     * ◆ ف٩-٢: «شريطٌ موحَّدٌ واحدٌ بستِّ أدواتٍ بهذا الترتيبِ حصرًا».
+     * ◆ **والعطبُ الذي يسدُّه**: منتقي الأعمدةِ وزرُّ التصديرِ كانا يُنشئ كلٌّ
+     *   منهما مضيفَه بمنطقِه هو — والتصديرُ **غيرُ متزامن** (يُحمِّل JSZip
+     *   وButtons). فأيُّهما وصل أولًا أخذ المرساةَ وترك الآخرَ في مستوًى ثانٍ.
+     *   وقياسٌ حيٌّ أظهر **مستويَين** (606 · 654) ثم أظهرهما منقلبَين بعد أولِ
+     *   إصلاح — **وهو دليلُ التنازعِ لا دليلُ الحل**.
+     * ◆ **فالمضيفُ واحدٌ يُطلَب بالنداء**: أوَّلُ من يصل يُنشئه، والثاني يجده.
+     *   ولا يبقى منطقُ موضعٍ في مسلكَين يتفرّقان.
+     * ═══════════════════════════════════════════════════════════════════════ */
+    function emsToolbarHost(container) {
+        if (!container) { return null; }
+        var host = container.querySelector('.ems-auto-buttons');
+        if (host) { return host; }
+        host = document.createElement('div');
+        host.className = 'ems-auto-buttons';
+        var f = container.querySelector('.dataTables_filter');
+        if (f && f.parentElement) {
+            host.className += ' ems-toolbar-inline';
+            f.parentElement.insertBefore(host, f.nextSibling);
+        } else {
+            container.insertBefore(host, container.firstChild);
+            /* حقلُ البحثِ قد يُبنى بعدُ — يُنقل المضيفُ إليه مرةً واحدةً حين يظهر */
+            if (window.MutationObserver) {
+                var mo = new MutationObserver(function () {
+                    var f2 = container.querySelector('.dataTables_filter');
+                    if (!f2 || !f2.parentElement) { return; }
+                    if (!host.classList.contains('ems-toolbar-inline')) {
+                        host.classList.add('ems-toolbar-inline');
+                        f2.parentElement.insertBefore(host, f2.nextSibling);
+                    }
+                    mo.disconnect();
+                });
+                mo.observe(container, { childList: true, subtree: true });
+                setTimeout(function () { mo.disconnect(); }, 8000);
+            }
+        }
+        return host;
+    }
     function ensureTableTools(tableEl) {
         var $ = window.jQuery;
         if (!$ || !$.fn.dataTable || !$.fn.dataTable.isDataTable(tableEl)) return;
@@ -1009,12 +1142,8 @@
             return;
         }
         tableEl.dataset.emsTools = '1';
-        var host = container.querySelector('.ems-auto-buttons');
-        if (!host) {
-            host = document.createElement('div');
-            host.className = 'ems-auto-buttons';
-            container.insertBefore(host, container.firstChild);
-        }
+        var host = emsToolbarHost(container);
+        if (!host) { return; }
         if (host.querySelector('.ems-colvis')) { return; }   /* عاطلةٌ: لا تكرار */
         try {
             var tid = 't' + Math.floor(Date.now() % 1e7) + '_' + Math.floor(Math.random() * 1e5);
@@ -1074,8 +1203,7 @@
                 }
             }]
         });
-        var host = document.createElement('div');
-        host.className = 'ems-auto-buttons';
+        var host = null;   /* يُطلَب بعد تثبيتِ الوعاء */
         /* المرساةُ .dataTables_wrapper لا .ems-xscroll: غلافُ التمرير يُفكُّ
            ويُعاد بناؤه داخل الوعاء بعد التهيئة (unwrapStaleScrollers)، فزرٌّ
            مُعلَّقٌ عليه يبقى يتيمًا في .main حين يزول. الوعاءُ ثابت. */
@@ -1089,17 +1217,8 @@
            فيُلحَق التصديرُ بصفِّ البحثِ نفسِه — شريطٌ واحدٌ لا شريطان.
            ◆ والارتدادُ محفوظ: إن لم يوجد صفُّ بحثٍ (جدولٌ بلا فلترة) يعود
              السلوكُ القديمُ فلا يفقد الزرَّ جدولٌ واحد (صفرُ فقد). */
-        var filterEl = container.querySelector('.dataTables_filter');
-        if (filterEl && filterEl.parentElement) {
-            /* شقيقًا **مباشرًا** لحقلِ البحث — لا صفًّا فوقَه. وحقلُ البحثِ
-               عائمٌ في RTL، فالشقيقُ ذو العرضِ السطريِّ يجلس في سطرِه نفسِه.
-               (وأولُ صياغةٍ اشترطت صفًّا وسيطًا فسقطت للسلوكِ القديمِ صامتةً:
-                DataTables يضع الفلترَ في الوعاءِ مباشرةً بلا صفٍّ وسيط.) */
-            host.className += ' ems-toolbar-inline';
-            filterEl.parentElement.insertBefore(host, filterEl.nextSibling);
-        } else {
-            container.insertBefore(host, container.firstChild);
-        }
+        host = emsToolbarHost(container);
+        if (!host) { tableEl.dataset.emsXlsx = ''; return; }
         $(host).append(btns.container());
     }
 
