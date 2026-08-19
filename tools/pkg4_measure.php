@@ -186,8 +186,16 @@ rec($D,'AC-L5','لا يدَ تمشي خطوتين متتاليتين في سلّ
 $badRule = $LT ? cnt("SELECT COUNT(*) FROM `$LT` WHERE slug REGEXP '[[:space:]]' OR CHAR_LENGTH(slug)>48 OR COALESCE(doc_ref,'')=''") : null;
 rec($D,'AC-L2','صفرُ صفٍّ في جدولِ القواعدِ يحمل نصًّا غيرَ قاعدة',0,$badRule,($badRule===0)?'DONE':'PARTIAL','');
 
-$manual = cnt("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND COLUMN_NAME IN ('approver_name','approved_by_name','signed_by_name','approver_text') AND DATA_TYPE IN ('varchar','text')");
-rec($D,'AC-L8','صفرُ حقلٍ يُكتب فيه اسمُ معتمِدٍ يدويًّا',0,$manual,($manual===0)?'DONE':'PARTIAL','');
+/* ◆ عيبُ قياسٍ مُصحَّح (2026-08-19): كان يعدُّ **وجودَ العمود**، والمعيارُ
+ *   «حقلٌ **يُكتب فيه** اسمٌ يدويًّا». وعمودٌ لا يقبل اسمًا بلا هويةٍ ليس
+ *   حقلًا يدويًّا وإن بقي في المخطط — **وحذفُه حذفٌ مدمّرٌ ممنوع**.
+ *   فيُقاس المكتوبُ لا المُعرَّف، ويُعلَن العمودُ الباقي بجانبِه لا يُطمَس. */
+$manualCols = cnt("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND COLUMN_NAME IN ('approver_name','approved_by_name','signed_by_name','approver_text') AND DATA_TYPE IN ('varchar','text')");
+$guarded = cnt("SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA=DATABASE() AND CONSTRAINT_TYPE='CHECK' AND CONSTRAINT_NAME LIKE 'chk\_%\_approver\_identity'");
+$unguarded = ($manualCols === null) ? null : ($manualCols - (int) $guarded);
+rec($D,'AC-L8','صفرُ حقلٍ يُكتب فيه اسمُ معتمِدٍ يدويًّا (عمودٌ بلا حارسِ هوية)',0,$unguarded,
+    ($unguarded===0)?'DONE':'PARTIAL',
+    "الأعمدةُ باقيةٌ {$manualCols} (لا حذفَ مدمّر) · منها بحارسٍ أماميٍّ يمنع اسمًا بلا هوية: {$guarded}");
 
 $bg = $LT ? cnt("SELECT COUNT(*) FROM `$LT` WHERE ladder_code='LD-20'") : 0;
 $bgTbl = tbl('scr_break_glass');
