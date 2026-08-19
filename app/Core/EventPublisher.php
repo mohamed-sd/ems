@@ -437,6 +437,11 @@ class EventPublisher
         $stmt->close();
         $newId = intval($conn->insert_id);
 
+        // سادسًا · الإسقاطُ يرث سياقَ التدريبِ من الكاتبِ نفسِه — فالحقيقةُ وإسقاطُها
+        // يُكتبان بحسابٍ واحدٍ في هذه المعاملة، والبوابةُ تتحقّق من الاتساقِ
+        // عبر `correlation_id` فلا تكتفي بنيّةِ الشيفرة.
+        self::stampTraining($conn, 'fin_financial_events', $newId, $n['created_by']);
+
         // ── 6) أثرُ الحدث (FES §3.2 · H-12): رأسٌ وأثرُه معًا في معاملة المستدعي ──
         // النوعُ من المستدعي إن مرّره، وإلا اشتقاقٌ من نوع الجسر والمراجع.
         // UQ المركّب يجعل التكرار عطالةً (1062 يُبتلع عمدًا — الأثرُ قائم).
@@ -643,6 +648,43 @@ class EventPublisher
         // فإن انهارت الواقعةُ انهار معها الصادرُ والتسليم — ولا حدثَ لواقعةٍ لم تقع.
         \App\Services\Bus\EventOutboxFanout::open($conn, $rootId, $r['event_key'], $r['company_id']);
 
+        // سادسًا · سياقُ التدريبِ يُشتقُّ من الكاتبِ لحظةَ الكتابة (تفصيلُ العلّةِ
+        // في `stampTraining`) — داخلَ معاملةِ الواقعةِ نفسِها فلا حقيقةَ بلا وسمِها.
+        self::stampTraining($conn, 'ems_business_events', $rootId, $r['created_by']);
+
         return $rootId;
+    }
+
+    /**
+     * وسمُ صفٍّ بسياقِ التدريبِ **مشتقًّا من حسابِ كاتبِه** (سادسًا · صفرُ تسرّب).
+     *
+     * ◆ **ولماذا جملةٌ ثانيةٌ لا عمودٌ في جملةِ الإدراج**: جملتا الإدراجِ هنا
+     *   بثمانيةٍ وعشرين وتسعةٍ وثلاثين وسيطًا ونصِّ أنواعٍ **معدودٍ بالحرف**.
+     *   وحرفٌ واحدٌ يُزيح القيمَ كلَّها **صامتةً** — والدرسُ مدفوعُ الثمنِ في هذا
+     *   المستودع (`bind_param` منزاحٌ محا أربعةَ عشرَ نصًّا). فالكلفةُ جملةٌ
+     *   إضافيةٌ في المعاملةِ نفسِها، والعائدُ **صفرُ خطرٍ على ما يعمل**.
+     *
+     * ◆ **ويُشتقُّ ولا يُمرَّر**: القيمةُ تُقرأ من `users` بمعرِّفِ الكاتب، فلا
+     *   تُنسى في نداءٍ ولا تُزوَّر بحمولةٍ ولا تنكسر إذا نُودي الناشرُ من CLI.
+     *
+     * ◆ **وصمتُه مقصود**: تعذُّرُ الوسمِ لا يُسقط الواقعة — والحقيقةُ المكتوبةُ
+     *   بلا وسمٍ تبقى **إنتاجيةً** (الافتراضُ صفر)، وهو الاتجاهُ الأرحم: حقيقةٌ
+     *   إنتاجيةٌ تُوسَم تدريبًا تختفي من التقاريرِ وذلك **فقدٌ صامت**. والبوابةُ
+     *   `tests/training_isolation_gate.php` هي التي تكشف أيَّ صفٍّ أفلتَ.
+     */
+    private static function stampTraining(\mysqli $conn, $table, $rowId, $createdBy)
+    {
+        $rowId = intval($rowId); $createdBy = intval($createdBy);
+        if ($rowId <= 0 || $createdBy <= 0) { return; }
+        $allowed = array('ems_business_events' => 1, 'fin_financial_events' => 1);
+        if (!isset($allowed[$table])) { return; }
+        $sql = 'UPDATE `' . $table . '` SET is_training = '
+             . '(SELECT COALESCE(MAX(u.is_training), 0) FROM `users` u WHERE u.id = ?) '
+             . 'WHERE id = ?';
+        $st = @$conn->prepare($sql);
+        if (!$st) { return; }
+        $st->bind_param('ii', $createdBy, $rowId);
+        @$st->execute();
+        $st->close();
     }
 }
