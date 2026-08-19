@@ -76,15 +76,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         'risk' => $fRisk ?: null, 'atype' => $fType ?: null)));
     echo ems_states_bundle('لا نسخَ تقييمٍ ضمن هذا الترشيح', 'وسّع الترشيحَ — والتقييمُ يُسجَّل من ملفِّ الخطر');
     ?>
-    <style>
-        .rsk-filter-form { align-items: flex-end; }
-        .rsk-filter-label { font-size: .8rem; }
-        .rsk-id-input { max-width: 130px; }
-        .rsk-w100 { width: 100%; }
-        .rsk-subnote { font-size: .72rem; opacity: .7; }
-        .rsk-fs76 { font-size: .76rem; }
-        .rsk-fs74 { font-size: .74rem; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <form method="get" class="ems-toolbar rsk-filter-form">
         <input type="hidden" name="view" value="<?php echo htmlspecialchars($view); ?>">

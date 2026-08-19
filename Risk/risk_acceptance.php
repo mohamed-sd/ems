@@ -75,16 +75,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     echo ems_next_step('مراجعةُ القرارِ قبل مهلتِه — وإعادةُ التقييمِ أو السحبُ من ملفِّ الخطر', 'risk_register.php');
     echo ems_states_bundle('لا قراراتِ قبولٍ ضمن هذا الترشيح', 'القبولُ يُسجَّل من ملفِّ الخطرِ حيث الدرجةُ الجاريةُ وحارسُ السلطة');
     ?>
-    <style>
-        .rsk-filter-form { align-items: flex-end; }
-        .rsk-filter-label { font-size: .8rem; }
-        .rsk-w100 { width: 100%; }
-        .rsk-row-late { background: var(--c-rgba2551937008, rgba(255,193,7,.08)); }
-        .rsk-subnote { font-size: .72rem; opacity: .7; }
-        .rsk-fs76 { font-size: .76rem; }
-        .rsk-fs74 { font-size: .74rem; }
-        .rsk-cell-w200 { font-size: .76rem; max-width: 200px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <form method="get" class="ems-toolbar rsk-filter-form">
         <label class="rsk-filter-label"><input type="checkbox" name="late" value="1" aria-label="تجاوزت مهلة المراجعة فقط" <?php echo $fLate ? 'checked' : ''; ?>>

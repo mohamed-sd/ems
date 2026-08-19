@@ -42,9 +42,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     echo ems_states_bundle('لا مراجعاتٍ مستحقةً ولا قراراتِ قبولٍ في نطاقك', 'المهلُ تُحتسب من مستوى الخطرِ — والقبولُ يُسجَّل من ملفِّ الخطر');
     ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('risk', 'سجلُّ المراجعات'); ?>
-    <style>
-        .rsk-row-overdue { background: var(--c-fef2f2); }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <div class="ems-grid">
         <div class="ems-card ems-col-5">
             <h6>مراجعات مستحقة أو متأخرة</h6>

@@ -22,11 +22,7 @@ $FA_SCREEN = array(
 function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 {
 ?>
-    <style>
-        .fa-field-label{font-size:.8rem}
-        .fa-mono{font-family:monospace}
-        .fa-table-full{width:100%}
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <?php echo ems_states_bundle('لا قياسَ لهذه النسبةِ في هذه الفترة', 'غيّر الفترةَ أو تحقق من احتسابِ النسبِ للفترة'); ?>
 <?php
     $code = isset($_GET['ratio']) ? preg_replace('/[^A-Z0-9\-]/', '', strtoupper($_GET['ratio'])) : 'FR-01';

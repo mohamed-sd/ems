@@ -203,27 +203,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا تسويةَ مورّدٍ مولَّدةً بعدُ', 'اختر المورّدَ والفترةَ من نموذجِ «تسويةٌ جديدة» واضغط «ولّد التسوية» — البنودُ تُجلب من مصادرها');
     ?>
-    <style>
-        .sup-set-msg-body      { padding: 12px 16px; }
-        .sup-set-lead          { color: var(--c-4b5563, #4b5563); margin: 0; line-height: 1.8; }
-        .sup-set-h5            { margin: 0 0 10px; }
-        .sup-set-gen-form      { box-shadow: none; padding: 0; }
-        .sup-set-actions-sm    { margin-top: 10px; }
-        .sup-set-actions       { margin-top: 12px; }
-        .sup-set-scroll        { overflow-x: auto; }
-        .sup-set-table         { width: 100%; }
-        .sup-set-empty-cell    { text-align: center; color: var(--c-ink-500, #6b7280); padding: 18px; }
-        .sup-set-row-open      { background: var(--c-fffbeb, #fffbeb); }
-        .sup-set-row-objected  { background: var(--c-fef2f2, #fef2f2); }
-        .sup-set-net-due       { color: var(--c-b91c1c, #b91c1c); }
-        .sup-set-net-ok        { color: var(--c-15803d, #15803d); }
-        .sup-set-danger-note   { color: var(--c-b91c1c, #b91c1c); }
-        .sup-set-muted         { color: var(--c-ink-500, #6b7280); }
-        .sup-set-nowrap        { white-space: nowrap; }
-        .sup-set-inline-form   { display: inline; }
-        .sup-set-req           { color: var(--c-state-danger-strong, #c00); }
-        .sup-set-obj-input     { width: 150px; padding: 3px 6px; font-size: 12px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if (isset($_GET['msg'])): ?>
     <div class="card"><div class="card-body sup-set-msg-body">

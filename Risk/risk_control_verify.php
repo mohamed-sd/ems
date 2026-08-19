@@ -72,22 +72,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
               'فشلُ ضابطٍ حرجٍ يصعَّد للرئيسِ في اليومِ نفسِه ولا يُعكس — يُغلق بإجراءٍ تصحيحيٍّ متحقَّقٍ منه'));
     echo ems_states_bundle('لا ضوابطَ حرجةً ضمن هذا الترشيح', 'الحرجُ يُوسَم بحقوله الخمسةِ من شاشةِ الضوابط');
     ?>
-    <style>
-        .rsk-filter-form { align-items: flex-end; }
-        .rsk-filter-label { font-size: .8rem; }
-        .rsk-due-select { min-width: 200px; }
-        .rsk-w100 { width: 100%; }
-        .rsk-row-overdue { background: var(--c-rgba2205369005, rgba(220,53,69,.05)); }
-        .rsk-fs76 { font-size: .76rem; }
-        .rsk-cell-w200 { font-size: .76rem; max-width: 200px; }
-        .rsk-cell-w180 { font-size: .76rem; max-width: 180px; }
-        .rsk-cell-w160 { font-size: .76rem; max-width: 160px; }
-        .rsk-subnote { font-size: .72rem; opacity: .7; }
-        .rsk-guard-note { font-size: .74rem; color: var(--c-b02a37, #b02a37); }
-        .rsk-form-card { margin-top: 16px; }
-        .rsk-form-card.is-hidden { display: none; }
-        .rsk-msg-inline { margin-inline-start: 10px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <form method="get" class="ems-toolbar rsk-filter-form">
         <label class="rsk-filter-label">الحالة

@@ -76,15 +76,7 @@ require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('sup
 require_once __DIR__ . '/../includes/screen_contract.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصنافٍ — والألوانُ رموزٌ حصرًا */
-.suph-sub { color: var(--c-666666, #666); margin: 4px 0 0; }
-.suph-flash { display: flex; gap: 8px; align-items: center; }
-.suph-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-.suph-req { color: var(--c-state-danger-strong); }
-.suph-span-all { grid-column: 1 / -1; }
-.suph-empty-note { color: var(--c-777777, #777); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="content-wrapper ems-doc-cycle" dir="rtl">
   <section class="content-header"><h1>تسليمُ الحصص بين الموردين</h1>
     <p class="suph-sub">هنا نسجّل انتقالَ حصةِ ساعاتٍ من موردٍ إلى آخر — بمستندٍ وتاريخٍ، ولا يُمسُّ شهرٌ مغلق.</p>

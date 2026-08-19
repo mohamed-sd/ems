@@ -1980,3 +1980,158 @@ body.ems-site,
     border-color: var(--c-c81f24, #c81f24);
 }
 .employee-profile-page .eprof-flash { margin-bottom: 14px; font-weight: 700; }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   نُقل من كتلِ النمطِ المحليةِ في الشاشاتِ الذهبية (UXUI-01 · البند ٦)
+   2026-08-19 12:55 — **نقلٌ حرفيٌّ بلا مسِّ قيمة**: صفرُ انحرافٍ بصريٍّ بالتصميم.
+   وموضعُ التحميلِ هنا قربَ الآخرِ كما كانت الكتلُ داخلَ الصفحة، فلا يتغيّر مَن يغلب مَن.
+   والعكسُ بأمرٍ واحد: php tools/uxui_extract_local_styles.php --revert
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Finance/fin_cashflow_stmt.php ── */
+.fa-note{font-size:.78rem;opacity:.75;margin-inline-start:10px}
+        .fa-mono{font-family:monospace}
+        .fa-table-full{width:100%}
+
+/* ── Finance/fin_equity_stmt.php ── */
+.fa-note{font-size:.78rem;opacity:.75;margin-inline-start:10px}
+        .fa-mono{font-family:monospace}
+        .fa-fs72{font-size:.72rem}
+        .fa-table-full{width:100%}
+
+/* ── Finance/fin_project_pl.php ── */
+.fa-gen-bar{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
+        .fa-field-label{font-size:.8rem}
+        .fa-mono{font-family:monospace}
+        .fa-fs74{font-size:.74rem}
+        .fa-fs72{font-size:.72rem}
+        .fa-table-full{width:100%}
+
+/* ── Finance/fin_ratio_detail.php ── */
+.fa-field-label{font-size:.8rem}
+        .fa-mono{font-family:monospace}
+        .fa-table-full{width:100%}
+
+/* ── Finance/fin_ratio_targets.php ── */
+.fa-mono{font-family:monospace}
+        .fa-fs76{font-size:.76rem}
+        .fa-fs72{font-size:.72rem}
+        .fa-table-full{width:100%}
+
+/* ── Finance/financial_statements_fin.php ── */
+/* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
+        .fin-stmt-num { text-align: end; }
+        .fin-stmt-tbl { width: 100%; }
+        .fin-stmt-h5 { margin: 0 0 10px; }
+        .fin-stmt-note { margin: 4px 2px 10px; }
+        .fin-stmt-sec-rev { background: var(--c-f0fdf4); }
+        .fin-stmt-sec-neg { background: var(--c-fef2f2); }
+        .fin-stmt-sec-ast { background: var(--c-eff6ff); }
+        .fin-stmt-sec-eqt { background: var(--c-f5f3ff, #f5f3ff); }
+
+/* ── Risk/risk_acceptance.php ── */
+.rsk-filter-form { align-items: flex-end; }
+        .rsk-filter-label { font-size: .8rem; }
+        .rsk-w100 { width: 100%; }
+        .rsk-row-late { background: var(--c-rgba2551937008, rgba(255,193,7,.08)); }
+        .rsk-subnote { font-size: .72rem; opacity: .7; }
+        .rsk-fs76 { font-size: .76rem; }
+        .rsk-fs74 { font-size: .74rem; }
+        .rsk-cell-w200 { font-size: .76rem; max-width: 200px; }
+
+/* ── Risk/risk_assessment.php ── */
+.rsk-filter-form { align-items: flex-end; }
+        .rsk-filter-label { font-size: .8rem; }
+        .rsk-id-input { max-width: 130px; }
+        .rsk-w100 { width: 100%; }
+        .rsk-subnote { font-size: .72rem; opacity: .7; }
+        .rsk-fs76 { font-size: .76rem; }
+        .rsk-fs74 { font-size: .74rem; }
+
+/* ── Risk/risk_card.php ── */
+/* ══ UXW-01 ②: أنماطٌ ثابتةٌ نُقِلت من سماتِ style إلى أصنافٍ ببادئةِ الشاشة ══ */
+.rsk-mt-6  { margin-top: 6px; }
+.rsk-mt-8  { margin-top: 8px; }
+.rsk-mt-16 { margin-top: 16px; }
+.rsk-dedup-key { font-family: monospace; font-size: .72rem; }
+.rsk-esc-item { font-size: .8rem; padding: 4px 0; border-bottom: 1px dashed var(--c-eeeeee); }
+.rsk-list-item { padding: 6px 0; border-bottom: 1px dashed var(--c-eeeeee); font-size: .84rem; }
+.rsk-form-divider { border-top: 1px solid var(--c-eeeeee); padding-top: 12px; }
+.rsk-impact-label { font-size: .75rem; }
+.rsk-control-id-input { max-width: 140px; }
+
+/* ── Risk/risk_committee.php ── */
+.rsk-flash { padding: 10px; margin: 8px 0; font-size: .85rem; }
+        .rsk-w100 { width: 100%; }
+        .rsk-fs74 { font-size: .74rem; }
+        .rsk-cell-w200 { font-size: .76rem; max-width: 200px; }
+        .rsk-cell-w240 { font-size: .76rem; max-width: 240px; }
+        .rsk-new-card { margin-top: 16px; }
+        .rsk-new-card.is-hidden { display: none; }
+        .rsk-hint-inline { margin-inline-start: 10px; font-size: .78rem; opacity: .75; }
+
+/* ── Risk/risk_control_verify.php ── */
+.rsk-filter-form { align-items: flex-end; }
+        .rsk-filter-label { font-size: .8rem; }
+        .rsk-due-select { min-width: 200px; }
+        .rsk-w100 { width: 100%; }
+        .rsk-row-overdue { background: var(--c-rgba2205369005, rgba(220,53,69,.05)); }
+        .rsk-fs76 { font-size: .76rem; }
+        .rsk-cell-w200 { font-size: .76rem; max-width: 200px; }
+        .rsk-cell-w180 { font-size: .76rem; max-width: 180px; }
+        .rsk-cell-w160 { font-size: .76rem; max-width: 160px; }
+        .rsk-subnote { font-size: .72rem; opacity: .7; }
+        .rsk-guard-note { font-size: .74rem; color: var(--c-b02a37, #b02a37); }
+        .rsk-form-card { margin-top: 16px; }
+        .rsk-form-card.is-hidden { display: none; }
+        .rsk-msg-inline { margin-inline-start: 10px; }
+
+/* ── Risk/risk_controls.php ── */
+.rsk-w100 { width: 100%; }
+        .rsk-fs78 { font-size: .78rem; }
+        .rsk-fs76 { font-size: .76rem; }
+        .rsk-cell-w200 { font-size: .76rem; max-width: 200px; }
+        .rsk-cell-w180 { font-size: .76rem; max-width: 180px; }
+        .rsk-cell-w160 { font-size: .76rem; max-width: 160px; }
+        .rsk-actions-cell { min-width: 260px; }
+        .rsk-guard-note { font-size: .74rem; color: var(--c-b02a37, #b02a37); }
+        .rsk-readonly-note { font-size: .74rem; opacity: .6; }
+        .rsk-new-card { margin-top: 16px; }
+        .rsk-new-card.is-hidden { display: none; }
+
+/* ── Risk/risk_reviews.php ── */
+.rsk-row-overdue { background: var(--c-fef2f2); }
+
+/* ── Suppliers/settlements.php ── */
+.sup-set-msg-body      { padding: 12px 16px; }
+        .sup-set-lead          { color: var(--c-4b5563, #4b5563); margin: 0; line-height: 1.8; }
+        .sup-set-h5            { margin: 0 0 10px; }
+        .sup-set-gen-form      { box-shadow: none; padding: 0; }
+        .sup-set-actions-sm    { margin-top: 10px; }
+        .sup-set-actions       { margin-top: 12px; }
+        .sup-set-scroll        { overflow-x: auto; }
+        .sup-set-table         { width: 100%; }
+        .sup-set-empty-cell    { text-align: center; color: var(--c-ink-500, #6b7280); padding: 18px; }
+        .sup-set-row-open      { background: var(--c-fffbeb, #fffbeb); }
+        .sup-set-row-objected  { background: var(--c-fef2f2, #fef2f2); }
+        .sup-set-net-due       { color: var(--c-b91c1c, #b91c1c); }
+        .sup-set-net-ok        { color: var(--c-15803d, #15803d); }
+        .sup-set-danger-note   { color: var(--c-b91c1c, #b91c1c); }
+        .sup-set-muted         { color: var(--c-ink-500, #6b7280); }
+        .sup-set-nowrap        { white-space: nowrap; }
+        .sup-set-inline-form   { display: inline; }
+        .sup-set-req           { color: var(--c-state-danger-strong, #c00); }
+        .sup-set-obj-input     { width: 150px; padding: 3px 6px; font-size: 12px; }
+
+/* ── Suppliers/shares_coverage.php ── */
+.sup-shc-note { font-size: .9em; }
+
+/* ── Suppliers/sup_handover.php ── */
+/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصنافٍ — والألوانُ رموزٌ حصرًا */
+.suph-sub { color: var(--c-666666, #666); margin: 4px 0 0; }
+.suph-flash { display: flex; gap: 8px; align-items: center; }
+.suph-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.suph-req { color: var(--c-state-danger-strong); }
+.suph-span-all { grid-column: 1 / -1; }
+.suph-empty-note { color: var(--c-777777, #777); }

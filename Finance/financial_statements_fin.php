@@ -103,17 +103,7 @@ function fin_stmt_rows($rows, $type_lbl)
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا قيودَ مرحَّلةً تُشتَقُّ منها القوائمُ بعدُ', 'رحِّل قيدًا واحدًا على الأقلِّ من دفترِ اليوميةِ لتظهرَ القوائمُ الثلاث');
     ?>
-    <style>
-        /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
-        .fin-stmt-num { text-align: end; }
-        .fin-stmt-tbl { width: 100%; }
-        .fin-stmt-h5 { margin: 0 0 10px; }
-        .fin-stmt-note { margin: 4px 2px 10px; }
-        .fin-stmt-sec-rev { background: var(--c-f0fdf4); }
-        .fin-stmt-sec-neg { background: var(--c-fef2f2); }
-        .fin-stmt-sec-ast { background: var(--c-eff6ff); }
-        .fin-stmt-sec-eqt { background: var(--c-f5f3ff, #f5f3ff); }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <p class="text-muted fin-stmt-note"><i class="fas fa-circle-info"></i> مُشتَقّة من <strong>القيود المرحّلة فقط</strong> · عملة الأساس SDG · المركز المالي يتوازن آليًا (نتيجة القيد المزدوج).</p>
 
     <!-- قائمة الدخل -->

@@ -26,12 +26,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                         ORDER BY group_code, ratio_code");
     while ($x = $r->fetch_assoc()) { $rows[] = $x; }
 ?>
-    <style>
-        .fa-mono{font-family:monospace}
-        .fa-fs76{font-size:.76rem}
-        .fa-fs72{font-size:.72rem}
-        .fa-table-full{width:100%}
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <?php echo ems_states_bundle('لا حدودَ نسبٍ معتمدةً بعد', 'تُعتمد الحدودُ من هذه الشاشةِ بصلاحيةِ نائبِ الرئيسِ للشؤونِ الماليةِ والاستثمار'); ?>
     <div class="card"><div class="card-body table-responsive">
         <table class="alltables display nowrap fa-table-full">

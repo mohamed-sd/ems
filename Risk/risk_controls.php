@@ -53,19 +53,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
     risk_view_bar('risk_controls', $view);
     echo ems_states_bundle('لا ضوابطَ مسجَّلةً بعد', 'الضابطُ يُسجَّل بدليلِ تنفيذٍ محدَّد — والحرجُ بحقوله الخمسة');
     ?>
-    <style>
-        .rsk-w100 { width: 100%; }
-        .rsk-fs78 { font-size: .78rem; }
-        .rsk-fs76 { font-size: .76rem; }
-        .rsk-cell-w200 { font-size: .76rem; max-width: 200px; }
-        .rsk-cell-w180 { font-size: .76rem; max-width: 180px; }
-        .rsk-cell-w160 { font-size: .76rem; max-width: 160px; }
-        .rsk-actions-cell { min-width: 260px; }
-        .rsk-guard-note { font-size: .74rem; color: var(--c-b02a37, #b02a37); }
-        .rsk-readonly-note { font-size: .74rem; opacity: .6; }
-        .rsk-new-card { margin-top: 16px; }
-        .rsk-new-card.is-hidden { display: none; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card"><div class="card-body table-responsive">
         <?php $V = function ($c) use ($view) { return risk_col_visible('risk_controls', $view, $c); }; ?>

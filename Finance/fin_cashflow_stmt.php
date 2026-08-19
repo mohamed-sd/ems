@@ -26,11 +26,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                         ORDER BY period DESC, id DESC LIMIT 24");
     if ($r) { while ($x = $r->fetch_assoc()) { $rows[] = $x; } }
 ?>
-    <style>
-        .fa-note{font-size:.78rem;opacity:.75;margin-inline-start:10px}
-        .fa-mono{font-family:monospace}
-        .fa-table-full{width:100%}
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <?php echo ems_states_bundle('لا بياناتٍ لهذه الفترةِ المالية', 'غيّر الفترةَ أو تحقق من ترحيلِ القيود'); ?>
     <?php if ($can_write): ?>
     <div class="card"><div class="card-body">

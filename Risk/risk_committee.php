@@ -104,16 +104,7 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
         echo '<div class="ems-card rsk-flash">' . htmlspecialchars($flash) . '</div>';
     }
     ?>
-    <style>
-        .rsk-flash { padding: 10px; margin: 8px 0; font-size: .85rem; }
-        .rsk-w100 { width: 100%; }
-        .rsk-fs74 { font-size: .74rem; }
-        .rsk-cell-w200 { font-size: .76rem; max-width: 200px; }
-        .rsk-cell-w240 { font-size: .76rem; max-width: 240px; }
-        .rsk-new-card { margin-top: 16px; }
-        .rsk-new-card.is-hidden { display: none; }
-        .rsk-hint-inline { margin-inline-start: 10px; font-size: .78rem; opacity: .75; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if (empty($rows)): ?>
     <div class="ems-card" id="cmtEmpty"></div>
