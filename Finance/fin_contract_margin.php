@@ -33,11 +33,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                         WHERE l.company_id = {$company_id} AND l.contract_id IS NOT NULL LIMIT 100");
     if ($r) { while ($x = $r->fetch_assoc()) { $ctr[] = (int) $x['contract_id']; } }
 ?>
-    <style>
-        .fa-table-full{width:100%}
-        .fa-mono{font-family:monospace}
-        .fa-card-gap{margin-top:12px}
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <?php echo ems_states_bundle('لا توجد بياناتٌ لهذه الفترة', 'غيّر الفترةَ أو تحقق من توفرِ السجلات'); ?>
     <div class="card"><div class="card-body table-responsive">
         <h6>الهامش بنموذج العمل — الثلاثة لا تُخلط</h6>

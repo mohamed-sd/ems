@@ -1074,47 +1074,7 @@ include('../insidebar.php'); ?>
   <script src="/ems/assets/vendor/pdfmake/pdfmake.min.js"></script>
   <script src="/ems/assets/vendor/pdfmake/vfs_fonts.js"></script>
 
-  <style>
-    .driver-contracts-main .contracts-table-body {
-      overflow-x: auto;
-    }
-
-    #projectsTable.contracts-table-nowrap,
-    #projectsTable.contracts-table-nowrap th,
-    #projectsTable.contracts-table-nowrap td {
-      white-space: nowrap;
-    }
-
-    #projectsTable .action-btns {
-      display: flex;
-      gap: 6px;
-      justify-content: center;
-      flex-wrap: nowrap;
-      white-space: nowrap;
-    }
-
-    #projectsTable .action-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      font-size: .85rem;
-      transition: all .2s ease;
-    }
-
-    #projectsTable .action-btn.view { background: var(--c-rgba232184018, rgba(232, 184, 0, .18)); color: var(--c-9a7b00, #9a7b00); }
-    #projectsTable .action-btn.edit { background: var(--c-rgba12286208, rgba(12, 28, 62, .08)); color: var(--c-0c1c3e, #0c1c3e); }
-    #projectsTable .action-btn.delete { background: var(--c-rgba220383812, rgba(220, 38, 38, .12)); color: var(--c-b91c1c, #b91c1c); }
-
-    #projectsTable .action-btn.view:hover { background: var(--c-e8b800, #e8b800); color: var(--c-0c1c3e, #0c1c3e); transform: translateY(-2px); }
-    #projectsTable .action-btn.edit:hover { background: var(--c-0c1c3e, #0c1c3e); color: var(--c-surface, #fff); transform: translateY(-2px); }
-    #projectsTable .action-btn.delete:hover { background: var(--c-dc2626, #dc2626); color: var(--c-surface, #fff); transform: translateY(-2px); }
-  </style>
+  <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 
   <script>

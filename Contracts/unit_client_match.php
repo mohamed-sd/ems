@@ -69,13 +69,7 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 $canWrite = !empty($PERMS['can_edit']) || !empty($PERMS['can_add']);
 ?>
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
-.ucm-sub { color: var(--c-666666); margin: 4px 0 0; }
-.ucm-empty-note { color: var(--c-777777, #777777); }
-.ucm-decide-form { display: flex; gap: 6px; align-items: center; }
-.ucm-ref-input { width: 130px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="content-wrapper ems-doc-cycle" dir="rtl">
   <section class="content-header"><h1>مطابقةُ العميلِ على الوحدات</h1>
     <p class="ucm-sub">القيودُ التي اعتمدتها المبيعاتُ تُعرض على العميل: نطابقُ ما قَبِله ونسجّل ما نازعَ فيه — بمرجعٍ دائمًا.</p>

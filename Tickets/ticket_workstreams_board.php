@@ -83,13 +83,7 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 ?>
-<style>
-/* UXW-01 ①②: أنماطُ هذه الشاشةِ الثابتةُ أصنافًا ببادئةِ الشاشة — والألوانُ برموزٍ باحتياطٍ حرفيّ */
-.tkt-wsb-table       { width: 100%; }
-.tkt-wsb-cond        { color: var(--c-e67e22, #e67e22); }
-.tkt-wsb-skip        { color: var(--c-888, #888); }
-.tkt-wsb-inline-form { display: inline; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'المسارات المتوازية — رأس واحد وخمس أيادٍ'; $header_icon = 'fa fa-code-branch';

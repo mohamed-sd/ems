@@ -46,11 +46,7 @@ require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('sup
 require_once __DIR__ . '/../includes/screen_contract.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-  /* أنماطُ الشاشةِ الصفحية — الألوانُ رموزٌ من design-tokens.css حصرًا */
-  .uss-sub { color: var(--c-s-666); margin: 4px 0 0; }
-  .uss-muted { color: var(--c-s-777); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="content-wrapper" dir="rtl">
   <section class="content-header"><h1>كشفُ وحداتِ المورد</h1>
     <p class="uss-sub">أداءُ كلِّ موردٍ شهرًا شهرًا من القيدِ اليومي — وتسوياتُه بالمنفَّذِ المحسوبِ والمتحمَّلِ من الخزينة.</p>

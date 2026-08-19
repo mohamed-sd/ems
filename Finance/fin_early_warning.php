@@ -30,15 +30,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
                         ORDER BY id DESC LIMIT 100");
     while ($x = $r->fetch_assoc()) { $sigs[] = $x; }
 ?>
-    <style>
-        .fa-kpi-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-        .fa-kpi-badge{font-size:14px;padding:7px 12px}
-        .fa-table-full{width:100%}
-        .fa-mono{font-family:monospace}
-        .fa-cell-sm{font-size:.76rem}
-        .fa-cell-xs{font-size:.7rem}
-        .fa-card-gap{margin-top:12px}
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <?php echo ems_states_bundle('لا توجد بياناتٌ لهذه الفترة', 'غيّر الفترةَ أو تحقق من توفرِ السجلات'); ?>
     <div class="card"><div class="card-body fa-kpi-row">
         <span class="badge badge-info fa-kpi-badge">قواعد: <strong><?php echo count($rules); ?></strong></span>

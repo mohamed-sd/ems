@@ -35,10 +35,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
         $rows[] = array('eq' => $e, 'm' => $m);
     }
 ?>
-    <style>
-        .fa-table-full{width:100%}
-        .fa-mono{font-family:monospace}
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <?php echo ems_states_bundle('لا توجد بياناتٌ لهذه الفترة', 'غيّر الفترةَ أو تحقق من توفرِ السجلات'); ?>
     <div class="card"><div class="card-body table-responsive">
         <?php if (!$rows): ?>

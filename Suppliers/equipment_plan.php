@@ -57,12 +57,7 @@ include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
 echo ems_states_bundle('لا خطةَ معداتٍ لهذا المورد', 'اختر موردًا من القائمةِ أعلاه، أو خصِّص له مقاعدَ معداتٍ في حاويةِ التشغيل');
 ?>
-  <style>
-    .sup-eqp-filter        { margin-bottom: 14px; }
-    .sup-eqp-picker        { max-width: 340px; }
-    .sup-eqp-role-standby  { background: var(--c-6c757d, #6c757d); }
-    .sup-eqp-role-primary  { background: var(--c-0d6efd, #0d6efd); }
-  </style>
+  <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <form method="get" class="ems-form sup-eqp-filter">
     <select name="supplier_id" aria-label="المورد" class="form-control sup-eqp-picker" onchange="this.form.submit()">
       <option value="">— اختر موردًا —</option>

@@ -188,17 +188,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 </div>
 
 <script src="../includes/js/jquery-3.7.1.main.js"></script>
-<style>
-    /* UXW-01 ①+②: الأنماطُ الموضعيةُ صارت أصنافًا والألوانُ من الرموز — القيمُ ذاتُها بلا style= */
-    .cst-filter { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    .cst-client-select { min-width:320px; }
-    .cst-note { color:var(--c-666, #666); margin-top:10px; }
-    .cst-badges { display:flex; gap:14px; flex-wrap:wrap; }
-    .cst-badge { font-size:15px; padding:8px 14px; }
-    .cst-badge-balance { font-size:16px; padding:8px 14px; }
-    .cst-alert { margin:8px 0; }
-    .cst-w100 { width:100%; }
-    .cst-credit { color:var(--c-0a7, #0a7); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 </body>
 </html>

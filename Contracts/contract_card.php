@@ -53,22 +53,7 @@ include '../insidebar.php';
                            'انتقل إلى تبويبٍ آخرَ من شريطِ التبويبات أو افتح المصدرَ الأصليَّ من رابطِه');
     ?>
 
-    <style>
-    .cc-head{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-    .cc-title{font-size:1.1rem}
-    .cc-tabs{margin-inline-start:auto}
-    .cc-tab{border:1px solid var(--c-ddd, #ddd);border-radius:6px;padding:4px 10px;margin:0 2px}
-    .cc-tab-active{background:var(--c-e2b93b, #e2b93b);font-weight:800}
-    .cc-table{width:100%}
-    .cc-alert-split{display:flex;justify-content:space-between}
-    .cc-chips{display:flex;gap:12px;flex-wrap:wrap}
-    .cc-chips-mb{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px}
-    .cc-chip-lg{font-size:15px;padding:10px 16px}
-    .cc-chip{font-size:14px;padding:8px 14px}
-    .cc-note{margin-top:10px;color:var(--c-666, #666)}
-    .cc-empty-cell{color:var(--c-ink-400)}
-    .cc-sub-h{margin-top:12px}
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if (!$c): ems_state_empty('اختر عقدًا', 'إلى العقود', 'contracts.php'); ?>
     <?php else: ?>

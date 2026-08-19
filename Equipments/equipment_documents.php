@@ -140,21 +140,7 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('equipment', 'الوثائقُ وصلاحيتُها');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01 بوابتا ١·٢: أنماطُ شاشةِ وثائقِ المعداتِ والمشغّلين — أصنافٌ ببادئةِ
-   الشاشة بدل style=، والألوانُ برموزٍ ذاتِ ردمٍ حرفيٍّ يحفظ المظهرَ كما كان */
-.eqdoc-msg       { background: var(--c-fffbe6, #fffbe6); border: 1px solid var(--c-f0c36d, #f0c36d);
-                   border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; }
-.eqdoc-lede      { color: var(--c-4b5563, #4b5563); margin: 0 0 12px; line-height: 1.8; }
-.eqdoc-counts    { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.eqdoc-count     { padding: 6px 12px; font-size: 13px; }
-.eqdoc-h5        { margin: 0 0 10px; }
-.eqdoc-form-flat { box-shadow: none; padding: 0; }
-.eqdoc-table     { width: 100%; }
-.eqdoc-ltr       { direction: ltr; }
-.eqdoc-stop      { text-decoration: none; padding: 5px 10px; }
-.eqdoc-empty     { color: var(--c-ink-500, #6b7280); text-align: center; padding: 16px; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <div class="main eq-docs-main ems-unified-page-shell">
     <?php

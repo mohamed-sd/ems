@@ -95,14 +95,7 @@ include '../insidebar.php';
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا عملياتِ تمويلٍ نافذةً ولا أقساطَ مستحقةً في الثلاثين يومًا', 'أنشئ عمليةَ تمويلٍ بنموذجِها من زرِّ «إنشاء عملية تمويل» أسفلَ اللوحة');
     ?>
-    <style>
-      .fin-bd-alert-flush { margin: 0; }
-      .fin-bd-kpis { display: flex; gap: 14px; flex-wrap: wrap; }
-      .fin-bd-kpi { font-size: 15px; padding: 8px 14px; }
-      .fin-bd-kpi-link { text-decoration: none; }
-      .fin-bd-table { width: 100%; }
-      .fin-bd-cta { margin-top: 10px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if (!$granted): ?>
     <div class="card"><div class="card-body">

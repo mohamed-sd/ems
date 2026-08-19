@@ -126,20 +126,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 $sf_supplier_id = intval($_GET['supplier_id'] ?? $_GET['id'] ?? 0); $sf_active = 'evaluation';
 if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php';
 ?>
-<style>
-/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصنافٍ — والألوانُ رموزٌ حصرًا */
-.sev-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.sev-supplier-select { min-width: 320px; }
-.sev-quote { color: var(--c-666666, #666); margin-top: 10px; }
-.sev-muted { color: var(--c-666666, #666); }
-.sev-req { color: var(--c-state-danger-strong); }
-.sev-table-gap { margin-top: 12px; }
-.sev-table { width: 100%; }
-.sev-actions { margin-top: 12px; }
-.sev-partial-note { color: var(--c-a15c00, #a15c00); }
-.sev-decide-form { margin-top: 14px; }
-.sev-decision-note { color: var(--c-a15c00, #a15c00); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell ems-doc-cycle">
     <?php
     $header_title = 'تقييم المورد الدوري'; $header_icon = 'fa fa-star-half-stroke';

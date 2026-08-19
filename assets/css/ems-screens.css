@@ -2135,3 +2135,774 @@ body.ems-site,
 .suph-req { color: var(--c-state-danger-strong); }
 .suph-span-all { grid-column: 1 / -1; }
 .suph-empty-note { color: var(--c-777777, #777); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   نُقل من كتلِ النمطِ المحليةِ في الشاشاتِ الذهبية (UXUI-01 · البند ٦)
+   2026-08-19 13:02 — **نقلٌ حرفيٌّ بلا مسِّ قيمة**: صفرُ انحرافٍ بصريٍّ بالتصميم.
+   وموضعُ التحميلِ هنا قربَ الآخرِ كما كانت الكتلُ داخلَ الصفحة، فلا يتغيّر مَن يغلب مَن.
+   والعكسُ بأمرٍ واحد: php tools/uxui_extract_local_styles.php --revert
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Contracts/client_statement.php ── */
+/* UXW-01 ①+②: الأنماطُ الموضعيةُ صارت أصنافًا والألوانُ من الرموز — القيمُ ذاتُها بلا style= */
+    .cst-filter { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .cst-client-select { min-width:320px; }
+    .cst-note { color:var(--c-666, #666); margin-top:10px; }
+    .cst-badges { display:flex; gap:14px; flex-wrap:wrap; }
+    .cst-badge { font-size:15px; padding:8px 14px; }
+    .cst-badge-balance { font-size:16px; padding:8px 14px; }
+    .cst-alert { margin:8px 0; }
+    .cst-w100 { width:100%; }
+    .cst-credit { color:var(--c-0a7, #0a7); }
+
+/* ── Contracts/contract_card.php ── */
+.cc-head{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+    .cc-title{font-size:1.1rem}
+    .cc-tabs{margin-inline-start:auto}
+    .cc-tab{border:1px solid var(--c-ddd, #ddd);border-radius:6px;padding:4px 10px;margin:0 2px}
+    .cc-tab-active{background:var(--c-e2b93b, #e2b93b);font-weight:800}
+    .cc-table{width:100%}
+    .cc-alert-split{display:flex;justify-content:space-between}
+    .cc-chips{display:flex;gap:12px;flex-wrap:wrap}
+    .cc-chips-mb{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+    .cc-chip-lg{font-size:15px;padding:10px 16px}
+    .cc-chip{font-size:14px;padding:8px 14px}
+    .cc-note{margin-top:10px;color:var(--c-666, #666)}
+    .cc-empty-cell{color:var(--c-ink-400)}
+    .cc-sub-h{margin-top:12px}
+
+/* ── Contracts/contract_coverage.php ── */
+.cov-gap-banner { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; font-size: 1.05rem;
+        display: flex; align-items: center; gap: 10px; border: 1px solid; }
+    .cov-gap-banner.is-gap { background: var(--c-fff4f2, #fff4f2); border-color: var(--c-e0a9a0, #e0a9a0); color: var(--c-8a2c1d, #8a2c1d); }
+    .cov-gap-banner.is-ok { background: var(--c-f2fbf4, #f2fbf4); border-color: var(--c-a9d8b0, #a9d8b0); color: var(--c-1d6b2e, #1d6b2e); }
+    .cov-table th, .cov-table td { white-space: nowrap; padding: 6px 10px; }
+    .cov-table .cov-sub th { font-size: .8rem; color: var(--c-666, #666); }
+    .cov-bad { color: var(--c-b3261e, #b3261e); font-weight: 800; }
+    .cov-ok { color: var(--c-1d6b2e, #1d6b2e); font-weight: 700; }
+    .cov-sep { border-right: 2px dashed var(--c-bbb, #bbb); }
+    .cov-lvl2 { margin-top: 10px; }
+    .cov-lvl3 { margin-top: 6px; margin-bottom: 18px; }
+    .table-container { overflow-x: auto; }
+
+/* ── Contracts/unit_client_match.php ── */
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ucm-sub { color: var(--c-666666); margin: 4px 0 0; }
+.ucm-empty-note { color: var(--c-777777, #777777); }
+.ucm-decide-form { display: flex; gap: 6px; align-items: center; }
+.ucm-ref-input { width: 130px; }
+
+/* ── Contracts/unit_statement_client.php ── */
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.ucs-sub { color: var(--c-666666); margin: 4px 0 0; }
+.ucs-empty-note { color: var(--c-777777, #777777); }
+
+/* ── Employees/employee_contracts.php ── */
+.driver-contracts-main .contracts-table-body {
+      overflow-x: auto;
+    }
+
+    #projectsTable.contracts-table-nowrap,
+    #projectsTable.contracts-table-nowrap th,
+    #projectsTable.contracts-table-nowrap td {
+      white-space: nowrap;
+    }
+
+    #projectsTable .action-btns {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    #projectsTable .action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      font-size: .85rem;
+      transition: all .2s ease;
+    }
+
+    #projectsTable .action-btn.view { background: var(--c-rgba232184018, rgba(232, 184, 0, .18)); color: var(--c-9a7b00, #9a7b00); }
+    #projectsTable .action-btn.edit { background: var(--c-rgba12286208, rgba(12, 28, 62, .08)); color: var(--c-0c1c3e, #0c1c3e); }
+    #projectsTable .action-btn.delete { background: var(--c-rgba220383812, rgba(220, 38, 38, .12)); color: var(--c-b91c1c, #b91c1c); }
+
+    #projectsTable .action-btn.view:hover { background: var(--c-e8b800, #e8b800); color: var(--c-0c1c3e, #0c1c3e); transform: translateY(-2px); }
+    #projectsTable .action-btn.edit:hover { background: var(--c-0c1c3e, #0c1c3e); color: var(--c-surface, #fff); transform: translateY(-2px); }
+    #projectsTable .action-btn.delete:hover { background: var(--c-dc2626, #dc2626); color: var(--c-surface, #fff); transform: translateY(-2px); }
+
+/* ── Equipments/equipment_documents.php ── */
+/* UXW-01 بوابتا ١·٢: أنماطُ شاشةِ وثائقِ المعداتِ والمشغّلين — أصنافٌ ببادئةِ
+   الشاشة بدل style=، والألوانُ برموزٍ ذاتِ ردمٍ حرفيٍّ يحفظ المظهرَ كما كان */
+.eqdoc-msg       { background: var(--c-fffbe6, #fffbe6); border: 1px solid var(--c-f0c36d, #f0c36d);
+                   border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; }
+.eqdoc-lede      { color: var(--c-4b5563, #4b5563); margin: 0 0 12px; line-height: 1.8; }
+.eqdoc-counts    { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.eqdoc-count     { padding: 6px 12px; font-size: 13px; }
+.eqdoc-h5        { margin: 0 0 10px; }
+.eqdoc-form-flat { box-shadow: none; padding: 0; }
+.eqdoc-table     { width: 100%; }
+.eqdoc-ltr       { direction: ltr; }
+.eqdoc-stop      { text-decoration: none; padding: 5px 10px; }
+.eqdoc-empty     { color: var(--c-ink-500, #6b7280); text-align: center; padding: 16px; }
+
+/* ── Finance/budget_dept.php ── */
+/* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
+    .bd-filter-form { margin-bottom: 12px; }
+    .bd-year-input  { max-width: 120px; display: inline-block; }
+    .bd-var-over    { color: var(--c-dc3545); }
+    .bd-var-under   { color: var(--c-198754); }
+
+/* ── Finance/dues_fin.php ── */
+/* UXW-01 ٢: أنماطُ هذه الشاشةِ الثابتةُ صارتْ أصنافًا ببادئةِ الشاشة */
+.fin-dues-srcnote { color: var(--c-note-ink); display: block; margin-top: 4px; }
+.fin-dues-h5 { margin: 0 0 10px; }
+.fin-dues-h5-next { margin: 18px 0 10px; }
+.fin-dues-tbl { width: 100%; }
+
+/* ── Finance/fin_contract_margin.php ── */
+.fa-table-full{width:100%}
+        .fa-mono{font-family:monospace}
+        .fa-card-gap{margin-top:12px}
+
+/* ── Finance/fin_early_warning.php ── */
+.fa-kpi-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+        .fa-kpi-badge{font-size:14px;padding:7px 12px}
+        .fa-table-full{width:100%}
+        .fa-mono{font-family:monospace}
+        .fa-cell-sm{font-size:.76rem}
+        .fa-cell-xs{font-size:.7rem}
+        .fa-card-gap{margin-top:12px}
+
+/* ── Finance/fin_ratios.php ── */
+.fa-kpi-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+        .fa-kpi-badge{font-size:14px;padding:7px 12px}
+        .fa-table-full{width:100%}
+        .fa-mono{font-family:monospace}
+        .fa-cell-sm{font-size:.76rem}
+
+/* ── Finance/fin_unit_economics.php ── */
+.fa-table-full{width:100%}
+        .fa-mono{font-family:monospace}
+
+/* ── Finance/supplier_statement_fin.php ── */
+/* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
+        .fin-sup-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .fin-sup-select { min-width: 220px; }
+        .fin-sup-h5 { margin: 0 0 12px; }
+        .fin-sup-h5-mid { margin: 18px 0 10px; }
+        .fin-sup-h5-sec { margin: 16px 0 10px; }
+        .fin-sup-kpi { text-align: center; }
+        .fin-sup-kpi-value { font-size: 20px; font-weight: 700; }
+        .fin-sup-ok { color: var(--c-166534); }
+        .fin-sup-neg { color: var(--c-991b1b); }
+        .fin-sup-hint { color: var(--c-ink-500); }
+        .fin-sup-badge-gap { margin-inline-start: 8px; }
+        .fin-sup-layer { margin-bottom: 10px; }
+        .fin-sup-layer-total { font-weight: 700; }
+        .fin-sup-layer-wrap { margin-top: 8px; }
+        .fin-sup-tbl { width: 100%; }
+        .fin-sup-objected { background: var(--c-fef2f2); }
+        .fin-sup-amt { white-space: nowrap; }
+        .fin-sup-net { margin: 6px 0 16px; }
+        .fin-sup-empty-cell { text-align: center; color: var(--c-ink-500); padding: 14px; }
+        .fin-sup-pick { margin: 0; }
+
+/* ── Financing/cost_allocation.php ── */
+.fin-ca-note { font-size: .9em; }
+
+/* ── Financing/deviations.php ── */
+.fin-dev-badge-open { background: var(--c-fd7e14, #fd7e14); }
+    .fin-dev-badge-closed { background: var(--c-198754); }
+    .fin-dev-close-form { display: flex; gap: 6px; }
+    .fin-dev-decision { max-width: 160px; }
+    .fin-dev-docref { max-width: 120px; }
+
+/* ── Financing/fin_changes.php ── */
+.cmp03-form-actions { margin-top: 12px; display: flex; gap: 10px; }
+
+/* ── Financing/fin_models.php ── */
+.cmp03-form-actions { margin-top: 12px; display: flex; gap: 10px; }
+
+/* ── Financing/financing_board.php ── */
+.fin-bd-alert-flush { margin: 0; }
+      .fin-bd-kpis { display: flex; gap: 14px; flex-wrap: wrap; }
+      .fin-bd-kpi { font-size: 15px; padding: 8px 14px; }
+      .fin-bd-kpi-link { text-decoration: none; }
+      .fin-bd-table { width: 100%; }
+      .fin-bd-cta { margin-top: 10px; }
+
+/* ── Governance/perm_explain.php ── */
+/* UXW-01 بوابة ٢: أنماطُ الشاشةِ في كتلةٍ بأصنافٍ لا style= موضعيًّا — والألوانُ رموزٌ (بوابة ١) */
+.px-filter-form { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; }
+.px-w-220 { min-width: 220px; }
+.px-w-320 { min-width: 320px; }
+.px-result { margin-top: 14px; padding: 12px; border-radius: 8px; border: 1px solid var(--c-s-ddd, #ddd); }
+.px-result-verdict { font-weight: 800; margin-bottom: 8px; }
+.px-table-full { width: 100%; }
+.px-th-source { width: 30%; }
+.px-grantor { margin-top: 8px; color: var(--c-s-555, #555); }
+.cmp03-form-actions { margin-top: 12px; display: flex; gap: 10px; }
+
+/* ── Operations/distribution_space.php ── */
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
+.dsp-filter { display: flex; gap: 8px; align-items: center; }
+.dsp-conflict-card { border-inline-start: 4px solid var(--c-state-danger-strong); }
+.dsp-conflict-icon { color: var(--c-state-danger-strong); }
+.dsp-conflict-item { margin: 6px 0; }
+.dsp-table-full { width: 100%; }
+
+/* ── Operations/equipment_quota.php ── */
+/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا */
+.cmp03-form-actions { margin-top: 12px; display: flex; gap: 10px; }
+
+/* ── Operations/site_gate_person.php ── */
+.cmp03-form-actions { margin-top: 12px; display: flex; gap: 10px; }
+
+/* ── Procurement/consumption_rate.php ── */
+.cr-src-note { font-size: .9em; }
+        .cr-legacy-note { margin-top: 14px; }
+
+/* ── Suppliers/equipment_plan.php ── */
+.sup-eqp-filter        { margin-bottom: 14px; }
+    .sup-eqp-picker        { max-width: 340px; }
+    .sup-eqp-role-standby  { background: var(--c-6c757d, #6c757d); }
+    .sup-eqp-role-primary  { background: var(--c-0d6efd, #0d6efd); }
+
+/* ── Suppliers/supplier_advances.php ── */
+/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصنافٍ — والألوانُ رموزٌ حصرًا */
+.sadv-note { margin-bottom: 14px; }
+.sadv-req { color: var(--c-state-danger-strong); }
+.sadv-actions { margin-top: 12px; }
+.sadv-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.sadv-filter-select { min-width: 280px; }
+.sadv-balance-badge { font-size: 1.05em; }
+.sadv-table { width: 100%; }
+.sadv-inline-form { display: inline; }
+
+/* ── Suppliers/supplier_bank.php ── */
+/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصناف */
+.supbk-form-actions { margin-top: 12px; display: flex; gap: 10px; }
+
+/* ── Suppliers/supplier_capacity.php ── */
+/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصنافٍ — والألوانُ رموزٌ حصرًا */
+.scap-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.scap-contract-select { min-width: 360px; }
+.scap-penalty-note { color: var(--c-a15c00, #a15c00); margin-top: 10px; background: var(--c-brand-gold-soft); padding: 10px; border-radius: 6px; }
+.scap-quote { color: var(--c-666666, #666); }
+.scap-req { color: var(--c-state-danger-strong); }
+.scap-actions { margin-top: 12px; }
+.scap-table { width: 100%; }
+.scap-badges { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.scap-badge-lg { font-size: 15px; padding: 8px 14px; }
+.scap-note-inline { margin: 6px 0; }
+.scap-raw-note { color: var(--c-a15c00, #a15c00); }
+
+/* ── Suppliers/supplier_evaluation.php ── */
+/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصنافٍ — والألوانُ رموزٌ حصرًا */
+.sev-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.sev-supplier-select { min-width: 320px; }
+.sev-quote { color: var(--c-666666, #666); margin-top: 10px; }
+.sev-muted { color: var(--c-666666, #666); }
+.sev-req { color: var(--c-state-danger-strong); }
+.sev-table-gap { margin-top: 12px; }
+.sev-table { width: 100%; }
+.sev-actions { margin-top: 12px; }
+.sev-partial-note { color: var(--c-a15c00, #a15c00); }
+.sev-decide-form { margin-top: 14px; }
+.sev-decision-note { color: var(--c-a15c00, #a15c00); }
+
+/* ── Suppliers/supplier_rules.php ── */
+/* أنماطُ الشاشةِ الصفحية — الألوانُ رموزٌ من design-tokens.css حصرًا */
+    .sr-filter-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .sr-contract-select { min-width: 360px; }
+    .sr-note { color: var(--c-s-666); }
+    .sr-gap { margin-top: 10px; }
+    .sr-actions { margin-top: 12px; }
+    .sr-table-full { width: 100%; }
+
+/* ── Suppliers/supplierscontracts.php ── */
+.supplier-contracts-page .form-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  @media (max-width: 991px) {
+    .supplier-contracts-page .form-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .supplier-contracts-page .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .contracts-main .table-container {
+    overflow-x: auto;
+  }
+
+  #projectsTable.contracts-table-nowrap,
+  #projectsTable.contracts-table-nowrap th,
+  #projectsTable.contracts-table-nowrap td {
+    white-space: nowrap;
+  }
+
+  #projectsTable .action-btns {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
+
+  #projectsTable .action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-size: .85rem;
+    transition: all .2s ease;
+  }
+
+  #projectsTable .action-btn.view {
+    background: var(--c-e8b800-18, rgba(232, 184, 0, .18));
+    color: var(--c-9a7b00);
+  }
+
+  #projectsTable .action-btn.edit {
+    background: var(--c-0c1c3e-08, rgba(12, 28, 62, .08));
+    color: var(--c-0c1c3e);
+  }
+
+  #projectsTable .action-btn.delete {
+    background: var(--c-dc2626-12, rgba(220, 38, 38, .12));
+    color: var(--c-b91c1c);
+  }
+
+  #projectsTable .action-btn.view:hover {
+    background: var(--c-e8b800);
+    color: var(--c-0c1c3e);
+    transform: translateY(-2px);
+  }
+
+  #projectsTable .action-btn.edit:hover {
+    background: var(--c-0c1c3e);
+    color: var(--c-surface);
+    transform: translateY(-2px);
+  }
+
+  #projectsTable .action-btn.delete:hover {
+    background: var(--c-dc2626, #dc2626);
+    color: var(--c-surface);
+    transform: translateY(-2px);
+  }
+
+  /* ══ UXW-01 ② — الأنماطُ الموضعيةُ الثابتةُ نُقلت أصنافًا ببادئةِ الشاشة sc- ══
+     والألوانُ كلُّها رموزٌ من assets/css/design-tokens.css (① لونٌ مثبَّت).
+     وما بقي نمطًا موضعيًّا فمحسوبٌ لحظيًّا من البيانات ويحمل سمةَ التصريح. */
+
+  /* الإخفاءُ الابتدائيُّ — يُبدَّل بجافاسكربت */
+  .ems-site .main.supplier-contracts-page .sc-is-hidden {
+    display: none;
+  }
+
+  /* شريطُ المرشِّحات */
+  .ems-site .main.supplier-contracts-page .sc-filter-bar {
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--c-e0e0e0);
+    background: var(--c-f8f9fa);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-filter-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: end;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-filter-col {
+    min-width: 220px;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-filter-label {
+    font-weight: 700;
+    margin-bottom: 6px;
+    display: block;
+  }
+
+  /* شريطُ مجموعاتِ الأعمدة */
+  .ems-site .main.supplier-contracts-page .sc-group-bar {
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--c-e0e0e0);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-group-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-group-toolbar-label {
+    font-weight: 700;
+    color: var(--navy);
+    margin-left: 10px;
+  }
+
+  /* غلافُ الجدولِ والجدول */
+  .ems-site .main.supplier-contracts-page .sc-table-wrap {
+    padding: 2rem;
+    overflow-x: auto;
+  }
+
+  #projectsTable.sc-table {
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  /* أقسامُ المعدات */
+  .ems-site .main.supplier-contracts-page .sc-equip-box {
+    border: 1px solid var(--c-dddddd);
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: var(--c-f9f9f9);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-equip-box-title {
+    margin: 0 0 15px 0;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-equip-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-equip-head-title {
+    margin: 0;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-equip-remove-btn {
+    background: var(--c-dc3545);
+    color: var(--c-surface);
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-dot-basic {
+    color: var(--c-007bff);
+    font-weight: 600;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-dot-backup {
+    color: var(--c-ffc107);
+    font-weight: 600;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-input-basic {
+    background: var(--c-e3f2fd);
+    border-right: 3px solid var(--c-007bff);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-input-backup {
+    background: var(--c-fffde7);
+    border-right: 3px solid var(--c-ffc107);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-add-equip-row {
+    margin: 15px 0;
+    display: flex;
+    gap: 10px;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-add-equip-btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+  }
+
+  /* تفصيلُ الساعاتِ والموردين — يحقنه جافاسكربت من استجابةِ الخادم */
+  .ems-site .main.supplier-contracts-page .sc-bd {
+    color: var(--c-555555);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bd-title-blue {
+    color: var(--c-1976d2);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bd-title-red {
+    color: var(--c-d32f2f);
+    display: block;
+    margin-bottom: 0.5rem;
+    margin-top: 0.8rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bd-title-green {
+    color: var(--c-43a047, #43a047);
+    display: block;
+    margin-bottom: 0.5rem;
+    margin-top: 0.8rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bd-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.6rem;
+    padding: 0.5rem;
+    background: var(--c-f8f9fa);
+    border-radius: 6px;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-sup-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.6rem;
+    padding: 0.5rem;
+    background: var(--c-ffebee, #ffebee);
+    border-radius: 6px;
+    border-left: 4px solid var(--c-d32f2f);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-rem-item {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.6rem;
+    padding: 0.5rem;
+    background: var(--c-e8f5e9, #e8f5e9);
+    border-radius: 6px;
+    border-left: 4px solid var(--c-999999);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bd-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.3rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bd-sub {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    padding-top: 0.3rem;
+    border-top: 1px dashed var(--c-dddddd);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-sup-sub {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    padding-top: 0.3rem;
+    border-top: 1px dashed var(--c-ffcdd2, #ffcdd2);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-rem-sub {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.85rem;
+    padding-top: 0.3rem;
+    border-top: 1px dashed var(--c-c8e6c9, #c8e6c9);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-ic-blue {
+    color: var(--c-1976d2);
+    margin-left: 0.3rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-ic-red {
+    color: var(--c-d32f2f);
+    margin-left: 0.3rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-ic-dyn {
+    margin-left: 0.3rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-ic-red-plain {
+    color: var(--c-d32f2f);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-ic-green {
+    color: var(--c-2e7d32);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-ic-crimson {
+    color: var(--c-c62828);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bd-val-blue {
+    font-weight: 600;
+    color: var(--c-0d47a1);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-sup-val {
+    font-weight: 600;
+    color: var(--c-c62828);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-rem-val {
+    font-weight: 600;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-chip-basic {
+    background: var(--c-007bff);
+    color: var(--c-surface);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-chip-backup {
+    background: var(--c-ffc107);
+    color: var(--c-surface);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-chip-total {
+    background: var(--c-667eea);
+    color: var(--c-surface);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-meta {
+    color: var(--c-666666);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-tone-blue {
+    color: var(--c-1976d2);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-tone-red {
+    color: var(--c-d32f2f);
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bar-wrap {
+    margin-top: 0.4rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bar-track {
+    background: var(--c-e0e0e0);
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bar-fill {
+    height: 100%;
+    transition: width 0.3s;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bar-fill-red {
+    background: var(--c-d32f2f);
+    height: 100%;
+    transition: width 0.3s;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-bar-note {
+    font-size: 0.75rem;
+    color: var(--c-666666);
+    display: block;
+    margin-top: 0.2rem;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-empty-note {
+    color: var(--c-999999);
+    font-style: italic;
+  }
+
+  .ems-site .main.supplier-contracts-page .sc-empty-note-block {
+    color: var(--c-999999);
+    font-style: italic;
+    margin-top: 0.5rem;
+    display: block;
+  }
+
+/* ── Suppliers/unit_statement_supplier.php ── */
+/* أنماطُ الشاشةِ الصفحية — الألوانُ رموزٌ من design-tokens.css حصرًا */
+  .uss-sub { color: var(--c-s-666); margin: 4px 0 0; }
+  .uss-muted { color: var(--c-s-777); }
+
+/* ── Tickets/ticket_close.php ── */
+.tkc-alert-gap { margin: 10px 0; }
+    .tkc-stat-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
+    .tkc-stat-card { padding: 10px 14px; }
+    .tkc-stat-ready { border-inline-start: 4px solid var(--c-198754); }
+    .tkc-stat-blocked { border-inline-start: 4px solid var(--warning-600); }
+    .tkc-stat-label { font-size: .78rem; opacity: .75; }
+    .tkc-stat-value { font-size: 1.4rem; font-weight: 700; }
+    .tkc-w100 { width: 100%; }
+    .tkc-empty-cell { text-align: center; opacity: .7; }
+    .tkc-badge-ready { background: var(--c-198754); }
+    .tkc-badge-blocked { background: var(--warning-600); }
+    .tkc-blockers { font-size: .78rem; opacity: .85; margin-top: 3px; }
+    .tkc-footnote { font-size: .8rem; margin-top: 8px; }
+
+/* ── Tickets/ticket_escalation_config.php ── */
+/* UXW-01 ①②: أنماطُ الشاشةِ الثابتةُ — بادئةُ الشاشة tkt-esc- */
+    .tkt-esc-note  { background: var(--c-f7f3e6, #f7f3e6); color: var(--c-6b5a1e, #6b5a1e); }
+    .tkt-esc-table { width: 100%; }
+
+/* ── Tickets/ticket_kpi.php ── */
+.tkpi-alert-gap { margin: 10px 0; }
+    .tkpi-stat-card { padding: 10px 14px; margin: 10px 0; border-inline-start: 4px solid var(--c-0d6efd); display: inline-block; }
+    .tkpi-stat-label { font-size: .78rem; opacity: .75; }
+    .tkpi-stat-value { font-size: 1.4rem; font-weight: 700; }
+    .tkpi-w100 { width: 100%; }
+    .tkpi-empty-cell { text-align: center; opacity: .7; }
+    .tkpi-footnote { font-size: .8rem; margin-top: 8px; }
+
+/* ── Tickets/ticket_recurrence.php ── */
+/* UXW-01 ①②: أنماطُ الشاشةِ الثابتةُ — بادئةُ الشاشة tkt-rec- */
+    .tkt-rec-note  { background: var(--c-f7f3e6, #f7f3e6); color: var(--c-6b5a1e, #6b5a1e); }
+    .tkt-rec-table { width: 100%; }
+
+/* ── Tickets/ticket_types_config.php ── */
+/* UXW-01 ②: عرضُ الجدولِ الثابتُ صنفًا ببادئةِ الشاشة */
+.tkt-typ-table { width: 100%; }
+
+/* ── Tickets/ticket_workstreams_board.php ── */
+/* UXW-01 ①②: أنماطُ هذه الشاشةِ الثابتةُ أصنافًا ببادئةِ الشاشة — والألوانُ برموزٍ باحتياطٍ حرفيّ */
+.tkt-wsb-table       { width: 100%; }
+.tkt-wsb-cond        { color: var(--c-e67e22, #e67e22); }
+.tkt-wsb-skip        { color: var(--c-888, #888); }
+.tkt-wsb-inline-form { display: inline; }
+
+/* ── Workforce/op_codes.php ── */
+.cmp03-form-actions { margin-top: 12px; display: flex; gap: 10px; }
+
+/* ── Workforce/op_qual.php ── */
+.cmp03-form-actions { margin-top: 12px; display: flex; gap: 10px; }
+
+/* ── Workforce/proposed_deductions.php ── */
+/* UXW-01 ①②: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة — والألوانُ برموزٍ باحتياطٍ حرفيّ */
+.wf-ded-count   { background: var(--c-fd7e14, #fd7e14); }
+.wf-ded-note    { font-size: .9em; }
+.wf-ded-propose { margin-bottom: 14px; padding: 10px 12px; border: 1px solid var(--c-e0d7bd, #e0d7bd);
+                  border-radius: 8px; background: var(--c-fffdf3, #fffdf3); }
+.wf-ded-grid    { margin-top: 8px; }
+.wf-ded-req     { color: var(--c-c00, #c00); }
+.wf-ded-actions { margin-top: 10px; }
+.wf-ded-ok      { color: var(--c-198754, #198754); }

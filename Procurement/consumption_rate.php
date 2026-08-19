@@ -186,10 +186,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا معدلَ استهلاكٍ محسوبًا في المدة',
         'المعدلُ يُحتسب من حركاتِ الصرف — سجِّلِ الصرفَ في «حركات المخزون» أو وسِّعِ المدة');
     ?>
-    <style>
-        .cr-src-note { font-size: .9em; }
-        .cr-legacy-note { margin-top: 14px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php /* ⇐ INJ-0356 · «**ولا يوجد فيها حقلُ إدخالٍ يدويٍّ للمعدل**» —
              فورمُ الإدخالِ المسطَّحُ ذو الخمسةِ والعشرين حقلًا رُفع كلُّه:

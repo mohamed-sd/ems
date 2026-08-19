@@ -33,17 +33,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01 ①②: أنماطُ هذه الشاشةِ الثابتةُ صارت أصنافًا ببادئةِ الشاشة — والألوانُ برموزٍ باحتياطٍ حرفيّ */
-.wf-ded-count   { background: var(--c-fd7e14, #fd7e14); }
-.wf-ded-note    { font-size: .9em; }
-.wf-ded-propose { margin-bottom: 14px; padding: 10px 12px; border: 1px solid var(--c-e0d7bd, #e0d7bd);
-                  border-radius: 8px; background: var(--c-fffdf3, #fffdf3); }
-.wf-ded-grid    { margin-top: 8px; }
-.wf-ded-req     { color: var(--c-c00, #c00); }
-.wf-ded-actions { margin-top: 10px; }
-.wf-ded-ok      { color: var(--c-198754, #198754); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main" dir="rtl">
   <?php
 /* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —

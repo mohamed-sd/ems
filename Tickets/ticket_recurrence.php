@@ -80,11 +80,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا قواعدَ تكرارٍ معرَّفةً بعدُ', 'أضف أولَ قاعدةِ تكرارٍ بزرِّ الإضافةِ في رأسِ الشاشة');
     ?>
     <?php tkt_msg_banner(); ?>
-    <style>
-    /* UXW-01 ①②: أنماطُ الشاشةِ الثابتةُ — بادئةُ الشاشة tkt-rec- */
-    .tkt-rec-note  { background: var(--c-f7f3e6, #f7f3e6); color: var(--c-6b5a1e, #6b5a1e); }
-    .tkt-rec-table { width: 100%; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="success-message is-success tkt-rec-note">
         <i class="fas fa-circle-info"></i>

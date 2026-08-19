@@ -55,13 +55,7 @@ include __DIR__ . '/../includes/page_header.php';
 // UXW-01 ⑨: حالاتُ الشاشةِ الثلاثُ من المكوّنِ المركزيّ
 echo ems_states_bundle('لا ميزانيةَ لنطاقِك في هذه السنة', 'غيِّر السنةَ أو راجعْ اعتمادَ ميزانيةِ إدارتِك');
 ?>
-  <style>
-    /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
-    .bd-filter-form { margin-bottom: 12px; }
-    .bd-year-input  { max-width: 120px; display: inline-block; }
-    .bd-var-over    { color: var(--c-dc3545); }
-    .bd-var-under   { color: var(--c-198754); }
-  </style>
+  <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <form method="get" class="bd-filter-form"><label for="emsf_222_9326f">السنة</label>
     <input type="number" name="year" id="emsf_222_9326f" class="form-control bd-year-input" value="<?= $year ?>" onchange="this.form.submit()"></form>
   <table class="table table-striped" data-no-dt>

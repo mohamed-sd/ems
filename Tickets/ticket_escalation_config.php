@@ -81,11 +81,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا مستوياتِ تصعيدٍ معرَّفةً بعدُ', 'أضف أولَ مستوًى بزرِّ «إضافة مستوى» في رأسِ الشاشة');
     ?>
     <?php tkt_msg_banner(); ?>
-    <style>
-    /* UXW-01 ①②: أنماطُ الشاشةِ الثابتةُ — بادئةُ الشاشة tkt-esc- */
-    .tkt-esc-note  { background: var(--c-f7f3e6, #f7f3e6); color: var(--c-6b5a1e, #6b5a1e); }
-    .tkt-esc-table { width: 100%; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="success-message is-success tkt-esc-note">
         <i class="fas fa-circle-info"></i>

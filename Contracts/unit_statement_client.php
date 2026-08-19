@@ -34,11 +34,7 @@ include __DIR__ . '/../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
-.ucs-sub { color: var(--c-666666); margin: 4px 0 0; }
-.ucs-empty-note { color: var(--c-777777, #777777); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="content-wrapper" dir="rtl">
   <section class="content-header"><h1>كشفُ وحداتِ العميل</h1>
     <p class="ucs-sub">لكلِّ شهرٍ وعقد: ساعاتُ التشغيلِ والاستعدادِ المفوترِ (F-11) — محسوبةٌ من القيدِ اليوميِّ لا مُدخَلة.</p>

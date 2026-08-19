@@ -113,10 +113,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01 ②: عرضُ الجدولِ الثابتُ صنفًا ببادئةِ الشاشة */
-.tkt-typ-table { width: 100%; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
 <div class="main tkt-types-main ems-unified-page-shell">
     <?php

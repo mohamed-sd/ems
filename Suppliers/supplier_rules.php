@@ -126,15 +126,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 $sf_supplier_id = intval($_GET['supplier_id'] ?? $_GET['id'] ?? 0); $sf_active = 'rules';
 if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php';
 ?>
-<style>
-    /* أنماطُ الشاشةِ الصفحية — الألوانُ رموزٌ من design-tokens.css حصرًا */
-    .sr-filter-form { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-    .sr-contract-select { min-width: 360px; }
-    .sr-note { color: var(--c-s-666); }
-    .sr-gap { margin-top: 10px; }
-    .sr-actions { margin-top: 12px; }
-    .sr-table-full { width: 100%; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'قواعد تحميل المورد وجزاءاته'; $header_icon = 'fa fa-scale-unbalanced';

@@ -178,9 +178,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     echo ems_states_bundle('لا نماذجَ تمويلٍ معرَّفةً بعدُ', 'أضف أولَ نموذجٍ بزرِّ «إضافة» — والنموذجُ المعرَّفُ هنا هو ما تُنشأ به عملياتُ التمويل');
     ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('financing', 'الممولُ والشروط'); ?>
-    <style>
-        .cmp03-form-actions { margin-top: 12px; display: flex; gap: 10px; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <?php if ($fm_msg !== ''): ?>
       <div class="alert <?= (mb_strpos($fm_msg, '✅') !== false ? 'alert-success' : 'alert-danger') ?>">

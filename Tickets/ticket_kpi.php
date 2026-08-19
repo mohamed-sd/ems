@@ -58,15 +58,7 @@ include __DIR__ . '/../includes/page_header.php';
 echo ems_states_bundle('لا بلاغاتِ ضمن نطاقِك بعدُ', 'المؤشراتُ تُحسب على البلاغاتِ الحيّةِ لحظةَ تسجيلِها من شاشةِ البلاغات');
 ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('ticket', ''); ?>
-  <style>
-    .tkpi-alert-gap { margin: 10px 0; }
-    .tkpi-stat-card { padding: 10px 14px; margin: 10px 0; border-inline-start: 4px solid var(--c-0d6efd); display: inline-block; }
-    .tkpi-stat-label { font-size: .78rem; opacity: .75; }
-    .tkpi-stat-value { font-size: 1.4rem; font-weight: 700; }
-    .tkpi-w100 { width: 100%; }
-    .tkpi-empty-cell { text-align: center; opacity: .7; }
-    .tkpi-footnote { font-size: .8rem; margin-top: 8px; }
-  </style>
+  <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
   <?php if ($failed): ?>
   <div class="alert alert-danger tkpi-alert-gap">
     <strong>تعذّرت قراءةُ البيانات.</strong>

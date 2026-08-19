@@ -126,20 +126,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 $sf_supplier_id = intval($_GET['supplier_id'] ?? $_GET['id'] ?? 0); $sf_active = 'capacity';
 if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php';
 ?>
-<style>
-/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصنافٍ — والألوانُ رموزٌ حصرًا */
-.scap-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.scap-contract-select { min-width: 360px; }
-.scap-penalty-note { color: var(--c-a15c00, #a15c00); margin-top: 10px; background: var(--c-brand-gold-soft); padding: 10px; border-radius: 6px; }
-.scap-quote { color: var(--c-666666, #666); }
-.scap-req { color: var(--c-state-danger-strong); }
-.scap-actions { margin-top: 12px; }
-.scap-table { width: 100%; }
-.scap-badges { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 12px; }
-.scap-badge-lg { font-size: 15px; padding: 8px 14px; }
-.scap-note-inline { margin: 6px 0; }
-.scap-raw-note { color: var(--c-a15c00, #a15c00); }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell">
     <?php
     $header_title = 'الطاقة والجاهزية ومهلة الإحلال'; $header_icon = 'fa fa-gauge-high';

@@ -300,19 +300,6 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <?php endforeach; ?>
 </div>
 
-<style>
-    .cov-gap-banner { border-radius: 12px; padding: 14px 18px; margin-bottom: 14px; font-size: 1.05rem;
-        display: flex; align-items: center; gap: 10px; border: 1px solid; }
-    .cov-gap-banner.is-gap { background: var(--c-fff4f2, #fff4f2); border-color: var(--c-e0a9a0, #e0a9a0); color: var(--c-8a2c1d, #8a2c1d); }
-    .cov-gap-banner.is-ok { background: var(--c-f2fbf4, #f2fbf4); border-color: var(--c-a9d8b0, #a9d8b0); color: var(--c-1d6b2e, #1d6b2e); }
-    .cov-table th, .cov-table td { white-space: nowrap; padding: 6px 10px; }
-    .cov-table .cov-sub th { font-size: .8rem; color: var(--c-666, #666); }
-    .cov-bad { color: var(--c-b3261e, #b3261e); font-weight: 800; }
-    .cov-ok { color: var(--c-1d6b2e, #1d6b2e); font-weight: 700; }
-    .cov-sep { border-right: 2px dashed var(--c-bbb, #bbb); }
-    .cov-lvl2 { margin-top: 10px; }
-    .cov-lvl3 { margin-top: 6px; margin-bottom: 18px; }
-    .table-container { overflow-x: auto; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 </body>
 </html>

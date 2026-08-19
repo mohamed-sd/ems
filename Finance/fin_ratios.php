@@ -37,13 +37,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
     $byFlag = array('ok' => 0, 'warn' => 0, 'critical' => 0, 'unmeasured' => 0);
     foreach ($rows as $x) { $f = $x['status_flag'] ?: 'unmeasured'; $byFlag[$f] = ($byFlag[$f] ?? 0) + 1; }
 ?>
-    <style>
-        .fa-kpi-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-        .fa-kpi-badge{font-size:14px;padding:7px 12px}
-        .fa-table-full{width:100%}
-        .fa-mono{font-family:monospace}
-        .fa-cell-sm{font-size:.76rem}
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
     <?php echo ems_states_bundle('لا توجد بياناتٌ لهذه الفترة', 'غيّر الفترةَ أو تحقق من توفرِ السجلات'); ?>
     <?php if (!$rows): /* حالةُ الفراغِ تُعرض بدل أصفارِ العدّاداتِ والجدولِ الخالي — والأفعالُ تبقى متاحة */ ?>
     <div class="card"><div class="card-body">

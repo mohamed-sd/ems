@@ -115,17 +115,7 @@ include '../insidebar.php';
 require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'التسوياتُ والصرف');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<style>
-/* UXW-01: أنماطُ الصفحةِ الموضعيةُ رُحِّلت إلى أصنافٍ — والألوانُ رموزٌ حصرًا */
-.sadv-note { margin-bottom: 14px; }
-.sadv-req { color: var(--c-state-danger-strong); }
-.sadv-actions { margin-top: 12px; }
-.sadv-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-.sadv-filter-select { min-width: 280px; }
-.sadv-balance-badge { font-size: 1.05em; }
-.sadv-table { width: 100%; }
-.sadv-inline-form { display: inline; }
-</style>
+<?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell ems-doc-cycle">
     <?php
     $header_title = 'سلفيات الموردين'; $header_icon = 'fa fa-money-bill-transfer';

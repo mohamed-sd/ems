@@ -105,29 +105,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا بنودَ لهذا الموردِ في الفترةِ المختارة', 'بدّل الشهرَ أو اختر موردًا آخرَ من قائمةِ الأعلى');
     ?>
-    <style>
-        /* UXW-01 ②: أصنافُ الصفحةِ بدلَ الأنماطِ الموضعية — ألوانُها رموزٌ حصرًا */
-        .fin-sup-filter { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
-        .fin-sup-select { min-width: 220px; }
-        .fin-sup-h5 { margin: 0 0 12px; }
-        .fin-sup-h5-mid { margin: 18px 0 10px; }
-        .fin-sup-h5-sec { margin: 16px 0 10px; }
-        .fin-sup-kpi { text-align: center; }
-        .fin-sup-kpi-value { font-size: 20px; font-weight: 700; }
-        .fin-sup-ok { color: var(--c-166534); }
-        .fin-sup-neg { color: var(--c-991b1b); }
-        .fin-sup-hint { color: var(--c-ink-500); }
-        .fin-sup-badge-gap { margin-inline-start: 8px; }
-        .fin-sup-layer { margin-bottom: 10px; }
-        .fin-sup-layer-total { font-weight: 700; }
-        .fin-sup-layer-wrap { margin-top: 8px; }
-        .fin-sup-tbl { width: 100%; }
-        .fin-sup-objected { background: var(--c-fef2f2); }
-        .fin-sup-amt { white-space: nowrap; }
-        .fin-sup-net { margin: 6px 0 16px; }
-        .fin-sup-empty-cell { text-align: center; color: var(--c-ink-500); padding: 14px; }
-        .fin-sup-pick { margin: 0; }
-    </style>
+    <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
     <div class="card"><div class="card-body">
         <form method="get" class="fin-sup-filter">

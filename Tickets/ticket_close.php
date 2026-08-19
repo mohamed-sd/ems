@@ -102,21 +102,7 @@ echo ems_next_step('تأكيدُ الحلِّ ثم الإقفالُ — يقعا
 echo ems_states_bundle('لا بلاغَ منجَزًا ينتظر الإقفال', 'الطابورُ يمتلئ حين تبلغ البلاغاتُ مرحلةَ «منجَز» فعلًا');
 ?>
 <?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('ticket', 'الإغلاق'); ?>
-  <style>
-    .tkc-alert-gap { margin: 10px 0; }
-    .tkc-stat-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0; }
-    .tkc-stat-card { padding: 10px 14px; }
-    .tkc-stat-ready { border-inline-start: 4px solid var(--c-198754); }
-    .tkc-stat-blocked { border-inline-start: 4px solid var(--warning-600); }
-    .tkc-stat-label { font-size: .78rem; opacity: .75; }
-    .tkc-stat-value { font-size: 1.4rem; font-weight: 700; }
-    .tkc-w100 { width: 100%; }
-    .tkc-empty-cell { text-align: center; opacity: .7; }
-    .tkc-badge-ready { background: var(--c-198754); }
-    .tkc-badge-blocked { background: var(--warning-600); }
-    .tkc-blockers { font-size: .78rem; opacity: .85; margin-top: 3px; }
-    .tkc-footnote { font-size: .8rem; margin-top: 8px; }
-  </style>
+  <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 
   <?php if ($failed): ?>
   <div class="alert alert-danger tkc-alert-gap">
