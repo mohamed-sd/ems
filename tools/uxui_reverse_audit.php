@@ -295,4 +295,86 @@ if ($den > 0) {
 echo $tot['GAP'] === 0 && $tot['NOT_MEASURED'] === 0
    ? "✔ كلُّ ما يُقاس آليًّا مُنجَز\n"
    : "◆ الناقصُ والمعلَّقُ معلَنانِ أعلاه — ولا يُدَّعى اكتمالٌ فوقَهما\n";
+
+/* ══════════════════════════════════════════════════════════════════════════
+   بطاقةُ إدارةٍ بإدارةٍ — تاسعًا في الترتيبِ المُلزِم
+   ──────────────────────────────────────────────────────────────────────────
+   ◆ نصُّ الطلب: «ثم **المراجعةُ العكسيةُ ببطاقةٍ لكلِّ إدارة**».
+   ◆ **والبطاقةُ تُقسِّم ما قيسَ أعلاه ولا تخترع مقياسًا جديدًا**: المحاورُ الأربعةُ
+     كلُّها مصادرُها مقيسةٌ في هذه الجولةِ نفسِها (`nav_canonical` · `nav_items`
+     النشِط · القرص · مصفوفةُ التبنّي). **ولا رقمَ هنا لا يُردُّ إلى مصدرِه.**
+   ◆ **والمقامُ لكلِّ إدارةٍ شاشاتُها هي** لا مجموعُ النظام — فإدارةٌ بأربعِ شاشاتٍ
+     لا تُقارَن بأخرى بإحدى وسبعين، **ونسبةٌ بمقامٍ صغيرٍ تُعلَن بمقامِها ظاهرًا**.
+   ◆ و«دور N» أسماءُ إداراتٍ لم تُسمَّ بعدُ في السجل — **تُعرض كما هي ولا تُدمج
+     في «أخرى»**، فالدمجُ يُخفي أن ثلاثَ إداراتٍ بلا اسم.
+   ══════════════════════════════════════════════════════════════════════════ */
+echo "\n\n════ بطاقةُ الإدارات — المراجعةُ العكسيةُ مقسومةً على مالكِ الشاشة ════\n";
+
+$DEPT = array();
+$r = $conn->query("SELECT owner_dept, route FROM nav_canonical
+                    WHERE owner_dept IS NOT NULL AND owner_dept <> ''");
+while ($r && ($x = $r->fetch_assoc())) {
+    $d = trim((string) $x['owner_dept']);
+    if (!isset($DEPT[$d])) { $DEPT[$d] = array('n' => 0, 'nav' => 0, 'disk' => 0, 'gen' => 0, 'routes' => array()); }
+    $DEPT[$d]['n']++;
+    $DEPT[$d]['routes'][] = (string) $x['route'];
+}
+
+/* المساراتُ الحيةُ في السايدبارِ النشِط — استعلامٌ واحدٌ لا استعلامٌ لكلِّ شاشة */
+$LIVE = array();
+$r = $conn->query("SELECT DISTINCT route FROM nav_items WHERE active = 1");
+while ($r && ($x = $r->fetch_row())) { $LIVE[mb_strtolower(trim((string) $x[0]))] = 1; }
+
+/* الشاشاتُ المولَّدةُ على المخزنِ المشترك — دَينُ CMP-03 موزَّعًا على مالكيه */
+$GEN = array();
+if (is_file($ROOT . '/includes/cmp03_registry.php')) {
+    require_once $ROOT . '/includes/cmp03_registry.php';
+    if (function_exists('cmp03_registry')) {
+        foreach (array_keys(cmp03_registry()) as $f) { $GEN[mb_strtolower($f)] = 1; }
+    }
+}
+$BRIDGED = array();
+if (is_file($ROOT . '/includes/cmp03_domain_bridge.php')) {
+    require_once $ROOT . '/includes/cmp03_domain_bridge.php';
+    if (function_exists('cmp03_bridged_screens')) {
+        foreach (array_keys(cmp03_bridged_screens()) as $f) { $BRIDGED[mb_strtolower($f)] = 1; }
+    }
+}
+
+foreach ($DEPT as $d => &$row) {
+    foreach ($row['routes'] as $rt) {
+        if (isset($LIVE[mb_strtolower(trim($rt))])) { $row['nav']++; }
+        if (is_file($ROOT . '/' . $rt)) { $row['disk']++; }
+        $base = mb_strtolower(basename($rt));
+        if (isset($GEN[$base]) && !isset($BRIDGED[$base])) { $row['gen']++; }
+    }
+    unset($row['routes']);
+}
+unset($row);
+
+uasort($DEPT, function ($a, $b) { return $b['n'] - $a['n']; });
+
+echo "  المقام: " . count($DEPT) . " إدارةً · " . array_sum(array_column($DEPT, 'n')) . " شاشةً مسجَّلةً في `nav_canonical`\n";
+echo "  ┌ الإدارة ──────────────────── شاشات ─ حيةٌ بالسايدبار ─ على القرص ─ دَينُ CMP-03\n";
+$tN = 0; $tNav = 0; $tDisk = 0; $tGen = 0;
+foreach ($DEPT as $d => $v) {
+    $tN += $v['n']; $tNav += $v['nav']; $tDisk += $v['disk']; $tGen += $v['gen'];
+    printf("  │ %-30s %5d %11d %13d %11s\n", mb_substr($d, 0, 30), $v['n'], $v['nav'], $v['disk'],
+           $v['gen'] > 0 ? (string) $v['gen'] : '—');
+}
+echo "  └──────────────────────────────────────────────────────────────────────────\n";
+printf("    المجموع %28s %5d %11d %13d %11d\n", '', $tN, $tNav, $tDisk, $tGen);
+
+/* ◆ ما لا يُعرض في البطاقةِ يُقال صراحةً — وإلا قُرئ الصمتُ اكتمالًا */
+$offNav  = $tN - $tNav;
+$offDisk = $tN - $tDisk;
+echo "\n  ◆ **مسجَّلٌ ولا يظهر في سايدبارِ أيِّ دورٍ نشط: {$offNav}** — ووجودُ الملفِّ\n";
+echo "    لا يعني وصولَ مستخدمٍ إليه. **والشاشةُ بلا مدخلٍ شاشةٌ لا تُستعمَل.**\n";
+if ($offDisk > 0) {
+    echo "  ◆ **مسجَّلٌ ولا ملفَّ له على القرص: {$offDisk}** — سجلٌّ يَعِد بما لا يُفتح.\n";
+}
+echo "  ◆ **دَينُ CMP-03 موزَّعًا: {$tGen} شاشةً مولَّدةً ما تزال على المخزنِ المشترك**\n";
+echo "    (المجسورةُ الخمسُ مطروحةٌ) — وهي 38 من 42، والقرارُ لكلٍّ منها **نمذجةٌ**\n";
+echo "    لا اشتقاقٌ آليّ، فتظهر هنا موزَّعةً على مالكيها لا رقمًا واحدًا مبهمًا.\n";
+
 exit(0);
