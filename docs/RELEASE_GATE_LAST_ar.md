@@ -1,9 +1,9 @@
 # شهادة بوابات التسليم — آخر عبور
 
-**التاريخ:** 2026-08-18 11:23 · **الحكم:** ✘ توقف عند ② التكامل: tools/e02_checks.php
+**التاريخ:** 2026-08-19 10:41 · **الحكم:** ✘ توقف عند ② التكامل: tools/e02_checks.php
 
 ```
-════ بوابات التسليم الخمس — 2026-08-18 11:21 ════
+════ بوابات التسليم الخمس — 2026-08-19 10:39 ════
 
 ▌ البوابة ① — اختبار الوحدة (يشهد: المطوّر)
   ✔ tests/wfm_engine_test.php — ✔ صفّا خطوتين في approval_links (الأولى مختومة)
@@ -14,18 +14,18 @@
   ✔ tools/act_checks.php — ────────────────────────────────────────────────────────────
 الحكم: ✔ صفرٌ في الحاكمة — الدمجُ مسموح
   ✘ tools/e02_checks.php — ──────────────────────────────────────────────
-الحكم: ✘ 1 خرقًا — الدمجُ ممنوع
+الحكم: ✘ 2 خرقًا — الدمجُ ممنوع
   ✔ tools/e05_checks.php — ──────────────────────────────────────────────────────
-الحكم: ✔ صفرٌ في الحاكمة
+الحكم: ✔ صفرٌ في الحاكمة — و② دَينُ عزلٍ معلَنٌ لا يحجب (فاحصٌ يُبلّغ)
   ✔ tools/wfm_checks.php — ──────────────────────────────────────────────
 الحكم: ✔ صفرٌ في الحاكمة
   ✘ tools/se03_ten_checks.php — المخالف: CK-04=5 ·
 ══════════════════════════════════════════════════════════════════════
   ✔ tools/fin01_posting_verify.php — ✔ الترحيلُ سليمٌ — صفرُ مخالفٍ في الثمانية
   ✘ tools/uxw_visual_baseline.php — ✔ مطابق: main/user_profile.php
-✔ مطابق: Governance/authority_caps.php
-  ✘ tools/uxw_gates.php — [١٠ فرق بصري] Suppliers__unit_statement_supplier.diff.txt — فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح
-  [١٠ فرق بصري] Timesheet__timesheet.diff.txt — فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح
+✘ فرق: Governance/authority_caps.php — كُتب Governance__authority_caps.diff.txt (يعتمده --capture بعد توثيقِ السبب)
+  ✘ tools/uxw_gates.php — [١٠ فرق بصري] Suppliers__supplier_profile.diff.txt — فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح
+  [١٠ فرق بصري] Suppliers__unit_statement_supplier.diff.txt — فرقٌ بصريٌّ غيرُ معتمدٍ — يُقبل بسببٍ مكتوبٍ أو يُصلَح
   ✔ tools/govauth_checks.php — ✔ فحوصُ GOV-AUTH-01 نافذةُ النطاقِ مجتازة
   ✘ tools/govauth_parity_probe.php — ✘ view	fin.deptmgr@equipation.sd (دور 19)	Finance/ob_due_soon.php	قائم=0 قالب=1
   … و338 أخرى

@@ -14,8 +14,21 @@
   const HEADER_MAX = 96;   /* ف٨-٣ · بوابة G19 */
 
   /* ── ① الترويسة: أطولُ مرشَّحٍ مُصيَّرٍ فعلًا ── */
+  /* ═══════════════════════════════════════════════════════════════════════
+     صنفُ الترويسةِ الحقيقيُّ أولًا — و«أولُ ابنٍ» احتياطٌ لا أصل
+     ─────────────────────────────────────────────────────────────────────────
+     ◆ كشفه قياسٌ حيٌّ على `Maintenance/orders.php`: الترويسةُ قُرئت `null`
+       لأن أولَ ابنٍ في الغلافِ كان `.ems-state-loading` بارتفاعِ صفر — والترويسةُ
+       بعدَه. فالشاشةُ تبدو **بلا ترويسة** وهي ذاتُ ترويسةٍ سليمةٍ (59px).
+     ◆ و`.main_head` هو الصنفُ الذي يُصدره `includes/page_header.php` فعلًا
+       (موثَّقٌ في ترويسةِ الملف). فيُقدَّم، ويبقى «أولُ ابنٍ» احتياطًا لما لا
+       يمرُّ بالمكوّن.
+     ◆ ولا يُبطل هذا ما قِيس قبلَه: على الشاشاتِ التي قِيست كان «أولُ ابنٍ»
+       **هو `.main_head` نفسَه** (59px عند top=74 في كلتَيهما) — عنصرٌ واحدٌ
+       بمنتقيَين، لا رقمان.
+     ═══════════════════════════════════════════════════════════════════════ */
   const headerSelectors = [
-    '.ux-page-header', '.page-header', '.ems-page-header', '#pageHeader',
+    '.main_head', '.ux-page-header', '.page-header', '.ems-page-header', '#pageHeader',
     '.ems-unified-page-shell > :first-child'
   ];
   let header = null;
@@ -66,12 +79,28 @@
     .filter(visible)
     .filter(el => !el.closest('.ux-viewpicker'));      /* منتقي المنظرِ أداةٌ لا شريط */
   const outerBars = barEls.filter(el => !barEls.some(o => o !== el && o.contains(el)));
-  const bands = new Set(outerBars.map(el => Math.round(el.getBoundingClientRect().top / 8)));
-  const toolbars = bands.size;
+  /* ◆ **والقياسُ لكلِّ جدولٍ على حدةٍ لا للصفحة**: كشفه قياسٌ حيٌّ على
+       `Finance/approvals_inbox.php` — **أربعةُ جداولٍ** لكلٍّ شريطُه، فقُرئت
+       «أربعةَ أشرطةٍ مكدَّسة» وهي شريطٌ واحدٌ لكلِّ جدول. وبوابةُ G20 تسأل:
+       أفوقَ الجدولِ الواحدِ شريطٌ أم شريطان؟ فالمقامُ **أقصى ما فوقَ جدولٍ
+       واحد** لا مجموعُ الصفحة. */
+  const groupOf = el => {
+    const w = el.closest('.dataTables_wrapper, .ems-table-wrap, [data-ux-table]');
+    return w || document.body;
+  };
+  const perGroup = new Map();
+  outerBars.forEach(el => {
+    const g = groupOf(el);
+    if (!perGroup.has(g)) { perGroup.set(g, new Set()); }
+    perGroup.get(g).add(Math.round(el.getBoundingClientRect().top / 8));
+  });
+  let toolbars = 0;
+  perGroup.forEach(s => { if (s.size > toolbars) { toolbars = s.size; } });
   const toolbarDetail = outerBars.map(el => ({
     cls: String(el.className).trim().split(/\s+/).slice(0, 2).join('.'),
     top: Math.round(el.getBoundingClientRect().top)
   }));
+  const toolbarGroups = perGroup.size;
 
   /* ── ⑤ إجراءاتُ خليةِ الجدولِ (G18) — أظهرُ خليةٍ ── */
   let worstCell = 0;

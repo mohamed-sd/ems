@@ -550,10 +550,60 @@
 
     /* أعمدةُ الأفعال لا تُصدَّر: خلاياها أزرارٌ وروابطُ لا بيانات. */
     var ACTION_HEAD = /^(الإجراءات|إجراءات|العمليات|عمليات|الخيارات|خيارات|أدوات|الأدوات|التحكم|actions?|options?|tools?|manage)$/i;
+    /* ═══════════════════════════════════════════════════════════════════════
+     * أعمدةٌ واعيةٌ بالصلاحية — والمنعُ في العرضِ **والتصديرِ** معًا
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ قرارُ المالك (ف١٦ · شبكةُ إنجاز): «أعمدةٌ واعيةٌ بالصلاحيةِ وتصديرٌ
+     *   بالمسموحِ لا بالكل».
+     * ◆ والعطبُ الذي يسدُّه: عمودٌ يُخفى بصنفِ CSS **يبقى في التصدير** — فمن
+     *   لا يراه على الشاشةِ يجده في ملفِّ إكسل. وهو تسريبٌ صامت.
+     * ◆ فالعلاجُ **مسندٌ واحدٌ يقرؤه المسلكان**: `data-perm` على `<th>`.
+     *   يُطابَق بقائمةِ صلاحياتِ المستخدمِ التي يزرعها الخادمُ في
+     *   `<body data-ems-perms>`؛ وما لا يملكه المستخدمُ **يُنزع من الشاشة
+     *   بـ`column().visible(false)` ويُستبعد من التصدير** — لا يُخفى بصنف.
+     * ◆ **وغيابُ المسندِ ليس منعًا**: عمودٌ بلا `data-perm` عمومٌ مرئيٌّ كما
+     *   كان — فصفرُ ارتدادٍ في 361 شاشةً لم تُعلَّم أعمدتُها بعد.
+     * ◆ **والخادمُ يبقى الحاكم**: هذا إخفاءُ عرضٍ لا حارسُ بيانات. من يملك
+     *   الاستعلامَ يملك الصفَّ — فالحقولُ السريةُ تُمنع في الاستعلامِ لا هنا.
+     *   (ولذلك لا يُعوَّل عليه في المجالاتِ الستةِ المحظورة.)
+     * ═══════════════════════════════════════════════════════════════════════ */
+    var __emsPerms = null;
+    function emsUserPerms() {
+        if (__emsPerms) { return __emsPerms; }
+        var raw = (document.body && document.body.getAttribute('data-ems-perms')) || '';
+        __emsPerms = {};
+        raw.split(/[,\s]+/).forEach(function (p) { if (p) { __emsPerms[p] = true; } });
+        return __emsPerms;
+    }
+    /** أيملك المستخدمُ صلاحيةَ هذا العمود؟ وغيابُ الوسمِ = عمومٌ مسموح. */
+    function isPermittedColumn(api, idx) {
+        var th;
+        try { th = api.column(idx).header(); } catch (e) { return true; }
+        if (!th || !th.getAttribute) { return true; }
+        var need = th.getAttribute('data-perm');
+        if (!need) { return true; }
+        var perms = emsUserPerms();
+        /* «أيٌّ من» بفاصلة — والمنعُ لا يقع إلا إذا لم يملك المستخدمُ واحدةً */
+        return need.split('|').some(function (p) { return !!perms[p.trim()]; });
+    }
+    /** يُطبَّق مرةً عند التهيئة: ما لا يُسمح به يُنزع من الجدولِ نفسِه. */
+    function applyColumnPermissions(api) {
+        var hidden = 0;
+        try {
+            api.columns().every(function (i) {
+                if (!isPermittedColumn(api, i)) { this.visible(false, false); hidden++; }
+                return true;
+            });
+            if (hidden) { api.columns.adjust(); }
+        } catch (e) { /* جدولٌ لا يقبل الضبطَ — يبقى كما هو ولا يُكسَر */ }
+        return hidden;
+    }
+
     function isExportableColumn(api, idx) {
         var th = api.column(idx).header();
         if (!th) return true;
         if (th.classList && (th.classList.contains('no-export') || th.hasAttribute('data-no-export'))) return false;
+        if (!isPermittedColumn(api, idx)) return false;   /* ما مُنع عرضُه لا يُصدَّر */
         return !ACTION_HEAD.test((th.textContent || '').trim());
     }
 
@@ -635,6 +685,12 @@
         var allBtn = document.createElement('button');
         allBtn.type = 'button';
         allBtn.textContent = 'إظهار كل الأعمدة';
+        /* ◆ **اسمٌ صريحٌ لا يعتمد على حالةِ العرض**: الزرُّ داخلَ `<details>`
+             مطويّ، و`innerText` يرجع فارغًا لما ليس مُصيَّرًا — فيُقرأ «ضابطًا
+             بلا اسم» في فحصِ الوصولِ وهو ذو نصٍّ سليم. و`aria-label` يُقرأ في
+             الحالتَين، فيصير الاسمُ حقيقةً لا أثرًا لانطواء. */
+        allBtn.setAttribute('aria-label', 'إظهار كل الأعمدة المسموح بها');
+        allBtn.title = 'إظهار كل الأعمدة المسموح بها';
         allBtn.style.cssText = 'display:block;width:100%;margin-bottom:8px;padding:4px;font-size:.8rem;cursor:pointer';
         panel.appendChild(allBtn);
 
@@ -736,11 +792,17 @@
 
         var boxes = [];
         for (var i = 0; i < nCols; i++) {
+            /* ◆ **الممنوعُ لا يُدرَج في القائمةِ أصلًا** — لا يُعرَض مُعطَّلًا.
+                 فإدراجُه بصندوقٍ مقفلٍ يُعلن للمستخدمِ وجودَ عمودٍ لا يراه،
+                 وذاك تسريبُ بنيةٍ لا حاجةَ له. وقاعدةُ «صفر فقد» لا تُخالَف:
+                 العمودُ قائمٌ في الشاشةِ لمن يملك صلاحيتَه. */
+            if (!isPermittedColumn(api, i)) { continue; }
             (function (ci) {
                 var lab = document.createElement('label');
                 lab.style.cssText = 'display:flex;gap:6px;align-items:center;font-size:.82rem;padding:2px 0;cursor:pointer';
                 var cb = document.createElement('input');
                 cb.type = 'checkbox';
+                cb.dataset.col = String(ci);          /* الفهرسُ مسندٌ لا التقاطُ مغلَق */
                 cb.checked = api.column(ci).visible();
                 cb.addEventListener('change', function () {
                     var visCount = 0;
@@ -771,8 +833,17 @@
             })(i);
         }
         allBtn.addEventListener('click', function () {
-            for (var k = 0; k < boxes.length; k++) { boxes[k].checked = true; }
-            api.columns().visible(true, false);          /* دفعةً — لا رسمٌ لكلِّ عمود */
+            /* ◆ **«كلُّ الأعمدة» تعني كلَّ المسموحِ لا كلَّ الموجود.**
+                 و`api.columns().visible(true)` كان يُعيد إظهارَ ما منعته
+                 الصلاحيةُ لحظةَ التهيئة — فيصير القيدُ زخرفةً يُبطلها زرٌّ واحد.
+                 فتُستثنى الممنوعةُ صراحةً، وتبقى الدفعةُ واحدةً لا رسمًا لكلِّ عمود. */
+            var allowed = [];
+            for (var c = 0; c < nCols; c++) { if (isPermittedColumn(api, c)) { allowed.push(c); } }
+            for (var k = 0; k < boxes.length; k++) {
+                var ci = parseInt(boxes[k].dataset.col, 10);
+                boxes[k].checked = (allowed.indexOf(ci) !== -1);
+            }
+            api.columns(allowed).visible(true, false);
             try { api.columns.adjust().draw(false); } catch (e) {}
             note.style.color = '';
         });
@@ -900,6 +971,9 @@
         try {
             var tid = 't' + Math.floor(Date.now() % 1e7) + '_' + Math.floor(Math.random() * 1e5);
             tableEl.dataset.emsToolsId = tid;
+            /* الصلاحيةُ تُطبَّق **قبل** بناءِ المنتقي — فما مُنع لا يُعرَض ولا يُدرَج */
+            var __hid = applyColumnPermissions(api);
+            if (__hid) { tableEl.dataset.emsPermHidden = String(__hid); }
             buildColumnsAndViews(api, tableEl, host);
             var built = host.querySelector('.ems-colvis');
             if (built) { built.setAttribute('data-ems-for', tid); tableEl.dataset.emsToolsBuilt = '1'; }

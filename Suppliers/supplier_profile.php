@@ -240,7 +240,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     </div>
 
     <div class="card spf-section-card">
-        <div class="card-header"><h5><i class="fas fa-truck"></i> المعدات المرتبطة بالمورد</h5></div>
+        <div class="card-header"><h3 class="h5"><i class="fas fa-truck" aria-hidden="true"></i> المعدات المرتبطة بالمورد</h3></div>
         <div class="card-body">
             <table id="supplierEquipmentsTable" class="display spf-table">
                 <thead><tr><th>المعدة</th><th>الكود</th><th>عدد المشاريع</th><th>الساعات</th></tr></thead>
@@ -259,7 +259,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     </div>
 
     <div class="card">
-        <div class="card-header"><h5><i class="fas fa-file-contract"></i> آخر عقود المورد</h5></div>
+        <div class="card-header"><h3 class="h5"><i class="fas fa-file-contract" aria-hidden="true"></i> آخر عقود المورد</h3></div>
         <div class="card-body">
             <table id="supplierContractsTable" class="display spf-table">
                 <thead><tr><th>المشروع</th><th>تاريخ التوقيع</th><th>مستهدف شهري</th><th>إجمالي ساعات</th><th>الحالة</th>

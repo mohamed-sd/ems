@@ -2,28 +2,28 @@
 /**
  * 2027_07_13_test_data_isolation_register.php — سجلُّ عزلِ الصفوفِ الملوَّثة
  * ═══════════════════════════════════════════════════════════════════════════
- * ◆ قرارُ المالك (2026-08-19 · سادسًا) — خمسُ خطواتٍ لكلِّ قيمةٍ ملوَّثة، وفيها:
- *   «**فإن لم توجد يقينًا فلا تخمّن ولا تكتب NULL تلقائيًّا** — اعزلِ السجلَّ
- *   أو امنعْ أثرَه وفقَ قيدِ الحقل… احفظِ النصَّ الأصليَّ ومرجعَه».
+ * ◆ قرارُ المالك (2026-08-19 · سادسًا) — خمسُ خطواتٍ لكلِّ قيمةٍ في حقلِ رمزٍ
+ *   أو تعداد: ① أثبتْ أنها في غيرِ موضعِها ② حدّدِ القيمةَ الصحيحةَ من مصدرٍ
+ *   حاكم ③ **فإن لم توجد يقينًا فلا تخمّن ولا تكتب NULL تلقائيًّا** — اعزلِ
+ *   السجلَّ أو امنعْ أثرَه **وفقَ قيدِ الحقل** ④ احفظِ النصَّ الأصليَّ ومرجعَه
+ *   ⑤ ثم قيدٌ يمنع عودتَه.
  *
- * ◆ والقياسُ الحيُّ حسم شكلَ العلاج: الصفُّ المصابُ **مصطنَعٌ بكاملِه** لا
- *   صفٌّ سليمٌ فيه حقلٌ فاسد. مثالٌ مقيس (`fleet_model` id=2): `model_name`
- *   اسمُ شخصٍ، و`manufacturer` و`operating_category` و`fuel_type` و
- *   `std_capacity_uom` **تحمل الجملةَ نفسَها حرفًا**. فلا «قيمةٌ صحيحةٌ»
- *   تُبحث لـ`fuel_type` — إذ لا أصلَ له يُستعاد. وقِسْ عليه الصفَّ السليمَ
- *   (id=1): تايوتا · samba · تحميل · بنزين · لتر.
+ * ◆ والحالُ المقيسُ يمنع القفزَ إلى ⑤ الآن:
+ *   ① الأعمدةُ المصابةُ **NOT NULL** — فلا يُكتب فيها NULL أصلًا.
+ *   ② ولا مصدرَ حاكمًا يقول ما القيمةُ الصحيحةُ لـ`entity_type` انطلاقًا من
+ *      جملةٍ عربيةٍ لا تدلُّ عليها.
+ *   ③ وجُرِّب القيدُ المانعُ فعلًا على `deduction_types` فرفضته القاعدةُ
+ *      **لأن الصفوفَ الملوَّثةَ قائمة** — فالترتيبُ: عزلٌ ثم قيد، لا العكس.
  *
- * ◆ ودليلٌ ثانٍ على سوءِ الموضع: القيمُ **مبتورةٌ في منتصفِ كلمتِها**
- *   («UAT-202» بدل «UAT-2026-0013») لأن عمودَ الرمزِ أضيقُ من الجملة.
+ * ◆ فهذا الجدولُ يُنجز ① و④ بلا مساسٍ ببياناتِ العمل: يُعدِّد الصفَّ بمفتاحِه
+ *   ويحفظ نصَّه الأصليَّ ومرجعَه ومجالَ سياستِه، فيصير المتبقّي **مقيسًا
+ *   ومحصورًا** بدل أن يكون تقديرًا.
  *
- * ◆ وأعمدةُ الإصابةِ **NOT NULL** فلا يُكتب فيها NULL — وهو عينُ ما اشترطه
- *   المالك: «NULL لا يُستعمل إلا حيث يُسمح به دلاليًّا وبنيويًّا».
+ * ◆ و`policy_domain` يُشتقُّ من اسمِ الجدولِ لا من إقرارِ الكاتب — فما وقع في
+ *   المجالاتِ الستةِ المحظورةِ يُسجَّل ولا يُمَسُّ بلا قرارٍ صريحٍ من المالك.
  *
- * ◆ فهذه الهجرةُ تُنشئ السجلَّ **فارغًا**: يحفظ المفتاحَ والنصَّ الأصليَّ
- *   ومرجعَه وقيدَ الحقلِ ومجالَ السياسة — **وصفرُ تعديلٍ في بياناتِ العمل**.
- *   والصفُّ نفسُه لا يُمَسُّ حتى يُحسم المجال: فمنه ما يقع في **المجالاتِ
- *   الستةِ المحظورة** (`approval_workflow_rules` · `fin_approval_chain` ·
- *   `fin_obl_register`) وقاعدةُ المالكِ فيها صريحة: لا تطبيقَ بلا اعتراضٍ أبدًا.
+ * ◆ والتسجيلُ في `TenantRegistry` كـ`T_GLOBAL`: السجلُّ حوكميٌّ عابرٌ للشركات —
+ *   والتلوثُ يقع في جداولٍ عالميةٍ ومستأجَرةٍ معًا، فحصرُه بشركةٍ يُخفي نصفَه.
  * ═══════════════════════════════════════════════════════════════════════════
  */
 if (php_sapi_name() !== 'cli') { exit("CLI فقط\n"); }
@@ -46,21 +46,105 @@ $ok = $conn->query("CREATE TABLE IF NOT EXISTS `gov_test_data_isolation` (
   `pk_column` VARCHAR(64) NOT NULL,
   `pk_value` VARCHAR(64) NOT NULL,
   `column_name` VARCHAR(64) NOT NULL,
-  `original_value` TEXT NOT NULL COMMENT 'النصُّ الأصليُّ محفوظًا — لا يُفقد',
-  `source_ref` VARCHAR(190) NOT NULL COMMENT 'مرجعُ النصِّ كما وُجد',
+  `original_value` TEXT NOT NULL
+      COMMENT 'النصُّ الأصليُّ محفوظًا حرفًا — قاعدةُ صفرِ فقدٍ تسري هنا أيضًا',
+  `source_ref` VARCHAR(64) NOT NULL DEFAULT 'UNMARKED'
+      COMMENT 'مرجعُ النصِّ مقروءًا من النصِّ نفسِه — لا يُخترع',
   `reason` VARCHAR(190) NOT NULL,
-  `column_nullable` TINYINT(1) NOT NULL COMMENT 'أيقبل الحقلُ NULL؟ يحدّد العلاجَ الممكن',
-  `policy_domain` ENUM('NAVIGATION_NAMING_POSITION','PERMISSIONS','APPROVAL_LADDERS',
-        'FINANCIAL_CAPS','SEGREGATION_OF_DUTIES','LEGAL_OBLIGATIONS','FINANCIAL_DECISIONS',
-        'OPERATIONAL_DATA') NOT NULL DEFAULT 'OPERATIONAL_DATA',
-  `resolution` ENUM('PENDING_SOURCE','PENDING_OWNER','QUARANTINED','RESOLVED')
-        NOT NULL DEFAULT 'PENDING_SOURCE',
+  `column_nullable` TINYINT(1) NOT NULL
+      COMMENT 'أيقبل الحقلُ NULL؟ يحدّد أيَّ علاجٍ ممكنٌ بنيويًّا',
+  `policy_domain` ENUM(
+      'OPERATIONAL_DATA','PERMISSIONS','APPROVAL_LADDERS','FINANCIAL_CAPS',
+      'SEGREGATION_OF_DUTIES','LEGAL_OBLIGATIONS','FINANCIAL_DECISIONS'
+  ) NOT NULL DEFAULT 'OPERATIONAL_DATA'
+      COMMENT 'ما وقع في الستةِ المحظورةِ لا يُمَسُّ بلا قرارٍ صريح',
+  `resolution` ENUM('PENDING_SOURCE','PENDING_OWNER','RESOLVED')
+      NOT NULL DEFAULT 'PENDING_SOURCE',
+  `resolved_value` VARCHAR(190) DEFAULT NULL
+      COMMENT 'لا تُملأ إلا من مصدرٍ حاكمٍ — والتخمينُ ممنوع',
+  `resolved_source` VARCHAR(190) DEFAULT NULL
+      COMMENT 'المصدرُ الحاكمُ الذي أعطى القيمة — بلا مصدرٍ لا حسم',
   `registered_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_row_col` (`table_name`, `pk_value`, `column_name`),
   KEY `ix_res` (`resolution`),
-  KEY `ix_dom` (`policy_domain`)
+  KEY `ix_domain` (`policy_domain`),
+  /* ◆ **قيدٌ لا قاعدةٌ مكتوبة**: لا يُعلَن صفٌّ محسومًا بلا قيمةٍ **ومصدرٍ**
+       معًا — فالحسمُ بلا مصدرٍ تخمينٌ مسجَّلٌ باسمِ الحقيقة. */
+  CONSTRAINT `chk_resolved_needs_source` CHECK (
+      `resolution` <> 'RESOLVED'
+      OR (`resolved_value` IS NOT NULL AND `resolved_source` IS NOT NULL)
+  )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
-  COMMENT='عزلٌ بتسجيلٍ — النصُّ محفوظٌ وبياناتُ العملِ لم تُمَسّ'");
+  COMMENT='عزلُ صفوفٍ ملوَّثةٍ بتسجيلٍ — النصُّ محفوظٌ والبياناتُ لم تُمَسّ'");
+
 if (!$ok) { exit("✗ {$conn->error}\n"); }
-echo "✔ gov_test_data_isolation أُنشئ فارغًا — والملءُ بجردٍ لا بتعديل\n";
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * إكمالُ الناقصِ في جدولٍ قائم — و`IF NOT EXISTS` لا يفعل ذلك
+ * ───────────────────────────────────────────────────────────────────────────
+ * ◆ كشفه تشغيلٌ حيٌّ: الجدولُ كان قائمًا سلفًا بـ991 صفًّا، فمرَّ الأمرُ
+ *   **ناجحًا وصامتًا** ولم يُضَف القيدُ ولا فرادةُ المفتاح. ولو اكتُفي بمُرجَعِ
+ *   `query()` لأُعلن «مُنشأ» وهو ناقص — وذاك رقمٌ بلا مصدر.
+ * ◆ فتُفحص البنيةُ **كما هي في القاعدة** ويُكمَل ما نقص:
+ *   ① فرادةُ (جدول، مفتاح، عمود) — وإلا سُجِّل الصفُّ الواحدُ مرارًا.
+ *   ② قيدُ «لا حسمَ بلا مصدر».
+ * ═══════════════════════════════════════════════════════════════════════════ */
+$fixes = array();
+
+/* ① الفرادة — تُفحص من الفهارسِ لا من نيّةِ الأمر */
+$r = $conn->query("SELECT NON_UNIQUE FROM information_schema.STATISTICS
+                    WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='gov_test_data_isolation'
+                      AND INDEX_NAME='uq_row_col' LIMIT 1");
+$idx = $r ? $r->fetch_assoc() : null;
+if ($idx && (int) $idx['NON_UNIQUE'] === 1) {
+    $dups = (int) $conn->query("SELECT COUNT(*) c FROM (
+                SELECT 1 FROM gov_test_data_isolation
+                 GROUP BY table_name, pk_value, column_name HAVING COUNT(*) > 1) d")->fetch_assoc()['c'];
+    if ($dups === 0) {
+        if ($conn->query("ALTER TABLE gov_test_data_isolation DROP INDEX `uq_row_col`,
+                           ADD UNIQUE KEY `uq_row_col` (`table_name`,`pk_value`,`column_name`)")) {
+            $fixes[] = 'الفرادةُ أُضيفت (كان فهرسًا عاديًّا)';
+        } else { $fixes[] = 'الفرادةُ رُفضت: ' . $conn->error; }
+    } else {
+        /* لا يُحذف صفٌّ لتمريرِ قيد — يُعلَن العددُ ويُترك القرارُ للمالك */
+        $fixes[] = "الفرادةُ مؤجَّلة: {$dups} مجموعةً مكرَّرةً — ولا يُحذف صفٌّ لتمريرِ قيد";
+    }
+}
+
+/* ② لا حسمَ بلا مصدرٍ — قيدًا لا قاعدةً مكتوبة */
+$r = $conn->query("SELECT COUNT(*) c FROM information_schema.CHECK_CONSTRAINTS
+                    WHERE CONSTRAINT_SCHEMA=DATABASE() AND TABLE_NAME='gov_test_data_isolation'
+                      AND CONSTRAINT_NAME='chk_resolved_needs_source'");
+if (!$r || (int) $r->fetch_assoc()['c'] === 0) {
+    /* والعمودانِ قد لا يكونانِ في الجدولِ القائم */
+    foreach (array('resolved_value', 'resolved_source') as $needCol) {
+        $q = $conn->query("SELECT 1 FROM information_schema.COLUMNS
+                            WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='gov_test_data_isolation'
+                              AND COLUMN_NAME='{$needCol}'");
+        if (!$q || $q->num_rows === 0) {
+            $cmt = ($needCol === 'resolved_value')
+                 ? 'لا تُملأ إلا من مصدرٍ حاكمٍ — والتخمينُ ممنوع'
+                 : 'المصدرُ الحاكمُ الذي أعطى القيمة — بلا مصدرٍ لا حسم';
+            $conn->query("ALTER TABLE gov_test_data_isolation
+                          ADD `{$needCol}` VARCHAR(190) DEFAULT NULL COMMENT '{$cmt}'");
+            $fixes[] = "العمودُ `{$needCol}` أُضيف";
+        }
+    }
+    if ($conn->query("ALTER TABLE gov_test_data_isolation
+        ADD CONSTRAINT `chk_resolved_needs_source` CHECK (
+            `resolution` <> 'RESOLVED'
+            OR (`resolved_value` IS NOT NULL AND `resolved_source` IS NOT NULL))")) {
+        $fixes[] = 'قيدُ «لا حسمَ بلا مصدر» أُضيف';
+    } else { $fixes[] = 'القيدُ رُفض: ' . $conn->error; }
+}
+
+echo "════ سجلُّ عزلِ الصفوفِ الملوَّثة ════\n";
+foreach ($fixes as $f) { echo "  · {$f}\n"; }
+$r = $conn->query("SELECT COUNT(*) c FROM information_schema.TABLE_CONSTRAINTS
+                    WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='gov_test_data_isolation'
+                      AND CONSTRAINT_TYPE='CHECK'");
+$chk = $r ? (int) $r->fetch_assoc()['c'] : 0;
+echo "  الجدولُ مُنشأ · قيودُ CHECK: {$chk}\n";
+echo "  ▸ الحسمُ بلا مصدرٍ مرفوضٌ **بقيدٍ** لا بقاعدةٍ مكتوبة\n";
+echo "✔ العزلُ يسبق القيدَ — لأن القيدَ يرفض جدولًا فيه صفوفٌ ملوَّثةٌ قائمة\n";

@@ -89,14 +89,45 @@
   const iconNoTip = iconOnly.filter(e => !e.getAttribute('title') && !e.getAttribute('aria-label'));
   R.icon_tooltips = { iconOnly: iconOnly.length, violations: iconNoTip.length, sample: sample(iconNoTip) };
 
-  /* ⑬ حالةُ التركيزِ مرئيةٌ (لا outline:none بلا بديل) */
+  /* ═══════════════════════════════════════════════════════════════════════
+     ⑬ حالةُ التركيزِ مرئيةٌ — **تُقاس والعنصرُ مركَّزٌ لا وهو ساكن**
+     ─────────────────────────────────────────────────────────────────────────
+     ◆ كان يُقرأ `getComputedStyle` على العنصرِ **الساكن** — و`outline` في
+       الحالةِ الساكنةِ `none` في كلِّ متصفّحٍ لكلِّ عنصرٍ تقريبًا. فأبلغ القياسُ
+       **48 مخالفةً من 72** على `Risk/risk_register.php` وفي المصدرِ 23 قاعدةَ
+       `:focus-visible` عاملة — عيبُ قياسٍ لا عيبُ منتج.
+     ◆ **والشرطُ اللازمُ ضغطةُ Tab حقيقيةٌ أولًا**: كروم يتتبّع آخرَ نمطيةِ
+       إدخال، فبعد الفأرةِ لا يُطابق `:focus-visible` زرًّا وإن رُكِّز برمجيًّا.
+       فيُطلَب من المُشغِّلِ ضغطُ Tab مرةً واحدةً قبل النداء — ويُعلَن ذلك في
+       المخرَجِ (`keyboardModality`) فلا يُقرأ رقمٌ بلا شرطِه.
+     ◆ **والمخالفةُ تُحسب حيث يُطابق `:focus-visible` ولا مؤشِّرَ**: عنصرٌ لا
+       يُطابقها أصلًا لا يُتوقَّع له مؤشِّرٌ، فعدُّه مخالفةً كذبٌ في الاتجاهِ
+       المعاكس. وقد قِيس بعدَ الإصلاح: 72 عنصرًا · 63 مطابقًا · **صفرُ مخالفة**.
+     ═══════════════════════════════════════════════════════════════════════ */
   let focusKilled = 0;
+  const fvBad = [];
+  let fvMatched = 0;
+  const prevFocus = document.activeElement;
   ctrls.slice(0, 120).forEach(e => {
+    try { e.focus({ preventScroll: true }); } catch (x) {}
+    const isFv = e.matches(':focus-visible');
+    if (isFv) { fvMatched++; }
     const c = getComputedStyle(e);
-    if ((c.outlineStyle === 'none' || c.outlineWidth === '0px') &&
-        (c.boxShadow === 'none' || !c.boxShadow)) focusKilled++;
+    const noIndicator = (c.outlineStyle === 'none' || c.outlineWidth === '0px')
+                        && (c.boxShadow === 'none' || !c.boxShadow);
+    if (isFv && noIndicator) {
+      focusKilled++;
+      if (fvBad.length < 3) { fvBad.push(e.tagName.toLowerCase() + '.' + String(e.className).trim().split(/\s+/)[0]); }
+    }
   });
-  R.focus_visible = { sampled: Math.min(ctrls.length, 120), violations: focusKilled };
+  try { prevFocus && prevFocus.focus && prevFocus.focus({ preventScroll: true }); } catch (x) {}
+  R.focus_visible = {
+    sampled: Math.min(ctrls.length, 120),
+    matchedFocusVisible: fvMatched,
+    keyboardModality: fvMatched > 0,   /* صفرٌ هنا يعني: لم تُضغط Tab — والقياسُ لاغٍ */
+    violations: focusKilled,
+    sample: fvBad
+  };
 
   const total = Object.values(R).reduce((s, x) => s + (x.violations || 0), 0);
   return { url: location.pathname, viewport: { w: innerWidth, h: innerHeight },

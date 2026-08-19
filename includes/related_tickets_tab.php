@@ -40,7 +40,7 @@ $rt_res = mysqli_query($conn, $rt_sql);
 if ($rt_res) { while ($x = mysqli_fetch_assoc($rt_res)) $rt_rows[] = $x; }
 ?>
 <div class="related-tickets-tab" dir="rtl">
-  <h5><i class="fa fa-bell"></i> البلاغاتُ المتصلة <span class="badge" style="background:#6c757d"><?= count($rt_rows) ?></span></h5>
+  <h3 class="h5"><i class="fa fa-bell" aria-hidden="true"></i> البلاغاتُ المتصلة <span class="badge" style="background:#6c757d"><?= count($rt_rows) ?></span></h3>
   <?php if (empty($rt_rows)): ?>
     <p class="text-muted">لا بلاغاتَ متصلةً بهذا الكيان.</p>
   <?php else: ?>

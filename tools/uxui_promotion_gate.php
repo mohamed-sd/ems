@@ -75,9 +75,22 @@ foreach (explode("\n", $o2) as $ln) {
     if (preg_match('~^\s*([✔✗])\s+(\S+\.php)\s+\(.*مخالفات:\s*(\d+)~u', $ln, $m)) { $g2[$m[2]] = (int) $m[3]; }
 }
 
-/* ③ الوصولُ الرقميّ — التضادُّ آليٌّ · والأحدَ عشرَ من قياسِ المتصفحِ المسجَّل */
+/* ═══════════════════════════════════════════════════════════════════════════
+ * ③ الوصولُ الرقميُّ — التضادُّ آليٌّ **والاثنا عشرَ من قياسٍ حيٍّ مسجَّل**
+ * ───────────────────────────────────────────────────────────────────────────
+ * ◆ كان مثبَّتًا على `PARTIAL` بشيفرةٍ صريحةٍ لأن الأحدَ عشرَ لم تُقَس قطُّ —
+ *   وكان **صادقًا** إذ لم يدَّعِ ما لم يُقَس. والآن تُقرأ من `gov_a11y_measurements`.
+ * ◆ **وثلاثةُ شروطٍ مجتمعةٍ للترقية**: صفرُ مخالفةٍ في التضادِّ · **وقياسٌ
+ *   بالإصدارِ العاملِ نفسِه** (لا يُورَث من إصدارٍ سابق) · **ونمطيةُ لوحةِ
+ *   مفاتيحٍ مُعلَنة** (بلا ضغطةِ Tab حقيقيةٍ لم يقعْ فحصُ التركيزِ أصلًا،
+ *   فصفرُه كاذب). وغيابُ أيِّها يُبقيها `PARTIAL` لا `PASS`.
+ * ═══════════════════════════════════════════════════════════════════════════ */
 $o3 = run(escapeshellarg($PHPBIN) . ' ' . escapeshellarg($ROOT . '/tools/uxw_a11y_contrast.php'));
 $c3_contrast = (preg_match('~راسبة:\s*0~u', $o3) === 1);
+$a11y = array();
+$q = $conn->query("SELECT screen_file, violations_total, keyboard_modality, checks_total
+                     FROM gov_a11y_measurements");
+while ($q && ($x = $q->fetch_assoc())) { $a11y[$x['screen_file']] = $x; }
 
 /* ⑥ مركزيةُ المكوّنات */
 $o6 = run(escapeshellarg($PHPBIN) . ' ' . escapeshellarg($ROOT . '/tools/uxui_component_centrality.php'));
@@ -146,7 +159,18 @@ foreach ($screens as $s) {
         $r['c2_browser'] = ((int) $mm['header_within_limit'] === 1 && (int) $mm['stacked_toolbars'] <= 1
                             && (int) $mm['primary_buttons'] <= 1) ? 'PASS' : 'FAIL';
     }
-    $r['c3'] = $c3_contrast ? 'PARTIAL' : 'FAIL';   /* التضادُّ وحدَه مقيسٌ آليًّا */
+    /* ③ ثلاثةُ شروطٍ مجتمعةٍ — وغيابُ أيِّها يُبقيها PARTIAL لا PASS */
+    if (!$c3_contrast) {
+        $r['c3'] = 'FAIL';
+    } elseif (!isset($a11y[$f])) {
+        $r['c3'] = 'PARTIAL';                       /* التضادُّ وحدَه — والأحدَ عشرَ لم تُقَس */
+    } else {
+        $a = $a11y[$f];
+        $r['c3'] = ((int) $a['violations_total'] === 0
+                    && (int) $a['keyboard_modality'] === 1
+                    && (int) $a['checks_total'] >= 12)
+                 ? 'PASS' : 'FAIL';
+    }
     if (!$m1920 || !$m1366 || !$mTab) { $r['c4'] = 'NOT_MEASURED'; }
     else {
         $r['c4'] = ((int) $m1920['has_h_scroll'] === 0 && (int) $m1366['has_h_scroll'] === 0

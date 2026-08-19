@@ -730,7 +730,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                  ظاهرٌ ⇒ ثانويّ. وتعدُّدُ الرئيسيِّ يُلغي معناه. */ ?>
         <div class="filter-actions">
           <button type="submit" class="btn-secondary"><i class="fa fa-search"></i> تطبيق</button>
-          <button type="button" class="btn-secondary" title="إعادة تعيين"><a href="contracts.php" class="ct-1"><i class="fa fa-rotate-right"></i></a></button>
+          <button type="button" class="btn-secondary" title="إعادة تعيين"><a href="contracts.php" class="ct-1" aria-label="إعادة تعيين المرشِّحات" title="إعادة تعيين المرشِّحات"><i class="fa fa-rotate-right" aria-hidden="true"></i></a></button>
         </div>
       </div>
     </div>

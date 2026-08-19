@@ -78,9 +78,9 @@ include '../insidebar.php';
     </div></div>
 
     <?php foreach ($inbox['boxes'] as $b): ?>
-    <div class="card"><div class="card-header"><h5><i class="fa fa-folder-open"></i>
+    <div class="card"><div class="card-header"><h2 class="h5"><i class="fa fa-folder-open" aria-hidden="true"></i>
         <?php echo htmlspecialchars($b['title']); ?> (<?php echo intval($b['count']); ?>)
-        <small class="fin-inbox-owner">— القرارُ في <?php echo htmlspecialchars($b['owner']); ?></small></h5></div>
+        <small class="fin-inbox-owner">— القرارُ في <?php echo htmlspecialchars($b['owner']); ?></small></h2></div>
     <div class="card-body">
         <?php if (!$b['rows']):
             // M-44: الحالةُ الفارغة الموحّدة — لا نصَّ DataTables العام
