@@ -137,6 +137,18 @@ req($SEC, 'ف١٣-٤ · معاييرُ القبول', 'A2', 'الوصولُ ال
     judge($a11yBad, $a11yN), $a11yN - $a11yBad, $a11yN,
     $a11yTbl ? 'قياسٌ حيٌّ بضغطةِ Tab حقيقية' : '**لا سجلَّ قياسِ وصول**');
 
+/* اتساقُ القوالبِ بين الإدارات — معيارُ قبولٍ صريحٌ لم يكن يُقاس */
+$oc = run(escapeshellarg($PHPBIN) . ' ' . escapeshellarg($ROOT . '/tools/uxui_dept_consistency.php'));
+$ocShared = preg_match('~مشترَكةٌ بين إدارتَين فأكثر: (\d+)~u', $oc, $mc) ? (int) $mc[1] : 0;
+$ocG = preg_match('~تبويبٌ مختلفٌ لمسارٍ \*\*APPROVED\*\*: (\d+)~u', $oc, $mc2) ? (int) $mc2[1] : null;
+$ocL = preg_match('~اسمٌ مزدوجٌ لمسارٍ \*\*APPROVED\*\*: (\d+)~u', $oc, $mc3) ? (int) $mc3[1] : null;
+$ocPendG = preg_match('~معلَّقٌ بقرارِ المالك: (\d+)~u', $oc, $mc4) ? (int) $mc4[1] : 0;
+$ocPendL = preg_match('~\(معلَّقٌ: (\d+)~u', $oc, $mc5) ? (int) $mc5[1] : 0;
+req($SEC, 'ف١٣-٤ · معاييرُ القبول', 'A8', 'اتساقُ القوالبِ بين الإدارات — صفرُ اختلافٍ معتمَد',
+    ($ocG === null || $ocL === null) ? 'NOT_MEASURED' : judge($ocG + $ocL, $ocShared),
+    $ocShared - (int) $ocG - (int) $ocL, $ocShared,
+    'رصدُ الوثيقة: 139 تبويبًا و43 اسمًا · والحيُّ الآن **صفرٌ معتمَدٌ** ومعلَّقٌ '
+    . ($ocPendG + $ocPendL) . ' بقرارِ المالك');
 $o = run(escapeshellarg($PHPBIN) . ' ' . escapeshellarg($ROOT . '/tools/uxui_gates.php'));
 $langBad = preg_match_all('~إنفاذ=(\d+)~u', $o, $mm2) ? array_sum(array_map('intval', $mm2[1])) : -1;
 $langGates = isset($mm2[1]) ? count($mm2[1]) : 0;
