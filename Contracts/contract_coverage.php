@@ -131,7 +131,7 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main ems-unified-page-shell">
+<div class="main ems-unified-page-shell scr-contract-coverage">
     <?php
     $header_title = 'التغطية التعاقدية — عقد #' . $contract_id;
     $header_icon = 'fas fa-shield-halved';

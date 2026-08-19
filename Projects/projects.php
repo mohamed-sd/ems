@@ -397,7 +397,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
 
 <link rel="stylesheet" href="/ems/assets/css/all.min.css">
 <link href="/ems/assets/css/local-fonts.css" rel="stylesheet">
-<div class="main projects-main ems-unified-page-shell">
+<div class="main projects-main ems-unified-page-shell scr-projects">
 
     <?php
     // Unified page header (structure: includes/page_header.php · styling: ems.main.all.style.css)

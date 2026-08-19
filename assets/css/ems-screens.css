@@ -2184,7 +2184,7 @@ body.ems-site,
     .cov-sep { border-right: 2px dashed var(--c-bbb, #bbb); }
     .cov-lvl2 { margin-top: 10px; }
     .cov-lvl3 { margin-top: 6px; margin-bottom: 18px; }
-    .table-container { overflow-x: auto; }
+    .table-container.scr-contract-coverage{ overflow-x: auto; }
 
 /* ── Contracts/unit_client_match.php ── */
 /* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
@@ -5175,7 +5175,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
     #projectsTable.projects-w100 { width: 100%; }
     #projectsTable .projects-contract-count { font-size: 11px; font-weight: 700; margin-inline-start: 3px; }
 
-    .table-container {
+    .table-container.scr-projects{
         overflow-x: auto;
     }
 
@@ -5310,7 +5310,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
         .rsk-ms10 { margin-inline-start: 10px; }
 
 /* ── Settings/change_password.php ── */
-.main {
+.main.scr-change-password{
             padding: 20px;
             max-width: 600px;
             margin: 0 auto;
@@ -5414,7 +5414,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
         }
 
         /* زر الحفظ */
-        .btn-primary {
+        .btn-primary.scr-change-password{
             display: inline-flex;
             align-items: center;
             gap: 10px;
@@ -5434,7 +5434,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
         }
 
         /* تأثير وميض ذهبي عند التحويم */
-        .btn-primary::before {
+        .btn-primary.scr-change-password::before{
             content: '';
             position: absolute;
             top: 0;
@@ -5445,25 +5445,25 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
             transition: left 0.5s ease;
         }
 
-        .btn-primary:hover::before { left: 100%; }
+        .btn-primary.scr-change-password:hover::before{ left: 100%; }
 
-        .btn-primary:hover {
+        .btn-primary.scr-change-password:hover{
             transform: translateY(-2px);
             box-shadow: 0 6px 20px var(--c-rgba122862035, rgba(12, 28, 62, 0.35));
             background: linear-gradient(135deg, var(--gold) 0%, var(--gold-dark) 100%);
             color: var(--navy);
         }
 
-        .btn-primary:active {
+        .btn-primary.scr-change-password:active{
             transform: translateY(0);
             box-shadow: 0 2px 8px var(--c-rgba12286202, rgba(12, 28, 62, 0.2));
         }
 
-        .btn-primary i { font-size: 1.05rem; transition: transform var(--ease); }
-        .btn-primary:hover i { transform: scale(1.15); }
+        .btn-primary.scr-change-password i{ font-size: 1.05rem; transition: transform var(--ease); }
+        .btn-primary.scr-change-password:hover i{ transform: scale(1.15); }
 
         /* زر إعادة التعيين */
-        .btn-secondary {
+        .btn-secondary.scr-change-password{
             display: inline-flex;
             align-items: center;
             gap: 10px;
@@ -5480,7 +5480,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
             box-shadow: 0 2px 8px var(--c-rgba122862008);
         }
 
-        .btn-secondary:hover {
+        .btn-secondary.scr-change-password:hover{
             background: var(--red-soft);
             border-color: var(--red);
             color: var(--red);
@@ -5488,21 +5488,21 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
             box-shadow: 0 4px 14px var(--c-rgba220383802);
         }
 
-        .btn-secondary:active {
+        .btn-secondary.scr-change-password:active{
             transform: translateY(0);
             box-shadow: 0 2px 6px var(--c-rgba2203838015, rgba(220, 38, 38, 0.15));
         }
 
-        .btn-secondary i { font-size: 1rem; transition: transform var(--ease); }
-        .btn-secondary:hover i { transform: rotate(-180deg); }
+        .btn-secondary.scr-change-password i{ font-size: 1rem; transition: transform var(--ease); }
+        .btn-secondary.scr-change-password:hover i{ transform: rotate(-180deg); }
 
         /* ── حالة التحميل لزر الإرسال ── */
-        .btn-primary.loading {
+        .btn-primary.scr-change-password.loading{
             pointer-events: none;
             opacity: 0.7;
         }
 
-        .btn-primary.loading i { animation: spin 1s linear infinite; }
+        .btn-primary.scr-change-password.loading i{ animation: spin 1s linear infinite; }
 
         /* ── الحركات ── */
         @keyframes slideUp {
@@ -5524,7 +5524,7 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
         @media (max-width: 600px) {
             .form-actions { flex-direction: column; }
             .btn-primary,
-            .btn-secondary {
+            .btn-secondary.scr-change-password{
                 width: 100%;
                 justify-content: center;
                 padding: 13px 24px;

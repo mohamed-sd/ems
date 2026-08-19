@@ -84,7 +84,7 @@ ems_shell_axes(null);
 include('../insidebar.php'); ?>
 <?php require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); } ?>
 
-    <div class="main">
+    <div class="main scr-change-password">
 
         <?php
         /* UXW-01 ⑨: حزمةُ الحالاتِ الدنيا — مخفيةٌ افتراضًا ويُظهرها منطقُ الشاشةِ عند حالِها */
