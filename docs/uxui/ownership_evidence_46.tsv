@@ -1,0 +1,46 @@
+72	admin/ops_manager_board.php	ادارة التشغيل	الحوكمة والالتزام	إدارة الأسطول	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: operations · daily_plans · mnt_order
+864	Finance/acc_approval_chain.php	المراجع الداخلي المستقل	المالية والخزينة	الحوكمة والالتزام	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: gov_field_class · nav09_action_map
+862	Finance/acc_backflow.php	المراجع الداخلي المستقل	المالية والخزينة	المالية والخزينة	CONFIRMED_BY_EVIDENCE	تكتب في: fin_backflow_log · fin_routing_log
+867	Finance/acc_my_day.php	المراجع الداخلي المستقل	المالية والخزينة	الحوكمة والالتزام	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: gov_field_class · nav09_action_map
+868	Finance/acc_routing_matrix.php	المراجع الداخلي المستقل	المالية والخزينة	الحوكمة والالتزام	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: gov_field_class · nav09_action_map
+869	Finance/acc_specializations.php	المراجع الداخلي المستقل	المالية والخزينة	الحوكمة والالتزام	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: gov_field_class · nav09_action_map
+881	Finance/ctrl_authority_limits.php	المراجع الداخلي المستقل	المالية والخزينة	الحوكمة والالتزام	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: gov_field_class · nav09_action_map
+870	Finance/ctrl_dept_propagation.php	المراجع الداخلي المستقل	المالية والخزينة	الحوكمة والالتزام	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: gov_field_class · nav09_action_map
+871	Finance/ctrl_doc_registry.php	المراجع الداخلي المستقل	المالية والخزينة	الحوكمة والالتزام	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: gov_field_class · nav09_action_map
+882	Finance/ctrl_doc_variance.php	المراجع الداخلي المستقل	المالية والخزينة	الحوكمة والالتزام	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: gov_field_class · nav09_action_map
+865	Finance/ctrl_quality_kpis.php	المراجع الداخلي المستقل	المالية والخزينة	الحوكمة والالتزام	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: gov_field_class · nav09_action_map
+873	Finance/ctrl_role_migration.php	المراجع الداخلي المستقل	المالية والخزينة	الحوكمة والالتزام	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: gov_field_class · nav09_action_map
+866	Finance/ctrl_supervision.php	المراجع الداخلي المستقل	المالية والخزينة	الحوكمة والالتزام	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: gov_field_class · nav09_action_map
+817	Finance/fin_cashflow_stmt.php	إدارة المخاطر	المالية والخزينة	المالية والخزينة	CONFIRMED_BY_EVIDENCE	تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow
+815	Finance/fin_contract_margin.php	إدارة المخاطر	المالية والخزينة	المالية والخزينة	CONFIRMED_BY_EVIDENCE	تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow
+813	Finance/fin_early_warning.php	إدارة المخاطر	المالية والخزينة	المالية والخزينة	CONFIRMED_BY_EVIDENCE	تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow
+818	Finance/fin_equity_stmt.php	إدارة المخاطر	المالية والخزينة	المالية والخزينة	CONFIRMED_BY_EVIDENCE	تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow
+819	Finance/fin_posting_matrix.php	إدارة المخاطر	المالية والخزينة	المالية والخزينة	CONFIRMED_BY_EVIDENCE	تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow
+816	Finance/fin_project_pl.php	إدارة المخاطر	المالية والخزينة	المالية والخزينة	CONFIRMED_BY_EVIDENCE	تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow
+811	Finance/fin_ratio_detail.php	إدارة المخاطر	المالية والخزينة	المالية والخزينة	CONFIRMED_BY_EVIDENCE	تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow
+812	Finance/fin_ratio_targets.php	إدارة المخاطر	المالية والخزينة	المالية والخزينة	CONFIRMED_BY_EVIDENCE	تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow
+810	Finance/fin_ratios.php	إدارة المخاطر	المالية والخزينة	المالية والخزينة	CONFIRMED_BY_EVIDENCE	تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow
+814	Finance/fin_unit_economics.php	إدارة المخاطر	المالية والخزينة	المالية والخزينة	CONFIRMED_BY_EVIDENCE	تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow
+884	Finance/tre_cycle_stages.php	المراجع الداخلي المستقل	المالية والخزينة	الحوكمة والالتزام	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: gov_field_class · nav09_action_map
+885	Finance/tre_sod_matrix.php	المراجع الداخلي المستقل	المالية والخزينة	الحوكمة والالتزام	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: gov_field_class · nav09_action_map
+872	Finance/tre_unit_roles.php	المراجع الداخلي المستقل	المالية والخزينة	الحوكمة والالتزام	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: gov_field_class · nav09_action_map
+173	Governance/gov_dept.php	ادارة الاسطول	الحوكمة والالتزام		NO_WRITE	لا كتابةَ ولا قراءةَ في جدولِ نطاقٍ — لا شاهدَ آليّ
+329	Governance/gov_reports.php	الإدارة التنفيذية	الحوكمة والالتزام	الموارد البشرية	OWNER_DIFFERS	تكتب في: cmp03_idempotency · cmp03_screen_rows · activity_logs
+77	Governance/ownership_grants.php	ادارة التشغيل	الحوكمة والالتزام		NO_WRITE	لا كتابةَ ولا قراءةَ في جدولِ نطاقٍ — لا شاهدَ آليّ
+303	movement/map_page.php	إدارة الموقع	الحوكمة والالتزام	إدارة الأسطول	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: project · operations · equipment_drivers
+305	movement/movement_operations.php	إدارة الموقع	الحوكمة والالتزام	إدارة الأسطول	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: project · mnt_order · operations
+408	Operations/fleet_calendar.php	ادارة المبيعات	إدارة التشغيل	إدارة الأسطول	CONFIRMED_BY_READS	مالكُ البيان — تقرأ: fleet_reservations · equipments_types · clients
+410	Operations/fleet_utilization.php	ادارة المبيعات	إدارة التشغيل	إدارة الأسطول	CONFIRMED_BY_READS	مالكُ البيان — تقرأ: equipments_types · operations · fleet_reservations
+146	Oprators/select_project.php	ادارة الاسطول	الحوكمة والالتزام	المبيعات والعقود	OWNER_DIFFERS_BY_READS	مالكُ البيان — تقرأ: project · operations · contracts
+711	Procurement/warehouse_board.php	أمين المستودع	إدارة المشتريات التشغيلية	إدارة المشتريات التشغيلية	CONFIRMED_BY_READS	مالكُ البيان — تقرأ: proc_item · proc_receipt_custody · proc_issue
+11	Settings/guard_classification.php	ادارة التشغيل	الحوكمة والالتزام		NO_WRITE	لا كتابةَ ولا قراءةَ في جدولِ نطاقٍ — لا شاهدَ آليّ
+834	Tickets/my_tickets.php	المدير المالي	مركز البلاغات	مركز البلاغات	CONFIRMED_BY_READS	مالكُ البيان — تقرأ: tickets
+328	Tickets/ticket_dashboard.php	الإدارة التنفيذية	مركز البلاغات	مركز البلاغات	CONFIRMED_BY_EVIDENCE	تكتب في: tickets
+832	Tickets/ticket_form.php	المدير المالي	مركز البلاغات	مركز البلاغات	CONFIRMED_BY_EVIDENCE	تكتب في: activity_logs · fleet_equipment_history · tickets
+454	Tickets/ticket_recurrence.php	ادارة الصيانة	مركز البلاغات	مركز البلاغات	CONFIRMED_BY_EVIDENCE	تكتب في: tickets
+450	Tickets/ticket_workstreams_board.php	ادارة الصيانة	مركز البلاغات	مركز البلاغات	CONFIRMED_BY_EVIDENCE	تكتب في: ticket_workstreams · ticket_responses · ticket_effects
+240	Workforce/worker_contract.php	ادارة الموارد البشرية	القوى التشغيلية	القوى التشغيلية	CONFIRMED_BY_READS	مالكُ البيان — تقرأ: employees · worker_contract
+239	Workforce/worker_register.php	ادارة الموارد البشرية	القوى التشغيلية	القوى التشغيلية	CONFIRMED_BY_READS	مالكُ البيان — تقرأ: employees · suppliers · worker_qualification
+224	Workforce/worker_settlement.php	ادارة الموارد البشرية	القوى التشغيلية	القوى التشغيلية	CONFIRMED_BY_READS	مالكُ البيان — تقرأ: worker_settlement · employees
+243	Workforce/worker_worklog.php	ادارة الموارد البشرية	القوى التشغيلية	القوى التشغيلية	CONFIRMED_BY_READS	مالكُ البيان — تقرأ: employees · equipment_drivers · worker_leave_absence
+236	Workforce/workforce_requirement.php	ادارة الموارد البشرية	القوى التشغيلية	القوى التشغيلية	CONFIRMED_BY_READS	مالكُ البيان — تقرأ: project · workforce_requirement · equipment_drivers
