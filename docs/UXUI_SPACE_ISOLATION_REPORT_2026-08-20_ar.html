@@ -1,0 +1,327 @@
+<title>عزل الإدارات ومِلكية الشاشة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@300;400;500;600;700&family=Noto+Kufi+Arabic:wght@500;700&display=swap">
+
+<style>
+:root{
+  --paper:#FBFAF7; --ink:#1C1A17; --ink-2:#4A463F; --mute:#7A756C;
+  --rule:#E4E0D6; --rule-soft:#EFEBE2; --card:#FFFFFF;
+  --accent:#A8621B; --accent-soft:#F4E8DA;
+  --pass:#2F6B4F; --pass-soft:#E4EFE8;
+  --fail:#9B2C2C; --fail-soft:#F6E5E3;
+  --debt:#8A6D1F; --debt-soft:#F5EEDA;
+  --shadow:0 1px 2px rgba(28,26,23,.05), 0 6px 20px rgba(28,26,23,.045);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141310; --ink:#EDE9E0; --ink-2:#C3BDB1; --mute:#8E887C;
+    --rule:#2E2B25; --rule-soft:#232019; --card:#1B1A15;
+    --accent:#D08A3E; --accent-soft:#2C2115;
+    --pass:#77BC98; --pass-soft:#17251D;
+    --fail:#E08A82; --fail-soft:#2A1917;
+    --debt:#D6B25A; --debt-soft:#26200F;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 26px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141310; --ink:#EDE9E0; --ink-2:#C3BDB1; --mute:#8E887C;
+  --rule:#2E2B25; --rule-soft:#232019; --card:#1B1A15;
+  --accent:#D08A3E; --accent-soft:#2C2115;
+  --pass:#77BC98; --pass-soft:#17251D;
+  --fail:#E08A82; --fail-soft:#2A1917;
+  --debt:#D6B25A; --debt-soft:#26200F;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 26px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+html{ -webkit-text-size-adjust:100% }
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans Arabic", system-ui, "Segoe UI", sans-serif;
+  font-size:16.5px; line-height:1.85; font-weight:400;
+  direction:rtl; text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.wrap{ max-width:1000px; margin:0 auto; padding:0 clamp(18px,4vw,44px) 120px }
+h1,h2,h3{ font-family:"Noto Kufi Arabic","IBM Plex Sans Arabic",sans-serif; text-wrap:balance; margin:0 }
+a{ color:var(--accent) }
+code{
+  font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size:.86em;
+  background:var(--rule-soft); padding:.1em .38em; border-radius:3px; direction:ltr;
+  display:inline-block; unicode-bidi:isolate;
+}
+strong{ font-weight:600; color:var(--ink) }
+
+/* ── الترويسة ── */
+header.head{ padding:clamp(48px,9vw,92px) 0 34px; border-bottom:2px solid var(--ink) }
+.eyebrow{
+  font-size:12.5px; letter-spacing:.14em; font-weight:600; color:var(--accent);
+  text-transform:uppercase; margin-bottom:18px;
+}
+h1{ font-size:clamp(30px,5.4vw,50px); line-height:1.28; font-weight:700; letter-spacing:-.01em }
+.lede{ font-size:clamp(17px,2.1vw,19.5px); color:var(--ink-2); max-width:62ch; margin-top:16px; font-weight:300 }
+.meta{ margin-top:26px; font-size:13.5px; color:var(--mute); display:flex; flex-wrap:wrap; gap:8px 22px }
+
+/* ── الأرقام الأربعة ── */
+.figures{ display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1px;
+  background:var(--rule); border:1px solid var(--rule); margin:0 0 56px }
+.fig{ background:var(--paper); padding:24px 20px }
+.fig .n{ font-family:"Noto Kufi Arabic",sans-serif; font-size:clamp(30px,4.6vw,42px); font-weight:700; line-height:1;
+  color:var(--accent); letter-spacing:-.02em }
+.fig .n.ok{ color:var(--pass) }
+.fig .k{ font-size:13px; color:var(--mute); margin-top:10px; line-height:1.5 }
+
+section{ margin-top:60px }
+h2{ font-size:clamp(20px,2.9vw,26px); font-weight:700; padding-bottom:12px; border-bottom:1px solid var(--rule) }
+h2 .num{ color:var(--accent); font-size:.72em; margin-inline-end:.5em; font-weight:500 }
+h3{ font-size:17.5px; font-weight:600; margin:34px 0 10px }
+p{ margin:14px 0; max-width:68ch }
+.note{ color:var(--ink-2); font-size:15.5px }
+
+/* ── السلّم: الترتيب المُلزِم تسلسلٌ حقيقيّ ── */
+.ladder{ list-style:none; padding:0; margin:26px 0 0; counter-reset:step;
+  border-top:1px solid var(--rule-soft) }
+.ladder li{ counter-increment:step; display:grid;
+  grid-template-columns:44px 1fr auto; gap:6px 16px; align-items:baseline;
+  padding:14px 0; border-bottom:1px solid var(--rule-soft) }
+.ladder li::before{ content:counter(step,decimal); font-family:"Noto Kufi Arabic",sans-serif;
+  font-size:13px; font-weight:700; color:var(--mute); padding-top:2px }
+.ladder .t{ font-weight:500 }
+.ladder .d{ grid-column:2; font-size:14.5px; color:var(--mute); line-height:1.6 }
+.pill{ font-size:12.5px; font-weight:600; padding:3px 11px; border-radius:99px; white-space:nowrap }
+.pill.ok{ background:var(--pass-soft); color:var(--pass) }
+.pill.hold{ background:var(--debt-soft); color:var(--debt) }
+
+/* ── الجداول ── */
+.tbl{ overflow-x:auto; margin:22px 0; border:1px solid var(--rule) }
+table{ border-collapse:collapse; width:100%; min-width:520px; font-size:15px }
+th,td{ padding:11px 14px; text-align:right; border-bottom:1px solid var(--rule-soft) }
+thead th{ background:var(--rule-soft); font-weight:600; font-size:13.5px; color:var(--ink-2);
+  border-bottom:1px solid var(--rule) }
+tbody tr:last-child td{ border-bottom:0 }
+td.n{ font-weight:600; font-variant-numeric:tabular-nums }
+td.n.ok{ color:var(--pass) } td.n.bad{ color:var(--fail) } td.n.debt{ color:var(--debt) }
+
+/* ── بطاقات العطب ── */
+.finds{ display:grid; gap:14px; margin-top:24px }
+.find{ background:var(--card); border:1px solid var(--rule); border-radius:2px;
+  padding:20px 22px; box-shadow:var(--shadow); position:relative }
+.find::before{ content:""; position:absolute; inset-block:0; inset-inline-start:0; width:3px; background:var(--fail) }
+.find.mine::before{ background:var(--accent) }
+.find.debt::before{ background:var(--debt) }
+.find h3{ margin:0 0 8px; font-size:16.5px }
+.find p{ margin:0; font-size:15px; color:var(--ink-2); max-width:none }
+.find .why{ margin-top:10px; font-size:14.5px; color:var(--mute); border-top:1px dashed var(--rule);
+  padding-top:10px }
+
+.cmds{ background:var(--card); border:1px solid var(--rule); padding:18px 20px; margin-top:20px;
+  direction:ltr; text-align:left; overflow-x:auto }
+.cmds div{ font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; color:var(--ink-2);
+  white-space:nowrap; padding:3px 0 }
+
+footer{ margin-top:72px; padding-top:22px; border-top:1px solid var(--rule);
+  font-size:13.5px; color:var(--mute) }
+
+@media (max-width:620px){
+  .ladder li{ grid-template-columns:32px 1fr; }
+  .ladder .pill{ grid-column:2; justify-self:start; margin-top:4px }
+}
+@media (prefers-reduced-motion:reduce){ *{ animation:none!important; transition:none!important } }
+</style>
+
+<div class="wrap">
+
+<header class="head">
+  <div class="eyebrow">INJAZ-UXUI-01 · الفصل ٢٠</div>
+  <h1>عزلُ الإداراتِ ومِلكيةُ الشاشة</h1>
+  <p class="lede">
+    الترتيبُ المُلزِمُ العشرُ نُفِّذ من أوّلِه إلى آخرِه على ثمانيَ عشرةَ مساحةَ عمل.
+    كلُّ رقمٍ أدناه مخرَجُ أمرٍ يعيد إنتاجَه، ولا يُكتب «مغلق» إلا على مقامٍ مكتملٍ مثبَت.
+  </p>
+  <div class="meta">
+    <span>٢٠ أغسطس ٢٠٢٦</span>
+    <span>الفرع <code>fix/remediation-2026-08</code></span>
+    <span>١٨ التزامًا</span>
+  </div>
+</header>
+
+<div class="figures">
+  <div class="fig"><div class="n">887</div><div class="k">موضعَ ظهورٍ صُنِّف — ١٨ مساحةً · ٣٥٨ مسارًا</div></div>
+  <div class="fig"><div class="n ok">0</div><div class="k">مِلكيةٌ مشكوكةٌ · قرارٌ معلَّقٌ · فقدٌ غيرُ مصرَّح</div></div>
+  <div class="fig"><div class="n">176</div><div class="k">موضعًا أُزيل ظهورُه من مساحةٍ لا تملكه</div></div>
+  <div class="fig"><div class="n ok">36</div><div class="k">تشغيلَ فحصٍ للإغلاق · صفرُ إخفاق</div></div>
+</div>
+
+<section>
+  <h2><span class="num">١</span>الترتيبُ المُلزِمُ ونتيجةُ كلِّ خطوة</h2>
+  <p class="note">الترقيمُ هنا يعني التسلسلَ حقًّا: كلُّ خطوةٍ شرطٌ لما بعدَها، ولا تُزال شاشةٌ قبلَ حسمِ المِلكيةِ لأن المِلكيةَ هي التي تحدّد ما هو ممنوعٌ أصلًا.</p>
+  <ol class="ladder">
+    <li><span class="t">لقطةُ الحال</span><span class="pill ok">أُغلقت</span>
+      <span class="d">٨٨٧ موضعًا استُوردت إلى القاعدةِ لا إلى ملف — والأصلُ محفوظٌ في أعمدةِ <code>src_*</code> فما أُعيد تصنيفُه يُقارَن بأصلِه.</span></li>
+    <li><span class="t">خريطةُ الأثر</span><span class="pill ok">أُغلقت</span>
+      <span class="d">٧٤ زوجَ (واقعة × مستهلِك) لـ٥٨ واقعةً حية، مقيسةً من الحيِّ قبلَ أن يُعزَل شيء.</span></li>
+    <li><span class="t">الستُّ والأربعون مِلكيةً مشكوكة</span><span class="pill ok">حُسمت</span>
+      <span class="d">٤٢ نقصُ ظهورٍ لا خطأُ مالك · و٤ صُحِّح مالكُها بالدورةِ المستندية. ولم تُرفع واحدةٌ إليك.</span></li>
+    <li><span class="t">إعادةُ تصنيفِ الـ٨٨٧</span><span class="pill ok">أُغلقت</span>
+      <span class="d">بشجرةِ القرارِ السداسيةِ بترتيبِها حرفًا — يُوقَف عند أولِ «نعم».</span></li>
+    <li><span class="t">حسمُ المعلَّق</span><span class="pill ok">٢٦٥ ← صفر</span>
+      <span class="d">كلُّ قرارٍ يحمل عقدةَ الشجرةِ التي حسمَته وشاهدَها المقيس.</span></li>
+    <li><span class="t">قائمةُ الممنوعِ النهائية</span><span class="pill ok">٢٠٣</span>
+      <span class="d">و<strong>٢١ من ٢١</strong> من الدفترِ القديمِ بقيت ممنوعةً بعدَ إعادةِ القياس — خرجَ صفر.</span></li>
+    <li><span class="t">الإزالةُ من المساحةِ الخاطئةِ وحدَها</span><span class="pill ok">١٧٦ موضعًا</span>
+      <span class="d">بسياقِ <code>user + active_scope + route</code> — والشاشةُ مفتوحةٌ في مساحتِها المالكةِ كاملةً بأفعالِها.</span></li>
+    <li><span class="t">المناظرُ المقيَّدة</span><span class="pill ok">٤ مناظر</span>
+      <span class="d">خدمةٌ في الخادم تعيد <code>row_scope × field_allowlist</code> وحدَه، والنطاقُ في شرطِ الاستعلامِ لا بعدَ الجلب.</span></li>
+    <li><span class="t">إغلاقُ مساحةٍ مساحة</span><span class="pill ok">١٨ / ١٨</span>
+      <span class="d">فحصٌ سلبيٌّ ثمانيُّ القنواتِ وإثباتُ وصولِ الأثرِ لكلِّ مساحة.</span></li>
+    <li><span class="t">تحديثُ المصفوفةِ والبصمات</span><span class="pill ok">أُغلقت</span>
+      <span class="d">٤ مِلكياتٍ · ٤٢ فجوةً مسجَّلة · ٣٥٨ صنفًا · و٤٧١ لقطةً بصفرِ فروقٍ معلَّقة.</span></li>
+  </ol>
+</section>
+
+<section>
+  <h2><span class="num">٢</span>التصنيفُ بعدَ إعادةِ القياس</h2>
+  <p class="note">قبلَ الجولةِ كان ٢٦٥ موضعًا بلا حكمٍ و٢١ ممنوعًا. وبعدَها لا موضعَ بلا صنف.</p>
+  <div class="tbl">
+    <table>
+      <thead><tr><th>الصنف</th><th>العدد</th><th>ماذا يعني</th></tr></thead>
+      <tbody>
+        <tr><td>OWNED</td><td class="n">235</td><td>المساحةُ هي المالكُ — تظهر كاملةً بأفعالِها</td></tr>
+        <tr><td>PERSONAL_SPACE</td><td class="n">232</td><td>منصةٌ مشترَكةٌ فوقَ الإدارات — ليست تسرّبًا</td></tr>
+        <tr><td>FORBIDDEN</td><td class="n bad">203</td><td>تُزال من هذه المساحةِ وحدَها</td></tr>
+        <tr><td>CONTROL_OVERSIGHT</td><td class="n">78</td><td>اطّلاعٌ رقابيٌّ موسوم — ترى ولا تحكم</td></tr>
+        <tr><td>CONTEXTUAL_READ_ONLY</td><td class="n">65</td><td>توقّفٌ حقيقيٌّ مقيس — منظرٌ مقيَّدٌ بحقولِه</td></tr>
+        <tr><td>SHARED_WORK_ITEM</td><td class="n">51</td><td>مهمةٌ أو اعتمادٌ — محلُّه مركزُ العمل</td></tr>
+        <tr><td>EXECUTIVE_OVERSIGHT</td><td class="n">23</td><td>مجمَّعٌ أولًا وتعمُّقٌ مصرَّحٌ ثانيًا</td></tr>
+        <tr><td>UNRESOLVED</td><td class="n ok">0</td><td>كان ٢٦٥ — حُسمت كلُّها بالشجرة</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">٣</span>أربعةُ أعطابٍ في النظامِ كُشفت</h2>
+  <p class="note">هذه ليست أخطاءَ الجولةِ بل ما كانت الجولةُ سببًا في ظهورِه.</p>
+  <div class="finds">
+    <div class="find">
+      <h3>نقطةُ التصديرِ المركزيةُ كانت تبثُّ الجدولَ الممنوعَ كاملًا</h3>
+      <p>الشاشةُ أُزيلت من السايدبارِ ومُنعت بالعنوانِ المباشرِ وحُجب معالجُها — <strong>ويظلُّ <code>excel.php</code> يعمل</strong>، لأنه يسأل عن الصلاحيةِ لا عن المساحة.</p>
+      <p class="why">وملفٌّ يُنزَّل أخطرُ من شاشةٍ تُعرض: يخرج من النظامِ ولا يعود. وُصلت النقطةُ بحارسِ المساحةِ ورمزُ الرفضِ <code>SCOPE-403</code>.</p>
+    </div>
+    <div class="find">
+      <h3>البحثُ العامُّ والأفعالُ الجماعيةُ قناتانِ مفتوحتان</h3>
+      <p>كلتاهما تفحص الصلاحيةَ وحدَها. فالبحثُ يُعيد لمن في مساحةِ التشغيلِ نتائجَ الشاشةِ الماليةِ الممنوعةِ عليه هنا، والمعالجُ يقبل الفعلَ بعدَ أن أُزيلت شاشتُه.</p>
+      <p class="why">والفحصُ الآن قبلَ الاستعلامِ لا بعدَه، ويُسجَّل الرفضُ بنوعِه <code>scope_denied</code> — فاثنانِ يُرفضان بالرمزِ نفسِه لسببَين يُخفيان أحدَهما.</p>
+    </div>
+    <div class="find">
+      <h3>خمسةُ مستهلِكين مُعلَنين ومعطَّلين</h3>
+      <p>رصدتهم خريطةُ الأثرِ <strong>قبلَ أن يُزال ظهورُ شاشةٍ واحدة</strong>: النظامُ يَعِد بمستهلِكٍ لا يستهلك.</p>
+      <p class="why">ولولا أن الخريطةَ سبقت العزلَ لنُسب هذا القطعُ إليه — أو لمُرَّ عليه فظُنَّ العزلُ سليمًا وهو فوقَ عطبٍ سابق.</p>
+    </div>
+    <div class="find">
+      <h3>بوابةُ الثباتِ البصريِّ كانت تقول «صفرُ فروقٍ» وهي لم تُقارِنْ</h3>
+      <p>المقارنةُ تسقط برمز ٢٥٥ على شاشةٍ ضخمةٍ لأن <code>preg</code> تُعيد NULL صامتةً عند تجاوزِ حدِّ الارتداد — <strong>فتُقرأ «لا وسومَ» لا «تعذّر القياس»</strong>. بقيت ٢٩ شاشةً بلا مقارنة.</p>
+      <p class="why">وأداةٌ تُقارن ولا تعرف متى عجزت تُنتج «صفرَ فرقٍ» من عجزِها — وذلك أخطرُ من فرقٍ يظهر: الأولُ يُرسِّب والثاني يُسلَّم.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">٤</span>ستةُ أخطاءٍ في عملي أُوقفت قبلَ أن تُنتج حكمًا</h2>
+  <div class="finds">
+    <div class="find mine">
+      <h3>«٤٦ من ٤٦ بلا كتابة»</h3>
+      <p>أداةُ شاهدِ المِلكيةِ قاست ملفَّ الشاشةِ وحدَه، والشاشاتُ تفوّض الكتابةَ لخدماتِ نطاق.</p>
+      <p class="why">ونتيجةٌ يستحيل أن تصدُقَ في كلِّ صفٍّ عيبُ أداةٍ لا كشف.</p>
+    </div>
+    <div class="find mine">
+      <h3>حذفُ لوحةِ الدورِ وصفحةِ البداية</h3>
+      <p>التصنيفُ الأولُ جعل <code>role_board</code> و<code>dashboard</code> و<code>my_workspace</code> ممنوعةً، فحُذفت من تسعِ مساحاتٍ وهبطَ المجموعُ ٨٩٣ ← ٦١٢.</p>
+      <p class="why">كشفتها مصفوفةُ الحفظِ لا القياس. والعلّة: عمودُ <code>owner_kind</code> يقول «إدارةُ أعمال» لشاشةٍ تظهر في الثمانيَ عشرةَ كلِّها — وعمودٌ واحدٌ خاطئٌ يهدم شجرةً كاملة.</p>
+    </div>
+    <div class="find mine">
+      <h3>ترشيحٌ مرَّ صامتًا</h3>
+      <p>وُضع في طبقةٍ يسبقها مولِّدٌ يصطنع روابطَ بعدَها: قاسَ صفرَ تسرّبٍ في القائمةِ بينما السايدبارُ المُصيَّرُ فيه ٤٤.</p>
+      <p class="why">وترشيحٌ في طبقةٍ يسبقها مولِّدٌ ليس ترشيحًا — والفرقُ لا يظهر إلا بقياسِ ما يصل المتصفح.</p>
+    </div>
+    <div class="find mine">
+      <h3>اثنتا عشرةَ شاشةً ماليةً خرجت من المنع</h3>
+      <p>بحجّةِ الاستهلاكِ نفسِها التي تُوجب منعَها: التشغيلُ يقرأ جدولًا تكتبه المالية، فرُجِّح أنه يستحقُّ شاشتَها.</p>
+      <p class="why">وذلك عكسُ القاعدة: من يستهلك الأثرَ يملك <strong>مستندَه هو</strong> لا شاشةَ المنتِج.</p>
+    </div>
+    <div class="find mine">
+      <h3>فشلٌ اتُّهم به بريء</h3>
+      <p>أعطى فحصُ الأثرِ «مستهلِكٌ مقطوعٌ بعدَ العزل» — والسببُ أنني استعملتُ <code>publishFact</code> وهي تكتب الجذرَ وحدَه ولا تُنتج إسقاطًا ماليًّا أصلًا.</p>
+      <p class="why">وفشلٌ لا يُتحقَّق من سببِه يُنسب إلى بريء — وكان سيُسجَّل على العزلِ كسرٌ لم يقعْ.</p>
+    </div>
+    <div class="find mine">
+      <h3>مقياسانِ للتبعيةِ سقطا قبلَ أن يصحَّ الثالث</h3>
+      <p>الانتشارُ صنّف مسردَ المصطلحاتِ ممنوعًا، والرابطُ بين الشاشاتِ لم يُطلِق إلا خمسَ مراتٍ لأن روابطَ السايدبارِ يولّدها المولِّد.</p>
+      <p class="why">والصادقُ استهلاكُ البيانات — ومقياسٌ لا يُطلِق يُحوِّل كلَّ شيءٍ إلى ممنوع.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">٥</span>رقمانِ أعلنتُهما ولا يعيدُ القياسُ إنتاجَهما</h2>
+  <p class="note">أُصحِّحهما هنا لأن قاعدةَ «لا رقمَ بلا مصدر» تسري على أرقامي قبلَ غيرِها.</p>
+  <div class="finds">
+    <div class="find mine">
+      <h3>«٨٠ زوجًا» في خريطةِ الأثر — والمقيسُ ٧٤</h3>
+      <p>الثمانون كانت <strong>عددَ عملياتِ الإدراج</strong> لا عددَ الصفوف؛ والمفتاحُ الفريدُ <code>(event_key, consumer_key)</code> يطوي ما تكرَّر من وحداتٍ منتِجةٍ مختلفة.</p>
+    </div>
+    <div class="find mine">
+      <h3>«أُضيف ١١٨ صفًّا والقديمُ باقٍ للمقارنة» — لم يُضَفْ صفٌّ واحد</h3>
+      <p>جملةُ <code>ON DUPLICATE KEY UPDATE</code> <strong>استبدلت</strong> نسبةَ المنتِجِ في مكانِها ولم تُنشئ صفًّا جديدًا، فالنسبةُ القديمةُ لم تُحفَظ. والنسبةُ الحاليةُ (المشتقةُ من الشاشةِ الناشرة) هي الأصحُّ، لكنَّ المقارنةَ بالقديمِ غيرُ ممكنةٍ من الجدول.</p>
+      <p class="why">وادّعاءُ حفظِ الأصلِ أسوأُ من عدمِ حفظِه: يُغري بمقارنةٍ لا مادةَ لها.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">٦</span>ديونٌ مرفوعةٌ — لا مطويّة</h2>
+  <div class="finds">
+    <div class="find debt">
+      <h3>٤٢ فجوةَ ظهور</h3>
+      <p>مِلكيتُها صحيحةٌ وهي غائبةٌ عن مساحةِ مالكِها. سُجِّلت في <code>gov_appearance_gaps</code> ولم يُضَفْ مدخلٌ واحدٌ تلقائيًّا.</p>
+      <p class="why">إضافةُ ٤٢ مدخلًا بلا قرارِك توسيعُ وصولٍ بلا طلب — وهي عكسُ الغرضِ من الجولة.</p>
+    </div>
+    <div class="find debt">
+      <h3>ثلاثُ إداراتٍ عاملةٌ بلا حدثٍ منشور</h3>
+      <p>الموارد البشرية · أمين المستودع · الأسطول: عملُها لا يصل مستهلِكيه بالحدث، فمن يحتاج أثرَها يقرؤه من جدولٍ مباشرةً أو لا يقرؤه.</p>
+      <p class="why">فجوةٌ في نموذجِ الأحداثِ لا في العزل — والعزلُ لم يكسرْ فيها شيئًا لأن لا شيءَ كان يسري.</p>
+    </div>
+    <div class="find debt">
+      <h3>فرقُ +١ في مصالحةِ المقام</h3>
+      <p>منسوبٌ إلى دور ١٧ (المالية): ٨٩٣ − (٤٦ + ٢ + ١٧٦) + ١٩ = ٦٨٨ والمقيسُ ٦٨٩.</p>
+      <p class="why">زيادةُ ظهورٍ لا نقص، فلا تمسُّ قاعدةَ صفرِ الفقد — وتبقى مُعلَنةً حتى تُفسَّر.</p>
+    </div>
+    <div class="find debt">
+      <h3>٣٧ جسرَ CMP-03</h3>
+      <p>شاشاتٌ مولَّدةٌ ما تزال على المخزنِ المشترك. ولكلٍّ منها يلزم قرارُ جدولِ مجالٍ تكتب فيه.</p>
+      <p class="why">قرارُ نمذجةٍ لا اشتقاقٌ آليّ — ولن تُخترع وجهةُ كتابةٍ لبيانات.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="num">٧</span>كيف يُعاد إنتاجُ كلِّ رقمٍ هنا</h2>
+  <p class="note">كلُّ سطرٍ أدناه يطبع ما استُشهد به في هذا التقرير.</p>
+  <div class="cmds">
+    <div>php tests/space_isolation_negative_test.php "ادارة التشغيل"   # الثمانُ قنوات</div>
+    <div>php tests/space_effect_reach_test.php "ادارة التشغيل"        # وصولُ الأثر</div>
+    <div>php tools/uxui_preserve_check.php                            # صفرُ فقدٍ + مصالحةُ المقام</div>
+    <div>php tools/uxw_gates.php                                      # بواباتُ المنعِ ١٢</div>
+    <div>php tools/uxui_gates.php                                     # بواباتُ الجولةِ ٨</div>
+    <div>php tools/uxw_visual_baseline.php                            # البصماتُ البصرية</div>
+    <div>php tools/uxui_ownership_evidence.php                        # شاهدُ مِلكيةِ الـ٤٦</div>
+  </div>
+</section>
+
+<footer>
+  ثمانيةَ عشرَ التزامًا على <code>fix/remediation-2026-08</code> · والدفعُ إلى المستودعِ البعيدِ بانتظارِ مفتاحِك،
+  ولا تنتقل مادةٌ سريةٌ في هذا المسار.
+</footer>
+
+</div>
