@@ -12,6 +12,13 @@
  * اعتمادُ فرقٍ مقصود: أعد --capture بعد كتابةِ السببِ في .ssdiff/APPROVALS.md
  */
 error_reporting(E_ALL);
+/* ◆ **سقطت المقارنةُ برمز 255 بعدَ 84 ثانيةً على شاشةٍ ضخمة** — و`preg` تُعيد
+     NULL صامتةً عند تجاوزِ حدِّ الارتدادِ أو الذاكرة، **فتُقرأ «لا وسومَ» لا
+     «تعذّر القياس»**. والحدُّ يُرفع هنا، **ومُرجَعُ الاستبدالِ يُفحَص أدناه**:
+     أداةٌ تُقارن ولا تعرف متى عجزت تُنتج «صفرَ فرقٍ» من عجزِها. */
+ini_set('pcre.backtrack_limit', '100000000');
+ini_set('pcre.recursion_limit', '10000000');
+ini_set('memory_limit', '1024M');
 $ROOT = dirname(__DIR__);
 $CAPTURE = in_array('--capture', $argv, true);
 $BASE = 'http://localhost/ems';
@@ -83,6 +90,12 @@ function skeleton(string $html): string {
         },
         $b
     );
+    /* ◆ **العجزُ يُعلَن ولا يُقرأ «لا وسوم»**: `preg_last_error` غيرُ صفرٍ يعني
+         أن المسحَ توقّف — وهيكلٌ ناقصٌ يُقارَن بكاملٍ يُنتج فرقًا كاذبًا،
+         أو يُلتقط أساسًا ناقصًا **فيصمت عن كلِّ فرقٍ بعدَه**. */
+    if (preg_last_error() !== PREG_NO_ERROR) {
+        return '__SKELETON_ERROR__:' . preg_last_error_msg();
+    }
     return implode("\n", $lines);
 }
 
