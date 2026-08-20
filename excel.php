@@ -82,6 +82,48 @@ try {
     $service = new ExcelService($conn);
     $def = $service->definition($entity);
 
+    /* ══ عزلُ الإدارات (سابعًا-⑤) — التصديرُ قناةٌ من الثمان ══════════════════
+       ◆ **وهو أخطرُ أبوابِ الاطّلاع**: الشاشةُ أُزيلت من السايدبارِ ومُنعت
+         بالعنوانِ المباشرِ وحُجب معالجُها — **ويظل `excel.php?entity=…&export`
+         يبثُّ جدولَها كاملًا**، لأنه يسأل عن الصلاحيةِ لا عن المساحة.
+         **وملفٌّ يُنزَّل أخطرُ من شاشةٍ تُعرض: يخرج من النظامِ ولا يعود.**
+       ◆ **والربطُ بالشاشةِ المالكةِ للكيان** لا بالكيانِ اسمًا: يُسأل الحارسُ عن
+         مسارِ الشاشةِ التي يخدمها هذا الكيانُ في هذه المساحة.
+       ◆ **والغيابُ ليس منعًا**: كيانٌ لا شاشةَ مسجَّلةً له يمرُّ كما كان. */
+    $__sf = __DIR__ . '/includes/space_scope.php';
+    if (is_file($__sf) && isset($_SESSION['user'])
+        && strval(isset($_SESSION['user']['role']) ? $_SESSION['user']['role'] : '') !== '-1'
+        && in_array($action, array('export', 'template'), true)) {
+        require_once $__sf;
+        if (function_exists('ems_scope_forbids') && function_exists('ems_active_scope')) {
+            $__scope = ems_active_scope();
+            $__tbl = preg_replace('/[^a-zA-Z0-9_]/', '', (string) $def->table);
+            $__st = $conn->prepare(
+                "SELECT a.route FROM gov_space_appearances a
+                  WHERE a.space_ar = ? AND a.cls = 'FORBIDDEN'
+                    AND (LOWER(a.route) LIKE CONCAT('%', LOWER(?), '%')
+                         OR LOWER(a.route) LIKE CONCAT('%', LOWER(?), '%'))
+                  LIMIT 1");
+            if ($__st) {
+                $__st->bind_param('sss', $__scope, $entity, $__tbl);
+                $__st->execute();
+                $__r = $__st->get_result();
+                $__hit = $__r ? $__r->fetch_row() : null;
+                $__st->close();
+                if ($__hit) {
+                    http_response_code(403);
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode(array(
+                        'ok' => false, 'code' => 'SCOPE-403',
+                        'message' => 'هذا التصديرُ يخصُّ مساحةَ عملٍ أخرى — بدِّلِ المساحةَ لتنفيذِه.',
+                        'route' => $__hit[0],
+                    ), JSON_UNESCAPED_UNICODE);
+                    exit;
+                }
+            }
+        }
+    }
+
     switch ($action) {
         case 'template':
             $service->template($def); // يبثّ ويُنهي.

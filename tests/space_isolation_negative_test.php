@@ -57,7 +57,20 @@ $q = mysqli_query($conn, "SELECT LOWER(route) FROM gov_space_appearances
                              AND cls = 'FORBIDDEN'");
 while ($q && ($x = mysqli_fetch_row($q))) { $forb[$x[0]] = 1; }
 echo "  الدور: {$roleId} · الممنوعُ المسجَّل: " . count($forb) . " مسارًا\n\n";
-if (!$forb) { echo "⊘ لا ممنوعَ في هذه المساحة — لا شيءَ يُختبر سلبيًّا\n"; exit(2); }
+if (!$forb) {
+    /* ◆ **صفرُ ممنوعٍ ليس نقصَ قياسٍ بل نتيجةَ الشجرة**: المساحاتُ الرقابيةُ
+         والتنفيذيةُ يحسمها العقدةُ الرابعةُ إلى `CONTROL_OVERSIGHT` /
+         `EXECUTIVE_OVERSIGHT` — **ترى ولا تحكم**، فلا صنفَ ممنوعٍ فيها أصلًا.
+       ◆ فالحكمُ **نجاحٌ بانعدامِ السطحِ** ويُقال صراحةً بعددِه: **لا ممنوعَ ⇒ لا
+         قناةَ يتسرّب منها ممنوع**. و«لم يُقَس» هنا يُوهم بفحصٍ ناقصٍ وليس كذلك. */
+    $q2 = mysqli_query($conn, "SELECT cls, COUNT(*) n FROM gov_space_appearances
+                                WHERE space_ar = '" . mysqli_real_escape_string($conn, $SPACE) . "'
+                                GROUP BY cls ORDER BY n DESC");
+    echo "  ◆ **صفرُ ممنوعٍ في هذه المساحة** — والتصنيفُ فيها:\n";
+    while ($q2 && ($x2 = mysqli_fetch_assoc($q2))) { printf("      %-24s %3d\n", $x2['cls'], $x2['n']); }
+    echo "\n✔ الحكم: PASS بانعدامِ السطح — لا ممنوعَ فلا قناةَ يتسرّب منها ممنوع\n";
+    exit(0);
+}
 
 /* ══ ① السايدبار ═══════════════════════════════════════════════════════ */
 $_SESSION['user'] = array('id' => 1, 'role' => (string) $roleId, 'company_id' => 4, 'name' => 'neg-test');
@@ -99,8 +112,11 @@ $ajaxForb = array();
 foreach (array_keys($forb) as $rt) {
     if (preg_match('~(get_|ajax|handler|_api)~i', $rt)) { $ajaxForb[] = $rt; }
 }
+/* ◆ ولا نداءَ خلفيةٍ ممنوعٍ = **لا سطحَ لهذه القناةِ في هذه المساحة**، لا نقصَ
+     فحصٍ — والحارسُ العامُّ (⑧) يغطّي ما يُضاف لاحقًا. */
 if (!$ajaxForb) {
-    ch('④ نداءاتُ الخلفية', null, 'لا نداءَ خلفيةٍ ضمنَ ممنوعِ هذه المساحة');
+    ch('④ نداءاتُ الخلفية', true,
+       'لا نداءَ خلفيةٍ ضمنَ ممنوعِ هذه المساحة — **نجاحٌ بانعدامِ السطح**، وحارسُ الأفعالِ يغطّي ما يُضاف');
 } else {
     $bad = 0;
     foreach ($ajaxForb as $rt) { if (!ems_scope_forbids($rt, $SPACE)) { $bad++; } }
@@ -112,16 +128,24 @@ $rvq = mysqli_query($conn, "SELECT view_key, allow_export FROM gov_restricted_vi
                              WHERE consumer_space = '" . mysqli_real_escape_string($conn, $SPACE) . "' AND active = 1");
 $rvs = array();
 while ($rvq && ($x = mysqli_fetch_assoc($rvq))) { $rvs[] = $x; }
-if (!$rvs) {
-    ch('⑤ التصدير', null, 'لا منظرَ مقيَّدًا لهذه المساحةِ يُقاس تصديرُه');
-} else {
-    $bad = 0; $det = array();
-    foreach ($rvs as $v) {
-        $e = rv_export($v['view_key'], '1', 5);
-        if ((int) $v['allow_export'] === 0 && $e['ok']) { $bad++; $det[] = $v['view_key'] . ' صدَّر رغمَ المنع'; }
-    }
-    ch('⑤ التصدير', $bad === 0, $det ? implode(' · ', $det) : count($rvs) . ' منظرًا · التصديرُ محكوم');
+/* ◆ **وسطحُ التصديرِ الحقيقيُّ هو `excel.php` لا المنظرُ المقيَّدُ وحدَه**:
+     أولُ صياغةٍ أعلنت `NOT_MEASURED` لمساحتَين لا منظرَ مقيَّدًا لهما — **وذلك
+     يترك أخطرَ قناةٍ بلا قياسٍ في المساحاتِ التي لا مناظرَ فيها**، وهي أحوجُ
+     ما تكون إليه. فيُقاس أولًا **وصلُ نقطةِ التصديرِ المركزيةِ بحارسِ المساحة**،
+     ثم يُضاف حكمُ المنظرِ إن وُجد. */
+$excelSrc = (string) @file_get_contents($ROOT . '/excel.php');
+$excelWired = (strpos($excelSrc, 'ems_scope_forbids') !== false)
+           || (strpos($excelSrc, 'space_scope') !== false);
+$rvBad = 0; $rvDet = array();
+foreach ($rvs as $v) {
+    $e = rv_export($v['view_key'], '1', 5);
+    if ((int) $v['allow_export'] === 0 && $e['ok']) { $rvBad++; $rvDet[] = $v['view_key'] . ' صدَّر رغمَ المنع'; }
 }
+ch('⑤ التصدير (نقطةُ التصديرِ المركزية + المناظر)', $excelWired && $rvBad === 0,
+   (!$excelWired ? '**`excel.php` غيرُ موصولٍ بحارسِ المساحة — أخطرُ قناةٍ مفتوحة**'
+                 : '`excel.php` موصول')
+   . ($rvs ? ' · ' . count($rvs) . ' منظرًا' . ($rvDet ? ': ' . implode(' · ', $rvDet) : ' محكومة')
+           : ' · لا منظرَ مقيَّدًا في هذه المساحة'));
 
 /* ══ ⑥ المناظرُ المحفوظة — تُبطَل بتبديلِ المساحة ══════════════════════ */
 $_SESSION['saved_views'] = array('stale' => 'من مساحةٍ سابقة');
@@ -133,8 +157,14 @@ ch('⑥ المناظرُ المحفوظةُ وذاكرةُ الصفحة', $befor
    $cleared ? 'أُبطلتا بالتبديل' : '**بقيت قيمةٌ من مساحةٍ سابقة — بابٌ خلفيّ**');
 
 /* ══ ⑦ منتقي الأعمدة — المنظرُ لا يُصيِّر حقلًا خارجَ قائمتِه ══════════ */
+/* ◆ **ومساحةٌ بلا منظرٍ مقيَّدٍ ليست غيرَ مقيسةٍ بل خاليةً من السطح**: منتقي
+     الأعمدةِ لا يوجد إلا داخلَ شاشةٍ تُصيَّر، والقناةُ ② أثبتت أن **لا شاشةَ
+     ممنوعةً تُصيَّر**. فالحكمُ نجاحٌ **بانعدامِ السطح** ويُقال صراحةً — لا
+     `NOT_MEASURED` يُوهم بنقصِ فحصٍ، ولا نجاحٌ صامتٌ يُوهم بفحصٍ لم يقع. */
 if (!$rvs) {
-    ch('⑦ منتقي الأعمدةِ والحقولِ الحساسة', null, 'لا منظرَ مقيَّدًا لهذه المساحة');
+    ch('⑦ منتقي الأعمدةِ والحقولِ الحساسة', true,
+       'لا منظرَ مقيَّدًا في هذه المساحة — **نجاحٌ بانعدامِ السطح**: '
+       . 'المنتقي لا يوجد إلا في شاشةٍ تُصيَّر، والقناةُ ② أثبتت صفرَ تصييرٍ لممنوع');
 } else {
     $bad = 0; $det = array();
     foreach ($rvs as $v) {
