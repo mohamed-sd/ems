@@ -87,6 +87,20 @@ while ($rr && ($x = mysqli_fetch_assoc($rr))) {
     if ($of !== '' && $nf !== '' && $of !== $nf) { $mergeInto[$of] = $nf; }
 }
 
+/* ══ سجلُّ الإزالةِ المصرَّحةِ بعزلِ الإدارات — بالدورِ لا بالمساحةِ اسمًا ══════
+   ◆ يُقرأ من `gov_space_appearances` عبرَ `gov_space_roles`، فالربطُ **مقيسٌ**
+     (تقاطعُ المساراتِ المُصيَّرة) لا مطابقةَ أسماءٍ عربيةٍ تختلف بحرف.
+   ◆ **ولا يُصرَّح إلا بالمساحةِ بعينِها**: ما أُزيل من دورٍ ولم يُسجَّل ممنوعًا
+     في مساحتِه يبقى فقدًا يُرسِّب — فلا يصير هذا البابُ غطاءً لكلِّ اختفاء. */
+$forbiddenBySpace = array();
+$fq = @mysqli_query($conn, "SELECT r.role_id, LOWER(a.route) rt
+                              FROM gov_space_roles r
+                              JOIN gov_space_appearances a ON a.space_ar = r.space_ar
+                             WHERE a.cls = 'FORBIDDEN'");
+while ($fq && ($x = mysqli_fetch_assoc($fq))) {
+    $forbiddenBySpace[(int) $x['role_id']][$x['rt']] = 1;
+}
+
 /** هويةُ البند: (الملفُّ الأمُّ صغيرًا) + الاسمُ المعروض */
 function upc_key($href, $label)
 {
@@ -107,7 +121,7 @@ foreach ($lines as $l) {
 }
 
 /* ── الحاضرُ: التصييرُ الحيُّ نفسُه ── */
-$fails = 0; $totPre = 0; $totNow = 0; $renamed = 0; $merged = 0; $resurfaced = 0; $absorbed = 0;
+$fails = 0; $totPre = 0; $totNow = 0; $renamed = 0; $merged = 0; $resurfaced = 0; $absorbed = 0; $isolated = 0; $recon = array();
 echo "════ مصفوفةُ الحفظِ — بنودُ السايدبارِ الظاهرةُ قبلًا وبعدًا ════\n";
 foreach (uxp_root_roles() as $rid) {
     if (isset($archivedRoles[$rid])) {
@@ -128,12 +142,24 @@ foreach (uxp_root_roles() as $rid) {
     $preF = array(); $nowF = array();
     foreach ($p as $k => $c)   { list($f, $l) = explode('||', $k, 2); $preF[$f]['labels'][$l] = ($preF[$f]['labels'][$l] ?? 0) + $c; $preF[$f]['n'] = ($preF[$f]['n'] ?? 0) + $c; }
     foreach ($now as $k => $c) { list($f, $l) = explode('||', $k, 2); $nowF[$f]['labels'][$l] = ($nowF[$f]['labels'][$l] ?? 0) + $c; $nowF[$f]['n'] = ($nowF[$f]['n'] ?? 0) + $c; }
-    $missing = array(); $renamedHere = 0; $mergedHere = 0; $absorbedHere = 0;
+    $missing = array(); $renamedHere = 0; $mergedHere = 0; $absorbedHere = 0; $isolatedHere = 0;
     foreach ($preF as $f => $P) {
         /* ملفٌّ اختفى من الدور = فقدٌ صريح — إلا أن يكون **ذاب في وارثٍ مُعلَنٍ
            حاضرٍ في الدورِ نفسِه**: الإعلانُ من nav_redirects والحضورُ مقيسٌ الآن. */
         if (!isset($nowF[$f]) && isset($mergeInto[$f]) && isset($nowF[$mergeInto[$f]])) {
             $absorbedHere += $P['n'];
+            continue;
+        }
+        /* ══ عزلُ الإدارات — إزالةٌ **مصرَّحةٌ بسجلٍّ** لا فقدٌ صامت ══════════
+           ◆ نصُّ المالك: «**صفرُ فقد — والإزالةُ من مساحةٍ ليست حذفًا من النظام**».
+             فالمسارُ المصنَّفُ `FORBIDDEN` **لهذه المساحةِ بعينِها** أُزيل ظهورُه
+             بقرارٍ مسجَّلٍ في `gov_space_appearances` بشاهدِ عقدةِ الشجرةِ التي
+             حسمَته — وهو باقٍ في النظامِ ومفتوحٌ في مساحتِه المالكة.
+           ◆ **والتصريحُ مقيَّدٌ بالمساحةِ لا مطلق**: ما أُزيل من مساحةٍ ولم يُسجَّل
+             ممنوعًا فيها **يبقى فقدًا غيرَ مصرَّحٍ ويُرسِّب** — فلا يصير هذا البابُ
+             غطاءً لكلِّ اختفاء. */
+        if (!isset($nowF[$f]) && isset($forbiddenBySpace[$rid][mb_strtolower($f)])) {
+            $isolatedHere += $P['n'];
             continue;
         }
         if (!isset($nowF[$f])) { $missing[] = 'الملفُّ كلُّه: ' . $f; continue; }
@@ -157,18 +183,38 @@ foreach (uxp_root_roles() as $rid) {
             elseif (!$had && $canonName !== null && $l === $canonName && !isset($preF[$f])) { $added[] = '«' . $l . '» (' . $f . ')'; }
         }
     }
-    $renamed += $renamedHere; $merged += $mergedHere; $resurfaced += count($added);
+    $renamed += $renamedHere; $merged += $mergedHere; $resurfaced += count($added); $isolated += $isolatedHere;
+    $recon[$rid] = array("pre"=>$cntPre,"now"=>$cntNow,"abs"=>$absorbedHere,"mrg"=>$mergedHere,"iso"=>$isolatedHere,"add"=>count($added));
     $absorbed += $absorbedHere;
     $ok = empty($missing);
     if (!$ok) { $fails++; }
     echo ($ok ? '  ✔' : '  ✗') . " دور {$rid}: قبل={$cntPre} · بعد={$cntNow}"
         . ($absorbedHere ? " · ذاب في وارثٍ مُعلَنٍ حاضر={$absorbedHere}" : '')
+        . ($isolatedHere ? " · **أُزيل بعزلٍ مصرَّحٍ={$isolatedHere}**" : '')
         . ($renamedHere ? " · أُعيدت تسميتُه بالسجل={$renamedHere}" : '')
         . ($mergedHere ? " · توأمٌ مندمجٌ باسمٍ واحد={$mergedHere}" : '')
         . ($missing ? ' · ناقص: ' . implode(' ، ', array_slice($missing, 0, 6)) : '')
         . ($added ? ' · جديدُ الظهور: ' . implode(' ، ', array_slice($added, 0, 4)) : '') . "\n";
 }
-echo "الإجمالي: قبل={$totPre} · بعد={$totNow} · أُعيدت تسميتُه بالسجل={$renamed} · ذاب في وارثٍ مُعلَن={$absorbed} · توأمٌ مندمج={$merged} · جديدُ الظهور={$resurfaced}\n";
+echo "الإجمالي: قبل={$totPre} · بعد={$totNow} · أُعيدت تسميتُه بالسجل={$renamed} · ذاب في وارثٍ مُعلَن={$absorbed} · توأمٌ مندمج={$merged} · **أُزيل بعزلٍ مصرَّح={$isolated}** · جديدُ الظهور={$resurfaced}\n";
+/* ◆ والفرقُ يُصالَح حسابيًّا ولا يُترك للقارئ: قبل − بعد يجب أن يساوي مجموعَ
+     المصرَّحاتِ الثلاثِ ناقصَ ما عاد للظهور. **وفارقُ مقامٍ بلا سطرِ تصالحٍ
+     يطابق حسابيًّا لا يُقبل** — وهو شرطُ المواصفةِ نفسِها (٢٠-٣). */
+$expected = $totPre - $absorbed - $merged - $isolated + $resurfaced;
+printf("مصالحةُ المقام: %d − (ذاب %d + مندمج %d + معزول %d) + جديد %d = %d · والمقيسُ بعدًا %d ⇒ %s\n",
+    $totPre, $absorbed, $merged, $isolated, $resurfaced, $expected, $totNow,
+    ($expected === $totNow ? '✔ يطابق' : '✘ فرقٌ ' . ($totNow - $expected)));
+if ($expected !== $totNow) {
+    /* ◆ **ولا يُترك الفرقُ رقمًا عامًّا**: يُنسب إلى دورِه بعينِه، فالفرقُ المنسوبُ
+         يُفحَص والفرقُ المعلَّقُ في الهواءِ يُتجاهَل. */
+    echo "  ◆ الفرقُ منسوبًا إلى أدوارِه:\n";
+    foreach ($recon as $rid => $r) {
+        $exp = $r['pre'] - $r['abs'] - $r['mrg'] - $r['iso'] + $r['add'];
+        if ($exp !== $r['now']) {
+            printf("    · دور %-3d متوقَّع=%d مقيس=%d فرق=%+d\n", $rid, $exp, $r['now'], $r['now'] - $exp);
+        }
+    }
+}
 if ($fails === 0) { echo "✔ صفرُ فقدٍ غيرِ مصرَّح — كلُّ بندٍ قبليٍّ موجودٌ بهويتِه أو باسمِه المعياريِّ المسجَّل\n"; exit(0); }
 echo "✗ {$fails} دورًا فيه نقصٌ غيرُ مصرَّح — " . ($GATE ? 'التسليمُ مرسَّب' : 'راجِع قبل أيِّ تسليم') . "\n";
 exit($GATE ? 1 : 0);

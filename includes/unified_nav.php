@@ -127,6 +127,38 @@ function getUnifiedNavItems($conn, $roleId) {
             }));
         }
     }
+
+    /* ══ عزلُ الإدارات (ثامنًا-⑦) — الإزالةُ من **المساحةِ الخاطئةِ وحدَها** ══
+       ◆ نصُّ المالك: «`user + active_scope + route` لا `user + route`… **ومنعُها
+         عالميًّا يكسر صلاحيةً مشروعة**». فالترشيحُ هنا يسأل عن **هذه المساحةِ**
+         لا عن المستخدمِ مطلقًا: الشاشةُ الممنوعةُ في مساحةٍ تظهر في مساحتِها
+         المالكةِ كاملةً بأفعالِها.
+       ◆ **وموضعُه هنا قصدًا**: `getUnifiedNavItems` هي **البابُ الوحيدُ** لعناصرِ
+         التنقل، فالإزالةُ فعلٌ واحدٌ في موضعٍ واحد. ولو نُثر الترشيحُ في المصيِّرات
+         لتفرّق ونجا مسارٌ من بابٍ ثانٍ.
+       ◆ **ولا يُلغى مسارٌ ولا نقطةُ نهايةٍ ولا حدث**: هذا **إخفاءُ ظهورٍ** في
+         مساحةٍ بعينِها؛ والمسارُ يبقى مفتوحًا لمالكِه، ويبقى مقصدًا لفعلٍ أو
+         مهمةٍ أو رابطٍ من شاشةٍ أخرى. **صفرُ فقد — والإزالةُ من مساحةٍ ليست
+         حذفًا من النظام.**
+       ◆ **والغيابُ ليس منعًا**: ما لا صفَّ له في اللقطةِ يمرُّ — فبوابةٌ تمنع ما
+         لا تعرفه تكسر النظامَ صامتةً عند أولِ شاشةٍ جديدة. */
+    if (isset($_SESSION['user']) && strval(isset($_SESSION['user']['role']) ? $_SESSION['user']['role'] : '') !== '-1') {
+        $scopeFile = dirname(__DIR__) . '/includes/space_scope.php';
+        if (is_file($scopeFile)) {
+            require_once $scopeFile;
+            $scope = ems_active_scope();
+            if ($scope !== '') {
+                $forb = ems_scope_forbidden_set($scope);
+                if (!empty($forb)) {
+                    $items = array_values(array_filter($items, function ($it) use ($forb) {
+                        $r = ltrim(preg_replace('/[?#].*$/', '', (string) $it['route']), '/');
+                        return !isset($forb[mb_strtolower($r)]);
+                    }));
+                }
+            }
+        }
+    }
+
     return $items;
 }
 

@@ -128,6 +128,35 @@ if (!function_exists('ems_scope_forbids')) {
     }
 }
 
+if (!function_exists('ems_scope_forbidden_set')) {
+    /**
+     * كلُّ ممنوعِ مساحةٍ في استعلامٍ واحد — لترشيحِ السايدبار.
+     *
+     * ◆ **استعلامٌ واحدٌ لا استعلامٌ لكلِّ رابط**: سايدبارٌ بمئةِ رابطٍ يعني مئةَ
+     *   ذهابٍ وإيابٍ لو سُئل عن كلٍّ على حدة — وبطءُ التنقلِ يُغري بتعطيلِ البوابة.
+     */
+    function ems_scope_forbidden_set($space = null) {
+        static $cache = array();
+        $conn = ems_scope_conn();
+        if (!$conn) { return array(); }
+        if ($space === null) { $space = ems_active_scope(); }
+        if ($space === '') { return array(); }
+        if (isset($cache[$space])) { return $cache[$space]; }
+        $out = array();
+        $st = mysqli_prepare($conn, "SELECT LOWER(route) FROM gov_space_appearances
+                                      WHERE space_ar = ? AND cls = 'FORBIDDEN'");
+        if ($st) {
+            mysqli_stmt_bind_param($st, 's', $space);
+            mysqli_stmt_execute($st);
+            $res = mysqli_stmt_get_result($st);
+            while ($res && ($row = mysqli_fetch_row($res))) { $out[$row[0]] = 1; }
+            mysqli_stmt_close($st);
+        }
+        $cache[$space] = $out;
+        return $out;
+    }
+}
+
 if (!function_exists('ems_scope_class')) {
     /** صنفُ ظهورِ المسارِ في المساحةِ الفعّالة — أو '' إن لم يكن مسجَّلًا. */
     function ems_scope_class($route, $space = null) {
