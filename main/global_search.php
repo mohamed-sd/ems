@@ -11,6 +11,8 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/screen_contract.php';
+/* عزلُ الإدارات — حارسُ المساحةِ يُحمَّل هنا ليُفحَص قبلَ كلِّ استعلامِ كيان */
+require_once __DIR__ . '/../includes/space_scope.php';
 
 $company_id = intval($_SESSION['user']['company_id'] ?? 0);
 $q = mb_substr(trim($_GET['q'] ?? ''), 0, 80);
@@ -73,6 +75,22 @@ if (mb_strlen($q) >= 2) {
         // §13-③: الصلاحيةُ تُفحص قبل الاستعلام — فما لا يُملك لا يُصيَّر أصلًا
         // (ولا يُستعلَم عنه). السوبر خارج الفحص كسائر شاشات النظام.
         if (!$is_super && !gs_can_open($conn, $entities[$key][2])) { $hidden_sections++; return; }
+
+        /* ══ عزلُ الإدارات (سابعًا-③) — البحثُ العامُّ قناةٌ من الثمان ══════════
+           ◆ **الصلاحيةُ لا تكفي هنا**: من يملك الشاشةَ في إدارتِها المالكةِ يبلغها
+             بتبديلِ المساحة، **ويُمنع منها في المساحةِ الأجنبية**. فبحثٌ يفحص
+             الصلاحيةَ وحدَها يُعيد للمستخدمِ في مساحةِ التشغيلِ نتائجَ الشاشةِ
+             الماليةِ الممنوعةِ عليه هنا — **ويصير البحثُ بابًا خلفيًّا لما أُزيل
+             من السايدبار**.
+           ◆ **والفحصُ قبلَ الاستعلامِ لا بعدَه**، على نسقِ سطرِ الصلاحيةِ أعلاه:
+             فما يُمنع في هذه المساحةِ **لا يُستعلَم عنه أصلًا** ولا تمرُّ صفوفُه
+             في الحمولة. */
+        $__gsRoute = isset($entities[$key][3]) ? (string) $entities[$key][3] : '';
+        if ($__gsRoute === '' && isset($entities[$key][2])) { $__gsRoute = (string) $entities[$key][2]; }
+        if (!$is_super && $__gsRoute !== '' && function_exists('ems_scope_forbids')
+            && ems_scope_forbids($__gsRoute)) {
+            $hidden_sections++; return;
+        }
         $r = mysqli_query($conn, $sql);
         // config.php يُطفئ رمي mysqli — فاستعلامٌ خاطئُ العمود يعود false صامتًا
         // ويبدو «لا نتيجة». يُعلَن العطبُ ولا يُصمت عليه (كان يخفي كيانين).

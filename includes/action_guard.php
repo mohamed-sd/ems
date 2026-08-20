@@ -192,6 +192,34 @@ if (!function_exists('ems_action_guard_registry')) {
             return;
         }
 
+        /* ══ عزلُ الإدارات (سابعًا-⑧) — الفعلُ يعرف مساحتَه ══════════════════
+           ◆ **الصلاحيةُ وحدَها تترك البابَ الثامنَ مفتوحًا**: الشاشةُ أُزيلت من
+             السايدبارِ ومُنعت بالعنوانِ المباشر، **ومعالجُها يظل يقبل الفعلَ**
+             لأنه لا يسأل إلا «أيحق لك؟» لا «أهنا؟». فيمرُّ الفعلُ الجماعيُّ
+             والنداءُ الخلفيُّ إلى شاشةٍ ممنوعةٍ في هذه المساحة.
+           ◆ **والسؤالُ بالمساحةِ لا بالمستخدم**: الفعلُ نفسُه مشروعٌ في المساحةِ
+             المالكةِ ويُرفض في الأجنبية — فلا تُكسر صلاحيةٌ مشروعة.
+           ◆ ويُسجَّل الرفضُ بنوعِه (`scope_denied`) فلا يختلط بمنعِ الصلاحية:
+             **اثنانِ يُرفضان بالرمزِ نفسِه لسببَين مختلفَين يُخفيان أحدَهما.** */
+        $__sf = dirname(__DIR__) . '/includes/space_scope.php';
+        if (is_file($__sf) && isset($_SESSION['user'])
+            && strval(isset($_SESSION['user']['role']) ? $_SESSION['user']['role'] : '') !== '-1') {
+            require_once $__sf;
+            if (function_exists('ems_scope_forbids')) {
+                $__owner = isset($entry['screen']) ? (string) $entry['screen']
+                         : (isset($entry['route']) ? (string) $entry['route'] : '');
+                foreach (array($script, $__owner) as $__cand) {
+                    if ($__cand === '' || !ems_scope_forbids($__cand)) { continue; }
+                    ems_action_guard_log('scope_denied', $script, $verb, $mode);
+                    if ($mode === 'enforce') {
+                        ems_ajax_guard_response(403,
+                            'هذا الإجراء يخصُّ مساحةَ عملٍ أخرى — بدِّلِ المساحةَ لتنفيذِه.');
+                    }
+                    return;
+                }
+            }
+        }
+
         if ($entry['action'] === 'public') {
             return; // قرارٌ واعٍ موثَّق في السجل.
         }
