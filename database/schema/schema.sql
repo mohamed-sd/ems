@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-21 18:03:05
--- الجداول: 617 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-21 19:15:04
+-- الجداول: 618 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -499,7 +499,8 @@ CREATE TABLE `approval_workflow_rules` (
   CONSTRAINT `chk_rules_retired` CHECK (`is_active` = 0),
   CONSTRAINT `chk_nopollute_d662685283921e14` CHECK (`created_at` <= '2026-08-10 19:39:36' or `entity_type` is null or `entity_type`  not like '% %' or octet_length(`entity_type`) <= char_length(`entity_type`)),
   CONSTRAINT `chk_keypure_approval_workflow_rules_entity_type` CHECK (`entity_type`  not like '% %' and `entity_type`  not like '%·%'),
-  CONSTRAINT `chk_keypure_approval_workflow_rules_action` CHECK (`action`  not like '% %' and `action`  not like '%·%')
+  CONSTRAINT `chk_keypure_approval_workflow_rules_action` CHECK (`action`  not like '% %' and `action`  not like '%·%'),
+  CONSTRAINT `chk_awr_legacy_write_blocked` CHECK (`is_active` = 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: asset_hour_reconciliations ──
@@ -6649,6 +6650,18 @@ CREATE TABLE `gov_field_inheritance` (
   UNIQUE KEY `uq_inh` (`company_id`,`child_entity`,`child_field`),
   KEY `ix_parent` (`parent_entity`,`parent_field`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-OBL-01 §4-21 — التوريثُ ومنعُ إعادةِ الإدخال';
+
+-- ── Table: gov_finance_gate_policy ──
+CREATE TABLE `gov_finance_gate_policy` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `ladder_code` varchar(12) NOT NULL,
+  `policy` varchar(24) NOT NULL COMMENT 'MANDATORY_GATE | REQUEST_REGISTER',
+  `covered_by` varchar(12) DEFAULT NULL COMMENT 'سلّمُ البوابةِ المُغطّي لسجلِّ الطلبات',
+  `reason` varchar(400) NOT NULL,
+  `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ladder` (`ladder_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='GAP-15 — قرارٌ مُعلَنٌ لكلِّ سلّمٍ بسقفٍ نقديّ: بوابةٌ إلزاميةٌ أم سجلُّ طلبات';
 
 -- ── Table: gov_golden_approvals ──
 CREATE TABLE `gov_golden_approvals` (
