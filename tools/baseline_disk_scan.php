@@ -16,6 +16,7 @@ error_reporting(E_ALL);
 mb_internal_encoding('UTF-8');
 $ROOT = dirname(__DIR__);
 $OUT = $ROOT . '/docs/baseline_20260821/extract';
+require_once __DIR__ . '/lib/deprecated_mark.php';   /* NF-06 — قاعدةُ الوسمِ الوحيدة */
 if (!is_dir($OUT)) { mkdir($OUT, 0777, true); }
 
 $SKIP = array('tools', 'tests', 'includes', 'app', 'vendor', 'database', 'docs', 'storage',
@@ -46,7 +47,22 @@ foreach ($files as $rel) {
     $echoesJson = (strpos($src, 'json_encode') !== false && (strpos($src, "header('Content-Type: application/json") !== false || strpos($src, '"Content-Type: application/json') !== false || strpos($src, 'application/json') !== false));
     $hasThead   = (strpos($src, '<thead') !== false);
     $hasForm    = (bool) preg_match('/<form[\s>]/i', $src);
-    $deprecatedMark = (bool) preg_match('/@deprecated|DEPRECATED|متقاعد|قديم — لا يُستخدم/u', $src);
+    /* ══ وسمُ التقاعد — INJ-FIX-02 · NF-06 ═══════════════════════════════════
+     * ◆ **الكاشفُ السابقُ كان يرصد مفرداتِه هو**: `/@deprecated|DEPRECATED|متقاعد/`
+     *   على الشيفرةِ الخام. فوسَم ١٣ سطحًا متقاعدًا وليس فيها متقاعدٌ واحد:
+     *     · ١٢ منها مطابقتُها **`E_DEPRECATED`** في `error_reporting(E_ALL & ~E_DEPRECATED)`
+     *       — ومنها `cron_jobs.php` نفسُه، **العاملُ الذي يشغّل المجدولَ كلَّه**.
+     *     · و`Governance/auth_profiles.php` مطابقتُها كلمةُ «متقاعد» التي **تطبعها
+     *       الشاشةُ لافتةَ حالةٍ لغيرِها** — وهي الشاشةُ التي تحكم دخولَ ٩٧٪.
+     *   ومَن قرأ الوسمَ فأطفأهما أوقف النظام. **فالوسمُ الخاطئُ خطرُ إتلافٍ لا دَينُ
+     *   توثيق** — ولذلك دخل الموجةَ أ.
+     *
+     * ◆ **والقاعدةُ الجديدة: يُقاس المُعلَنُ لا المذكور.** لا يُعتدُّ إلا بوسمٍ
+     *   مقصودٍ في موضعِ إعلان — `@deprecated` وسمَ توثيقٍ في أولِ الكلمة، أو
+     *   `EMS_DEPRECATED` ثابتًا مُعلَنًا. وتُستبعد `E_DEPRECATED` بحدِّ كلمةٍ
+     *   يسبقها، وتُستبعد النصوصُ المطبوعةُ بقصرِ العربيِّ على التعليقات.
+     * ═══════════════════════════════════════════════════════════════════════ */
+    $deprecatedMark = ems_deprecated_mark($src);   /* tools/lib/deprecated_mark.php */
 
     $isU13 = (strpos($src, '$U13') !== false || strpos($src, 'u13_screen_kit') !== false);
     $isDeptGov = (strpos($src, 'dept_gov_space') !== false);
