@@ -1,0 +1,1849 @@
+{
+    "tally": {
+        "IMPLEMENTED_UNDER_OTHER_ROUTE": 131,
+        "REQUIRED_AND_MISSING": 53
+    },
+    "build_denominator_provisional": 53,
+    "rows": [
+        {
+            "file": "acc_budget_check.php",
+            "title": "فحص الموازنة والالتزام",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Finance\/budget_dept.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "acc_cost_alloc.php",
+            "title": "توزيع مراكز التكلفة",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Financing\/cost_allocation.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "acc_dept_budget.php",
+            "title": "ميزانية إدارتي",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/budget_form_fin.php",
+            "evidence": "التسميةُ «ميزانية إدارتي» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "acc_docs_check.php",
+            "title": "مراجعة المستندات",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "main\/check_username_availability.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "acc_inbox.php",
+            "title": "المعاملات الواردة من الإدارات",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/import_events_fin.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "acc_myday.php",
+            "title": "عملي اليوم — محاسب الإدارة",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/acc_my_day.php",
+            "evidence": "تداخلُ 3 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "acc_returned.php",
+            "title": "المعاملات المعادة",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "acc_scope_events.php",
+            "title": "الأحداث المالية في نطاقي",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/events_list_fin.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "acc_spec_reports.php",
+            "title": "تقارير تخصصي المحاسبي",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "admin\/reports_permissions.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "acc_treatment.php",
+            "title": "المعالجة المحاسبية المقترحة",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "acc_variance.php",
+            "title": "انحرافات الموازنة",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Finance\/ctrl_doc_variance.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "activation.php",
+            "title": "أنماط تفعيل المزايا",
+            "appearances": 1,
+            "depts": "الحوكمة والالتزام",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Governance\/activation_patterns.php",
+            "evidence": "التسميةُ «أنماط تفعيل المزايا» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "advances.php",
+            "title": "السلف والعهد المالية",
+            "appearances": 1,
+            "depts": "الموارد البشرية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Workforce\/employee_advances.php",
+            "evidence": "التسميةُ «السلف والعهد المالية» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "ap_oblig_gen.php",
+            "title": "توليد التزامات عقد المورد",
+            "appearances": 2,
+            "depts": "المالية والخزينة · إدارة الموردين",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Contracts\/contract_obligations.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "ar_accrual_gen.php",
+            "title": "توليد استحقاقات عقد العميل",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Contracts\/contract_lines.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "ar_accrual_sched.php",
+            "title": "جدول استحقاقات العميل",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/ob_schedule.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "ar_claim_invoice.php",
+            "title": "فاتورة المطالبة وإحالتها للتحصيل",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Contracts\/claim_helpers.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "ar_completion_cert.php",
+            "title": "شهادة الإنجاز الشهرية",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Fleet\/readiness_cert.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "assistants.php",
+            "title": "المعاونون والنيابة المؤقتة",
+            "appearances": 1,
+            "depts": "الحوكمة والالتزام",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "main\/all_assistants.php",
+            "evidence": "التسميةُ «المعاونون والنيابة المؤقتة» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "audit.php",
+            "title": "سجل التدقيق والاطّلاع",
+            "appearances": 2,
+            "depts": "الحوكمة والالتزام · التمويل والملكية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "ActivityLogs\/activity_logs.php",
+            "evidence": "التسميةُ «سجل التدقيق والاطّلاع» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "bank_recon.php",
+            "title": "المطابقة البنكية",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/bank_reconciliation_fin.php",
+            "evidence": "التسميةُ «المطابقة البنكية» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "cash_forecast.php",
+            "title": "التدفق النقدي والتنبؤ",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/cash_forecast_fin.php",
+            "evidence": "التسميةُ «التدفق النقدي والتنبؤ» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "central_proc_budget.php",
+            "title": "ميزانية المشتريات المركزية المجمَّعة",
+            "appearances": 1,
+            "depts": "إدارة المشتريات التشغيلية",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "cron_proc_replenish.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "ceo_appointments.php",
+            "title": "موافقات التكليف على المسميات القيادية",
+            "appearances": 1,
+            "depts": "مكتب الرئيس التنفيذي والنواب",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Operations\/distribution_space.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "ceo_audit_inbox.php",
+            "title": "تقارير المراجعة الداخلية — الرئيس",
+            "appearances": 1,
+            "depts": "مكتب الرئيس التنفيذي والنواب",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Portal\/ceo_audit_reports.php",
+            "evidence": "تداخلُ 3 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "ceo_fin_approvals.php",
+            "title": "الاعتمادات المالية العليا — الرئيس",
+            "appearances": 1,
+            "depts": "مكتب الرئيس التنفيذي والنواب",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Portal\/ceo_approvals.php",
+            "evidence": "تداخلُ 2 رمزًا في الاسمِ مع سطحٍ حيّ",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "ceo_reserved.php",
+            "title": "المسائل المحجوزة للرئيس التنفيذي",
+            "appearances": 1,
+            "depts": "مكتب الرئيس التنفيذي والنواب",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Portal\/ceo_approvals.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "cfo_board.php",
+            "title": "لوحة المدير المالي",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/cfo_daily_board_fin.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "coa.php",
+            "title": "دليل الحسابات ومراكز التكلفة",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/management_accounting_fin.php",
+            "evidence": "التسميةُ «دليل الحسابات ومراكز التكلفة» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "contract_terms.php",
+            "title": "أحكام العقد — العملات والمقدم والمهل",
+            "appearances": 2,
+            "depts": "المالية والخزينة · المبيعات والعقود",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Contracts\/contract_card.php",
+            "evidence": "التسميةُ «أحكام العقد — العملات والمقدم والمهل» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "cost_report.php",
+            "title": "التكاليف والربحية بالمركز",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/cost_report_fin.php",
+            "evidence": "التسميةُ «التكاليف والربحية بالمركز» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "coverage.php",
+            "title": "التزام العقد بنوع المعدة",
+            "appearances": 2,
+            "depts": "المبيعات والعقود · إدارة التشغيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Contracts\/contract_coverage.php",
+            "evidence": "التسميةُ «التزام العقد بنوع المعدة» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "ctrl_accruals.php",
+            "title": "الاستحقاقات والمخصصات",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "ctrl_board.php",
+            "title": "لوحة رئيس الحسابات",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/ctrl_supervision.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "ctrl_cash_count.php",
+            "title": "مراجعة محاضر الجرد النقدي",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Finance\/cash_forecast_fin.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "ctrl_close_calendar.php",
+            "title": "تقويم الإقفال",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Operations\/fleet_calendar.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "ctrl_close_checklist.php",
+            "title": "قائمة فحص الإقفال",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Operations\/monthly_close.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "ctrl_exceptions.php",
+            "title": "الاستثناءات المحاسبية",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Governance\/exceptions.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "ctrl_fx_diff.php",
+            "title": "فروق العملات",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "ctrl_je_orphan.php",
+            "title": "القيود غير المرتبطة بمصدر",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "ctrl_je_queue.php",
+            "title": "طابور مراجعة القيود",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Governance\/job_queue.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "ctrl_je_risky.php",
+            "title": "القيود عالية المخاطر",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "ctrl_quality.php",
+            "title": "تقارير جودة المحاسبة",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/ctrl_quality_kpis.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "ctrl_recon_review.php",
+            "title": "مراجعة المطابقات البنكية",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Equipments\/asset_recon.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "ctrl_reopen_log.php",
+            "title": "سجل إعادة فتح الفترات",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "admin\/audit_log.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "ctrl_statements.php",
+            "title": "القوائم المالية",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/financial_statements_fin.php",
+            "evidence": "التسميةُ «القوائم المالية» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "ctrl_trial_balance.php",
+            "title": "ميزان المراجعة",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "custody.php",
+            "title": "العهد والمرتجعات",
+            "appearances": 2,
+            "depts": "إدارة الصيانة · إدارة المخازن",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Procurement\/receipt_custody_proc.php",
+            "evidence": "التسميةُ «العهد والمرتجعات» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "cycle_time.php",
+            "title": "زمن دورة الطلبات",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "FinRequests\/cycle_time_board.php",
+            "evidence": "التسميةُ «زمن دورة الطلبات» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "delegations.php",
+            "title": "التفويض بالتوقيع",
+            "appearances": 2,
+            "depts": "مكتب الرئيس التنفيذي والنواب · الحوكمة والالتزام",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Governance\/signing_authority.php",
+            "evidence": "التسميةُ «التفويض بالتوقيع» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "dep_profiles.php",
+            "title": "سياسات الإهلاك المعتمدة",
+            "appearances": 1,
+            "depts": "إدارة الأسطول",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Equipments\/fleet_depreciation_profiles.php",
+            "evidence": "التسميةُ «سياسات الإهلاك المعتمدة» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "depreciation.php",
+            "title": "الإهلاك والقيمة الدفترية",
+            "appearances": 3,
+            "depts": "المالية والخزينة · التمويل والملكية · إدارة الأسطول",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/assets_fin.php",
+            "evidence": "التسميةُ «الإهلاك والقيمة الدفترية» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "distribution.php",
+            "title": "توزيع المعدات والمشغّلين",
+            "appearances": 3,
+            "depts": "إدارة الأسطول · إدارة التشغيل · القوى التشغيلية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Operations\/distribution_space.php",
+            "evidence": "التسميةُ «توزيع المعدات والمشغّلين» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "emp_contracts.php",
+            "title": "عقود الموظفين",
+            "appearances": 1,
+            "depts": "الموارد البشرية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Employees\/employee_contracts.php",
+            "evidence": "التسميةُ «عقود الموظفين» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "entities.php",
+            "title": "سجل الشركات والكيانات",
+            "appearances": 2,
+            "depts": "الحوكمة والالتزام · التمويل والملكية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Governance\/entities_registry.php",
+            "evidence": "التسميةُ «سجل الشركات والكيانات» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "equip_docs.php",
+            "title": "وثائق المعدات والمشغّلين",
+            "appearances": 4,
+            "depts": "الموارد البشرية · إدارة الأسطول · إدارة التشغيل · القوى التشغيلية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Equipments\/equipment_documents.php",
+            "evidence": "التسميةُ «وثائق المعدات والمشغّلين» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "equip_meters.php",
+            "title": "قراءات العدّادات",
+            "appearances": 2,
+            "depts": "إدارة الأسطول · إدارة الصيانة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Equipments\/meter_readings.php",
+            "evidence": "التسميةُ «قراءات العدّادات» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "equip_models.php",
+            "title": "موديلات المعدات ومواصفاتها",
+            "appearances": 2,
+            "depts": "إدارة الأسطول · إدارة الصيانة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Equipments\/fleet_models.php",
+            "evidence": "التسميةُ «موديلات المعدات ومواصفاتها» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "equip_types.php",
+            "title": "أنواع المعدات وفئاتها",
+            "appearances": 1,
+            "depts": "إدارة الأسطول",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Equipments\/equipments_types.php",
+            "evidence": "التسميةُ «أنواع المعدات وفئاتها» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "failures.php",
+            "title": "تصنيف الأعطال وأسبابها",
+            "appearances": 3,
+            "depts": "إدارة الأسطول · إدارة التشغيل · إدارة الصيانة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Equipments\/manage_failure_codes.php",
+            "evidence": "التسميةُ «تصنيف الأعطال وأسبابها» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "fin_alerts.php",
+            "title": "تنبيهات الاستحقاقات والالتزامات",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Finance\/cron_obligation_alerts.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "fin_avoid_test.php",
+            "title": "اختبار قابلية التجنب للعقود",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "fin_backflow.php",
+            "title": "سجل المرتجَع المالي للإدارات",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/acc_backflow.php",
+            "evidence": "تداخلُ 3 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "fin_commitments.php",
+            "title": "سجل الارتباطات التعاقدية والإفصاح",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Clients\/contract_commitments.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "fin_cost.php",
+            "title": "توزيع تكلفة التمويل على المشاريع",
+            "appearances": 2,
+            "depts": "المالية والخزينة · التمويل والملكية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Financing\/cost_allocation.php",
+            "evidence": "التسميةُ «توزيع تكلفة التمويل على المشاريع» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "fin_data_class.php",
+            "title": "تصنيف بيانات الشاشات الرباعي",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Employees\/get_employee_data.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "fin_deviations.php",
+            "title": "انحرافات التمويل — السداد والملكية والتوثيق",
+            "appearances": 1,
+            "depts": "التمويل والملكية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Financing\/deviations.php",
+            "evidence": "التسميةُ «انحرافات التمويل — السداد والملكية والتوثيق» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "fin_exit.php",
+            "title": "الخروج غير المسجَّل من الملكية",
+            "appearances": 1,
+            "depts": "التمويل والملكية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Financing\/deviations.php",
+            "evidence": "التسميةُ «الخروج غير المسجَّل من الملكية» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "fin_idle.php",
+            "title": "عقود تمويل بلا حركة",
+            "appearances": 1,
+            "depts": "التمويل والملكية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Financing\/deviations.php",
+            "evidence": "التسميةُ «عقود تمويل بلا حركة» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "fin_mgr_assign.php",
+            "title": "توزيع التخصصات والنطاقات",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "fin_mgr_board.php",
+            "title": "لوحة مدير الإدارة المالية",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/cfo_daily_board_fin.php",
+            "evidence": "التسميةُ «لوحة مدير الإدارة المالية» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "fin_ops.php",
+            "title": "عمليات التمويل",
+            "appearances": 1,
+            "depts": "التمويل والملكية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Financing\/financing_board.php",
+            "evidence": "التسميةُ «عمليات التمويل» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "fin_recognition.php",
+            "title": "مصفوفة شروط الاعتراف بالمعيار",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "fin_routing.php",
+            "title": "مصفوفة توجيه الطلبات المالية",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "FinRequests\/routing_admin.php",
+            "evidence": "تداخلُ 3 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "fin_statements.php",
+            "title": "القوائم المالية",
+            "appearances": 2,
+            "depts": "مكتب الرئيس التنفيذي والنواب · المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/financial_statements_fin.php",
+            "evidence": "التسميةُ «القوائم المالية» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "fin_triggers.php",
+            "title": "سجل المُطلِقات المالية الخمسة والثلاثين",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/events_list_fin.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "fin_variance.php",
+            "title": "فروق السداد والاستحقاق",
+            "appearances": 1,
+            "depts": "التمويل والملكية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Financing\/deviations.php",
+            "evidence": "التسميةُ «فروق السداد والاستحقاق» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "financiers.php",
+            "title": "سجل الممولين",
+            "appearances": 1,
+            "depts": "التمويل والملكية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Financing\/financiers_registry.php",
+            "evidence": "التسميةُ «سجل الممولين» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "fleet_owners.php",
+            "title": "ملّاك الأسطول",
+            "appearances": 1,
+            "depts": "إدارة الأسطول",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Financing\/owners_registry.php",
+            "evidence": "التسميةُ «ملّاك الأسطول» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "fuel_issue.php",
+            "title": "صرف الوقود اليومي للمعدات",
+            "appearances": 1,
+            "depts": "إدارة الموقع",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Procurement\/issue_proc.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "fuel_receipt.php",
+            "title": "استلام الوقود من العميل",
+            "appearances": 1,
+            "depts": "إدارة الموقع",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Procurement\/receipt_custody_proc.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "fuel_reconcile.php",
+            "title": "مطابقة كميات الوقود",
+            "appearances": 1,
+            "depts": "إدارة الموقع",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "fx_daily.php",
+            "title": "سعر الصرف اليومي",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Finance\/cfo_daily_board_fin.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "fx_rates.php",
+            "title": "أسعار الصرف",
+            "appearances": 2,
+            "depts": "المالية والخزينة · التمويل والملكية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/currencies_fin.php",
+            "evidence": "التسميةُ «أسعار الصرف» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "gov_dept_iaf.php",
+            "title": "حوكمة المراجعة الداخلية",
+            "appearances": 1,
+            "depts": "المراجع الداخلي المستقل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Portal\/ceo_audit_reports.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "gov_ladder_steps.php",
+            "title": "خطوات السلالم المسجَّلة",
+            "appearances": 1,
+            "depts": "الحوكمة والالتزام",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "gov_ladders.php",
+            "title": "سلاليم الاعتماد وتعريفها",
+            "appearances": 1,
+            "depts": "الحوكمة والالتزام",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "iaf_actions.php",
+            "title": "خطط المعالجة والمتابعة",
+            "appearances": 1,
+            "depts": "المراجع الداخلي المستقل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Audit\/iaf_action_plans.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "iaf_board.php",
+            "title": "لوحة رئيس المراجعة الداخلية",
+            "appearances": 1,
+            "depts": "المراجع الداخلي المستقل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Portal\/ceo_audit_reports.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "iaf_evidence.php",
+            "title": "طلبات الأدلة",
+            "appearances": 1,
+            "depts": "المراجع الداخلي المستقل",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "iaf_overdue.php",
+            "title": "الملاحظات المتأخرة والتصعيد",
+            "appearances": 1,
+            "depts": "المراجع الداخلي المستقل",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Finance\/ob_overdue.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "iaf_programs.php",
+            "title": "برامج المراجعة",
+            "appearances": 1,
+            "depts": "المراجع الداخلي المستقل",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "iaf_samples.php",
+            "title": "العينات ونتائج الاختبارات",
+            "appearances": 1,
+            "depts": "المراجع الداخلي المستقل",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "iaf_sensitive_log.php",
+            "title": "سجل الاطلاع الحساس للمراجعين",
+            "appearances": 1,
+            "depts": "المراجع الداخلي المستقل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Audit\/iaf_access_log.php",
+            "evidence": "تداخلُ 3 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "invoices.php",
+            "title": "فواتير العملاء",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Contracts\/tax_invoices.php",
+            "evidence": "التسميةُ «فواتير العملاء» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "issue.php",
+            "title": "صرف مواد من المخزن",
+            "appearances": 3,
+            "depts": "المالية والخزينة · إدارة الصيانة · إدارة المخازن",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Procurement\/issue_proc.php",
+            "evidence": "التسميةُ «صرف مواد من المخزن» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "items.php",
+            "title": "كتالوج الأصناف والقطع الحرجة",
+            "appearances": 3,
+            "depts": "إدارة الصيانة · إدارة المشتريات التشغيلية · إدارة المخازن",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Procurement\/items_proc.php",
+            "evidence": "التسميةُ «كتالوج الأصناف والقطع الحرجة» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "journal.php",
+            "title": "القيود اليومية",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/journal_form_fin.php",
+            "evidence": "التسميةُ «القيود اليومية» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "journey_tracker.php",
+            "title": "متابعة الرحلات الذهبية",
+            "appearances": 1,
+            "depts": "إدارة التشغيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Transport\/transfer_in_transit.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "leaves.php",
+            "title": "الإجازات والغياب",
+            "appearances": 2,
+            "depts": "الموارد البشرية · القوى التشغيلية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Workforce\/worker_leave_absence.php",
+            "evidence": "التسميةُ «الإجازات والغياب» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "licenses.php",
+            "title": "التراخيص والكفالات",
+            "appearances": 1,
+            "depts": "الحوكمة والالتزام",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Governance\/licenses_guarantees.php",
+            "evidence": "التسميةُ «التراخيص والكفالات» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "maint_provision.php",
+            "title": "مخصص الصيانة والعمرات",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/maintenance_provision_fin.php",
+            "evidence": "التسميةُ «مخصص الصيانة والعمرات» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "margin.php",
+            "title": "هامش الربح للعقد والواقعة",
+            "appearances": 3,
+            "depts": "مكتب الرئيس التنفيذي والنواب · المالية والخزينة · إدارة التشغيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Reports\/margin_report.php",
+            "evidence": "التسميةُ «هامش الربح للعقد والواقعة» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "messages.php",
+            "title": "المراسلات",
+            "appearances": 16,
+            "depts": "مكتب الرئيس التنفيذي والنواب · الحوكمة والالتزام · المالية والخزينة · الموارد البشرية · المبيعات والعقود · التمويل والملكية · إدارة الموردين · إدارة الأسطول · إدارة التشغيل · إدارة الصيانة · إدارة المشتريات التشغيلية · إدارة المخازن · النقل والترحيل · القوى التشغيلية · مركز البلاغات · مساحة العمل الشخصية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "index.php",
+            "evidence": "التسميةُ «المراسلات» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "my_workspace_v2.php",
+            "title": "مساحة عملي — أربعة صناديق",
+            "appearances": 1,
+            "depts": "إدارة التشغيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "main\/my_workspace.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "op_assign.php",
+            "title": "تكليف المشغّل على المعدة",
+            "appearances": 3,
+            "depts": "الموارد البشرية · إدارة التشغيل · القوى التشغيلية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Operations\/distribution_space.php",
+            "evidence": "التسميةُ «تكليف المشغّل على المعدة» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "op_deduct.php",
+            "title": "خصومات المشغّلين المقترحة",
+            "appearances": 2,
+            "depts": "الموارد البشرية · القوى التشغيلية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Workforce\/proposed_deductions.php",
+            "evidence": "التسميةُ «خصومات المشغّلين المقترحة» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "operators.php",
+            "title": "سجل المشغّلين",
+            "appearances": 3,
+            "depts": "الموارد البشرية · النقل والترحيل · القوى التشغيلية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Employees\/equipment_operators.php",
+            "evidence": "التسميةُ «سجل المشغّلين» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "ops_room.php",
+            "title": "غرفة عمليات المواقع",
+            "appearances": 1,
+            "depts": "إدارة التشغيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Operations\/operations_room.php",
+            "evidence": "التسميةُ «غرفة عمليات المواقع» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "payables.php",
+            "title": "ذمم الموردين والمستحقات",
+            "appearances": 2,
+            "depts": "المالية والخزينة · التمويل والملكية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/dues_fin.php",
+            "evidence": "التسميةُ «ذمم الموردين والمستحقات» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "payments.php",
+            "title": "طلبات الدفع والسداد",
+            "appearances": 6,
+            "depts": "المالية والخزينة · الموارد البشرية · التمويل والملكية · إدارة التشغيل · إدارة المشتريات التشغيلية · النقل والترحيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/payments_fin.php",
+            "evidence": "التسميةُ «طلبات الدفع والسداد» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "payroll.php",
+            "title": "مسيّر الرواتب",
+            "appearances": 2,
+            "depts": "المالية والخزينة · الموارد البشرية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Workforce\/payroll_runs.php",
+            "evidence": "التسميةُ «مسيّر الرواتب» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "period_close.php",
+            "title": "إقفال الفترة المحاسبية",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/periods_fin.php",
+            "evidence": "التسميةُ «إقفال الفترة المحاسبية» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "po.php",
+            "title": "أوامر الشراء",
+            "appearances": 2,
+            "depts": "إدارة المشتريات التشغيلية · إدارة المخازن",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Procurement\/orders_proc.php",
+            "evidence": "التسميةُ «أوامر الشراء» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "pr.php",
+            "title": "طلبات الشراء",
+            "appearances": 4,
+            "depts": "إدارة التشغيل · إدارة الصيانة · إدارة المشتريات التشغيلية · إدارة المخازن",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Procurement\/requests_proc.php",
+            "evidence": "التسميةُ «طلبات الشراء» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "preventive.php",
+            "title": "خطط الصيانة الوقائية",
+            "appearances": 2,
+            "depts": "إدارة الأسطول · إدارة الصيانة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Maintenance\/preventive_plans.php",
+            "evidence": "التسميةُ «خطط الصيانة الوقائية» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "price_adjust.php",
+            "title": "آليات تعديل السعر",
+            "appearances": 1,
+            "depts": "المبيعات والعقود",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Contracts\/price_terms.php",
+            "evidence": "التسميةُ «آليات تعديل السعر» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "quota_ledger.php",
+            "title": "دفتر استهلاك حصص الموردين",
+            "appearances": 1,
+            "depts": "إدارة الموردين",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Suppliers\/shares_coverage.php",
+            "evidence": "التسميةُ «دفتر استهلاك حصص الموردين» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "readiness.php",
+            "title": "جاهزية المعدات للتشغيل",
+            "appearances": 3,
+            "depts": "إدارة الأسطول · إدارة التشغيل · إدارة الصيانة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Fleet\/readiness_board.php",
+            "evidence": "التسميةُ «جاهزية المعدات للتشغيل» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "receivables.php",
+            "title": "ذمم العملاء وأعمارها",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Contracts\/collections.php",
+            "evidence": "التسميةُ «ذمم العملاء وأعمارها» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "recruitment.php",
+            "title": "التوظيف من الشاغر إلى المباشرة",
+            "appearances": 2,
+            "depts": "الموارد البشرية · القوى التشغيلية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Workforce\/recruitment_pipeline.php",
+            "evidence": "التسميةُ «التوظيف من الشاغر إلى المباشرة» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "reports_index.php",
+            "title": "مركز التقارير",
+            "appearances": 12,
+            "depts": "الحوكمة والالتزام · المالية والخزينة · الموارد البشرية · التمويل والملكية · إدارة الأسطول · إدارة التشغيل · إدارة الصيانة · إدارة المشتريات التشغيلية · إدارة المخازن · النقل والترحيل · القوى التشغيلية · مركز البلاغات",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Reports\/reports.php",
+            "evidence": "التسميةُ «مركز التقارير» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "rfq.php",
+            "title": "طلب العروض ومقارنتها",
+            "appearances": 1,
+            "depts": "إدارة المشتريات التشغيلية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Procurement\/rfq_compare_award.php",
+            "evidence": "التسميةُ «طلب العروض ومقارنتها» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "risk_dashboard.php",
+            "title": "لوحة المخاطر المؤسسية",
+            "appearances": 1,
+            "depts": "إدارة المخاطر المؤسسية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Risk\/risk_board.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "risk_dept_iaf.php",
+            "title": "مخاطر المراجعة الداخلية",
+            "appearances": 1,
+            "depts": "المراجع الداخلي المستقل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Portal\/ceo_audit_reports.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "risk_dept_view.php",
+            "title": "مخاطر الإدارة",
+            "appearances": 1,
+            "depts": "إدارة المخاطر المؤسسية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Risk\/dept_risk_space.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "risk_kri.php",
+            "title": "مؤشرات المخاطر والضوابط",
+            "appearances": 1,
+            "depts": "إدارة المخاطر المؤسسية",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Portal\/ceo_risk.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "risk_profile.php",
+            "title": "ملف الخطر",
+            "appearances": 1,
+            "depts": "إدارة المخاطر المؤسسية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Risk\/risk_card.php",
+            "evidence": "التسميةُ «ملف الخطر» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "risk_treatment.php",
+            "title": "إجراءات المعالجة",
+            "appearances": 1,
+            "depts": "إدارة المخاطر المؤسسية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Risk\/risk_treatments.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "shares.php",
+            "title": "حصص الملكية في الأصول",
+            "appearances": 2,
+            "depts": "التمويل والملكية · إدارة الأسطول",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Financing\/owners_registry.php",
+            "evidence": "التسميةُ «حصص الملكية في الأصول» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "shift_metrics.php",
+            "title": "مؤشرات الورديات المشتقة",
+            "appearances": 1,
+            "depts": "إدارة الموقع",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "movement\/update_operation_shift_type.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "site_acc_board.php",
+            "title": "لوحة محاسب الموقع",
+            "appearances": 1,
+            "depts": "إدارة الموقع",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/cfo_daily_board_fin.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "site_custody.php",
+            "title": "عهدة الموقع والصرف منها",
+            "appearances": 1,
+            "depts": "إدارة الموقع",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Procurement\/issue_proc.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "site_custody_settle.php",
+            "title": "تصفية العهدة",
+            "appearances": 1,
+            "depts": "إدارة الموقع",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Operations\/site_gate_equip.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "site_custody_spend.php",
+            "title": "صرف مشتريات ميدانية من العهدة",
+            "appearances": 1,
+            "depts": "إدارة الموقع",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Procurement\/issue_proc.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "standby_decide.php",
+            "title": "قرار الاستعداد أو التعطل",
+            "appearances": 1,
+            "depts": "إدارة الموقع",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "stock.php",
+            "title": "أرصدة المخزون بحالاتها",
+            "appearances": 5,
+            "depts": "المالية والخزينة · إدارة التشغيل · إدارة الصيانة · إدارة المشتريات التشغيلية · إدارة المخازن",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Procurement\/stock_proc.php",
+            "evidence": "التسميةُ «أرصدة المخزون بحالاتها» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "stops.php",
+            "title": "التوقفات وتحديد المتحمل",
+            "appearances": 1,
+            "depts": "إدارة التشغيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Operations\/stops_unattributed.php",
+            "evidence": "التسميةُ «التوقفات وتحديد المتحمل» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "supplier_contracts.php",
+            "title": "عقود الموردين",
+            "appearances": 1,
+            "depts": "إدارة الموردين",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Suppliers\/supplierscontracts.php",
+            "evidence": "التسميةُ «عقود الموردين» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "supplier_equip.php",
+            "title": "معدات المورد ومالكوها",
+            "appearances": 1,
+            "depts": "إدارة الموردين",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Suppliers\/equipment_plan.php",
+            "evidence": "التسميةُ «معدات المورد ومالكوها» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "supplier_perf.php",
+            "title": "أداء الموردين وجاهزيتهم",
+            "appearances": 1,
+            "depts": "إدارة الموردين",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Suppliers\/supplier_capacity.php",
+            "evidence": "التسميةُ «أداء الموردين وجاهزيتهم» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "supplier_plan.php",
+            "title": "خطة معدات المورد المتعهَّد بها",
+            "appearances": 1,
+            "depts": "إدارة الموردين",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Suppliers\/equipment_plan.php",
+            "evidence": "التسميةُ «خطة معدات المورد المتعهَّد بها» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "supplier_quota.php",
+            "title": "حصص الموردين من العقود",
+            "appearances": 3,
+            "depts": "المالية والخزينة · إدارة الموردين · إدارة التشغيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Suppliers\/shares_coverage.php",
+            "evidence": "التسميةُ «حصص الموردين من العقود» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "supplier_settle.php",
+            "title": "تسويات ومستحقات الموردين",
+            "appearances": 3,
+            "depts": "المالية والخزينة · إدارة الموردين · القوى التشغيلية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Suppliers\/settlements.php",
+            "evidence": "التسميةُ «تسويات ومستحقات الموردين» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "supplier_stmt.php",
+            "title": "كشف حساب المورد الشهري",
+            "appearances": 2,
+            "depts": "المالية والخزينة · إدارة الموردين",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/supplier_statement_fin.php",
+            "evidence": "التسميةُ «كشف حساب المورد الشهري» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "ticket_config.php",
+            "title": "إعدادات البلاغات — الأنواع والمهل والتصعيد",
+            "appearances": 1,
+            "depts": "مركز البلاغات",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Tickets\/ticket_types_config.php",
+            "evidence": "التسميةُ «إعدادات البلاغات — الأنواع والمهل والتصعيد» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "ticket_escalate.php",
+            "title": "مهل البلاغات وتصعيدها",
+            "appearances": 1,
+            "depts": "مركز البلاغات",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Tickets\/ticket_escalation_config.php",
+            "evidence": "التسميةُ «مهل البلاغات وتصعيدها» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "ticket_open.php",
+            "title": "أبلغ عن مشكلة من هذه الشاشة",
+            "appearances": 12,
+            "depts": "الحوكمة والالتزام · المالية والخزينة · الموارد البشرية · التمويل والملكية · إدارة الأسطول · إدارة الصيانة · إدارة المشتريات التشغيلية · إدارة المخازن · النقل والترحيل · القوى التشغيلية · مركز البلاغات · مساحة العمل الشخصية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Tickets\/ticket_contextual_open.php",
+            "evidence": "التسميةُ «أبلغ عن مشكلة من هذه الشاشة» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "ticket_periodic.php",
+            "title": "البلاغات الدورية المولَّدة",
+            "appearances": 1,
+            "depts": "مركز البلاغات",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Tickets\/ticket_recurrence.php",
+            "evidence": "التسميةُ «البلاغات الدورية المولَّدة» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "ticket_recur.php",
+            "title": "البلاغات المتكررة وسببها الجذري",
+            "appearances": 2,
+            "depts": "إدارة الصيانة · مركز البلاغات",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Tickets\/ticket_recurrence.php",
+            "evidence": "التسميةُ «البلاغات المتكررة وسببها الجذري» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "ticket_route.php",
+            "title": "تصنيف البلاغ وتوجيهه آليًّا",
+            "appearances": 1,
+            "depts": "مركز البلاغات",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Tickets\/ticket_types_config.php",
+            "evidence": "التسميةُ «تصنيف البلاغ وتوجيهه آليًّا» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "ticket_split.php",
+            "title": "تحويل البلاغ وتفريعه لمسارات",
+            "appearances": 2,
+            "depts": "إدارة الصيانة · مركز البلاغات",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Tickets\/ticket_workstreams_board.php",
+            "evidence": "التسميةُ «تحويل البلاغ وتفريعه لمسارات» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "tickets.php",
+            "title": "بلاغات المركز",
+            "appearances": 1,
+            "depts": "مركز البلاغات",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Tickets\/tickets_list.php",
+            "evidence": "التسميةُ «بلاغات المركز» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "tickets_dept.php",
+            "title": "بلاغات إدارتي",
+            "appearances": 12,
+            "depts": "الحوكمة والالتزام · المالية والخزينة · الموارد البشرية · التمويل والملكية · إدارة الأسطول · إدارة التشغيل · إدارة الصيانة · إدارة المشتريات التشغيلية · إدارة المخازن · النقل والترحيل · القوى التشغيلية · مركز البلاغات",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Equipments\/gov_dept_flt.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "training_mode.php",
+            "title": "وضع التدريب وسيناريوهاته",
+            "appearances": 1,
+            "depts": "الحوكمة والالتزام",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Portal\/founding_mode.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "transfer_cost.php",
+            "title": "إقفال الأمر وتحميل تكلفته",
+            "appearances": 2,
+            "depts": "المالية والخزينة · النقل والترحيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Transport\/transfer_close_cost.php",
+            "evidence": "التسميةُ «إقفال الأمر وتحميل تكلفته» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "transfer_ord.php",
+            "title": "أوامر الترحيل",
+            "appearances": 3,
+            "depts": "إدارة الأسطول · إدارة المخازن · النقل والترحيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Transport\/transfer_orders_list.php",
+            "evidence": "التسميةُ «أوامر الترحيل» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "transfer_req.php",
+            "title": "طلبات الترحيل",
+            "appearances": 5,
+            "depts": "إدارة التشغيل · إدارة الصيانة · إدارة المخازن · النقل والترحيل · القوى التشغيلية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Transport\/transfer_requests.php",
+            "evidence": "التسميةُ «طلبات الترحيل» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "transfer_tariff.php",
+            "title": "تعرفة الترحيل وقواعد التحميل",
+            "appearances": 1,
+            "depts": "النقل والترحيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Transport\/transfer_tariffs.php",
+            "evidence": "التسميةُ «تعرفة الترحيل وقواعد التحميل» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "transfer_track.php",
+            "title": "متابعة الرحلات في الطريق",
+            "appearances": 1,
+            "depts": "النقل والترحيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Transport\/transfer_in_transit.php",
+            "evidence": "التسميةُ «متابعة الرحلات في الطريق» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "tre_bank_accounts.php",
+            "title": "سجل الحسابات البنكية والتوقيعات",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Suppliers\/supplier_bank.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "tre_beneficiary.php",
+            "title": "المستفيدون والحسابات البنكية",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Suppliers\/supplier_bank.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "tre_board.php",
+            "title": "لوحة الخزينة والبنوك",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/cfo_daily_board_fin.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "tre_cash_box.php",
+            "title": "الخزائن والصناديق",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Finance\/cash_forecast_fin.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "tre_exec_log.php",
+            "title": "توثيق التنفيذ والإشعارات",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "admin\/audit_log.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "tre_liquidity.php",
+            "title": "السيولة والتدفق النقدي",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/cash_forecast_fin.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "tre_pay_batch.php",
+            "title": "دفعات الدفع والتنفيذ",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Finance\/operator_pay_fin.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "tre_receipts.php",
+            "title": "سندات القبض والتحصيل",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "treasury.php",
+            "title": "الخزينة والصناديق",
+            "appearances": 1,
+            "depts": "المالية والخزينة",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/accounts_fin.php",
+            "evidence": "التسميةُ «الخزينة والصناديق» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "unit_assign.php",
+            "title": "إسناد المعدات للوحدات",
+            "appearances": 2,
+            "depts": "إدارة الأسطول · إدارة التشغيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Operations\/containers.php",
+            "evidence": "التسميةُ «إسناد المعدات للوحدات» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "unit_client_accept.php",
+            "title": "قبول العميل للفاتورة",
+            "appearances": 2,
+            "depts": "المبيعات والعقود · إدارة التشغيل",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Clients\/client_profile.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "unit_client_invoice.php",
+            "title": "الفاتورة النهائية للعميل",
+            "appearances": 2,
+            "depts": "المبيعات والعقود · إدارة التشغيل",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Clients\/client_profile.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "unit_correction.php",
+            "title": "تصحيح الوحدات بالسلسلة الثلاثية",
+            "appearances": 1,
+            "depts": "إدارة التشغيل",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "unit_daily_approve.php",
+            "title": "الاعتماد اليومي لرفع الوحدات",
+            "appearances": 2,
+            "depts": "إدارة التشغيل · إدارة الموقع",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Approvals\/hours_approval.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "unit_entry.php",
+            "title": "إدخال وحدات العمل اليومية",
+            "appearances": 2,
+            "depts": "إدارة التشغيل · إدارة الموقع",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Reports\/daily_units_report.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "unit_fin_final.php",
+            "title": "الاعتماد المالي النهائي",
+            "appearances": 2,
+            "depts": "المالية والخزينة · إدارة التشغيل",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "Workforce\/final_settlement.php",
+            "evidence": "مرشَّحٌ ضعيفٌ برمزٍ واحد",
+            "confidence": "ضعيفة"
+        },
+        {
+            "file": "unit_fin_prelim.php",
+            "title": "الاعتماد المالي الأولي",
+            "appearances": 2,
+            "depts": "المالية والخزينة · إدارة التشغيل",
+            "kind": "REQUIRED_AND_MISSING",
+            "candidate": "",
+            "evidence": "",
+            "confidence": "لا مرشَّحَ آليّ"
+        },
+        {
+            "file": "unit_sales_gate.php",
+            "title": "بوابة مدير المبيعات",
+            "appearances": 2,
+            "depts": "المبيعات والعقود · إدارة التشغيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Approvals\/hours_approval.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "unit_statement_worker.php",
+            "title": "كشف التايم شيت — المشغّل",
+            "appearances": 2,
+            "depts": "إدارة التشغيل · القوى التشغيلية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Timesheet\/timesheet_type.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "unit_supplier_approve.php",
+            "title": "اعتماد وحدات الموردين",
+            "appearances": 2,
+            "depts": "إدارة الموردين · إدارة التشغيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Approvals\/hours_approval.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "unit_workforce_approve.php",
+            "title": "اعتماد وحدات المشغّلين",
+            "appearances": 2,
+            "depts": "إدارة التشغيل · القوى التشغيلية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Approvals\/hours_approval.php",
+            "evidence": "تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة",
+            "confidence": "متوسطة — تحتاج حسمَ بشر"
+        },
+        {
+            "file": "units.php",
+            "title": "الوحدات التعاقدية المرقَّمة",
+            "appearances": 2,
+            "depts": "المبيعات والعقود · إدارة التشغيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Operations\/containers.php",
+            "evidence": "التسميةُ «الوحدات التعاقدية المرقَّمة» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "variance.php",
+            "title": "متابعة انحراف المنفَّذ عن المخطط",
+            "appearances": 2,
+            "depts": "المالية والخزينة · إدارة التشغيل",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Finance\/variance_monitor_fin.php",
+            "evidence": "التسميةُ «متابعة انحراف المنفَّذ عن المخطط» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        },
+        {
+            "file": "visibility.php",
+            "title": "من يرى ماذا ومكوّنات البوابة",
+            "appearances": 3,
+            "depts": "الحوكمة والالتزام · الموارد البشرية · التمويل والملكية",
+            "kind": "IMPLEMENTED_UNDER_OTHER_ROUTE",
+            "candidate": "Portal\/visibility_keys.php",
+            "evidence": "التسميةُ «من يرى ماذا ومكوّنات البوابة» حيّةٌ في التنقّلِ على مسارٍ آخر",
+            "confidence": "عالية"
+        }
+    ]
+}

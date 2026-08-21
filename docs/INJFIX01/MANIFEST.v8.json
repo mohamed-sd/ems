@@ -68,6 +68,16 @@
             "NF-12 — BLOCKED_EXTERNAL_INPUT: الرقمُ 91 لا يُعاد إنتاجُه من القاعدة (المقيسُ صفر)",
             "اعتمادُ الملحقِ نفسِه — استثناءُ «لا شاشةَ جديدة» تغييرُ نطاقٍ لا يملكه المنفِّذ"
         ],
-        "NOTE": "GAP_COUNT النافذُ يبقى 33 — و50 مقامٌ مُعلَنٌ مشروطٌ بالاعتماد. ولا تُجمع نسبٌ مختلفةٌ في نسبةِ نظام"
+        "NOTE": "GAP_COUNT النافذُ يبقى 33 — و50 مقامٌ مُعلَنٌ مشروطٌ بالاعتماد. ولا تُجمع نسبٌ مختلفةٌ في نسبةِ نظام",
+        "CAPABILITY_GATE": {
+            "tool": "tools\/injfix02_capability_gate.php",
+            "evidence": "docs\/INJFIX01\/evidence\/NF-01_capability_gate.csv",
+            "names_adjudicated": 184,
+            "IMPLEMENTED_UNDER_OTHER_ROUTE": 131,
+            "REQUIRED_AND_MISSING_provisional": 53,
+            "CEILING_NOT_VERDICT": "٥٣ سقفٌ لا حكم — غيابُ المرشَّحِ الآليِّ ليس إثباتَ غيابِ الوظيفة. ومنه tickets_dept.php وهو على الأرجحِ Tickets\/tickets_list.php الحيّ",
+            "BATCH1_WARNING": "الدفعةُ الأولى في الملحقِ (بواباتُ دورةِ الوحداتِ الست) أكثرُها مبنيٌّ باسمٍ آخر — unit_sales_gate⇒Approvals\/hours_approval · unit_entry⇒Timesheet\/timesheet_type · unit_daily_approve⇒timesheet\/aprovment. والبدءُ بها كان سيُنتج ازدواجًا",
+            "MISSING_LAYER": "acc_* حيٌّ 5 · ctrl_* حيٌّ 7 · tre_* حيٌّ 4 — وكلُّها طبقةُ حوكمةٍ وإعداد. و ar_*\/ap_*\/invoice* صفرٌ مطلق. فالغائبُ طبقةُ المستندِ لا الوحدةُ الإدارية"
+        }
     }
 }

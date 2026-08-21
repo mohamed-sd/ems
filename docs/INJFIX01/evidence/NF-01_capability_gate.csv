@@ -1,0 +1,185 @@
+﻿"اسم الملف",العنوان,ظهورات,الإدارات,التكييف,"المرشَّح البديل",الدليل,الثقة
+acc_budget_check.php,"فحص الموازنة والالتزام",1,"المالية والخزينة",REQUIRED_AND_MISSING,Finance/budget_dept.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+acc_cost_alloc.php,"توزيع مراكز التكلفة",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Financing/cost_allocation.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+acc_dept_budget.php,"ميزانية إدارتي",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/budget_form_fin.php,"التسميةُ «ميزانية إدارتي» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+acc_docs_check.php,"مراجعة المستندات",1,"المالية والخزينة",REQUIRED_AND_MISSING,main/check_username_availability.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+acc_inbox.php,"المعاملات الواردة من الإدارات",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/import_events_fin.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+acc_myday.php,"عملي اليوم — محاسب الإدارة",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/acc_my_day.php,"تداخلُ 3 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+acc_returned.php,"المعاملات المعادة",1,"المالية والخزينة",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+acc_scope_events.php,"الأحداث المالية في نطاقي",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/events_list_fin.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+acc_spec_reports.php,"تقارير تخصصي المحاسبي",1,"المالية والخزينة",REQUIRED_AND_MISSING,admin/reports_permissions.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+acc_treatment.php,"المعالجة المحاسبية المقترحة",1,"المالية والخزينة",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+acc_variance.php,"انحرافات الموازنة",1,"المالية والخزينة",REQUIRED_AND_MISSING,Finance/ctrl_doc_variance.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+activation.php,"أنماط تفعيل المزايا",1,"الحوكمة والالتزام",IMPLEMENTED_UNDER_OTHER_ROUTE,Governance/activation_patterns.php,"التسميةُ «أنماط تفعيل المزايا» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+advances.php,"السلف والعهد المالية",1,"الموارد البشرية",IMPLEMENTED_UNDER_OTHER_ROUTE,Workforce/employee_advances.php,"التسميةُ «السلف والعهد المالية» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+ap_oblig_gen.php,"توليد التزامات عقد المورد",2,"المالية والخزينة · إدارة الموردين",IMPLEMENTED_UNDER_OTHER_ROUTE,Contracts/contract_obligations.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+ar_accrual_gen.php,"توليد استحقاقات عقد العميل",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Contracts/contract_lines.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+ar_accrual_sched.php,"جدول استحقاقات العميل",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/ob_schedule.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+ar_claim_invoice.php,"فاتورة المطالبة وإحالتها للتحصيل",1,"المالية والخزينة",REQUIRED_AND_MISSING,Contracts/claim_helpers.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+ar_completion_cert.php,"شهادة الإنجاز الشهرية",1,"المالية والخزينة",REQUIRED_AND_MISSING,Fleet/readiness_cert.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+assistants.php,"المعاونون والنيابة المؤقتة",1,"الحوكمة والالتزام",IMPLEMENTED_UNDER_OTHER_ROUTE,main/all_assistants.php,"التسميةُ «المعاونون والنيابة المؤقتة» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+audit.php,"سجل التدقيق والاطّلاع",2,"الحوكمة والالتزام · التمويل والملكية",IMPLEMENTED_UNDER_OTHER_ROUTE,ActivityLogs/activity_logs.php,"التسميةُ «سجل التدقيق والاطّلاع» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+bank_recon.php,"المطابقة البنكية",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/bank_reconciliation_fin.php,"التسميةُ «المطابقة البنكية» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+cash_forecast.php,"التدفق النقدي والتنبؤ",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/cash_forecast_fin.php,"التسميةُ «التدفق النقدي والتنبؤ» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+central_proc_budget.php,"ميزانية المشتريات المركزية المجمَّعة",1,"إدارة المشتريات التشغيلية",REQUIRED_AND_MISSING,cron_proc_replenish.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+ceo_appointments.php,"موافقات التكليف على المسميات القيادية",1,"مكتب الرئيس التنفيذي والنواب",IMPLEMENTED_UNDER_OTHER_ROUTE,Operations/distribution_space.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+ceo_audit_inbox.php,"تقارير المراجعة الداخلية — الرئيس",1,"مكتب الرئيس التنفيذي والنواب",IMPLEMENTED_UNDER_OTHER_ROUTE,Portal/ceo_audit_reports.php,"تداخلُ 3 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+ceo_fin_approvals.php,"الاعتمادات المالية العليا — الرئيس",1,"مكتب الرئيس التنفيذي والنواب",IMPLEMENTED_UNDER_OTHER_ROUTE,Portal/ceo_approvals.php,"تداخلُ 2 رمزًا في الاسمِ مع سطحٍ حيّ","متوسطة — تحتاج حسمَ بشر"
+ceo_reserved.php,"المسائل المحجوزة للرئيس التنفيذي",1,"مكتب الرئيس التنفيذي والنواب",REQUIRED_AND_MISSING,Portal/ceo_approvals.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+cfo_board.php,"لوحة المدير المالي",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/cfo_daily_board_fin.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+coa.php,"دليل الحسابات ومراكز التكلفة",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/management_accounting_fin.php,"التسميةُ «دليل الحسابات ومراكز التكلفة» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+contract_terms.php,"أحكام العقد — العملات والمقدم والمهل",2,"المالية والخزينة · المبيعات والعقود",IMPLEMENTED_UNDER_OTHER_ROUTE,Contracts/contract_card.php,"التسميةُ «أحكام العقد — العملات والمقدم والمهل» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+cost_report.php,"التكاليف والربحية بالمركز",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/cost_report_fin.php,"التسميةُ «التكاليف والربحية بالمركز» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+coverage.php,"التزام العقد بنوع المعدة",2,"المبيعات والعقود · إدارة التشغيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Contracts/contract_coverage.php,"التسميةُ «التزام العقد بنوع المعدة» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+ctrl_accruals.php,"الاستحقاقات والمخصصات",1,"المالية والخزينة",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+ctrl_board.php,"لوحة رئيس الحسابات",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/ctrl_supervision.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+ctrl_cash_count.php,"مراجعة محاضر الجرد النقدي",1,"المالية والخزينة",REQUIRED_AND_MISSING,Finance/cash_forecast_fin.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+ctrl_close_calendar.php,"تقويم الإقفال",1,"المالية والخزينة",REQUIRED_AND_MISSING,Operations/fleet_calendar.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+ctrl_close_checklist.php,"قائمة فحص الإقفال",1,"المالية والخزينة",REQUIRED_AND_MISSING,Operations/monthly_close.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+ctrl_exceptions.php,"الاستثناءات المحاسبية",1,"المالية والخزينة",REQUIRED_AND_MISSING,Governance/exceptions.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+ctrl_fx_diff.php,"فروق العملات",1,"المالية والخزينة",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+ctrl_je_orphan.php,"القيود غير المرتبطة بمصدر",1,"المالية والخزينة",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+ctrl_je_queue.php,"طابور مراجعة القيود",1,"المالية والخزينة",REQUIRED_AND_MISSING,Governance/job_queue.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+ctrl_je_risky.php,"القيود عالية المخاطر",1,"المالية والخزينة",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+ctrl_quality.php,"تقارير جودة المحاسبة",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/ctrl_quality_kpis.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+ctrl_recon_review.php,"مراجعة المطابقات البنكية",1,"المالية والخزينة",REQUIRED_AND_MISSING,Equipments/asset_recon.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+ctrl_reopen_log.php,"سجل إعادة فتح الفترات",1,"المالية والخزينة",REQUIRED_AND_MISSING,admin/audit_log.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+ctrl_statements.php,"القوائم المالية",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/financial_statements_fin.php,"التسميةُ «القوائم المالية» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+ctrl_trial_balance.php,"ميزان المراجعة",1,"المالية والخزينة",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+custody.php,"العهد والمرتجعات",2,"إدارة الصيانة · إدارة المخازن",IMPLEMENTED_UNDER_OTHER_ROUTE,Procurement/receipt_custody_proc.php,"التسميةُ «العهد والمرتجعات» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+cycle_time.php,"زمن دورة الطلبات",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,FinRequests/cycle_time_board.php,"التسميةُ «زمن دورة الطلبات» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+delegations.php,"التفويض بالتوقيع",2,"مكتب الرئيس التنفيذي والنواب · الحوكمة والالتزام",IMPLEMENTED_UNDER_OTHER_ROUTE,Governance/signing_authority.php,"التسميةُ «التفويض بالتوقيع» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+dep_profiles.php,"سياسات الإهلاك المعتمدة",1,"إدارة الأسطول",IMPLEMENTED_UNDER_OTHER_ROUTE,Equipments/fleet_depreciation_profiles.php,"التسميةُ «سياسات الإهلاك المعتمدة» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+depreciation.php,"الإهلاك والقيمة الدفترية",3,"المالية والخزينة · التمويل والملكية · إدارة الأسطول",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/assets_fin.php,"التسميةُ «الإهلاك والقيمة الدفترية» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+distribution.php,"توزيع المعدات والمشغّلين",3,"إدارة الأسطول · إدارة التشغيل · القوى التشغيلية",IMPLEMENTED_UNDER_OTHER_ROUTE,Operations/distribution_space.php,"التسميةُ «توزيع المعدات والمشغّلين» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+emp_contracts.php,"عقود الموظفين",1,"الموارد البشرية",IMPLEMENTED_UNDER_OTHER_ROUTE,Employees/employee_contracts.php,"التسميةُ «عقود الموظفين» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+entities.php,"سجل الشركات والكيانات",2,"الحوكمة والالتزام · التمويل والملكية",IMPLEMENTED_UNDER_OTHER_ROUTE,Governance/entities_registry.php,"التسميةُ «سجل الشركات والكيانات» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+equip_docs.php,"وثائق المعدات والمشغّلين",4,"الموارد البشرية · إدارة الأسطول · إدارة التشغيل · القوى التشغيلية",IMPLEMENTED_UNDER_OTHER_ROUTE,Equipments/equipment_documents.php,"التسميةُ «وثائق المعدات والمشغّلين» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+equip_meters.php,"قراءات العدّادات",2,"إدارة الأسطول · إدارة الصيانة",IMPLEMENTED_UNDER_OTHER_ROUTE,Equipments/meter_readings.php,"التسميةُ «قراءات العدّادات» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+equip_models.php,"موديلات المعدات ومواصفاتها",2,"إدارة الأسطول · إدارة الصيانة",IMPLEMENTED_UNDER_OTHER_ROUTE,Equipments/fleet_models.php,"التسميةُ «موديلات المعدات ومواصفاتها» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+equip_types.php,"أنواع المعدات وفئاتها",1,"إدارة الأسطول",IMPLEMENTED_UNDER_OTHER_ROUTE,Equipments/equipments_types.php,"التسميةُ «أنواع المعدات وفئاتها» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+failures.php,"تصنيف الأعطال وأسبابها",3,"إدارة الأسطول · إدارة التشغيل · إدارة الصيانة",IMPLEMENTED_UNDER_OTHER_ROUTE,Equipments/manage_failure_codes.php,"التسميةُ «تصنيف الأعطال وأسبابها» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+fin_alerts.php,"تنبيهات الاستحقاقات والالتزامات",1,"المالية والخزينة",REQUIRED_AND_MISSING,Finance/cron_obligation_alerts.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+fin_avoid_test.php,"اختبار قابلية التجنب للعقود",1,"المالية والخزينة",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+fin_backflow.php,"سجل المرتجَع المالي للإدارات",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/acc_backflow.php,"تداخلُ 3 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+fin_commitments.php,"سجل الارتباطات التعاقدية والإفصاح",1,"المالية والخزينة",REQUIRED_AND_MISSING,Clients/contract_commitments.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+fin_cost.php,"توزيع تكلفة التمويل على المشاريع",2,"المالية والخزينة · التمويل والملكية",IMPLEMENTED_UNDER_OTHER_ROUTE,Financing/cost_allocation.php,"التسميةُ «توزيع تكلفة التمويل على المشاريع» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+fin_data_class.php,"تصنيف بيانات الشاشات الرباعي",1,"المالية والخزينة",REQUIRED_AND_MISSING,Employees/get_employee_data.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+fin_deviations.php,"انحرافات التمويل — السداد والملكية والتوثيق",1,"التمويل والملكية",IMPLEMENTED_UNDER_OTHER_ROUTE,Financing/deviations.php,"التسميةُ «انحرافات التمويل — السداد والملكية والتوثيق» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+fin_exit.php,"الخروج غير المسجَّل من الملكية",1,"التمويل والملكية",IMPLEMENTED_UNDER_OTHER_ROUTE,Financing/deviations.php,"التسميةُ «الخروج غير المسجَّل من الملكية» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+fin_idle.php,"عقود تمويل بلا حركة",1,"التمويل والملكية",IMPLEMENTED_UNDER_OTHER_ROUTE,Financing/deviations.php,"التسميةُ «عقود تمويل بلا حركة» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+fin_mgr_assign.php,"توزيع التخصصات والنطاقات",1,"المالية والخزينة",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+fin_mgr_board.php,"لوحة مدير الإدارة المالية",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/cfo_daily_board_fin.php,"التسميةُ «لوحة مدير الإدارة المالية» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+fin_ops.php,"عمليات التمويل",1,"التمويل والملكية",IMPLEMENTED_UNDER_OTHER_ROUTE,Financing/financing_board.php,"التسميةُ «عمليات التمويل» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+fin_recognition.php,"مصفوفة شروط الاعتراف بالمعيار",1,"المالية والخزينة",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+fin_routing.php,"مصفوفة توجيه الطلبات المالية",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,FinRequests/routing_admin.php,"تداخلُ 3 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+fin_statements.php,"القوائم المالية",2,"مكتب الرئيس التنفيذي والنواب · المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/financial_statements_fin.php,"التسميةُ «القوائم المالية» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+fin_triggers.php,"سجل المُطلِقات المالية الخمسة والثلاثين",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/events_list_fin.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+fin_variance.php,"فروق السداد والاستحقاق",1,"التمويل والملكية",IMPLEMENTED_UNDER_OTHER_ROUTE,Financing/deviations.php,"التسميةُ «فروق السداد والاستحقاق» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+financiers.php,"سجل الممولين",1,"التمويل والملكية",IMPLEMENTED_UNDER_OTHER_ROUTE,Financing/financiers_registry.php,"التسميةُ «سجل الممولين» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+fleet_owners.php,"ملّاك الأسطول",1,"إدارة الأسطول",IMPLEMENTED_UNDER_OTHER_ROUTE,Financing/owners_registry.php,"التسميةُ «ملّاك الأسطول» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+fuel_issue.php,"صرف الوقود اليومي للمعدات",1,"إدارة الموقع",REQUIRED_AND_MISSING,Procurement/issue_proc.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+fuel_receipt.php,"استلام الوقود من العميل",1,"إدارة الموقع",REQUIRED_AND_MISSING,Procurement/receipt_custody_proc.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+fuel_reconcile.php,"مطابقة كميات الوقود",1,"إدارة الموقع",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+fx_daily.php,"سعر الصرف اليومي",1,"المالية والخزينة",REQUIRED_AND_MISSING,Finance/cfo_daily_board_fin.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+fx_rates.php,"أسعار الصرف",2,"المالية والخزينة · التمويل والملكية",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/currencies_fin.php,"التسميةُ «أسعار الصرف» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+gov_dept_iaf.php,"حوكمة المراجعة الداخلية",1,"المراجع الداخلي المستقل",IMPLEMENTED_UNDER_OTHER_ROUTE,Portal/ceo_audit_reports.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+gov_ladder_steps.php,"خطوات السلالم المسجَّلة",1,"الحوكمة والالتزام",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+gov_ladders.php,"سلاليم الاعتماد وتعريفها",1,"الحوكمة والالتزام",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+iaf_actions.php,"خطط المعالجة والمتابعة",1,"المراجع الداخلي المستقل",IMPLEMENTED_UNDER_OTHER_ROUTE,Audit/iaf_action_plans.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+iaf_board.php,"لوحة رئيس المراجعة الداخلية",1,"المراجع الداخلي المستقل",IMPLEMENTED_UNDER_OTHER_ROUTE,Portal/ceo_audit_reports.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+iaf_evidence.php,"طلبات الأدلة",1,"المراجع الداخلي المستقل",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+iaf_overdue.php,"الملاحظات المتأخرة والتصعيد",1,"المراجع الداخلي المستقل",REQUIRED_AND_MISSING,Finance/ob_overdue.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+iaf_programs.php,"برامج المراجعة",1,"المراجع الداخلي المستقل",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+iaf_samples.php,"العينات ونتائج الاختبارات",1,"المراجع الداخلي المستقل",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+iaf_sensitive_log.php,"سجل الاطلاع الحساس للمراجعين",1,"المراجع الداخلي المستقل",IMPLEMENTED_UNDER_OTHER_ROUTE,Audit/iaf_access_log.php,"تداخلُ 3 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+invoices.php,"فواتير العملاء",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Contracts/tax_invoices.php,"التسميةُ «فواتير العملاء» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+issue.php,"صرف مواد من المخزن",3,"المالية والخزينة · إدارة الصيانة · إدارة المخازن",IMPLEMENTED_UNDER_OTHER_ROUTE,Procurement/issue_proc.php,"التسميةُ «صرف مواد من المخزن» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+items.php,"كتالوج الأصناف والقطع الحرجة",3,"إدارة الصيانة · إدارة المشتريات التشغيلية · إدارة المخازن",IMPLEMENTED_UNDER_OTHER_ROUTE,Procurement/items_proc.php,"التسميةُ «كتالوج الأصناف والقطع الحرجة» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+journal.php,"القيود اليومية",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/journal_form_fin.php,"التسميةُ «القيود اليومية» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+journey_tracker.php,"متابعة الرحلات الذهبية",1,"إدارة التشغيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Transport/transfer_in_transit.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+leaves.php,"الإجازات والغياب",2,"الموارد البشرية · القوى التشغيلية",IMPLEMENTED_UNDER_OTHER_ROUTE,Workforce/worker_leave_absence.php,"التسميةُ «الإجازات والغياب» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+licenses.php,"التراخيص والكفالات",1,"الحوكمة والالتزام",IMPLEMENTED_UNDER_OTHER_ROUTE,Governance/licenses_guarantees.php,"التسميةُ «التراخيص والكفالات» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+maint_provision.php,"مخصص الصيانة والعمرات",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/maintenance_provision_fin.php,"التسميةُ «مخصص الصيانة والعمرات» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+margin.php,"هامش الربح للعقد والواقعة",3,"مكتب الرئيس التنفيذي والنواب · المالية والخزينة · إدارة التشغيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Reports/margin_report.php,"التسميةُ «هامش الربح للعقد والواقعة» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+messages.php,المراسلات,16,"مكتب الرئيس التنفيذي والنواب · الحوكمة والالتزام · المالية والخزينة · الموارد البشرية · المبيعات والعقود · التمويل والملكية · إدارة الموردين · إدارة الأسطول · إدارة التشغيل · إدارة الصيانة · إدارة المشتريات التشغيلية · إدارة المخازن · النقل والترحيل · القوى التشغيلية · مركز البلاغات · مساحة العمل الشخصية",IMPLEMENTED_UNDER_OTHER_ROUTE,index.php,"التسميةُ «المراسلات» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+my_workspace_v2.php,"مساحة عملي — أربعة صناديق",1,"إدارة التشغيل",IMPLEMENTED_UNDER_OTHER_ROUTE,main/my_workspace.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+op_assign.php,"تكليف المشغّل على المعدة",3,"الموارد البشرية · إدارة التشغيل · القوى التشغيلية",IMPLEMENTED_UNDER_OTHER_ROUTE,Operations/distribution_space.php,"التسميةُ «تكليف المشغّل على المعدة» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+op_deduct.php,"خصومات المشغّلين المقترحة",2,"الموارد البشرية · القوى التشغيلية",IMPLEMENTED_UNDER_OTHER_ROUTE,Workforce/proposed_deductions.php,"التسميةُ «خصومات المشغّلين المقترحة» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+operators.php,"سجل المشغّلين",3,"الموارد البشرية · النقل والترحيل · القوى التشغيلية",IMPLEMENTED_UNDER_OTHER_ROUTE,Employees/equipment_operators.php,"التسميةُ «سجل المشغّلين» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+ops_room.php,"غرفة عمليات المواقع",1,"إدارة التشغيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Operations/operations_room.php,"التسميةُ «غرفة عمليات المواقع» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+payables.php,"ذمم الموردين والمستحقات",2,"المالية والخزينة · التمويل والملكية",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/dues_fin.php,"التسميةُ «ذمم الموردين والمستحقات» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+payments.php,"طلبات الدفع والسداد",6,"المالية والخزينة · الموارد البشرية · التمويل والملكية · إدارة التشغيل · إدارة المشتريات التشغيلية · النقل والترحيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/payments_fin.php,"التسميةُ «طلبات الدفع والسداد» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+payroll.php,"مسيّر الرواتب",2,"المالية والخزينة · الموارد البشرية",IMPLEMENTED_UNDER_OTHER_ROUTE,Workforce/payroll_runs.php,"التسميةُ «مسيّر الرواتب» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+period_close.php,"إقفال الفترة المحاسبية",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/periods_fin.php,"التسميةُ «إقفال الفترة المحاسبية» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+po.php,"أوامر الشراء",2,"إدارة المشتريات التشغيلية · إدارة المخازن",IMPLEMENTED_UNDER_OTHER_ROUTE,Procurement/orders_proc.php,"التسميةُ «أوامر الشراء» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+pr.php,"طلبات الشراء",4,"إدارة التشغيل · إدارة الصيانة · إدارة المشتريات التشغيلية · إدارة المخازن",IMPLEMENTED_UNDER_OTHER_ROUTE,Procurement/requests_proc.php,"التسميةُ «طلبات الشراء» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+preventive.php,"خطط الصيانة الوقائية",2,"إدارة الأسطول · إدارة الصيانة",IMPLEMENTED_UNDER_OTHER_ROUTE,Maintenance/preventive_plans.php,"التسميةُ «خطط الصيانة الوقائية» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+price_adjust.php,"آليات تعديل السعر",1,"المبيعات والعقود",IMPLEMENTED_UNDER_OTHER_ROUTE,Contracts/price_terms.php,"التسميةُ «آليات تعديل السعر» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+quota_ledger.php,"دفتر استهلاك حصص الموردين",1,"إدارة الموردين",IMPLEMENTED_UNDER_OTHER_ROUTE,Suppliers/shares_coverage.php,"التسميةُ «دفتر استهلاك حصص الموردين» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+readiness.php,"جاهزية المعدات للتشغيل",3,"إدارة الأسطول · إدارة التشغيل · إدارة الصيانة",IMPLEMENTED_UNDER_OTHER_ROUTE,Fleet/readiness_board.php,"التسميةُ «جاهزية المعدات للتشغيل» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+receivables.php,"ذمم العملاء وأعمارها",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Contracts/collections.php,"التسميةُ «ذمم العملاء وأعمارها» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+recruitment.php,"التوظيف من الشاغر إلى المباشرة",2,"الموارد البشرية · القوى التشغيلية",IMPLEMENTED_UNDER_OTHER_ROUTE,Workforce/recruitment_pipeline.php,"التسميةُ «التوظيف من الشاغر إلى المباشرة» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+reports_index.php,"مركز التقارير",12,"الحوكمة والالتزام · المالية والخزينة · الموارد البشرية · التمويل والملكية · إدارة الأسطول · إدارة التشغيل · إدارة الصيانة · إدارة المشتريات التشغيلية · إدارة المخازن · النقل والترحيل · القوى التشغيلية · مركز البلاغات",IMPLEMENTED_UNDER_OTHER_ROUTE,Reports/reports.php,"التسميةُ «مركز التقارير» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+rfq.php,"طلب العروض ومقارنتها",1,"إدارة المشتريات التشغيلية",IMPLEMENTED_UNDER_OTHER_ROUTE,Procurement/rfq_compare_award.php,"التسميةُ «طلب العروض ومقارنتها» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+risk_dashboard.php,"لوحة المخاطر المؤسسية",1,"إدارة المخاطر المؤسسية",IMPLEMENTED_UNDER_OTHER_ROUTE,Risk/risk_board.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+risk_dept_iaf.php,"مخاطر المراجعة الداخلية",1,"المراجع الداخلي المستقل",IMPLEMENTED_UNDER_OTHER_ROUTE,Portal/ceo_audit_reports.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+risk_dept_view.php,"مخاطر الإدارة",1,"إدارة المخاطر المؤسسية",IMPLEMENTED_UNDER_OTHER_ROUTE,Risk/dept_risk_space.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+risk_kri.php,"مؤشرات المخاطر والضوابط",1,"إدارة المخاطر المؤسسية",REQUIRED_AND_MISSING,Portal/ceo_risk.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+risk_profile.php,"ملف الخطر",1,"إدارة المخاطر المؤسسية",IMPLEMENTED_UNDER_OTHER_ROUTE,Risk/risk_card.php,"التسميةُ «ملف الخطر» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+risk_treatment.php,"إجراءات المعالجة",1,"إدارة المخاطر المؤسسية",IMPLEMENTED_UNDER_OTHER_ROUTE,Risk/risk_treatments.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+shares.php,"حصص الملكية في الأصول",2,"التمويل والملكية · إدارة الأسطول",IMPLEMENTED_UNDER_OTHER_ROUTE,Financing/owners_registry.php,"التسميةُ «حصص الملكية في الأصول» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+shift_metrics.php,"مؤشرات الورديات المشتقة",1,"إدارة الموقع",REQUIRED_AND_MISSING,movement/update_operation_shift_type.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+site_acc_board.php,"لوحة محاسب الموقع",1,"إدارة الموقع",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/cfo_daily_board_fin.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+site_custody.php,"عهدة الموقع والصرف منها",1,"إدارة الموقع",IMPLEMENTED_UNDER_OTHER_ROUTE,Procurement/issue_proc.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+site_custody_settle.php,"تصفية العهدة",1,"إدارة الموقع",REQUIRED_AND_MISSING,Operations/site_gate_equip.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+site_custody_spend.php,"صرف مشتريات ميدانية من العهدة",1,"إدارة الموقع",IMPLEMENTED_UNDER_OTHER_ROUTE,Procurement/issue_proc.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+standby_decide.php,"قرار الاستعداد أو التعطل",1,"إدارة الموقع",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+stock.php,"أرصدة المخزون بحالاتها",5,"المالية والخزينة · إدارة التشغيل · إدارة الصيانة · إدارة المشتريات التشغيلية · إدارة المخازن",IMPLEMENTED_UNDER_OTHER_ROUTE,Procurement/stock_proc.php,"التسميةُ «أرصدة المخزون بحالاتها» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+stops.php,"التوقفات وتحديد المتحمل",1,"إدارة التشغيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Operations/stops_unattributed.php,"التسميةُ «التوقفات وتحديد المتحمل» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+supplier_contracts.php,"عقود الموردين",1,"إدارة الموردين",IMPLEMENTED_UNDER_OTHER_ROUTE,Suppliers/supplierscontracts.php,"التسميةُ «عقود الموردين» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+supplier_equip.php,"معدات المورد ومالكوها",1,"إدارة الموردين",IMPLEMENTED_UNDER_OTHER_ROUTE,Suppliers/equipment_plan.php,"التسميةُ «معدات المورد ومالكوها» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+supplier_perf.php,"أداء الموردين وجاهزيتهم",1,"إدارة الموردين",IMPLEMENTED_UNDER_OTHER_ROUTE,Suppliers/supplier_capacity.php,"التسميةُ «أداء الموردين وجاهزيتهم» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+supplier_plan.php,"خطة معدات المورد المتعهَّد بها",1,"إدارة الموردين",IMPLEMENTED_UNDER_OTHER_ROUTE,Suppliers/equipment_plan.php,"التسميةُ «خطة معدات المورد المتعهَّد بها» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+supplier_quota.php,"حصص الموردين من العقود",3,"المالية والخزينة · إدارة الموردين · إدارة التشغيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Suppliers/shares_coverage.php,"التسميةُ «حصص الموردين من العقود» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+supplier_settle.php,"تسويات ومستحقات الموردين",3,"المالية والخزينة · إدارة الموردين · القوى التشغيلية",IMPLEMENTED_UNDER_OTHER_ROUTE,Suppliers/settlements.php,"التسميةُ «تسويات ومستحقات الموردين» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+supplier_stmt.php,"كشف حساب المورد الشهري",2,"المالية والخزينة · إدارة الموردين",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/supplier_statement_fin.php,"التسميةُ «كشف حساب المورد الشهري» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+ticket_config.php,"إعدادات البلاغات — الأنواع والمهل والتصعيد",1,"مركز البلاغات",IMPLEMENTED_UNDER_OTHER_ROUTE,Tickets/ticket_types_config.php,"التسميةُ «إعدادات البلاغات — الأنواع والمهل والتصعيد» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+ticket_escalate.php,"مهل البلاغات وتصعيدها",1,"مركز البلاغات",IMPLEMENTED_UNDER_OTHER_ROUTE,Tickets/ticket_escalation_config.php,"التسميةُ «مهل البلاغات وتصعيدها» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+ticket_open.php,"أبلغ عن مشكلة من هذه الشاشة",12,"الحوكمة والالتزام · المالية والخزينة · الموارد البشرية · التمويل والملكية · إدارة الأسطول · إدارة الصيانة · إدارة المشتريات التشغيلية · إدارة المخازن · النقل والترحيل · القوى التشغيلية · مركز البلاغات · مساحة العمل الشخصية",IMPLEMENTED_UNDER_OTHER_ROUTE,Tickets/ticket_contextual_open.php,"التسميةُ «أبلغ عن مشكلة من هذه الشاشة» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+ticket_periodic.php,"البلاغات الدورية المولَّدة",1,"مركز البلاغات",IMPLEMENTED_UNDER_OTHER_ROUTE,Tickets/ticket_recurrence.php,"التسميةُ «البلاغات الدورية المولَّدة» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+ticket_recur.php,"البلاغات المتكررة وسببها الجذري",2,"إدارة الصيانة · مركز البلاغات",IMPLEMENTED_UNDER_OTHER_ROUTE,Tickets/ticket_recurrence.php,"التسميةُ «البلاغات المتكررة وسببها الجذري» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+ticket_route.php,"تصنيف البلاغ وتوجيهه آليًّا",1,"مركز البلاغات",IMPLEMENTED_UNDER_OTHER_ROUTE,Tickets/ticket_types_config.php,"التسميةُ «تصنيف البلاغ وتوجيهه آليًّا» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+ticket_split.php,"تحويل البلاغ وتفريعه لمسارات",2,"إدارة الصيانة · مركز البلاغات",IMPLEMENTED_UNDER_OTHER_ROUTE,Tickets/ticket_workstreams_board.php,"التسميةُ «تحويل البلاغ وتفريعه لمسارات» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+tickets.php,"بلاغات المركز",1,"مركز البلاغات",IMPLEMENTED_UNDER_OTHER_ROUTE,Tickets/tickets_list.php,"التسميةُ «بلاغات المركز» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+tickets_dept.php,"بلاغات إدارتي",12,"الحوكمة والالتزام · المالية والخزينة · الموارد البشرية · التمويل والملكية · إدارة الأسطول · إدارة التشغيل · إدارة الصيانة · إدارة المشتريات التشغيلية · إدارة المخازن · النقل والترحيل · القوى التشغيلية · مركز البلاغات",REQUIRED_AND_MISSING,Equipments/gov_dept_flt.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+training_mode.php,"وضع التدريب وسيناريوهاته",1,"الحوكمة والالتزام",REQUIRED_AND_MISSING,Portal/founding_mode.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+transfer_cost.php,"إقفال الأمر وتحميل تكلفته",2,"المالية والخزينة · النقل والترحيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Transport/transfer_close_cost.php,"التسميةُ «إقفال الأمر وتحميل تكلفته» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+transfer_ord.php,"أوامر الترحيل",3,"إدارة الأسطول · إدارة المخازن · النقل والترحيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Transport/transfer_orders_list.php,"التسميةُ «أوامر الترحيل» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+transfer_req.php,"طلبات الترحيل",5,"إدارة التشغيل · إدارة الصيانة · إدارة المخازن · النقل والترحيل · القوى التشغيلية",IMPLEMENTED_UNDER_OTHER_ROUTE,Transport/transfer_requests.php,"التسميةُ «طلبات الترحيل» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+transfer_tariff.php,"تعرفة الترحيل وقواعد التحميل",1,"النقل والترحيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Transport/transfer_tariffs.php,"التسميةُ «تعرفة الترحيل وقواعد التحميل» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+transfer_track.php,"متابعة الرحلات في الطريق",1,"النقل والترحيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Transport/transfer_in_transit.php,"التسميةُ «متابعة الرحلات في الطريق» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+tre_bank_accounts.php,"سجل الحسابات البنكية والتوقيعات",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Suppliers/supplier_bank.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+tre_beneficiary.php,"المستفيدون والحسابات البنكية",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Suppliers/supplier_bank.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+tre_board.php,"لوحة الخزينة والبنوك",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/cfo_daily_board_fin.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+tre_cash_box.php,"الخزائن والصناديق",1,"المالية والخزينة",REQUIRED_AND_MISSING,Finance/cash_forecast_fin.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+tre_exec_log.php,"توثيق التنفيذ والإشعارات",1,"المالية والخزينة",REQUIRED_AND_MISSING,admin/audit_log.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+tre_liquidity.php,"السيولة والتدفق النقدي",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/cash_forecast_fin.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+tre_pay_batch.php,"دفعات الدفع والتنفيذ",1,"المالية والخزينة",REQUIRED_AND_MISSING,Finance/operator_pay_fin.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+tre_receipts.php,"سندات القبض والتحصيل",1,"المالية والخزينة",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+treasury.php,"الخزينة والصناديق",1,"المالية والخزينة",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/accounts_fin.php,"التسميةُ «الخزينة والصناديق» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+unit_assign.php,"إسناد المعدات للوحدات",2,"إدارة الأسطول · إدارة التشغيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Operations/containers.php,"التسميةُ «إسناد المعدات للوحدات» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+unit_client_accept.php,"قبول العميل للفاتورة",2,"المبيعات والعقود · إدارة التشغيل",REQUIRED_AND_MISSING,Clients/client_profile.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+unit_client_invoice.php,"الفاتورة النهائية للعميل",2,"المبيعات والعقود · إدارة التشغيل",REQUIRED_AND_MISSING,Clients/client_profile.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+unit_correction.php,"تصحيح الوحدات بالسلسلة الثلاثية",1,"إدارة التشغيل",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+unit_daily_approve.php,"الاعتماد اليومي لرفع الوحدات",2,"إدارة التشغيل · إدارة الموقع",IMPLEMENTED_UNDER_OTHER_ROUTE,Approvals/hours_approval.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+unit_entry.php,"إدخال وحدات العمل اليومية",2,"إدارة التشغيل · إدارة الموقع",IMPLEMENTED_UNDER_OTHER_ROUTE,Reports/daily_units_report.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+unit_fin_final.php,"الاعتماد المالي النهائي",2,"المالية والخزينة · إدارة التشغيل",REQUIRED_AND_MISSING,Workforce/final_settlement.php,"مرشَّحٌ ضعيفٌ برمزٍ واحد",ضعيفة
+unit_fin_prelim.php,"الاعتماد المالي الأولي",2,"المالية والخزينة · إدارة التشغيل",REQUIRED_AND_MISSING,,,"لا مرشَّحَ آليّ"
+unit_sales_gate.php,"بوابة مدير المبيعات",2,"المبيعات والعقود · إدارة التشغيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Approvals/hours_approval.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+unit_statement_worker.php,"كشف التايم شيت — المشغّل",2,"إدارة التشغيل · القوى التشغيلية",IMPLEMENTED_UNDER_OTHER_ROUTE,Timesheet/timesheet_type.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+unit_supplier_approve.php,"اعتماد وحدات الموردين",2,"إدارة الموردين · إدارة التشغيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Approvals/hours_approval.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+unit_workforce_approve.php,"اعتماد وحدات المشغّلين",2,"إدارة التشغيل · القوى التشغيلية",IMPLEMENTED_UNDER_OTHER_ROUTE,Approvals/hours_approval.php,"تداخلُ 2 كلمةً في **المعنى العربيّ** مع تسميةٍ حيّة","متوسطة — تحتاج حسمَ بشر"
+units.php,"الوحدات التعاقدية المرقَّمة",2,"المبيعات والعقود · إدارة التشغيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Operations/containers.php,"التسميةُ «الوحدات التعاقدية المرقَّمة» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+variance.php,"متابعة انحراف المنفَّذ عن المخطط",2,"المالية والخزينة · إدارة التشغيل",IMPLEMENTED_UNDER_OTHER_ROUTE,Finance/variance_monitor_fin.php,"التسميةُ «متابعة انحراف المنفَّذ عن المخطط» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
+visibility.php,"من يرى ماذا ومكوّنات البوابة",3,"الحوكمة والالتزام · الموارد البشرية · التمويل والملكية",IMPLEMENTED_UNDER_OTHER_ROUTE,Portal/visibility_keys.php,"التسميةُ «من يرى ماذا ومكوّنات البوابة» حيّةٌ في التنقّلِ على مسارٍ آخر",عالية
