@@ -646,7 +646,8 @@ function cmd_dump_schema(mysqli $conn)
         fwrite(STDERR, "[migrate] فشل توليد المخطّط: {$err}\n");
         return 1;
     }
-    echo "  ✔ المخطّط: {$schemaMeta['tables']} جدولًا · {$schemaMeta['views']} منظورًا\n";
+    $trg = isset($schemaMeta['triggers']) ? $schemaMeta['triggers'] : 0;
+    echo "  ✔ المخطّط: {$schemaMeta['tables']} جدولًا · {$schemaMeta['views']} منظورًا · {$trg} قادحًا\n";
 
     list($seedSql, $err, $seedMeta) = $dumper->dumpSeed();
     if ($err !== '') {

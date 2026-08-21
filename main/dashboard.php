@@ -685,7 +685,14 @@ echo ems_states_bundle('لا أرقامَ تشغيليةً محسوبةً لهذ
     // (2..6 هو مدى `data-cols` المعتمَد في `ems-statcards.css`؛ وما فوقَه أربعة.)
     $dashStatCols = count($displayStats);
     if ($dashStatCols < 2 || $dashStatCols > 6) { $dashStatCols = 4; }
+
+    // ولوحُ الشرطاتِ لا يُعرض فوقَ لوحةِ دورٍ حيّة: دورٌ بلا فرعِ عدّاداتٍ
+    // (مدير الصلاحيات مثلًا) كان يُخرج أربعَ شرطاتٍ «—» تحتَ لوحةٍ فيها أرقامُه
+    // الحقيقيةُ كاملةً — ضجيجٌ يقرأه الناظرُ عطبًا. والشرطاتُ تبقى حيثُ تعني
+    // شيئًا: صفحةٌ بلا لوحةِ دورٍ تعلن نقصَ مصدرِها ولا تلفّق صفرًا.
+    $dashShowNumPanel = !empty($stats) || empty($dash_board);
     ?>
+    <?php if ($dashShowNumPanel): ?>
     <div class="shot-num-panel">
       <div class="shot-stat-grid" data-cols="<?= (int) $dashStatCols ?>">
         <?php foreach ($displayStats as $st): ?>
@@ -706,6 +713,7 @@ echo ems_states_bundle('لا أرقامَ تشغيليةً محسوبةً لهذ
         خروج <i class="fas fa-power-off"></i>
       </a>
     </div>
+    <?php endif; ?>
 
     <?php if (!empty($analyticsSummaryCards)): ?>
     <div class="shot-num-panel shot-num-panel-secondary">

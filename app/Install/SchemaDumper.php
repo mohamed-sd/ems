@@ -173,13 +173,71 @@ class SchemaDumper
             $out[] = '';
         }
 
+        /* ══ INJ-FIX-01 · الموجة ب · الحاجز ① — القوادحُ صنفٌ ثالثٌ كان يسقط ══
+           ◆ **العيبُ الذي يسدُّه — مقيسٌ باستنساخٍ نظيفٍ لا بمراجعةِ كود**:
+             بصمةُ المخططِ طابقت حرفًا (628 كائنًا · 10094 عمودًا) **والاستنساخُ
+             خالٍ من أربعةٍ وثلاثين قادحًا**. فالمُصدِّرُ كان يُخرج جدولًا ومنظورًا
+             ولا يُخرج قادحًا، والبصمةُ المبنيةُ على الأعمدةِ **لا تراه**
+             فتُعلن تطابقًا صادقًا على مقامٍ ناقص.
+           ◆ **وليست زينة**: منها ما يمنع تداخلَ حصصِ الملكية · ويحفظ عدمَ
+             رجعيةِ قراراتِ الإدارةِ التنفيذيةِ واعتماداتِها · ويمنع التفويضَ
+             غيرَ القابلِ للتفويضِ وتسلسلَ الإنابة · ويمنع رصيدَ مخزونٍ سالبًا ·
+             ويردُّ الوحدةَ المكرَّرة. فاستنساخٌ بلا قوادحَ نظامٌ **بلا حرّاسِ
+             قاعدةٍ** يبدو مطابقًا.
+           ◆ **ولماذا لم تُرَ قبلًا**: `information_schema.TRIGGERS` تُرشِّح بما
+             يملكه الحسابُ الفاحص. فقياسُ الأساسِ أعلن «قوادح=0» وهو يقرأ
+             بحسابٍ لا يراها — وهذا نصُّ GAP-33: «قادحٌ لا يُرى قد لا يُعاد بناؤه».
+           ◆ **و`DEFINER` يُنزَع** كما يُنزَع من المناظير: يربط القادحَ بمستخدمٍ
+             قد لا يوجد على خادمِ الوجهةِ فيُفشل الاستيراد.
+           ◆ **و`DROP TRIGGER IF EXISTS` يسبق كلَّ إنشاء**: الاستيرادُ المستأنَفُ
+             على قاعدةٍ فيها القادحُ يرفع 1359 ويقف. */
+        $triggers = $this->listTriggers();
+        foreach ($triggers as $t) {
+            $r = $this->conn->query('SHOW CREATE TRIGGER ' . $this->qi($t));
+            if (!$r) {
+                return array('', "فشل SHOW CREATE TRIGGER {$t}: " . $this->conn->error, array());
+            }
+            $row = $r->fetch_assoc();
+            $r->free();
+            $create = isset($row['SQL Original Statement']) ? $row['SQL Original Statement'] : '';
+            if ($create === '') { continue; }
+            $create = preg_replace('/\sDEFINER\s*=\s*`[^`]*`@`[^`]*`/i', '', $create);
+            /* ◆ **ولا `DELIMITER` هنا**: هي تعليمةُ عميلٍ لا عبارةُ SQL، والمُثبِّتُ
+                 يستورد بـ`multi_query` — فالخادمُ هو من يفصل العبارات، وهو يفهم
+                 الكتلةَ المركَّبةَ `BEGIN … END` ولا يحتاج فاصلًا بديلًا.
+                 وإقحامُها كان يكسر المسارَ الحقيقيَّ للتثبيتِ ليُرضيَ عميلَ سطرِ
+                 الأوامر — فيُصلَح المُصدِّرُ على المسارِ الذي يُستعمل فعلًا. */
+            $out[] = '-- ── Trigger: ' . $t . ' ──';
+            $out[] = 'DROP TRIGGER IF EXISTS ' . $this->qi($t) . ';';
+            $out[] = $create . ';';
+            $out[] = '';
+        }
+
         $out[] = 'SET FOREIGN_KEY_CHECKS = 1;';
         $out[] = '';
 
         return array(implode("\n", $out), '', array(
-            'tables' => count($tables),
-            'views'  => count($views),
+            'tables'   => count($tables),
+            'views'    => count($views),
+            'triggers' => count($triggers),
         ));
+    }
+
+    /** أسماءُ قوادحِ القاعدةِ الحالية — مرتَّبةً بجدولِها ثم باسمِها. */
+    private function listTriggers()
+    {
+        $out = array();
+        $st = $this->conn->prepare(
+            "SELECT TRIGGER_NAME FROM information_schema.TRIGGERS
+              WHERE TRIGGER_SCHEMA = ? ORDER BY EVENT_OBJECT_TABLE, ACTION_ORDER, TRIGGER_NAME");
+        if (!$st) { return $out; }
+        $db = $this->databaseName();
+        $st->bind_param('s', $db);
+        $st->execute();
+        $r = $st->get_result();
+        while ($x = $r->fetch_assoc()) { $out[] = $x['TRIGGER_NAME']; }
+        $st->close();
+        return $out;
     }
 
     // ═══════════════════════════════════════════════════════════════════════

@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-21 09:16:06
+-- المصدر: equipation_manage · التوليد: 2026-08-21 09:33:55
 -- الجداول: 603 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -15015,5 +15015,462 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_worker_presence` AS sele
 -- ── View: v_worker_worklog ──
 SET collation_connection = 'utf8mb4_unicode_ci';
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_worker_worklog` AS select `wp`.`id` AS `employee_id`,`wp`.`name` AS `worker_name`,coalesce(`wp`.`worker_category`,'موظف') AS `worker_category`,coalesce(`wp`.`workforce_state`,'-') AS `worker_state`,(select count(distinct `o`.`id`) from (`equipment_drivers` `ed` join `operations` `o` on(`o`.`equipment` = `ed`.`equipment_id`)) where `ed`.`employee_id` = `wp`.`id` and `ed`.`status` = 1) AS `operations_count`,(select coalesce(sum(`b`.`billable_baseline`),0) from `v_worker_billable_hours` `b` where `b`.`employee_id` = `wp`.`id`) AS `total_billable_hours`,(select count(0) from `worker_leave_absence` `la` where `la`.`employee_id` = `wp`.`id`) AS `leave_absence_count`,(select count(0) from `worker_movement` `m` where `m`.`employee_id` = `wp`.`id`) AS `movement_count`,(select count(0) from `worker_evaluation` `ev` where `ev`.`employee_id` = `wp`.`id`) AS `evaluation_count`,(select coalesce(sum(`ev`.`amount`),0) from `worker_evaluation` `ev` where `ev`.`employee_id` = `wp`.`id` and `ev`.`incentive_penalty_type` = 'حافز') AS `incentive_total`,(select coalesce(sum(`ev`.`amount`),0) from `worker_evaluation` `ev` where `ev`.`employee_id` = `wp`.`id` and `ev`.`incentive_penalty_type` = 'جزاء') AS `penalty_total` from `employees` `wp`;
+
+-- ── Trigger: trg_share_no_overlap_ins ──
+DROP TRIGGER IF EXISTS `trg_share_no_overlap_ins`;
+CREATE TRIGGER trg_share_no_overlap_ins BEFORE INSERT ON asset_ownership_shares
+FOR EACH ROW BEGIN 
+    DECLARE clash INT;
+    SELECT COUNT(*) INTO clash
+      FROM asset_ownership_shares x
+     WHERE x.company_id = NEW.company_id
+       AND x.asset_kind = NEW.asset_kind
+       AND x.asset_id = NEW.asset_id
+       AND x.financier_entity_id = NEW.financier_entity_id
+       AND x.share_id <> COALESCE(NEW.share_id, 0)
+       AND NEW.valid_from <= COALESCE(x.valid_to, '9999-12-31')
+       AND x.valid_from  <= COALESCE(NEW.valid_to, '9999-12-31');
+    IF clash > 0 THEN
+        SIGNAL SQLSTATE '45000'
+          SET MESSAGE_TEXT = 'SHR-409: فترتان متراكبتان لنفس (الاصل × الممول) — valid_to شامل فاغلق اليوم السابق';
+    END IF;
+ END;
+
+-- ── Trigger: trg_share_no_overlap_upd ──
+DROP TRIGGER IF EXISTS `trg_share_no_overlap_upd`;
+CREATE TRIGGER trg_share_no_overlap_upd BEFORE UPDATE ON asset_ownership_shares
+FOR EACH ROW BEGIN 
+    DECLARE clash INT;
+    SELECT COUNT(*) INTO clash
+      FROM asset_ownership_shares x
+     WHERE x.company_id = NEW.company_id
+       AND x.asset_kind = NEW.asset_kind
+       AND x.asset_id = NEW.asset_id
+       AND x.financier_entity_id = NEW.financier_entity_id
+       AND x.share_id <> COALESCE(NEW.share_id, 0)
+       AND NEW.valid_from <= COALESCE(x.valid_to, '9999-12-31')
+       AND x.valid_from  <= COALESCE(NEW.valid_to, '9999-12-31');
+    IF clash > 0 THEN
+        SIGNAL SQLSTATE '45000'
+          SET MESSAGE_TEXT = 'SHR-409: فترتان متراكبتان لنفس (الاصل × الممول) — valid_to شامل فاغلق اليوم السابق';
+    END IF;
+ END;
+
+-- ── Trigger: trg_cc_balance_ins ──
+DROP TRIGGER IF EXISTS `trg_cc_balance_ins`;
+CREATE TRIGGER trg_cc_balance_ins BEFORE INSERT ON container_consumption FOR EACH ROW
+BEGIN
+    DECLARE v_cap DECIMAL(14,2); DECLARE v_used DECIMAL(14,2); DECLARE v_key VARCHAR(64);
+    SELECT cap_qty, consumed_qty, container_no INTO v_cap, v_used, v_key
+      FROM op_containers WHERE id = NEW.container_id;
+    SET NEW.share_key      = COALESCE(NEW.share_key, v_key);
+    SET NEW.balance_before = v_cap - COALESCE(v_used, 0);
+    SET NEW.balance_after  = NEW.balance_before - COALESCE(NEW.qty, 0);
+    SET NEW.gap_units      = GREATEST(0, -NEW.balance_after);
+END;
+
+-- ── Trigger: trg_swap_ho_ins ──
+DROP TRIGGER IF EXISTS `trg_swap_ho_ins`;
+CREATE TRIGGER trg_swap_ho_ins BEFORE INSERT ON container_swaps FOR EACH ROW
+BEGIN
+    IF NEW.effective_from IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'HO-01: لا حدثَ تسليمٍ بلا تاريخِ سريان';
+    END IF;
+    IF NEW.doc_ref IS NULL OR NEW.doc_ref = '' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'لا تسليمَ بلا مستندٍ — اذكرْ مرجعَ المحضرِ أو الخطاب';
+    END IF;
+    IF NEW.container_id IS NULL OR NEW.to_container_id IS NULL THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'HO-02: التسليمُ بطرفين — الحاويةُ المسلِّمةُ والمستلِمة';
+    END IF;
+    IF EXISTS (SELECT 1 FROM fin_financial_periods p
+               WHERE p.company_id = NEW.company_id AND p.period_type='month'
+                 AND NEW.effective_from BETWEEN p.start_date AND p.end_date
+                 AND p.posting_allowed = 0) THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'HO-05: الشهرُ مغلقٌ — لا حدثَ يعيد احتسابَ شهرٍ مقفل';
+    END IF;
+END;
+
+-- ── Trigger: trg_contract_needs_quote_ins ──
+DROP TRIGGER IF EXISTS `trg_contract_needs_quote_ins`;
+CREATE TRIGGER trg_contract_needs_quote_ins BEFORE INSERT ON contracts FOR EACH ROW BEGIN IF COALESCE(NEW.is_deleted,0)=0 AND COALESCE(NEW.quotation_id,0)=0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'لا عقدَ بلا مرجعِ عرضٍ — أنشئِ العرضَ واقبله أولًا (سلسلة عميل⇐فرصة⇐عرض⇐عقد)';
+      END IF; END;
+
+-- ── Trigger: trg_contract_needs_quote_upd ──
+DROP TRIGGER IF EXISTS `trg_contract_needs_quote_upd`;
+CREATE TRIGGER trg_contract_needs_quote_upd BEFORE UPDATE ON contracts FOR EACH ROW BEGIN IF COALESCE(NEW.is_deleted,0)=0 AND COALESCE(NEW.quotation_id,0)=0 THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'لا عقدَ بلا مرجعِ عرضٍ — أنشئِ العرضَ واقبله أولًا (سلسلة عميل⇐فرصة⇐عرض⇐عقد)';
+      END IF; END;
+
+-- ── Trigger: trg_cmt_f03_ins ──
+DROP TRIGGER IF EXISTS `trg_cmt_f03_ins`;
+CREATE TRIGGER trg_cmt_f03_ins BEFORE INSERT ON contract_commitments FOR EACH ROW BEGIN IF NEW.slot_monthly_basis IS NOT NULL AND NEW.renewal_months IS NOT NULL THEN
+        SET NEW.type_capacity = COALESCE(NEW.primary_units_contracted, 0) * NEW.slot_monthly_basis * NEW.renewal_months;
+      END IF; END;
+
+-- ── Trigger: trg_cmt_f03_upd ──
+DROP TRIGGER IF EXISTS `trg_cmt_f03_upd`;
+CREATE TRIGGER trg_cmt_f03_upd BEFORE UPDATE ON contract_commitments FOR EACH ROW BEGIN IF NEW.slot_monthly_basis IS NOT NULL AND NEW.renewal_months IS NOT NULL THEN
+        SET NEW.type_capacity = COALESCE(NEW.primary_units_contracted, 0) * NEW.slot_monthly_basis * NEW.renewal_months;
+      END IF; END;
+
+-- ── Trigger: trg_cnote_close_needs_doc ──
+DROP TRIGGER IF EXISTS `trg_cnote_close_needs_doc`;
+CREATE TRIGGER trg_cnote_close_needs_doc BEFORE UPDATE ON contract_notes
+        FOR EACH ROW BEGIN
+          IF NEW.note_state = 'closed' AND OLD.note_state <> 'closed'
+             AND NEW.severity = 'critical'
+             AND (NEW.closure_doc_ref IS NULL OR NEW.closure_doc_ref = ''
+                  OR NEW.closed_by IS NULL OR NEW.closed_by = 0) THEN
+            SIGNAL SQLSTATE '45000'
+              SET MESSAGE_TEXT = 'CNOTE-422: إغلاقُ ملاحظةٍ حرجةٍ يلزمه مستندٌ ومعتمِد';
+          END IF;
+        END;
+
+-- ── Trigger: trg_delivery_backoff ──
+DROP TRIGGER IF EXISTS `trg_delivery_backoff`;
+CREATE TRIGGER `trg_delivery_backoff` BEFORE UPDATE ON `ems_event_deliveries`
+      FOR EACH ROW
+      BEGIN
+        IF NEW.`state` = 'failed' AND NEW.`attempt_no` > OLD.`attempt_no` THEN
+          SET NEW.`next_attempt_at` = NOW(3) + INTERVAL POW(4, LEAST(OLD.`attempt_no`, 4)) SECOND;
+        END IF;
+        IF NEW.`state` = 'processed' AND NEW.`processed_at` IS NULL THEN
+          SET NEW.`processed_at` = NOW(3);
+        END IF;
+        IF NEW.`state` = 'dlq' AND NEW.`processed_at` IS NULL THEN
+          SET NEW.`processed_at` = NOW(3);
+        END IF;
+      END;
+
+-- ── Trigger: trg_n21_equipments_owner_ins ──
+DROP TRIGGER IF EXISTS `trg_n21_equipments_owner_ins`;
+CREATE TRIGGER `trg_n21_equipments_owner_ins` BEFORE INSERT ON `equipments` FOR EACH ROW BEGIN
+  IF NEW.`actual_owner_name` IS NOT NULL OR NEW.`owner_type` IS NOT NULL
+     OR NEW.`owner_phone` IS NOT NULL OR NEW.`owner_supplier_relation` IS NOT NULL THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT =
+      'N-21: أعمدة المالك في equipments مهجورة — بيانات الملكية في المجال المقيَّد حصرًا';
+  END IF;
+END;
+
+-- ── Trigger: trg_n21_equipments_owner_upd ──
+DROP TRIGGER IF EXISTS `trg_n21_equipments_owner_upd`;
+CREATE TRIGGER `trg_n21_equipments_owner_upd` BEFORE UPDATE ON `equipments` FOR EACH ROW BEGIN
+  IF (NEW.`actual_owner_name` IS NOT NULL AND (OLD.`actual_owner_name` IS NULL OR NEW.`actual_owner_name` <> OLD.`actual_owner_name`))
+     OR (NEW.`owner_type` IS NOT NULL AND (OLD.`owner_type` IS NULL OR NEW.`owner_type` <> OLD.`owner_type`))
+     OR (NEW.`owner_phone` IS NOT NULL AND (OLD.`owner_phone` IS NULL OR NEW.`owner_phone` <> OLD.`owner_phone`))
+     OR (NEW.`owner_supplier_relation` IS NOT NULL AND (OLD.`owner_supplier_relation` IS NULL OR NEW.`owner_supplier_relation` <> OLD.`owner_supplier_relation`)) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT =
+      'N-21: أعمدة المالك في equipments مهجورة — الكتابة في المجال المقيَّد حصرًا';
+  END IF;
+END;
+
+-- ── Trigger: trg_exap_immutable ──
+DROP TRIGGER IF EXISTS `trg_exap_immutable`;
+CREATE TRIGGER `trg_exap_immutable` BEFORE UPDATE ON `exec_approvals`
+FOR EACH ROW
+BEGIN
+  IF OLD.decision IS NOT NULL AND OLD.decision <> '' AND (
+       NOT (NEW.decision <=> OLD.decision)
+    OR NOT (NEW.decision_reason <=> OLD.decision_reason)
+    OR NOT (NEW.decision_date <=> OLD.decision_date)
+    OR NOT (NEW.amount <=> OLD.amount)
+    OR NOT (NEW.request_no <=> OLD.request_no)
+    OR NOT (NEW.authority_ref <=> OLD.authority_ref)
+  ) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'BR-CEO-08: القرار الموقع لا يعدل — التغيير قرار جديد يشير للأصل';
+  END IF;
+END;
+
+-- ── Trigger: trg_excs_immutable ──
+DROP TRIGGER IF EXISTS `trg_excs_immutable`;
+CREATE TRIGGER `trg_excs_immutable` BEFORE UPDATE ON `exec_contract_signings`
+FOR EACH ROW
+BEGIN
+  IF OLD.signing_date IS NOT NULL AND (
+       NOT (NEW.signing_date <=> OLD.signing_date)
+    OR NOT (NEW.amount <=> OLD.amount)
+    OR NOT (NEW.contract_no <=> OLD.contract_no)
+    OR NOT (NEW.signed_by_us <=> OLD.signed_by_us)
+    OR NOT (NEW.authority_ref <=> OLD.authority_ref)
+  ) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'BR-CEO-08: العقد الموقع لا يعدل — الإنهاء أو التعليق قرار موثق جديد';
+  END IF;
+END;
+
+-- ── Trigger: trg_exdc_immutable ──
+DROP TRIGGER IF EXISTS `trg_exdc_immutable`;
+CREATE TRIGGER `trg_exdc_immutable` BEFORE UPDATE ON `exec_decisions`
+FOR EACH ROW
+BEGIN
+  IF OLD.decision_date IS NOT NULL AND (
+       NOT (NEW.chosen_option <=> OLD.chosen_option)
+    OR NOT (NEW.choice_reason <=> OLD.choice_reason)
+    OR NOT (NEW.decision_date <=> OLD.decision_date)
+    OR NOT (NEW.assigned_dept <=> OLD.assigned_dept)
+    OR NOT (NEW.exec_deadline <=> OLD.exec_deadline)
+  ) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'BR-CEO-08: القرار المحسوم لا يعدل — قرار لاحق يعدله بمرجع الأصل';
+  END IF;
+END;
+
+-- ── Trigger: trg_expc_immutable ──
+DROP TRIGGER IF EXISTS `trg_expc_immutable`;
+CREATE TRIGGER `trg_expc_immutable` BEFORE UPDATE ON `exec_project_charters`
+FOR EACH ROW
+BEGIN
+  IF OLD.approval_date IS NOT NULL AND OLD.approval_date <> ''
+     AND OLD.status IN ('مفتوح', 'مغلق') AND (
+       NOT (NEW.decision_no <=> OLD.decision_no)
+    OR NOT (NEW.approval_date <=> OLD.approval_date)
+    OR NOT (NEW.site_manager <=> OLD.site_manager)
+    OR NOT (NEW.contract_ref <=> OLD.contract_ref)
+  ) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'BR-CEO-08: قرار الفتح المعتمد لا يعدل — الإغلاق قرار مشابه بمحضر تصفية';
+  END IF;
+END;
+
+-- ── Trigger: trg_grant_issuer ──
+DROP TRIGGER IF EXISTS `trg_grant_issuer`;
+CREATE TRIGGER `trg_grant_issuer` BEFORE INSERT ON `gov_authority_grants` FOR EACH ROW
+      BEGIN
+        DECLARE issuer_role INT DEFAULT NULL;
+        SELECT `role` INTO issuer_role FROM `users` WHERE `id` = NEW.`issued_by` LIMIT 1;
+        IF NEW.`source` <> 'profile' AND (issuer_role IS NULL OR issuer_role NOT IN (15)) THEN
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'chk_grant_issuer: المنحُ بيدِ الحوكمةِ حصرًا (A1)';
+        END IF;
+      END;
+
+-- ── Trigger: trg_cap_owner_only ──
+DROP TRIGGER IF EXISTS `trg_cap_owner_only`;
+CREATE TRIGGER `trg_cap_owner_only` BEFORE INSERT ON `gov_cap_history` FOR EACH ROW
+      BEGIN
+        DECLARE r INT DEFAULT NULL;
+        SELECT `role` INTO r FROM `users` WHERE `id` = NEW.`changed_by` LIMIT 1;
+        IF r IS NULL OR r <> 9 THEN
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'تعديلُ السقفِ باعتمادِ المالكِ وحدَه (الدور 9)';
+        END IF;
+      END;
+
+-- ── Trigger: trg_deleg_no_relay ──
+DROP TRIGGER IF EXISTS `trg_deleg_no_relay`;
+CREATE TRIGGER `trg_deleg_no_relay` BEFORE INSERT ON `gov_delegations` FOR EACH ROW
+      BEGIN
+        IF EXISTS (SELECT 1 FROM `gov_delegations` d
+                    WHERE d.`to_user` = NEW.`from_user` AND d.`revoked_at` IS NULL
+                      AND d.`valid_to` > NOW()) THEN
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'chk_deleg_no_relay: لا سلسلةَ تفويضٍ ثانية';
+        END IF;
+      END;
+
+-- ── Trigger: trg_deleg_non_delegable ──
+DROP TRIGGER IF EXISTS `trg_deleg_non_delegable`;
+CREATE TRIGGER `trg_deleg_non_delegable` BEFORE INSERT ON `gov_delegations` FOR EACH ROW
+      BEGIN
+        IF EXISTS (SELECT 1 FROM `non_delegable_actions` n
+                    WHERE NEW.`scope_json` LIKE CONCAT('%', n.`action_code`, '%')) THEN
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'chk_non_delegable: فعلٌ محصورٌ لا يُفوَّض';
+        END IF;
+      END;
+
+-- ── Trigger: trg_imp_not_oversight ──
+DROP TRIGGER IF EXISTS `trg_imp_not_oversight`;
+CREATE TRIGGER `trg_imp_not_oversight` BEFORE INSERT ON `impersonation_sessions` FOR EACH ROW
+      BEGIN
+        DECLARE tgt_role INT DEFAULT NULL;
+        SELECT `role` INTO tgt_role FROM `users` WHERE `id` = NEW.`target_user` LIMIT 1;
+        IF tgt_role IN (15,20,28,29,30,33) THEN
+          SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'chk_imp_not_oversight: لا نيابةَ على الرقابيّين';
+        END IF;
+      END;
+
+-- ── Trigger: trg_nav_provisional_scope ──
+DROP TRIGGER IF EXISTS `trg_nav_provisional_scope`;
+CREATE TRIGGER `trg_nav_provisional_scope`
+    BEFORE UPDATE ON `nav_canonical` FOR EACH ROW
+    BEGIN
+        IF NEW.application_state = 'PROVISIONALLY_APPLIED_NO_OBJECTION'
+           AND NEW.policy_domain <> 'NAVIGATION_NAMING_POSITION' THEN
+            SIGNAL SQLSTATE '45000'
+              SET MESSAGE_TEXT = 'التطبيقُ المؤقَّتُ ممنوعٌ في هذا المجال: الصلاحياتُ · سلاليمُ الاعتمادِ · السقوفُ الماليةُ · فصلُ الواجباتِ · الالتزاماتُ القانونيةُ · القراراتُ المالية';
+        END IF;
+        IF NEW.application_state = 'PROVISIONALLY_APPLIED_NO_OBJECTION'
+           AND NEW.provisional_reversible <> 1 THEN
+            SIGNAL SQLSTATE '45000'
+              SET MESSAGE_TEXT = 'التطبيقُ المؤقَّتُ محصورٌ فيما يُعكس — وهذا الصفُّ غيرُ معلَنٍ قابلًا للعكس';
+        END IF;
+        IF NEW.decision_state IN ('APPROVED','REJECTED')
+           AND COALESCE(OLD.decision_state,'') <> NEW.decision_state
+           AND NEW.decided_by IS NULL
+           AND (NEW.decision_source IS NULL OR NEW.decision_source = '') THEN
+            SIGNAL SQLSTATE '45000'
+              SET MESSAGE_TEXT = 'حسمٌ بلا فاعلٍ ولا مصدرٍ حاكمٍ مرفوض — الصمتُ لا يُرقِّي قرارًا';
+        END IF;
+    END;
+
+-- ── Trigger: trg_opc_cap_ins ──
+DROP TRIGGER IF EXISTS `trg_opc_cap_ins`;
+CREATE TRIGGER trg_opc_cap_ins BEFORE INSERT ON op_containers FOR EACH ROW BEGIN 
+    IF NEW.parent_id IS NOT NULL AND COALESCE(NEW.is_deleted,0) = 0 THEN
+        SET @cap_parent = (SELECT p.cap_qty FROM op_containers p WHERE p.id = NEW.parent_id);
+        SET @cap_sibs = (SELECT COALESCE(SUM(s.cap_qty),0) FROM op_containers s
+                          WHERE s.parent_id = NEW.parent_id AND s.is_deleted = 0 AND s.id <> COALESCE(NEW.id,0));
+        IF @cap_parent IS NOT NULL AND (@cap_sibs + NEW.cap_qty) > @cap_parent + 0.005 THEN
+            SIGNAL SQLSTATE '45000'
+              SET MESSAGE_TEXT = 'سعةُ الحاوية: مجموعُ الأبناءِ يتجاوز سعةَ الأب — الأعلى مشتقٌّ من الأدنى ولا يُتجاوز';
+        END IF;
+    END IF; END;
+
+-- ── Trigger: trg_opc_cap_upd ──
+DROP TRIGGER IF EXISTS `trg_opc_cap_upd`;
+CREATE TRIGGER trg_opc_cap_upd BEFORE UPDATE ON op_containers FOR EACH ROW BEGIN 
+    IF NEW.parent_id IS NOT NULL AND COALESCE(NEW.is_deleted,0) = 0 THEN
+        SET @cap_parent = (SELECT p.cap_qty FROM op_containers p WHERE p.id = NEW.parent_id);
+        SET @cap_sibs = (SELECT COALESCE(SUM(s.cap_qty),0) FROM op_containers s
+                          WHERE s.parent_id = NEW.parent_id AND s.is_deleted = 0 AND s.id <> COALESCE(NEW.id,0));
+        IF @cap_parent IS NOT NULL AND (@cap_sibs + NEW.cap_qty) > @cap_parent + 0.005 THEN
+            SIGNAL SQLSTATE '45000'
+              SET MESSAGE_TEXT = 'سعةُ الحاوية: مجموعُ الأبناءِ يتجاوز سعةَ الأب — الأعلى مشتقٌّ من الأدنى ولا يُتجاوز';
+        END IF;
+    END IF; END;
+
+-- ── Trigger: trg_opc_f0102_ins ──
+DROP TRIGGER IF EXISTS `trg_opc_f0102_ins`;
+CREATE TRIGGER trg_opc_f0102_ins BEFORE INSERT ON op_containers FOR EACH ROW BEGIN IF NEW.slot_role IS NOT NULL THEN
+        SET NEW.daily_hours_basis = CASE NEW.slot_role
+            WHEN 'primary_two_shifts' THEN 20
+            WHEN 'primary_one_shift'  THEN 12
+            ELSE COALESCE(NEW.daily_hours_basis, 0) END;
+        SET NEW.monthly_basis = NEW.daily_hours_basis * 30;
+      END IF; END;
+
+-- ── Trigger: trg_opc_f0102_upd ──
+DROP TRIGGER IF EXISTS `trg_opc_f0102_upd`;
+CREATE TRIGGER trg_opc_f0102_upd BEFORE UPDATE ON op_containers FOR EACH ROW BEGIN IF NEW.slot_role IS NOT NULL THEN
+        SET NEW.daily_hours_basis = CASE NEW.slot_role
+            WHEN 'primary_two_shifts' THEN 20
+            WHEN 'primary_one_shift'  THEN 12
+            ELSE COALESCE(NEW.daily_hours_basis, 0) END;
+        SET NEW.monthly_basis = NEW.daily_hours_basis * 30;
+      END IF; END;
+
+-- ── Trigger: trg_po_request_required ──
+DROP TRIGGER IF EXISTS `trg_po_request_required`;
+CREATE TRIGGER trg_po_request_required BEFORE INSERT ON proc_order
+         FOR EACH ROW BEGIN
+           IF NEW.request_id IS NULL OR NEW.request_id = 0 THEN
+             SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'PO-REQ-422: لا أمرَ شراءٍ بلا طلبٍ مرتبط';
+           END IF;
+         END;
+
+-- ── Trigger: trg_psm_return_not_exceed_issued ──
+DROP TRIGGER IF EXISTS `trg_psm_return_not_exceed_issued`;
+CREATE TRIGGER trg_psm_return_not_exceed_issued
+BEFORE INSERT ON proc_stock_move
+FOR EACH ROW
+BEGIN
+  DECLARE v_issued   DECIMAL(18,4) DEFAULT 0;
+  DECLARE v_returned DECIMAL(18,4) DEFAULT 0;
+  DECLARE v_msg      VARCHAR(255);
+  IF NEW.move_type = 'مرتجع' AND NEW.ref_type = 'issue' AND NEW.ref_id > 0 THEN
+    SELECT COALESCE(SUM(il.qty),0) INTO v_issued
+      FROM proc_issue_line il
+      JOIN proc_issue i ON i.id = il.issue_id
+     WHERE il.issue_id = NEW.ref_id AND il.item_id = NEW.item_id
+       AND i.company_id = NEW.company_id;
+    SELECT COALESCE(SUM(m.qty),0) INTO v_returned
+      FROM proc_stock_move m
+     WHERE m.company_id = NEW.company_id AND m.move_type = 'مرتجع'
+       AND m.ref_type = 'issue' AND m.ref_id = NEW.ref_id AND m.item_id = NEW.item_id;
+    IF (v_returned + NEW.qty) > (v_issued + 0.0001) THEN
+      SET v_msg = CONCAT('FN-07: المرتجع يتجاوز المصروف — مصروف ', v_issued,
+                         ' · أُرجع ', v_returned, ' · المطلوب ', NEW.qty);
+      SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = v_msg;
+    END IF;
+  END IF;
+END;
+
+-- ── Trigger: trg_stock_no_negative ──
+DROP TRIGGER IF EXISTS `trg_stock_no_negative`;
+CREATE TRIGGER trg_stock_no_negative BEFORE INSERT ON proc_stock_move
+FOR EACH ROW
+BEGIN
+    DECLARE bal DECIMAL(18,4);
+    IF NEW.move_type NOT IN ('استلام','تحويل وارد','مرتجع','تسوية زيادة') THEN
+        SELECT COALESCE(SUM(CASE WHEN move_type IN ('استلام','تحويل وارد','مرتجع','تسوية زيادة') THEN qty ELSE -qty END), 0)
+          INTO bal
+          FROM proc_stock_move
+         WHERE company_id = NEW.company_id
+           AND item_id = NEW.item_id
+           AND warehouse_id = NEW.warehouse_id;
+        IF bal < NEW.qty THEN
+            SIGNAL SQLSTATE '45000'
+              SET MESSAGE_TEXT = 'STK-409: لا يخرج من المخزن ما ليس فيه — الرصيد اقل من المطلوب';
+        END IF;
+    END IF;
+END;
+
+-- ── Trigger: trg_settle_f0708_ins ──
+DROP TRIGGER IF EXISTS `trg_settle_f0708_ins`;
+CREATE TRIGGER trg_settle_f0708_ins BEFORE INSERT ON settlements FOR EACH ROW BEGIN SET NEW.supplier_executed_hours = NEW.client_executed_hours + NEW.adj_work_added
+        + NEW.adj_breakdown_added + NEW.adj_standby_added - NEW.adj_deducted;
+      SET NEW.borne_by_treasury = GREATEST(NEW.supplier_executed_hours - NEW.client_settled_hours, 0); END;
+
+-- ── Trigger: trg_settle_f0708_upd ──
+DROP TRIGGER IF EXISTS `trg_settle_f0708_upd`;
+CREATE TRIGGER trg_settle_f0708_upd BEFORE UPDATE ON settlements FOR EACH ROW BEGIN SET NEW.supplier_executed_hours = NEW.client_executed_hours + NEW.adj_work_added
+        + NEW.adj_breakdown_added + NEW.adj_standby_added - NEW.adj_deducted;
+      SET NEW.borne_by_treasury = GREATEST(NEW.supplier_executed_hours - NEW.client_settled_hours, 0); END;
+
+-- ── Trigger: trg_taxinv_needs_lines ──
+DROP TRIGGER IF EXISTS `trg_taxinv_needs_lines`;
+CREATE TRIGGER trg_taxinv_needs_lines BEFORE INSERT ON tax_invoices FOR EACH ROW
+BEGIN
+    IF NEW.claim_id IS NOT NULL
+       AND (SELECT COUNT(*) FROM claim_lines l WHERE l.claim_id = NEW.claim_id) = 0 THEN
+        SIGNAL SQLSTATE '45000'
+          SET MESSAGE_TEXT = 'لا فاتورةَ لمستخلصٍ بلا بنود — أكمِلْ بنودَ المستخلصِ أولًا';
+    END IF;
+END;
+
+-- ── Trigger: trg_ue_dup_shield_ins ──
+DROP TRIGGER IF EXISTS `trg_ue_dup_shield_ins`;
+CREATE TRIGGER `trg_ue_dup_shield_ins` BEFORE INSERT ON `unit_entries`
+FOR EACH ROW
+BEGIN
+  IF NEW.entry_date >= '2026-08-05'
+     AND NEW.state NOT IN ('rejected','cancelled','superseded','reversed')
+     AND EXISTS (
+       SELECT 1 FROM unit_entries ue
+        WHERE ue.equipment_id = NEW.equipment_id
+          AND ue.entry_date = NEW.entry_date
+          AND ue.shift <=> NEW.shift
+          AND ue.state NOT IN ('rejected','cancelled','superseded','reversed')
+  ) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ق-18: تكرار (معدة×تاريخ×وردية) مرفوض بنيويًّا على السكة الجديدة';
+  END IF;
+END;
+
+-- ── Trigger: trg_ue_dup_shield_upd ──
+DROP TRIGGER IF EXISTS `trg_ue_dup_shield_upd`;
+CREATE TRIGGER `trg_ue_dup_shield_upd` BEFORE UPDATE ON `unit_entries`
+FOR EACH ROW
+BEGIN
+  IF NEW.entry_date >= '2026-08-05'
+     AND NEW.state NOT IN ('rejected','cancelled','superseded','reversed')
+     AND (NOT (NEW.equipment_id <=> OLD.equipment_id)
+       OR NOT (NEW.entry_date <=> OLD.entry_date)
+       OR NOT (NEW.shift <=> OLD.shift))
+     AND EXISTS (
+       SELECT 1 FROM unit_entries ue
+        WHERE ue.equipment_id = NEW.equipment_id
+          AND ue.entry_date = NEW.entry_date
+          AND ue.shift <=> NEW.shift
+          AND ue.id <> OLD.id
+          AND ue.state NOT IN ('rejected','cancelled','superseded','reversed')
+  ) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ق-18: نقل الصف إلى (معدة×تاريخ×وردية) مشغولة مرفوض بنيويًّا';
+  END IF;
+END;
 
 SET FOREIGN_KEY_CHECKS = 1;
