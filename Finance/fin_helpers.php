@@ -97,10 +97,38 @@ if (!function_exists('fin_project_scope')) {
      *
      * @return int|null null = بلا تصفية · موجب = المشروع · -1 = لا شيء
      */
+    /* ══ INJ-FIX-01 · GAP-22 — نطاقٌ يفتح افتراضيًّا للدورِ الجديد ═══════════
+       ◆ **العطبُ**: كان الحكمُ «ليس 5 ولا 6 ⇒ `null` ⇒ بلا تصفية». فالدورُ
+         الذي يُنشأ غدًا ويُمنح الشاشةَ **يرى كلَّ صفوفِ الشركةِ فورًا** بلا
+         قرارٍ من أحد. والانفتاحُ الافتراضيُّ عيبُ اتجاه: القاعدةُ منعٌ ما لم
+         يُصرَّح، لا سماحٌ ما لم يُمنَع.
+       ◆ **والعلاجُ قائمةٌ صريحةٌ لا فشلٌ مغلقٌ إلى صفر**: قُيس أن ستةَ عشرَ
+         دورًا تملك `can_view` على الشاشاتِ الثلاثِ فعلًا — فقلبُ المجهولِ إلى
+         «صفرِ صفٍّ» كان سيُفرِغ الشاشةَ لعشرةِ أدوارٍ تشغيليةٍ تملكها بحقّ.
+         فيُصنَّف كلُّ دورٍ **صراحةً**: مقيَّدٌ بمشروعِه · أو يرى شركتَه · وما
+         لم يُصنَّف **لا يرى شيئًا** حتى يُصنَّف.
+       ◆ **فالسلوكُ اليومَ لم يتغيّر حرفًا** — والبابُ أُغلق على الغد. */
+    /** أدوارٌ مقيَّدةٌ بمشروعِها حصرًا (قرار 2026-07-17). */
+    if (!defined('FIN_SCOPE_PROJECT_ROLES')) { define('FIN_SCOPE_PROJECT_ROLES', '5,6'); }
+    /** أدوارٌ ترى صفوفَ شركتِها كلَّها — **مصنَّفةٌ صراحةً لا افتراضًا**. */
+    if (!defined('FIN_SCOPE_COMPANY_ROLES')) {
+        define('FIN_SCOPE_COMPANY_ROLES', '1,3,7,10,11,12,13,14,16,17,18,19,20,21,22,23');
+    }
+
     function fin_project_scope($conn, $ctx)
     {
-        if ($ctx['is_super'] || !in_array(strval($ctx['role']), array('5', '6'), true)) {
-            return null;
+        if (!empty($ctx['is_super'])) { return null; }
+        $r = strval($ctx['role']);
+        $projectRoles = explode(',', FIN_SCOPE_PROJECT_ROLES);
+        $companyRoles = explode(',', FIN_SCOPE_COMPANY_ROLES);
+
+        if (in_array($r, $companyRoles, true)) { return null; }   // مصنَّفٌ: يرى شركتَه
+        if (!in_array($r, $projectRoles, true)) {
+            /* دورٌ غيرُ مصنَّفٍ في أيِّ قائمة — يُمنَع حتى يُصنَّف، ويُسجَّل
+               ليُعلم أنه يحتاج تصنيفًا لا ليبقى صامتًا. */
+            error_log('[GAP-22] fin_project_scope: دورٌ غيرُ مصنَّفٍ للنطاق role=' . $r
+                    . ' — أُرجع صفرُ صفٍّ حتى يُصنَّف في FIN_SCOPE_*_ROLES');
+            return -1;
         }
         try {
             $u = ems_tenant_db()->selectOne('users', array(

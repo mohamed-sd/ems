@@ -39,10 +39,10 @@
 | المسار | قرّاء | كتّاب | الكتّابُ بأسمائِهم |
 |---|---:|---:|---|
 | `ems_business_events` | 34 | 5 | `C:/wamp64/www/ems/app/Core/EventPublisher.php` · `C:/wamp64/www/ems/app/Services/Bus/EventDeliveryWorker.php` · `C:/wamp64/www/ems/app/Services/Bus/EventOutboxFanout.php` · `C:/wamp64/www/ems/app/Services/Finance/FxRevaluationService.php` · `C:/wamp64/www/ems/database/migrations/2027_05_25_eng01_backfill_constraints.php` |
-| `fin_financial_events` | 51 | 11 | `C:/wamp64/www/ems/app/Core/EventPublisher.php` · `C:/wamp64/www/ems/app/Services/CompensationService.php` · `C:/wamp64/www/ems/app/Services/Contract/ContractSignedEffects.php` · `C:/wamp64/www/ems/app/Services/Finance/PostingService.php` · `C:/wamp64/www/ems/database/migrations/2027_02_08_fx_base_rows_backfill.php` · `C:/wamp64/www/ems/database/migrations/2027_02_09_restore_all_lost_business_checks.php` …+5 |
+| `fin_financial_events` | 51 | 15 | `C:/wamp64/www/ems/app/Core/EventPublisher.php` · `C:/wamp64/www/ems/app/Services/CompensationService.php` · `C:/wamp64/www/ems/app/Services/Contract/ContractSignedEffects.php` · `C:/wamp64/www/ems/app/Services/Contract/PlanActualLinkService.php` · `C:/wamp64/www/ems/app/Services/Finance/EventStateMachine.php` · `C:/wamp64/www/ems/app/Services/Finance/PostingService.php` …+9 |
 | `ems_event_consumers` | 5 | 1 | `C:/wamp64/www/ems/app/Core/EventDispatcher.php` |
 | `ems_event_deliveries` | 13 | 5 | `C:/wamp64/www/ems/app/Core/EventDispatcher.php` · `C:/wamp64/www/ems/app/Services/Bus/EventDeliveryWorker.php` · `C:/wamp64/www/ems/database/migrations/2027_05_24_eng01_shared_engines.php` · `C:/wamp64/www/ems/database/migrations/2027_06_02_bus_fix_broken_subscriptions.php` · `C:/wamp64/www/ems/database/migrations/2027_06_03_bus_method_level_audit.php` |
-| `capacity_outbox` | 3 | 0 | — |
+| `capacity_outbox` | 3 | 1 | `C:/wamp64/www/ems/app/Services/Capacity/CapacityOutbox.php` |
 
 ## التنقل
 
@@ -58,7 +58,14 @@
 
 | المسار | قرّاء | كتّاب | الكتّابُ بأسمائِهم |
 |---|---:|---:|---|
-| `fin_financial_periods` | 17 | 2 | `C:/wamp64/www/ems/database/migrations/2027_03_02_fiscal_calendar_extend_next_year.php` · `C:/wamp64/www/ems/database/migrations/2027_04_25_open_period_2026_06_for_trial.php` |
+| `fin_financial_periods` | 17 | 3 | `C:/wamp64/www/ems/database/migrations/2027_03_02_fiscal_calendar_extend_next_year.php` · `C:/wamp64/www/ems/database/migrations/2027_04_25_open_period_2026_06_for_trial.php` · `C:/wamp64/www/ems/Finance/periods_fin.php` |
 | `scr_monthly_close` | 2 | 0 | — |
-| `fin_closing_items` | 2 | 0 | — |
+| `fin_closing_items` | 2 | 1 | `C:/wamp64/www/ems/Finance/periods_fin.php` |
+
+## دفترُ القيد
+
+| المسار | قرّاء | كتّاب | الكتّابُ بأسمائِهم |
+|---|---:|---:|---|
+| `fin_journal_entries` | 21 | 9 | `C:/wamp64/www/ems/app/Services/Finance/PostingService.php` · `C:/wamp64/www/ems/app/Services/Governance/GovernanceM14Service.php` · `C:/wamp64/www/ems/database/migrations/2027_02_04_restore_lost_check_constraints.php` · `C:/wamp64/www/ems/database/migrations/2027_04_30_purge_reversal_chain_artifacts.php` · `C:/wamp64/www/ems/database/seeds/uat0001/07_financial_cycle.php` · `C:/wamp64/www/ems/database/seeds/uat0001/08_settlements_payroll.php` …+3 |
+| `fin_journal_lines` | 13 | 5 | `C:/wamp64/www/ems/app/Services/Finance/PostingService.php` · `C:/wamp64/www/ems/database/migrations/2027_04_30_purge_reversal_chain_artifacts.php` · `C:/wamp64/www/ems/Finance/fin_helpers.php` · `C:/wamp64/www/ems/Finance/journal_form_fin.php` · `C:/wamp64/www/ems/includes/fx.php` |
 

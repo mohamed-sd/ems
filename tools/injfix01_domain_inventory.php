@@ -44,6 +44,11 @@ $DOMAINS = array(
         'nav_items', 'nav_canonical', 'nav_canonical_current', 'link_groups', 'nav_route_group')),
     'closing'     => array('label' => 'الإقفال',   'paths' => array(
         'fin_financial_periods', 'scr_monthly_close', 'fin_closing_items')),
+    /* ◆ **دفترُ القيدِ ليس مجالَ توحيدٍ سابعًا** — بل أخطرُ جدولٍ في النظام،
+         وGAP-27 يطلب له **كاتبًا واحدًا معتمَدًا وفحصًا يُرسِّب عندَ ظهورِ رابع**.
+         فيُجرَد هنا بالأداةِ نفسِها لا بأداةٍ ثانيةٍ لغرضٍ واحد. */
+    'journal'     => array('label' => 'دفترُ القيد', 'paths' => array(
+        'fin_journal_entries', 'fin_journal_lines')),
 );
 
 /* ══ وجودُ المسارِ يُقاس قبلَ عدِّ قرّائه ═════════════════════════════════════
@@ -99,13 +104,23 @@ foreach ($DOMAINS as $key => $d) {
             continue;
         }
         $readers = array(); $writers = array();
-        $rx = '/(INSERT\s+INTO|UPDATE|DELETE\s+FROM|REPLACE\s+INTO)\s+`?' . preg_quote($t, '/') . '`?\b/i';
+        /* ══ الكاتبُ بوجهَيه — والاكتفاءُ بأحدِهما يُنقص الجردَ صامتًا ═══════
+           ◆ **خطأٌ وقع في أولِ جردٍ وصُحِّح**: كان الكشفُ يطابق **SQL الخام**
+             وحدَه (`INSERT INTO x`). و`TenantGate` تكتب بنداءٍ لا بعبارة:
+             `$g->insert('fin_journal_entries', …)`. فـ`PostingService` —
+             **الكاتبُ المعتمَدُ لأخطرِ جدولٍ في النظام** — لم يظهر كاتبًا
+             إطلاقًا، وظهر بدلَه هجراتٌ وبذور.
+           ◆ **وأثرُ ذلك أن كلَّ عددِ كتّابٍ في المصفوفةِ كان ناقصًا** — وجردٌ
+             ناقصٌ للكتّابِ يجعل التقاعدَ يبدو أسهلَ مما هو، وهو أخطرُ من
+             جردٍ زائد. فيُقاس الوجهان معًا. */
+        $rxSql  = '/(INSERT\s+INTO|UPDATE|DELETE\s+FROM|REPLACE\s+INTO)\s+`?' . preg_quote($t, '/') . '`?\b/i';
+        $rxGate = '/->\s*(insert|update|delete|upsert|replace)\s*\(\s*[\'"]' . preg_quote($t, '/') . '[\'"]/i';
         foreach ($files as $p) {
             $src = @file_get_contents($p);
             if ($src === false || stripos($src, $t) === false) { continue; }
             $rel = str_replace($ROOT . '/', '', $p);
             $readers[] = $rel;
-            if (preg_match($rx, $src)) { $writers[] = $rel; }
+            if (preg_match($rxSql, $src) || preg_match($rxGate, $src)) { $writers[] = $rel; }
         }
         $nR = count($readers); $nW = count($writers);
         printf("  %-30s قرّاء=%-4s كتّاب=%-3s %s\n", $t, $nR, $nW,
