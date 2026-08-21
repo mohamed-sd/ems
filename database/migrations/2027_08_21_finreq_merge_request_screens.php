@@ -35,7 +35,7 @@
  *   المدموجة — لا دورَ يرى ما لم يكن يراه، ولا فعلَ يُضاف.
  *
  * ◆ **الرجوعُ يقرأ لقطةً لا يخمّن**: كلُّ ما تُغيّره الهجرةُ يُلتقط قبلَ
- *   التغييرِ في `storage/finreq/merge_20260821_state.json`، و`--revert` يستعيد
+ *   التغييرِ في `storage/backups/finreq_merge_20260821/state.json`، و`--revert` يستعيد
  *   منها حرفًا. فلا يُحذف صفٌّ لم تُنشئه ولا يُنزع منحٌ لم تمنحه.
  *
  * التشغيل:  php database/migrations/2027_08_21_finreq_merge_request_screens.php
@@ -403,6 +403,6 @@ printf("الشاهد · ممنوحٌ بلا رابطٍ حيّ    : %d (يُعل�
 $bad = ($liveGone !== 0) + ($canonGone !== 0) + ($dupe !== 0) + ($ghost !== 0);
 echo "───────────────────────────────────────────────────────────────────\n";
 echo ($bad === 0 ? "✔ اكتمل" : "✘ اكتمل بـ{$bad} شاهدًا مخالفًا")
-   . " · اللقطة: storage/finreq/merge_20260821_state.json\n";
+   . " · اللقطة: storage/backups/finreq_merge_20260821/state.json\n";
 echo "  ثم: php database/migrate.php dump-schema\n";
 exit($bad === 0 ? 0 : 1);

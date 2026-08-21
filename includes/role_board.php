@@ -54,21 +54,22 @@ function roleBoardRoute($roleId, $parentRoleId = null)
         16 => 'Procurement/dashboard_proc.php',
         23 => 'Transport/transfer_dashboard.php',
         26 => 'Financing/financing_board.php',   // FIN-26 — لوحة إدارة التمويل (الشاشة 214)
-        // التشغيلُ والموردون والأسطولُ والمواردُ البشريةُ والمبيعات: لوحتُها
-        // هي «الرئيسية» نفسُها (قرار المالك 2026-08-21) — المكوّناتُ السبعةُ
-        // مُدمَجةٌ في main/dashboard.php بلغةِ تصميمِها بدل شاشةٍ ثانية.
-        // والرجوعُ بسطرٍ واحدٍ لكلِّ دور. ولا شيءَ في العرضِ يخصُّ دورًا بعينه:
-        // القالبُ يقرأ إعدادَ الدورِ من roleBoardGenericConfig، فإضافةُ دورٍ
-        // سطرٌ واحدٌ هنا.
-        1  => 'main/dashboard.php',
-        2  => 'main/dashboard.php',
-        3  => 'main/dashboard.php',
-        4  => 'main/dashboard.php',
-        12 => 'main/dashboard.php',
-        // الباقون على اللوحة العامة الواحدة (تصيَّر من إعداد الدور)
-        24 => 'main/role_board.php',
-        5  => 'main/role_board.php',
-        6  => 'main/role_board.php', 15 => 'main/role_board.php',
+        // ── كلُّ صاحبِ لوحةٍ عامةٍ لوحتُه «الرئيسية» نفسُها ──────────────────
+        // قرارُ المالك 2026-08-21 (نُفِّذ دورًا بعد دورٍ حتى اكتمل): المكوّناتُ
+        // السبعةُ تُصيَّر داخلَ main/dashboard.php بلغةِ تصميمِها بدل شاشةٍ
+        // ثانية. ولا شيءَ في العرضِ يخصُّ دورًا بعينه — القالبُ يقرأ إعدادَ
+        // الدورِ من roleBoardGenericConfig — فالرجوعُ لأيِّ دورٍ سطرٌ واحد.
+        // (اللوحاتُ المخصصةُ أعلاه ليست من هذا: بُنيت شاشاتٍ قائمةً بذاتها
+        //  ولا إعدادَ عامًّا لها، فتبقى حيث هي.)
+        1  => 'main/dashboard.php',   // ادارة التشغيل
+        2  => 'main/dashboard.php',   // ادارة الموردين
+        3  => 'main/dashboard.php',   // ادارة الاسطول
+        4  => 'main/dashboard.php',   // ادارة الموارد البشرية
+        5  => 'main/dashboard.php',   // إدارة الموقع (القديم — مدمج في 6)
+        6  => 'main/dashboard.php',   // إدارة الموقع / الحركة والتشغيل
+        12 => 'main/dashboard.php',   // ادارة المبيعات
+        15 => 'main/dashboard.php',   // إدارة الصلاحيات
+        24 => 'main/dashboard.php',   // إدارة البلاغات (ابنُ 1 — ومدخلُه الصريحُ يسبق وراثةَ أبيه)
     );
     $rid = intval($roleId);
     if (isset($map[$rid])) { return $map[$rid]; }

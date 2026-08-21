@@ -1,0 +1,27 @@
+# ═══════════════════════════════════════════════════════════════════════════
+# EMS REST API — توجيه كل الطلبات إلى index.php + تمرير ترويسة Authorization
+# ═══════════════════════════════════════════════════════════════════════════
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /ems/api/
+
+    # تمرير ترويسة Authorization إلى PHP (بعض إعدادات Apache تحذفها).
+    RewriteCond %{HTTP:Authorization} ^(.+)$
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # وجّه أي مسار غير ملف/مجلد فعلي إلى المتحكّم الأمامي.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [QSA,L]
+</IfModule>
+
+# احتياط إضافي لتمرير Authorization عبر CGI/FastCGI.
+<IfModule mod_setenvif.c>
+    SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+</IfModule>
+
+# اسمح بالوصول لمجلد الـ API (الجذر يمنع فهرسة المجلدات).
+<IfModule mod_authz_core.c>
+    Require all granted
+</IfModule>
