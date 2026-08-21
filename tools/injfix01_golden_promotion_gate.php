@@ -88,7 +88,22 @@ foreach ($rows as $r) {
     $res['G1_EXISTS']    = is_file($abs);
     /* صفرُ الفقد: الشاشةُ ما تزال مسجَّلةً في السجلِّ الموحَّد */
     $res['G2_ZERO_LOSS'] = isset($reg[$base]);
+    /* ◆ **والوصولُ لا يعني رابطَ سايدبارٍ دائمًا**: بطاقةُ الكيانِ تُفتح من
+     *   سجلِّها، ولوحةُ التبويبِ من مكوِّنِها. فطلبُ رابطٍ مباشرٍ يُرسِّب سطحًا
+     *   ابنًا **بلوغُه سليم**. ⇒ الوصولُ: رابطٌ نشطٌ **أو** سطحٌ حيٌّ يربطه. */
     $res['G3_REACHABLE'] = isset($navRoutes[$base]);
+    if (!$res['G3_REACHABLE']) {
+        foreach (array('Suppliers', 'Operations', 'main', 'Portal', 'includes', 'Contracts',
+                       'Finance', 'Risk', 'Timesheet', 'Maintenance') as $d) {
+            if (!is_dir($ROOT . '/' . $d)) { continue; }
+            foreach (glob($ROOT . '/' . $d . '/*.php') as $cand) {
+                if (mb_strtolower(basename($cand)) === $base) { continue; }   /* لا يربط نفسَه */
+                if (strpos((string) @file_get_contents($cand), basename($rel)) !== false) {
+                    $res['G3_REACHABLE'] = true; break 2;
+                }
+            }
+        }
+    }
     /* ◆ **الأمنُ يُقاس بحارسِ النظامِ لا بقائمةٍ خمّنتُها**: أولُ صياغةٍ طلبت
      *   `check_permission` وأخواتِها **فرسبت العشرُ كلُّها** — والعشرُ محروسةٌ
      *   فعلًا بـ`enforce_current_page_view_permission` و`check_page_permissions`

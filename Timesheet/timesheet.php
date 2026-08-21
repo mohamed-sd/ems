@@ -8,6 +8,16 @@ if (!isset($_SESSION['user'])) {
 }
 include '../config.php';
 
+/* ── INJ-FIX-01 · GAP-23 و GAP-11 — الإنفاذُ بالنقطةِ الواحدة ─────────────
+   ◆ كانت الشاشةُ تحرس الجلسةَ ثم **تقارن الدورَ يدويًّا** ولا تنادي نقطةَ
+     القرارِ المركزية — فمن بلغها بمسارٍ مباشرٍ لم يمرَّ بحارسِ صلاحية.
+   ◆ **وقِيس قبلَ الإضافة**: كلُّ دورٍ يراها في السايدبارِ له `can_view` فعلًا
+     ⇒ **صفرُ مستخدمٍ يفقد وصولًا مشروعًا**، والمغلَقُ هو البابُ الخلفيُّ وحدَه. */
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
+
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
 $company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;

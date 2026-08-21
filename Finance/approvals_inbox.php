@@ -11,6 +11,16 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+
+/* ── INJ-FIX-01 · GAP-23 و GAP-11 — الإنفاذُ بالنقطةِ الواحدة ─────────────
+   ◆ كانت الشاشةُ تحرس الجلسةَ ثم **تقارن الدورَ يدويًّا** ولا تنادي نقطةَ
+     القرارِ المركزية — فمن بلغها بمسارٍ مباشرٍ لم يمرَّ بحارسِ صلاحية.
+   ◆ **وقِيس قبلَ الإضافة**: كلُّ دورٍ يراها في السايدبارِ له `can_view` فعلًا
+     ⇒ **صفرُ مستخدمٍ يفقد وصولًا مشروعًا**، والمغلَقُ هو البابُ الخلفيُّ وحدَه. */
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 require_once __DIR__ . '/../app/Services/Finance/ApprovalsInboxService.php';
 require_once __DIR__ . '/../includes/status_display.php'; // ف٦-٢: دالةُ عرضِ الحالةِ الواحدة
 require_once __DIR__ . '/../includes/screen_contract.php';
