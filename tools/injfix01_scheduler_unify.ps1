@@ -96,20 +96,35 @@ Get-ScheduledTask | Where-Object { $_.TaskName -match '^EMS' } | ForEach-Object 
     }
 }
 
-# ── ③ المهمةُ الناقصة ──────────────────────────────────────────────────────
-$missing = 'EMS_cron_proc_replenish'
-$exists  = Get-ScheduledTask -TaskName $missing -ErrorAction SilentlyContinue
-if ($exists) {
-    Write-Output "  ✔ $missing: مجدولةٌ سلفًا"
-} elseif ($WhatIf) {
-    Write-Output "  ◆ [WhatIf] تُجدوَل: $missing (كلَّ 30 دقيقة)"
-} else {
-    $a = New-ScheduledTaskAction -Execute $Target -Argument "$Root\cron_proc_replenish.php"
-    $t = New-ScheduledTaskTrigger -Once -At (Get-Date) `
-            -RepetitionInterval (New-TimeSpan -Minutes 30) -RepetitionDuration ([TimeSpan]::MaxValue)
-    Register-ScheduledTask -TaskName $missing -Action $a -Trigger $t `
-        -Description 'INJ-FIX-01 §ب③ — تعبئةُ المخزونِ الدوريّة (GAP-17: مهمةٌ كانت على القرصِ بلا جدولة)' | Out-Null
-    Write-Output "  ✔ $missing: جُدولت كلَّ 30 دقيقة"
+# ── ③ المهامُّ الناقصة ─────────────────────────────────────────────────────
+# ◆ **والنسخةُ اليوميةُ منها**: الحاجزُ ④ أثبت أن `ops01_daily_backup.php` يعمل
+#   وأن الاستعادةَ منه تنجح — **لكنَّ لا مهمةَ مجدولةً تُشغّله**، فالـRPO
+#   المُعلَنُ «≤ 24 ساعة» يبقى قدرةً لا ضمانًا. والقدرةُ المُثبَتةُ بلا جدولةٍ
+#   هي بالضبط ما رفضه المالك: «لا أقبل ‹النسخُ الاحتياطيُّ مفعَّل›».
+$toAdd = @(
+    @{ Name = 'EMS_cron_proc_replenish'
+       Args = "$Root\cron_proc_replenish.php"
+       Every = 30
+       Desc  = 'INJ-FIX-01 §ب③ — تعبئةُ المخزونِ الدوريّة (GAP-17: كانت على القرصِ بلا جدولة)' },
+    @{ Name = 'EMS_daily_backup'
+       Args = "$Root\tools\ops01_daily_backup.php"
+       Every = 1440
+       Desc  = 'INJ-FIX-01 §ب④ — النسخةُ اليوميةُ الكاملة (الاستعادةُ منها مُثبَتةٌ في RESTORE_DRILL.md)' }
+)
+foreach ($m in $toAdd) {
+    $exists = Get-ScheduledTask -TaskName $m.Name -ErrorAction SilentlyContinue
+    if ($exists) {
+        Write-Output "  ✔ $($m.Name): مجدولةٌ سلفًا"
+    } elseif ($WhatIf) {
+        Write-Output "  ◆ [WhatIf] تُجدوَل: $($m.Name) (كلَّ $($m.Every) دقيقة)"
+    } else {
+        $a = New-ScheduledTaskAction -Execute $Target -Argument $m.Args
+        $t = New-ScheduledTaskTrigger -Once -At (Get-Date) `
+                -RepetitionInterval (New-TimeSpan -Minutes $m.Every) `
+                -RepetitionDuration ([TimeSpan]::MaxValue)
+        Register-ScheduledTask -TaskName $m.Name -Action $a -Trigger $t -Description $m.Desc | Out-Null
+        Write-Output "  ✔ $($m.Name): جُدولت كلَّ $($m.Every) دقيقة"
+    }
 }
 
 Write-Output ''
