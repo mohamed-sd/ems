@@ -515,3 +515,34 @@ function api_sensitive_value(array $ctx, string $code, $value)
                 'api:' . ($ctx['id'] ?? 0), $v['grant_ref'], 'api');
     return $value;
 }
+
+/* ═══ INJ-FIX-01 · GAP-33 — قرارُ ترويسةِ الأصل، دالةً نقيةً تُختبَر ═══════════
+ * ◆ **لماذا دالةٌ لا سطرٌ في الصفحة**: `api/index.php` مُتحكِّمٌ أماميٌّ يُصيَّر
+ *   ولا يُستدعى من فاحص. وفرعُ التضييقِ لو بقي في متنِها **لَشُحن بلا اختبار** —
+ *   وفرعٌ لا يُختبَر فرعٌ لا يُوثَق به.
+ * ◆ **وبلا فقد**: `*` تبقى الافتراضَ ما لم يُعلَن `EMS_API_ALLOWED_ORIGINS`.
+ *   فالتضييقُ قرارُ نشرٍ لا كسرُ عميلٍ قائم.
+ *
+ * @param  string $allowed قائمةُ الأصولِ المُعلَنةِ («*» أو مفصولةٌ بفواصل)
+ * @param  string $origin  ترويسةُ `Origin` الواردة (قد تكون فارغة)
+ * @return string|null     ما يُوضع في `Allow-Origin` — أو `null` فلا ترويسةَ
+ */
+if (!function_exists('api_cors_origin')) {
+    function api_cors_origin($allowed, $origin)
+    {
+        $allowed = trim((string) $allowed);
+        $origin  = trim((string) $origin);
+
+        if ($allowed === '' || $allowed === '*') { return '*'; }
+
+        $list = array();
+        foreach (explode(',', $allowed) as $o) {
+            $o = trim($o);
+            if ($o !== '') { $list[] = $o; }
+        }
+        if (!$list) { return '*'; }                    // إعلانٌ فارغٌ فعليًّا
+
+        if ($origin === '') { return null; }           // نداءٌ بلا أصل — لا ترويسةَ تلزمه
+        return in_array($origin, $list, true) ? $origin : null;
+    }
+}

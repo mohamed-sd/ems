@@ -28,7 +28,7 @@ error_reporting(E_ALL & ~E_DEPRECATED & ~E_WARNING & ~E_NOTICE);
 mb_internal_encoding('UTF-8');
 
 $ROOT = dirname(__DIR__);
-$pass = 0; $fail = 0; $facts = array();
+$okCount = 0; $badCount = 0; $facts = array();
 function ok($c, $l, &$p, &$f, $d = '') { if ($c) { $p++; echo "  ✔ {$l}" . ($d !== '' ? " — {$d}" : '') . "\n"; } else { $f++; echo "  ✘ {$l}" . ($d !== '' ? " — {$d}" : '') . "\n"; } }
 function note($l, $v) { echo "  ◆ {$l}: {$v}\n"; }
 
@@ -53,7 +53,7 @@ function http_probe($url, $headers = array())
 
 $base = 'http://127.0.0.1/ems/api';
 $r = http_probe($base . '/me');
-ok($r['code'] > 0, 'الواجهةُ حيةٌ وتردّ', $pass, $fail, "HTTP {$r['code']}" . ($r['err'] ? " · {$r['err']}" : ''));
+ok($r['code'] > 0, 'الواجهةُ حيةٌ وتردّ', $okCount, $badCount, "HTTP {$r['code']}" . ($r['err'] ? " · {$r['err']}" : ''));
 $facts['live_http'] = $r['code'];
 
 /* ══════════ ② طبقةُ التخويلِ في الخادم — القياسُ من التكوينِ الحيّ ═════════ */
@@ -80,14 +80,44 @@ note('api/.htaccess', $apiGrantAll ? '`Require all granted` — **ينقض ال�
      **ولم يُنقَض**. والنقضُ هنا مقيسٌ لا مُستنتَج. */
 $networkBlocked = $rootRequireLocal && !($allowOverride && $apiGrantAll);
 ok($networkBlocked,
-   'الواجهةُ محجوبةٌ شبكيًّا بحجبٍ مثبَت (طبقةُ الخادم)', $pass, $fail,
+   'الواجهةُ محجوبةٌ شبكيًّا بحجبٍ مثبَت (طبقةُ الخادم)', $okCount, $badCount,
    $networkBlocked ? 'الجذرُ يمنع ولا ناقضَ له'
                    : 'الجذرُ يمنع بـ`Require local` **و`api/.htaccess` ينقضه بـ`Require all granted`**');
 $facts['network_blocked'] = $networkBlocked;
 
-$corsStar = (bool) preg_match("/Access-Control-Allow-Origin:\s*\*/", (string) @file_get_contents($ROOT . '/api/index.php'));
-note('ترويسةُ الأصل', $corsStar ? '`*` — مفتوحةٌ للجميع (GAP-33)' : 'مضيَّقة');
-$facts['cors_star'] = $corsStar;
+/* ══ ترويسةُ الأصل — GAP-33 · ويُقاس الفرعُ المضيَّقُ لا وجودُ السطرِ فقط ═════
+   ◆ الافتراضُ `*` باقٍ عمدًا (بلا فقدٍ لعميلٍ قائم)، **والتضييقُ قرارُ نشرٍ**
+     بـ`EMS_API_ALLOWED_ORIGINS`. وفرعٌ لا يُختبَر فرعٌ لا يُوثَق به — فيُقاس
+     القرارُ نفسُه بدالتِه النقيّة لا بوجودِ سطرٍ في ملفّ. */
+define('EMS_API', 1);
+require_once $ROOT . '/includes/env.php';
+require_once $ROOT . '/api/bootstrap.php';
+
+$declared = function_exists('ems_env') ? trim((string) ems_env('EMS_API_ALLOWED_ORIGINS', '*')) : '*';
+note('ترويسةُ الأصل المُعلَنة', $declared === '*' || $declared === ''
+     ? '`*` — الافتراضُ المفتوحُ (قرارُ نشرٍ لم يُتخذ بعد)' : $declared);
+$facts['cors_declared'] = $declared;
+
+$corsCases = array(
+    array('*',                          'https://evil.example',      '*',                          'الافتراضُ المفتوحُ باقٍ — لا فقد'),
+    array('',                           'https://x.test',            '*',                          'إعلانٌ فارغٌ = الافتراض'),
+    array('https://app.equipation.sd',  'https://app.equipation.sd', 'https://app.equipation.sd',  'أصلٌ مُعلَنٌ يُردّ'),
+    array('https://app.equipation.sd',  'https://evil.example',      null,                         '**أصلٌ غيرُ مُعلَنٍ ⇒ لا ترويسة**'),
+    array('https://a.test, https://b.test', 'https://b.test',        'https://b.test',             'قائمةٌ بفواصلَ ومسافات'),
+    array('https://a.test',             '',                          null,                         'قائمةٌ مُعلَنةٌ ونداءٌ بلا أصل'),
+);
+$corsBad = array();
+foreach ($corsCases as $cse) {
+    list($al, $orig, $want, $lbl) = $cse;
+    if (api_cors_origin($al, $orig) !== $want) { $corsBad[] = $lbl; }
+}
+ok(count($corsBad) === 0,
+   'قرارُ ترويسةِ الأصلِ مضبوطٌ في ' . count($corsCases) . ' حالة', $okCount, $badCount,
+   count($corsBad) ? 'رسب: ' . implode(' · ', $corsBad) : 'ومنها **رفضُ الأصلِ غيرِ المُعلَن**');
+
+$idxSrc = (string) @file_get_contents($ROOT . '/api/index.php');
+ok(strpos($idxSrc, 'Access-Control-Allow-Credentials') !== false,
+   'وحارسُ «`*` مع توثيقِ الارتباط» موجودٌ — الشرطُ لم يعد بلا حارس', $okCount, $badCount);
 
 /* ══════════ ③ أتُسلِّم بيانًا بلا رمزٍ أو برمزٍ باطل؟ ═══════════════════════ */
 echo "\n── ③ انكشافُ بيانٍ غيرِ مُصادَق ──\n";
@@ -101,9 +131,9 @@ foreach ($cases as $label => $hdrs) {
     $p = http_probe($base . '/me', $hdrs);
     $denied = in_array($p['code'], array(401, 403), true);
     if (!$denied) { $anyLeak = true; }
-    ok($denied, "يُردُّ غيرُ المُصادَق — {$label}", $pass, $fail, "HTTP {$p['code']}");
+    ok($denied, "يُردُّ غيرُ المُصادَق — {$label}", $okCount, $badCount, "HTTP {$p['code']}");
 }
-ok(!$anyLeak, 'صفرُ تسليمِ بيانٍ بلا رمزٍ صحيح', $pass, $fail);
+ok(!$anyLeak, 'صفرُ تسليمِ بيانٍ بلا رمزٍ صحيح', $okCount, $badCount);
 
 /* ══════════ ④ التصنيفُ — بعدَ القياسِ لا قبلَه ═══════════════════════════ */
 echo "\n── ④ التصنيفُ الناتج ──\n";
@@ -119,6 +149,6 @@ note('ما لا يُقاس من هنا', 'أيُمرِّر محيطُ الشبك
 note('البيانُ غيرُ المُصادَق', $anyLeak ? '**يتسرَّب**' : 'لا يتسرَّب (401/403 في الحالاتِ الثلاث)');
 
 echo "───────────────────────────────────────────────────────────────\n";
-echo ($fail === 0 ? "✔" : "✘") . " النتيجة: نجح {$pass} · رسب {$fail}\n";
+echo ($badCount === 0 ? "✔" : "✘") . " النتيجة: نجح {$okCount} · رسب {$badCount}\n";
 echo "◆ والرسوبُ هنا **قياسٌ لا عطبُ فاحص**: يعني أن الحجبَ غيرُ مثبَت.\n";
-exit($fail === 0 ? 0 : 1);
+exit($badCount === 0 ? 0 : 1);

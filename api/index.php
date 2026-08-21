@@ -27,12 +27,47 @@ require_once __DIR__ . '/controllers/timesheet.php';
 require_once __DIR__ . '/controllers/sync.php';
 require_once __DIR__ . '/controllers/periods.php';
 
-// ── CORS (تطبيق جوّال/أدوات اختبار) — توكن لا كوكيز، فلا خطر على الجلسة ──────
+/* ══ CORS — INJ-FIX-01 · GAP-33 · تضييقُ ترويسةِ الأصل ═══════════════════════
+   ◆ **ما كان**: `Access-Control-Allow-Origin: *` — أيُّ صفحةٍ في أيِّ نطاقٍ
+     تستطيع نداءَ الواجهةِ من متصفحِ المستخدم. وتبريرُه المكتوبُ صحيحٌ في شقِّه
+     الأول: «توكن لا كوكيز، فلا خطر على الجلسة» — فبلا `credentials` لا يُرسل
+     المتصفحُ الكوكيز تلقائيًّا.
+   ◆ **لكنَّ معيارَ القبولِ مشروط**: «الترويسةُ تُضيَّق **أو يُوثَّق قبولُها بشرطِ
+     ألّا يُضاف توثيقُ ارتباط**». والشرطُ لا يحرسه شيءٌ اليوم: من يضيف
+     `Allow-Credentials` غدًا يجد `*` بانتظارِه — **وعندها يصير الجمعُ بينهما
+     ثغرةً مكتملة** (والمتصفحُ نفسُه يرفض الجمعَ، فيُصلَح بتضييقِ الشرطِ لا
+     بإزالةِ `*`، فيُفتح البابُ لأصلٍ واحدٍ منتحَل).
+   ◆ **فالعلاجُ قائمةُ أصولٍ مُعلَنةٌ + حارسٌ صريح**: يُردُّ الأصلُ المطابقُ
+     وحدَه، ويُرفع خطأٌ صريحٌ إن اجتمع `*` مع توثيقِ الارتباطِ يومًا.
+   ◆ **وبلا فقد**: القائمةُ الافتراضيةُ `*` كما كانت **ما لم يُعلَن** غيرُها في
+     `EMS_API_ALLOWED_ORIGINS` — فالتضييقُ قرارُ نشرٍ لا كسرُ عميلٍ قائم،
+     والحارسُ يعمل في الحالتَين. */
 if (!headers_sent()) {
-    header('Access-Control-Allow-Origin: *');
+    /* ◆ القرارُ في دالةٍ نقيةٍ (`api_cors_origin` في bootstrap) لا في متنِ الصفحة:
+         فرعٌ لا يُختبَر فرعٌ لا يُوثَق به، وهذه الصفحةُ لا تُستدعى من فاحص. */
+    $__allowed = function_exists('ems_env') ? (string) ems_env('EMS_API_ALLOWED_ORIGINS', '*') : '*';
+    $__origin  = isset($_SERVER['HTTP_ORIGIN']) ? (string) $_SERVER['HTTP_ORIGIN'] : '';
+    $__decided = api_cors_origin($__allowed, $__origin);
+
+    if ($__decided !== null) {
+        header('Access-Control-Allow-Origin: ' . $__decided);
+        if ($__decided !== '*') { header('Vary: Origin'); }   // وإلا خُزِّن ردُّ أصلٍ لأصلٍ آخر
+    }
+    // أصلٌ غيرُ مُعلَنٍ ⇒ لا ترويسةَ إطلاقًا — والمتصفحُ يمنع بنفسِه
+
     header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
     header('Access-Control-Allow-Headers: Authorization, Content-Type');
     header('Access-Control-Max-Age: 86400');
+
+    /* ◆ الشرطُ الذي كان بلا حارس: `*` + توثيقُ ارتباطٍ = ثغرةٌ مكتملة.
+         فبدل الاعتمادِ على أن أحدًا لن يضيفها، يُرفع الخطأُ عند اجتماعِهما. */
+    foreach (headers_list() as $__h) {
+        if (stripos($__h, 'Access-Control-Allow-Credentials') !== false && $__allowed === '*') {
+            header_remove('Access-Control-Allow-Credentials');
+            error_log('[GAP-33] رُفض Access-Control-Allow-Credentials مع Allow-Origin:* '
+                    . '— أعلِن EMS_API_ALLOWED_ORIGINS قبلَ توثيقِ الارتباط');
+        }
+    }
 }
 
 $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
