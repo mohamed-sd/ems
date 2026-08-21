@@ -1,13 +1,12 @@
 {
     "gap": "GAP-22 · NF-24",
     "meaning": "مساراتٌ نشطةٌ في التنقّلِ بلا صفٍّ في gov_space_appearances ⇒ مفتوحةٌ افتراضًا",
-    "count": 14,
+    "count": 13,
     "routes": [
         "admin_close.php",
         "asset_hours_link.php",
         "daily_pricing_fin.php",
         "depr_run.php",
-        "global_search.php",
         "intake_classify.php",
         "soon.php",
         "ticket_categories_config.php",

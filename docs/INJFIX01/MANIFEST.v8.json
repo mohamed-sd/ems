@@ -131,5 +131,13 @@
         "INVARIANT_GATED": "tests\/injfix01_scheduler_parity_proof.php ③: صفرُ عتبةٍ ≤ دوريتِها",
         "LATENT_FRAGILITY_DECLARED": "JobScheduleService::isDue() مطابقةٌ لحظيّةٌ للدقيقةِ الحاليةِ بلا استدراك — أيُّ إعادةِ تشغيلٍ تتجاوز الدقيقةَ تُسقط نافذةَ اليومِ صامتةً. وسببُ تأخُّرِ اليوم **انقطاعُ العاملِ على جهازِ تطوير** لا عطبُ الشفرة (قِيس من توزُّعِ ساعاتِ التشغيل). والاستدراكُ تغييرُ سلوكِ جدولةٍ حيّ ⇒ يُعلَن ولا يُنفَّذ",
         "STILL_BLOCKED": "4 مهامَّ على 3 إصداراتِ PHP غيرِ الأساس · وcron_proc_replenish.php غيرُ مجدول — كلاهما يحتاج Set-ScheduledTask"
+    },
+    "GAP_28_TOPBAR": {
+        "status": "CLOSED — صفرُ مسارٍ مصيَّرٍ خارجَ السجلِّ أو الإعفاءِ المُعلَن",
+        "measured_scope": "◆ المقامُ **عشرةٌ لا تسعة**: الفاحصُ يقرأ includes\/topbar.php نفسَه لا قائمةً منسوخة، فأخرج main\/global_search.php وهو خارجُ السجلِّ ولم يكن في «التسعة» المُعلَنة",
+        "composition": "5 كانت داخلَ السجلِّ سلفًا · 3 أُدخلت PERSONAL_SPACE في 18 مساحةً لكلٍّ (main\/profile · user_capacities · main\/global_search) · 2 إعفاءٌ مُعلَنٌ بسببِه (logout.php إنهاءُ جلسةٍ لا شاشة · chats\/get_unread_count.php نقطةُ عدٍّ لا تُصيَّر)",
+        "migration": "database\/migrations\/2027_09_04_topbar_routes_into_registry.php — رجوعٌ مُثبَت (888 ⇐ 888)",
+        "proof": "tests\/injfix01_topbar_registry_proof.php — 4\/4 · ويفحص الإعفاءَ المتقادمَ أيضًا",
+        "side_effect": "NF-24 انخفض 14 ⇐ 13 والسقّاطةُ طلبت الشدَّ فشُدَّت"
     }
 }
