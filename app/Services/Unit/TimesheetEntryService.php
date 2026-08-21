@@ -38,6 +38,7 @@
 namespace App\Services\Unit;
 
 require_once __DIR__ . '/../../../includes/catch_log.php';
+require_once __DIR__ . '/../../../includes/unit_chain_helpers.php';
 
 require_once __DIR__ . '/CapacityGuard.php';
 require_once __DIR__ . '/DocumentGuard.php';
@@ -424,6 +425,27 @@ class TimesheetEntryService
             return array('ok' => false, 'code' => 422, 'reasons' => array("مرحلةٌ غير معروفة: {$stage}"));
         }
 
+        /* ══ وصلُ السلّم — INJ-CHAIN-CLOSE-01 · GAP-01 ═══════════════════════
+         * ◆ **الفرقُ الذي أُغلق هنا**: كانت الآلةُ تفرض **ترتيبَ الحالات** ولا
+         *   تقرأ **السلّمَ** — فبقي «مَن يملك الخطوة» و«لا يدَ تمشي خطوتَين»
+         *   غيرَ منفَّذَين، وبقي `ladder_wired = 0` في أربعَ عشرةَ رحلة.
+         * ◆ **ولا تُكتب جهةٌ هنا**: تُحَلُّ من `gov_ladder_steps` وجسرِ الأدوار.
+         * ◆ **والنمطُ يحكم الأثر**: `monitor` يُسجِّل ولا يمنع (الافتراض)،
+         *   و`enforce` يمنع بـ422. فقلبُ المنعِ قرارٌ بعدَ إثباتِ صفرِ خرق —
+         *   ولا يُوقَف مسارٌ حيٌّ بلا علم.
+         * ◆ ويُتجاوَز في المرآةِ التاريخية (`publish_events=false`) لأنها
+         *   **تسجيلُ ما وقع** لا اتخاذُ قرارٍ جديد. */
+        if (!isset($opts['skip_ladder']) || !$opts['skip_ladder']) {
+            $ladderRes = \ems_uc_ladder_check($conn, $companyId, $entryId, $round, $stage, (int) $actor);
+            if (!$ladderRes['ok']) {
+                \ems_uc_ladder_log($conn, $companyId, $entryId, $stage, (int) $actor, $ladderRes);
+                if ($ladderRes['mode'] === 'enforce') {
+                    return array('ok' => false, 'code' => 422,
+                                 'reasons' => $ladderRes['reasons'], 'ladder' => $ladderRes['ladder']);
+                }
+            }
+        }
+
         $note = isset($opts['note']) ? mb_substr(trim((string) $opts['note']), 0, 200) : null;
         $newState = $state;
 
@@ -716,7 +738,7 @@ class TimesheetEntryService
             $who = (int) $lv['approved_by'] ?: (int) $actor;
             $last = self::approve($conn, $gate, (int) $e['company_id'], (int) $e['id'],
                 self::LEGACY_LEVEL_STAGE[$l], $who,
-                array('enforce_capacity' => false, 'publish_events' => false,
+                array('enforce_capacity' => false, 'publish_events' => false, 'skip_ladder' => true,
                       'note' => 'مرآةُ اعتماد المسار الحي L' . $l));
         }
         return $last;

@@ -122,3 +122,157 @@ function ems_uc_notify_once(mysqli $conn, $companyId, $userId, $title, $link)
          VALUES ({$companyId}, 'all', {$userId}, '{$t}', '{$l}', 0, NOW())");
     return true;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * وصلُ السلّم بسلسلةِ الوحدات — INJ-CHAIN-CLOSE-01 · GAP-01
+ * ───────────────────────────────────────────────────────────────────────────
+ * ◆ **العطبُ الذي يعالجه**: `gov_journey_ladders.ladder_wired = 0` في أربعَ
+ *   عشرةَ رحلةٍ من أربعَ عشرة. والفاحصُ القديمُ أثبت أن كلَّ رحلةٍ **تجد**
+ *   سلّمًا نشطًا — ولم يُثبت أن الشاشةَ القائدةَ **تقرؤه عند التنفيذ**.
+ *   فبقي ترتيبُ الخطواتِ و«لا يدَ تمشي خطوتَين» **غيرَ منفَّذَين**.
+ *
+ * ◆ **ولا تُكتب جهةُ اعتمادٍ هنا**: تُقرأ من `gov_ladder_steps` مجسورةً
+ *   بـ`gov_ladder_actor_roles` — «الجهةُ تُحَلُّ من المحرك وقتَ التنفيذ».
+ *   وأيُّ تعديلٍ في السلّم يقع في المحرك لا في هذا الملف.
+ *
+ * ◆ **وثلاثةُ أنماطٍ كنمطِ البيت** (`EMS_UNIT_LADDER`):
+ *     off      — لا يُقرأ السلّمُ أصلًا (للرجوعِ الفوريِّ عند عطل)
+ *     monitor  — يُقرأ ويُسجَّل كلُّ خرقٍ في `guard_denials` **ولا يُمنع** (الافتراض)
+ *     enforce  — يُمنع الخرقُ برمزٍ 422
+ *   والافتراضُ `monitor` لأن القلبَ إلى المنعِ **تغييرُ وصولٍ حيّ** يوقف
+ *   مساراتٍ تعمل — ويُقلَب بقرارٍ بعدَ أن يُثبت القياسُ صفرَ خرق.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+/** مرحلةُ السلسلة ⇐ رمزُ السلّم الحاكم. مصدرُه وثيقةُ إغلاقِ سلسلةِ الأثر. */
+function ems_uc_stage_ladder($stage)
+{
+    $map = array(
+        'site'       => 'LD-01',   // الاعتمادُ اليوميُّ لرفعِ الوحدات
+        'sales'      => 'LD-02',   // مطابقةُ العميلِ وبوابةُ اعتمادِ المبيعات
+        'supplier'   => 'LD-03',   // اعتمادُ وحداتِ الموردين
+        'operator'   => 'LD-04',   // اعتمادُ وحداتِ المشغّلين
+        'supervisor' => 'LD-04',   // المشرفُ طرفٌ في السلّمِ نفسِه
+        'fleet'      => 'LD-03',   // الأسطولُ يشهد على المعدةِ في سلّمِ التغطية
+        'finance'    => 'LD-05',   // الاعتمادُ الماليُّ الأوّليّ — بوابةُ المالية
+    );
+    return isset($map[$stage]) ? $map[$stage] : null;
+}
+
+/** نمطُ إنفاذِ وصلِ السلّم: off | monitor | enforce. */
+function ems_uc_ladder_mode()
+{
+    $m = function_exists('ems_env') ? strtolower((string) ems_env('EMS_UNIT_LADDER', 'monitor')) : 'monitor';
+    return in_array($m, array('off', 'monitor', 'enforce'), true) ? $m : 'monitor';
+}
+
+/**
+ * خطواتُ السلّمِ بأدوارِها — تُقرأ من المحرك، ولا تُكتب هنا.
+ * @return array صفوفُ [step_no, actor_code, step_kind, may_approve, roles[]]
+ */
+function ems_uc_ladder_steps(mysqli $conn, $ladderCode)
+{
+    static $cache = array();
+    if (isset($cache[$ladderCode])) { return $cache[$ladderCode]; }
+    $out = array();
+    $st = $conn->prepare(
+        "SELECT s.step_no, s.actor_code, s.step_kind, s.may_approve, s.is_finance_gate,
+                GROUP_CONCAT(DISTINCT r.role_id) AS roles
+           FROM gov_ladder_steps s
+           LEFT JOIN gov_ladder_actor_roles r ON r.actor_code = s.actor_code
+          WHERE s.ladder_code = ?
+          GROUP BY s.step_no, s.actor_code, s.step_kind, s.may_approve, s.is_finance_gate
+          ORDER BY s.step_no");
+    if ($st) {
+        $st->bind_param('s', $ladderCode);
+        $st->execute();
+        $res = $st->get_result();
+        while ($res && $row = $res->fetch_assoc()) {
+            $row['roles'] = array_values(array_filter(array_map('intval',
+                explode(',', (string) $row['roles']))));
+            $out[] = $row;
+        }
+        $st->close();
+    }
+    $cache[$ladderCode] = $out;
+    return $out;
+}
+
+/**
+ * فحصُ السلّمِ لخطوةِ اعتمادٍ واحدة.
+ *
+ * ◆ يفحص ثلاثةً: **وجودَ السلّم** · **أهليةَ الدور** · **لا يدَ تمشي خطوتَين**.
+ * ◆ ويُرجع دائمًا `ladder` و`mode` ليُسجَّلا في الأثر — فالسلّمُ المقروءُ
+ *   يُثبَت بالسجلِّ لا بالادّعاء.
+ */
+function ems_uc_ladder_check(mysqli $conn, $companyId, $entryId, $round, $stage, $actorId, $actorRole = null)
+{
+    $mode = ems_uc_ladder_mode();
+    $ladder = ems_uc_stage_ladder($stage);
+    $res = array('ok' => true, 'mode' => $mode, 'ladder' => $ladder, 'reasons' => array(), 'step' => null);
+    if ($mode === 'off' || $ladder === null) { return $res; }
+
+    $steps = ems_uc_ladder_steps($conn, $ladder);
+    if (!$steps) {
+        $res['ok'] = false;
+        $res['reasons'][] = "السلّمُ {$ladder} بلا خطواتٍ مسجَّلة — ولا يُخترَع سلّمٌ عند التنفيذ";
+        return $res;
+    }
+
+    /* خطوةُ الاعتماد: آخرُ خطوةٍ may_approve — «الإعدادُ لا يُنشئ اعتمادًا» */
+    $approveStep = null;
+    foreach ($steps as $s) { if ((int) $s['may_approve'] === 1) { $approveStep = $s; } }
+    if ($approveStep === null) {
+        $res['ok'] = false;
+        $res['reasons'][] = "السلّمُ {$ladder} بلا خطوةِ اعتمادٍ مميَّزة (may_approve)";
+        return $res;
+    }
+    $res['step'] = (int) $approveStep['step_no'];
+
+    /* ① أهليةُ الدور — الجهةُ تُحَلُّ من المحرك لا تُكتب هنا */
+    if ($actorRole === null) {
+        $st = $conn->prepare("SELECT role_id FROM users WHERE id = ? LIMIT 1");
+        if ($st) { $st->bind_param('i', $actorId); $st->execute(); $st->bind_result($rr);
+                   if ($st->fetch()) { $actorRole = (int) $rr; } $st->close(); }
+    }
+    $roles = $approveStep['roles'];
+    if ($roles && $actorRole !== null && !in_array((int) $actorRole, $roles, true)) {
+        $res['ok'] = false;
+        $res['reasons'][] = "الدورُ {$actorRole} ليس صاحبَ خطوةِ الاعتمادِ في {$ladder}"
+                          . " (`{$approveStep['actor_code']}` ⇐ " . implode('،', $roles) . ')';
+    }
+
+    /* ② لا يدَ تمشي خطوتَين — في الواقعةِ نفسِها والجولةِ نفسِها */
+    $st = $conn->prepare(
+        "SELECT GROUP_CONCAT(DISTINCT stage) FROM unit_approvals
+          WHERE company_id = ? AND entry_id = ? AND round_no = ? AND actor_id = ? AND stage <> ?");
+    if ($st) {
+        $st->bind_param('iiiis', $companyId, $entryId, $round, $actorId, $stage);
+        $st->execute(); $st->bind_result($prev); $st->fetch(); $st->close();
+        if ($prev !== null && $prev !== '') {
+            $res['ok'] = false;
+            $res['reasons'][] = "**لا يدَ تمشي خطوتَين**: هذا الفاعلُ قرّر سلفًا ({$prev}) في الجولةِ نفسِها";
+        }
+    }
+
+    return $res;
+}
+
+/** يُسجِّل خرقَ السلّمِ في سجلِّ الحرّاس — فالدَّينُ مقيسٌ لا مُخمَّن. */
+function ems_uc_ladder_log(mysqli $conn, $companyId, $entryId, $stage, $actorId, array $res)
+{
+    /* ◆ أعمدةُ `guard_denials` الحيّةُ **تُقرأ من المخطَّطِ لا تُفترض**:
+     *   guard_code · person_id · attempted_ref · reason_code — ولا `mode` فيها،
+     *   فيُحمَل النمطُ داخلَ رمزِ الحارسِ ليبقى مقيسًا. */
+    $reason = mb_substr(implode(' · ', $res['reasons']), 0, 78);
+    $key    = mb_substr('unit_ladder:' . (string) $res['ladder'] . ':' . $stage
+                        . ':' . (string) $res['mode'], 0, 64);
+    $sub    = 'unit_entry:' . (int) $entryId;
+    $st = @$conn->prepare(
+        "INSERT INTO guard_denials (company_id, guard_code, person_id, attempted_ref, reason_code, at)
+         VALUES (?,?,?,?,?,NOW())");
+    if (!$st) { return false; }
+    $st->bind_param('isiss', $companyId, $key, $actorId, $sub, $reason);
+    $ok = $st->execute();
+    $st->close();
+    return $ok;
+}

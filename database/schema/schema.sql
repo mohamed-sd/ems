@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-21 23:58:02
+-- المصدر: equipation_manage · التوليد: 2026-08-22 00:09:43
 -- الجداول: 619 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -15727,6 +15727,46 @@ BEGIN
         SIGNAL SQLSTATE '45000'
           SET MESSAGE_TEXT = 'لا فاتورةَ لمستخلصٍ بلا بنود — أكمِلْ بنودَ المستخلصِ أولًا';
     END IF;
+END;
+
+-- ── Trigger: trg_ue_dup_shield_ins ──
+DROP TRIGGER IF EXISTS `trg_ue_dup_shield_ins`;
+CREATE TRIGGER `trg_ue_dup_shield_ins` BEFORE INSERT ON `unit_entries`
+FOR EACH ROW
+BEGIN
+  IF NEW.entry_date >= '2026-08-05'
+     AND NEW.state NOT IN ('rejected','cancelled','superseded','reversed')
+     AND EXISTS (
+       SELECT 1 FROM unit_entries ue
+        WHERE ue.equipment_id = NEW.equipment_id
+          AND ue.entry_date = NEW.entry_date
+          AND ue.shift <=> NEW.shift
+          AND ue.state NOT IN ('rejected','cancelled','superseded','reversed')
+  ) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ق-18: تكرار (معدة×تاريخ×وردية) مرفوض بنيويًّا على السكة الجديدة';
+  END IF;
+END;
+
+-- ── Trigger: trg_ue_dup_shield_upd ──
+DROP TRIGGER IF EXISTS `trg_ue_dup_shield_upd`;
+CREATE TRIGGER `trg_ue_dup_shield_upd` BEFORE UPDATE ON `unit_entries`
+FOR EACH ROW
+BEGIN
+  IF NEW.entry_date >= '2026-08-05'
+     AND NEW.state NOT IN ('rejected','cancelled','superseded','reversed')
+     AND (NOT (NEW.equipment_id <=> OLD.equipment_id)
+       OR NOT (NEW.entry_date <=> OLD.entry_date)
+       OR NOT (NEW.shift <=> OLD.shift))
+     AND EXISTS (
+       SELECT 1 FROM unit_entries ue
+        WHERE ue.equipment_id = NEW.equipment_id
+          AND ue.entry_date = NEW.entry_date
+          AND ue.shift <=> NEW.shift
+          AND ue.id <> OLD.id
+          AND ue.state NOT IN ('rejected','cancelled','superseded','reversed')
+  ) THEN
+    SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'ق-18: نقل الصف إلى (معدة×تاريخ×وردية) مشغولة مرفوض بنيويًّا';
+  END IF;
 END;
 
 SET FOREIGN_KEY_CHECKS = 1;
