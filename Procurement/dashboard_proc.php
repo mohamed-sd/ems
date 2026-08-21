@@ -28,6 +28,17 @@ if (!$perms['can_view']) {
     exit();
 }
 
+// لوحتان لصاحبٍ واحدٍ لا تجتمعان: بطاقاتُ هذه اللوحةِ وجدولُ «بانتظارِ قطع»
+// صارا يُصيَّران في «الرئيسية» (قرارُ المالك 2026-08-21 — انظر
+// roleBoardGenericConfig(16))، وسجلُّ «القطعِ الحرجة» بابُه `items_proc.php`
+// بأعمدتِه كلِّها. فمَن لوحتُه هناك يُردُّ إليها، والجسدُ أدناه مسارُ رجوع.
+require_once __DIR__ . '/../includes/role_board.php';
+$proc_role = isset($_SESSION['user']['role']) ? intval($_SESSION['user']['role']) : 0;
+if (roleBoardRoute($proc_role, roleBoardConfigRole($g ?? proc_gate($is_super_admin), $proc_role)) === 'main/dashboard.php') {
+    header('Location: ../main/dashboard.php');
+    exit();
+}
+
 // K9-M1: العدّادات عبر البوابة (العزل والحذف الناعم مسؤوليتها؛ العربية بمعاملات محضّرة)
 $g = proc_gate($is_super_admin);
 $k_items    = $g->count('proc_item');

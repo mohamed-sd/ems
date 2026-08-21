@@ -1066,6 +1066,40 @@ body.ems-site .main .shot-ops-kpis .ems-kpi-meta:not(:has(span:not(:empty))) {
   min-width: 0;
 }
 
+/* جزءُ اللوحةِ الخاصُّ (`view`) يمتدُّ على الصفِّ كلِّه: جدولٌ لا صندوقُ قائمة.
+   وهو خارجَ `.shot-ops-grid` فيقف بعرضِ القسمِ كاملًا بلا قواعدَ إضافية. */
+.shot-ops-wide {
+  margin-top: 12px;
+}
+
+.shot-ops-wide .table-container {
+  overflow-x: auto;
+}
+
+.shot-ops-wide table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .84rem;
+}
+
+.shot-ops-wide th,
+.shot-ops-wide td {
+  padding: 7px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--c-cfcfcf);
+  white-space: nowrap;
+}
+
+.shot-ops-wide tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* صفٌّ تجاوز انتظارُه الأسبوع — نغمةُ الخطرِ من رموزِ اللوحةِ نفسِها */
+.ems-site .main .shot-ops-row-late td {
+  background: var(--dash-tone-err-soft, #FEF2F2);
+  color: var(--dash-tone-err-text, #B91C1C);
+}
+
 .shot-ops-box-title {
   display: flex;
   align-items: center;

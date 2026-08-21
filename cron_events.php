@@ -152,6 +152,18 @@ if ($stalled > 0) {
     echo "[events-cron " . date('Y-m-d H:i:s') . "] bus-stall alerts raised: {$stalled}\n";
 }
 
+// ═══ INJ-FIX-01 · GAP-05 — المُعلَنُ يُقارَن بالمُنفَّذ ═══════════════════════
+// `ems_event_subscriptions` كان **سجلًّا بلا قارئٍ في الإنتاج**: يُعلن اشتراكاتٍ
+// نشطةً بمعالجاتٍ موجودةٍ، و`runOnce()` لا يعرفها لأنها ليست في `register()`.
+// فالقراءةُ هنا **حوكمةٌ لا تنفيذ**: تُقارِن وتُنذر بالاسمِ، ولا تُفعِّل معالجًا
+// لم يمرَّ بظلٍّ ولا مقارِن. والتفعيلُ قلبٌ مُدارٌ في الموجة ج لا سطرٌ هنا.
+$unwired = $dispatcher->unwiredSubscriptions();
+if ($unwired) {
+    $raised = $dispatcher->alertUnwiredSubscriptions();
+    echo "[events-cron " . date('Y-m-d H:i:s') . "] bus-unwired: "
+       . count($unwired) . " subscription(s) declared but not registered · alerts={$raised}\n";
+}
+
 // ═══ مصالِح مروحة الأثر (§6.4 · §6.1) — وحدةٌ معتمدةٌ بلا مروحةٍ كاملة ═══
 // نمط المصالِح نفسه: وحدةٌ approved فاتها الخطّاف (انهيارٌ بعد الاعتماد) أو
 // سبقت المحرّك (بياناتٌ قديمة) ⇒ تُفرَّع مروحتها بعطالة المحرّك (fin_event_links).

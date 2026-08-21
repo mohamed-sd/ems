@@ -299,6 +299,82 @@ class EventDispatcher
         return $n;
     }
 
+    /* ══ INJ-FIX-01 · GAP-05 — سجلُّ الاشتراكاتِ يصير مقروءًا في الإنتاج ═══════
+       ◆ **العطبُ المقيس**: `ems_event_subscriptions` يحمل **91 اشتراكًا نشطًا**
+         بمعالجاتٍ موجودةٍ على القرص — **ولا يقرؤه سطرُ إنتاجٍ واحد**. تقرؤه
+         هجرتان وثلاثُ أدواتِ قياس، و`runOnce()` يدور على `$this->handlers`
+         وحدَها (ما سُجِّل بـ`register()` في `cron_events.php`: مستهلكان).
+         ⇐ فالسجلُّ **إعلانُ نيّةٍ لا عقدُ تنفيذ**، والوثيقةُ تصف ما لا يجري.
+       ◆ **ولا تُفعَّل الواحدُ والتسعون تلقائيًّا**: تشغيلُ معالجاتٍ لم تعمل قطُّ
+         على نظامٍ ماليٍّ حيٍّ **دفعةً واحدةً** هو عينُ ما يمنعه بروتوكولُ القلبِ
+         السباعيّ — تفعيلٌ بلا ظلٍّ ولا مقارنٍ ولا معيارِ رجوع.
+       ◆ **فالقراءةُ حوكمةٌ لا تنفيذ**: يُقارَن المُعلَنُ بالمُنفَّذ، وكلُّ اشتراكٍ
+         نشطٍ بلا معالجٍ مسجَّلٍ **يُنذَر عنه بالاسم**. فيصير الفارقُ **مقيسًا
+         ومرئيًّا** بدل أن يكون صمتًا، وتفعيلُه يبقى قلبًا مُدارًا في الموجة ج. */
+
+    /**
+     * اشتراكاتٌ نشطةٌ في السجلِّ بلا معالجٍ مسجَّلٍ في الشيفرة — قراءةٌ محضة.
+     * @return array<int, array{event_code:string, consumer_key:string, handler:string}>
+     */
+    public function unwiredSubscriptions()
+    {
+        $out = array();
+        $res = $this->conn->query(
+            "SELECT `event_code`, `consumer_key`, `handler_class`, `handler_method`
+               FROM `ems_event_subscriptions`
+              WHERE `is_active` = 1
+              ORDER BY `consumer_key`, `event_code`");
+        if (!$res) { return $out; }
+        while ($row = $res->fetch_assoc()) {
+            $key = (string) $row['consumer_key'];
+            if (isset($this->handlers[$key])) { continue; }
+            $out[] = array(
+                'event_code'   => (string) $row['event_code'],
+                'consumer_key' => $key,
+                'handler'      => (string) $row['handler_class'] . '::' . (string) $row['handler_method'],
+            );
+        }
+        return $out;
+    }
+
+    /**
+     * إنذارٌ واحدٌ في الساعةِ لكلِّ مستهلكٍ مُعلَنٍ غيرِ موصول.
+     * ◆ ويُجمَع بالمستهلكِ لا بالحدث: مستهلكٌ واحدٌ لعشرةِ أحداثٍ عطبٌ واحدٌ
+     *   لا عشرة — وإنذارٌ لكلِّ حدثٍ يُغرق القارئَ فيُهمل الجميع.
+     * @return int عددُ الإنذاراتِ المرفوعة
+     */
+    public function alertUnwiredSubscriptions()
+    {
+        $byConsumer = array();
+        foreach ($this->unwiredSubscriptions() as $s) {
+            $byConsumer[$s['consumer_key']]['n'] = isset($byConsumer[$s['consumer_key']]['n'])
+                ? $byConsumer[$s['consumer_key']]['n'] + 1 : 1;
+            $byConsumer[$s['consumer_key']]['handler'] = $s['handler'];
+        }
+        $n = 0;
+        foreach ($byConsumer as $key => $info) {
+            $tag = '[BUS-UNWIRED:' . $key . ']';
+            $dupe = $this->conn->query(
+                "SELECT COUNT(*) FROM `fin_notifications`
+                  WHERE `title` LIKE '" . $this->conn->real_escape_string($tag) . "%'
+                    AND `created_at` > NOW() - INTERVAL 1 HOUR");
+            if ($dupe && (int) $dupe->fetch_row()[0] > 0) { continue; }
+
+            $title = mb_substr(
+                $tag . ' اشتراكٌ نشطٌ بلا معالجٍ مسجَّل — ' . $info['n'] . ' نوعَ حدثٍ '
+                . 'يقودُ إلى «' . $info['handler'] . '» ولا يُنفَّذ. '
+                . 'المُعلَنُ ليس المُنفَّذ.', 0, 195);
+
+            $st = $this->conn->prepare(
+                "INSERT INTO `fin_notifications` (`company_id`,`target_level`,`title`,`link`)
+                 VALUES (1, 'finance_manager', ?, 'admin/bus_monitor.php')");
+            $st->bind_param('s', $title);
+            if ($st->execute()) { $n++; }
+            $st->close();
+        }
+        return $n;
+    }
+
     /** صياغةٌ بشريةٌ للمدة — نسخةُ `JobScheduleService::humanSeconds` نفسِها. */
     private function humanSeconds($sec)
     {

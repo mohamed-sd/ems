@@ -50,7 +50,6 @@ function roleBoardRoute($roleId, $parentRoleId = null)
     $map = array(
         // لوحاتٌ مخصصةٌ قائمة
         13 => 'Maintenance/dashboard_mnt.php',
-        16 => 'Procurement/dashboard_proc.php',
         23 => 'Transport/transfer_dashboard.php',
         26 => 'Financing/financing_board.php',   // FIN-26 — لوحة إدارة التمويل (الشاشة 214)
         // ── كلُّ صاحبِ لوحةٍ عامةٍ لوحتُه «الرئيسية» نفسُها ──────────────────
@@ -68,6 +67,7 @@ function roleBoardRoute($roleId, $parentRoleId = null)
         6  => 'main/dashboard.php',   // إدارة الموقع / الحركة والتشغيل
         12 => 'main/dashboard.php',   // ادارة المبيعات
         15 => 'main/dashboard.php',   // إدارة الصلاحيات
+        16 => 'main/dashboard.php',   // إدارة المشتريات — سبعُ بطاقاتٍ وجدولُ «بانتظار قطع»
         17 => 'main/dashboard.php',   // الإدارة المالية — بطاقاتُها العشرُ منقولةٌ حرفًا، وحارسُ can_view معها
         24 => 'main/dashboard.php',   // إدارة البلاغات (ابنُ 1 — ومدخلُه الصريحُ يسبق وراثةَ أبيه)
     );
@@ -743,6 +743,55 @@ function roleBoardGenericConfig($rid)
             'pulse' => array('نبض الأداء — دخولُ المستخدمين (7 أيام)', array('دخلوا', ''),
                 array('t' => 'users', 'a' => 'u'), "SELECT COUNT(*) FROM users u WHERE {TENANT_SCOPE} AND DATE(u.last_login_at)=?",
                 null, null)),
+        /* ── §8.10 · إدارة المشتريات ───────────────────────────────────────
+           نُقلت لوحتُها من `Procurement/dashboard_proc.php` إلى «الرئيسية»
+           (قرار المالك 2026-08-21). البطاقاتُ السبعُ **بعدّاداتِ البوابةِ
+           نفسِها** (`count` بشروطِها حرفًا) فلا يتبدّل رقمٌ بسببِ نقلِ مكان.
+           ومهامُّها ② من `roleBoardTasks(16)`، وتنبيهاتُها ④ من §8.10.
+           ◆ **وجدولُ «معداتٌ بانتظار قطع» لم يسقط**: استُخرج جزءَ عرضٍ
+             (`view`) يُصيَّر داخلَ اللوحة بمصدرِه نفسِه.
+           ◆ **وجدولُ «القطع الحرجة» لم يُنقَل عمدًا**: هو سجلٌّ لا مؤشر،
+             وأعمدتُه السّتُّ كلُّها قائمةٌ في `items_proc.php` ومعها «قطعة
+             حرجة؟» — فالبطاقةُ تنقر إليه ولا يضيع شيء. */
+        16 => array('title' => 'لوحة إدارة المشتريات', 'icon' => 'fa fa-cart-flatbed',
+            'perm' => 'Procurement/dashboard_proc.php',
+            'view' => 'Procurement/_board_waiting.php',
+            'cards' => array(
+                array('الأصناف', 'fa-boxes-stacked', array('t' => 'proc_item', 'a' => 'i'),
+                    function ($g) { return (float) $g->count('proc_item'); },
+                    '../Procurement/items_proc.php', 'or', array('unit' => 'صنف')),
+
+                array('القطع الحرجة', 'fa-triangle-exclamation', array('t' => 'proc_item', 'a' => 'i'),
+                    function ($g) { return (float) $g->count('proc_item', array('where' => array('is_critical' => 1))); },
+                    '../Procurement/items_proc.php', 'err', array('unit' => 'صنف')),
+
+                array('طلبات شراء مفتوحة', 'fa-file-lines', array('t' => 'proc_request', 'a' => 'r'),
+                    function ($g) { return (float) $g->count('proc_request', array('whereRaw' => 'state NOT IN (?, ?)', 'params' => array('مغلق', 'مرفوض'))); },
+                    '../Procurement/requests_proc.php', 'warn', array('unit' => 'طلب')),
+
+                array('أوامر شراء مؤكَّدة', 'fa-file-invoice-dollar', array('t' => 'proc_order', 'a' => 'o'),
+                    function ($g) { return (float) $g->count('proc_order', array('where' => array('state' => 'مؤكَّد'))); },
+                    '../Procurement/orders_proc.php', 'ok', array('unit' => 'أمر')),
+
+                array('عهد استلام مفتوحة', 'fa-truck-ramp-box', array('t' => 'proc_receipt_custody', 'a' => 'c'),
+                    function ($g) { return (float) $g->count('proc_receipt_custody', array('whereRaw' => 'state <> ?', 'params' => array('مسلَّمة للوجهة'))); },
+                    '../Procurement/receipt_custody_proc.php', 'warn', array('unit' => 'عهدة')),
+
+                array('عمليات الصرف', 'fa-hand-holding-box', array('t' => 'proc_issue', 'a' => 's'),
+                    function ($g) { return (float) $g->count('proc_issue'); },
+                    '../Procurement/issue_proc.php', 'or', array('unit' => 'عملية')),
+
+                array('الموردون التشغيليون', 'fa-truck-field', array('t' => 'proc_supplier', 'a' => 'p'),
+                    function ($g) { return (float) $g->count('proc_supplier'); },
+                    '../Procurement/suppliers_proc.php', 'or', array('unit' => 'مورد')),
+            ),
+            // ② مهامُّ الدورِ منطقُها مكتوبٌ في roleBoardTasks(16) — لا تُكرَّر هنا
+            'tasks' => array(),
+            'pulse' => array('نبض الأداء — طلباتٌ واردة مقابل صرفيات (7 أيام)', array('طلبات واردة', 'صرفيات'),
+                array('t' => 'proc_request', 'a' => 'r'),
+                "SELECT COUNT(*) FROM proc_request r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND DATE(r.created_at)=?",
+                array('t' => 'proc_issue', 'a' => 'i'),
+                "SELECT COUNT(*) FROM proc_issue i WHERE {TENANT_SCOPE} AND COALESCE(i.is_deleted,0)=0 AND DATE(i.created_at)=?")),
         /* ── §8.11 · الإدارة المالية ───────────────────────────────────────
            نُقلت لوحتُها من `Finance/cfo_daily_board_fin.php` إلى «الرئيسية»
            (قرار المالك 2026-08-21). البطاقاتُ العشرُ **منقولةٌ حرفًا**: نفسُ
@@ -757,6 +806,9 @@ function roleBoardGenericConfig($rid)
              مالكٍ مستقلٌّ عن النقل — لأنه يغيّر أرقامًا لا مواضع. */
         17 => array('title' => 'لوحة الإدارة المالية', 'icon' => 'fa fa-building-columns',
             'perm' => 'Finance/cfo_daily_board_fin.php',
+            // «جدولُ القرارِ اليومي» كان في جسدِ الشاشةِ المنقولة — استُخرج
+            // جزءَ عرضٍ فلا يسقط بالنقل (كاد يسقط: أُضيف بعد اكتشافِ سقوطه).
+            'view' => 'Finance/_board_decisions.php',
             'cards' => array(
                 // ① النقد المتاح = افتتاحيُّ البنوك + صافي حركة الكشوف (قراءتان معزولتان تُجمعان)
                 array('النقد المتاح (البنوك)', 'fa-wallet', array('t' => 'fin_bank_accounts', 'a' => 'a'),
@@ -948,6 +1000,9 @@ function roleBoardBuild($conn, $gate, $roleId, $userId)
         // افتراضًا، ولوحةٌ مخصصةٌ لمن نُقلت لوحتُه (المالية). الحارسُ في
         // `main/dashboard.php` — فالتضمينُ لا يُسقط قفلًا كانت الشاشةُ تحمله.
         'perm'         => isset($cfg['perm']) ? $cfg['perm'] : 'main/role_board.php',
+        // جزءُ عرضٍ خاصٌّ باللوحة (اختياري) — لما لا يسعه نحوُ المكوّناتِ السبعة
+        // ولا يجوز فقدُه عند نقلِ لوحةٍ مخصصةٍ إلى «الرئيسية».
+        'view'         => isset($cfg['view']) ? $cfg['view'] : '',
         'cards'        => $cards,
         'tasks'        => $tasks,
         'approvals'    => roleBoardApprovals($conn, $gate, $rid, $badges),

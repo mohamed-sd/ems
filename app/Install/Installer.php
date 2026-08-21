@@ -260,6 +260,40 @@ class Installer
         }
         $this->step('استُورد المخطّط', $this->objectCount() . ' كائنًا');
 
+        /* ══ INJ-FIX-01 · GAP-18/GAP-33 — القوادحُ تُعَدُّ ولا تُفترَض ══════════
+           ◆ **العطبُ الذي يمنعه هذا الفحص**: `schema.sql` يصدّر أربعةً وثلاثين
+             قادحًا، **وحسابُ النشرِ قد لا يملك امتيازَ إنشائِها** حين يعمل
+             السجلُّ الثنائيُّ (`log_bin=ON`) وتكون الثقةُ مطفأة. وعندئذٍ يمرُّ
+             الاستيرادُ **بلا خطأٍ ظاهرٍ في الجداولِ والمناظر** ويسقط القوادحُ
+             وحدَها — فيقوم نظامٌ **بلا حرّاسِ قاعدة** يبدو مكتملًا.
+           ◆ **والحرّاسُ ليسوا زينة**: عدمُ رجعيةِ قراراتِ الإدارةِ التنفيذية ·
+             منعُ مخزونٍ سالب · منعُ تسلسلِ الإنابة · ردُّ الوحدةِ المكرَّرة.
+           ◆ **فالتثبيتُ يقف صراحةً** ولا يُسلِّم نظامًا ناقصَ الحراسة. والرسالةُ
+             تسمّي السببَ والعلاجَ — فمن يقرؤها يعرف ما يطلب من إدارةِ القاعدة. */
+        $wantTriggers = preg_match_all('/^\s*CREATE\s+TRIGGER\s/mi',
+            (string) @file_get_contents($this->schemaDir() . '/schema.sql'));
+        if ($wantTriggers > 0) {
+            $got = 0;
+            $rs = $this->conn->query("SELECT COUNT(*) FROM information_schema.TRIGGERS
+                                       WHERE TRIGGER_SCHEMA = DATABASE()");
+            if ($rs) { $got = (int) $rs->fetch_row()[0]; }
+            if ($got < $wantTriggers) {
+                $hint = '';
+                $v = $this->conn->query("SHOW VARIABLES LIKE 'log_bin'");
+                $vr = $v ? $v->fetch_assoc() : null;
+                if ($vr && strtoupper((string) $vr['Value']) === 'ON') {
+                    $hint = ' والسجلُّ الثنائيُّ يعمل، فإنشاءُ القادحِ يلزمه امتيازٌ '
+                          . '(SUPER أو log_bin_trust_function_creators=1) — امنحه لحسابِ النشرِ '
+                          . 'أو شغِّل طورَ القوادحِ بحسابٍ إداريّ.';
+                }
+                return $this->fail(
+                    "نقصُ حرّاسِ القاعدة: المخطّطُ يُعلن {$wantTriggers} قادحًا وأُنشئ منها {$got}."
+                  . ' ولا يُسلَّم نظامٌ بلا حرّاسِه — فهي تمنع مخزونًا سالبًا وتحفظ عدمَ'
+                  . ' رجعيةِ القرارات.' . $hint);
+            }
+            $this->step('حرّاسُ القاعدة', "{$got}/{$wantTriggers} قادحًا — مُثبَتٌ لا مفترَض");
+        }
+
         // ③ الشركة — تسبق البذرةَ المستأجَرة لأن معرّفَها يُحقن فيها
         $companyId = $this->createCompany();
         if ($companyId <= 0) {

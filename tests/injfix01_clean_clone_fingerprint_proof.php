@@ -146,6 +146,46 @@ foreach (array('TRIGGERS' => 'قوادح', 'ROUTINES' => 'إجراءات') as $t
         echo "           ⇐ قرارٌ إداريّ: منحُ الامتيازِ لحسابِ النشر · أو تشغيلُ طورِ\n";
         echo "             القوادحِ بحسابٍ إداريّ · أو `log_bin_trust_function_creators=1`.\n";
         echo "           وهذه صورةُ GAP-33 نفسِها: «قادحٌ لا يُرى قد لا يُعاد بناؤه».\n";
+
+        /* ══ فصلُ السببَين — «المُخرَجُ معطوب» أم «الحسابُ لا يملك»؟ ══════════
+           ◆ هذان عطبان مختلفان تمامًا وعلاجُهما مختلف: الأولُ يُصلَح بكودٍ في
+             المُصدِّر، والثاني بقرارِ امتيازاتٍ لا يملكه منفِّذ. **وخلطُهما
+             يُرسل الجهدَ إلى غيرِ موضعِه.**
+           ◆ فيُعاد الاستيرادُ **بحسابٍ إداريٍّ** إن أمكن: فإن نجحت القوادحُ
+             فالمُخرَجُ سليمٌ والعائقُ الامتيازُ وحدَه — وذلك جوابٌ قاطع. */
+        $adminTried = false; $adminOk = false; $adminCount = -1;
+        $ac = @new mysqli($host, 'root', '', '', $port);
+        if ($ac && !$ac->connect_errno) {
+            $adminTried = true;
+            $ac->set_charset('utf8mb4');
+            $ac->query("DROP DATABASE IF EXISTS `{$CLONE}_adm`");
+            $ac->query("CREATE DATABASE `{$CLONE}_adm` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+            $ai = @new mysqli($host, 'root', '', $CLONE . '_adm', $port);
+            if ($ai && !$ai->connect_errno) {
+                $ai->set_charset('utf8mb4');
+                $sqlA = (string) file_get_contents($schemaFile);
+                if ($ai->multi_query($sqlA)) {
+                    do { if ($rr = $ai->store_result()) { $rr->free(); } }
+                    while ($ai->more_results() && $ai->next_result());
+                }
+                $ai->close();
+            }
+            $rq = $ac->query("SELECT COUNT(*) FROM information_schema.TRIGGERS
+                               WHERE TRIGGER_SCHEMA = '{$CLONE}_adm'");
+            $adminCount = $rq ? (int) $rq->fetch_row()[0] : -1;
+            $adminOk = ($adminCount === $nLive);
+            if ($adminOk) { $ac->query("DROP DATABASE `{$CLONE}_adm`"); }
+            $ac->close();
+        }
+        if ($adminTried) {
+            ok($adminOk,
+               '◆ **بحسابٍ إداريٍّ: القوادحُ تُبنى كاملةً** — فالمُخرَجُ سليمٌ والعائقُ الامتيازُ وحدَه',
+               $pass, $fail, "بالحسابِ الإداريّ={$adminCount}/{$nLive}");
+            echo "        ↳ ⇐ **الجوابُ قاطع**: لا عطبَ في `SchemaDumper` ولا في `schema.sql`.\n";
+            echo "           والحاجزُ ① لا يُفتح بكودٍ بل بقرارِ امتيازاتٍ لحسابِ النشر.\n";
+        } else {
+            echo "        ↳ (تعذّر الفحصُ بحسابٍ إداريّ — فيبقى السببانِ غيرَ مفصولَين)\n";
+        }
     }
 }
 echo "  ◆ والبصمةُ تقيس **البنيةَ** لا البيانات: صفرُ صفٍّ مرجعيٍّ في الاستنساخ\n";

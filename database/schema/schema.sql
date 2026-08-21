@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-21 12:49:28
+-- المصدر: equipation_manage · التوليد: 2026-08-21 13:28:21
 -- الجداول: 606 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -6727,6 +6727,8 @@ CREATE TABLE `gov_ladders` (
   `is_active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `entity_type` varchar(64) DEFAULT NULL,
+  `action` varchar(64) DEFAULT NULL,
   PRIMARY KEY (`ladder_code`),
   KEY `ix_ld_cycle` (`cycle_no`),
   CONSTRAINT `chk_ld_cap` CHECK (`cap_state` <> 'resolved' or `cap_kind` <> 'amount' or `cap_amount` is not null and `cap_currency` is not null)
@@ -15036,7 +15038,7 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_active_impersonations` A
 
 -- ── View: v_approval_rules_effective ──
 SET collation_connection = 'utf8mb4_unicode_ci';
-CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_approval_rules_effective` AS select `l`.`ladder_code` AS `ladder_code`,`l`.`slug` AS `entity_type`,`s`.`step_no` AS `step_order`,coalesce(`a`.`role_id`,-99) AS `role_required`,`s`.`actor_code` AS `actor_code`,`s`.`actor_name_ar` AS `actor_name_ar`,`s`.`step_kind` AS `step_kind`,`s`.`may_approve` AS `may_approve`,`l`.`name_ar` AS `ladder_name`,`l`.`cap_kind` AS `cap_kind`,`l`.`cap_amount` AS `cap_amount`,`l`.`cap_currency` AS `cap_currency`,`l`.`cap_state` AS `cap_state`,`l`.`escalate_after_hours` AS `escalate_after_hours`,`l`.`is_active` AS `is_active` from ((`gov_ladders` `l` join `gov_ladder_steps` `s` on(`s`.`ladder_code` = `l`.`ladder_code`)) left join `gov_ladder_actor_roles` `a` on(`a`.`actor_code` = `s`.`actor_code`)) where `l`.`is_active` = 1 union select `l`.`ladder_code` AS `ladder_code`,`j`.`entity_type` AS `entity_type`,`s`.`step_no` AS `step_order`,coalesce(`a`.`role_id`,-99) AS `role_required`,`s`.`actor_code` AS `actor_code`,`s`.`actor_name_ar` AS `actor_name_ar`,`s`.`step_kind` AS `step_kind`,`s`.`may_approve` AS `may_approve`,`l`.`name_ar` AS `ladder_name`,`l`.`cap_kind` AS `cap_kind`,`l`.`cap_amount` AS `cap_amount`,`l`.`cap_currency` AS `cap_currency`,`l`.`cap_state` AS `cap_state`,`l`.`escalate_after_hours` AS `escalate_after_hours`,`l`.`is_active` AS `is_active` from (((`gov_journey_ladders` `j` join `gov_ladders` `l` on(`l`.`ladder_code` = `j`.`ladder_code`)) join `gov_ladder_steps` `s` on(`s`.`ladder_code` = `l`.`ladder_code`)) left join `gov_ladder_actor_roles` `a` on(`a`.`actor_code` = `s`.`actor_code`)) where `l`.`is_active` = 1 and `j`.`entity_type` is not null and `j`.`entity_type` <> '';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_approval_rules_effective` AS select `l`.`ladder_code` AS `ladder_code`,`l`.`slug` AS `entity_type`,`s`.`step_no` AS `step_order`,coalesce(`a`.`role_id`,-99) AS `role_required`,`s`.`actor_code` AS `actor_code`,`s`.`actor_name_ar` AS `actor_name_ar`,`s`.`step_kind` AS `step_kind`,`s`.`may_approve` AS `may_approve`,`l`.`name_ar` AS `ladder_name`,`l`.`cap_kind` AS `cap_kind`,`l`.`cap_amount` AS `cap_amount`,`l`.`cap_currency` AS `cap_currency`,`l`.`cap_state` AS `cap_state`,`l`.`escalate_after_hours` AS `escalate_after_hours`,`l`.`is_active` AS `is_active` from ((`gov_ladders` `l` join `gov_ladder_steps` `s` on(`s`.`ladder_code` = `l`.`ladder_code`)) left join `gov_ladder_actor_roles` `a` on(`a`.`actor_code` = `s`.`actor_code`)) where `l`.`is_active` = 1 union select `l`.`ladder_code` AS `ladder_code`,`l`.`entity_type` AS `entity_type`,`s`.`step_no` AS `step_order`,coalesce(`a`.`role_id`,-99) AS `role_required`,`s`.`actor_code` AS `actor_code`,`s`.`actor_name_ar` AS `actor_name_ar`,`s`.`step_kind` AS `step_kind`,`s`.`may_approve` AS `may_approve`,`l`.`name_ar` AS `ladder_name`,`l`.`cap_kind` AS `cap_kind`,`l`.`cap_amount` AS `cap_amount`,`l`.`cap_currency` AS `cap_currency`,`l`.`cap_state` AS `cap_state`,`l`.`escalate_after_hours` AS `escalate_after_hours`,`l`.`is_active` AS `is_active` from ((`gov_ladders` `l` join `gov_ladder_steps` `s` on(`s`.`ladder_code` = `l`.`ladder_code`)) left join `gov_ladder_actor_roles` `a` on(`a`.`actor_code` = `s`.`actor_code`)) where `l`.`is_active` = 1 and `l`.`entity_type` is not null and `l`.`entity_type` <> '';
 
 -- ── View: v_authority_expiring ──
 SET collation_connection = 'utf8mb4_general_ci';

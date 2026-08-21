@@ -135,7 +135,7 @@ if ($distinctRoles < 2) {
     echo "      وهذا سؤالُ **مستوى السلطة** (الشخصُ لا الدور) — مجالُ الموجة ج.\n";
 }
 $r = $conn->query("SELECT COUNT(*) FROM `approval_requests`
-                    WHERE entity_type NOT REGEXP '^[a-z_]+$'");
+                    WHERE entity_type NOT REGEXP '^[a-z0-9_]+$'");
 $polluted = $r ? (int) $r->fetch_row()[0] : 0;
 echo "  ◆ صفوفٌ تاريخيةٌ بنصٍّ بشريٍّ في حقلِ مفتاحِ `approval_requests`: {$polluted} (GAP-09)\n";
 

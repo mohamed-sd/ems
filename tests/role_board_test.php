@@ -32,16 +32,25 @@ ok('العلم: المذكور يفعَّل وغيره لا (حتميًّا بت
 
 // قرارُ المالك 2026-08-21: «الرئيسية» صارت لوحةَ كلِّ صاحبِ إعدادٍ عام — والأربعُ
 // المخصصةُ الباقيةُ (13·16·23·26) شاشاتٌ قائمةٌ بذاتها لا إعدادَ عامًّا لها.
-$boardRoles = array(1, 2, 3, 4, 5, 6, 12, 15, 17, 24);
+$boardRoles = array(1, 2, 3, 4, 5, 6, 12, 15, 16, 17, 24);
 $routeOk = true;
 foreach ($boardRoles as $r) { if (roleBoardRoute($r) !== 'main/dashboard.php') { $routeOk = false; } }
-ok('الخريطة: أربعُ لوحاتٍ مخصصةٌ باقيةٌ في شاشاتها + عشرةُ أدوارٍ على «الرئيسية»',
+ok('الخريطة: ثلاثُ لوحاتٍ مخصصةٌ باقيةٌ في شاشاتها + أحدَ عشرَ دورًا على «الرئيسية»',
     $routeOk
     && roleBoardRoute(13) === 'Maintenance/dashboard_mnt.php'
-    && roleBoardRoute(16) === 'Procurement/dashboard_proc.php'
     && roleBoardRoute(23) === 'Transport/transfer_dashboard.php'
     && roleBoardRoute(26) === 'Financing/financing_board.php'
     && roleBoardRoute(999) === null);
+
+// ولوحةٌ نُقلت من شاشةٍ فيها ما لا يسعه نحوُ المكوّناتِ السبعة تحمل جزءَ عرضِها
+// معها — وإلا سقط بالنقل (وقد كاد يسقط «جدولُ القرارِ اليومي» فعلًا).
+$viewOk = true;
+foreach (array(16 => 'Procurement/_board_waiting.php', 17 => 'Finance/_board_decisions.php') as $r => $v) {
+    $cfg = roleBoardGenericConfig($r);
+    if (empty($cfg['view']) || $cfg['view'] !== $v
+        || !is_file(dirname(__DIR__) . '/' . $v)) { $viewOk = false; }
+}
+ok('اللوحتان المنقولتان تحملان جزأَي عرضِهما — وملفّاهما موجودان', $viewOk);
 
 // «الفرعيُّ يرث أباه، ومَن له مدخلٌ صريحٌ لا يرث»
 ok('الوراثة: الفرعيُّ بلا مدخلٍ يرث أباه — وصاحبُ المدخلِ الصريحِ لا يرث',
