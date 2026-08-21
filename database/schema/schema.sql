@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-21 10:39:35
--- الجداول: 604 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-21 11:19:23
+-- الجداول: 605 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6494,6 +6494,23 @@ CREATE TABLE `gov_elevations` (
   CONSTRAINT `chk_elev_four_parties` CHECK (`state` not in ('approved','active') or `hr_witness` is not null and `fin_witness` is not null and `ceo_approver` is not null),
   CONSTRAINT `chk_elev_ceo_not_self` CHECK (`ceo_approver` is null or `ceo_approver` <> `user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-AUTH-01 §7 — الرفعُ الاستثنائيُّ LD-21: أربعةُ أطرافٍ في أربعةِ أعمدةٍ لا واحدٍ نصيّ';
+
+-- ── Table: gov_event_rulings ──
+CREATE TABLE `gov_event_rulings` (
+  `event_key` varchar(120) NOT NULL,
+  `ruling` enum('business','audit') DEFAULT NULL,
+  `reason` varchar(400) DEFAULT NULL,
+  `produced_count` int(10) unsigned NOT NULL DEFAULT 0,
+  `has_subscription` tinyint(1) NOT NULL DEFAULT 0,
+  `subscription_active` tinyint(1) NOT NULL DEFAULT 0,
+  `handler_class` varchar(190) DEFAULT NULL,
+  `handler_on_disk` tinyint(1) NOT NULL DEFAULT 0,
+  `in_projection` tinyint(1) NOT NULL DEFAULT 0,
+  `measured_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `decided_at` datetime DEFAULT NULL,
+  `decided_by` varchar(120) DEFAULT NULL,
+  PRIMARY KEY (`event_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: gov_export_log ──
 CREATE TABLE `gov_export_log` (
