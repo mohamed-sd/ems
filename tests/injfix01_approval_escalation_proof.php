@@ -103,4 +103,9 @@ chk($q && (int) $q->fetch_row()[0] === 0, 'أثرُ الفحصِ مكنوس');
 
 echo "\n" . str_repeat('─', 66) . "\n";
 printf("النتيجة: %d نجاح · %d رسوب\n", $ok, $bad);
+
+/* حكمُ الإغلاقِ — عقدُ GAP-56: يُصرَّح به بعدَ القياسِ لا يُستنتَج من الذِّكر */
+require_once dirname(__DIR__) . '/tools/lib/gap_verdict.php';
+gapv('GAP-04', true, 'التصعيدُ يقرأ مهلتَه من gov_ladders.escalate_after_hours ويعمل بلا تكرارٍ لنفسِ الخطوة', $bad);
+
 exit($bad === 0 ? 0 : 1);

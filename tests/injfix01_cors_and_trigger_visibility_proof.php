@@ -104,4 +104,9 @@ if ($conn->connect_errno) {
 
 echo "\n" . str_repeat('─', 66) . "\n";
 printf("النتيجة: %d نجاح · %d رسوب\n", $ok, $bad);
+
+/* حكمُ الإغلاقِ — عقدُ GAP-56: يُصرَّح به بعدَ القياسِ لا يُستنتَج من الذِّكر */
+require_once dirname(__DIR__) . '/tools/lib/gap_verdict.php';
+gapv('GAP-33', true, 'القوادحُ الأربعُ والثلاثون منشأةٌ ومقيسةٌ وظيفيًّا · وترويسةُ الأصلِ محكومةٌ بقائمةِ سماح', $bad);
+
 exit($bad === 0 ? 0 : 1);

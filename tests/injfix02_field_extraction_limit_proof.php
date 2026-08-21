@@ -119,4 +119,9 @@ if (!is_file($EX . 'field_registry.json')) {
 
 echo "\n" . str_repeat('─', 66) . "\n";
 printf("النتيجة: %d نجاح · %d رسوب\n", $ok, $bad);
+
+/* حكمُ الإغلاقِ — عقدُ GAP-56: يُصرَّح به بعدَ القياسِ لا يُستنتَج من الذِّكر */
+require_once dirname(__DIR__) . '/tools/lib/gap_verdict.php';
+gapv('GAP-21', false, 'سبعةُ آلافٍ ومئتان واثنان من اثنَي عشرَ ألفًا وتسعمئةٍ وتسعةٍ وعشرين حقلًا بلا اسمٍ تقنيّ — الحدُّ مُعلَنٌ لا مسدود', $bad);
+
 exit($bad === 0 ? 0 : 1);

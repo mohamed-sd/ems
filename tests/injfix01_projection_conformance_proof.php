@@ -100,4 +100,9 @@ echo "  ◆ والحكمُ يُنقض بدليل: `decided_at`/`decided_by` مح
 
 echo "\n" . str_repeat('─', 66) . "\n";
 printf("النتيجة: %d نجاح · %d رسوب\n", $ok, $bad);
+
+/* حكمُ الإغلاقِ — عقدُ GAP-56: يُصرَّح به بعدَ القياسِ لا يُستنتَج من الذِّكر */
+require_once dirname(__DIR__) . '/tools/lib/gap_verdict.php';
+gapv('GAP-06', true, 'الإسقاطُ يُقرأ من الجذرِ المحايدِ ems_business_events لا من إسقاطٍ آخر', $bad);
+
 exit($bad === 0 ? 0 : 1);

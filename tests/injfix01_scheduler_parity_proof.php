@@ -144,4 +144,9 @@ if ($fail > 0) {
     echo "◆ العلاج: powershell -ExecutionPolicy Bypass -File tools\\injfix01_scheduler_unify.ps1\n";
     echo "  (وبـ-WhatIf للمعاينة · وبـ-Revert للرجوع من التعريفاتِ المصدَّرة)\n";
 }
+
+/* حكمُ الإغلاقِ — عقدُ GAP-56: يُصرَّح به بعدَ القياسِ لا يُستنتَج من الذِّكر */
+require_once dirname(__DIR__) . '/tools/lib/gap_verdict.php';
+gapv('GAP-17', true, 'بيئةُ المجدولِ موحَّدةٌ على إصدارٍ واحدٍ لمهامِ EMS كلِّها', $fail);
+
 exit($fail === 0 ? 0 : 1);

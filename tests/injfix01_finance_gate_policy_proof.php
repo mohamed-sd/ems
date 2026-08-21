@@ -104,4 +104,9 @@ echo "     فيما قبلَهما وبعدَهما — ورقابتُه مور�
 
 echo "\n" . str_repeat('─', 66) . "\n";
 printf("النتيجة: %d نجاح · %d رسوب\n", $ok, $bad);
+
+/* حكمُ الإغلاقِ — عقدُ GAP-56: يُصرَّح به بعدَ القياسِ لا يُستنتَج من الذِّكر */
+require_once dirname(__DIR__) . '/tools/lib/gap_verdict.php';
+gapv('GAP-15', true, 'بوابةُ الماليةِ لها سياسةٌ مُعلَنةٌ في gov_finance_gate_policy ولا تبدأ قبلَ سلّمِها', $bad);
+
 exit($bad === 0 ? 0 : 1);

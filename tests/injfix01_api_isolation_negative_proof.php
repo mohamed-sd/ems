@@ -114,4 +114,9 @@ chk(stripos($ht, 'Require local') !== false || stripos($ht, 'Require ip') !== fa
 
 echo "\n" . str_repeat('─', 66) . "\n";
 printf("النتيجة: %d نجاح · %d رسوب\n", $ok, $bad);
+
+/* حكمُ الإغلاقِ — عقدُ GAP-56: يُصرَّح به بعدَ القياسِ لا يُستنتَج من الذِّكر */
+require_once dirname(__DIR__) . '/tools/lib/gap_verdict.php';
+gapv('GAP-13', true, 'الواجهةُ البرمجيةُ معزولةٌ: صفرُ تسريبِ حقلٍ حسّاسٍ في الاستجابة — مُثبَتٌ بحزامٍ سلبيّ', $bad);
+
 exit($bad === 0 ? 0 : 1);
