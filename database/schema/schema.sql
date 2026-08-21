@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 01:39:53
--- الجداول: 630 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-22 01:53:55
+-- الجداول: 631 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -7245,6 +7245,23 @@ CREATE TABLE `gov_sensitive_policy_debt` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_target` (`source_register`,`declared_target`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='INJ-FIX-02 NF-09 — سياساتٌ تُعلن حمايةً لهدفٍ لا وجودَ له';
+
+-- ── Table: gov_sheet_decisions ──
+CREATE TABLE `gov_sheet_decisions` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `doc_code` varchar(24) NOT NULL COMMENT 'INJ-SAL-ALIGN-01 | INJ-SUP-ALIGN-01',
+  `sheet_code` varchar(12) NOT NULL,
+  `sheet_ar` varchar(160) NOT NULL,
+  `stage_ar` varchar(80) NOT NULL COMMENT 'مرحلةُ الدورةِ الحاكمة',
+  `decision` varchar(40) NOT NULL,
+  `target` varchar(220) NOT NULL COMMENT 'السطحُ المستهدَفُ أو سببُ عدمِ وجودِه',
+  `is_index` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'ورقةُ فهرسٍ — خارجَ مقامِ أوراقِ العمل',
+  `note` varchar(300) DEFAULT NULL,
+  `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_sheet` (`doc_code`,`sheet_code`),
+  KEY `ix_decision` (`decision`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='قرارُ السطحِ لكلِّ ورقةٍ في وثيقتَي المواءمة — منقولٌ حرفًا';
 
 -- ── Table: gov_space_appearances ──
 CREATE TABLE `gov_space_appearances` (

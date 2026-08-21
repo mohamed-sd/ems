@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 01:39:53
+-- المصدر: equipation_manage · التوليد: 2026-08-22 01:53:55
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -5270,7 +5270,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (693,12,'DAILY',4020,172,'نطاقات العقد التشغيلية','Contracts/contract_sites.php','fa fa-map-location-dot',50,NULL,'Contracts/contract_sites.php',1,'2026-08-03 08:47:41','2026-08-18 02:27:10'),
 (694,19,'REC',3945,172,'نطاقات العقد التشغيلية','Contracts/contract_sites.php','fa fa-map-location-dot',71,NULL,'Contracts/contract_sites.php',1,'2026-08-01 00:20:15','2026-08-16 00:03:05'),
 (695,6,'DAILY',4020,172,'نطاقات العقد التشغيلية','Contracts/contract_sites.php','fa fa-map-location-dot',50,NULL,'Contracts/contract_sites.php',1,'2026-08-03 08:47:41','2026-08-18 02:27:10'),
-(699,12,'DAILY',4026,173,'بنود عقد العميل وقيمته','Contracts/contract_lines.php','fa fa-list-ol',50,NULL,'Contracts/contract_lines.php',1,'2026-08-03 08:47:41','2026-08-18 02:27:10'),
+(699,12,'DAILY',4026,173,'بنود عقد العميل وقيمته','Contracts/contract_lines.php','fa fa-list-ol',50,NULL,'Contracts/contract_lines.php',1,'2026-08-03 08:47:41','2026-08-22 01:50:44'),
 (700,19,'REC',3945,173,'بنود عقد العميل وقيمته','Contracts/contract_lines.php','fa fa-list-ol',72,NULL,'Contracts/contract_lines.php',1,'2026-08-01 00:36:52','2026-08-16 00:03:05'),
 (701,17,'DAILY',4026,173,'بنود عقد العميل وقيمته','Contracts/contract_lines.php','fa fa-list-ol',50,NULL,'Contracts/contract_lines.php',1,'2026-08-03 08:47:41','2026-08-18 02:27:10'),
 (703,12,'DAILY',4020,174,'الجدول الشهري للعقد','Contracts/contract_monthly_plan.php','fa fa-calendar-days',50,NULL,'Contracts/contract_monthly_plan.php',1,'2026-08-03 08:47:41','2026-08-18 02:27:10'),
@@ -5993,7 +5993,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (9557,12,'DAILY',3426,292,'الأداء الشهري للوحدة','Operations/unit_perf.php','fa fa-circle-dot',25,NULL,'Operations/unit_perf.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
 (9558,12,'DAILY',3427,308,'تسجيل التايم شيت والإنتاج','Timesheet/timesheet.php','fa fa-circle-dot',26,NULL,'Timesheet/timesheet.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
 (9559,12,'DAILY',3427,284,'الإنتاج والقياس','Operations/production.php','fa fa-circle-dot',27,NULL,'Operations/production.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
-(9560,12,'DAILY',3428,142,'المستخلصات والمطالبات','Contracts/claims.php','fa fa-circle-dot',28,NULL,'Contracts/claims.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
+(9560,12,'DAILY',3428,142,'المستخلصات والمطالبات','Contracts/claims.php','fa fa-circle-dot',28,NULL,'Contracts/claims.php',1,'2026-08-16 17:07:11','2026-08-22 01:51:00'),
 (9561,12,'DAILY',3429,147,'الجزاءات والحوافز التعاقدية','Contracts/penalties.php','fa fa-circle-dot',29,NULL,'Contracts/penalties.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
 (9562,12,'DAILY',3430,291,'الأعمال غير المفوترة','Operations/unbilled.php','fa fa-circle-dot',30,NULL,'Operations/unbilled.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
 (9563,12,'DAILY',3431,166,'ذمم العملاء وأعمارها','Contracts/collections.php','fa fa-circle-dot',31,NULL,'Contracts/collections.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
