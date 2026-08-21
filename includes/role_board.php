@@ -54,10 +54,16 @@ function roleBoardRoute($roleId, $parentRoleId = null)
         16 => 'Procurement/dashboard_proc.php',
         23 => 'Transport/transfer_dashboard.php',
         26 => 'Financing/financing_board.php',   // FIN-26 — لوحة إدارة التمويل (الشاشة 214)
+        // إدارةُ التشغيل وإدارةُ الموردين: لوحتُهما هي «الرئيسية» نفسُها (قرار
+        // المالك 2026-08-21) — المكوّناتُ السبعةُ مُدمَجةٌ في main/dashboard.php
+        // بلغةِ تصميمِها بدل شاشةٍ ثانية. والرجوعُ بسطرٍ واحدٍ لكلِّ دور.
+        // ولا شيءَ في العرضِ يخصُّ دورًا بعينه: القالبُ يقرأ إعدادَ الدورِ
+        // من roleBoardGenericConfig، فإضافةُ دورٍ ثالثٍ سطرٌ واحدٌ هنا.
+        1  => 'main/dashboard.php',
+        2  => 'main/dashboard.php',
         // الباقون على اللوحة العامة الواحدة (تصيَّر من إعداد الدور)
-        1  => 'main/role_board.php',
         24 => 'main/role_board.php', 12 => 'main/role_board.php',
-        2  => 'main/role_board.php', 3  => 'main/role_board.php',
+        3  => 'main/role_board.php',
         4  => 'main/role_board.php', 5  => 'main/role_board.php',
         6  => 'main/role_board.php', 15 => 'main/role_board.php',
     );
@@ -735,6 +741,95 @@ function roleBoardGenericConfig($rid)
                 null, null)),
     );
     return isset($C[intval($rid)]) ? $C[intval($rid)] : null;
+}
+
+/**
+ * الدورُ صاحبُ الإعدادِ العام: دورُ الجلسةِ نفسُه، أو أبوه إن كان فرعيًّا بلا
+ * إعدادٍ خاص («الفرعيةُ ترث أباها» — قرار المالك). يعيد 0 إن لم يُوجد إعداد.
+ */
+function roleBoardConfigRole($gate, $roleId)
+{
+    $rid = intval($roleId);
+    if (roleBoardGenericConfig($rid) !== null) { return $rid; }
+    try {
+        $p = $gate->selectOne('roles', array('columns' => array('parent_role_id'), 'where' => array('id' => $rid)));
+        if ($p && !empty($p['parent_role_id'])) {
+            $pid = intval($p['parent_role_id']);
+            if (roleBoardGenericConfig($pid) !== null) { return $pid; }
+        }
+    } catch (\Throwable $t) { error_log('role_board config role: ' . $t->getMessage()); }
+    return 0;
+}
+
+/**
+ * محرّكُ اللوحةِ العامة — يُجهّز المكوّناتِ السبعةَ (UX-01 §5) لدورٍ مرةً واحدة،
+ * فتقرأ منه الشاشتان اللتان تعرضانها: `main/role_board.php` و«الرئيسية»
+ * `main/dashboard.php` حين تكون هي لوحةَ الدور (إدارة التشغيل — قرار المالك
+ * 2026-08-21). مصدرٌ واحدٌ لا نسختان تتفرّقان بعد أولِ تعديلٍ على مؤشّر
+ * (قانونُ «التوأمِ الراكد» — كان الحسابُ كلُّه في جسدِ الشاشةِ لا في دالّة).
+ *
+ * @param int $roleId دورُ الإعداد (يُحَلُّ سلفًا عبر roleBoardConfigRole)
+ * @return array|null بنيةُ العرضِ كاملةً، أو null لدورٍ بلا إعدادٍ عام
+ */
+function roleBoardBuild($conn, $gate, $roleId, $userId)
+{
+    $rid = intval($roleId);
+    $cfg = roleBoardGenericConfig($rid);
+    if ($cfg === null) { return null; }
+
+    /** تنفيذُ عنصرِ إعدادٍ [label,icon,scope,sql,href(,tone)] عدًّا معزولًا. */
+    $exec = function (array $def, array $params = array()) use ($gate) {
+        $scopeArr = array('scope' => array($def[2]['a'] => $def[2]['t']));
+        if (isset($def[2]['enrich'])) { $scopeArr['enrich'] = $def[2]['enrich']; }
+        return roleBoardScalar($gate, $scopeArr, $def[3], $params);
+    };
+
+    // ① مؤشرات اليوم
+    $cards = array();
+    foreach ($cfg['cards'] as $def) {
+        $n = $exec($def);
+        $tone = isset($def[5]) ? $def[5] : 'or';
+        if ($tone === 'err' && $n <= 0) { $tone = 'ok'; }   // الحرجُ الصفري يهدأ لونًا لا يختفي
+        $cards[] = array($def[1], $n, $def[0], $tone, $def[4]);
+    }
+
+    // ② مهامي (من الإعداد) — والصفريُّ يختفي
+    $tasks = array();
+    foreach ($cfg['tasks'] as $def) {
+        $n = (int) $exec($def);
+        if ($n > 0) { $tasks[] = array('label' => $def[0], 'icon' => $def[1], 'count' => $n, 'href' => $def[4]); }
+    }
+
+    // ⑥ نبض الأداء من إعداده (سلسلةٌ ثانيةٌ اختيارية)
+    list($pulseTitle, $pulseSeries, $psA, $sqlA, $psB, $sqlB) = $cfg['pulse'];
+    $pulse = array('labels' => array(), 'in' => array(), 'out' => array());
+    for ($d = 6; $d >= 0; $d--) {
+        $day = date('Y-m-d', strtotime("-{$d} days"));
+        $pulse['labels'][] = date('m/d', strtotime($day));
+        $pulse['in'][]  = $sqlA !== null ? roleBoardScalar($gate, array('scope' => array($psA['a'] => $psA['t'])), $sqlA, array($day)) : 0;
+        $pulse['out'][] = $sqlB !== null ? roleBoardScalar($gate, array('scope' => array($psB['a'] => $psB['t'])), $sqlB, array($day)) : 0;
+    }
+
+    // ③④⑤⑦ عبر المحرك الموحّد — وشاراتُ السايدبار مصدرُ عدّادِ الموافقات نفسُه
+    if (!function_exists('ems_finreq_nav_badges')) {
+        require_once __DIR__ . '/finreq_badges.php';
+    }
+    $badges = function_exists('ems_finreq_nav_badges') ? ems_finreq_nav_badges($conn) : array();
+
+    return array(
+        'role_id'      => $rid,
+        'title'        => $cfg['title'],
+        'icon'         => $cfg['icon'],
+        'cards'        => $cards,
+        'tasks'        => $tasks,
+        'approvals'    => roleBoardApprovals($conn, $gate, $rid, $badges),
+        'alerts'       => roleBoardAlerts($conn, $gate, $rid),
+        'quick'        => roleBoardQuickActions($conn, $rid, intval($userId)),
+        'recent'       => roleBoardRecent($conn, intval($userId)),
+        'pulse'        => $pulse,
+        'pulse_title'  => $pulseTitle,
+        'pulse_series' => $pulseSeries,
+    );
 }
 
 /**

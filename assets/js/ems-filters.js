@@ -95,6 +95,11 @@
 
             if (n.classList.contains('filter-actions')) { flush(); continue; }
             if (n.classList.contains('filter-title'))   { flush(); continue; }
+            /* ملاحظةٌ أعلنتها الشاشةُ بنفسِها — تُترك كما هي. ولولا هذا الحارسُ
+               لالتقطها فرعُ «غلافِ الأزرارِ» أدناه (فيها روابطُ ولا ضابطَ فيها)
+               فوسمَها `.filter-actions` ودفعَها إلى طرفِ السطرِ مع الأزرار —
+               وهي نصٌّ وأقراصُ اختصارٍ لا مجموعةَ أفعال. */
+            if (n.classList.contains('filter-note'))    { flush(); continue; }
 
             /* غلافُ شبكةٍ يذوب في النمط ⇒ ننزل فيه ولا نعدُّه حقلًا */
             if (depth < 3 && n.matches && n.matches(GRID_WRAP)) { flush(); normalize(n, depth + 1); continue; }

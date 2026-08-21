@@ -789,14 +789,28 @@ code {
   transform: scaleY(0.25);
   transition: opacity 0.2s ease, transform 0.2s ease;
 }
+/* ══ الهوفرُ على مستوى الرابطِ لا المجموعة (قرارُ المالك 2026-08-17) ══════
+   ◆ **العطبُ المقيس**: كانت القواعدُ تكتب `li:hover a` — و`a` هنا **سليلٌ**
+     لا ابن. وغلافُ المجموعةِ نفسُه عنصرُ `li` يحوي روابطَها كلَّها، فمرورُ
+     الفأرةِ على رابطٍ واحدٍ يُرضي `li.nav-group:hover` أيضًا فتُصبغ روابطُ
+     المجموعةِ كلُّها معًا: **اثنا عشرَ رابطًا في أكبرِ مجموعةٍ** بضربةٍ
+     واحدة. فلا يعرف المستخدمُ أيَّ سطرٍ سيفتحه إن ضغط.
+   ◆ **والعلاجُ حرفٌ واحدٌ في موضعِه**: `>` بدل المسافة — فالغلافُ لا يملك
+     `<a>` ابنًا مباشرًا (مقيسٌ: صفرٌ من ثمانيةِ أغلفة) فلا يُصبغ شيء،
+     والروابطُ كلُّها تملكه (43 من 43) فيبقى الهوفرُ عليها كما كان.
+   ◆ والشريطُ الذهبيُّ الجانبيُّ (`::after`) استُثني منه غلافُ المجموعةِ
+     صراحةً بـ`:not(.nav-group)` — كان يرسمه بطولِ المجموعةِ كلِّها.
+   ◆ ورأسُ المجموعةِ له هوفرُه الخاصُّ في `ems-nav-groups.css` فلم يفقد شيئًا.
+   ◆ والقواعدُ **ثلاثُ نسخٍ** في هذا الملف (793 · 9725 · 11909) وآخرُها
+     بـ`!important` — فعُولجت الثلاثُ معًا، وإلا غلبت نسخةٌ لم تُصحَّح. */
 
-.ems-site .sidebar ul li:hover::after,
+.ems-site .sidebar ul li:not(.nav-group):hover::after,
 .ems-site .sidebar ul li.active::after {
   opacity: 1;
   transform: scaleY(1);
 }
 
-.ems-site .sidebar ul li:hover a {
+.ems-site .sidebar ul li:hover > a {
   background: var(--c-rgba24419766012);
   color: var(--c-ink-900);
 }
@@ -807,7 +821,7 @@ code {
   color: var(--c-ink-900);
 }
 
-.ems-site .sidebar ul li:active a {
+.ems-site .sidebar ul li:active > a {
   transform: scale(0.99);
 }
 
@@ -821,7 +835,7 @@ code {
   flex-shrink: 0;
 }
 
-.ems-site .sidebar ul li:hover i,
+.ems-site .sidebar ul li:hover > a i,
 .ems-site .sidebar ul li.active i {
   color: var(--c-brand-gold);
   transform: translateY(-1px);
@@ -1010,7 +1024,7 @@ code {
     transform: translateX(50%) scaleY(0.25);
   }
 
-  .ems-site .sidebar.closed ul li:hover::after,
+  .ems-site .sidebar.closed ul li:not(.nav-group):hover::after,
   .ems-site .sidebar.closed ul li.active::after {
     transform: translateX(50%) scaleY(1);
   }
@@ -9722,7 +9736,7 @@ body.ems-site {
   color: var(--c-4b5563) !important;
 }
 
-.ems-site .sidebar ul li:hover a {
+.ems-site .sidebar ul li:hover > a {
   background: var(--c-rgba2441976602) !important;
   color: var(--text-black) !important;
 }
@@ -9734,7 +9748,7 @@ body.ems-site {
   font-weight: 800;
 }
 
-.ems-site .sidebar ul li:hover i,
+.ems-site .sidebar ul li:hover > a i,
 .ems-site .sidebar ul li.active i {
   color: var(--text-black) !important;
 }
@@ -11906,7 +11920,7 @@ body.ems-site .main .card .card-header {
 .ems-site .sidebar ul li::after {
   background: var(--primary-yellow) !important;
 }
-.ems-site .sidebar ul li:hover a {
+.ems-site .sidebar ul li:hover > a {
   background: var(--c-rgba24419766014) !important;
   color: var(--c-ink-900) !important;
 }
@@ -11915,7 +11929,7 @@ body.ems-site .main .card .card-header {
   background: var(--c-rgba24419766026) !important;
   color: var(--c-ink-900) !important;
 }
-.ems-site .sidebar ul li:hover i,
+.ems-site .sidebar ul li:hover > a i,
 .ems-site .sidebar ul li.active i {
   color: var(--yellow-deep) !important;
 }

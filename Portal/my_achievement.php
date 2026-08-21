@@ -83,11 +83,27 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <label for="emsf_370_07324">من</label><input type="date" name="from" id="emsf_370_07324" value="<?php echo htmlspecialchars($from); ?>">
             <label for="emsf_371_48875">إلى</label><input type="date" name="to" id="emsf_371_48875" value="<?php echo htmlspecialchars($to); ?>">
             <button type="submit" class="btn-primary"><i class="fa fa-calculator"></i> قِس</button>
-            <small class="ems-pta-muted">اختصارات:
-                <a href="?capacity_id=<?php echo $capId; ?>&from=<?php echo date('Y-m-d'); ?>&to=<?php echo date('Y-m-d'); ?>">يوم</a> ·
-                <a href="?capacity_id=<?php echo $capId; ?>&from=<?php echo date('Y-m-d', strtotime('-7 days')); ?>&to=<?php echo date('Y-m-d'); ?>">أسبوع</a> ·
-                <a href="?capacity_id=<?php echo $capId; ?>&from=<?php echo date('Y-m-01'); ?>&to=<?php echo date('Y-m-d'); ?>">شهر</a> ·
-                <a href="?capacity_id=<?php echo $capId; ?>&from=<?php echo date('Y-01-01'); ?>&to=<?php echo date('Y-m-d'); ?>">سنة</a></small>
+            <?php
+            /* أقراصُ الاختصارِ — ملاحظةٌ مُعلَنةٌ (`filter-note`) لا نصٌّ حُرّ:
+               فالعونُ يترك ما أعلنتْه الشاشةُ، والتصميمُ في `ems-filters.css`.
+               والمدى المعروضُ الآنَ يُوسَم `is-active` فيُعرَف بلونِه. */
+            $sc_today = date('Y-m-d');
+            $shortcuts = array(
+                array('label' => 'يوم',   'from' => $sc_today),
+                array('label' => 'أسبوع', 'from' => date('Y-m-d', strtotime('-7 days'))),
+                array('label' => 'شهر',   'from' => date('Y-m-01')),
+                array('label' => 'سنة',   'from' => date('Y-01-01')),
+            );
+            ?>
+            <div class="filter-note filter-links">
+                <span class="filter-note-label">اختصارات:</span>
+                <?php foreach ($shortcuts as $sc):
+                    $sc_on = ($from === $sc['from'] && $to === $sc_today); ?>
+                    <a class="filter-link<?php echo $sc_on ? ' is-active' : ''; ?>"
+                       <?php echo $sc_on ? 'aria-current="true"' : ''; ?>
+                       href="?capacity_id=<?php echo $capId; ?>&amp;from=<?php echo $sc['from']; ?>&amp;to=<?php echo $sc_today; ?>"><?php echo $sc['label']; ?></a>
+                <?php endforeach; ?>
+            </div>
         </form>
             </div>
         </div>

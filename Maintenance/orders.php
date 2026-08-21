@@ -523,7 +523,7 @@ function mnt_opt($value, $label, $selected) {
 function mnt_state_class($st) {
     if ($st === 'إغلاق') return 'mnt-pill mnt-pill--green';
     if ($st === 'ملغى') return 'mnt-pill mnt-pill--gray';
-    if ($st === 'فحص')  return 'mnt-pill mnt-pill--purple';
+    if ($st === 'فحص')  return 'mnt-pill mnt-pill--navy';
     if ($st === 'تنفيذ') return 'mnt-pill mnt-pill--blue';
     return 'mnt-pill mnt-pill--gold';
 }

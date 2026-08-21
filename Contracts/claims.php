@@ -741,22 +741,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </div>
             <table class="display clm-w100">
                 <thead><tr>
+                    <th>الإجراءات</th>
                     <th>رقم البند</th><th>العميل</th><th>المشروع</th><th>الفترة</th>
-                    <th>الإجمالي</th><th>صافي المستحق</th><th>الضريبة</th><th>الفاتورة</th><th>الحالة</th><th></th>
+                    <th>الإجمالي</th><th>صافي المستحق</th><th>الضريبة</th><th>الفاتورة</th><th>الحالة</th>
                 </tr></thead>
                 <tbody>
                 <?php foreach ($claims as $c): ?>
                     <tr>
-                        <td><strong><?php echo clm_e($c['claim_no']); ?></strong></td>
-                        <td><?php echo clm_e($c['client_name'] ?: '—'); ?></td>
-                        <td><?php echo clm_e($c['project_name'] ?: '—'); ?></td>
-                        <td><?php echo clm_e($c['period_from']); ?> → <?php echo clm_e($c['period_to']); ?></td>
-                        <td><?php echo clm_num($c['gross_amount']); ?></td>
-                        <td><strong><?php echo clm_num($c['net_amount']); ?></strong>
-                            <span class="text-muted"><?php echo clm_e($c['currency']); ?></span></td>
-                        <td><?php echo clm_num($c['tax_amount']); ?></td>
-                        <td><?php echo $c['invoice_no'] ? clm_e($c['invoice_no']) : '—'; ?></td>
-                        <td><?php echo clm_e($states[$c['state']] ?? $c['state']); ?></td>
                         <td>
                             <div class="action-btns clm-flexform">
                                 <a href="claims.php?open=<?php echo intval($c['id']); ?>" class="action-btn view" title="البنود">
@@ -802,6 +793,16 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                                 <?php endif; ?>
                             </div>
                         </td>
+                        <td><strong><?php echo clm_e($c['claim_no']); ?></strong></td>
+                        <td><?php echo clm_e($c['client_name'] ?: '—'); ?></td>
+                        <td><?php echo clm_e($c['project_name'] ?: '—'); ?></td>
+                        <td><?php echo clm_e($c['period_from']); ?> → <?php echo clm_e($c['period_to']); ?></td>
+                        <td><?php echo clm_num($c['gross_amount']); ?></td>
+                        <td><strong><?php echo clm_num($c['net_amount']); ?></strong>
+                            <span class="text-muted"><?php echo clm_e($c['currency']); ?></span></td>
+                        <td><?php echo clm_num($c['tax_amount']); ?></td>
+                        <td><?php echo $c['invoice_no'] ? clm_e($c['invoice_no']) : '—'; ?></td>
+                        <td><?php echo clm_e($states[$c['state']] ?? $c['state']); ?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>

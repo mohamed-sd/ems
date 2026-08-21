@@ -112,13 +112,18 @@ include '../inheader.php';
 include '../insidebar.php';
 ?>
 <style>
-/* UXW-01 ①②: أنماطُ شاشةِ الاعتماداتِ المتأخرة — بادئةُ الشاشةِ rpt-lag */
-.rpt-lag-row{display:flex;gap:14px;flex-wrap:wrap}
-.rpt-lag-card{flex:1;min-width:220px}
-.rpt-lag-body{text-align:center}
-.rpt-lag-num{font-size:34px;font-weight:bold}
+/* UXW-01 ①②: أنماطُ شاشةِ الاعتماداتِ المتأخرة — بادئةُ الشاشةِ rpt-lag
+   ───────────────────────────────────────────────────────────────────────────
+   ◆ بطاقاتُ الرأسِ صارت **البطاقةَ الموحَّدة** (`assets/css/ems-statcards.css`):
+     `stats-section > stats-grid > stats-card` بترتيبِ الأصل — أيقونةٌ ⇐ قيمةٌ ⇐
+     عنوانٌ ⇐ تابع. فالرقمُ يقع في `stats-value` وهو **أكبرُ خطٍّ في البطاقة**
+     (35px · ثقل 900 · tabular-nums)، وكان قبلَها في صنفٍ محلّيٍّ (`rpt-lag-num`
+     بـ34px) لا يعرفه المصدرُ الموحَّد فخرجت البطاقةُ بشكلٍ خاصٍّ بهذه الشاشة.
+   ◆ **ولا لونَ محلّيًّا على القيمة**: المصدرُ الموحَّد يفرض لونَ النصِّ الداكنَ بـ`!important`،
+     فمنازعتُه تكسر التوحيد. والحالةُ تُعلَن **نصًّا وأيقونةً** في السطرِ التابع
+     (`ems-statcard__meta`) لا لونًا وحدَه — واللونُ وحدَه إشارةٌ لا يراها كلُّ قارئ.
+   ◆ `rpt-lag-bad` باقيةٌ لعمودِ العمرِ في الجدولِ وحدَه. */
 .rpt-lag-bad{color:var(--c-c0392b, #c0392b)}
-.rpt-lag-ok{color:var(--c-27ae60, #27ae60)}
 .rpt-lag-table{width:100%}
 </style>
 <div class="main ems-unified-page-shell">
@@ -134,23 +139,33 @@ include '../insidebar.php';
     echo ems_states_bundle('لا وحداتٍ معلَّقةً ولا وثائقَ منتهيةً في هذه الفترة',
         'وسّع الفترةَ أو تحقق من ترحيلِ سجلاتِ الورديات وتواريخِ انتهاءِ الوثائق');
     ?>
-    <div class="row rpt-lag-row">
-        <div class="card rpt-lag-card"><div class="card-body rpt-lag-body">
-            <div class="rpt-lag-num"><?php echo $pending; ?></div>
-            <div>وحدة غير معتمدة</div>
-        </div></div>
-        <div class="card rpt-lag-card"><div class="card-body rpt-lag-body">
-            <div class="rpt-lag-num <?php echo $oldest > 7 ? 'rpt-lag-bad' : 'rpt-lag-ok'; ?>"><?php echo $oldest; ?></div>
-            <div>أقدمها بالأيام — <?php echo $oldest > 7 ? 'تجاوز 7: صُعّد للإدارة العامة' : 'ضمن المستهدف (≤7)'; ?></div>
-        </div></div>
-        <div class="card rpt-lag-card"><div class="card-body rpt-lag-body">
-            <div class="rpt-lag-num <?php echo $weekRate < 95 ? 'rpt-lag-bad' : 'rpt-lag-ok'; ?>"><?php echo $weekRate; ?>٪</div>
-            <div>نسبة اعتماد الأسبوع (مستهدف ≥95٪ · <?php echo $weekApproved; ?>/<?php echo $weekTotal; ?>)</div>
-        </div></div>
-        <div class="card rpt-lag-card"><div class="card-body rpt-lag-body">
-            <div class="rpt-lag-num <?php echo $uncovered > 0 ? 'rpt-lag-bad' : 'rpt-lag-ok'; ?>"><?php echo $expired; ?></div>
-            <div>وثيقة منتهية — منها <strong><?php echo $uncovered; ?></strong> بلا استثناء نافذ (المستهدف: صفر)</div>
-        </div></div>
+    <div class="stats-section">
+        <div class="stats-grid">
+            <div class="stats-card">
+                <div class="stats-icon"><i class="fas fa-clipboard-check"></i></div>
+                <div class="stats-value"><?php echo $pending; ?></div>
+                <div class="stats-title">وحدة غير معتمدة</div>
+                <div class="ems-statcard__meta">فتراتٌ بلا توقيعِ سلسلة (unit_chain)</div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-icon"><i class="fas <?php echo $oldest > 7 ? 'fa-hourglass-end' : 'fa-hourglass-half'; ?>"></i></div>
+                <div class="stats-value"><?php echo $oldest; ?></div>
+                <div class="stats-title">أقدمها بالأيام</div>
+                <div class="ems-statcard__meta"><?php echo $oldest > 7 ? 'تجاوز 7: صُعّد للإدارة العامة' : 'ضمن المستهدف (≤7)'; ?></div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-icon"><i class="fas fa-percentage"></i></div>
+                <div class="stats-value"><?php echo $weekRate; ?>٪</div>
+                <div class="stats-title">نسبة اعتماد الأسبوع</div>
+                <div class="ems-statcard__meta">مستهدف ≥95٪ · <?php echo $weekApproved; ?>/<?php echo $weekTotal; ?> — <?php echo $weekRate < 95 ? 'دون المستهدف' : 'ضمن المستهدف'; ?></div>
+            </div>
+            <div class="stats-card">
+                <div class="stats-icon"><i class="fas <?php echo $uncovered > 0 ? 'fa-file-circle-exclamation' : 'fa-file-shield'; ?>"></i></div>
+                <div class="stats-value"><?php echo $expired; ?></div>
+                <div class="stats-title">وثيقة منتهية</div>
+                <div class="ems-statcard__meta">منها <?php echo $uncovered; ?> بلا استثناء نافذ (المستهدف: صفر)</div>
+            </div>
+        </div>
     </div>
 
     <div class="card"><div class="card-body">

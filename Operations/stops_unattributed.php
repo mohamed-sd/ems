@@ -102,7 +102,7 @@ echo ems_states_bundle('لا توقفاتٍ بلا جهةٍ مسؤولةٍ في 
 ?>
   <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
   <table class="table table-striped" data-no-dt>
-    <thead><tr><th>#</th><th>التاريخ</th><th>أثر أجر المشغّل</th><th>الوردية</th><th>ساعاتُ التعطل</th><th>النوع</th><th>الإسناد</th>
+    <thead><tr><th>الإسناد</th><th>#</th><th>التاريخ</th><th>أثر أجر المشغّل</th><th>الوردية</th><th>ساعاتُ التعطل</th><th>النوع</th>
               <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
               <th class="ems-fn-th" data-fn="1">رقم التوقف</th>
               <th class="ems-fn-th" data-fn="1">الموقع</th>
@@ -139,12 +139,6 @@ echo ems_states_bundle('لا توقفاتٍ بلا جهةٍ مسؤولةٍ في 
     <?php if (empty($rows)): ?><tr><td colspan="7" class="text-center stu-ok">✔ صفرُ توقفٍ بلا مسؤول</td></tr><?php endif; ?>
     <?php foreach ($rows as $t): ?>
       <tr>
-        <td><?= intval($t['id']) ?></td>
-        <td><?= htmlspecialchars($t['date'], ENT_QUOTES, 'UTF-8') ?></td>
-        <td><?= htmlspecialchars($t['operator'], ENT_QUOTES, 'UTF-8') ?></td>
-        <td><?= htmlspecialchars($t['shift'], ENT_QUOTES, 'UTF-8') ?></td>
-        <td><strong><?= floatval($t['total_fault_hours']) ?></strong></td>
-        <td><?= htmlspecialchars($t['fault_type'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
         <td>
           <form method="post" class="stu-assign-form">
         <?= csrf_field() ?>
@@ -156,6 +150,12 @@ echo ems_states_bundle('لا توقفاتٍ بلا جهةٍ مسؤولةٍ في 
             <button class="action-btn" type="submit">أسند</button>
           </form>
         </td>
+        <td><?= intval($t['id']) ?></td>
+        <td><?= htmlspecialchars($t['date'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars($t['operator'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars($t['shift'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><strong><?= floatval($t['total_fault_hours']) ?></strong></td>
+        <td><?= htmlspecialchars($t['fault_type'] ?: '—', ENT_QUOTES, 'UTF-8') ?></td>
       </tr>
     <?php endforeach; ?>
     </tbody>

@@ -136,11 +136,24 @@ echo ems_states_bundle('لا نشاطَ معتمدًا للإدارةِ في ه�
   if ($allZero): ?>
     <div class="alert alert-warning">لا نشاطَ معتمدًا في هذه المدة — وسّع «من/إلى» أعلاه.</div>
   <?php endif; ?>
-  <div class="ems-dach-cards">
+  <?php
+  /* بطاقاتُ الإحصاءِ الموحَّدة — التصميمُ من `assets/css/ems-statcards.css` وحدَه.
+     ◆ والأصنافُ تُكتب هنا **صراحةً** لا تُترك لعونِ الوسمِ `ems-statcards.js`:
+       اسمُ `ems-dach-card` ليس من عائلةِ البطاقاتِ في العون (لا `stat` ولا `kpi`
+       ولا `metric` ولا `tile`) فما كان يراها أصلًا — فبقيت بتصميمِها القديم
+       (رماديٌّ فاتحٌ · قطر 8 · بلا ظلّ) بينما أخواتُها في النظامِ موحَّدة.
+     ◆ وعدَدُ الأعمدةِ يُعلَن على الحاويةِ نفسِها (القسم ⑨ من الملف) لا يُنقَض
+       من الشاشة، فتملأ البطاقاتُ العرضَ: أربعةٌ ⇐ أربعةٌ في صفٍّ واحد ·
+       ستةٌ (المشتريات) ⇐ ثلاثةٌ في صفَّين. و`ems-statgrid--fill` يمدُّ الأخيرةَ
+       على ما بقي من صفِّها فلا تبقى خانةٌ خاوية مهما تغيَّر العدَد. */
+  $dach_n    = count($metrics);
+  $dach_cols = ($dach_n % 4 === 0) ? 4 : (($dach_n % 3 === 0) ? 3 : max(2, min(6, $dach_n)));
+  ?>
+  <div class="ems-dach-cards ems-statgrid ems-statgrid--fill" data-cols="<?= (int) $dach_cols ?>">
     <?php foreach ($metrics as $m2): ?>
-    <div class="ems-dach-card">
-      <div class="ems-dach-num"><?= number_format($m2[1], is_float($m2[1]) && $m2[1] != intval($m2[1]) ? 1 : 0) ?></div>
-      <div class="text-muted"><?= $m2[0] ?></div>
+    <div class="ems-dach-card ems-statcard">
+      <div class="ems-dach-num ems-statcard__value"><?= number_format($m2[1], is_float($m2[1]) && $m2[1] != intval($m2[1]) ? 1 : 0) ?></div>
+      <div class="text-muted ems-statcard__title"><?= $m2[0] ?></div>
     </div>
     <?php endforeach; ?>
   </div>

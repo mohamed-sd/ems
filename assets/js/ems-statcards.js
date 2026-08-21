@@ -25,7 +25,16 @@
 
     /* عائلةُ اسمِ البطاقة · وأسماءُ الأجزاءِ التي ليست بطاقةً · والمستثنى */
     var FAM  = /(^|-)(stat|stats|kpi|metric|metrics|tile)(-|$)|(^|-)summary-(card|item|box)(-|$)/i;
-    var PART = /-(icon|ico|img|title|value|val|label|lbl|num|number|text|desc|caption|cap|foot|head|header|meta|badge|body|sub|note|link|arrow|trend|delta|unit|row|col|wrap|inner|content|line|main|info|left|right|top|bottom|bar|dot|chip|pill|tag|hint|grid|section|container|list)$/i;
+    /* ◆ **`state` و`status` اسما جزءٍ لا اسمَ بطاقة** (قرارُ المالك 2026-08-17
+         · `Maintenance/orders.php`). المقيسُ: بطاقةُ `ems_kpi_card` تحوي
+         `<span class="ems-kpi-state">` — و`state` لم تكن في هذه القائمة، فطابق
+         الاسمَ **عائلةُ البطاقات** عبر `-kpi-`، فصار الجزءُ مرشَّحَ بطاقة،
+         و«مَن ضمَّ مرشَّحًا فهو حاوية» فوُسمت البطاقةُ `ems-statgrid` بدل
+         `ems-statcard`. فخرجت بطاقاتُ الصيانةِ بيضاءَ بلا حدٍّ وباستدارةِ 12
+         بينما الموحَّدةُ رماديةٌ بحدٍّ واستدارةِ 35 — «تختلف عن الموحَّدة».
+         والعلاجُ في القائمةِ لا في الشاشة: كلُّ شاشةٍ تستعمل `ems_kpi_card`
+         تُصحَّح معها. */
+    var PART = /-(icon|ico|img|title|value|val|label|lbl|num|number|text|desc|caption|cap|foot|head|header|meta|badge|body|sub|note|link|arrow|trend|delta|unit|row|col|wrap|inner|content|line|main|info|left|right|top|bottom|bar|dot|chip|pill|tag|hint|grid|section|container|list|state|status)$/i;
     var SKIP = /^(counter-field|counter-input-group|counter-separator|counter-seg|required-indicator|rtl-number)$/i;
     var VALC = /(^|[\s-])(value|val|num|number|count|figure|amount)($|[^a-z])/i;
     var LBLC = /(^|[\s-])(title|label|lbl|cap|caption|name|desc)($|[^a-z])/i;
@@ -211,12 +220,63 @@
                `main/dashboard.php`). فتُلتقط **بموضعِها**: أبٌ فيه بطاقتان
                فأكثر. ولولا ذلك بقيت أعمدةُ الشاشةِ القديمةُ فخرجت البطاقةُ
                بعرضِ ٤٣ بكسلًا يفيض محتواها. */
+            /* ◆ **وحاملُ البطاقةِ الواحدةِ ليس شبكةً — الشبكةُ جدُّه**
+                 (قرارُ المالك 2026-08-17 · `Approvals/hours_approval.php`)
+               ◆ **المقيسُ**: الشاشةُ تكتب `row > col-sm-6 col-lg-3 > stat-card`
+                 أربعَ مرّات. وكلُّ عمودٍ يضمُّ بطاقةً **واحدة**، فكان الشرطُ
+                 `>= 1` يُعلن **العمودَ** شبكةً. وقاعدةُ الشبكةِ تفرض
+                 `width:auto !important` وأربعةَ أعمدةٍ داخلَه — فينتفخ العمودُ
+                 من ٢٢٢ بكسلًا إلى ٧٣٢، ويلفُّ الصفُّ فيصير كلُّ بطاقةٍ في سطر.
+                 قِيس قبلَ التحميلِ وبعدَه في المتصفّحِ نفسِه: أربعُ بطاقاتٍ على
+                 محورٍ واحدٍ (y=50) قبلَ الجافاسكربت، وأربعةُ صفوفٍ بعدَه.
+               ◆ **والتعليقُ أعلاه كان يقول الصوابَ والشرطُ يخالفه**: «أبٌ فيه
+                 بطاقتان فأكثر». فصار الشرطُ يقولُ ما يقصده:
+                   · أبٌ فيه بطاقتان فأكثر ⇐ هو الشبكة.
+                   · أبٌ فيه بطاقةٌ واحدةٌ وله إخوةٌ يحملون بطاقاتٍ مثلَه ⇐
+                     الشبكةُ **جدُّه** (صفُّ الأعمدة)، والعمودُ يُترك كما هو.
+                   · أبٌ فيه بطاقةٌ واحدةٌ بلا إخوةٍ كذلك ⇐ يبقى الحكمُ القديم،
+                     فلا تنكشف الأعمدةُ القديمةُ الضيّقةُ التي عولجت أصلًا. */
             var seen = [];
+            /* غلافٌ رفيع: يحمل بطاقةً واحدةً ولا عنصرَ آخرَ معها — كعمودِ بوتستراب. */
+            var thinWrap = function (el) {
+                if (!el || el.nodeType !== 1) { return false; }
+                if (el.querySelectorAll('.ems-statcard').length !== 1) { return false; }
+                return el.children.length === 1 && el.children[0].classList.contains('ems-statcard');
+            };
+            var cardCount = function (el) {
+                return (el && el.nodeType === 1) ? el.querySelectorAll('.ems-statcard').length : 0;
+            };
             for (i = 0; i < cards.length; i++) {
                 var par = cards[i].parentElement;
                 if (!par || par === document.body || seen.indexOf(par) !== -1) { continue; }
                 seen.push(par);
-                if (par.querySelectorAll(':scope > .ems-statcard').length >= 1) {
+
+                var own = par.querySelectorAll(':scope > .ems-statcard').length;
+                if (own >= 2) { par.classList.add('ems-statgrid'); continue; }
+                if (own < 1) { continue; }
+
+                /* ◆ **صفُّ الأغلفةِ الرفيعة**: `row > col > card` أربعَ مرّات.
+                     الشبكةُ الحقيقيةُ هي **الصفُّ** لا العمود. ولا يُتسلَّق إليه
+                     إلا بشرطٍ ضيّقٍ يمنع الصعودَ إلى حاويةِ الصفحة:
+                       · الأبُ نفسُه غلافٌ رفيع، و
+                       · للجَدِّ **غلافان رفيعان فأكثر**، و
+                       · **كلُّ** ابنٍ في الجَدِّ يحمل بطاقةً هو غلافٌ رفيعٌ مثلُه.
+                     الشرطُ الثالثُ هو المانع: في حاويةِ صفحةٍ أبناؤها يحملون
+                     4 و2 و1 و3 بطاقاتٍ لا تتحقّق «كلُّها واحدة»، فلا يُتسلَّق —
+                     وقد قِيس هذا التسلُّطُ الخاطئُ على `.main` قبلَ إضافةِ الشرط. */
+                var gp = par.parentElement, thin = 0, holders = 0, uniform = true;
+                if (thinWrap(par) && gp && gp !== document.body) {
+                    for (j = 0; j < gp.children.length; j++) {
+                        var ch = gp.children[j];
+                        if (cardCount(ch) === 0) { continue; }
+                        holders++;
+                        if (thinWrap(ch)) { thin++; } else { uniform = false; }
+                    }
+                }
+                if (uniform && thin >= 2 && thin === holders) {
+                    if (seen.indexOf(gp) === -1) { seen.push(gp); }
+                    gp.classList.add('ems-statgrid');
+                } else {
                     par.classList.add('ems-statgrid');
                 }
             }

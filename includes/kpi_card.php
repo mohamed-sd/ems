@@ -97,8 +97,17 @@ if (!function_exists('ems_kpi_card')) {
         $html  = '<a class="' . $E(trim($cls)) . '" href="' . $E($k['drill'])
                . '" title="تعمّق: ' . $E($k['title']) . '">';
         $html .= '<div class="ems-kpi-title">' . $ico . $E($k['title']) . '</div>';
-        $html .= '<div class="ems-kpi-value">' . $E($k['value'])
-               . ' <small>' . $E($k['unit']) . '</small></div>';
+        /* ◆ **الوحدةُ أختٌ للقيمةِ لا ابنةٌ لها.** `ems-statcards.js` يجمع
+             أجزاءَ البطاقةِ بأوراقِ شجرتِها: أيُّ عنصرٍ له ابنٌ عنصريٌّ يُنزَل
+             فيه ولا يُعَدُّ جزءًا. فكان `<small>` داخلَ `ems-kpi-value` يُخفي
+             **القيمةَ نفسَها** عن الموسِم، فيسقط ترشيحُ الصنفِ والنصِّ الرقميِّ
+             معًا، ويقع الاختيارُ على السقّاطةِ الأخيرة: «أكبرُ خطٍّ باقٍ» —
+             وهو نصُّ الفترة. المقيسُ في `main/role_board.php` قبلَ الإصلاح:
+             «لحظي (2026-08-21)» بـ35 بكسلًا/900 في مكانِ القيمة، والرقمُ «82»
+             تحتَه بـ24 يتيمًا بلا وسم. فالقيمةُ تُصيَّر ورقةً نصُّها رقمٌ
+             وصنفُها يذكر قيمةً — والوحدةُ سطرٌ تابعٌ تُعلَن ولا تُطمَس. */
+        $html .= '<div class="ems-kpi-value">' . $E($k['value']) . '</div>';
+        $html .= '<small class="ems-kpi-unit">' . $E($k['unit']) . '</small>';
         $html .= '<div class="ems-kpi-meta"><span>' . $E($k['period']) . '</span>'
                . '<span>' . $E($comparison) . '</span></div>';
         $html .= '<div class="ems-kpi-meta"><span class="ems-kpi-state">' . $E($tone[1]) . '</span>'

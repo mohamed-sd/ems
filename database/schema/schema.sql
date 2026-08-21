@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-19 13:29:17
--- الجداول: 594 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-21 07:34:18
+-- الجداول: 603 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -2636,6 +2636,7 @@ CREATE TABLE `ems_business_events` (
   `delivered_failed` smallint(5) unsigned NOT NULL DEFAULT 0 COMMENT 'TSP-0212: كم مستهلكًا فشل',
   `in_dlq` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'TSP-0213: في صندوقِ الموتى',
   `seed_tag` varchar(32) DEFAULT NULL COMMENT 'TSP-0214: وسمُ البيانِ المبذور — CK-10',
+  `is_training` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'يُشتقُّ من users.is_training للكاتبِ لحظةَ الكتابة — لا يُمرَّر',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_ebe_no` (`company_id`,`event_no`),
   UNIQUE KEY `uq_ebe_uuid` (`event_uuid`),
@@ -2650,6 +2651,7 @@ CREATE TABLE `ems_business_events` (
   KEY `fk_be_currency` (`company_id`,`currency`),
   KEY `ix_pub` (`created_at`),
   KEY `ix_code` (`event_key`,`created_at`),
+  KEY `ix_ebe_training` (`is_training`),
   CONSTRAINT `fk_be_currency` FOREIGN KEY (`company_id`, `currency`) REFERENCES `fin_currencies` (`company_id`, `code`) ON UPDATE CASCADE,
   CONSTRAINT `chk_consumers` CHECK (`consumers_declared` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ADR-15: الجذر المحايد — سجل الحقائق المؤسسي append-only؛ القناة: EventPublisher حصرًا؛ الدفتر المالي إسقاطه الأول';
@@ -3200,10 +3202,14 @@ CREATE TABLE `exec_approvals` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `approved_at` datetime DEFAULT NULL COMMENT 'لحظةُ الاعتماد — وبها يُقاس زمنُ الدورة',
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_exec_appr_no` (`company_id`,`request_no`),
   KEY `ix_exap_live` (`company_id`,`status`,`received_date`),
-  KEY `ix_exap_src` (`source_request_id`)
+  KEY `ix_exap_src` (`source_request_id`),
+  KEY `fk_exec_approvals_approver` (`approver_user_id`),
+  CONSTRAINT `fk_exec_approvals_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_exec_approvals_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: الاعتماد الأعلى — الجدول الأصلي لشاشة ceo_approvals';
 
 -- ── Table: exec_assignments ──
@@ -3331,10 +3337,14 @@ CREATE TABLE `exec_contract_signings` (
   `approver_name` varchar(120) DEFAULT NULL COMMENT 'من اعتمده وبأي صفة',
   `approver_authority_ref` varchar(120) DEFAULT NULL COMMENT 'سندُ صلاحيةِ المعتمِد — غيرُ سندِ المُوقِّع',
   `approved_at` datetime DEFAULT NULL COMMENT 'لحظةُ الاعتماد',
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_exec_sign_no` (`company_id`,`contract_no`),
   KEY `ix_excs_live` (`company_id`,`status`,`signing_date`),
-  KEY `ix_excs_contract` (`contract_id`)
+  KEY `ix_excs_contract` (`contract_id`),
+  KEY `fk_exec_contract_signings_approver` (`approver_user_id`),
+  CONSTRAINT `fk_exec_contract_signings_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_exec_contract_signings_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: سجل التوقيع — الجدول الأصلي لشاشة ceo_contracts';
 
 -- ── Table: exec_decisions ──
@@ -3364,9 +3374,13 @@ CREATE TABLE `exec_decisions` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `authority_ref` varchar(120) DEFAULT NULL COMMENT 'سندُ صلاحيةِ معتمِدِ القرار',
   `parent_ref` varchar(64) DEFAULT NULL COMMENT 'المستندُ الذي تولَّد عنه — خيطُ التتبع',
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_exec_decision_no` (`company_id`,`decision_no`),
-  KEY `ix_exdc_live` (`company_id`,`status`,`raised_date`)
+  KEY `ix_exdc_live` (`company_id`,`status`,`raised_date`),
+  KEY `fk_exec_decisions_approver` (`approver_user_id`),
+  CONSTRAINT `fk_exec_decisions_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_exec_decisions_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: سجل القرارات العليا — الجدول الأصلي لشاشة ceo_risk';
 
 -- ── Table: exec_dept_caps ──
@@ -3444,10 +3458,14 @@ CREATE TABLE `exec_project_charters` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `authority_ref` varchar(120) DEFAULT NULL COMMENT 'سندُ صلاحيةِ معتمِدِ القرار',
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_exec_charter_no` (`company_id`,`decision_no`),
   KEY `ix_expc_live` (`company_id`,`status`,`planned_start`),
-  KEY `ix_expc_project` (`project_id`)
+  KEY `ix_expc_project` (`project_id`),
+  KEY `fk_exec_project_charters_approver` (`approver_user_id`),
+  CONSTRAINT `fk_exec_project_charters_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_exec_project_charters_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='M-00 §8-2: قرار فتح المشروع — الجدول الأصلي لشاشة project_charter';
 
 -- ── Table: failure_codes ──
@@ -4550,6 +4568,7 @@ CREATE TABLE `fin_financial_events` (
   `schema_version` smallint(5) unsigned DEFAULT NULL COMMENT 'إصدار مخطط الحدث (عقد §9) — يكتبه الناشر K3',
   `event_version` int(11) NOT NULL DEFAULT 1 COMMENT 'H-12 (FES §7.3): قفلٌ تفاؤلي — كلُّ انتقالٍ يفحصها ويرفعها، والمتزامنان: الأولُ يمضي والثاني Conflict',
   `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'Payload (عقد §9 إلزامي): الحمولة التفصيلية JSON — يفرضها الناشر' CHECK (json_valid(`payload`)),
+  `is_training` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'يرثُ وسمَ الحقيقةِ الجذرِ بـcorrelation_id',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_fin_event_no` (`company_id`,`event_no`),
   UNIQUE KEY `uq_ffe_idempotency` (`idempotency_key`),
@@ -4569,6 +4588,7 @@ CREATE TABLE `fin_financial_events` (
   KEY `ix_ffe_causation` (`causation_id`),
   KEY `ix_ffe_source_line` (`company_id`,`entity_type`,`entity_id`,`source_line_id`,`source_doc_version`),
   KEY `fk_ffe_period` (`fiscal_period_id`),
+  KEY `ix_ffe_training` (`is_training`),
   CONSTRAINT `fk_ffe_period` FOREIGN KEY (`fiscal_period_id`) REFERENCES `fin_financial_periods` (`id`),
   CONSTRAINT `fk_ffe_root` FOREIGN KEY (`root_event_id`) REFERENCES `ems_business_events` (`id`),
   CONSTRAINT `ck_ffe_fx_pair` CHECK (`fx_rate` is null and `base_amount` is null or `fx_rate` is not null and `base_amount` = round(`amount` * `fx_rate`,2))
@@ -6143,6 +6163,17 @@ CREATE TABLE `gov_alternate_authority` (
   CONSTRAINT `chk_alt_quorum` CHECK (`quorum` >= 2)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='② جهةُ اعتمادٍ بديلةٌ مستقلة — فلا يكون الرئيسُ معتمِدًا وحيدًا وممنوعًا معًا';
 
+-- ── Table: gov_appearance_gaps ──
+CREATE TABLE `gov_appearance_gaps` (
+  `route` varchar(190) NOT NULL,
+  `owner_dept` varchar(120) NOT NULL COMMENT 'المالكُ المؤكَّدُ بالشاهد',
+  `seen_in` varchar(190) NOT NULL DEFAULT '' COMMENT 'المساحةُ الوحيدةُ التي تظهر فيها اليوم',
+  `basis` varchar(400) NOT NULL DEFAULT '',
+  `state` enum('OPEN','OWNER_DECIDED','CLOSED') NOT NULL DEFAULT 'OPEN',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`route`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='مِلكيةٌ صحيحةٌ وظهورٌ ناقصٌ في مساحةِ المالك — دَينٌ لا يُغلَق تلقائيًّا';
+
 -- ── Table: gov_approval_decisions ──
 CREATE TABLE `gov_approval_decisions` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -6410,11 +6441,32 @@ CREATE TABLE `gov_dup_semantics` (
   `human_by` varchar(120) DEFAULT NULL,
   `decision` varchar(190) DEFAULT NULL COMMENT 'دمجٌ · منظرٌ محفوظ · إبقاءٌ منفصلًا',
   `decided_at` datetime DEFAULT NULL,
+  `human_note` text DEFAULT NULL COMMENT 'نصُّ الحكمِ الفنيِّ كما كُتب — لا يُلخَّص ولا يُعاد صوغُه',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_pair` (`route_a`,`route_b`),
   KEY `ix_verdict` (`human_verdict`),
   CONSTRAINT `chk_dupsem_human` CHECK (`decision` is null or `human_verdict` is not null and `human_by` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='أزواجُ ازدواجِ المعنى — الترجيحُ الآليُّ والحكمُ البشريُّ عمودانِ لا عمود';
+
+-- ── Table: gov_effect_map ──
+CREATE TABLE `gov_effect_map` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `event_key` varchar(80) NOT NULL,
+  `producer_mod` varchar(40) NOT NULL COMMENT 'وحدةُ الإنتاجِ التقنية',
+  `producer_space` varchar(80) NOT NULL COMMENT 'المساحةُ المالكةُ للواقعة',
+  `fact_rows` int(11) NOT NULL DEFAULT 0 COMMENT 'وقائعُ حيةٌ بهذا المفتاح',
+  `consumer_key` varchar(80) NOT NULL COMMENT 'المستهلِك',
+  `consumer_space` varchar(80) NOT NULL DEFAULT '—',
+  `consumer_doc` varchar(120) NOT NULL DEFAULT '' COMMENT 'المستندُ الذي يُنتجه المستهلِك',
+  `evidence` enum('MEASURED','DECLARED_ACTIVE','DECLARED_INACTIVE') NOT NULL,
+  `evidence_n` int(11) NOT NULL DEFAULT 0 COMMENT 'صفوفُ الأثرِ الواصلةِ فعلًا',
+  `note` varchar(255) NOT NULL DEFAULT '',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_gem` (`event_key`,`consumer_key`),
+  KEY `ix_gem_prod` (`producer_space`),
+  KEY `ix_gem_ev` (`evidence`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ثامنًا-٢ خريطةُ الأثر — من يُنتج · من يستهلك · وأيُّ مستندٍ يُنتجه';
 
 -- ── Table: gov_elevations ──
 CREATE TABLE `gov_elevations` (
@@ -6571,6 +6623,21 @@ CREATE TABLE `gov_inheritance_denials` (
   KEY `ix_field` (`company_id`,`child_entity`,`child_field`,`denied_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-OBL-01 IN-01 — سجلُّ رفضِ تعديلِ الموروث';
 
+-- ── Table: gov_journey_ladders ──
+CREATE TABLE `gov_journey_ladders` (
+  `journey_code` varchar(20) NOT NULL COMMENT 'JR-REV إيراد · JR-SUP مورّد · JR-OPR مشغّل',
+  `journey_ar` varchar(80) NOT NULL,
+  `seq_no` tinyint(4) NOT NULL COMMENT 'ترتيبُ السلّمِ داخلَ الرحلة',
+  `ladder_code` varchar(20) NOT NULL,
+  `driver_route` varchar(190) NOT NULL DEFAULT '' COMMENT 'الشاشةُ التي تقود هذه الخطوةَ اليوم',
+  `driver_state` enum('LIVE_IN_NAV','FILE_ONLY','MISSING') NOT NULL DEFAULT 'MISSING' COMMENT 'مقيسٌ من nav_items النشِط ومن القرص — لا مُعلَنٌ يدويًّا',
+  `nav_hits` smallint(6) NOT NULL DEFAULT 0 COMMENT 'مواضعُ الشاشةِ في سايدبارِ الأدوار',
+  `ladder_wired` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'أتقرأ الشاشةُ سلّمَها لحظةَ الاعتماد؟ — الفجوةُ المرفوعة',
+  `gap_note` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`journey_code`,`seq_no`),
+  KEY `ix_gjl_ladder` (`ladder_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='خامسًا/سابعًا — الـ13 سلّمًا مرتّبةً بحسبِ الرحلاتِ الثلاث';
+
 -- ── Table: gov_ladder_actor_roles ──
 CREATE TABLE `gov_ladder_actor_roles` (
   `actor_code` varchar(40) NOT NULL,
@@ -6677,6 +6744,19 @@ CREATE TABLE `gov_orphan_links` (
   KEY `ix_decision` (`owner_decision`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXW-01 §8 — الروابطُ اليتيمةُ في مركزِ الحوكمةِ التقنيِّ حتى قرارِ المالك';
 
+-- ── Table: gov_ownership_rulings ──
+CREATE TABLE `gov_ownership_rulings` (
+  `route` varchar(190) NOT NULL,
+  `owner_before` varchar(120) NOT NULL,
+  `owner_after` varchar(120) NOT NULL,
+  `witness` varchar(255) NOT NULL COMMENT 'الشاهدُ ومصدرُه',
+  `witness_kind` enum('DOMAIN_WRITE','DATA_READ','DOC_CYCLE','NONE') NOT NULL,
+  `ruling` enum('OWNER_CONFIRMED','OWNER_CHANGED','APPEARANCE_MISSING') NOT NULL,
+  `reason` varchar(400) NOT NULL DEFAULT '',
+  `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`route`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ثامنًا-٣ حسمُ المِلكيةِ المشكوكة — بالشاهدِ أو بالدورةِ المستندية';
+
 -- ── Table: gov_permission_corrections ──
 CREATE TABLE `gov_permission_corrections` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -6740,6 +6820,24 @@ CREATE TABLE `gov_profile_items` (
   CONSTRAINT `fk_pi_profile` FOREIGN KEY (`profile_id`) REFERENCES `gov_role_profiles` (`profile_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-AUTH-01 §5-1 — بنودُ القالبِ الستة';
 
+-- ── Table: gov_restricted_views ──
+CREATE TABLE `gov_restricted_views` (
+  `view_key` varchar(60) NOT NULL COMMENT 'مُعرِّفُ المنظر',
+  `source_table` varchar(64) NOT NULL COMMENT 'جدولُ المصدر',
+  `owner_dept_ar` varchar(120) NOT NULL COMMENT 'مالكُ المصدر',
+  `consumer_space` varchar(80) NOT NULL COMMENT 'المساحةُ المستهلِكة',
+  `purpose_ar` varchar(255) NOT NULL COMMENT 'غرضُه — ولا منظرَ بلا غرضٍ مكتوب',
+  `row_scope_col` varchar(64) NOT NULL COMMENT 'عمودُ نطاقِ الصفِّ — يُحقن في الشرطِ لا يُرشَّح بعدَه',
+  `field_allowlist` varchar(500) NOT NULL COMMENT 'الحقولُ المسموحةُ حصرًا',
+  `allow_export` tinyint(1) NOT NULL DEFAULT 0,
+  `needs_audit` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'أيلزمه أثرٌ في سجلِّ الاطّلاع',
+  `replaces_route` varchar(190) NOT NULL DEFAULT '' COMMENT 'الشاشةُ الممنوعةُ التي يحلُّ محلَّها',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`view_key`),
+  KEY `ix_grv_space` (`consumer_space`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='سادسًا — المنظرُ المقيَّدُ: row_scope × field_allowlist';
+
 -- ── Table: gov_role_profiles ──
 CREATE TABLE `gov_role_profiles` (
   `profile_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -6784,6 +6882,48 @@ CREATE TABLE `gov_screen_cycle` (
   KEY `ix_file` (`screen_file`),
   KEY `ix_dept` (`dept_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXW-01 §7-1 — مصفوفةُ التحققِ الحاكمةُ: عناصرُ الدورةِ السبعةُ لكلِّ شاشة';
+
+-- ── Table: gov_space_appearances ──
+CREATE TABLE `gov_space_appearances` (
+  `id` int(11) NOT NULL,
+  `space_ar` varchar(80) NOT NULL COMMENT 'مساحةُ العمل',
+  `space_kind` enum('DEPARTMENT','ROLE','CONTROL','EXECUTIVE','PERSONAL') NOT NULL,
+  `tab_ar` varchar(120) NOT NULL DEFAULT '',
+  `screen_ar` varchar(190) NOT NULL DEFAULT '',
+  `route` varchar(190) NOT NULL,
+  `owner_dept_ar` varchar(120) NOT NULL DEFAULT '',
+  `owner_kind` enum('BUSINESS_DEPARTMENT','PLATFORM_SHARED') NOT NULL DEFAULT 'BUSINESS_DEPARTMENT',
+  `src_class` varchar(32) NOT NULL DEFAULT '' COMMENT '① صنفُ الظهورِ كما ورد',
+  `src_ownership` varchar(32) NOT NULL DEFAULT '' COMMENT '② حالةُ المِلكيةِ كما وردت',
+  `src_decision` varchar(32) NOT NULL DEFAULT '' COMMENT '③ حالةُ القرارِ كما وردت',
+  `src_note` varchar(255) NOT NULL DEFAULT '',
+  `spaces_count` smallint(6) NOT NULL DEFAULT 0 COMMENT 'في كم مساحةٍ يظهر هذا المسار',
+  `cls` varchar(32) NOT NULL DEFAULT '' COMMENT 'صنفُ الظهورِ بعدَ إعادةِ التصنيف',
+  `ownership` varchar(32) NOT NULL DEFAULT '',
+  `decision` varchar(32) NOT NULL DEFAULT '',
+  `basis` varchar(255) NOT NULL DEFAULT '' COMMENT 'الشاهدُ الذي أوجبَ الحكمَ — لا رأيٌ',
+  `rule_step` tinyint(4) NOT NULL DEFAULT 0 COMMENT 'أيُّ عقدةٍ من شجرةِ القرارِ حسمَته (١..٦)',
+  `view_fields` varchar(500) NOT NULL DEFAULT '' COMMENT 'حقولُ المنظرِ المقيَّدِ إن كان',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_gsa_space` (`space_ar`),
+  KEY `ix_gsa_route` (`route`),
+  KEY `ix_gsa_cls` (`cls`),
+  KEY `ix_gsa_own` (`ownership`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ثامنًا-١ لقطةُ الحال — 887 موضعَ ظهورٍ بثلاثةِ محاورَ مستقلة';
+
+-- ── Table: gov_space_roles ──
+CREATE TABLE `gov_space_roles` (
+  `role_id` int(11) NOT NULL,
+  `space_ar` varchar(80) NOT NULL,
+  `overlap_pct` decimal(5,2) NOT NULL DEFAULT 0.00 COMMENT 'ثقةُ الربطِ — نسبةُ تقاطعِ المسارات',
+  `matched` smallint(6) NOT NULL DEFAULT 0,
+  `role_routes` smallint(6) NOT NULL DEFAULT 0,
+  `basis` varchar(190) NOT NULL DEFAULT '',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`role_id`),
+  KEY `ix_gsr_space` (`space_ar`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='رابعًا — الدورُ ⇄ مساحتُه، مقيسًا بتقاطعِ المساراتِ المُصيَّرة';
 
 -- ── Table: gov_stage_outputs ──
 CREATE TABLE `gov_stage_outputs` (
@@ -7827,6 +7967,9 @@ CREATE TABLE `nav_canonical` (
   `output_doc` varchar(190) DEFAULT NULL COMMENT 'المستندُ الناتجُ — من دفترِ التدقيقِ حصرًا، ولا يُكتب تخمينًا',
   `state_transition` varchar(190) DEFAULT NULL COMMENT 'وسمُ انتقالِ الحالةِ الصريحُ — مقروءٌ من الشيفرةِ لا مؤلَّف',
   `ops_source` varchar(190) DEFAULT NULL COMMENT 'من أين جاء أيٌّ منهما — فلا رقمَ بلا مصدر',
+  `placement_kind` enum('SINGLE','CROSS_ROLE_ENTRY','UNJUSTIFIED_SPLIT') NOT NULL DEFAULT 'SINGLE' COMMENT 'مدخلٌ عابرٌ للأدوارِ مشروعٌ · أو اختلافٌ يُوحَّد بقرارِ المالك',
+  `placement_basis` varchar(190) DEFAULT NULL COMMENT 'مصدرُ التصنيفِ — مقيسٌ أو مسمًّى بنصِّ المالك، لا اجتهادٌ صامت',
+  `space_class` varchar(32) NOT NULL DEFAULT '' COMMENT 'صنفُ الظهورِ الغالبُ بعدَ شجرةِ القرار — ليقرأ قارئُ المصفوفةِ حكمَ الحارس',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_route` (`route`),
   KEY `ix_status_level` (`status`,`level_no`,`sort_no`)
@@ -7867,6 +8010,17 @@ CREATE TABLE `nav_dedup_verdicts` (
   PRIMARY KEY (`pair_no`),
   KEY `ix_class` (`verdict_class`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01: أحكامُ ازدواجِ المعنى الـ59 — مثبَّتةٌ حقولًا لا نصًّا في ملف';
+
+-- ── Table: nav_group_taxonomy ──
+CREATE TABLE `nav_group_taxonomy` (
+  `code` varchar(24) NOT NULL COMMENT 'رمزٌ ثابتٌ — يعيش في data-group-key فتُحفظ حالةُ الطيّ',
+  `name_ar` varchar(64) NOT NULL COMMENT 'اسمُ المجموعةِ كما يُقرأ في السايدبار',
+  `icon` varchar(64) NOT NULL COMMENT 'أيقونةُ الرأسِ — مُتحقَّقٌ وجودُها في مكتبةِ الأيقوناتِ المحمَّلة',
+  `sort_no` tinyint(4) NOT NULL COMMENT 'ترتيبُ الظهور: أنا ← ما ينتظرني ← عملي ← المجالات ← الرقابة ← البصيرة ← الضبط',
+  `open_default` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'مفتوحةٌ عند أولِ زيارةٍ فقط — واختيارُ المستخدمِ يغلبها',
+  PRIMARY KEY (`code`),
+  UNIQUE KEY `uq_sort` (`sort_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='العشرُ مجموعاتٍ — سقفُ التبويبِ في السايدبار لكلِّ إدارة';
 
 -- ── Table: nav_items ──
 CREATE TABLE `nav_items` (
@@ -8093,6 +8247,17 @@ CREATE TABLE `nav_redirects` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_navred_old` (`old_route`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='تحويلُ المسارات القديمة — UX-01 §10.2';
+
+-- ── Table: nav_route_group ──
+CREATE TABLE `nav_route_group` (
+  `route` varchar(160) NOT NULL COMMENT 'المسارُ مطبَّعًا صغيرًا — بلا ../ ولا استعلامٍ ولا مرساة',
+  `group_code` varchar(24) NOT NULL,
+  `basis` varchar(190) NOT NULL COMMENT 'سندُ الحكم: PIN · GROUP:… · LEVEL:… · DIR:… · FALLBACK',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`route`),
+  KEY `ix_nrg_group` (`group_code`),
+  CONSTRAINT `fk_nrg_group` FOREIGN KEY (`group_code`) REFERENCES `nav_group_taxonomy` (`code`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='المسارُ ⇄ مجموعتُه الواحدة — والمشترَكُ بين الإداراتِ في مكانٍ واحدٍ دائمًا';
 
 -- ── Table: non_delegable_actions ──
 CREATE TABLE `non_delegable_actions` (
@@ -10280,8 +10445,12 @@ CREATE TABLE `scr_access_review` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_access_review_live` (`company_id`,`status`)
+  KEY `ix_access_review_live` (`company_id`,`status`),
+  KEY `fk_scr_access_review_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_access_review_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_access_review_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة access_review.php';
 
 -- ── Table: scr_asset_recon ──
@@ -10346,8 +10515,12 @@ CREATE TABLE `scr_attendance` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_attendance_live` (`company_id`,`status`)
+  KEY `ix_attendance_live` (`company_id`,`status`),
+  KEY `fk_scr_attendance_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_attendance_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_attendance_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة attendance.php';
 
 -- ── Table: scr_break_glass ──
@@ -10415,8 +10588,12 @@ CREATE TABLE `scr_business_models` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_business_models_live` (`company_id`,`status`)
+  KEY `ix_business_models_live` (`company_id`,`status`),
+  KEY `fk_scr_business_models_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_business_models_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_business_models_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة business_models.php';
 
 -- ── Table: scr_canonical_names ──
@@ -10446,8 +10623,12 @@ CREATE TABLE `scr_canonical_names` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_canonical_names_live` (`company_id`,`status`)
+  KEY `ix_canonical_names_live` (`company_id`,`status`),
+  KEY `fk_scr_canonical_names_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_canonical_names_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_canonical_names_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة canonical_names.php';
 
 -- ── Table: scr_code_bridge ──
@@ -10477,8 +10658,12 @@ CREATE TABLE `scr_code_bridge` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_code_bridge_live` (`company_id`,`status`)
+  KEY `ix_code_bridge_live` (`company_id`,`status`),
+  KEY `fk_scr_code_bridge_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_code_bridge_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_code_bridge_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة code_bridge.php';
 
 -- ── Table: scr_consumption_rate ──
@@ -10547,8 +10732,12 @@ CREATE TABLE `scr_contract_review` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_contract_review_live` (`company_id`,`status`)
+  KEY `ix_contract_review_live` (`company_id`,`status`),
+  KEY `fk_scr_contract_review_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_contract_review_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_contract_review_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة contract_review.php';
 
 -- ── Table: scr_deductions ──
@@ -10663,8 +10852,12 @@ CREATE TABLE `scr_equipment_quota` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_equipment_quota_live` (`company_id`,`status`)
+  KEY `ix_equipment_quota_live` (`company_id`,`status`),
+  KEY `fk_scr_equipment_quota_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_equipment_quota_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_equipment_quota_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة equipment_quota.php';
 
 -- ── Table: scr_equipment_sourcing ──
@@ -10698,8 +10891,12 @@ CREATE TABLE `scr_equipment_sourcing` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_equipment_sourcing_live` (`company_id`,`status`)
+  KEY `ix_equipment_sourcing_live` (`company_id`,`status`),
+  KEY `fk_scr_equipment_sourcing_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_equipment_sourcing_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_equipment_sourcing_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة equipment_sourcing.php';
 
 -- ── Table: scr_exceptions ──
@@ -10768,9 +10965,13 @@ CREATE TABLE `scr_fin_assets` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
   KEY `ix_fin_assets_live` (`company_id`,`status`),
-  CONSTRAINT `chk_nopollute_33fe84c0716621cf` CHECK (`created_at` <= '2026-07-28 14:46:00' or `status` is null or `status`  not like '% %' or octet_length(`status`) <= char_length(`status`))
+  KEY `fk_scr_fin_assets_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_fin_assets_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_nopollute_33fe84c0716621cf` CHECK (`created_at` <= '2026-07-28 14:46:00' or `status` is null or `status`  not like '% %' or octet_length(`status`) <= char_length(`status`)),
+  CONSTRAINT `chk_scr_fin_assets_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة fin_assets.php';
 
 -- ── Table: scr_fin_changes ──
@@ -10897,8 +11098,12 @@ CREATE TABLE `scr_guards` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_guards_live` (`company_id`,`status`)
+  KEY `ix_guards_live` (`company_id`,`status`),
+  KEY `fk_scr_guards_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_guards_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_guards_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة guards.php';
 
 -- ── Table: scr_monthly_close ──
@@ -10967,8 +11172,12 @@ CREATE TABLE `scr_op_codes` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_op_codes_live` (`company_id`,`status`)
+  KEY `ix_op_codes_live` (`company_id`,`status`),
+  KEY `fk_scr_op_codes_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_op_codes_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_op_codes_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة op_codes.php';
 
 -- ── Table: scr_op_monthly ──
@@ -11034,8 +11243,12 @@ CREATE TABLE `scr_op_qual` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_op_qual_live` (`company_id`,`status`)
+  KEY `ix_op_qual_live` (`company_id`,`status`),
+  KEY `fk_scr_op_qual_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_op_qual_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_op_qual_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة op_qual.php';
 
 -- ── Table: scr_ownership_links ──
@@ -11071,8 +11284,12 @@ CREATE TABLE `scr_ownership_links` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_ownership_links_live` (`company_id`,`status`)
+  KEY `ix_ownership_links_live` (`company_id`,`status`),
+  KEY `fk_scr_ownership_links_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_ownership_links_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_ownership_links_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة ownership_links.php';
 
 -- ── Table: scr_perm_explain ──
@@ -11131,8 +11348,12 @@ CREATE TABLE `scr_portal_users` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_portal_users_live` (`company_id`,`status`)
+  KEY `ix_portal_users_live` (`company_id`,`status`),
+  KEY `fk_scr_portal_users_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_portal_users_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_portal_users_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة portal_users.php';
 
 -- ── Table: scr_production ──
@@ -11168,8 +11389,12 @@ CREATE TABLE `scr_production` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_production_live` (`company_id`,`status`)
+  KEY `ix_production_live` (`company_id`,`status`),
+  KEY `fk_scr_production_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_production_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_production_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة production.php';
 
 -- ── Table: scr_project_contracts ──
@@ -11208,8 +11433,12 @@ CREATE TABLE `scr_project_contracts` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_project_contracts_live` (`company_id`,`status`)
+  KEY `ix_project_contracts_live` (`company_id`,`status`),
+  KEY `fk_scr_project_contracts_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_project_contracts_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_project_contracts_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة project_contracts.php';
 
 -- ── Table: scr_release_stamp ──
@@ -11239,8 +11468,12 @@ CREATE TABLE `scr_release_stamp` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_release_stamp_live` (`company_id`,`status`)
+  KEY `ix_release_stamp_live` (`company_id`,`status`),
+  KEY `fk_scr_release_stamp_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_release_stamp_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_release_stamp_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة release_stamp.php';
 
 -- ── Table: scr_rotation ──
@@ -11280,8 +11513,12 @@ CREATE TABLE `scr_rotation` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_rotation_live` (`company_id`,`status`)
+  KEY `ix_rotation_live` (`company_id`,`status`),
+  KEY `fk_scr_rotation_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_rotation_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_rotation_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة rotation.php';
 
 -- ── Table: scr_sensitive_fields ──
@@ -11308,8 +11545,12 @@ CREATE TABLE `scr_sensitive_fields` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_sensitive_fields_live` (`company_id`,`status`)
+  KEY `ix_sensitive_fields_live` (`company_id`,`status`),
+  KEY `fk_scr_sensitive_fields_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_sensitive_fields_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_sensitive_fields_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة sensitive_fields.php';
 
 -- ── Table: scr_shift_log ──
@@ -11342,8 +11583,12 @@ CREATE TABLE `scr_shift_log` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_shift_log_live` (`company_id`,`status`)
+  KEY `ix_shift_log_live` (`company_id`,`status`),
+  KEY `fk_scr_shift_log_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_shift_log_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_shift_log_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة shift_log.php';
 
 -- ── Table: scr_site_gate_equip ──
@@ -11415,8 +11660,18 @@ CREATE TABLE `scr_site_gate_person` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `employee_id` int(11) DEFAULT NULL COMMENT 'الشخصُ من سجلِّ الموظفين — لا نصًّا حرًّا',
+  `site_project_id` int(11) DEFAULT NULL COMMENT 'الموقعُ من سجلِّ المواقع',
+  `supplier_entity_id` int(11) DEFAULT NULL COMMENT 'المورِّدُ التابعُ له من سجلِّ المورِّدين',
+  `approved_by_user` int(11) DEFAULT NULL COMMENT 'المعتمِدُ يُشتقُّ من الجلسةِ ولا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_site_gate_person_live` (`company_id`,`status`)
+  KEY `ix_site_gate_person_live` (`company_id`,`status`),
+  KEY `fk_sgp_employee_id` (`employee_id`),
+  KEY `fk_sgp_site_project_id` (`site_project_id`),
+  KEY `fk_sgp_approved_by_user` (`approved_by_user`),
+  CONSTRAINT `fk_sgp_approved_by_user` FOREIGN KEY (`approved_by_user`) REFERENCES `users` (`id`),
+  CONSTRAINT `fk_sgp_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`),
+  CONSTRAINT `fk_sgp_site_project_id` FOREIGN KEY (`site_project_id`) REFERENCES `project` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة site_gate_person.php';
 
 -- ── Table: scr_site_shift_plan ──
@@ -11449,8 +11704,12 @@ CREATE TABLE `scr_site_shift_plan` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_site_shift_plan_live` (`company_id`,`status`)
+  KEY `ix_site_shift_plan_live` (`company_id`,`status`),
+  KEY `fk_scr_site_shift_plan_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_site_shift_plan_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_site_shift_plan_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة site_shift_plan.php';
 
 -- ── Table: scr_site_work_calendar ──
@@ -11483,8 +11742,12 @@ CREATE TABLE `scr_site_work_calendar` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_site_work_calendar_live` (`company_id`,`status`)
+  KEY `ix_site_work_calendar_live` (`company_id`,`status`),
+  KEY `fk_scr_site_work_calendar_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_site_work_calendar_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_site_work_calendar_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة site_work_calendar.php';
 
 -- ── Table: scr_state_machines ──
@@ -11547,8 +11810,12 @@ CREATE TABLE `scr_transfer_fleet` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_transfer_fleet_live` (`company_id`,`status`)
+  KEY `ix_transfer_fleet_live` (`company_id`,`status`),
+  KEY `fk_scr_transfer_fleet_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_transfer_fleet_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_transfer_fleet_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة transfer_fleet.php';
 
 -- ── Table: scr_transfer_permits ──
@@ -11580,9 +11847,13 @@ CREATE TABLE `scr_transfer_permits` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
   KEY `ix_transfer_permits_live` (`company_id`,`status`),
-  CONSTRAINT `chk_nopollute_c2649c3504db26ec` CHECK (`created_at` <= '2026-07-28 14:46:00' or `status` is null or `status`  not like '% %' or octet_length(`status`) <= char_length(`status`))
+  KEY `fk_scr_transfer_permits_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_transfer_permits_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_nopollute_c2649c3504db26ec` CHECK (`created_at` <= '2026-07-28 14:46:00' or `status` is null or `status`  not like '% %' or octet_length(`status`) <= char_length(`status`)),
+  CONSTRAINT `chk_scr_transfer_permits_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة transfer_permits.php';
 
 -- ── Table: scr_unbilled ──
@@ -11694,8 +11965,12 @@ CREATE TABLE `scr_workshop` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
   PRIMARY KEY (`id`),
-  KEY `ix_workshop_live` (`company_id`,`status`)
+  KEY `ix_workshop_live` (`company_id`,`status`),
+  KEY `fk_scr_workshop_approver` (`approver_user_id`),
+  CONSTRAINT `fk_scr_workshop_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `chk_scr_workshop_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة workshop.php';
 
 -- ── Table: screen_about ──
@@ -13340,7 +13615,8 @@ CREATE TABLE `timesheet_approvals` (
   UNIQUE KEY `uq_ts_level` (`timesheet_id`,`approval_level`),
   KEY `idx_ts_id` (`timesheet_id`),
   KEY `idx_company` (`company_id`),
-  KEY `idx_level` (`approval_level`)
+  KEY `idx_level` (`approval_level`),
+  CONSTRAINT `chk_timesheet_approvals_approver_identity` CHECK (`approved_by_name` is null or trim(`approved_by_name`) = '' or `approved_by` is not null and `approved_by` <> 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='اعتمادات ساعات العمل الهرمية';
 
 -- ── Table: timesheet_failure_hours ──
@@ -14138,6 +14414,8 @@ CREATE TABLE `users` (
   `is_deleted` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'محذوف',
   `deleted_at` datetime DEFAULT NULL COMMENT 'وقت الحذف',
   `deleted_by` int(11) DEFAULT NULL COMMENT 'الحاذف',
+  `is_training` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'حسابُ تدريبٍ — كلُّ ما يكتبه يُوسَم ولا يدخل الإنتاج',
+  `training_since` datetime DEFAULT NULL COMMENT 'لحظةُ إعلانِ الحسابِ تدريبيًّا — ولا يُحاسَب على وسمٍ ما كُتب قبلَها',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `uq_users_email` (`email`),
@@ -14148,6 +14426,8 @@ CREATE TABLE `users` (
   KEY `idx_users_is_deleted` (`is_deleted`),
   KEY `idx_users_position` (`position_id`),
   KEY `ix_users_supplier` (`supplier_entity_id`),
+  KEY `ix_users_training` (`is_training`),
+  KEY `ix_users_training_since` (`training_since`),
   CONSTRAINT `fk_users_employee` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_users_position` FOREIGN KEY (`position_id`) REFERENCES `positions` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_users_supplier` FOREIGN KEY (`supplier_entity_id`) REFERENCES `suppliers` (`id`)

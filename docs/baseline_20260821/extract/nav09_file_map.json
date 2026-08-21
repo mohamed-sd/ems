@@ -1,0 +1,2324 @@
+[
+    {
+        "canonical_file": "access_review.php",
+        "title_ar": "دورة المراجعة الدورية للصلاحيات",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Governance\/access_review.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:49"
+    },
+    {
+        "canonical_file": "accountant_desk.php",
+        "title_ar": "مهام المحاسب اليومية",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "FinRequests\/accountant_desk.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "activation.php",
+        "title_ar": "أنماط تفعيل المزايا",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "mapped",
+        "real_path": "Governance\/activation_patterns.php",
+        "note": "CMP-03 ⑥ J-07: مواءمة عنوانية — تُعرض على المالك",
+        "updated_at": "2026-08-03 21:47:48"
+    },
+    {
+        "canonical_file": "advances.php",
+        "title_ar": "السلف والعهد المالية",
+        "owner_dept": "الموارد البشرية",
+        "state": "mapped",
+        "real_path": "Workforce\/employee_advances.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "approvals_inbox.php",
+        "title_ar": "صندوق ما ينتظر اعتمادي",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Finance\/approvals_inbox.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:50"
+    },
+    {
+        "canonical_file": "asset_recon.php",
+        "title_ar": "مطابقة سجل الأصول بالتشغيل",
+        "owner_dept": "إدارة الأسطول",
+        "state": "live",
+        "real_path": "Equipments\/asset_recon.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:47"
+    },
+    {
+        "canonical_file": "assistants.php",
+        "title_ar": "المعاونون والنيابة المؤقتة",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "mapped",
+        "real_path": "main\/all_assistants.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "attendance.php",
+        "title_ar": "الحضور والانصراف",
+        "owner_dept": "الموارد البشرية",
+        "state": "live",
+        "real_path": "Operations\/attendance.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:43"
+    },
+    {
+        "canonical_file": "audit.php",
+        "title_ar": "سجل التدقيق والاطّلاع",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "mapped",
+        "real_path": "ActivityLogs\/activity_logs.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "bank_recon.php",
+        "title_ar": "المطابقة البنكية",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Finance\/bank_reconciliation_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "break_glass.php",
+        "title_ar": "صلاحية الطوارئ اللحظية (كسر الزجاج)",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Governance\/break_glass.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:49"
+    },
+    {
+        "canonical_file": "budget_dept.php",
+        "title_ar": "ميزانية إدارتي",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/budget_dept.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:50"
+    },
+    {
+        "canonical_file": "budget_master.php",
+        "title_ar": "الموازنة العامة",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/budget_master.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "business_models.php",
+        "title_ar": "نماذج العمل ووحدات القياس",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Portal\/business_models.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:40"
+    },
+    {
+        "canonical_file": "canonical_names.php",
+        "title_ar": "سجل الأسماء المعتمدة",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Governance\/canonical_names.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:48"
+    },
+    {
+        "canonical_file": "cash_forecast.php",
+        "title_ar": "التدفق النقدي والتنبؤ",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Finance\/cash_forecast_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "ceo_approvals.php",
+        "title_ar": "اعتمادات المدير التنفيذي",
+        "owner_dept": "الإدارة التنفيذية",
+        "state": "live",
+        "real_path": "Portal\/ceo_approvals.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:40"
+    },
+    {
+        "canonical_file": "ceo_board.php",
+        "title_ar": "لوحة المدير التنفيذي",
+        "owner_dept": "الإدارة التنفيذية",
+        "state": "live",
+        "real_path": "Portal\/ceo_board.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:40"
+    },
+    {
+        "canonical_file": "ceo_contracts.php",
+        "title_ar": "توقيع العقود والالتزامات",
+        "owner_dept": "الإدارة التنفيذية",
+        "state": "live",
+        "real_path": "Portal\/ceo_contracts.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:41"
+    },
+    {
+        "canonical_file": "ceo_risk.php",
+        "title_ar": "المخاطر والقرارات العليا",
+        "owner_dept": "الإدارة التنفيذية",
+        "state": "live",
+        "real_path": "Portal\/ceo_risk.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:41"
+    },
+    {
+        "canonical_file": "change_password.php",
+        "title_ar": "تغيير كلمة المرور",
+        "owner_dept": "مساحة عملي",
+        "state": "live",
+        "real_path": "Settings\/change_password.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:50"
+    },
+    {
+        "canonical_file": "claims.php",
+        "title_ar": "المستخلصات والمطالبات",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Contracts\/claims.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "client_statement.php",
+        "title_ar": "كشف حساب العميل",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Contracts\/client_statement.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "clients.php",
+        "title_ar": "سجل العملاء",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Clients\/clients.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "coa.php",
+        "title_ar": "دليل الحسابات ومراكز التكلفة",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Finance\/management_accounting_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "code_bridge.php",
+        "title_ar": "جسر ترقيم المعدات",
+        "owner_dept": "إدارة الأسطول",
+        "state": "live",
+        "real_path": "Equipments\/code_bridge.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:47"
+    },
+    {
+        "canonical_file": "commercial_risks.php",
+        "title_ar": "المخاطر التجارية",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Clients\/commercial_risks.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "consumption_rate.php",
+        "title_ar": "استهلاك المعدة ومعدله",
+        "owner_dept": "المخازن",
+        "state": "live",
+        "real_path": "Procurement\/consumption_rate.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:45"
+    },
+    {
+        "canonical_file": "contract_amendments.php",
+        "title_ar": "ملاحق العقود وتجديداتها",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Clients\/contract_amendments.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "contract_events.php",
+        "title_ar": "سجل حركة العقد",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Clients\/contract_events.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "contract_registry.php",
+        "title_ar": "سجل العقود الموحَّد",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Workforce\/contract_registry.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "contract_review.php",
+        "title_ar": "مراجعة العقود وملاحظاتها",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Portal\/contract_review.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:41"
+    },
+    {
+        "canonical_file": "contract_terms.php",
+        "title_ar": "أحكام العقد — العملات والمقدم والمهل",
+        "owner_dept": "المبيعات والعقود",
+        "state": "mapped",
+        "real_path": "Contracts\/contract_card.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "contracts.php",
+        "title_ar": "عقود العملاء",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Contracts\/contracts.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "cost_report.php",
+        "title_ar": "التكاليف والربحية بالمركز",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Finance\/cost_report_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "coverage.php",
+        "title_ar": "التزام العقد بنوع المعدة",
+        "owner_dept": "المبيعات والعقود",
+        "state": "mapped",
+        "real_path": "Contracts\/contract_coverage.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "custody.php",
+        "title_ar": "العهد والمرتجعات",
+        "owner_dept": "المخازن",
+        "state": "mapped",
+        "real_path": "Procurement\/receipt_custody_proc.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "cycle_time.php",
+        "title_ar": "زمن دورة الطلبات",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "FinRequests\/cycle_time_board.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "daily_plan.php",
+        "title_ar": "خطة عمل الغد",
+        "owner_dept": "إدارة الموقع",
+        "state": "live",
+        "real_path": "Operations\/daily_plan.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "deductions.php",
+        "title_ar": "الخصومات والجزاءات",
+        "owner_dept": "الموارد البشرية",
+        "state": "live",
+        "real_path": "Workforce\/deductions.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:46"
+    },
+    {
+        "canonical_file": "delegations.php",
+        "title_ar": "التفويض بالتوقيع",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "mapped",
+        "real_path": "Governance\/signing_authority.php",
+        "note": "CMP-03 ⑥ J-07: مواءمة عنوانية — تُعرض على المالك",
+        "updated_at": "2026-08-03 21:47:40"
+    },
+    {
+        "canonical_file": "dep_profiles.php",
+        "title_ar": "سياسات الإهلاك المعتمدة",
+        "owner_dept": "إدارة الأسطول",
+        "state": "mapped",
+        "real_path": "Equipments\/fleet_depreciation_profiles.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "depreciation.php",
+        "title_ar": "الإهلاك والقيمة الدفترية",
+        "owner_dept": "إدارة الأسطول",
+        "state": "mapped",
+        "real_path": "Finance\/assets_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "dept_achievement.php",
+        "title_ar": "إنجاز الإدارة",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Portal\/dept_achievement.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:50"
+    },
+    {
+        "canonical_file": "distribution.php",
+        "title_ar": "توزيع المعدات والمشغّلين",
+        "owner_dept": "إدارة التشغيل",
+        "state": "mapped",
+        "real_path": "Operations\/distribution_space.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "doc_types.php",
+        "title_ar": "سجل أنواع المستندات",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Governance\/doc_types.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:50"
+    },
+    {
+        "canonical_file": "effect_map.php",
+        "title_ar": "تتبّع الأثر من الواقعة إلى القيد",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "FinRequests\/effect_map.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "emp_contracts.php",
+        "title_ar": "عقود الموظفين",
+        "owner_dept": "الموارد البشرية",
+        "state": "mapped",
+        "real_path": "Employees\/employee_contracts.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "employees.php",
+        "title_ar": "سجل الموظفين",
+        "owner_dept": "الموارد البشرية",
+        "state": "live",
+        "real_path": "Employees\/employees.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "entities.php",
+        "title_ar": "سجل الشركات والكيانات",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "mapped",
+        "real_path": "Governance\/entities_registry.php",
+        "note": "CMP-03 ⑥ J-07: مواءمة عنوانية — تُعرض على المالك",
+        "updated_at": "2026-08-03 21:47:47"
+    },
+    {
+        "canonical_file": "entitlement_gate.php",
+        "title_ar": "فحص شروط الاستحقاق",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/entitlement_gate.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "entitlement.php",
+        "title_ar": "توليد المستحق من العمل المعتمد",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/entitlement.php",
+        "note": "update0012: بُنيت حية بمسارها القانوني",
+        "updated_at": "2026-08-08 17:28:56"
+    },
+    {
+        "canonical_file": "equip_docs.php",
+        "title_ar": "وثائق المعدات والمشغّلين",
+        "owner_dept": "إدارة الأسطول",
+        "state": "mapped",
+        "real_path": "Equipments\/equipment_documents.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "equip_meters.php",
+        "title_ar": "قراءات العدّادات",
+        "owner_dept": "إدارة الأسطول",
+        "state": "mapped",
+        "real_path": "Equipments\/meter_readings.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "equip_models.php",
+        "title_ar": "موديلات المعدات ومواصفاتها",
+        "owner_dept": "إدارة الأسطول",
+        "state": "mapped",
+        "real_path": "Equipments\/fleet_models.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "equip_types.php",
+        "title_ar": "أنواع المعدات وفئاتها",
+        "owner_dept": "إدارة الأسطول",
+        "state": "mapped",
+        "real_path": "Equipments\/equipments_types.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "equipment_quota.php",
+        "title_ar": "توزيع وحدات المورد على معداته",
+        "owner_dept": "إدارة الموردين",
+        "state": "live",
+        "real_path": "Operations\/equipment_quota.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:43"
+    },
+    {
+        "canonical_file": "equipment_sourcing.php",
+        "title_ar": "مصدر المعدة ونمط تملّكها",
+        "owner_dept": "إدارة الأسطول",
+        "state": "live",
+        "real_path": "Equipments\/equipment_sourcing.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:47"
+    },
+    {
+        "canonical_file": "equipments.php",
+        "title_ar": "سجل المعدات",
+        "owner_dept": "إدارة الأسطول",
+        "state": "live",
+        "real_path": "Equipments\/equipments.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "exceptions.php",
+        "title_ar": "طلبات الاستثناء",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Governance\/exceptions.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:49"
+    },
+    {
+        "canonical_file": "failures.php",
+        "title_ar": "تصنيف الأعطال وأسبابها",
+        "owner_dept": "إدارة الصيانة",
+        "state": "mapped",
+        "real_path": "Equipments\/manage_failure_codes.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "fin_assets.php",
+        "title_ar": "الأعيان المموَّلة",
+        "owner_dept": "التمويل والملكية",
+        "state": "live",
+        "real_path": "Equipments\/fin_assets.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:47"
+    },
+    {
+        "canonical_file": "fin_cashflow_stmt.php",
+        "title_ar": "قائمة التدفقات النقدية",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/fin_cashflow_stmt.php",
+        "note": "update0012: مرحلةُ التحليلِ الماليِّ والنسب",
+        "updated_at": "2026-08-08 19:09:47"
+    },
+    {
+        "canonical_file": "fin_changes.php",
+        "title_ar": "تغيّرات عقود التمويل",
+        "owner_dept": "التمويل والملكية",
+        "state": "live",
+        "real_path": "Financing\/fin_changes.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:48"
+    },
+    {
+        "canonical_file": "fin_contract_margin.php",
+        "title_ar": "هامش العقد ونموذج العمل",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/fin_contract_margin.php",
+        "note": "update0012: مرحلةُ التحليلِ الماليِّ والنسب",
+        "updated_at": "2026-08-08 19:09:47"
+    },
+    {
+        "canonical_file": "fin_cost.php",
+        "title_ar": "توزيع تكلفة التمويل على المشاريع",
+        "owner_dept": "التمويل والملكية",
+        "state": "mapped",
+        "real_path": "Financing\/cost_allocation.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "fin_deviations.php",
+        "title_ar": "انحرافات التمويل — السداد والملكية والتوثيق",
+        "owner_dept": "التمويل والملكية",
+        "state": "mapped",
+        "real_path": "Financing\/deviations.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "fin_early_warning.php",
+        "title_ar": "الإنذار المالي المبكر",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/fin_early_warning.php",
+        "note": "update0012: مرحلةُ التحليلِ الماليِّ والنسب",
+        "updated_at": "2026-08-08 19:09:47"
+    },
+    {
+        "canonical_file": "fin_equity_stmt.php",
+        "title_ar": "قائمة التغيرات في حقوق الملكية",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/fin_equity_stmt.php",
+        "note": "update0012: مرحلةُ التحليلِ الماليِّ والنسب",
+        "updated_at": "2026-08-08 19:09:47"
+    },
+    {
+        "canonical_file": "fin_exit.php",
+        "title_ar": "الخروج غير المسجَّل من الملكية",
+        "owner_dept": "التمويل والملكية",
+        "state": "mapped",
+        "real_path": "Financing\/deviations.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "fin_idle.php",
+        "title_ar": "عقود تمويل بلا حركة",
+        "owner_dept": "التمويل والملكية",
+        "state": "mapped",
+        "real_path": "Financing\/deviations.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "fin_models.php",
+        "title_ar": "نماذج التمويل ومعالجتها",
+        "owner_dept": "التمويل والملكية",
+        "state": "live",
+        "real_path": "Financing\/fin_models.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:47"
+    },
+    {
+        "canonical_file": "fin_ops.php",
+        "title_ar": "عمليات التمويل",
+        "owner_dept": "التمويل والملكية",
+        "state": "mapped",
+        "real_path": "Financing\/financing_board.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "fin_posting_matrix.php",
+        "title_ar": "مصفوفة الترحيل من الإدارات",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/fin_posting_matrix.php",
+        "note": "update0012: مرحلةُ التحليلِ الماليِّ والنسب",
+        "updated_at": "2026-08-08 19:09:47"
+    },
+    {
+        "canonical_file": "fin_project_pl.php",
+        "title_ar": "قائمة دخل المشروع",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/fin_project_pl.php",
+        "note": "update0012: مرحلةُ التحليلِ الماليِّ والنسب",
+        "updated_at": "2026-08-08 19:09:47"
+    },
+    {
+        "canonical_file": "fin_ratio_detail.php",
+        "title_ar": "تفصيل نسبة مالية",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/fin_ratio_detail.php",
+        "note": "update0012: مرحلةُ التحليلِ الماليِّ والنسب",
+        "updated_at": "2026-08-08 19:09:47"
+    },
+    {
+        "canonical_file": "fin_ratio_targets.php",
+        "title_ar": "حدود النسب وأهدافها",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/fin_ratio_targets.php",
+        "note": "update0012: مرحلةُ التحليلِ الماليِّ والنسب",
+        "updated_at": "2026-08-08 19:09:47"
+    },
+    {
+        "canonical_file": "fin_ratios.php",
+        "title_ar": "لوحة النسب المالية",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/fin_ratios.php",
+        "note": "update0012: مرحلةُ التحليلِ الماليِّ والنسب",
+        "updated_at": "2026-08-08 19:09:47"
+    },
+    {
+        "canonical_file": "fin_statements.php",
+        "title_ar": "القوائم المالية",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Finance\/financial_statements_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "fin_unit_economics.php",
+        "title_ar": "ربحية المعدة الواحدة",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/fin_unit_economics.php",
+        "note": "update0012: مرحلةُ التحليلِ الماليِّ والنسب",
+        "updated_at": "2026-08-08 19:09:47"
+    },
+    {
+        "canonical_file": "fin_variance.php",
+        "title_ar": "فروق السداد والاستحقاق",
+        "owner_dept": "التمويل والملكية",
+        "state": "mapped",
+        "real_path": "Financing\/deviations.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "final_settlement.php",
+        "title_ar": "تصفية إنهاء خدمة موظف",
+        "owner_dept": "الموارد البشرية",
+        "state": "live",
+        "real_path": "Workforce\/final_settlement.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "financiers.php",
+        "title_ar": "سجل الممولين",
+        "owner_dept": "التمويل والملكية",
+        "state": "mapped",
+        "real_path": "Financing\/financiers_registry.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "fleet_calendar.php",
+        "title_ar": "",
+        "owner_dept": "",
+        "state": "mapped",
+        "real_path": "Operations\/fleet_calendar.php",
+        "note": null,
+        "updated_at": "2026-08-06 18:56:54"
+    },
+    {
+        "canonical_file": "fleet_owners.php",
+        "title_ar": "ملّاك الأسطول",
+        "owner_dept": "إدارة الأسطول",
+        "state": "mapped",
+        "real_path": "Financing\/owners_registry.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "fleet_utilization.php",
+        "title_ar": "",
+        "owner_dept": "",
+        "state": "mapped",
+        "real_path": "Operations\/fleet_utilization.php",
+        "note": null,
+        "updated_at": "2026-08-06 18:56:54"
+    },
+    {
+        "canonical_file": "founding_mode.php",
+        "title_ar": "وضع التأسيس وإغلاقه",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Portal\/founding_mode.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:41"
+    },
+    {
+        "canonical_file": "fx_rates.php",
+        "title_ar": "أسعار الصرف",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Finance\/currencies_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "gov_dept_cap.php",
+        "title_ar": "حوكمة التمويل والملكية",
+        "owner_dept": "التمويل والملكية",
+        "state": "live",
+        "real_path": "Financing\/gov_dept_cap.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "gov_dept_ceo.php",
+        "title_ar": "حوكمة مكتبُ الرئيس التنفيذي والنواب",
+        "owner_dept": "الإدارة التنفيذية",
+        "state": "live",
+        "real_path": "Portal\/gov_dept_ceo.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "gov_dept_crp.php",
+        "title_ar": "حوكمة مركز البلاغات",
+        "owner_dept": "مركز البلاغات",
+        "state": "live",
+        "real_path": "Tickets\/gov_dept_crp.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "gov_dept_fin.php",
+        "title_ar": "حوكمة المالية والخزينة",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Finance\/gov_dept_fin.php",
+        "note": "update0012: بُنيت حية بمسارها القانوني",
+        "updated_at": "2026-08-08 17:28:56"
+    },
+    {
+        "canonical_file": "gov_dept_flt.php",
+        "title_ar": "حوكمة إدارة الأسطول",
+        "owner_dept": "إدارة الأسطول",
+        "state": "live",
+        "real_path": "Equipments\/gov_dept_flt.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "gov_dept_gov.php",
+        "title_ar": "حوكمة الحوكمة والالتزام",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Governance\/gov_dept_gov.php",
+        "note": "update0012: بُنيت حية بمسارها القانوني",
+        "updated_at": "2026-08-08 17:28:56"
+    },
+    {
+        "canonical_file": "gov_dept_hrm.php",
+        "title_ar": "حوكمة الموارد البشرية",
+        "owner_dept": "الموارد البشرية",
+        "state": "live",
+        "real_path": "Workforce\/gov_dept_hrm.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "gov_dept_inv.php",
+        "title_ar": "حوكمة إدارة المخازن",
+        "owner_dept": "المخازن",
+        "state": "live",
+        "real_path": "Procurement\/gov_dept_inv.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "gov_dept_mnt.php",
+        "title_ar": "حوكمة إدارة الصيانة",
+        "owner_dept": "إدارة الصيانة",
+        "state": "live",
+        "real_path": "Maintenance\/gov_dept_mnt.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "gov_dept_ops.php",
+        "title_ar": "حوكمة إدارة التشغيل",
+        "owner_dept": "إدارة التشغيل",
+        "state": "live",
+        "real_path": "Operations\/gov_dept_ops.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "gov_dept_prc.php",
+        "title_ar": "حوكمة إدارة المشتريات التشغيلية",
+        "owner_dept": "المشتريات",
+        "state": "live",
+        "real_path": "Procurement\/gov_dept_prc.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "gov_dept_sit.php",
+        "title_ar": "حوكمة إدارة الموقع",
+        "owner_dept": "إدارة الموقع",
+        "state": "live",
+        "real_path": "Operations\/gov_dept_sit.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "gov_dept_trp.php",
+        "title_ar": "حوكمة النقل والترحيل",
+        "owner_dept": "النقل والترحيل",
+        "state": "live",
+        "real_path": "Transport\/gov_dept_trp.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "gov_dept_wrk.php",
+        "title_ar": "حوكمة القوى التشغيلية",
+        "owner_dept": "القوى التشغيلية",
+        "state": "live",
+        "real_path": "Workforce\/gov_dept_wrk.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "guard_denials.php",
+        "title_ar": "المحاولات الممنوعة",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Governance\/guard_denials.php",
+        "note": "update0012: بُنيت حية بمسارها القانوني",
+        "updated_at": "2026-08-08 17:28:56"
+    },
+    {
+        "canonical_file": "guards.php",
+        "title_ar": "تصنيف قواعد المنع",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Governance\/guards.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:48"
+    },
+    {
+        "canonical_file": "housing_units.php",
+        "title_ar": "السكن والإعاشة والمعسكرات",
+        "owner_dept": "القوى التشغيلية",
+        "state": "live",
+        "real_path": "Workforce\/housing_units.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "inspections.php",
+        "title_ar": "الفحص الفني اليومي",
+        "owner_dept": "إدارة الصيانة",
+        "state": "live",
+        "real_path": "Maintenance\/inspections.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "installments.php",
+        "title_ar": "الأقساط ومواعيد السداد",
+        "owner_dept": "التمويل والملكية",
+        "state": "live",
+        "real_path": "Financing\/installments.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "invoices.php",
+        "title_ar": "فواتير العملاء",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Contracts\/tax_invoices.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "issue.php",
+        "title_ar": "صرف مواد من المخزن",
+        "owner_dept": "المخازن",
+        "state": "mapped",
+        "real_path": "Procurement\/issue_proc.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "items.php",
+        "title_ar": "كتالوج الأصناف والقطع الحرجة",
+        "owner_dept": "المخازن",
+        "state": "mapped",
+        "real_path": "Procurement\/items_proc.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "journal.php",
+        "title_ar": "القيود اليومية",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Finance\/journal_form_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "leaves.php",
+        "title_ar": "الإجازات والغياب",
+        "owner_dept": "الموارد البشرية",
+        "state": "mapped",
+        "real_path": "Workforce\/worker_leave_absence.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "licenses.php",
+        "title_ar": "التراخيص والكفالات",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "mapped",
+        "real_path": "Governance\/licenses_guarantees.php",
+        "note": "CMP-03 ⑥ J-07: مواءمة عنوانية — تُعرض على المالك",
+        "updated_at": "2026-08-03 21:47:45"
+    },
+    {
+        "canonical_file": "maint_provision.php",
+        "title_ar": "مخصص الصيانة والعمرات",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Finance\/maintenance_provision_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "margin.php",
+        "title_ar": "هامش الربح للعقد والواقعة",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Reports\/margin_report.php",
+        "note": "CMP-03 ⑥ J-07: مواءمة عنوانية — تُعرض على المالك",
+        "updated_at": "2026-08-03 21:47:41"
+    },
+    {
+        "canonical_file": "messages.php",
+        "title_ar": "المراسلات",
+        "owner_dept": "مساحة عملي",
+        "state": "mapped",
+        "real_path": "chats\/index.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:50"
+    },
+    {
+        "canonical_file": "modules.php",
+        "title_ar": "صفحات النظام والإدارات",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Settings\/modules.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "monthly_close.php",
+        "title_ar": "الإقفال الشهري للوحدة",
+        "owner_dept": "إدارة التشغيل",
+        "state": "live",
+        "real_path": "Operations\/monthly_close.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:43"
+    },
+    {
+        "canonical_file": "my_achievement.php",
+        "title_ar": "إنجازي",
+        "owner_dept": "مساحة عملي",
+        "state": "live",
+        "real_path": "Portal\/my_achievement.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:50"
+    },
+    {
+        "canonical_file": "my_certificate.php",
+        "title_ar": "شهادة إنجازي",
+        "owner_dept": "مساحة عملي",
+        "state": "live",
+        "real_path": "Portal\/my_certificate.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:50"
+    },
+    {
+        "canonical_file": "my_evaluation.php",
+        "title_ar": "تقييمي",
+        "owner_dept": "مساحة عملي",
+        "state": "live",
+        "real_path": "Portal\/my_evaluation.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:50"
+    },
+    {
+        "canonical_file": "my_portal.php",
+        "title_ar": "بوابتي",
+        "owner_dept": "مساحة عملي",
+        "state": "live",
+        "real_path": "Portal\/my_portal.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:50"
+    },
+    {
+        "canonical_file": "my_requests.php",
+        "title_ar": "طلباتي",
+        "owner_dept": "مساحة عملي",
+        "state": "live",
+        "real_path": "FinRequests\/my_requests.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:50"
+    },
+    {
+        "canonical_file": "my_tasks.php",
+        "title_ar": "مهامي",
+        "owner_dept": "مساحة عملي",
+        "state": "live",
+        "real_path": "Portal\/my_tasks.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:40"
+    },
+    {
+        "canonical_file": "op_assign.php",
+        "title_ar": "تكليف المشغّل على المعدة",
+        "owner_dept": "القوى التشغيلية",
+        "state": "mapped",
+        "real_path": "Operations\/distribution_space.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "op_codes.php",
+        "title_ar": "أرقام المشغّلين الشاغرة",
+        "owner_dept": "القوى التشغيلية",
+        "state": "live",
+        "real_path": "Workforce\/op_codes.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:46"
+    },
+    {
+        "canonical_file": "op_deduct.php",
+        "title_ar": "خصومات المشغّلين المقترحة",
+        "owner_dept": "القوى التشغيلية",
+        "state": "mapped",
+        "real_path": "Workforce\/proposed_deductions.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "op_monthly.php",
+        "title_ar": "الأداء الشهري للمشغّل",
+        "owner_dept": "القوى التشغيلية",
+        "state": "live",
+        "real_path": "Workforce\/op_monthly.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:46"
+    },
+    {
+        "canonical_file": "op_qual.php",
+        "title_ar": "تأهيل المشغّلين على أنواع المعدات",
+        "owner_dept": "القوى التشغيلية",
+        "state": "live",
+        "real_path": "Workforce\/op_qual.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:46"
+    },
+    {
+        "canonical_file": "operators.php",
+        "title_ar": "سجل المشغّلين",
+        "owner_dept": "القوى التشغيلية",
+        "state": "mapped",
+        "real_path": "Employees\/equipment_operators.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "opportunities.php",
+        "title_ar": "الفرص والزيارات والمناقصات",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Opportunities\/opportunities.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "ops_room.php",
+        "title_ar": "غرفة عمليات المواقع",
+        "owner_dept": "إدارة التشغيل",
+        "state": "mapped",
+        "real_path": "Operations\/operations_room.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "orders.php",
+        "title_ar": "أوامر الصيانة",
+        "owner_dept": "إدارة الصيانة",
+        "state": "live",
+        "real_path": "Maintenance\/orders.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "org_assignments.php",
+        "title_ar": "التكليفات التنظيمية",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "admin\/org_assignments.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "org_permits.php",
+        "title_ar": "أذون الزيارة والمركبات الخارجية",
+        "owner_dept": "إدارة الموقع",
+        "state": "live",
+        "real_path": "admin\/org_permits.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "org_structure.php",
+        "title_ar": "الهيكل التنظيمي والمسميات",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "admin\/org_structure.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "ownership_links.php",
+        "title_ar": "علاقات الملكية بين الكيانات",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Financing\/ownership_links.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:48"
+    },
+    {
+        "canonical_file": "payables.php",
+        "title_ar": "ذمم الموردين والمستحقات",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Finance\/dues_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "payments.php",
+        "title_ar": "طلبات الدفع والسداد",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Finance\/payments_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "payroll.php",
+        "title_ar": "مسيّر الرواتب",
+        "owner_dept": "الموارد البشرية",
+        "state": "mapped",
+        "real_path": "Workforce\/payroll_runs.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "penalties.php",
+        "title_ar": "الجزاءات والحوافز التعاقدية",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Contracts\/penalties.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "period_close.php",
+        "title_ar": "إقفال الفترة المحاسبية",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Finance\/periods_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "perm_explain.php",
+        "title_ar": "تفسير مصدر الصلاحية",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Governance\/perm_explain.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:49"
+    },
+    {
+        "canonical_file": "po_match.php",
+        "title_ar": "مطابقة الفاتورة بالأمر والاستلام",
+        "owner_dept": "المشتريات",
+        "state": "live",
+        "real_path": "Procurement\/po_match.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:45"
+    },
+    {
+        "canonical_file": "po.php",
+        "title_ar": "أوامر الشراء",
+        "owner_dept": "المشتريات",
+        "state": "mapped",
+        "real_path": "Procurement\/orders_proc.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "portal_users.php",
+        "title_ar": "حسابات بوابة الأطراف الخارجية",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Governance\/portal_users.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:48"
+    },
+    {
+        "canonical_file": "pr.php",
+        "title_ar": "طلبات الشراء",
+        "owner_dept": "المشتريات",
+        "state": "mapped",
+        "real_path": "Procurement\/requests_proc.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "preventive.php",
+        "title_ar": "خطط الصيانة الوقائية",
+        "owner_dept": "إدارة الصيانة",
+        "state": "mapped",
+        "real_path": "Maintenance\/preventive_plans.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "price_adjust.php",
+        "title_ar": "آليات تعديل السعر",
+        "owner_dept": "المبيعات والعقود",
+        "state": "mapped",
+        "real_path": "Contracts\/price_terms.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "pricelists.php",
+        "title_ar": "قوائم التسعير المعتمدة",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Clients\/pricelists.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "production.php",
+        "title_ar": "الإنتاج والقياس",
+        "owner_dept": "إدارة الموقع",
+        "state": "live",
+        "real_path": "Operations\/production.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:43"
+    },
+    {
+        "canonical_file": "products.php",
+        "title_ar": "كتالوج الخدمات وبنود البيع",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Clients\/products.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "profile.php",
+        "title_ar": "ملفي الشخصي",
+        "owner_dept": "مساحة عملي",
+        "state": "live",
+        "real_path": "main\/profile.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:50"
+    },
+    {
+        "canonical_file": "project_charter.php",
+        "title_ar": "قرار فتح مشروع جديد",
+        "owner_dept": "الإدارة التنفيذية",
+        "state": "live",
+        "real_path": "Portal\/project_charter.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:41"
+    },
+    {
+        "canonical_file": "project_contracts.php",
+        "title_ar": "عقود المشاريع المؤقتة",
+        "owner_dept": "الموارد البشرية",
+        "state": "live",
+        "real_path": "Workforce\/project_contracts.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:45"
+    },
+    {
+        "canonical_file": "projects.php",
+        "title_ar": "المشاريع والمواقع",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Projects\/projects.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "quota_ledger.php",
+        "title_ar": "دفتر استهلاك حصص الموردين",
+        "owner_dept": "إدارة الموردين",
+        "state": "mapped",
+        "real_path": "Suppliers\/shares_coverage.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "quotations.php",
+        "title_ar": "عروض الأسعار للعملاء",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Clients\/quotations.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "rate_books.php",
+        "title_ar": "",
+        "owner_dept": "",
+        "state": "mapped",
+        "real_path": "Clients\/rate_books.php",
+        "note": null,
+        "updated_at": "2026-08-06 18:56:54"
+    },
+    {
+        "canonical_file": "readiness.php",
+        "title_ar": "جاهزية المعدات للتشغيل",
+        "owner_dept": "إدارة الصيانة",
+        "state": "mapped",
+        "real_path": "Fleet\/readiness_board.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "receivables.php",
+        "title_ar": "ذمم العملاء وأعمارها",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Contracts\/collections.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "recruitment.php",
+        "title_ar": "التوظيف من الشاغر إلى المباشرة",
+        "owner_dept": "الموارد البشرية",
+        "state": "mapped",
+        "real_path": "Workforce\/recruitment_pipeline.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "release_stamp.php",
+        "title_ar": "بصمة الإصدار وتقرير النشر",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Portal\/release_stamp.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:42"
+    },
+    {
+        "canonical_file": "reports_index.php",
+        "title_ar": "مركز التقارير",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "mapped",
+        "real_path": "emsreports\/index.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:50"
+    },
+    {
+        "canonical_file": "rfq.php",
+        "title_ar": "طلب العروض ومقارنتها",
+        "owner_dept": "المشتريات",
+        "state": "mapped",
+        "real_path": "Procurement\/rfq_compare_award.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "risk_acceptance.php",
+        "title_ar": "القبول والاستثناءات",
+        "owner_dept": "إدارة المخاطر",
+        "state": "live",
+        "real_path": "Risk\/risk_acceptance.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_assessment.php",
+        "title_ar": "تقييم الخطر ونسخُه التاريخية",
+        "owner_dept": "إدارة المخاطر",
+        "state": "live",
+        "real_path": "Risk\/risk_assessment.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_committee.php",
+        "title_ar": "لجنة المخاطر",
+        "owner_dept": "إدارة المخاطر",
+        "state": "live",
+        "real_path": "Risk\/risk_committee.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_control_verify.php",
+        "title_ar": "التحقق من الضوابط الحرجة",
+        "owner_dept": "إدارة المخاطر",
+        "state": "live",
+        "real_path": "Risk\/risk_control_verify.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_controls.php",
+        "title_ar": "الضوابط والضوابط الحرجة",
+        "owner_dept": "إدارة المخاطر",
+        "state": "live",
+        "real_path": "Risk\/risk_controls.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_dashboard.php",
+        "title_ar": "لوحة المخاطر المؤسسية",
+        "owner_dept": "إدارة المخاطر",
+        "state": "mapped",
+        "real_path": "Risk\/risk_board.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_dept_cap.php",
+        "title_ar": "مخاطر التمويل والملكية",
+        "owner_dept": "التمويل والملكية",
+        "state": "live",
+        "real_path": "Risk\/risk_dept_cap.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_dept_ceo.php",
+        "title_ar": "المخاطر المؤسسية",
+        "owner_dept": "الإدارة التنفيذية",
+        "state": "live",
+        "real_path": "Risk\/risk_dept_ceo.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_dept_crp.php",
+        "title_ar": "مخاطر البلاغات والوقائع",
+        "owner_dept": "مركز البلاغات",
+        "state": "live",
+        "real_path": "Risk\/risk_dept_crp.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_dept_fin.php",
+        "title_ar": "المخاطر المالية",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Risk\/risk_dept_fin.php",
+        "note": "update0012: بُنيت حية بمسارها القانوني",
+        "updated_at": "2026-08-08 17:28:56"
+    },
+    {
+        "canonical_file": "risk_dept_flt.php",
+        "title_ar": "مخاطر الأسطول",
+        "owner_dept": "إدارة الأسطول",
+        "state": "live",
+        "real_path": "Risk\/risk_dept_flt.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_dept_gov.php",
+        "title_ar": "مخاطر الحوكمة والالتزام",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Risk\/risk_dept_gov.php",
+        "note": "update0012: بُنيت حية بمسارها القانوني",
+        "updated_at": "2026-08-08 17:28:56"
+    },
+    {
+        "canonical_file": "risk_dept_hrm.php",
+        "title_ar": "مخاطر الموارد البشرية",
+        "owner_dept": "الموارد البشرية",
+        "state": "live",
+        "real_path": "Risk\/risk_dept_hrm.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_dept_inv.php",
+        "title_ar": "مخاطر المخازن",
+        "owner_dept": "المخازن",
+        "state": "live",
+        "real_path": "Risk\/risk_dept_inv.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_dept_mnt.php",
+        "title_ar": "مخاطر الصيانة",
+        "owner_dept": "إدارة الصيانة",
+        "state": "live",
+        "real_path": "Risk\/risk_dept_mnt.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_dept_ops.php",
+        "title_ar": "المخاطر التشغيلية",
+        "owner_dept": "إدارة التشغيل",
+        "state": "live",
+        "real_path": "Risk\/risk_dept_ops.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_dept_prc.php",
+        "title_ar": "مخاطر المشتريات التشغيلية",
+        "owner_dept": "المشتريات",
+        "state": "live",
+        "real_path": "Risk\/risk_dept_prc.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_dept_sit.php",
+        "title_ar": "مخاطر الموقع",
+        "owner_dept": "إدارة الموقع",
+        "state": "live",
+        "real_path": "Risk\/risk_dept_sit.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_dept_trp.php",
+        "title_ar": "مخاطر النقل والترحيل",
+        "owner_dept": "النقل والترحيل",
+        "state": "live",
+        "real_path": "Risk\/risk_dept_trp.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_dept_wrk.php",
+        "title_ar": "مخاطر القوى التشغيلية",
+        "owner_dept": "القوى التشغيلية",
+        "state": "live",
+        "real_path": "Risk\/risk_dept_wrk.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_incidents.php",
+        "title_ar": "الحوادث والوقائع",
+        "owner_dept": "إدارة المخاطر",
+        "state": "live",
+        "real_path": "Risk\/risk_incidents.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_kri.php",
+        "title_ar": "مؤشرات المخاطر والضوابط",
+        "owner_dept": "إدارة المخاطر",
+        "state": "mapped",
+        "real_path": "Risk\/risk_kris.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_profile.php",
+        "title_ar": "ملف الخطر",
+        "owner_dept": "إدارة المخاطر",
+        "state": "mapped",
+        "real_path": "Risk\/risk_card.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_register.php",
+        "title_ar": "سجل المخاطر المؤسسي",
+        "owner_dept": "إدارة المخاطر",
+        "state": "live",
+        "real_path": "Risk\/risk_register.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_reviews.php",
+        "title_ar": "المراجعات والتصعيدات",
+        "owner_dept": "إدارة المخاطر",
+        "state": "live",
+        "real_path": "Risk\/risk_reviews.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_signals.php",
+        "title_ar": "إشارات المخاطر والفرز",
+        "owner_dept": "إدارة المخاطر",
+        "state": "live",
+        "real_path": "Risk\/risk_signals.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_treatment.php",
+        "title_ar": "إجراءات المعالجة",
+        "owner_dept": "إدارة المخاطر",
+        "state": "mapped",
+        "real_path": "Risk\/risk_treatments.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "risk_units.php",
+        "title_ar": "وحدات المخاطر والتصنيف",
+        "owner_dept": "إدارة المخاطر",
+        "state": "live",
+        "real_path": "Risk\/risk_units.php",
+        "note": "INJ-0457\/0476: ردمُ سجلِّ الأسماءِ من FRD §N-٤ — المسارُ محقَّقٌ على القرص",
+        "updated_at": "2026-08-16 02:17:26"
+    },
+    {
+        "canonical_file": "roles.php",
+        "title_ar": "الأدوار وقوالب صلاحياتها",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Settings\/roles.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "rotation.php",
+        "title_ar": "دورات التناوب والإجازة الميدانية",
+        "owner_dept": "القوى التشغيلية",
+        "state": "live",
+        "real_path": "Workforce\/rotation.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:46"
+    },
+    {
+        "canonical_file": "routing_admin.php",
+        "title_ar": "قواعد توجيه الطلبات المالية",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "FinRequests\/routing_admin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "sec_governance.php",
+        "title_ar": "فصل الواجبات المتعارضة",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "admin\/sec_governance.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "sensitive_fields.php",
+        "title_ar": "سياسات الحقول الحساسة",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Governance\/sensitive_fields.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:48"
+    },
+    {
+        "canonical_file": "shares.php",
+        "title_ar": "حصص الملكية في الأصول",
+        "owner_dept": "التمويل والملكية",
+        "state": "mapped",
+        "real_path": "Financing\/owners_registry.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "shift_log.php",
+        "title_ar": "سجل الوردية",
+        "owner_dept": "إدارة الموقع",
+        "state": "live",
+        "real_path": "Operations\/shift_log.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:43"
+    },
+    {
+        "canonical_file": "site_gate_equip.php",
+        "title_ar": "أذون دخول وخروج المعدات",
+        "owner_dept": "إدارة الموقع",
+        "state": "live",
+        "real_path": "Operations\/site_gate_equip.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:42"
+    },
+    {
+        "canonical_file": "site_gate_person.php",
+        "title_ar": "أذون دخول وخروج المشغّلين",
+        "owner_dept": "إدارة الموقع",
+        "state": "live",
+        "real_path": "Operations\/site_gate_person.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:42"
+    },
+    {
+        "canonical_file": "site_shift_plan.php",
+        "title_ar": "جدول الورديات — النهار والليل",
+        "owner_dept": "إدارة الموقع",
+        "state": "live",
+        "real_path": "Operations\/site_shift_plan.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:42"
+    },
+    {
+        "canonical_file": "site_work_calendar.php",
+        "title_ar": "جدول عمل المنجم — الأسبوعي والشهري",
+        "owner_dept": "إدارة الموقع",
+        "state": "live",
+        "real_path": "Operations\/site_work_calendar.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:42"
+    },
+    {
+        "canonical_file": "state_machines.php",
+        "title_ar": "حالات المستندات وانتقالاتها",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "Governance\/state_machines.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:50"
+    },
+    {
+        "canonical_file": "stock.php",
+        "title_ar": "أرصدة المخزون بحالاتها",
+        "owner_dept": "المخازن",
+        "state": "mapped",
+        "real_path": "Procurement\/stock_proc.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "stops.php",
+        "title_ar": "التوقفات وتحديد المتحمل",
+        "owner_dept": "إدارة التشغيل",
+        "state": "mapped",
+        "real_path": "Operations\/stops_unattributed.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "supplier_advances.php",
+        "title_ar": "سلفيات الموردين",
+        "owner_dept": "إدارة الموردين",
+        "state": "live",
+        "real_path": "Suppliers\/supplier_advances.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "supplier_bank.php",
+        "title_ar": "حسابات الموردين البنكية",
+        "owner_dept": "إدارة الموردين",
+        "state": "live",
+        "real_path": "Suppliers\/supplier_bank.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:45"
+    },
+    {
+        "canonical_file": "supplier_capacity.php",
+        "title_ar": "طاقة المورد وجاهزيته ومهلة الإحلال",
+        "owner_dept": "إدارة الموردين",
+        "state": "live",
+        "real_path": "Suppliers\/supplier_capacity.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "supplier_closure.php",
+        "title_ar": "تصفية إنهاء عقد مورد",
+        "owner_dept": "إدارة الموردين",
+        "state": "live",
+        "real_path": "Suppliers\/supplier_closure.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "supplier_contracts.php",
+        "title_ar": "عقود الموردين",
+        "owner_dept": "إدارة الموردين",
+        "state": "mapped",
+        "real_path": "Suppliers\/supplierscontracts.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "supplier_equip.php",
+        "title_ar": "معدات المورد ومالكوها",
+        "owner_dept": "إدارة الموردين",
+        "state": "mapped",
+        "real_path": "Suppliers\/equipment_plan.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "supplier_evaluation.php",
+        "title_ar": "تقييم المورد الدوري",
+        "owner_dept": "إدارة الموردين",
+        "state": "live",
+        "real_path": "Suppliers\/supplier_evaluation.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "supplier_perf.php",
+        "title_ar": "أداء الموردين وجاهزيتهم",
+        "owner_dept": "إدارة الموردين",
+        "state": "mapped",
+        "real_path": "Suppliers\/supplier_capacity.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "supplier_plan.php",
+        "title_ar": "خطة معدات المورد المتعهَّد بها",
+        "owner_dept": "إدارة الموردين",
+        "state": "mapped",
+        "real_path": "Suppliers\/equipment_plan.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "supplier_quota.php",
+        "title_ar": "حصص الموردين من العقود",
+        "owner_dept": "إدارة الموردين",
+        "state": "mapped",
+        "real_path": "Suppliers\/shares_coverage.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "supplier_rules.php",
+        "title_ar": "قواعد التحميل والجزاءات على المورد",
+        "owner_dept": "إدارة الموردين",
+        "state": "live",
+        "real_path": "Suppliers\/supplier_rules.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "supplier_settle.php",
+        "title_ar": "تسويات ومستحقات الموردين",
+        "owner_dept": "إدارة الموردين",
+        "state": "mapped",
+        "real_path": "Suppliers\/settlements.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "supplier_stmt.php",
+        "title_ar": "كشف حساب المورد الشهري",
+        "owner_dept": "إدارة الموردين",
+        "state": "mapped",
+        "real_path": "Finance\/supplier_statement_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "suppliers.php",
+        "title_ar": "سجل الموردين",
+        "owner_dept": "إدارة الموردين",
+        "state": "live",
+        "real_path": "Suppliers\/suppliers.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "tax_invoices.php",
+        "title_ar": "الفاتورة الضريبية والإقرارات",
+        "owner_dept": "المالية والخزينة",
+        "state": "live",
+        "real_path": "Contracts\/tax_invoices.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "ticket_close.php",
+        "title_ar": "إغلاق البلاغ وتأكيده",
+        "owner_dept": "مركز البلاغات",
+        "state": "mapped",
+        "real_path": "Tickets\/admin_close.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "ticket_config.php",
+        "title_ar": "إعدادات البلاغات — الأنواع والمهل والتصعيد",
+        "owner_dept": "مركز البلاغات",
+        "state": "mapped",
+        "real_path": "Tickets\/ticket_types_config.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "ticket_escalate.php",
+        "title_ar": "مهل البلاغات وتصعيدها",
+        "owner_dept": "مركز البلاغات",
+        "state": "mapped",
+        "real_path": "Tickets\/ticket_escalation_config.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "ticket_kpi.php",
+        "title_ar": "مؤشرات البلاغات",
+        "owner_dept": "مركز البلاغات",
+        "state": "mapped",
+        "real_path": "Tickets\/ticket_dashboard.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "ticket_open.php",
+        "title_ar": "أبلغ عن مشكلة من هذه الشاشة",
+        "owner_dept": "مركز البلاغات",
+        "state": "mapped",
+        "real_path": "Tickets\/ticket_contextual_open.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:50"
+    },
+    {
+        "canonical_file": "ticket_periodic.php",
+        "title_ar": "البلاغات الدورية المولَّدة",
+        "owner_dept": "مركز البلاغات",
+        "state": "mapped",
+        "real_path": "Tickets\/ticket_recurrence.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "ticket_recur.php",
+        "title_ar": "البلاغات المتكررة وسببها الجذري",
+        "owner_dept": "مركز البلاغات",
+        "state": "mapped",
+        "real_path": "Tickets\/ticket_recurrence.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "ticket_route.php",
+        "title_ar": "تصنيف البلاغ وتوجيهه آليًّا",
+        "owner_dept": "مركز البلاغات",
+        "state": "mapped",
+        "real_path": "Tickets\/ticket_types_config.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "ticket_split.php",
+        "title_ar": "تحويل البلاغ وتفريعه لمسارات",
+        "owner_dept": "مركز البلاغات",
+        "state": "mapped",
+        "real_path": "Tickets\/ticket_workstreams_board.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "tickets_dept.php",
+        "title_ar": "بلاغات إدارتي",
+        "owner_dept": "مركز البلاغات",
+        "state": "mapped",
+        "real_path": "Tickets\/dept_inbox.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:50"
+    },
+    {
+        "canonical_file": "tickets.php",
+        "title_ar": "بلاغات المركز",
+        "owner_dept": "مركز البلاغات",
+        "state": "mapped",
+        "real_path": "Tickets\/tickets_list.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "timesheet.php",
+        "title_ar": "تسجيل التايم شيت والإنتاج",
+        "owner_dept": "إدارة الموقع",
+        "state": "live",
+        "real_path": "Timesheet\/timesheet.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "transfer_cost.php",
+        "title_ar": "إقفال الأمر وتحميل تكلفته",
+        "owner_dept": "النقل والترحيل",
+        "state": "mapped",
+        "real_path": "Transport\/transfer_close_cost.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "transfer_fleet.php",
+        "title_ar": "اللوابد والمركبات الناقلة",
+        "owner_dept": "النقل والترحيل",
+        "state": "live",
+        "real_path": "Transport\/transfer_fleet.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:44"
+    },
+    {
+        "canonical_file": "transfer_ord.php",
+        "title_ar": "أوامر الترحيل",
+        "owner_dept": "النقل والترحيل",
+        "state": "mapped",
+        "real_path": "Transport\/transfer_orders_list.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "transfer_permits.php",
+        "title_ar": "تصاريح المسار والحمولة",
+        "owner_dept": "النقل والترحيل",
+        "state": "live",
+        "real_path": "Transport\/transfer_permits.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:44"
+    },
+    {
+        "canonical_file": "transfer_req.php",
+        "title_ar": "طلبات الترحيل",
+        "owner_dept": "النقل والترحيل",
+        "state": "mapped",
+        "real_path": "Transport\/transfer_requests.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "transfer_tariff.php",
+        "title_ar": "تعرفة الترحيل وقواعد التحميل",
+        "owner_dept": "النقل والترحيل",
+        "state": "mapped",
+        "real_path": "Transport\/transfer_tariffs.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "transfer_track.php",
+        "title_ar": "متابعة الرحلات في الطريق",
+        "owner_dept": "النقل والترحيل",
+        "state": "mapped",
+        "real_path": "Transport\/transfer_in_transit.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "treasury.php",
+        "title_ar": "الخزينة والصناديق",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Finance\/accounts_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "unbilled.php",
+        "title_ar": "الأعمال غير المفوترة",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Operations\/unbilled.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:44"
+    },
+    {
+        "canonical_file": "unit_assign.php",
+        "title_ar": "إسناد المعدات للوحدات",
+        "owner_dept": "إدارة التشغيل",
+        "state": "mapped",
+        "real_path": "Operations\/containers.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "unit_perf.php",
+        "title_ar": "الأداء الشهري للوحدة",
+        "owner_dept": "إدارة التشغيل",
+        "state": "live",
+        "real_path": "Operations\/unit_perf.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:44"
+    },
+    {
+        "canonical_file": "units_of_measure.php",
+        "title_ar": "وحدات القياس والتحويل",
+        "owner_dept": "المبيعات والعقود",
+        "state": "live",
+        "real_path": "Clients\/units_of_measure.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "units.php",
+        "title_ar": "الوحدات التعاقدية المرقَّمة",
+        "owner_dept": "المبيعات والعقود",
+        "state": "mapped",
+        "real_path": "Operations\/containers.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "user_capacities.php",
+        "title_ar": "صفاتي والتبديل بينها",
+        "owner_dept": "مساحة عملي",
+        "state": "live",
+        "real_path": "user_capacities.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "users.php",
+        "title_ar": "حسابات المستخدمين",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "live",
+        "real_path": "main\/users.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "variance.php",
+        "title_ar": "متابعة انحراف المنفَّذ عن المخطط",
+        "owner_dept": "المالية والخزينة",
+        "state": "mapped",
+        "real_path": "Finance\/variance_monitor_fin.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "visibility.php",
+        "title_ar": "من يرى ماذا ومكوّنات البوابة",
+        "owner_dept": "الحوكمة والالتزام",
+        "state": "mapped",
+        "real_path": "Portal\/visibility_keys.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 09:19:01"
+    },
+    {
+        "canonical_file": "warehouses.php",
+        "title_ar": "المخازن وأنواعها",
+        "owner_dept": "المخازن",
+        "state": "mapped",
+        "real_path": "Procurement\/master_data_proc.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "wh_count.php",
+        "title_ar": "الجرد ومعالجة الفروقات",
+        "owner_dept": "المخازن",
+        "state": "live",
+        "real_path": "Procurement\/wh_count.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "wh_receipt.php",
+        "title_ar": "الاستلام المؤقت قبل الإدخال",
+        "owner_dept": "المخازن",
+        "state": "live",
+        "real_path": "Procurement\/wh_receipt.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:44"
+    },
+    {
+        "canonical_file": "wh_transfer.php",
+        "title_ar": "التحويل بين المخازن",
+        "owner_dept": "المخازن",
+        "state": "live",
+        "real_path": "Procurement\/wh_transfer.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "worker_evaluation.php",
+        "title_ar": "تقييم أداء العاملين",
+        "owner_dept": "الموارد البشرية",
+        "state": "live",
+        "real_path": "Workforce\/worker_evaluation.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "worker_movement.php",
+        "title_ar": "تنقلات العاملين",
+        "owner_dept": "القوى التشغيلية",
+        "state": "live",
+        "real_path": "Workforce\/worker_movement.php",
+        "note": "auto",
+        "updated_at": "2026-08-03 08:30:51"
+    },
+    {
+        "canonical_file": "workshop.php",
+        "title_ar": "الورش والفنيون",
+        "owner_dept": "إدارة الصيانة",
+        "state": "live",
+        "real_path": "Maintenance\/workshop.php",
+        "note": "CMP-03 ⑥: بُنيت بتصميم SCR-DES — مصدر البيانات مهمة لحاق",
+        "updated_at": "2026-08-03 21:47:44"
+    }
+]

@@ -132,12 +132,12 @@ body.ems-site .main .filter :is(.row, .form-grid, .ems-grid, .form-row, .filter-
 /* ⓐ بالوسمِ الذي يضعه العون — يعمل مهما عمُقَ الغلافُ أو غرُب اسمُه */
 body.ems-site .main .filter .filter-field,
 /* ⓑ سنَدٌ موضعيٌّ بلا عون: ابنُ الجسمِ المباشرُ في الشكلِ المسطَّح */
-body.ems-site .main .filter > .filter-body > :not(.filter-actions):not(form):not(script):not(style):not(br):not(button):not(a):not(input):not(.filter-title):not(.row):not(.form-grid):not(.ems-grid):not(.form-row):not(.filter-grid),
+body.ems-site .main .filter > .filter-body > :not(.filter-actions):not(.filter-note):not(form):not(script):not(style):not(br):not(button):not(a):not(input):not(.filter-title):not(.row):not(.form-grid):not(.ems-grid):not(.form-row):not(.filter-grid),
 /* ⓒ وسنَدٌ موضعيٌّ في الشكلِ الملفوف */
-body.ems-site .main .filter > .filter-body > form > :not(.filter-actions):not(script):not(style):not(br):not(button):not(a):not(input):not(.row):not(.form-grid):not(.ems-grid):not(.form-row):not(.filter-grid),
+body.ems-site .main .filter > .filter-body > form > :not(.filter-actions):not(.filter-note):not(script):not(style):not(br):not(button):not(a):not(input):not(.row):not(.form-grid):not(.ems-grid):not(.form-row):not(.filter-grid),
 /* ⓓ وسنَدٌ لأبناءِ الغلافِ الذائبِ — درجةً أعمقَ، بلا عونٍ أيضًا */
-body.ems-site .main .filter > .filter-body > :is(.row, .form-grid, .ems-grid, .form-row, .filter-grid) > :not(.filter-actions):not(script):not(style):not(br):not(button):not(a):not(input),
-body.ems-site .main .filter > .filter-body > form > :is(.row, .form-grid, .ems-grid, .form-row, .filter-grid) > :not(.filter-actions):not(script):not(style):not(br):not(button):not(a):not(input) {
+body.ems-site .main .filter > .filter-body > :is(.row, .form-grid, .ems-grid, .form-row, .filter-grid) > :not(.filter-actions):not(.filter-note):not(script):not(style):not(br):not(button):not(a):not(input),
+body.ems-site .main .filter > .filter-body > form > :is(.row, .form-grid, .ems-grid, .form-row, .filter-grid) > :not(.filter-actions):not(.filter-note):not(script):not(style):not(br):not(button):not(a):not(input) {
   display: flex !important;
   flex-direction: column !important;
   justify-content: flex-end !important;
@@ -156,16 +156,41 @@ body.ems-site .main .filter > .filter-body > form > :is(.row, .form-grid, .ems-g
 /* حقلٌ يطلب سطرًا كاملًا صراحةً (بحثٌ نصِّيٌّ طويل) */
 body.ems-site .main .filter .filter-field.is-wide { flex: 1 1 100% !important; }
 
-/* ملاحظةٌ نصّيةٌ داخلَ الصندوق — تمتدُّ على ما بقي فلا تترك حفرةً بعدَها */
+/* ملاحظةٌ نصّيةٌ داخلَ الصندوق — تمتدُّ على ما بقي فلا تترك حفرةً بعدَها.
+   ◆ **صفٌّ لا عمود**: قبلَ استثنائها أعلاه كان السنَدُ الموضعيُّ (خصوصيتُه
+     ٠،٩،٧) يغلب هذه القاعدةَ (٠،٤،١) فيصير `flex-direction:column` —
+     ورُصد فعلًا في `Portal/my_achievement.php`: أربعةُ روابطِ اختصارٍ نزلت
+     كلٌّ في سطرٍ فبلغَ ارتفاعُ الملاحظةِ ١٩٨ بكسلًا. */
 body.ems-site .main .filter .filter-note {
   display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
   align-items: center !important;
+  /* ◆ **الفجوةُ لازمةٌ لا زينة**: الملاحظةُ صندوقٌ صفّيّ، والصفُّ يُسقط المسافةَ
+     البيضاءَ بين أبنائِه — فـ`النافذة <strong>٣٠ يومًا</strong>` تلتصق كلمتاها
+     بلا فجوة. و٦ بكسلًا قدرُ مسافةٍ ونصفٍ عند 13px. */
+  gap: 6px !important;
   flex: 1 1 auto !important;
   min-width: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
   font-size: 13px !important;
+  line-height: 1.5 !important;
   color: var(--c-555555, #555555) !important;
+}
+/* عنوانُ الملاحظةِ — كلمةٌ تسبق أقراصَها */
+body.ems-site .main .filter .filter-note > .filter-note-label {
+  flex: 0 0 auto !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  color: var(--c-555555, #555555) !important;
+  white-space: nowrap !important;
+}
+/* مجموعةُ روابطٍ — لا تنمو، فيبقى لصفِّها متَّسعٌ تنضمُّ فيه الأزرارُ إليها
+   بدلَ أن تنفردَ بسطرٍ تحتَها. */
+body.ems-site .main .filter .filter-note.filter-links {
+  flex: 0 1 auto !important;
+  gap: 8px !important;
 }
 
 /* عنوانُ الحقل */
@@ -325,6 +350,63 @@ body.ems-site .main .filter .filter-actions .btn-secondary.is-flash {
   background-color: var(--c-brand-gold, #f4c542) !important;
   color: var(--c-2a2300, #2a2300) !important;
   border-color: var(--c-brand-gold, #f4c542) !important;
+}
+
+/* ── ⑤-ب روابطُ الاختصارِ — أقراصٌ لا نصٌّ أزرقُ تحته خطّ ──────────────────
+   ◆ **لماذا**: الصندوقُ كان يملك تصميمًا لكلِّ ما فيه إلا الرابطَ العاري.
+     فرابطٌ يُكتب بلا صنفٍ داخلَ الصندوقِ يقع على لونِ بوتستراب الافتراضيِّ
+     `#0d6efd` مسطَّرًا — لونٌ لا وجودَ له في لوحةِ النظام. قِيس في
+     `Portal/my_achievement.php`: أربعةُ روابطَ زرقاءَ مسطَّرة.
+   ◆ **الهندسةُ ليست اجتهادًا**: هي هندسةُ شارةِ العدّادِ في الترويسةِ نفسِها
+     (قرصٌ 999px · حدٌّ #cfcfcf · 13px/700 · #555) وحالتُها المفعَّلةُ هي
+     حالةُ الزرِّ الرئيسيِّ (ذهبٌ #f4c542 على #2a2300) — فالصندوقُ لغةٌ واحدة.
+   ◆ **الاستثناءات**: كلُّ ما يحمل صنفَ زرٍّ يبقى زرًّا. رُصدت في الصناديقِ
+     روابطُ `btn`/`btn-secondary`/`fc-clear-link`/`ct-1` (إعادةُ ضبطٍ ومسح)،
+     ولها تصميمُها فلا تُمَسّ. */
+body.ems-site .main .filter :is(.filter-note, .filter-links) a:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger):not(.dt-button):not(.btn-close):not(.close):not(.action-btn):not(.fc-clear-link):not(.ct-1) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  flex: 0 0 auto !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  box-sizing: border-box !important;
+  padding: 0 14px !important;
+  border: 1px solid var(--c-cfcfcf, #cfcfcf) !important;
+  border-radius: 999px !important;
+  background-color: var(--c-surface, #ffffff) !important;
+  background-image: none !important;
+  color: var(--c-555555, #555555) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: background-color .18s ease, border-color .18s ease, color .18s ease !important;
+}
+body.ems-site .main .filter :is(.filter-note, .filter-links) a:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger):not(.dt-button):not(.btn-close):not(.close):not(.action-btn):not(.fc-clear-link):not(.ct-1):hover {
+  background-color: var(--c-fffdf5, #fffdf5) !important;
+  border-color: var(--c-brand-gold, #f4c542) !important;
+  color: var(--c-2a2300, #2a2300) !important;
+}
+body.ems-site .main .filter :is(.filter-note, .filter-links) a:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger):not(.dt-button):not(.btn-close):not(.close):not(.action-btn):not(.fc-clear-link):not(.ct-1):focus-visible {
+  outline: 2px solid var(--c-brand-gold, #f4c542) !important;
+  outline-offset: 2px !important;
+}
+/* المدى المعروضُ الآن — قرصٌ ذهبيٌّ كالزرِّ الرئيسيِّ فيُعرَف بلا قراءة.
+   ◆ **سلسلةُ `:not` تُنسَخ كما هي**: كلُّ `:not(.صنف)` يزيد الخصوصيةَ درجةَ
+     صنف، فسلسلةُ العشرةِ أعلاه تبلغ (٠،١٤،٢). ولو كُتبت هذه القاعدةُ مختصرةً
+     (٠،٨،٢) لغلبَتْها القاعدةُ الأساسُ وبقيَ القرصُ المفعَّلُ أبيضَ — وهو ما
+     قِيس فعلًا قبلَ التصحيح. */
+body.ems-site .main .filter :is(.filter-note, .filter-links) a.is-active:not(.btn):not(.btn-primary):not(.btn-secondary):not(.btn-danger):not(.dt-button):not(.btn-close):not(.close):not(.action-btn):not(.fc-clear-link):not(.ct-1) {
+  background-color: var(--c-brand-gold, #f4c542) !important;
+  border-color: var(--c-brand-gold, #f4c542) !important;
+  color: var(--c-2a2300, #2a2300) !important;
+  box-shadow: 0 2px 6px var(--c-rgba24419766045, rgba(244,197,66,.45)) !important;
+  cursor: default !important;
 }
 
 /* المخفيُّ لا يشغل حيّزًا في الصفّ */

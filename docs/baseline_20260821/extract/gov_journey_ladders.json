@@ -1,0 +1,156 @@
+[
+    {
+        "journey_code": "JR-OPR",
+        "journey_ar": "رحلةُ المشغّل",
+        "seq_no": "1",
+        "ladder_code": "LD-01",
+        "driver_route": "Approvals\/hours_approval.php",
+        "driver_state": "LIVE_IN_NAV",
+        "nav_hits": "5",
+        "ladder_wired": "0",
+        "gap_note": "الشاشةُ تقودُ الخطوةَ ولا تقرأ سلّمَها — فترتيبُ الخطواتِ والسقفُ و«لا يدَ تمشي خطوتَين» غيرُ مُنفَّذة"
+    },
+    {
+        "journey_code": "JR-OPR",
+        "journey_ar": "رحلةُ المشغّل",
+        "seq_no": "2",
+        "ladder_code": "LD-04",
+        "driver_route": "Approvals\/requests.php",
+        "driver_state": "LIVE_IN_NAV",
+        "nav_hits": "5",
+        "ladder_wired": "0",
+        "gap_note": "الشاشةُ تقودُ الخطوةَ ولا تقرأ سلّمَها — فترتيبُ الخطواتِ والسقفُ و«لا يدَ تمشي خطوتَين» غيرُ مُنفَّذة"
+    },
+    {
+        "journey_code": "JR-REV",
+        "journey_ar": "رحلةُ الإيراد",
+        "seq_no": "1",
+        "ladder_code": "LD-01",
+        "driver_route": "Approvals\/hours_approval.php",
+        "driver_state": "LIVE_IN_NAV",
+        "nav_hits": "5",
+        "ladder_wired": "0",
+        "gap_note": "الشاشةُ تقودُ الخطوةَ ولا تقرأ سلّمَها — فترتيبُ الخطواتِ والسقفُ و«لا يدَ تمشي خطوتَين» غيرُ مُنفَّذة"
+    },
+    {
+        "journey_code": "JR-REV",
+        "journey_ar": "رحلةُ الإيراد",
+        "seq_no": "2",
+        "ladder_code": "LD-02",
+        "driver_route": "Approvals\/attribution_board.php",
+        "driver_state": "LIVE_IN_NAV",
+        "nav_hits": "4",
+        "ladder_wired": "0",
+        "gap_note": "الشاشةُ تقودُ الخطوةَ ولا تقرأ سلّمَها — فترتيبُ الخطواتِ والسقفُ و«لا يدَ تمشي خطوتَين» غيرُ مُنفَّذة"
+    },
+    {
+        "journey_code": "JR-REV",
+        "journey_ar": "رحلةُ الإيراد",
+        "seq_no": "3",
+        "ladder_code": "LD-05",
+        "driver_route": "Finance\/approvals_inbox.php",
+        "driver_state": "LIVE_IN_NAV",
+        "nav_hits": "24",
+        "ladder_wired": "0",
+        "gap_note": "الشاشةُ تقودُ الخطوةَ ولا تقرأ سلّمَها — فترتيبُ الخطواتِ والسقفُ و«لا يدَ تمشي خطوتَين» غيرُ مُنفَّذة"
+    },
+    {
+        "journey_code": "JR-REV",
+        "journey_ar": "رحلةُ الإيراد",
+        "seq_no": "4",
+        "ladder_code": "LD-06",
+        "driver_route": "Finance\/acc_approval_chain.php",
+        "driver_state": "LIVE_IN_NAV",
+        "nav_hits": "3",
+        "ladder_wired": "0",
+        "gap_note": "الشاشةُ تقودُ الخطوةَ ولا تقرأ سلّمَها — فترتيبُ الخطواتِ والسقفُ و«لا يدَ تمشي خطوتَين» غيرُ مُنفَّذة"
+    },
+    {
+        "journey_code": "JR-REV",
+        "journey_ar": "رحلةُ الإيراد",
+        "seq_no": "5",
+        "ladder_code": "LD-07",
+        "driver_route": "Finance\/approvals_inbox.php",
+        "driver_state": "LIVE_IN_NAV",
+        "nav_hits": "24",
+        "ladder_wired": "0",
+        "gap_note": "الشاشةُ تقودُ الخطوةَ ولا تقرأ سلّمَها — فترتيبُ الخطواتِ والسقفُ و«لا يدَ تمشي خطوتَين» غيرُ مُنفَّذة"
+    },
+    {
+        "journey_code": "JR-SUP",
+        "journey_ar": "رحلةُ المورّد",
+        "seq_no": "1",
+        "ladder_code": "LD-10",
+        "driver_route": "Procurement\/requests_proc.php",
+        "driver_state": "LIVE_IN_NAV",
+        "nav_hits": "7",
+        "ladder_wired": "0",
+        "gap_note": "الشاشةُ تقودُ الخطوةَ ولا تقرأ سلّمَها — فترتيبُ الخطواتِ والسقفُ و«لا يدَ تمشي خطوتَين» غيرُ مُنفَّذة"
+    },
+    {
+        "journey_code": "JR-SUP",
+        "journey_ar": "رحلةُ المورّد",
+        "seq_no": "2",
+        "ladder_code": "LD-11",
+        "driver_route": "Procurement\/rfq_compare_award.php",
+        "driver_state": "LIVE_IN_NAV",
+        "nav_hits": "3",
+        "ladder_wired": "0",
+        "gap_note": "الشاشةُ تقودُ الخطوةَ ولا تقرأ سلّمَها — فترتيبُ الخطواتِ والسقفُ و«لا يدَ تمشي خطوتَين» غيرُ مُنفَّذة"
+    },
+    {
+        "journey_code": "JR-SUP",
+        "journey_ar": "رحلةُ المورّد",
+        "seq_no": "3",
+        "ladder_code": "LD-12",
+        "driver_route": "Procurement\/receipt_custody_proc.php",
+        "driver_state": "LIVE_IN_NAV",
+        "nav_hits": "6",
+        "ladder_wired": "0",
+        "gap_note": "الشاشةُ تقودُ الخطوةَ ولا تقرأ سلّمَها — فترتيبُ الخطواتِ والسقفُ و«لا يدَ تمشي خطوتَين» غيرُ مُنفَّذة"
+    },
+    {
+        "journey_code": "JR-SUP",
+        "journey_ar": "رحلةُ المورّد",
+        "seq_no": "4",
+        "ladder_code": "LD-03",
+        "driver_route": "Approvals\/requests.php",
+        "driver_state": "LIVE_IN_NAV",
+        "nav_hits": "5",
+        "ladder_wired": "0",
+        "gap_note": "الشاشةُ تقودُ الخطوةَ ولا تقرأ سلّمَها — فترتيبُ الخطواتِ والسقفُ و«لا يدَ تمشي خطوتَين» غيرُ مُنفَّذة"
+    },
+    {
+        "journey_code": "JR-SUP",
+        "journey_ar": "رحلةُ المورّد",
+        "seq_no": "5",
+        "ladder_code": "LD-13",
+        "driver_route": "Finance\/approvals_inbox.php",
+        "driver_state": "LIVE_IN_NAV",
+        "nav_hits": "24",
+        "ladder_wired": "0",
+        "gap_note": "الشاشةُ تقودُ الخطوةَ ولا تقرأ سلّمَها — فترتيبُ الخطواتِ والسقفُ و«لا يدَ تمشي خطوتَين» غيرُ مُنفَّذة"
+    },
+    {
+        "journey_code": "JR-SUP",
+        "journey_ar": "رحلةُ المورّد",
+        "seq_no": "6",
+        "ladder_code": "LD-08",
+        "driver_route": "Finance\/payments_fin.php",
+        "driver_state": "LIVE_IN_NAV",
+        "nav_hits": "13",
+        "ladder_wired": "0",
+        "gap_note": "الشاشةُ تقودُ الخطوةَ ولا تقرأ سلّمَها — فترتيبُ الخطواتِ والسقفُ و«لا يدَ تمشي خطوتَين» غيرُ مُنفَّذة"
+    },
+    {
+        "journey_code": "JR-SUP",
+        "journey_ar": "رحلةُ المورّد",
+        "seq_no": "7",
+        "ladder_code": "LD-09",
+        "driver_route": "Finance\/payments_fin.php",
+        "driver_state": "LIVE_IN_NAV",
+        "nav_hits": "13",
+        "ladder_wired": "0",
+        "gap_note": "الشاشةُ تقودُ الخطوةَ ولا تقرأ سلّمَها — فترتيبُ الخطواتِ والسقفُ و«لا يدَ تمشي خطوتَين» غيرُ مُنفَّذة"
+    }
+]

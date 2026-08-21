@@ -1,0 +1,462 @@
+[
+    {
+        "route": "admin\/ops_manager_board.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "إدارة التشغيل",
+        "witness": "مالكُ البيان — تقرأ: operations · daily_plans · mnt_order",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CHANGED",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: لوحةُ مديرِ التشغيل — دورةُ عملِ التشغيلِ نفسِها",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/acc_approval_chain.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "مالكُ البيان — تقرأ: gov_field_class · nav09_action_map",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: سلسلةُ اعتمادٍ ماليةٌ — دورتُها ماليةٌ و`gov_*` مخزنُ ضبطِها لا مالكُها · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/acc_backflow.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "تكتب في: fin_backflow_log · fin_routing_log",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/acc_my_day.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "مالكُ البيان — تقرأ: gov_field_class · nav09_action_map",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: يومُ المحاسبِ — دورةُ عملٍ ماليةٌ بحتة · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/acc_routing_matrix.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "مالكُ البيان — تقرأ: gov_field_class · nav09_action_map",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: توجيهُ المستندِ المالي — دورةٌ مستنديةٌ ماليةٌ · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/acc_specializations.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "مالكُ البيان — تقرأ: gov_field_class · nav09_action_map",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: تخصّصاتُ المحاسبين — بنيةُ فريقِ المالية · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/ctrl_authority_limits.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "مالكُ البيان — تقرأ: gov_field_class · nav09_action_map",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: سقفُ الاعتمادِ المالي — قيدٌ على الدورةِ الماليةِ نفسِها · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/ctrl_dept_propagation.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "مالكُ البيان — تقرأ: gov_field_class · nav09_action_map",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: سريانُ الضبطِ الماليِّ على الإدارات · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/ctrl_doc_registry.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "مالكُ البيان — تقرأ: gov_field_class · nav09_action_map",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: سجلُّ المستندِ المالي — الدورةُ المستنديةُ للمالية · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/ctrl_doc_variance.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "مالكُ البيان — تقرأ: gov_field_class · nav09_action_map",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: انحرافُ المستندِ المالي · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/ctrl_quality_kpis.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "مالكُ البيان — تقرأ: gov_field_class · nav09_action_map",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: جودةُ الأداءِ المحاسبي · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/ctrl_role_migration.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "مالكُ البيان — تقرأ: gov_field_class · nav09_action_map",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: ترحيلُ أدوارِ المالية · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/ctrl_supervision.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "مالكُ البيان — تقرأ: gov_field_class · nav09_action_map",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: إشرافُ المالية على فريقِها · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/fin_cashflow_stmt.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/fin_contract_margin.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/fin_early_warning.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/fin_equity_stmt.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/fin_posting_matrix.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/fin_project_pl.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/fin_ratio_detail.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/fin_ratio_targets.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/fin_ratios.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/fin_unit_economics.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "تكتب في: fin_ratio_values · fin_project_pl · fin_cashflow",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/tre_cycle_stages.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "مالكُ البيان — تقرأ: gov_field_class · nav09_action_map",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: مراحلُ دورةِ الخزينة — والخزينةُ ماليةٌ · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/tre_sod_matrix.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "مالكُ البيان — تقرأ: gov_field_class · nav09_action_map",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: فصلُ مهامِّ الخزينة — قيدٌ داخليٌّ ماليّ · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/tre_unit_roles.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "مالكُ البيان — تقرأ: gov_field_class · nav09_action_map",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: أدوارُ وحدةِ الخزينة · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Governance\/gov_dept.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "الحوكمة والالتزام",
+        "witness": "لا كتابةَ ولا قراءةَ في جدولِ نطاقٍ — لا شاهدَ آليّ",
+        "witness_kind": "NONE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "لا شاهدَ آليّ — يبقى المالكُ المسجَّلُ ولا يُبدَّل بلا دليل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Governance\/gov_reports.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "الحوكمة والالتزام",
+        "witness": "تكتب في: cmp03_idempotency · cmp03_screen_rows · activity_logs",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: تقاريرُ الحوكمة — وقراءتُها لجداولِ الموارد البشريةِ استهلاكٌ لا مِلكية · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Governance\/ownership_grants.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "الحوكمة والالتزام",
+        "witness": "لا كتابةَ ولا قراءةَ في جدولِ نطاقٍ — لا شاهدَ آليّ",
+        "witness_kind": "NONE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "لا شاهدَ آليّ — يبقى المالكُ المسجَّلُ ولا يُبدَّل بلا دليل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "movement\/map_page.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "إدارة التشغيل",
+        "witness": "مالكُ البيان — تقرأ: project · operations · equipment_drivers",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CHANGED",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: خريطةُ الحركةِ — **التشغيلُ يُنتج الحركةَ والأسطولُ يملك الأصلَ لا حركتَه**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "movement\/movement_operations.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "إدارة التشغيل",
+        "witness": "مالكُ البيان — تقرأ: project · mnt_order · operations",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CHANGED",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: عملياتُ الحركة — واقعتُها من التشغيل",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Operations\/fleet_calendar.php",
+        "owner_before": "إدارة التشغيل",
+        "owner_after": "إدارة التشغيل",
+        "witness": "مالكُ البيان — تقرأ: fleet_reservations · equipments_types · clients",
+        "witness_kind": "DATA_READ",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Operations\/fleet_utilization.php",
+        "owner_before": "إدارة التشغيل",
+        "owner_after": "إدارة التشغيل",
+        "witness": "مالكُ البيان — تقرأ: equipments_types · operations · fleet_reservations",
+        "witness_kind": "DATA_READ",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Oprators\/select_project.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "القوى التشغيلية",
+        "witness": "مالكُ البيان — تقرأ: project · operations · contracts",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CHANGED",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: اختيارُ مشروعِ المشغِّل — خطوةٌ في دورةِ القوى التشغيلية",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Procurement\/warehouse_board.php",
+        "owner_before": "إدارة المشتريات التشغيلية",
+        "owner_after": "إدارة المشتريات التشغيلية",
+        "witness": "مالكُ البيان — تقرأ: proc_item · proc_receipt_custody · proc_issue",
+        "witness_kind": "DATA_READ",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Settings\/guard_classification.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "الحوكمة والالتزام",
+        "witness": "لا كتابةَ ولا قراءةَ في جدولِ نطاقٍ — لا شاهدَ آليّ",
+        "witness_kind": "NONE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "لا شاهدَ آليّ — يبقى المالكُ المسجَّلُ ولا يُبدَّل بلا دليل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Tickets\/my_tickets.php",
+        "owner_before": "مركز البلاغات",
+        "owner_after": "مركز البلاغات",
+        "witness": "مالكُ البيان — تقرأ: tickets",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: بلاغاتي — بندٌ شخصيٌّ يملكه مركزُ البلاغات · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Tickets\/ticket_dashboard.php",
+        "owner_before": "مركز البلاغات",
+        "owner_after": "مركز البلاغات",
+        "witness": "تكتب في: tickets",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Tickets\/ticket_form.php",
+        "owner_before": "مركز البلاغات",
+        "owner_after": "مركز البلاغات",
+        "witness": "تكتب في: activity_logs · fleet_equipment_history · tickets",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Tickets\/ticket_recurrence.php",
+        "owner_before": "مركز البلاغات",
+        "owner_after": "مركز البلاغات",
+        "witness": "تكتب في: tickets",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Tickets\/ticket_workstreams_board.php",
+        "owner_before": "مركز البلاغات",
+        "owner_after": "مركز البلاغات",
+        "witness": "تكتب في: ticket_workstreams · ticket_responses · ticket_effects",
+        "witness_kind": "DOMAIN_WRITE",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Workforce\/worker_contract.php",
+        "owner_before": "القوى التشغيلية",
+        "owner_after": "القوى التشغيلية",
+        "witness": "مالكُ البيان — تقرأ: employees · worker_contract",
+        "witness_kind": "DATA_READ",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Workforce\/worker_register.php",
+        "owner_before": "القوى التشغيلية",
+        "owner_after": "القوى التشغيلية",
+        "witness": "مالكُ البيان — تقرأ: employees · suppliers · worker_qualification",
+        "witness_kind": "DATA_READ",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Workforce\/worker_settlement.php",
+        "owner_before": "القوى التشغيلية",
+        "owner_after": "القوى التشغيلية",
+        "witness": "مالكُ البيان — تقرأ: worker_settlement · employees",
+        "witness_kind": "DATA_READ",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Workforce\/worker_worklog.php",
+        "owner_before": "القوى التشغيلية",
+        "owner_after": "القوى التشغيلية",
+        "witness": "مالكُ البيان — تقرأ: employees · equipment_drivers · worker_leave_absence",
+        "witness_kind": "DATA_READ",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Workforce\/workforce_requirement.php",
+        "owner_before": "القوى التشغيلية",
+        "owner_after": "القوى التشغيلية",
+        "witness": "مالكُ البيان — تقرأ: project · workforce_requirement · equipment_drivers",
+        "witness_kind": "DATA_READ",
+        "ruling": "APPEARANCE_MISSING",
+        "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
+        "decided_at": "2026-08-20 03:20:39"
+    }
+]

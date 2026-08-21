@@ -1,0 +1,140 @@
+[
+    {
+        "actor_code": "cfo",
+        "role_id": "19",
+        "basis": "مرادفُ fin_cfo",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "client_acceptance",
+        "role_id": "12",
+        "basis": "قبولُ العميلِ يمرُّ بالمبيعات",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "client_supervisor",
+        "role_id": "12",
+        "basis": "مشرفُ العميلِ — إدارةُ المبيعات",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "containers_engine",
+        "role_id": "0",
+        "basis": "محرّكٌ آليٌّ لا موضعَ بشريًّا له — خطوةُ نظامٍ لا اعتماد",
+        "created_at": "2026-08-17 06:16:47"
+    },
+    {
+        "actor_code": "fin_accountant",
+        "role_id": "17",
+        "basis": "اسمُ الدورِ «إدارة المالية» — محاسبُ الماليةِ يعمل تحتَه",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "fin_cfo",
+        "role_id": "19",
+        "basis": "المديرُ الماليُّ — أعلى موضعٍ ماليٍّ قائمٍ في الأدوار",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "fin_dept_mgr",
+        "role_id": "19",
+        "basis": "اسمُ الدورِ «مدير الإدارة المالية» مطابقٌ حرفًا",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "FIN_FIELD_VERIFY",
+        "role_id": "1",
+        "basis": "محاسبُ الموقعِ — تحققٌ ميدانيّ",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "fin_treasury",
+        "role_id": "17",
+        "basis": "أمينُ الخزينةِ تحتَ إدارةِ المالية",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "finance_accountant",
+        "role_id": "17",
+        "basis": "مرادفٌ لـfin_accountant في سلاليمَ سابقة",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "finance_manager",
+        "role_id": "19",
+        "basis": "مرادفٌ لـfin_dept_mgr",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "proc_mgr",
+        "role_id": "16",
+        "basis": "مديرُ المشترياتِ — الدورُ نفسُه بموضعٍ أعلى",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "proc_officer",
+        "role_id": "16",
+        "basis": "اسمُ الدورِ «إدارة المشتريات»",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "sales_manager",
+        "role_id": "12",
+        "basis": "مديرُ المبيعات — الدورُ «ادارة المبيعات»",
+        "created_at": "2026-08-17 06:17:02"
+    },
+    {
+        "actor_code": "site_accountant",
+        "role_id": "1",
+        "basis": "محاسبُ الموقعِ تحتَ التشغيل",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "site_manager",
+        "role_id": "1",
+        "basis": "مديرُ الموقع — إدارةُ التشغيل",
+        "created_at": "2026-08-17 06:17:02"
+    },
+    {
+        "actor_code": "site_mgr",
+        "role_id": "1",
+        "basis": "مديرُ الموقعِ — إدارةُ التشغيل",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "sup_officer",
+        "role_id": "2",
+        "basis": "مسؤولُ الموردين",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "suppliers_officer",
+        "role_id": "2",
+        "basis": "مسؤولُ الموردين",
+        "created_at": "2026-08-17 06:16:47"
+    },
+    {
+        "actor_code": "unit_entry",
+        "role_id": "1",
+        "basis": "مدخلُ الوحداتِ تحتَ التشغيل",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "unit_entry_clerk",
+        "role_id": "1",
+        "basis": "مدخلُ الوحدات — تحتَ إدارةِ التشغيل",
+        "created_at": "2026-08-17 06:17:02"
+    },
+    {
+        "actor_code": "wh_keeper",
+        "role_id": "16",
+        "basis": "أمينُ المستودعِ تحتَ المشتريات",
+        "created_at": "2026-08-17 06:16:46"
+    },
+    {
+        "actor_code": "workforce_officer",
+        "role_id": "4",
+        "basis": "القوى التشغيلية — الموارد البشرية",
+        "created_at": "2026-08-17 06:16:47"
+    }
+]

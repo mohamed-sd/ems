@@ -178,17 +178,35 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
     <style>
     /* UXW-01 ①②: أنماطُ قائمةِ البلاغاتِ الثابتة — بادئةُ الشاشة tkt-list- */
-    .tkt-list-glance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 14px; }
-    .tkt-list-glance-link { text-decoration: none; color: inherit; }
-    .tkt-list-tone-open   { --tkt-list-tone: var(--c-fd7e14, #fd7e14); }
-    .tkt-list-tone-late   { --tkt-list-tone: var(--c-dc3545); }
-    .tkt-list-tone-crit   { --tkt-list-tone: var(--c-b58900, #b58900); }
-    .tkt-list-glance      { border-top: 3px solid var(--tkt-list-tone); }
-    .tkt-list-glance-body { padding: 12px; }
-    .tkt-list-glance-row  { display: flex; align-items: center; gap: 10px; }
-    .tkt-list-glance-icon { font-size: 20px; color: var(--tkt-list-tone); }
-    .tkt-list-glance-num  { font-size: 20px; font-weight: 800; line-height: 1; }
-    .tkt-list-glance-cap  { font-size: 12px; color: var(--c-6c757d); margin-top: 3px; }
+    /* ◆ **بطاقاتُ اللمحةِ صارت البطاقةَ الموحَّدة** — ولا يُكتب هنا لونٌ ولا
+         حجمٌ ولا حدٌّ لها إطلاقًا: مصدرُ تصميمِها `assets/css/ems-statcards.css`
+         وحدَه، ومَن كتب للبطاقةِ نمطًا في شاشتِه صار لها مصدران يتفرّقان.
+         وقد كانت هنا إحدى عشرةَ قاعدةً تصف بطاقةً خاصّةً بالشاشة (شريطُ نغمةٍ
+         علويٌّ · رقمٌ بـ20px · وصفٌ بـ12px) فرُفعت كلُّها.
+       ◆ **والرقمُ في خانةِ الخطِّ الكبير قطعًا لا ترجيحًا**: يُصيَّر في
+         `stats-value` — فينالها بالصنفِ من المركزيِّ (35px/900) قبل أن يُسأل
+         عنها موسِمُ `ems-statcards.js`، الذي يرشِّح بالصنفِ أولًا كذلك. ولولا
+         الصنفُ لسقط الترشيحُ إلى سقّاطةِ «أكبرِ خطٍّ باقٍ» فوقع الاختيارُ على
+         نصٍّ آخر — وهو العطبُ نفسُه الذي أخرج نصَّ الفترةِ في مكانِ القيمةِ
+         بـ`main/role_board.php`.
+       ◆ **والعددُ ثلاثةٌ لا أربعة**: المركزيُّ يفرض أربعةَ أعمدةٍ بـ`!important`
+         على محدِّدٍ وزنُه (0,5,1)، فيزيده محدِّدُ الشاشةِ صنفًا ليعلوَه (0,6,1)
+         — وإلا بقي عمودٌ رابعٌ فارغٌ وظنَّ القارئُ أن السطرَ لم يُكتب.
+         والانكساراتُ تُعاد هنا كاملةً لأن قاعدةَ الشاشةِ الأساسيةَ تعلو
+         انكساراتِ المركزيِّ فتُبطلها لو تُركت. */
+    body.ems-site .main .tkt-list-glance-grid.stats-grid:not(.dt-button):not(.btn-close) {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+    @media (max-width: 900px) {
+        body.ems-site .main .tkt-list-glance-grid.stats-grid:not(.dt-button):not(.btn-close) {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+    }
+    @media (max-width: 560px) {
+        body.ems-site .main .tkt-list-glance-grid.stats-grid:not(.dt-button):not(.btn-close) {
+            grid-template-columns: 1fr !important;
+        }
+    }
     .tkt-list-tabs        { display: flex; gap: 6px; flex-wrap: wrap; }
     .tkt-list-tab         { border: 1px solid var(--c-s-ddd); border-radius: 8px; padding: 6px 14px; text-decoration: none; }
     .tkt-list-tab.is-active { background: var(--c-e2b93b, #e2b93b); font-weight: 800; }
@@ -209,29 +227,33 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                           AND t.stage NOT IN ('closed','cancelled') THEN 1 ELSE 0 END) AS crit_cnt
          FROM tickets t WHERE {TENANT_SCOPE}" . $scope_sql);
     $g = !empty($glance) ? $glance[0] : array('open_cnt' => 0, 'late_cnt' => 0, 'crit_cnt' => 0);
+    // النغمةُ رُفعت من البطاقة: الموحَّدةُ بلا شريطِ لونٍ ولا أيقونةٍ ملوّنة،
+    // فصنفُ النغمةِ كان يبقى مكتوبًا بلا أثرٍ بصريٍّ — وهو أسوأُ من غيابه.
     $glance_cards = array(
-        array('مفتوحة الآن', (int)$g['open_cnt'], 'fa-folder-open', 'tkt-list-tone-open'),
-        array('متأخّرة', (int)$g['late_cnt'], 'fa-triangle-exclamation', 'tkt-list-tone-late'),
-        array('حرِجة للإنتاج', (int)$g['crit_cnt'], 'fa-bolt', 'tkt-list-tone-crit'),
+        array('مفتوحة الآن', (int)$g['open_cnt'], 'fa-folder-open'),
+        array('متأخّرة', (int)$g['late_cnt'], 'fa-triangle-exclamation'),
+        array('حرِجة للإنتاج', (int)$g['crit_cnt'], 'fa-bolt'),
     );
     ?>
-    <div class="tkt-list-glance-grid">
-        <?php foreach ($glance_cards as $c): ?>
-            <?php // الرقمُ يُعرض للجميع — والوصلةُ لمن يملك منحةَ اللوحةِ وحدَه.
-                  if ($__tkt_can_dash): ?>
-            <a href="ticket_dashboard.php" class="tkt-list-glance-link" title="افتح لوحة المتابعة">
-            <?php endif; ?>
-                <div class="card tkt-list-glance <?php echo $c[3]; ?>"><div class="card-body tkt-list-glance-body">
-                    <div class="tkt-list-glance-row">
-                        <i class="fa <?php echo $c[2]; ?> tkt-list-glance-icon"></i>
-                        <div>
-                            <div class="tkt-list-glance-num"><?php echo $c[1]; ?></div>
-                            <div class="tkt-list-glance-cap"><?php echo htmlspecialchars($c[0]); ?></div>
-                        </div>
-                    </div>
-                </div></div>
-            <?php if ($__tkt_can_dash): ?></a><?php endif; ?>
-        <?php endforeach; ?>
+    <div class="stats-section">
+        <div class="stats-grid tkt-list-glance-grid">
+            <?php foreach ($glance_cards as $c):
+                /* عقدُ البطاقةِ الموحَّدةِ الثلاثيُّ كما في شاشتَي العملاءِ
+                   والمشاريعِ (أصلُ التصميم): أيقونةٌ في حاويتِها ⇐ قيمةٌ ⇐ عنوان.
+                   ◆ **والبطاقةُ نفسُها هي الوصلةُ لا غلافٌ حولها**: غلافٌ
+                     يصير هو خليةَ الشبكةِ، فتقف البطاقةُ داخلَه بارتفاعِ
+                     محتواها لا بارتفاعِ أختِها فتتفاوت البطاقاتُ في الصفِّ
+                     الواحد. والقاعدةُ المركزيةُ تُلبس الوصلةَ ثوبَ البطاقةِ
+                     أصلًا (`display:block` · `color:inherit` · بلا تسطير).
+                   ◆ والرقمُ يُعرض للجميع — والوصلةُ لمن يملك منحةَ اللوحةِ وحدَه. */
+                $inner = '<div class="stats-icon"><i class="fa ' . htmlspecialchars($c[2]) . '"></i></div>'
+                       . '<div class="stats-value">' . (int)$c[1] . '</div>'
+                       . '<div class="stats-title">' . htmlspecialchars($c[0]) . '</div>';
+                echo $__tkt_can_dash
+                    ? '<a class="stats-card" href="ticket_dashboard.php" title="افتح لوحة المتابعة">' . $inner . '</a>'
+                    : '<div class="stats-card">' . $inner . '</div>';
+            endforeach; ?>
+        </div>
     </div>
 
     <div class="card"><div class="card-body tkt-list-tabs">

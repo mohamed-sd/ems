@@ -22,18 +22,17 @@ $current_user_id = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id
 if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد بيئة شركة صالحة ❌', 'GOV-SCOPE-403', ''); exit(); }
 
 // الدورُ الفعّال للوحة: دورُ الجلسة، أو أبوه إن كان فرعيًّا بلا إعدادٍ خاص
-$rb_rid = intval($current_role);
+$rb_rid = roleBoardConfigRole(ems_tenant_db(), $current_role);
+if ($rb_rid <= 0) { header("Location: ../main/dashboard.php"); exit(); }
 $rb_cfg = roleBoardGenericConfig($rb_rid);
-if ($rb_cfg === null) {
-    try {
-        $p = ems_tenant_db()->selectOne('roles', array('columns' => array('parent_role_id'), 'where' => array('id' => $rb_rid)));
-        if ($p && !empty($p['parent_role_id'])) {
-            $rb_rid = intval($p['parent_role_id']);
-            $rb_cfg = roleBoardGenericConfig($rb_rid);
-        }
-    } catch (\Throwable $t) {}
+
+// لوحتان لصاحبٍ واحدٍ لا تجتمعان: الدورُ الذي صارت «الرئيسية» لوحتَه
+// (إدارة التشغيل — قرار المالك 2026-08-21) يُردُّ إليها من هنا أيضًا، فرابطُ
+// «لوحة الإدارة» في السايدبار يفتح اللوحةَ نفسَها لا نسخةً ثانيةً منها.
+if (roleBoardRoute(intval($current_role), $rb_rid) === 'main/dashboard.php') {
+    header('Location: ../main/dashboard.php');
+    exit();
 }
-if ($rb_cfg === null) { header("Location: ../main/dashboard.php"); exit(); }
 
 // الحارس: شاشةٌ مسجَّلةٌ بمنحٍ صريحةٍ لكل دورٍ عام — لا افتراضَ سماح
 $page_permissions = check_page_permissions($conn, 'main/role_board.php');
@@ -43,45 +42,18 @@ if (!$can_view) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد
 $rb_gate = $is_super_admin ? ems_tenant_db()->forAllTenants('role board super') : ems_tenant_db();
 $today = date('Y-m-d');
 
-/** تنفيذُ عنصرِ إعدادٍ [label,icon,scope,sql,href(,tone)] عدًّا معزولًا. */
-$rb_exec = function (array $def, array $params = array()) use ($rb_gate) {
-    $scopeArr = array('scope' => array($def[2]['a'] => $def[2]['t']));
-    if (isset($def[2]['enrich'])) { $scopeArr['enrich'] = $def[2]['enrich']; }
-    return roleBoardScalar($rb_gate, $scopeArr, $def[3], $params);
-};
-
-// ① مؤشرات اليوم
-$rb_cards = array();
-foreach ($rb_cfg['cards'] as $def) {
-    $n = $rb_exec($def);
-    $tone = isset($def[5]) ? $def[5] : 'or';
-    if ($tone === 'err' && $n <= 0) { $tone = 'ok'; }   // الحرجُ الصفري يهدأ لونًا لا يختفي
-    $rb_cards[] = array($def[1], $n, $def[0], $tone, $def[4]);
-}
-
-// ② مهامي (من الإعداد) — والصفريُّ يختفي
-$rb_tasks = array();
-foreach ($rb_cfg['tasks'] as $def) {
-    $n = (int) $rb_exec($def);
-    if ($n > 0) { $rb_tasks[] = array('label' => $def[0], 'icon' => $def[1], 'count' => $n, 'href' => $def[4]); }
-}
-
-// ③④⑤⑦ عبر المحرك الموحّد
-$rb_badges    = ems_finreq_nav_badges($conn);
-$rb_approvals = roleBoardApprovals($conn, $rb_gate, $rb_rid, $rb_badges);
-$rb_alerts    = roleBoardAlerts($conn, $rb_gate, $rb_rid);
-$rb_quick     = roleBoardQuickActions($conn, $rb_rid, $current_user_id);
-$rb_recent    = roleBoardRecent($conn, $current_user_id);
-
-// ⑥ نبض الأداء من إعداده (سلسلةٌ ثانيةٌ اختيارية)
-list($rb_pulse_title, $rb_pulse_series, $psA, $sqlA, $psB, $sqlB) = $rb_cfg['pulse'];
-$rb_pulse = array('labels' => array(), 'in' => array(), 'out' => array());
-for ($d = 6; $d >= 0; $d--) {
-    $day = date('Y-m-d', strtotime("-{$d} days"));
-    $rb_pulse['labels'][] = date('m/d', strtotime($day));
-    $rb_pulse['in'][]  = $sqlA !== null ? roleBoardScalar($rb_gate, array('scope' => array($psA['a'] => $psA['t'])), $sqlA, array($day)) : 0;
-    $rb_pulse['out'][] = $sqlB !== null ? roleBoardScalar($rb_gate, array('scope' => array($psB['a'] => $psB['t'])), $sqlB, array($day)) : 0;
-}
+// ①-⑦ من المحرّك الموحّد (includes/role_board.php · roleBoardBuild) — الحسابُ
+// في دالّةٍ واحدةٍ تقرأ منها هذه الشاشةُ و«الرئيسية» معًا، فلا تتفرّق نسختان.
+$rb_board = roleBoardBuild($conn, $rb_gate, $rb_rid, $current_user_id);
+$rb_cards        = $rb_board['cards'];
+$rb_tasks        = $rb_board['tasks'];
+$rb_approvals    = $rb_board['approvals'];
+$rb_alerts       = $rb_board['alerts'];
+$rb_quick        = $rb_board['quick'];
+$rb_recent       = $rb_board['recent'];
+$rb_pulse        = $rb_board['pulse'];
+$rb_pulse_title  = $rb_board['pulse_title'];
+$rb_pulse_series = $rb_board['pulse_series'];
 
 $page_title = 'إيكوبيشن | ' . $rb_cfg['title'];
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
@@ -102,7 +74,37 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     ?>
     <style>
       .rbd-lead { margin: 4px 2px 10px; }
-      .rbd-kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(215px, 1fr)); gap: 16px; }
+      /* ① خمسُ بطاقاتٍ في صفٍّ واحد.
+           الوزنُ لا الرغبة: `ems-statcards.css` يفرض أربعةَ أعمدةٍ بـ`!important`
+           على محدِّدٍ وزنُه (0,5,1) — `body.ems-site .main :is(…):not(.dt-button)
+           :not(.btn-close)`. فمحدِّدُ الشاشةِ يزيدُه صنفًا ليعلوَه (0,6,1)، وإلا
+           بقيت الأربعةُ وظنَّ القارئُ أن السطرَ لم يُكتب. والانكساراتُ تُعاد هنا
+           كاملةً لأن الاستعلامَ لا يزيد وزنًا: قاعدةُ الشاشةِ الأساسيةُ تعلو
+           انكساراتِ المركزيِّ فتُبطلها لو تُركت. */
+      .rbd-kpi-grid,
+      body.ems-site .main .rbd-kpi-grid.ems-statgrid:not(.dt-button):not(.btn-close) {
+        display: grid !important;
+        grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+      }
+      @media (max-width: 1100px) {
+        .rbd-kpi-grid,
+        body.ems-site .main .rbd-kpi-grid.ems-statgrid:not(.dt-button):not(.btn-close) {
+          grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        }
+      }
+      @media (max-width: 820px) {
+        .rbd-kpi-grid,
+        body.ems-site .main .rbd-kpi-grid.ems-statgrid:not(.dt-button):not(.btn-close) {
+          grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+      }
+      @media (max-width: 560px) {
+        .rbd-kpi-grid,
+        body.ems-site .main .rbd-kpi-grid.ems-statgrid:not(.dt-button):not(.btn-close) {
+          grid-template-columns: 1fr !important;
+        }
+      }
     </style>
     <p class="text-muted rbd-lead"><i class="fas fa-mug-hot"></i> أسئلةُ أول اليوم لدورك — اضغط أي رقمٍ لفتح مصدره. (<?php echo $today; ?>)</p>
 

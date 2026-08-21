@@ -526,7 +526,7 @@ ems_screen_about(
     <?php endif; ?>
 
     <!-- ═══ مؤشراتُ الفريق ═══ -->
-    <div class="pu-kpis">
+    <div class="pu-kpis" data-cols="5">
         <div class="pu-kpi" data-tone="main">
             <span class="pu-kpi__ico"><i class="fas fa-users"></i></span>
             <span class="pu-kpi__val"><?= $kpi_total ?></span>

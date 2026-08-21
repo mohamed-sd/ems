@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — البذرة المرجعية (طبقتان)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-19 13:29:17
+-- المصدر: equipation_manage · التوليد: 2026-08-21 07:34:18
 -- ① عالمية: بنيةٌ متنكّرةٌ في هيئة بيانات — بدونها لا تنقّلَ ولا صلاحيات.
 -- ② مستأجَرة: مرجعيةٌ تحمل company_id — القيمةُ علامةٌ نائبةٌ يحقنها المُثبِّت:
 --    {{COMPANY_ID}}
@@ -3605,7 +3605,8 @@ INSERT INTO `role_permissions` (`id`, `role_id`, `module_id`, `can_view`, `can_a
 (3449,31,187,1,0,0,0),
 (3450,33,246,1,0,0,0),
 (3451,33,188,1,0,0,0),
-(3452,33,187,1,0,0,0);
+(3452,33,187,1,0,0,0),
+(3454,2,256,1,0,0,0);
 
 -- ── link_groups ──
 DELETE FROM `link_groups`;
@@ -4810,9 +4811,9 @@ INSERT INTO `link_groups` (`id`, `name`, `group_code`, `owner_role_id`, `icon`, 
 (3993,'أخرى — للمراجعة (ج)','n9s99_others_r4_3',4,'fa fa-box-archive',9902,99,'خارج الوثيقة — بانتظار قرار المالك',1,NULL),
 (3994,'متابعةُ إدارتي — المخاطرُ والحوكمة','n9o_mydept_r12',12,'fa fa-scale-balanced',71,7,'متابعةُ إدارتي',1,'الملاحقُ والتجديداتُ وسجلُّ حركةِ العقدِ ومراجعتُه'),
 (3995,'متابعةُ إدارتي — المخاطرُ والحوكمة','n9o_mydept_r2',2,'fa fa-scale-balanced',71,7,'متابعةُ إدارتي',1,'التقييمُ الدوريُّ وتصفيةُ إنهاءِ العقد'),
-(3996,'ناقلُ الأحداث','n9s16_10_32_r15',15,'fa fa-tower-broadcast',1032,10,'عاشرًا: نراقب الأحداثَ والمهام',1,NULL),
-(3997,'طابورُ المهام','n9s16_10_33_r15',15,'fa fa-list-check',1033,10,'عاشرًا: نراقب الأحداثَ والمهام',1,NULL),
-(3998,'الاستعادة','n9s16_10_34_r15',15,'fa fa-clock-rotate-left',1034,10,'عاشرًا: نراقب الأحداثَ والمهام',1,NULL),
+(3996,'ناقلُ الأحداث','n9s16_10_32_r15',15,'fa fa-tower-broadcast',1032,10,'عاشرًا: الأحداث والمهام الخلفية',1,NULL),
+(3997,'طابورُ المهام','n9s16_10_33_r15',15,'fa fa-list-check',1033,10,'عاشرًا: الأحداث والمهام الخلفية',1,NULL),
+(3998,'الاستعادة','n9s16_10_34_r15',15,'fa fa-clock-rotate-left',1034,10,'عاشرًا: الأحداث والمهام الخلفية',1,NULL),
 (3999,'نعتمد مستنداتٍ أخرى',NULL,1,'fa fa-folder',800,NULL,NULL,1,NULL),
 (4000,'مجموعةُ مجالِ الإدارةِ اليومية',NULL,1,'fa fa-folder',800,NULL,NULL,1,NULL);
 INSERT INTO `link_groups` (`id`, `name`, `group_code`, `owner_role_id`, `icon`, `display_order`, `stage_no`, `stage_title`, `is_active`, `stage_desc`) VALUES
@@ -5518,7 +5519,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (6988,32,'HOME',3926,436,'إيكوبيشن | البحث الموحد','main/global_search.php','fa fa-circle-dot',2,NULL,'main/global_search.php',0,'2026-08-09 23:47:47','2026-08-12 04:45:04'),
 (6989,32,'HOME',3926,437,'قريبًا','main/soon.php','fa fa-circle-dot',4,NULL,'main/soon.php',0,'2026-08-09 23:47:47','2026-08-12 04:45:04'),
 (6990,32,'HOME',3926,438,'إيكوبيشن | بطاقة المستخدم','main/user_profile.php','fa fa-circle-dot',5,NULL,'main/user_profile.php',0,'2026-08-09 23:47:47','2026-08-12 04:45:04'),
-(6991,33,'GOV',3929,389,'سجل اطّلاع المراجع الحساس','Audit/iaf_access_log.php','fa fa-circle-dot',1,NULL,'Audit/iaf_access_log.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
+(6991,33,'GOV',3929,389,'سجل اطّلاع المراجع الحساس','Audit/iaf_access_log.php','fa fa-circle-dot',1,NULL,'Audit/iaf_access_log.php',1,'2026-08-09 23:47:47','2026-08-19 17:43:02'),
 (6992,33,'GOV',3929,385,'خطط المعالجة ومتابعتها','Audit/iaf_action_plans.php','fa fa-circle-dot',2,NULL,'Audit/iaf_action_plans.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
 (6993,33,'GOV',3929,391,'صلاحيات المراجع داخل النظام','Audit/iaf_authorities.php','fa fa-circle-dot',3,NULL,'Audit/iaf_authorities.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
 (6994,33,'GOV',3929,377,'ميثاق المراجعة الداخلية','Audit/iaf_charter.php','fa fa-circle-dot',4,NULL,'Audit/iaf_charter.php',1,'2026-08-09 23:47:47','2026-08-09 23:47:47'),
@@ -5749,7 +5750,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (9375,1,'DAILY',3320,149,'إسناد المعدات للوحدات','Operations/containers.php#2','fa fa-circle-dot',17,NULL,'Operations/containers.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
 (9376,1,'DAILY',3321,196,'جاهزية المعدات للتشغيل','Fleet/readiness_board.php','fa fa-circle-dot',18,NULL,'Fleet/readiness_board.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
 (9377,1,'DAILY',3321,111,'طلبات الترحيل','Transport/transfer_requests.php','fa fa-circle-dot',19,NULL,'Transport/transfer_requests.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
-(9378,1,'DAILY',3322,308,'تسجيل التايم شيت والإنتاج','Timesheet/timesheet.php','fa fa-circle-dot',20,NULL,'Timesheet/timesheet.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
+(9378,1,'DAILY',3322,432,'تسجيل التايم شيت والإنتاج','Timesheet/view_timesheet.php','fa fa-circle-dot',20,NULL,'Timesheet/view_timesheet.php',1,'2026-08-16 17:07:11','2026-08-21 07:32:56'),
 (9379,1,'DAILY',3322,284,'الإنتاج والقياس','Operations/production.php','fa fa-circle-dot',21,NULL,'Operations/production.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
 (9380,1,'DAILY',3323,290,'التوقفات وتحديد المتحمل','Operations/stops_unattributed.php','fa fa-circle-dot',22,NULL,'Operations/stops_unattributed.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
 (9381,1,'DAILY',3325,292,'الأداء الشهري للوحدة','Operations/unit_perf.php','fa fa-circle-dot',23,NULL,'Operations/unit_perf.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
@@ -5971,7 +5972,7 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (9597,2,'DAILY',3449,196,'جاهزية المعدات للتشغيل','Fleet/readiness_board.php','fa fa-circle-dot',21,NULL,'Fleet/readiness_board.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
 (9598,2,'DAILY',3450,149,'الوحدات التعاقدية المرقَّمة','Operations/containers.php','fa fa-circle-dot',22,NULL,'Operations/containers.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
 (9599,2,'DAILY',3450,149,'إسناد المعدات للوحدات','Operations/containers.php#2','fa fa-circle-dot',23,NULL,'Operations/containers.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
-(9600,2,'DAILY',3451,308,'تسجيل التايم شيت والإنتاج','Timesheet/timesheet.php','fa fa-circle-dot',24,NULL,'Timesheet/timesheet.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
+(9600,2,'DAILY',3451,432,'تسجيل التايم شيت والإنتاج','Timesheet/view_timesheet.php','fa fa-circle-dot',24,NULL,'Timesheet/view_timesheet.php',1,'2026-08-16 17:07:11','2026-08-21 07:32:56'),
 (9601,2,'DAILY',3452,304,'دفتر استهلاك حصص الموردين','Suppliers/shares_coverage.php#2','fa fa-circle-dot',25,NULL,'Suppliers/shares_coverage.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
 (9602,2,'DAILY',3453,292,'الأداء الشهري للوحدة','Operations/unit_perf.php','fa fa-circle-dot',26,NULL,'Operations/unit_perf.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
 (9603,2,'DAILY',3453,160,'أداء الموردين وجاهزيتهم','Suppliers/supplier_capacity.php#2','fa fa-circle-dot',27,NULL,'Suppliers/supplier_capacity.php',1,'2026-08-16 17:07:11','2026-08-16 17:07:11'),
@@ -6632,7 +6633,8 @@ INSERT INTO `nav_items` (`id`, `role_id`, `door`, `group_id`, `module_id`, `labe
 (10347,31,'DAILY',3921,187,'بوابتي','Portal/my_portal.php','fa fa-user',3,NULL,'Portal/my_portal.php',1,'2026-08-19 11:37:18','2026-08-19 11:37:18'),
 (10348,33,'DAILY',3928,246,'مهامي','Portal/my_tasks.php','fa fa-user',1,NULL,'Portal/my_tasks.php',1,'2026-08-19 11:37:18','2026-08-19 11:37:18'),
 (10349,33,'DAILY',3928,188,'إنجازي','Portal/my_achievement.php','fa fa-user',2,NULL,'Portal/my_achievement.php',1,'2026-08-19 11:37:18','2026-08-19 11:37:18'),
-(10350,33,'DAILY',3928,187,'بوابتي','Portal/my_portal.php','fa fa-user',3,NULL,'Portal/my_portal.php',1,'2026-08-19 11:37:18','2026-08-19 11:37:18');
+(10350,33,'DAILY',3928,187,'بوابتي','Portal/my_portal.php','fa fa-user',3,NULL,'Portal/my_portal.php',1,'2026-08-19 11:37:18','2026-08-19 11:37:18'),
+(10354,2,'DAILY',3448,256,'سجل المعدات','Equipments/equipments.php','fa fa-circle-dot',20,'','Equipments/equipments.php',0,'2026-08-20 14:48:30','2026-08-21 07:18:51');
 
 -- ── equipments_types ──
 DELETE FROM `equipments_types`;

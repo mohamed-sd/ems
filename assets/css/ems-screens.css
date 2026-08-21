@@ -55,12 +55,26 @@
     cursor: pointer;
 }
 
-/* ── عمودُ «نقلِ الحالة»: أزرارٌ نصيةٌ تأخذ عرضَ نصِّها وتلتفُّ في أسطر ── */
+/* ── عمودُ «نقلِ الحالة»: أزرارٌ نصيةٌ تأخذ عرضَ نصِّها وتلتفُّ في أسطر ──
+   ◆ **ولماذا `.contracts-table-nowrap` في المُحدِّد**: مُعرِّفُ `#projectsTable`
+     مشتركٌ بين ثلاثِ شاشاتٍ (عقودُ العملاء · عقودُ الموظفين · عقودُ الموردين)،
+     وكتلةُ `nowrap` أعلاه **مكرَّرةٌ ثلاثَ مرّاتٍ في هذا الملفّ** — نسختانِ
+     مهاجرتانِ من الشاشتينِ الأخريينِ تقعانِ **بعدَ** هذه الكتلة. ووزنُهما
+     `(1,1,1)` مساوٍ لوزنِ `#projectsTable td.ems-lc-cell` — فالتعادلُ يُحسم
+     **بترتيبِ المصدر**، والمتأخّرُ يغلب: فيعود `white-space: nowrap` إلى خليةِ
+     نقلِ الحالة، وأزرارُها الثلاثةُ (توقيع · إعادةٌ للتفاوض · تعليقٌ بحقلِ سبب)
+     تصطفُّ في سطرٍ واحدٍ عرضُه ٣٧٣ بكسلًا داخلَ خليةٍ عرضُها ٢٧٤ — فيفيض
+     ٩٩ بكسلًا فوقَ عمودِ «رقم العقد» المجاور. أي أنَّ العلاجَ المكتوبَ هنا
+     كان **ميّتًا يقتله تكرارُ نفسِه**.
+   ◆ والحلُّ رفعُ الوزنِ إلى `(1,2,1)` بقيدِ صنفِ الجدول — فلا تغلبه نسخةٌ
+     مكرَّرةٌ قائمةٌ ولا مستحدَثة. (والتكرارُ نفسُه يبقى دَينًا يُنظَّف على حدة.) */
+#projectsTable.contracts-table-nowrap td.ems-lc-cell,
 #projectsTable td.ems-lc-cell {
     white-space: normal;
-    max-width: 250px;
+    max-width: 260px;
 }
 
+#projectsTable.contracts-table-nowrap td.ems-lc-cell .ems-inline-form,
 #projectsTable td.ems-lc-cell .ems-inline-form {
     display: inline-block;
     margin: 2px 3px 2px 0;
@@ -76,6 +90,7 @@
     cursor: pointer;
 }
 
+#projectsTable.contracts-table-nowrap td.ems-lc-cell .ems-note-inline,
 #projectsTable td.ems-lc-cell .ems-note-inline {
     width: 92px;
     vertical-align: middle;
@@ -401,6 +416,24 @@ body.ems-site,
   box-sizing: border-box;
 }
 
+/* ── هامشُ محتوى الـmain: 10px (طلبُ المالك 2026-08-21) ────────────────────
+   كان محتوى اللوحةِ ملتصقًا بحافّتَي القشرةِ (x=0 وx=1197 مقيسًا) — الرأسُ
+   و«عن الشاشة» وجسدُ اللوحةِ كلُّها. والحشوُ هنا يزيح **كلَّ** أبناءِ الـmain
+   إزاحةً واحدةً، فلا يُكتب هامشٌ في كلِّ كتلةٍ على حدة.
+   والوزنُ `body.ems-site .ems-dash.main` (0,3,1) يعلو حشوَ الجوّالِ العامَّ
+   (`.ems-site .main{padding:15px}` بوزنِ (0,2,1)) فلا يتبدّل المقاسُ بالعرض. */
+body.ems-site .ems-dash.main {
+  padding: 10px;
+}
+
+/* الرأسُ الأصفرُ («Dashboard») يبتعد 30 عن أعلى المحتوى (طلبُ المالك 2026-08-21):
+   شريطُ التاريخِ المعلَّقُ `.shot-breadcrumb` ثابتٌ عند 51 وارتفاعُه 23، فكان
+   الرأسُ — يبدأ عند 60 — يمرُّ **تحته** فيتقاطعان. والثلاثون تُنزله إلى 90
+   فيخلو لكلٍّ سطرُه. ومقصورٌ على اللوحةِ لأن الشريطَ المعلَّقَ لوحتُها وحدَها. */
+body.ems-site .ems-dash.main > .main_head {
+  margin-top: 30px;
+}
+
 /* Sidebar: inherits the unified layout from ems.main.all.style.css
    (GLOBAL SIDEBAR section). Dashboard no longer redefines its
    position/dimensions/colors — single source of truth. */
@@ -417,10 +450,12 @@ body.ems-site,
   display: none !important;
 }
 
+/* جسدُ اللوحةِ = لوحُ المحتوى: رماديٌّ مستديرٌ تجلس عليه البطاقات.
+   (كان `margin-top:-1px` رتقًا لتماسٍّ مع شريطٍ لم يعد فوقه — وقد سقط.) */
 .shot-body {
-  padding: 0 0px 14px;
+  padding: 10px;
   background: var(--c-e2e2e2);
-  margin-top: -1px;
+  border-radius: 20px;
 }
 
 .shot-breadcrumb {
@@ -477,12 +512,16 @@ body.ems-site,
   display: grid;
 }
 
+/* «الوصول السريع» بطاقةٌ كسائرِ بطاقاتِ اللوحةِ لا شريطًا سائبًا: كان
+   ملءَ العرضِ بلا حدٍّ ولا استدارةٍ وبحشوٍ غيرِ متناظر (25 أعلى · 50 جانبًا
+   · 50 أسفل) — فبدا سطحًا أبيضَ لا كتلةً، ولم تكن بلاطاتُه تُحاذي شيئًا
+   تحتها. والحشوُ الآن هو حشوُ البطاقاتِ نفسِه (16/18) فتُحاذي المحتوياتُ. */
 .shot-quick-zone {
   width: 100%;
   background: var(--c-s-fff);
-  border: none;
-  border-radius: 0;
-  padding: 25px 50px 50px;
+  border: 1px solid var(--c-cfcfcf);
+  border-radius: 20px;
+  padding: 16px 18px 18px;
   font-family: "IBM Plex Sans Arabic", "Tajawal", "Cairo", "Segoe UI", Tahoma, Arial, sans-serif !important;
 }
 
@@ -580,19 +619,25 @@ body.ems-site,
   font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "Font Awesome 5 Free", "Font Awesome 5 Brands", FontAwesome !important;
 }
 
+/* «بيانات الجلسة» بطاقةٌ كأخواتها — كانت شريطًا شفّافًا بحشوٍ جانبيٍّ 40
+   فبدأ محتواها عند 51 بينما تبدأ جارتُها عند 30. الآن الحشوُ واحد. */
 .shot-session {
-  margin-top: 0;
-  border-top: none;
-  border-bottom: none;
-  padding: 10px 40px;
+  background: var(--white);
+  border: 1px solid var(--c-cfcfcf);
+  border-radius: 20px;
+  padding: 16px 18px;
 }
 
+/* المنطقةُ السفلى **مجمّعٌ شفّافٌ لا صندوق**: كانت رماديًّا (#e4e4e4) داخلَ
+   رماديٍّ (#e2e2e2) — فرقُ درجتين لا تراهما العين، فلم يظهر منها إلا حدٌّ
+   رفيعٌ يوهم بصندوقٍ فارغ. وكان حشوُها 10 يزيح كلَّ أبنائها عن حافةِ
+   «الوصول السريع» فوقها بمقدارِ 11 بكسلًا. فصارت مجمّعًا يرث الحافّة. */
 .shot-lower-zone {
   margin-top: 12px;
-  background: var(--c-s-e4e4e4);
-  border: 1px solid var(--c-cfcfcf);
-  border-radius: 12px;
-  padding: 10px 10px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 .shot-session-title {
@@ -673,7 +718,7 @@ body.ems-site,
 .shot-session-row,
 .shot-session-chip,
 .shot-session-chip strong,
-.shot-stat-panel,
+.shot-num-panel,
 .shot-stat-grid,
 .shot-stat-card,
 .shot-stat-label,
@@ -689,57 +734,71 @@ body.ems-site,
   font-family: var(--dash-font) !important;
 }
 
-.shot-stat-panel {
-  margin-top: 14px;
+/* ── لوحُ الأرقامِ الكبير — الاسمُ غُيِّر عمدًا من `shot-stat-panel` ─────────
+   ◆ **العطبُ المقيس**: `ems-statcards.js` يسم كلَّ صنفٍ من عائلةِ البطاقات
+     (`-stat-`) ثم يقول «مَن ضمَّ بطاقةً فهو حاوية» — فوسم **اللوحَ** نفسَه
+     `ems-statgrid`، وقاعدةُ الشبكةِ الموحّدةُ تفرض عليه `display:grid` وأربعةَ
+     أعمدةٍ بـ`!important`. فسقطت شبكةُ البطاقاتِ الحقيقيةُ في **خليةٍ واحدةٍ
+     عرضُها 210** داخلَ لوحٍ عرضُه 1175: البطاقاتُ الأربعُ تفيض من خليّتها
+     وتنزاح إلى جهةٍ واحدة، ويبقى 309 بكسلًا فراغًا. (وكذلك اللوحُ الثانوي:
+     بطاقاتُه بين 164 و880 داخلَ لوحٍ من 11 إلى 1186.)
+   ◆ **العلاجُ في الاسمِ لا في `!important` مضاد**: اللوحُ حاوٍ لا شبكة، فاسمُه
+     يخرج من العائلة (`num` ليست من `stat|kpi|metric|tile`) فلا يراه الموسِمُ
+     أصلًا — وتبقى الشبكةُ الحقيقيةُ `.shot-stat-grid` موسومةً بموضعِها كما
+     يريد المكوّن. ولا تُلمَس بطاقاتُه ولا تيبوغرافيتُها.
+   ◆ والاستدارةُ 20 كسائرِ الكتل — كانت 68/68/0/0 وحدَها في الصفحة. */
+.shot-num-panel {
+  margin-top: 12px;
   position: relative;
-  padding: 58px 150px 44px;
+  padding: 36px 18px 30px;
+  border-radius: 20px;
   isolation: isolate;
 }
 
-.shot-stat-panel .shot-stat-label {
+.shot-num-panel .shot-stat-label {
   font-size: 1.5rem;
   font-weight: 700;
 }
 
-.shot-stat-panel .shot-stat-value {
+.shot-num-panel .shot-stat-value {
   font-size: 6.5rem;
   font-weight: 50;
 }
 
-.shot-stat-panel:not(.shot-stat-panel-secondary)::before {
+.shot-num-panel:not(.shot-num-panel-secondary)::before {
   content: "";
   position: absolute;
   inset: 0;
   background: var(--dash-yellow);
   border: 1px solid var(--c-brand-gold-deep);
-  border-radius: 68px 68px 0 0;
+  border-radius: 20px;
   z-index: 0;
   pointer-events: none;
 }
 
-.shot-stat-panel > * {
+.shot-num-panel > * {
   position: relative;
   z-index: 1;
 }
 
-.shot-stat-panel-secondary {
+.shot-num-panel-secondary {
   margin-top: 12px;
-    background: var(--white);
+  background: var(--white);
   border: 1px solid var(--c-cfcfcf);
   border-radius: 20px;
   padding: 16px 18px 14px;
 }
 
-.shot-stat-panel-secondary .shot-stat-grid {
+.shot-num-panel-secondary .shot-stat-grid {
   gap: 12px;
 }
 
-.shot-stat-panel-secondary .shot-stat-label {
+.shot-num-panel-secondary .shot-stat-label {
   font-size: 1.0rem;
   font-weight: 700;
 }
 
-.shot-stat-panel-secondary .shot-stat-value {
+.shot-num-panel-secondary .shot-stat-value {
   font-size: 3.1rem;
   font-weight: lighter;
 }
@@ -840,27 +899,25 @@ body.ems-site,
   color: var(--c-s-fff);
 }
 
-@media (max-width: 1280px) {
-  .shot-hex-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  /* عند عمودين: يُمدّ الكارت الأخير لعمودين إن كان الصف الأخير ناقصاً */
-  .shot-hex-grid > .shot-hex-link:last-child {
-    grid-column: span var(--last-span-mid, 1);
-  }
-
-  .shot-session-row,
-  .shot-stat-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }}
-
+/* ── سُلَّمُ الانكسارِ واحدٌ لكلِّ شبكاتِ اللوحة: كامل ← 900 عمودان ← 560 عمود
+   كان لشبكاتِ اللوحةِ الخاصةِ سُلَّمٌ ثانٍ يبدأ عند 1280، بينما شبكةُ البطاقاتِ
+   الموحّدةُ (`ems-statcards.css`) تنكسر عند 900. فعلى شاشةِ 1280 — وهي الأكثرُ
+   شيوعًا — كانت بلاطاتُ «الوصول السريع» وشرائحُ الجلسةِ عمودَين اثنين بينما
+   بطاقاتُ المؤشراتِ خمسةٌ والأرقامُ الكبيرةُ أربعة: أربعةُ إيقاعاتٍ في صفحةٍ
+   واحدة. والمقيسُ أن الأربعةَ تسع 1280 بلا فيض: بلاطةٌ 272×88 ونصُّها 158.
+   ── */
 @media (max-width: 900px) {
   /* Sidebar mobile behavior (off-canvas) is governed by the unified
-     CSS breakpoint (≤768px); the dashboard only adjusts its content here. */
-  .shot-body {
-    padding-top: 10px;
-    margin-top: 0;
+     CSS breakpoint (≤768px); the dashboard only adjusts its content here.
+     الحشوُ يضيق ولا يختفي — والإزاحةُ تبقى واحدةً في كلِّ الكتل. */
+  .shot-quick-zone,
+  .shot-session,
+  .shot-num-panel-secondary {
+    padding: 14px 12px;
+  }
+
+  .shot-num-panel {
+    padding: 26px 12px 22px;
   }
 
   .shot-breadcrumb {
@@ -871,8 +928,23 @@ body.ems-site,
 
   .shot-hex-grid,
   .shot-session-row,
-  .shot-stat-grid,
+  .shot-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* عند عمودين: يُمدّ الكارت الأخير لعمودين إن كان الصف الأخير ناقصاً */
+  .shot-hex-grid > .shot-hex-link:last-child {
+    grid-column: span var(--last-span-mid, 1);
+  }
+
   .shot-charts {
+    grid-template-columns: 1fr;
+  }}
+
+@media (max-width: 560px) {
+  .shot-hex-grid,
+  .shot-session-row,
+  .shot-stat-grid {
     grid-template-columns: 1fr;
   }
 
@@ -884,6 +956,303 @@ body.ems-site,
   .shot-stat-value {
     font-size: 4.2rem;
   }}
+
+/* ═══ لوحةُ الدورِ داخلَ «الرئيسية» — المكوّناتُ السبعةُ بلغةِ اللوحة ═══════════
+   `main/dashboard.php` صارت لوحةَ إدارةِ التشغيل (قرار المالك 2026-08-21)، فبدلَ
+   أن تُنسخ إليها بطاقاتُ `main/role_board.php` بثوبِها (`card`/`badge` وألوانٌ
+   مثبَّتةٌ في السطر) تُصيَّر هنا بثوبِ اللوحةِ نفسِه: البطاقةُ بيضاءُ بحدِّ
+   `--c-cfcfcf` واستدارةِ 20 كـ`.shot-chart-card`، والخطُّ `--dash-font`،
+   والتمييزُ بـ`--dash-yellow` كما في `.shot-session-chip:hover`.
+   ◆ **الأسماءُ تتجنّب عائلةَ بطاقاتِ الإحصاء عمدًا**: `ems-statcards.js` يسم
+     كلَّ صنفٍ فيه `-stat-`/`-kpi-` بطاقةً موحّدةً ويعيد ترتيبَ أبنائه. فصناديقُ
+     القوائمِ هنا `shot-ops-box` لا `shot-ops-kpi` كي تبقى قوائمَ. أما مؤشراتُ ①
+     فتُصيَّر بمكوّنِ `ems_kpi_card` عمدًا لتنالَ الشكلَ الموحَّدَ نفسَه الذي
+     تناله بطاقاتُ `.shot-stat-card` في هذه الصفحة. */
+.shot-ops {
+  margin-top: 12px;
+  background: var(--white);
+  border: 1px solid var(--c-cfcfcf);
+  border-radius: 20px;
+  padding: 16px 18px 18px;
+  font-family: var(--dash-font);
+  direction: rtl;
+}
+
+.shot-ops-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  margin-bottom: 12px;
+}
+
+.shot-ops-title {
+  margin: 0;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: var(--c-ink-900);
+}
+
+.shot-ops-title i {
+  margin-left: 8px;
+  color: var(--c-brand-gold-deep, #8a6a10);
+}
+
+.shot-ops-note {
+  font-size: .78rem;
+  color: var(--c-s-666);
+}
+
+/* ① مؤشراتُ اليوم — الشبكةُ الموحّدةُ تحكمها حين يسم `ems-statcards.js`
+   الحاويةَ `ems-statgrid` (‎data-cols‎ يقرّر العدَد). وهذه القاعدةُ هي
+   الاحتياطُ قبلَ عملِ الوسم — فلا يظهر صفٌّ منهارٌ في أولِ إطار. */
+.shot-ops-kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+}
+
+/* قشرةُ بطاقةِ المؤشرِ تُطابق `.shot-stat-card` في هذه الصفحةِ نفسِها.
+   ◆ **الوزنُ لا الرغبة**: `.ems-kpi-card` (ems-shell.css) تعطي أبيضَ واستدارةَ
+     12، وقاعدةُ `ems-statcards.css` الموحّدةُ تعطي رماديَّ 35 بوزنِ (0,5,1)
+     و`!important`. والمقيسُ في المتصفحِ أن الأولى هي التي تظهر على هذه الشاشة
+     — فبقيت خمسُ بطاقاتٍ بيضاءَ باستدارةِ 12 فوقَ بطاقاتٍ رماديةٍ باستدارةِ 35
+     في الصفحةِ نفسِها. فبدلَ الاتكالِ على سباقٍ يُحسَم مرةً ولا يُحسَم أخرى،
+     تُثبَّت القشرةُ هنا بوزنٍ يعلو الاثنتين: (0,6,1) — وهو نمطُ `.rbd-kpi-grid`
+     المعتمَدُ في `main/role_board.php`. والتيبوغرافيا لا تُنسَخ: أبناءُ البطاقةِ
+     يسمهم `ems-statcards.js` فينالون خطَّ الموحَّدةِ نفسَه (مقيسٌ: 35px/900
+     للقيمةِ و14.72/700 للعنوان — مطابقٌ لـ`.shot-stat-card` حرفًا).
+   ◆ **بلا حدٍّ ملوَّنٍ ولا ظلٍّ ملوَّن** (طلبُ المالك 2026-08-21): كان حدُّ
+     البدايةِ 6px بلونِ النغمة (أحمرُ للحرج · كهرمانيٌّ للإنذار) فبدت البطاقاتُ
+     مخالفةً لبطاقاتِ الصفحةِ الرمادية. والحالةُ **لا تضيع**: `ems_kpi_card`
+     يطبعها نصًّا في البطاقةِ نفسِها («حرج» · «إنذار» · «سليم») — واللونُ كان
+     إشارةً مكرِّرةً لا وحيدة. والظلُّ الآن ظلُّ البطاقةِ الموحَّدةِ حرفًا. */
+body.ems-site .main .shot-ops-kpis .ems-kpi-card:not(.dt-button):not(.btn-close) {
+  background: var(--c-s-eee, #eeeeee) !important;
+  background-image: none !important;
+  border: 1px solid var(--c-s-aaa, #aaaaaa) !important;
+  border-radius: 35px !important;
+  padding: 16px 18px !important;
+  box-shadow: 0 2px 8px rgba(26, 18, 8, .07) !important;
+  overflow: hidden !important;
+}
+
+body.ems-site .main .shot-ops-kpis .ems-kpi-card:not(.dt-button):not(.btn-close):hover {
+  border-color: var(--c-s-9d7e00) !important;
+}
+
+/* الصفوفُ الفارغةُ التي يخلّفها الموسِمُ بعد نقلِ أجزائها لا تُبقي فراغًا */
+body.ems-site .main .shot-ops-kpis .ems-kpi-meta:not(:has(span:not(:empty))) {
+  display: none !important;
+}
+
+/* ②③④⑤ — أربعةُ صناديقَ ثابتةِ البنية.
+   عددٌ **معلَنٌ** لا `auto-fit`: المُلائمُ التلقائيُّ كان يعطي ثلاثةَ أعمدةٍ
+   على 1024 وأربعةً على 1280 — فيهبط الصندوقُ الرابعُ سطرًا وحدَه بينما تبقى
+   جاراتُه أربعةً. والسُّلَّمُ هنا هو سُلَّمُ الصفحةِ كلِّها. */
+.shot-ops-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.shot-ops-box {
+  background: var(--white);
+  border: 1px solid var(--c-cfcfcf);
+  border-radius: 18px;
+  padding: 12px 14px 10px;
+  min-width: 0;
+}
+
+.shot-ops-box-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--c-cfcfcf);
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--c-ink-900);
+}
+
+.shot-ops-box-title i {
+  color: var(--c-brand-gold-deep, #8a6a10);
+}
+
+.shot-ops-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 6px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--c-s-333, #333);
+  font-size: .84rem;
+  transition: background .18s ease;
+}
+
+.shot-ops-row + .shot-ops-row {
+  border-top: 1px solid var(--c-s-f0f0f0, #f0f0f0);
+}
+
+.shot-ops-row:hover {
+  background: var(--dash-yellow);
+  color: var(--c-s-111);
+}
+
+.shot-ops-row-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  min-width: 0;
+}
+
+.shot-ops-row-text i {
+  opacity: .6;
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+/* التنبيهُ يحمل سببَه (UX-01 §9) — فالنصُّ يلتفُّ ثلاثةَ أسطرٍ ولا يُبتر
+   بنقاطٍ تبتلع السبب. والمقيسُ: أطولُ تنبيهٍ حيٍّ («فجوةُ تغطيةٍ تعاقدية:
+   35,938.0 ساعةً شهريةً غيرَ مغطاة») كان يُقصُّ عند سطرَين. وما زاد يُقرأ
+   كاملًا من `title` السطر. */
+.shot-ops-row-text span {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.45;
+}
+
+/* عدّادُ السطر — نغمتُه من رموزِ اللوحةِ نفسِها (‎--dash-tone-*‎) */
+.shot-ops-num {
+  flex-shrink: 0;
+  min-width: 30px;
+  text-align: center;
+  border-radius: 999px;
+  padding: 2px 9px;
+  font-size: .8rem;
+  font-weight: 700;
+  line-height: 1.5;
+  background: var(--dash-tone-or-soft, #FFF4E6);
+  color: var(--dash-tone-or-text, #B45309);
+  border: 1px solid var(--dash-tone-or-bg, #F7931A);
+}
+
+.shot-ops-num.is-warn {
+  background: var(--dash-tone-warn-soft, #FFFBEB);
+  color: var(--dash-tone-or-text, #B45309);
+  border-color: var(--dash-tone-warn-bg, #D97706);
+}
+
+.shot-ops-num.is-err {
+  background: var(--dash-tone-err-soft, #FEF2F2);
+  color: var(--dash-tone-err-text, #B91C1C);
+  border-color: var(--dash-tone-err-bg, #DC2626);
+}
+
+.shot-ops-empty {
+  margin: 4px 2px;
+  font-size: .82rem;
+  color: var(--c-s-666);
+}
+
+/* ⑤ إنشاء سريع — أزرارٌ بلغةِ بلاطةِ الوصولِ السريعِ مصغَّرةً */
+.shot-ops-act {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 9px 12px;
+  border: 1px solid var(--c-s-b7b7b7);
+  border-radius: 16px;
+  background: var(--c-ececec);
+  color: var(--c-s-111);
+  text-decoration: none;
+  font-size: .86rem;
+  font-weight: 700;
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.shot-ops-act:last-child { margin-bottom: 0; }
+
+.shot-ops-act:hover {
+  background: var(--dash-yellow);
+  border-color: var(--c-s-9d7e00);
+  color: var(--c-s-111);
+}
+
+/* ⑦ عملي الأخير — قائمةٌ داخلَ بطاقةِ رسمٍ فتُمرَّر ولا تُطيل الصفحة.
+   قائمةٌ لا لوحةٌ: لا حدَّ ولا حشوَ لها (البطاقةُ الحاويةُ تحملهما). */
+.shot-ops-recent {
+  max-height: 220px;
+  overflow-y: auto;
+  direction: rtl;
+  font-family: var(--dash-font);
+}
+
+.shot-ops-recent .shot-ops-row {
+  font-size: .82rem;
+}
+
+.shot-ops-time {
+  flex-shrink: 0;
+  font-size: .7rem;
+  color: var(--c-s-666);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ◆ **وزنُ اللون**: القشرةُ العامةُ تكتب `.ems-site .main span, … p, … label`
+     ووزنُها (0,2,1) — فتغلب أيَّ اسمِ صنفٍ مفردٍ هنا، وكانت أرقامُ الصفوفِ
+     تخرج سوداءَ بلا نغمة. فتُعاد ألوانُ النصِّ بوزنٍ يعلوها لا بـ`!important`
+     (القاعدةُ نفسُها التي حُلَّ بها تصادمُ الشبكاتِ في `.rbd-kpi-grid`). */
+.ems-site .main .shot-ops-note,
+.ems-site .main .shot-ops-empty,
+.ems-site .main .shot-ops-time {
+  color: var(--c-s-666);
+}
+
+.ems-site .main .shot-ops-num {
+  color: var(--dash-tone-or-text, #B45309);
+}
+
+.ems-site .main .shot-ops-num.is-warn {
+  color: var(--dash-tone-or-text, #B45309);
+}
+
+.ems-site .main .shot-ops-num.is-err {
+  color: var(--dash-tone-err-text, #B91C1C);
+}
+
+/* الأيقوناتُ تحتفظ بمكتبتِها — قاعدةُ الخطِّ أعلاه لا تبتلعها */
+.shot-ops i,
+.shot-ops-recent i {
+  font-family: "Font Awesome 6 Free", "Font Awesome 6 Brands", "Font Awesome 5 Free", "Font Awesome 5 Brands", FontAwesome !important;
+  line-height: 1;
+}
+
+/* الانكسارُ نفسُه الذي تنكسر به شبكةُ البطاقاتِ الموحّدة (900 ثم 560)
+   فلا يتفرّق نصفا الكتلةِ الواحدةِ على مقاسٍ وسيط. */
+@media (max-width: 900px) {
+  .shot-ops {
+    padding: 14px 12px;
+  }
+
+  .shot-ops-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .shot-ops-grid {
+    grid-template-columns: 1fr;
+  }
+}
 
 /* ── سجل الموظفين — كتلُ الصفحةِ المنقولة (INJ-0442 · 0571 · 0237) ── */
 .equipments-fleet-main .form-section {
@@ -1552,6 +1921,13 @@ body.ems-site,
     .mnt-wp-badge { margin: 0 3px; }
 
     /* شارة «auto» بجوار اسم المعدة للأوامر التلقائية */
+    /* ◆ **التخصيصُ لا الأمنية**: `ems.main.all.style.css` يصبغ كلَّ `span`
+         داخلَ `.main` بالأسود بتخصيصِ (0,2,1)، و`.mnt-auto-badge` وحدَها
+         (0,1,0) — فكان الأبيضُ المُعلَنُ هنا **يُهزَم صامتًا** ويخرج النصُّ
+         أسودَ على حبرٍ داكن. مقيسٌ: `rgb(0,0,0)` قبل، و`rgb(255,255,255)`
+         بعدَ تعطيلِ تلك الورقةِ — فالعلّةُ فيها لا في الرمز. والغلافُ
+         `.ems-site .main` يرفع التخصيصَ إلى (0,3,0) فيغلبها بلا `!important`. */
+    .ems-site .main .mnt-auto-badge,
     .mnt-auto-badge {
         display: inline-block;
         margin-inline-start: 6px;
@@ -1559,7 +1935,11 @@ body.ems-site,
         font-size: 11px;
         font-weight: 700;
         border-radius: 6px;
-        background: var(--c-6d28d9);
+        /* كانت `#6d28d9` بنفسجيًّا — لونٌ خارجَ لوحةِ النظام في عمودِ كودِ
+           المعدة. والشارةُ تقول **مصدرًا** لا حالةً (أمرٌ ولَّده النظامُ لا
+           إنسان)، فحبرُ الحيادِ أصدقُ لها من لونِ حالةٍ يزاحم شاراتِ
+           «فحص/تنفيذ/إغلاق» في الصفِّ نفسِه. */
+        background: var(--c-ink-600, #475569);
         color: var(--c-s-fff);
         letter-spacing: .5px;
     }
@@ -1662,11 +2042,14 @@ body.ems-site,
 
     /* الهوية البصرية لأوامر الصيانة — متّسقة مع باقي الموقع (navy/gold) */
     .mnt-orders-main .mnt-pill { display:inline-flex; align-items:center; padding:4px 12px; border-radius:999px; font-size:.78rem; font-weight:800; }
-    .mnt-pill--gold { background:var(--c-rgba22417446016, rgba(224,174,46,.16)); color:var(--c-9a6f10, #9a6f10); }
-    .mnt-pill--blue { background:var(--c-s-rgba379923514); color:var(--c-state-info-deep); }
-    .mnt-pill--purple { background:var(--c-s-rgba1245823714); color:var(--c-6d28d9); }
-    .mnt-pill--green { background:var(--c-rgba2216374016); color:var(--c-15803d); }
-    .mnt-pill--gray { background:var(--c-rgba107114128016, rgba(107,114,128,.16)); color:var(--c-4b5563); }
+    .ems-site .main .mnt-pill--gold, .mnt-pill--gold { background:var(--c-rgba22417446016, rgba(224,174,46,.16)); color:var(--c-9a6f10, #9a6f10); }
+    .ems-site .main .mnt-pill--blue, .mnt-pill--blue { background:var(--c-s-rgba379923514, rgba(37,99,235,.14)); color:var(--c-state-info-deep, #1d4ed8); }
+    /* «فحص» كان بنفسجيًّا — لونٌ خارجَ لوحةِ النظام، والتعليقُ فوقَه يقول
+       «متّسقة مع باقي الموقع (navy/gold)» فكان يناقض نفسَه. صار كحليَّ
+       الهويةِ نفسَه، فيتميّز عن الذهبيِّ والأزرقِ والأخضرِ بلا لونٍ دخيل. */
+    .ems-site .main .mnt-pill--navy, .mnt-pill--navy { background:var(--c-rgba11306312, rgba(11,30,63,.12)); color:var(--c-0b1e3f, #0B1E3F); }
+    .ems-site .main .mnt-pill--green, .mnt-pill--green { background:var(--c-rgba2216374016, rgba(22,163,74,.16)); color:var(--c-15803d, #15803d); }
+    .ems-site .main .mnt-pill--gray, .mnt-pill--gray { background:var(--c-rgba107114128016, rgba(107,114,128,.16)); color:var(--c-4b5563, #4b5563); }
 
     /* Stepper مراحل الأمر */
     .mnt-stepper-card { margin-bottom:14px; }
@@ -4499,9 +4882,10 @@ body.ems-site .main #contactsPanel .contacts-header .search-box input { width: 1
 /* ── Portal/dept_achievement.php ── */
 /* UXW-01: أنماطُ الشاشةِ في كتلةٍ واحدة — لا نمطَ موضعيًّا ولا لونَ خارجَ الرموز */
 .ems-dach-filter { display:flex; gap:8px; align-items:flex-end; margin-bottom:14px; }
-.ems-dach-cards { display:flex; flex-wrap:wrap; gap:12px; }
-.ems-dach-card { min-width:200px; padding:14px; border:1px solid var(--c-dee2e6); border-radius:8px; background:var(--c-f8f9fa); }
-.ems-dach-num { font-size:1.6em; font-weight:bold; }
+/* نُزعت هنا ثلاثُ قواعدَ (`.ems-dach-cards` · `.ems-dach-card` · `.ems-dach-num`)
+   نسخةً رابعةً من تصميمِ بطاقةِ الإحصاء — والشاشةُ صارت تكتب أصنافَ
+   `assets/css/ems-statcards.css` صراحةً، وهو مصدرُ تصميمِ البطاقةِ الوحيد.
+   والأسماءُ باقيةٌ في الوسمِ (صفرُ فقد) مراسيَ للقياسِ ولحزامِ اللقطات. */
 .ems-dach-note { font-size:.85em; margin-top:12px; }
 
 /* ── Portal/founding_mode.php ── */

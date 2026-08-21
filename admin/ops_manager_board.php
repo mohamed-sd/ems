@@ -102,13 +102,34 @@ ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
 
-function ems_board_tile($title, $value, $action, $link)
+/**
+ * بطاقةُ المجموعة — بمكوّنِ بطاقةِ الإحصاءِ الموحَّد (`assets/css/ems-statcards.css`).
+ * ───────────────────────────────────────────────────────────────────────────
+ * ◆ **الخللُ المُقاس**: كانت البطاقةُ تُرسَم بأصنافٍ محليّةٍ `ops-mb-tile*`
+ *   وتصميمٍ في `<style>` داخلَ الصفحة. والاسمُ نفسُه كان الخلل: `ops-mb-tile-t`
+ *   يطابق عائلةَ بطاقاتِ الإحصاءِ في `assets/js/ems-statcards.js`
+ *   (`(^|-)(stat|stats|kpi|metric|metrics|tile)(-|$)`) عبر `-tile-`. فوُسم
+ *   **كلُّ جزءٍ في البطاقةِ بطاقةً**، ووُسمت **البطاقةُ نفسُها شبكةً** — شبكةٌ
+ *   بأربعةِ أعمدةٍ `minmax(170px, 1fr)` داخلَ صندوقٍ عرضُه 212px. فخرجت
+ *   الأجزاءُ من حدودِها وتراكبت على جاراتِها: قِيس في المتصفّحِ طفلٌ عند
+ *   x=-298 داخلَ بطاقةٍ تبدأ عند x=41، وثلاثةُ أطفالٍ عرضُ كلٍّ منهم 170px
+ *   في صندوقٍ عرضُه 212. وهذا هو «التداخلُ» الظاهرُ أسفلَ الصفحة.
+ * ◆ **والعلاجُ ليس ترقيعَ الاسم** — فأيُّ اسمٍ محليٍّ يعود يتفرَّق عن النظام —
+ *   بل استعمالُ المكوّنِ الموحَّدِ بأسمائِه المعتمدة:
+ *   `stats-section` ⇐ `stats-grid` ⇐ `stats-card` (أيقونةٌ · قيمةٌ · عنوانٌ · تابع).
+ * ◆ **والبطاقةُ كلُّها رابطٌ** إلى موضعِ الفعل — والمكوّنُ يدعم ذلك صراحةً
+ *   (`color:inherit` و`text-decoration:none` و`display:block` على البطاقة) —
+ *   فبقي «كلُّ رقمٍ معه إجراؤه» (ORG-01 §3.1) بلا زرٍّ ذهبيٍّ يزاحم الرقم.
+ */
+function ems_board_tile($icon, $title, $value, $meta, $action, $link)
 {
-    echo '<div class="ops-mb-tile">'
-        . '<div class="ops-mb-tile-t">' . htmlspecialchars($title) . '</div>'
-        . '<div class="ops-mb-tile-v">' . $value . '</div>'
-        . '<a class="btn-primary ops-mb-tile-a" href="' . htmlspecialchars($link) . '">' . htmlspecialchars($action) . ' ▸</a>'
-        . '</div>';
+    echo '<a class="stats-card" href="' . htmlspecialchars($link) . '" title="' . htmlspecialchars($action) . '">'
+        . '<div class="stats-icon"><i class="fa ' . htmlspecialchars($icon) . '"></i></div>'
+        . '<div class="stats-value">' . htmlspecialchars(strval($value)) . '</div>'
+        . '<div class="stats-title">' . htmlspecialchars($title) . '</div>'
+        . ($meta !== '' ? '<div class="ems-statcard__meta">' . htmlspecialchars($meta) . '</div>' : '')
+        . '<div class="ems-statcard__meta">' . htmlspecialchars($action) . ' ▸</div>'
+        . '</a>';
 }
 ?>
 <div class="main ems-unified-page-shell">
@@ -128,13 +149,10 @@ function ems_board_tile($title, $value, $action, $link)
     ?>
 
     <style>
-    .ops-mb-tile   { border:1px solid var(--c-s-ddd); border-radius:8px; padding:12px 16px; min-width:200px; flex:1; }
-    .ops-mb-tile-t { color:var(--c-s-666); font-size:13px; }
-    .ops-mb-tile-v { font-size:26px; font-weight:bold; }
-    .ops-mb-tile-a { font-size:12px; }
-    .ops-mb-table  { width:100%; }
-    .ops-mb-tiles  { display:flex; gap:14px; flex-wrap:wrap; }
-    .ops-mb-sub    { font-size:13px; }
+    /* لم يبقَ من تصميمِ الصفحةِ المحليِّ إلا عرضُ الجدول. وبطاقاتُ المجموعاتِ
+       صارت بمكوّنِ `assets/css/ems-statcards.css` الموحَّد — لا تصميمَ لها هنا،
+       ولا اسمَ محليًّا يطابق عائلةَ البطاقاتِ فيَقلبَ البطاقةَ شبكةً. */
+    .ops-mb-table { width:100%; }
     </style>
 
     <div class="card"><div class="card-header"><h5>⑦ ما ينتظر قراره —
@@ -144,7 +162,7 @@ function ems_board_tile($title, $value, $action, $link)
         <?php if (!$pending) { ems_state_empty('لا شيء ينتظر قرارك — نظيف ✨'); } else { ?>
         <div class="table-container">
         <table class="alltables display nowrap ops-mb-table" data-no-dt="1">
-            <thead><tr><th>البند</th><th>منتظرًا منذ (ساعة)</th><th></th>
+            <thead><tr><th>البند</th><th>منتظرًا منذ (ساعة)</th><th>الإجراء</th>
               <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
               <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
               <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
@@ -160,7 +178,12 @@ function ems_board_tile($title, $value, $action, $link)
                 <tr>
                     <td><?php echo htmlspecialchars($x['label']); ?></td>
                     <td><strong><?php echo max(0, intval($x['wait_h'])); ?></strong></td>
-                    <td><a class="btn-primary" href="<?php echo htmlspecialchars($x['link']); ?>">إلى موضع الفعل ▸</a></td>
+                    <!-- زرُّ الصفِّ بنمطِ الجداولِ الموحَّد (`.action-btn` في
+                         `assets/css/ems-tables.css`): قرصٌ رماديٌّ محايدٌ بحدٍّ
+                         وأيقونة. وكان `btn-primary` — ذهبيَّ العلامة — والذهبيُّ
+                         نمطُ «الفعلِ الملتزِمِ في الشاشة» لا نمطُ فعلٍ داخلَ صفٍّ
+                         يتكرَّر بعددِ الصفوف، فكان يزاحم بياناتِ الجدولِ لونًا. -->
+                    <td><a class="action-btn" href="<?php echo htmlspecialchars($x['link']); ?>" title="إلى موضع الفعل"><i class="fa fa-arrow-left"></i> إلى موضع الفعل</a></td>
                 </tr>
             <?php endforeach; ?>
             </tbody>
@@ -169,19 +192,34 @@ function ems_board_tile($title, $value, $action, $link)
         <?php } ?>
     </div></div>
 
-    <div class="card"><div class="card-body ops-mb-tiles">
+    <!-- بطاقاتُ المجموعاتِ الستّ — القسمُ والشبكةُ والبطاقةُ بأسماءِ المكوّنِ
+         الموحَّد. و`data-cols="3"` تُعلن عدَدَ الأعمدةِ على الحاويةِ نفسِها
+         (⑨ في `ems-statcards.css`) فتخرج ستُّ بطاقاتٍ في صفَّين تامَّين بلا
+         خانةٍ خاوية، ولا تنقض الشاشةُ الشبكةَ بـ`!important` خاصٍّ بها. -->
+    <div class="stats-section">
+    <div class="stats-grid ems-statgrid" data-cols="3">
         <?php
-        ems_board_tile('① الأداء التشغيلي — تشغيلات نشطة',
-            intval($ops['c'] ?? 0) . ' <small class="ops-mb-sub">(تعمل ' . intval($ops['working'] ?? 0)
-            . ' · معطلة ' . intval($ops['broken'] ?? 0) . ' · هدف يومي ' . round(floatval($ops['target_h'] ?? 0)) . ' س)</small>',
+        ems_board_tile('fa-gauge-high', '① الأداء التشغيلي — تشغيلات نشطة',
+            intval($ops['c'] ?? 0),
+            'تعمل ' . intval($ops['working'] ?? 0) . ' · معطلة ' . intval($ops['broken'] ?? 0)
+            . ' · هدف يومي ' . round(floatval($ops['target_h'] ?? 0)) . ' س',
             'توزيع الموارد', '../movement/movement_operations.php');
-        ems_board_tile('② خطط المواقع المرفوعة', count($plans), 'اعتماد أو إعادة', '../Operations/daily_plans.php');
-        ems_board_tile('③ الصيانة — أوامر مفتوحة',
-            intval($mnt['open_orders'] ?? 0) . ' <small class="ops-mb-sub">(توقف ' . round(floatval($mnt['downtime_h'] ?? 0)) . ' س)</small>',
+        ems_board_tile('fa-calendar-day', '② خطط المواقع المرفوعة',
+            count($plans), '',
+            'اعتماد أو إعادة', '../Operations/daily_plans.php');
+        ems_board_tile('fa-screwdriver-wrench', '③ الصيانة — أوامر مفتوحة',
+            intval($mnt['open_orders'] ?? 0),
+            'توقف ' . round(floatval($mnt['downtime_h'] ?? 0)) . ' س',
             'رفع أولوية', '../Maintenance/orders.php');
-        ems_board_tile('④ القوى — مشغّلون معيَّنون', intval($ops4['c'] ?? 0), 'طلب نقل أو بديل', '../Oprators/oprators.php');
-        ems_board_tile('⑤ المشتريات — أوامر مفتوحة', intval($proc['c'] ?? 0), 'أولوية صرف', '../Procurement/orders_proc.php');
-        ems_board_tile('⑥ النقل — طلبات مفتوحة', intval($trs['c'] ?? 0), 'اعتماد تحرك', '../Transport/transfer_requests.php');
+        ems_board_tile('fa-users', '④ القوى — مشغّلون معيَّنون',
+            intval($ops4['c'] ?? 0), '',
+            'طلب نقل أو بديل', '../Oprators/oprators.php');
+        ems_board_tile('fa-cart-shopping', '⑤ المشتريات — أوامر مفتوحة',
+            intval($proc['c'] ?? 0), '',
+            'أولوية صرف', '../Procurement/orders_proc.php');
+        ems_board_tile('fa-truck', '⑥ النقل — طلبات مفتوحة',
+            intval($trs['c'] ?? 0), '',
+            'اعتماد تحرك', '../Transport/transfer_requests.php');
         ?>
     </div></div>
 </div>

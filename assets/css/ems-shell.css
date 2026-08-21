@@ -276,7 +276,8 @@
    (سقّاطةُ VT-01: كلُّ style= جديدٍ في الوسمِ رسوبٌ يوقف البناء). */
 .ems-kpi-title > i { opacity: .6; }
 .ems-kpi-value { font-size: 1.5rem; font-weight: 800; margin: var(--ems-sp-1) 0; }
-.ems-kpi-value small { font-size: .72rem; color: var(--c-ink-500); font-weight: 700; }
+.ems-kpi-value small, .ems-kpi-unit { font-size: .72rem; color: var(--c-ink-500); font-weight: 700; }
+.ems-kpi-unit { display: block; }
 .ems-kpi-meta { display: flex; justify-content: space-between; font-size: .74rem; color: var(--c-9ca3af); }
 
 /* UI-08/09/10: بطاقات المهام والاعتماد وقائمة التنبيه */

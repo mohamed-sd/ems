@@ -13,6 +13,11 @@ require_once dirname(__FILE__) . '/../includes/role_board.php';
 // الدورُ المفعَّل في EMS_ROLE_BOARD_ROLES تحوّله «الرئيسية» للوحته مباشرةً
 // (قرار المالك 2026-07-26)، وسائرُ الأدوار على هذه اللوحة العامة حرفيًّا —
 // والرجوعُ بحذف الدور من العلم بلا نشر كود (نمط السايدبار الموحّد نفسه).
+//
+// وحين تكون لوحةُ الدورِ **هذه الصفحةَ نفسَها** (إدارة التشغيل — قرار المالك
+// 2026-08-21) فلا تحويلَ ولا حلقةَ إعادةِ توجيه: يُحفظ دورُ الإعدادِ في
+// $dash_board_role، وتُبنى مكوّناتُه السبعةُ أدناه داخلَ الصفحةِ بلغةِ تصميمِها.
+$dash_board_role = 0;
 if (isset($_SESSION['user']['role']) && roleBoardEnabled($_SESSION['user']['role'])) {
   $rb_route = roleBoardRoute($_SESSION['user']['role']);
   if ($rb_route === null) {
@@ -25,7 +30,11 @@ if (isset($_SESSION['user']['role']) && roleBoardEnabled($_SESSION['user']['role
       }
     } catch (\Throwable $t) { error_log('dashboard role board parent: ' . $t->getMessage()); }
   }
-  if ($rb_route !== null) { header('Location: ../' . $rb_route); exit(); }
+  if ($rb_route === 'main/dashboard.php') {
+    $dash_board_role = roleBoardConfigRole(ems_tenant_db(), $_SESSION['user']['role']);
+  } elseif ($rb_route !== null) {
+    header('Location: ../' . $rb_route); exit();
+  }
 }
 
 if (!headers_sent()) {
@@ -482,6 +491,14 @@ $analyticsPayload = [
   'role' => strval($dashboardRole)
 ];
 
+/* ════════  لوحةُ الدورِ داخلَ «الرئيسية» (UX-01 §5 — المكوّناتُ السبعة)  ════════
+   الحسابُ كلُّه من المحرّك الموحّد roleBoardBuild، والعرضُ أدناه بلغةِ تصميمِ
+   هذه الشاشةِ (‎shot-*‎) لا بقالبِ اللوحةِ العامة — فالمحتوى واحدٌ والثوبُ ثوبُها. */
+$dash_board = null;
+if ($dash_board_role > 0) {
+  $dash_board = roleBoardBuild($conn, $dash_gate, $dash_board_role, isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0);
+}
+
 $AC = [
   'or' => ['bg' => 'var(--dash-tone-or-bg)', 'soft' => 'var(--dash-tone-or-soft)', 'text' => 'var(--dash-tone-or-text)', 'ico' => 'var(--dash-tone-or-bg)'],
   'ok' => ['bg' => 'var(--dash-tone-ok-bg)', 'soft' => 'var(--dash-tone-ok-soft)', 'text' => 'var(--dash-tone-ok-text)', 'ico' => 'var(--dash-tone-ok-bg)'],
@@ -647,6 +664,13 @@ echo ems_states_bundle('لا أرقامَ تشغيليةً محسوبةً لهذ
     </div>
 
     <?php
+    // لوحةُ الدورِ ①②③④⑤ — تُصيَّر هنا لأن «أسئلةَ أولِ اليوم» تُقرأ قبلَ
+    // العدّاداتِ العامةِ لا بعدَها. و⑥⑦ في شبكةِ الرسومِ أدناه.
+    // (القالبُ يخرج صامتًا حين لا تكون هذه الصفحةُ لوحةَ الدور.)
+    include __DIR__ . '/../includes/dash_role_board.php';
+    ?>
+
+    <?php
     // دور بلا فرع عدادات: لا نلفّق أصفارًا (UI-DEF-02 / قاعدة «لا رقم بلا بيانات») —
     // تُعرض شرطة «—» بدل عدّاد كاذب.
     $displayStats = !empty($stats) ? $stats : [
@@ -655,9 +679,15 @@ echo ems_states_bundle('لا أرقامَ تشغيليةً محسوبةً لهذ
       ['fa-file-contract', null, 'العقود', 'or'],
       ['fa-user-shield', null, 'المستخدمون', 'or'],
     ];
+    // عدَدُ أعمدةِ الأرقامِ يُعلَن على الحاويةِ لا يُترك للافتراض: عدّاداتُ الدورِ
+    // تختلف (ثلاثةٌ لإدارةِ الموردين · أربعةٌ للتشغيل · سبعةٌ لمدير الحركة)،
+    // والشبكةُ الموحّدةُ تفرض أربعةً — فكان دورُ الثلاثةِ يترك خانةً فارغة.
+    // (2..6 هو مدى `data-cols` المعتمَد في `ems-statcards.css`؛ وما فوقَه أربعة.)
+    $dashStatCols = count($displayStats);
+    if ($dashStatCols < 2 || $dashStatCols > 6) { $dashStatCols = 4; }
     ?>
-    <div class="shot-stat-panel">
-      <div class="shot-stat-grid">
+    <div class="shot-num-panel">
+      <div class="shot-stat-grid" data-cols="<?= (int) $dashStatCols ?>">
         <?php foreach ($displayStats as $st): ?>
         <div class="shot-stat-card" title="<?= htmlspecialchars($st[2]) ?> — الوحدة: سجل · الفترة: لحظي · بلا مقارنة معلنة">
           <div class="shot-stat-label"><?= htmlspecialchars($st[2]) ?></div>
@@ -678,9 +708,9 @@ echo ems_states_bundle('لا أرقامَ تشغيليةً محسوبةً لهذ
     </div>
 
     <?php if (!empty($analyticsSummaryCards)): ?>
-    <div class="shot-stat-panel shot-stat-panel-secondary">
+    <div class="shot-num-panel shot-num-panel-secondary">
       <div class="shot-session-title">إحصائيات الأداء</div>
-      <div class="shot-stat-grid">
+      <div class="shot-stat-grid" data-cols="<?= (int) max(2, min(6, count($analyticsSummaryCards))) ?>">
         <?php foreach ($analyticsSummaryCards as $kpi): ?>
         <div class="shot-stat-card">
           <div class="shot-stat-label"><?= htmlspecialchars($kpi['label']) ?></div>
@@ -721,6 +751,40 @@ echo ems_states_bundle('لا أرقامَ تشغيليةً محسوبةً لهذ
           <canvas id="chartTrend"></canvas>
         </div>
       </div>
+
+      <?php if ($dash_board): /* ⑥⑦ من لوحة الدور — بطاقتا رسمٍ بلغةِ الشبكةِ نفسِها */ ?>
+      <div class="shot-chart-card">
+        <div class="shot-chart-head">
+          <span class="shot-chart-title"><?= htmlspecialchars($dash_board['pulse_title']) ?></span>
+          <span class="shot-chart-note">آخر 7 أيام</span>
+        </div>
+        <div class="shot-chart-wrap">
+          <canvas id="rbPulse"></canvas>
+        </div>
+      </div>
+
+      <div class="shot-chart-card">
+        <div class="shot-chart-head">
+          <span class="shot-chart-title">عملي الأخير</span>
+          <span class="shot-chart-note">من سجل النشاط</span>
+        </div>
+        <div class="shot-ops-recent">
+          <?php if (empty($dash_board['recent'])): ?>
+            <p class="shot-ops-empty">لا نشاطَ مسجَّلًا بعد</p>
+          <?php else: foreach ($dash_board['recent'] as $rc):
+            $rcHref = preg_replace('#^.*?/ems/#', '../', (string) ($rc['url'] ?? ''));
+            if ($rcHref === '') { $rcHref = '#'; } ?>
+            <a class="shot-ops-row" href="<?= htmlspecialchars($rcHref, ENT_QUOTES, 'UTF-8') ?>" title="<?= htmlspecialchars((string) $rc['screen_name'], ENT_QUOTES, 'UTF-8') ?>">
+              <span class="shot-ops-row-text">
+                <i class="fas fa-clock-rotate-left"></i>
+                <span><?= htmlspecialchars((string) $rc['screen_name'], ENT_QUOTES, 'UTF-8') ?></span>
+              </span>
+              <span class="shot-ops-time"><?= htmlspecialchars(date('m/d H:i', strtotime((string) $rc['last_at'])), ENT_QUOTES, 'UTF-8') ?></span>
+            </a>
+          <?php endforeach; endif; ?>
+        </div>
+      </div>
+      <?php endif; ?>
     </div>
     </div>
   </div>
@@ -729,6 +793,18 @@ echo ems_states_bundle('لا أرقامَ تشغيليةً محسوبةً لهذ
 
 <!-- Chart.js -->
 <script src="/ems/assets/vendor/chartjs/chart.umd.min.js"></script>
+<?php if ($dash_board): ?>
+<script>
+  /* بيانات ⑥ نبضِ الأداء — تُبثُّ قبل شفرةِ الرسمِ لتُقرأ منها، والسلسلةُ
+     الثانيةُ قد تكون بلا اسمٍ (دورٌ بسلسلةٍ واحدة) فتُسقَط عند الرسم. */
+  window.RB_PULSE = <?= json_encode(array(
+    'labels' => $dash_board['pulse']['labels'],
+    'in'     => $dash_board['pulse']['in'],
+    'out'    => $dash_board['pulse']['out'],
+    'series' => $dash_board['pulse_series'],
+  ), JSON_UNESCAPED_UNICODE) ?>;
+</script>
+<?php endif; ?>
 <script>
 (function () {
   const AP = <?= json_encode($analyticsPayload) ?>;
@@ -907,6 +983,36 @@ echo ems_states_bundle('لا أرقامَ تشغيليةً محسوبةً لهذ
         scales: {
           x: { grid: { color: gridColor }, ticks: { color: tickColor, maxTicksLimit: 10 } },
           y: { grid: { color: gridColor }, ticks: { color: tickColor } }
+        }
+      }
+    });
+    });
+  }
+
+  /* ── ⑥ نبضُ الأداء (لوحة الدور) ──────────────────────────────────────
+     يُرسم بالحارسِ نفسِه وبألوانِ اللوحةِ نفسِها (‎--dash-*‎) لا بقيمٍ مثبَّتةٍ
+     تخصُّ اللوحةَ العامة — فالبطاقتان في شبكةٍ واحدةٍ فلا تختلف نغمتاهما. */
+  const rbCtx = document.getElementById('rbPulse');
+  if (rbCtx && window.RB_PULSE) {
+    emsChartGuard(rbCtx, [RB_PULSE.in, RB_PULSE.out], function () {
+    return new Chart(rbCtx, {
+      type: 'bar',
+      data: {
+        labels: RB_PULSE.labels,
+        datasets: [
+          { label: RB_PULSE.series[0], data: RB_PULSE.in,  backgroundColor: dashColor('bar-work'),  borderColor: dashColor('line-work'),  borderWidth: 1, borderRadius: 6 },
+          { label: RB_PULSE.series[1], data: RB_PULSE.out, backgroundColor: dashColor('bar-fault'), borderColor: dashColor('line-fault'), borderWidth: 1, borderRadius: 6 }
+        ].filter(function (d) { return d.label !== ''; })
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: true, rtl: true, position: 'bottom', labels: { color: tickColor, font: { size: 11 }, boxWidth: 12 } }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: tickColor } },
+          y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: tickColor, precision: 0 } }
         }
       }
     });

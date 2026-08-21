@@ -175,3 +175,104 @@ body.ems-site .main :is(.stats-card, .ems-statcard):not(.dt-button):not(.btn-clo
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ── ⑨ عدَدٌ مُعلَنٌ للأعمدة — `data-cols` ─────────────────────────────── */
+/* الأربعةُ في ② هي الأصلُ المقيس، لكنَّ شاشةً تحمل خمسَ بطاقاتٍ تُخرج الخامسةَ
+   وحدَها في سطرٍ ثانٍ. فبدلَ أن تنقضَ كلُّ شاشةٍ الشبكةَ بـ`!important` خاصٍّ بها
+   — وهو ما يُعيد التفرُّقَ الذي جُمع هنا — تُعلن الشاشةُ عدَدَها على الحاويةِ
+   نفسِها: `<div class="… ems-statgrid" data-cols="5">`. والانكسارُ يبقى واحدًا
+   للجميع: عمودان تحتَ 900px وعمودٌ تحتَ 560px.
+   و`minmax(0, 1fr)` — لا 170px — كي تضيقَ البطاقةُ ولا تفيضَ الشبكةُ إذا كان
+   عرضُ المحتوى أقلَّ من حاصلِ ضربِ العدَدِ في الحدِّ الأدنى. */
+body.ems-site .main :is(.stats-grid, .ems-statgrid):not(.dt-button):not(.btn-close)[data-cols="2"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+body.ems-site .main :is(.stats-grid, .ems-statgrid):not(.dt-button):not(.btn-close)[data-cols="3"] {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+body.ems-site .main :is(.stats-grid, .ems-statgrid):not(.dt-button):not(.btn-close)[data-cols="4"] {
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+}
+body.ems-site .main :is(.stats-grid, .ems-statgrid):not(.dt-button):not(.btn-close)[data-cols="5"] {
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+}
+body.ems-site .main :is(.stats-grid, .ems-statgrid):not(.dt-button):not(.btn-close)[data-cols="6"] {
+  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+}
+
+/* الانكسارُ يغلب العدَدَ المُعلَن: خصوصيةٌ متساويةٌ وموضعٌ لاحقٌ في المستند. */
+@media (max-width: 900px) {
+  body.ems-site .main :is(.stats-grid, .ems-statgrid):not(.dt-button):not(.btn-close)[data-cols] {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+@media (max-width: 560px) {
+  body.ems-site .main :is(.stats-grid, .ems-statgrid):not(.dt-button):not(.btn-close)[data-cols] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── ⑩ قيمةٌ نصّيةٌ لا رقميّة — `ems-statcard__value--text` ─────────────── */
+/* بعضُ البطاقاتِ لا رقمَ في قيمتِها أصلًا («لا عقدَ في السجل» · «لا كشفَ بعد»
+   في `Portal/my_portal.php`). وقاعدةُ القيمةِ ⑤ خطُّها 35px بسطرٍ واحدٍ وقصٍّ
+   بالنقاط — فنصٌّ كهذا يُبتر ويصير البطاقةُ كلامًا مقطوعًا.
+   فيُخفَّض خطُّه ويُسمح له بالالتفاف، ويبقى في **موضعِ القيمةِ نفسِه** فلا
+   تختلف البطاقةُ عن أختِها في الترتيب. و**الرقمُ — حيثُ وُجد — يبقى وحدَه
+   صاحبَ الخطِّ الكبير**؛ فهذا المُعدِّلُ لحالةِ «لا رقمَ» لا لتصغيرِ رقم. */
+body.ems-site .main :is(.stats-card, .ems-statcard):not(.dt-button):not(.btn-close) :is(.stats-value, .ems-statcard__value).ems-statcard__value--text {
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  line-height: 1.35 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* ── ⑪ ملءُ آخرِ صفٍّ — `ems-statgrid--fill` (مُعدِّلٌ يُطلَب صراحةً) ───── */
+/* الشبكةُ أعمدةٌ ثابتةُ العدَد (② والمُعلَنُ في ⑨). فإن لم يقسم عددُ البطاقاتِ
+   على عدَدِ الأعمدةِ بقيت في آخرِ الصفِّ خليةٌ خاويةٌ أو أكثر — سبعُ بطاقاتٍ في
+   شبكةٍ رباعيةٍ تترك خانةً فارغة. وبهذا المُعدِّلِ **تتمدَّد البطاقةُ الأخيرةُ**
+   فتغطّي ما بقي، فلا فراغَ في الصفِّ الأخير.
+   والحسابُ **بالموضعِ لا بالعدَد** — فلا يحتاج جافاسكربت ولا عدَّ صفوف: آخرُ
+   ابنٍ ترتيبُه `Cn+1` هو أوّلُ صفِّه فبعدَه C−1 خليةً ⇒ يمتدُّ C أعمدة؛
+   و`Cn+2` ⇒ C−1؛ وهكذا. ومَن وقع على `Cn` فقد ملأ صفَّه فلا يمتدّ.
+   وهو مُعدِّلٌ **اختياريّ**: لا يمسُّ شاشةً لم تكتبه.
+   ⚠ والانكسارُ يُبطِله ثم يُعيد حسابَه: كلُّ قواعدِه بخصوصيةٍ واحدةٍ (0,7,1)
+     فالغلبةُ بموضعِ المستندِ لا غير — ولذلك جاء الإبطالُ `:nth-child(n)` أوّلَ
+     كلِّ كتلةِ انكسارٍ قبلَ قاعدةِ عدَدِها الجديد. */
+
+/* ⑪-أ الأربعةُ الافتراضية (بلا `data-cols`) وما أُعلن أربعةً */
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill:is(:not([data-cols]), [data-cols="4"]) > :last-child:nth-child(4n+1) { grid-column: span 4 !important; }
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill:is(:not([data-cols]), [data-cols="4"]) > :last-child:nth-child(4n+2) { grid-column: span 3 !important; }
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill:is(:not([data-cols]), [data-cols="4"]) > :last-child:nth-child(4n+3) { grid-column: span 2 !important; }
+
+/* ⑪-ب الأعمدةُ المُعلَنة 2 · 3 · 5 · 6 */
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill[data-cols="2"] > :last-child:nth-child(2n+1) { grid-column: span 2 !important; }
+
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill[data-cols="3"] > :last-child:nth-child(3n+1) { grid-column: span 3 !important; }
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill[data-cols="3"] > :last-child:nth-child(3n+2) { grid-column: span 2 !important; }
+
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill[data-cols="5"] > :last-child:nth-child(5n+1) { grid-column: span 5 !important; }
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill[data-cols="5"] > :last-child:nth-child(5n+2) { grid-column: span 4 !important; }
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill[data-cols="5"] > :last-child:nth-child(5n+3) { grid-column: span 3 !important; }
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill[data-cols="5"] > :last-child:nth-child(5n+4) { grid-column: span 2 !important; }
+
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill[data-cols="6"] > :last-child:nth-child(6n+1) { grid-column: span 6 !important; }
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill[data-cols="6"] > :last-child:nth-child(6n+2) { grid-column: span 5 !important; }
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill[data-cols="6"] > :last-child:nth-child(6n+3) { grid-column: span 4 !important; }
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill[data-cols="6"] > :last-child:nth-child(6n+4) { grid-column: span 3 !important; }
+body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill[data-cols="6"] > :last-child:nth-child(6n+5) { grid-column: span 2 !important; }
+
+/* ⑪-ج الانكسار — عمودان تحتَ 900px (كما في ⑧ و⑨)
+   و`:is(:not([data-cols]), [data-cols])` هنا **ليس زخرفة**: قواعدُ ⑪-أ و⑪-ب
+   تحمل سمةً في مُحدِّدها فخصوصيتُها (0,7,1)، ولو جاء الإبطالُ بلا سمةٍ لكان
+   (0,6,1) فما غلبها ولو تأخّر في المستند. وهذا المقطعُ يطابق «أيًّا كان
+   عدَدُها المُعلَن» فيستوي العدُّ ويحكمَ الموضع. */
+@media (max-width: 900px) {
+  body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill:is(:not([data-cols]), [data-cols]) > :last-child:nth-child(n) { grid-column: auto !important; }
+  body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill:is(:not([data-cols]), [data-cols]) > :last-child:nth-child(2n+1) { grid-column: span 2 !important; }
+}
+/* ⑪-د عمودٌ واحدٌ تحتَ 560px — فلا تمدُّدَ أصلًا */
+@media (max-width: 560px) {
+  body.ems-site .main :is(.stats-grid, .ems-statgrid).ems-statgrid--fill:is(:not([data-cols]), [data-cols]) > :last-child:nth-child(n) { grid-column: auto !important; }
+}
