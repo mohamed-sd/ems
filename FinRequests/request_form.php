@@ -841,7 +841,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 form.classList.toggle('allforms-visible', open);
                 btn.classList.toggle('is-active', open);
                 btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-                if (hint) { hint.style.display = open ? 'none' : ''; }
+                /* بصنفٍ لا بنمطٍ موضعيّ: `ems-alerts.css` تفرض `display:flex`
+                   **مُعجَّبةً** على `.alert-info` فتبتلع `style.display='none'`
+                   — والصنفُ `.frq-hidden` له محدِّدٌ يغلبها في `ems-screens.css`. */
+                if (hint) { hint.classList.toggle('frq-hidden', open); }
                 if (open) { form.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
             };
             setState(form.classList.contains('allforms-visible'));

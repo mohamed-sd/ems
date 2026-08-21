@@ -58,7 +58,13 @@ function sweep(mysqli $c, $family)
     $c->query("DELETE FROM `fin_dues` WHERE `settlement_id` IN
                  (SELECT `id` FROM `settlements` WHERE `settlement_no` LIKE '{$like}%')");
     $c->query("DELETE FROM `fin_requests` WHERE `source_ref` LIKE '{$like}%'");
-    $c->query("DELETE FROM `ems_business_events` WHERE `source_ref` LIKE '{$like}%'");
+    /* ◆ **الحدثُ يُكتب في مقامَين ويُكنس منهما معًا**: `EventPublisher` يُدرج في
+         `ems_business_events` **و**`fin_financial_events`، والثاني هو مقامُ مؤشرِ
+         المستهلكِ في `EventDispatcher::runConsumer`. وكنسُ الأولِ وحدَه يترك
+         الثانيَ فيُخلّف **تأخُّرًا حقيقيًّا** في مستهلكَي الماليةِ يُشعل إنذارَ
+         التعثُّر — أي أن جولةَ اختبارٍ تصنع العطبَ الذي يرصده فاحصٌ آخر. */
+    $c->query("DELETE FROM `ems_business_events`  WHERE `source_ref` LIKE '{$like}%'");
+    $c->query("DELETE FROM `fin_financial_events` WHERE `source_ref` LIKE '{$like}%'");
     $c->query("DELETE FROM `settlement_lines` WHERE `settlement_id` IN
                  (SELECT `id` FROM `settlements` WHERE `settlement_no` LIKE '{$like}%')");
     $c->query("DELETE FROM `settlements` WHERE `settlement_no` LIKE '{$like}%'");

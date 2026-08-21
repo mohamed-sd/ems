@@ -2186,7 +2186,15 @@ body.ems-site .main .shot-ops-kpis .ems-kpi-meta:not(:has(span:not(:empty))) {
    ◆ و`.frq-stat-on` تُعلِن **أيَّ بطاقةٍ رشَّحتِ الجدولَ الآن**: البطاقةُ رابطٌ،
      ورابطٌ فعّالٌ بلا علامةٍ يترك القارئَ يخمّن مصدرَ ما يراه. والإعلانُ بحدٍّ
      وظلٍّ لا بلونِ خلفيةٍ — فلونُ البطاقةِ نفسُه هو معناها (حالتُها). */
+/* ⚠ `.frq-hidden` وحدَها (0,1,0) **لا تكفي على التنبيهات**: قاعدةُ
+   `body.ems-site .alert.alert-info` في `ems-alerts.css` تحمل `display:flex`
+   **مُعجَّبةً** بعدِّ (0,3,1) — والمُعجَّبتان تُحسمان بالخصوصية. فكان
+   `hint.style.display='none'` في الشفرةِ **خاملًا صامتًا**: الإرشادُ يبقى
+   ظاهرًا فوقَ نموذجٍ مفتوحٍ يقول «اضغط الزرَّ لفتحِ النموذج». والمحدِّدُ الثاني
+   (0,4,1) يغلبها — والطيُّ صار بصنفٍ لا بنمطٍ موضعيّ. */
         .frq-hidden { display:none !important; }
+        body.ems-site .main .frq-hidden,
+        body.ems-site .main .alert.frq-hidden { display:none !important; }
         .frq-table { width:100% !important; }
 /* رقمُ السجلِّ في الترويسةِ: تابعٌ للتسميةِ لا بديلٌ عنها — أخفُّ وزنًا وبمسافةٍ
    فاصلة. و`color:inherit` ليس زخرفة: قاعدةُ `.ems-site .main span` (0,2,1) في

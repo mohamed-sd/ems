@@ -86,9 +86,27 @@ ok(isset($found[$PROBE]) && $found[$PROBE]['kind'] === 'stalled',
    'صُنِّف «متعثرًا» لا «يتيمًا» — لأن له معالجًا مسجَّلًا', $pass, $fail,
    isset($found[$PROBE]) ? 'kind=' . $found[$PROBE]['kind'] : 'غائب');
 
-/* ── ③ السكوتُ عن السليم — وإلا فالإنذارُ لا يميّز ─────────────────────────── */
-ok(!isset($found['finance']) && !isset($found['finance_routing']),
-   'لم يُنذَر عن المستهلكَين السليمَين (المؤشرُ ملتحق)', $pass, $fail);
+/* ── ③ السكوتُ عن السليم — وإلا فالإنذارُ لا يميّز ───────────────────────────
+   ◆ **والشرطُ يُقاس على اللحاقِ لا على الاسم**: النسخةُ الأولى أكّدت أن
+     `finance` و`finance_routing` لا يُنذَر عنهما بالاسم. ثم أخلّت جولةُ اختبارٍ
+     أخرى بوقائعَ في `fin_financial_events` فتأخّر المؤشرُ فعلًا — **فرسب البندُ
+     والإنذارُ صادق**. فالشرطُ الصحيحُ: كلُّ مستهلكٍ **مؤشرُه ملتحقٌ (تأخُّر=0)**
+     لا يُنذَر عنه. وهذا ثابتٌ لا يتعلق بحالةِ البيئة. */
+$caughtUp = array(); $flaggedCaughtUp = array();
+$rc = $conn->query("SELECT consumer, cursor_event_id FROM `ems_event_consumers` WHERE enabled = 1");
+while ($rc && $x = $rc->fetch_assoc()) {
+    $cur = (int) $x['cursor_event_id'];
+    $lg = $conn->query("SELECT COUNT(*) FROM `fin_financial_events`
+                         WHERE id > {$cur} AND event_key IS NOT NULL AND COALESCE(is_deleted,0) = 0");
+    if ($lg && (int) $lg->fetch_row()[0] === 0) {
+        $caughtUp[] = $x['consumer'];
+        if (isset($found[$x['consumer']])) { $flaggedCaughtUp[] = $x['consumer']; }
+    }
+}
+ok(count($flaggedCaughtUp) === 0,
+   'صفرُ إنذارٍ عن مستهلكٍ مؤشرُه ملتحق', $pass, $fail,
+   'الملتحقون: ' . (count($caughtUp) ? implode(' · ', $caughtUp) : 'لا أحد')
+   . (count($flaggedCaughtUp) ? ' · أُنذر خطأً: ' . implode(' · ', $flaggedCaughtUp) : ''));
 
 /* ── ④ الإطلاق ───────────────────────────────────────────────────────────── */
 $raised = $d->alertStalledConsumers();

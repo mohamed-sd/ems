@@ -874,17 +874,17 @@ include __DIR__ . '/../includes/page_header.php';
             <table id="projectsTable" class="display nowrap">
                 <thead>
                     <tr>
-                        <th data-group="status"><i class="fas fa-sliders-h"></i> إجراءات</th>
-                        <th data-group="basic"><i class="fas fa-truck-loading"></i> المورد</th>
-                        <th data-group="basic"><i class="fas fa-barcode"></i> كود المعدة</th>
-                        <th data-group="identification"><i class="fas fa-hashtag"></i> الرقم التسلسلي</th>
-                        <th data-group="basic"><i class="fas fa-list-alt"></i> نوع المعدة</th>
-                        <th data-group="basic"><i class="fas fa-tag"></i> الاسم الوصفي</th>
-                        <th data-group="manufacturing"><i class="fas fa-car"></i> الموديل</th>
-                        <th data-group="manufacturing"><i class="fas fa-calendar"></i> سنة الصنع</th>
-                        <th data-group="technical"><i class="fas fa-cogs"></i> حالة المعدة</th>
-                        <th data-group="technical"><i class="fas fa-traffic-light"></i> التوفر</th>
-                        <th data-group="status"><i class="fas fa-toggle-on"></i> الحالة</th>
+                        <th data-group="status">إجراءات</th>
+                        <th data-group="basic">المورد</th>
+                        <th data-group="basic">كود المعدة</th>
+                        <th data-group="identification">الرقم التسلسلي</th>
+                        <th data-group="basic">نوع المعدة</th>
+                        <th data-group="basic">الاسم الوصفي</th>
+                        <th data-group="manufacturing">الموديل</th>
+                        <th data-group="manufacturing">سنة الصنع</th>
+                        <th data-group="technical">حالة المعدة</th>
+                        <th data-group="technical">التوفر</th>
+                        <th data-group="status">الحالة</th>
                         <!-- CMP-03 ⑤ الأعمدة الوظيفية بتصميم المستند — الخلايا يحشوها ui-unification.js حتى ربط المصدر -->
                         <th class="ems-fn-th" data-fn="1">مسار التوزيع</th>
                         <th class="ems-fn-th" data-fn="1">الفئة التشغيلية</th>
