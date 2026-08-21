@@ -32,7 +32,7 @@
   </Triggers>
   <Actions Context="Author">
     <Exec>
-      <Command>C:\wamp64\bin\php\php8.0.30\php.exe</Command>
+      <Command>C:\wamp64\bin\php\php8.2.30\php.exe</Command>
       <Arguments>C:\wamp64\www\ems\cron_events.php</Arguments>
     </Exec>
   </Actions>

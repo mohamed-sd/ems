@@ -32,8 +32,8 @@
   </Triggers>
   <Actions Context="Author">
     <Exec>
-      <Command>"C:\wamp64\bin\php\php8.5.0\php.exe"</Command>
-      <Arguments>"C:\wamp64\www\ems\cron_requests.php"</Arguments>
+      <Command>C:\wamp64\bin\php\php8.2.30\php.exe</Command>
+      <Arguments>C:\wamp64\www\ems\cron_requests.php</Arguments>
     </Exec>
   </Actions>
 </Task>

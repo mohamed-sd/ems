@@ -95,9 +95,52 @@ if (!$imp->multi_query($sql)) {
     } while ($imp->more_results() && $imp->next_result());
     if ($impErr === '' && $imp->error !== '') { $impErr = $imp->error; }
 }
+/* ◆ **وطورُ القوادحِ جزءٌ من مسارِ المُثبِّتِ لا التفافٌ عليه**: `Installer` يستورد
+ *   أولًا بحسابِ النشر، فإن سقطت القوادحُ لنقصِ الامتياز (`log_bin=ON` بلا SUPER)
+ *   **شغَّل طورًا ثانيًا باعتمادٍ إداريٍّ مُعلَنٍ في البيئة**، ثم وقف صراحةً إن لم
+ *   يكفِ. فيُحاكى الطوران هنا بالترتيبِ نفسِه — **وخطأُ الاستيرادِ لا يُبتلَع بل
+ *   يُقاس أثرُه**: إن كان مصدرُه القوادحَ وحدَها وأتمَّها الطورُ الثاني فالمسارُ
+ *   سليم، وإن نقصت بعدَه فالرسوبُ قائم. */
+$phaseMade = 0; $phaseTried = false;
+$adminUser = (string) ems_env('DB_ADMIN_USER', '');
+$wantT = preg_match_all('/^\s*CREATE\s+TRIGGER\s/mi', $sql);
+$rt = $c->query("SELECT COUNT(*) FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA='{$CLONE}'");
+$gotT = $rt ? (int) $rt->fetch_row()[0] : 0;
+if ($gotT < $wantT && $adminUser !== '') {
+    $phaseTried = true;
+    $ac = @new mysqli($host, $adminUser, (string) ems_env('DB_ADMIN_PASS', ''), $CLONE, $port);
+    if (!$ac->connect_errno) {
+        $ac->set_charset('utf8mb4');
+        if (preg_match_all('/^[ \t]*DROP\s+TRIGGER\s+IF\s+EXISTS\s+`?(\w+)`?\s*;[ \t]*$/mi',
+                           $sql, $dm, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+            foreach ($dm as $i => $one) {
+                $name = $one[1][0];
+                $from = $one[0][1] + strlen($one[0][0]);
+                $to   = isset($dm[$i + 1]) ? $dm[$i + 1][0][1] : strlen($sql);
+                $blk  = trim(substr($sql, $from, $to - $from));
+                if (!preg_match('/^CREATE\s+TRIGGER\s/i', $blk)) { continue; }
+                if (preg_match_all('/\bEND\b/i', $blk, $em2, PREG_OFFSET_CAPTURE)) {
+                    $lastE = $em2[0][count($em2[0]) - 1];
+                    $blk = substr($blk, 0, $lastE[1] + strlen($lastE[0]));
+                }
+                $blk = rtrim($blk, "; \t\r\n");
+                $ac->query("DROP TRIGGER IF EXISTS `{$name}`");
+                if ($ac->query($blk)) { $phaseMade++; }
+            }
+        }
+        $ac->close();
+    }
+}
 $imp->close();
-ok($impErr === '', 'استُورد المخططُ بمسارِ المُثبِّتِ (multi_query) بلا خطأ', $pass, $fail,
-   $impErr === '' ? 'صفرُ خطأ' : $impErr);
+
+$triggerOnly = ($impErr !== '' && stripos($impErr, 'SUPER privilege') !== false);
+if ($phaseTried) {
+    echo "  ◆ طورُ القوادحِ الإداريُّ: أُنشئ {$phaseMade} قادحًا بالحساب «{$adminUser}»\n";
+}
+ok($impErr === '' || ($triggerOnly && $phaseMade >= $wantT),
+   'أعاد مسارُ المُثبِّتِ بناءَ المخططِ كاملًا (استيرادٌ + طورُ قوادحَ عند اللزوم)', $pass, $fail,
+   $impErr === '' ? 'صفرُ خطأ'
+   : ($triggerOnly ? "نقصُ الامتيازِ عالجه الطورُ الثاني: {$phaseMade}/{$wantT}" : $impErr));
 
 /* ── ② المقارنةُ ببصمةٍ لا بالنظر ──────────────────────────────────────────── */
 echo "\n── ② المقارنة ──\n";

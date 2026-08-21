@@ -33,7 +33,7 @@
   <Actions Context="Author">
     <Exec>
       <Command>cmd</Command>
-      <Arguments>/c "C:\wamp64\bin\php\php8.2.29\php.exe C:\wamp64\www\ems\Operations\cron_unit_chain_sla.php &gt;&gt; C:\wamp64\www\ems\storage\logs\cron_unit_chain.log 2&gt;&amp;1"</Arguments>
+      <Arguments>/c "C:\wamp64\bin\php\php8.2.30\php.exe C:\wamp64\www\ems\Operations\cron_unit_chain_sla.php &gt;&gt; C:\wamp64\www\ems\storage\logs\cron_unit_chain.log 2&gt;&amp;1"</Arguments>
     </Exec>
   </Actions>
 </Task>

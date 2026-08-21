@@ -82,6 +82,79 @@ class Installer
         return $this->root . '/database/schema';
     }
 
+    /**
+     * طورُ القوادحِ بحسابٍ إداريّ — INJ-FIX-01 · GAP-33
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ **متى يُنادى**: بعدَ الاستيرادِ الرئيسِ وحين تنقص القوادحُ وحدَها — وهي
+     *   حالةُ `log_bin=ON` مع حسابِ نشرٍ بلا SUPER: تمرُّ الجداولُ والمناظرُ
+     *   ويسقط الحرّاسُ صامتين.
+     *
+     * ◆ **ولا يُخمَّن اعتماد**: يُقرأ `DB_ADMIN_USER`/`DB_ADMIN_PASS` من البيئة،
+     *   وإن لم يُعلَنا **لا يُجرَّب شيءٌ** ويعود بصفر — فيقف المُثبِّتُ برسالتِه.
+     *
+     * ◆ **والقادحُ يُنفَّذ عبارةً عبارةً لا بـ`multi_query`**: جسدُ القادحِ فيه
+     *   فواصلُ منقوطةٌ داخليةٌ (`DECLARE` و`IF`)، و`multi_query` يقطعه عندها
+     *   فيُنشئ شظايا.
+     *
+     * ◆ **والحدُّ سطرُ `DROP TRIGGER` لا سطرُ `END`**: أولُ محاولةٍ حدَّت الكتلةَ
+     *   بسطرٍ نصُّه `END` وحدَه — **فبنت ٢١ من ٣٤**. والسببُ أن قادحًا مثلَ
+     *   `trg_contract_needs_quote_ins` ينتهي بـ`END IF; END;` **في سطرٍ واحد**،
+     *   فلا يطابق «`END` وحدَه في سطر»، فامتدَّت كتلتُه إلى `END` قادحٍ لاحقٍ
+     *   وابتلعت `DROP` و`CREATE` بينهما. والمخطَّطُ يضع لكلِّ قادحٍ `DROP` قبلَه
+     *   (٣٤ و٣٤) — **فالحدُّ الموثوقُ هو الفاصلُ لا النهاية**.
+     *
+     * @param  int $shortBy كم قادحًا ينقص
+     * @return int عددُ ما أُنشئ فعلًا
+     */
+    private function triggerPhaseAsAdmin($shortBy)
+    {
+        $user = (string) ems_env('DB_ADMIN_USER', '');
+        if ($user === '') { return 0; }
+        $pass = (string) ems_env('DB_ADMIN_PASS', '');
+
+        $host = (string) ems_env('DB_HOST', 'localhost'); $port = 3306;
+        if (strpos($host, ':') !== false) { list($host, $port) = explode(':', $host); $port = (int) $port; }
+        $db = (string) ems_env('DB_NAME', '');
+
+        $ac = @new mysqli($host, $user, $pass, $db, $port);
+        if ($ac->connect_errno) { return 0; }
+        $ac->set_charset('utf8mb4');
+
+        $sql = (string) @file_get_contents($this->schemaDir() . '/schema.sql');
+        if ($sql === '') { $ac->close(); return 0; }
+
+        /* كلُّ قادحٍ يسبقه `DROP TRIGGER IF EXISTS` — فالكتلةُ ما بين فاصلٍ وفاصل */
+        $made = 0;
+        if (!preg_match_all('/^[ \t]*DROP\s+TRIGGER\s+IF\s+EXISTS\s+`?(\w+)`?\s*;[ \t]*$/mi',
+                            $sql, $dm, PREG_OFFSET_CAPTURE | PREG_SET_ORDER)) {
+            $ac->close();
+            return 0;
+        }
+        foreach ($dm as $i => $one) {
+            $name = $one[1][0];
+            $from = $one[0][1] + strlen($one[0][0]);
+            $to   = isset($dm[$i + 1]) ? $dm[$i + 1][0][1] : strlen($sql);
+            $block = trim(substr($sql, $from, $to - $from));
+            /* لا يُؤخَذ إلا ما بدأ فعلًا بـCREATE TRIGGER — فذيلُ الملفِّ ليس قادحًا */
+            if (!preg_match('/^CREATE\s+TRIGGER\s/i', $block)) { continue; }
+            /* ◆ **والأخيرُ يمتدُّ إلى آخرِ الملف** فيبتلع ذيلَه (`SET FOREIGN_KEY_CHECKS`)
+             *   — فبنى ٣٣ من ٣٤. فيُقطَع عندَ آخرِ `END` في الكتلةِ: جسدُ القادحِ
+             *   ينتهي بها دائمًا، و`END IF` قبلَها لا يزاحمها لأن المأخوذَ آخرُها. */
+            if (preg_match_all('/\bEND\b/i', $block, $em, PREG_OFFSET_CAPTURE)) {
+                $last  = $em[0][count($em[0]) - 1];
+                $block = substr($block, 0, $last[1] + strlen($last[0]));
+            }
+            $block = rtrim($block, "; \t\r\n");
+            $ac->query("DROP TRIGGER IF EXISTS `{$name}`");
+            if ($ac->query($block)) { $made++; }
+        }
+        $ac->close();
+        if ($made > 0) {
+            $this->step('طورُ القوادحِ الإداريّ', "أُنشئ {$made} قادحًا بحسابٍ إداريٍّ مُعلَن (النقصُ كان {$shortBy})");
+        }
+        return $made;
+    }
+
     public function markerPath()
     {
         return $this->root . '/.installed';
@@ -277,6 +350,21 @@ class Installer
             $rs = $this->conn->query("SELECT COUNT(*) FROM information_schema.TRIGGERS
                                        WHERE TRIGGER_SCHEMA = DATABASE()");
             if ($rs) { $got = (int) $rs->fetch_row()[0]; }
+            /* ◆ **طورُ القوادحِ بحسابٍ إداريّ** — المسارُ الذي كان ناقصًا.
+             *   الوقوفُ صريحًا خيرٌ من التسليمِ ناقصًا، **لكنَّ الوقوفَ وحدَه ليس
+             *   علاجًا**: من يقرأ الرسالةَ يعرف ما يطلب ولا يملك ما يفعل. فيُجرَّب
+             *   طورٌ ثانٍ باعتمادٍ إداريٍّ **مُعلَنٍ في البيئةِ لا مُخمَّن**
+             *   (`DB_ADMIN_USER`/`DB_ADMIN_PASS`)، ثم يُعادُّ ما بُني.
+             * ◆ ولا يُخفي هذا الطورُ فشلًا: إن لم يُعلَن الاعتمادُ أو لم يكفِ،
+             *   يقف المُثبِّتُ كما كان — والرسالةُ تسمّي أيَّ الطريقَين تعذّر. */
+            if ($got < $wantTriggers) {
+                $made = $this->triggerPhaseAsAdmin($wantTriggers - $got);
+                if ($made > 0) {
+                    $rs = $this->conn->query("SELECT COUNT(*) FROM information_schema.TRIGGERS
+                                               WHERE TRIGGER_SCHEMA = DATABASE()");
+                    if ($rs) { $got = (int) $rs->fetch_row()[0]; }
+                }
+            }
             if ($got < $wantTriggers) {
                 $hint = '';
                 $v = $this->conn->query("SHOW VARIABLES LIKE 'log_bin'");
@@ -284,8 +372,12 @@ class Installer
                 if ($vr && strtoupper((string) $vr['Value']) === 'ON') {
                     $hint = ' والسجلُّ الثنائيُّ يعمل، فإنشاءُ القادحِ يلزمه امتيازٌ '
                           . '(SUPER أو log_bin_trust_function_creators=1) — امنحه لحسابِ النشرِ '
-                          . 'أو شغِّل طورَ القوادحِ بحسابٍ إداريّ.';
+                          . 'أو أعلِن DB_ADMIN_USER وDB_ADMIN_PASS ليعمل طورُ القوادحِ بحسابٍ إداريّ.';
                 }
+                $declared = (string) ems_env('DB_ADMIN_USER', '');
+                $hint .= $declared === ''
+                    ? ' ولم يُعلَن اعتمادٌ إداريٌّ في البيئةِ فلم يُجرَّب الطورُ الثاني.'
+                    : " وجُرِّب الطورُ الثاني بالحساب «{$declared}» ولم يكفِ.";
                 return $this->fail(
                     "نقصُ حرّاسِ القاعدة: المخطّطُ يُعلن {$wantTriggers} قادحًا وأُنشئ منها {$got}."
                   . ' ولا يُسلَّم نظامٌ بلا حرّاسِه — فهي تمنع مخزونًا سالبًا وتحفظ عدمَ'
