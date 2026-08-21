@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-21 20:06:44
--- الجداول: 618 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-21 23:38:53
+-- الجداول: 619 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -2811,7 +2811,7 @@ CREATE TABLE `ems_job_schedule_alert_backup` (
   `alert_before` int(10) unsigned NOT NULL,
   `saved_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: ems_post_idempotency ──
 CREATE TABLE `ems_post_idempotency` (
@@ -6356,7 +6356,7 @@ CREATE TABLE `gov_cycle_consumers_backup` (
   `consumers_before` varchar(255) NOT NULL,
   `swept_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`cycle_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: gov_data_classes ──
 CREATE TABLE `gov_data_classes` (
@@ -6391,7 +6391,7 @@ CREATE TABLE `gov_dead_letter_rulings` (
   `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_fail` (`fail_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='GAP-32 — قرارٌ ومالكٌ وسببٌ لكلِّ صنفِ رسالةٍ ميتة';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GAP-32 — قرارٌ ومالكٌ وسببٌ لكلِّ صنفِ رسالةٍ ميتة';
 
 -- ── Table: gov_delegation_state ──
 CREATE TABLE `gov_delegation_state` (
@@ -6405,7 +6405,7 @@ CREATE TABLE `gov_delegation_state` (
   `measured_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_store` (`store`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='GAP-03 — حالةُ مساراتِ التفويضِ والتصعيدِ مقيسةً بالبياناتِ والقرّاء';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GAP-03 — حالةُ مساراتِ التفويضِ والتصعيدِ مقيسةً بالبياناتِ والقرّاء';
 
 -- ── Table: gov_delegations ──
 CREATE TABLE `gov_delegations` (
@@ -6661,7 +6661,7 @@ CREATE TABLE `gov_finance_gate_policy` (
   `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_ladder` (`ladder_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='GAP-15 — قرارٌ مُعلَنٌ لكلِّ سلّمٍ بسقفٍ نقديّ: بوابةٌ إلزاميةٌ أم سجلُّ طلبات';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GAP-15 — قرارٌ مُعلَنٌ لكلِّ سلّمٍ بسقفٍ نقديّ: بوابةٌ إلزاميةٌ أم سجلُّ طلبات';
 
 -- ── Table: gov_golden_approvals ──
 CREATE TABLE `gov_golden_approvals` (
@@ -6871,7 +6871,7 @@ CREATE TABLE `gov_nav_reference_standard` (
   `stage_name` varchar(160) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_stage` (`layer_no`,`stage_order`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='INJ-FIX-02 NF-04 — المعيارُ المرجعيُّ للترتيب: طبقةٌ ثم مرحلةٌ ثم رتبةٌ مستندية';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='INJ-FIX-02 NF-04 — المعيارُ المرجعيُّ للترتيب: طبقةٌ ثم مرحلةٌ ثم رتبةٌ مستندية';
 
 -- ── Table: gov_nav_stage_bridge ──
 CREATE TABLE `gov_nav_stage_bridge` (
@@ -6885,7 +6885,7 @@ CREATE TABLE `gov_nav_stage_bridge` (
   `match_kind` varchar(24) NOT NULL COMMENT 'EXACT | TOKEN | LAYER_ONLY | UNMAPPED',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_cycle` (`cycle_layer`,`cycle_stage`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='INJ-FIX-02 NF-04 — جسرُ مراحلِ دفترِ الدورةِ برؤوسِ المعيارِ المرجعيّ';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='INJ-FIX-02 NF-04 — جسرُ مراحلِ دفترِ الدورةِ برؤوسِ المعيارِ المرجعيّ';
 
 -- ── Table: gov_orphan_links ──
 CREATE TABLE `gov_orphan_links` (
@@ -6932,7 +6932,7 @@ CREATE TABLE `gov_path_rulings` (
   `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_path` (`path_key`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='GAP-24 و GAP-31 — حكمٌ مكتوبٌ لكلِّ مسارٍ يحمل معنًى حاكمًا';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GAP-24 و GAP-31 — حكمٌ مكتوبٌ لكلِّ مسارٍ يحمل معنًى حاكمًا';
 
 -- ── Table: gov_permission_corrections ──
 CREATE TABLE `gov_permission_corrections` (
@@ -7060,6 +7060,24 @@ CREATE TABLE `gov_screen_cycle` (
   KEY `ix_dept` (`dept_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXW-01 §7-1 — مصفوفةُ التحققِ الحاكمةُ: عناصرُ الدورةِ السبعةُ لكلِّ شاشة';
 
+-- ── Table: gov_screen_path_map ──
+CREATE TABLE `gov_screen_path_map` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `book_file` varchar(128) NOT NULL COMMENT 'الاسمُ كما في دفترِ الدورة',
+  `real_route` varchar(192) DEFAULT NULL COMMENT 'المسارُ الحقيقيُّ على القرص',
+  `ruling` varchar(24) NOT NULL COMMENT 'RENAMED_TO | VIEW_OF | MERGED_INTO | OWNED_ELSEWHERE | NOT_BUILT',
+  `owner_dept` varchar(64) DEFAULT NULL,
+  `chain_node` tinyint(3) unsigned DEFAULT NULL COMMENT 'رقمُ العقدةِ في سلسلةِ الأثرِ إن كانت منها',
+  `build_wave` tinyint(3) unsigned DEFAULT NULL COMMENT 'موجةُ البناءِ لغيرِ المبنيّ',
+  `source_doc` varchar(32) NOT NULL COMMENT 'الوثيقةُ الحاكمةُ لهذا الحكم',
+  `reason` varchar(400) NOT NULL,
+  `applied_to_cycle` tinyint(1) NOT NULL DEFAULT 0,
+  `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_book` (`book_file`),
+  KEY `ix_ruling` (`ruling`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='INJ-EXEC-01 ① — الاسمُ الدفتريُّ ومسارُه الحقيقيُّ بحكمٍ مكتوب';
+
 -- ── Table: gov_sensitive_policy_debt ──
 CREATE TABLE `gov_sensitive_policy_debt` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -7072,7 +7090,7 @@ CREATE TABLE `gov_sensitive_policy_debt` (
   `detected_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_target` (`source_register`,`declared_target`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='INJ-FIX-02 NF-09 — سياساتٌ تُعلن حمايةً لهدفٍ لا وجودَ له';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='INJ-FIX-02 NF-09 — سياساتٌ تُعلن حمايةً لهدفٍ لا وجودَ له';
 
 -- ── Table: gov_space_appearances ──
 CREATE TABLE `gov_space_appearances` (
@@ -7167,21 +7185,21 @@ CREATE TABLE `gov_test_residue_archive` (
   `user_id` bigint(20) unsigned DEFAULT NULL,
   `employee_id` bigint(20) unsigned DEFAULT NULL COMMENT 'لقطة الموظف الفاعل وقت الحدث',
   `role_id` bigint(20) unsigned DEFAULT NULL,
-  `role_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `session_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `screen_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `module_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `action_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `button_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `field_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `role_name` varchar(255) DEFAULT NULL,
+  `session_id` varchar(255) DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `screen_name` varchar(255) DEFAULT NULL,
+  `module_name` varchar(255) DEFAULT NULL,
+  `action_type` varchar(50) DEFAULT NULL,
+  `button_name` varchar(255) DEFAULT NULL,
+  `field_name` varchar(255) DEFAULT NULL,
   `record_id` bigint(20) unsigned DEFAULT NULL,
-  `old_value` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `new_value` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `http_method` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `request_payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `old_value` longtext DEFAULT NULL,
+  `new_value` longtext DEFAULT NULL,
+  `url` text DEFAULT NULL,
+  `http_method` varchar(10) DEFAULT NULL,
+  `request_payload` longtext DEFAULT NULL,
   `response_status` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `acted_by` bigint(20) unsigned DEFAULT NULL COMMENT 'الفاعلُ الحقيقيُّ في جلسةِ النيابة (A5)',
@@ -7204,7 +7222,7 @@ CREATE TABLE `gov_test_residue_archive` (
   KEY `idx_employee_created` (`employee_id`,`created_at`),
   KEY `ix_impersonation` (`impersonation_id`),
   CONSTRAINT `chk_act_attribution` CHECK (`impersonation_id` is null or `acted_by` is not null and `acted_for` is not null)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: gov_topbar_exemptions ──
 CREATE TABLE `gov_topbar_exemptions` (
@@ -7215,7 +7233,7 @@ CREATE TABLE `gov_topbar_exemptions` (
   `declared_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_route` (`route`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='GAP-28 — مساراتُ شريطٍ علويٍّ لا يسري عليها عزلُ المساحة، بسببٍ مكتوب';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GAP-28 — مساراتُ شريطٍ علويٍّ لا يسري عليها عزلُ المساحة، بسببٍ مكتوب';
 
 -- ── Table: gov_visual_measurements ──
 CREATE TABLE `gov_visual_measurements` (
