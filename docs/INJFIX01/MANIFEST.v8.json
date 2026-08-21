@@ -150,5 +150,21 @@
         "no_swallow": "لا INSERT IGNORE — التكرارُ بـON DUPLICATE KEY UPDATE الذي يُبلّغ، **ويُعَدُّ المؤرشَفُ فعلًا قبلَ الحذفِ فلا يُحذف ما لم يُؤرشَف**",
         "migration": "database\/migrations\/2027_09_05_orphan_deliveries_and_fk.php — رجوعٌ مُثبَت (21377 ⇐ 21377)",
         "proof": "tests\/injfix01_orphan_delivery_proof.php — 6\/6"
-    }
+    },
+    "GAP_03_DELEGATION": {
+        "status": "OPEN بحقّ — لا يُدَّعى إغلاقُه",
+        "claim_split": "◆ الشطرُ الأولُ من الادعاءِ **مردودٌ بالقياس**: التصعيدُ مبنيٌّ ومقروء — work_escalations 2,008 مفتوحًا (WorkItemService·cron_wfm_engine) · ticket_escalations 74 بـ20 قاعدةً نشطة (SlaMonitor·TicketRouter) · risk_escalations 20 آليًّا (RiskService·RiskSignalEngine). ◆ والشطرُ الثاني **قائم**: gov_delegations صفرُ صفٍّ، وwork_delegations صفرُ نافذ",
+        "pollution_swept": "20 صفًّا في work_delegations كُلُّها بذرُ UAT-2026 — والبرهانُ بنيويّ: الجملةُ الواحدةُ كُتبت في ثلاثةِ أعمدةٍ فبُترت بعرضِ كلٍّ (kind varchar(20) · status varchar(12)) و starts_at = ends_at ⇒ نافذةٌ بلا مدة. أُرشفت ثم كُنست",
+        "measured": "3 مساراتٍ حيّةٍ مقروءةٍ بأثر — والمعيارُ 8 ⇒ **البندُ يبقى مفتوحًا**",
+        "OWNER_ITEM": "تقاعدُ التفويضِ رسميًّا (الشقُّ الثاني من المعيار) قرارُ مالكٍ لا حكمُ منفِّذ — BLOCKED_OWNER_INPUT",
+        "migration": "database\/migrations\/2027_09_06_delegation_state_declaration.php · وسجلُّ gov_delegation_state",
+        "proof": "tests\/injfix01_delegation_state_proof.php — 3\/3 · ويرسُب إن تقادمت حالةٌ مُعلَنةٌ أو ادُّعي إغلاقٌ بأقلَّ من ثمانية"
+    },
+    "CROSS_EFFECT_CORRECTED": {
+        "what": "كنسُ GAP-08 أزال من الجدولِ الحيِّ عشرةَ صفوفٍ كانت الموجةُ أ قد حجرت حقلَ consumer فيها (2027_08_23) — فصار الحجرُ يشير إلى صفٍّ غيرِ موجودٍ ورسب injfix01_key_field_purity_proof بعشرِ حالات. **والشاهدُ كان صادقًا**",
+        "fix": "database\/migrations\/2027_09_07_quarantine_supersede_by_orphan_archive.php — يُعلَن الحجرُ منسوخًا إلى ems_event_delivery_orphans بسببٍ مكتوب، ولا يُوسَم restored_at (فالردُّ لم يقع) ولا يُحذف",
+        "gate_narrowed_not_weakened": "الفاحصُ يستثني المنسوخَ **بشرطَين مُثبَتَين**: سببٌ مكتوبٌ + صفُّه موجودٌ فعلًا في الموضعِ المُعلَن. وجُرِّب معطوبًا: أُفرغ سببٌ واحدٌ فرسب وسمّى الصفَّ — ثم أُعيد فمرّ. 18\/18",
+        "no_data_lost": "البيانُ كاملٌ في ems_event_delivery_orphans وأصلُه الملوَّثُ في gov_key_pollution_archive.original_value — والمفقودُ مسارُ الردِّ لا البيان"
+    },
+    "SUITE": "22 أخضر · 2 أحمر — clean_clone_fingerprint (امتيازُ القوادح) و scheduler_parity (Set-ScheduledTask) — وكلاهما قرارُ بنيةٍ تحتيةٍ لا عملٌ ناقص"
 }

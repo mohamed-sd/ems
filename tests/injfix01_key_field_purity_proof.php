@@ -98,16 +98,38 @@ $q = $conn->query("SELECT COUNT(*) FROM `gov_key_pollution_archive`
                     WHERE `original_value` = '' OR `row_snapshot` IS NULL OR `replacement` = ''");
 ok($q && (int) $q->fetch_row()[0] === 0, 'كلُّ محجورٍ يحمل أصلَه ولقطةَ صفِّه وبديلَه', $pass, $fail);
 
-/* ◆ والرجوعُ يُقاس بمطابقةِ البديلِ لما في الجدولِ فعلًا — لا بوجودِ الصفِّ وحدَه. */
-$mismatch = 0; $checked = 0;
-$q = $conn->query("SELECT `src_table`,`src_column`,`src_row_id`,`replacement`
+/* ◆ والرجوعُ يُقاس بمطابقةِ البديلِ لما في الجدولِ فعلًا — لا بوجودِ الصفِّ وحدَه.
+ * ◆ **ويُستثنى المنسوخُ وحدَه**: صفٌّ كُنس لاحقًا إلى أرشيفٍ آخرَ لا موضعَ حيًّا
+ *   يُردُّ إليه. ولا يُستثنى بالدعوى بل **بشرطَين**: `superseded_to` مُعلَنٌ
+ *   بسببٍ مكتوب، **وصفُّه موجودٌ فعلًا في الموضعِ المُعلَن**. فانفصالٌ جديدٌ غيرُ
+ *   مُعلَنٍ يُرسِّب كما كان — والاستثناءُ يضيّق الحكمَ ولا يُلغيه. */
+$mismatch = 0; $checked = 0; $superseded = 0; $badSup = array();
+$hasSup = (bool) $conn->query("SELECT COUNT(*) FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='gov_key_pollution_archive'
+      AND COLUMN_NAME='superseded_to'")->fetch_row()[0];
+$sel = $hasSup ? '`superseded_to`,`superseded_reason`' : "NULL AS `superseded_to`, NULL AS `superseded_reason`";
+$q = $conn->query("SELECT `src_table`,`src_column`,`src_row_id`,`replacement`,{$sel}
                      FROM `gov_key_pollution_archive` WHERE `restored_at` IS NULL");
 while ($q && $x = $q->fetch_assoc()) {
+    if (!empty($x['superseded_to'])) {
+        $superseded++;
+        /* المنسوخُ يُثبَت لا يُصدَّق: سببٌ مكتوبٌ وصفٌّ موجودٌ في موضعِه المُعلَن */
+        $t = preg_replace('/[^A-Za-z0-9_]/', '', (string) $x['superseded_to']);
+        $r = $conn->query("SELECT COUNT(*) FROM `{$t}` WHERE `id` = " . (int) $x['src_row_id']);
+        $there = $r ? (int) $r->fetch_row()[0] : 0;
+        if ($there === 0 || trim((string) $x['superseded_reason']) === '') {
+            $badSup[] = $x['src_table'] . '#' . $x['src_row_id'];
+        }
+        continue;
+    }
     $r = $conn->query("SELECT `{$x['src_column']}` FROM `{$x['src_table']}` WHERE `id` = " . (int) $x['src_row_id']);
     $cur = $r ? $r->fetch_row() : null;
     $checked++;
     if (!$cur || (string) $cur[0] !== (string) $x['replacement']) { $mismatch++; }
 }
+ok(count($badSup) === 0, 'كلُّ منسوخٍ له سببٌ مكتوبٌ وصفُّه في موضعِه المُعلَن', $pass, $fail,
+   'منسوخ=' . $superseded . ' · بلا إثبات=' . count($badSup)
+   . (count($badSup) ? ' — ' . implode(' · ', array_slice($badSup, 0, 4)) : ''));
 ok($mismatch === 0, 'كلُّ بديلٍ مطابقٌ لما في الجدولِ — فالرجوعُ يُصيب صفَّه', $pass, $fail,
    "فُحص={$checked} · غيرُ مطابق={$mismatch}");
 
