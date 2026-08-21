@@ -18,8 +18,8 @@
             "سجل التدقيق والاطّلاع",
             "سجل النشاط"
         ],
-        "owner_dept": "الحوكمة والالتزام",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة التمويل",
@@ -215,8 +215,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -496,8 +496,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -2392,7 +2392,7 @@
             "العملاء"
         ],
         "owner_dept": "المبيعات والعقود",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة التشغيل",
@@ -2564,8 +2564,8 @@
         "names_all": [
             "المخاطر التجارية"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة المبيعات",
@@ -3422,7 +3422,7 @@
             "المستخلصات"
         ],
         "owner_dept": "المبيعات والعقود",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -3734,8 +3734,8 @@
         "names_all": [
             "كشف حساب العميل"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "المالية والخزينة",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة المبيعات": [
@@ -3774,8 +3774,8 @@
         "names_all": [
             "ذمم العملاء وأعمارها"
         ],
-        "owner_dept": "المالية والخزينة",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "المبيعات والعقود",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -4035,8 +4035,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -4160,7 +4160,7 @@
             "أحكام العقد — العملات والمقدم والمهل"
         ],
         "owner_dept": "المبيعات والعقود",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -4331,7 +4331,7 @@
             "التزام العقد بنوع المعدة"
         ],
         "owner_dept": "المبيعات والعقود",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة التشغيل",
@@ -5284,8 +5284,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -5318,7 +5318,7 @@
             "حصص الموردين والتغطية"
         ],
         "owner_dept": "المبيعات والعقود",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -5685,8 +5685,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -5694,7 +5694,7 @@
         "stage": null,
         "ledger": null,
         "nav09": null,
-        "deprecated": 1,
+        "deprecated": 0,
         "known_issue": [],
         "table_columns": 0,
         "form_fields": 0
@@ -5710,8 +5710,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -5735,8 +5735,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -6287,8 +6287,8 @@
         "names_all": [
             "الفاتورة الضريبية والإقرارات"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "المالية والخزينة",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة المالية": [
@@ -6405,7 +6405,7 @@
             "مطابقةُ العميلِ على الوحدات"
         ],
         "owner_dept": "المبيعات والعقود",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة المبيعات",
@@ -6499,7 +6499,7 @@
             "كشفُ وحداتِ العميل"
         ],
         "owner_dept": "المبيعات والعقود",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة المبيعات",
@@ -6593,8 +6593,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -6668,8 +6668,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -7330,7 +7330,7 @@
             "سجل المشغّلين"
         ],
         "owner_dept": "الموارد البشرية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الموقع",
@@ -7531,8 +7531,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -7556,8 +7556,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -7581,8 +7581,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -7606,8 +7606,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -7776,8 +7776,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -8035,8 +8035,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -8060,8 +8060,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -8093,7 +8093,7 @@
             "وثائق المعدات والمشغّلين"
         ],
         "owner_dept": "إدارة الأسطول",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الموقع",
@@ -8616,8 +8616,8 @@
         "names_all": [
             "مصدر المعدة ونمط تملّكها"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة الأسطول",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة الاسطول": [
@@ -8664,7 +8664,7 @@
             "سجل المعدات"
         ],
         "owner_dept": "إدارة الأسطول",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة التمويل",
@@ -8744,13 +8744,6 @@
                 {
                     "group": "التوزيع والتخصيص",
                     "order": 15,
-                    "perm": "Equipments\/equipments.php"
-                }
-            ],
-            "ادارة الموردين": [
-                {
-                    "group": "معدات المورد ومالكوها",
-                    "order": 20,
                     "perm": "Equipments\/equipments.php"
                 }
             ],
@@ -9430,7 +9423,7 @@
             "الأعيان المموَّلة"
         ],
         "owner_dept": "إدارة الأسطول",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة التمويل",
@@ -9802,7 +9795,7 @@
             "الأنواع والموديلات"
         ],
         "owner_dept": "إدارة الأسطول",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة الاسطول",
@@ -10061,8 +10054,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -10086,8 +10079,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -10136,8 +10129,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -10269,7 +10262,7 @@
             "تصنيف الأعطال وأسبابها"
         ],
         "owner_dept": "إدارة الأسطول",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة الاسطول",
@@ -10447,7 +10440,7 @@
             "قراءات العدّادات"
         ],
         "owner_dept": "إدارة الأسطول",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة الاسطول",
@@ -11629,23 +11622,20 @@
         "screen_id": "SCR-0116",
         "route": "FinRequests\/my_requests.php",
         "file": "FinRequests\/my_requests.php",
-        "surface_type": "SCREEN",
+        "surface_type": "SCREEN_VIA_KIT",
         "on_disk": 1,
         "sources": [
-            "disk",
             "ledger",
             "cycle",
             "apps",
-            "nav",
             "nav09"
         ],
         "name_ar": "طلباتي",
         "names_all": [
-            "طلباتي",
-            "طلباتي المالية"
+            "طلباتي"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -11768,377 +11758,9 @@
                 "owner_kind": "PLATFORM_SHARED"
             }
         ],
-        "roles_nav": {
-            "ادارة التشغيل": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "ادارة الموردين": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "ادارة الاسطول": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "ادارة الموارد البشرية": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "إدارة الموقع": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "مشرف - مشاريع": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "مشرف موردين": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "الإدارة التنفيذية": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "مشرف اسطول": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "مشغل اسطول": [
-                {
-                    "group": "العمل اليومي",
-                    "order": 30,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "ادارة المبيعات": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "ادارة الصيانة": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "مشرف صيانة": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "إدارة الصلاحيات": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "إدارة المشتريات": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "إدارة المالية": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "محاسب الإدارة المالية": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "مدير الإدارة المالية": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "المراجع والمدقق المالي": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "أمين الخزينة": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "قارئ مالي": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "إدارة النقل والترحيل": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "إدارة البلاغات": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "أمين المستودع": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "إدارة التمويل": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ],
-            "القوى التشغيلية": [
-                {
-                    "group": "مساحتي الشخصية",
-                    "order": 4,
-                    "perm": "FinRequests\/my_requests.php"
-                }
-            ]
-        },
-        "profiles_count": 23,
-        "profiles": [
-            {
-                "profile": "CEO-G9",
-                "dept": "مكتب الرئيس التنفيذي والنواب",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "GOV-G7",
-                "dept": "الحوكمة والالتزام",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "FIN-G2",
-                "dept": "المالية والخزينة",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "FIN-G3",
-                "dept": "المالية والخزينة",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "FIN-G7",
-                "dept": "المالية والخزينة",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "HRM-G7",
-                "dept": "الموارد البشرية",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "SAL-G7",
-                "dept": "المبيعات والعقود",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "CAP-G7",
-                "dept": "التمويل والملكية",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "SUP-G4",
-                "dept": "إدارة الموردين",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "SUP-G7",
-                "dept": "إدارة الموردين",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "FLT-G2",
-                "dept": "إدارة الأسطول",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "FLT-G4",
-                "dept": "إدارة الأسطول",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "FLT-G7",
-                "dept": "إدارة الأسطول",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "OPS-G4",
-                "dept": "إدارة التشغيل",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "OPS-G7",
-                "dept": "إدارة التشغيل",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "MNT-G4",
-                "dept": "إدارة الصيانة",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "MNT-G7",
-                "dept": "إدارة الصيانة",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "PRC-G7",
-                "dept": "إدارة المشتريات التشغيلية",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "INV-G3",
-                "dept": "إدارة المخازن",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "TRP-G7",
-                "dept": "النقل والترحيل",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "WRK-G7",
-                "dept": "القوى التشغيلية",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "CRP-G7",
-                "dept": "مركز البلاغات",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            },
-            {
-                "profile": "SIT-G7",
-                "dept": "إدارة الموقع",
-                "allow": 1,
-                "add": 0,
-                "edit": 0,
-                "del": 0
-            }
-        ],
+        "roles_nav": [],
+        "profiles_count": 0,
+        "profiles": [],
         "stage": {
             "stage_order": 0,
             "stage_name": "مركز العمل",
@@ -12187,8 +11809,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -12212,8 +11834,9 @@
             "apps",
             "nav"
         ],
-        "name_ar": "طلب مالي جديد",
+        "name_ar": "طلباتي المالية",
         "names_all": [
+            "طلباتي المالية",
             "طلب مالي جديد"
         ],
         "owner_dept": "المالية والخزينة",
@@ -12350,6 +11973,13 @@
                     "perm": "FinRequests\/request_form.php"
                 }
             ],
+            "الإدارة التنفيذية": [
+                {
+                    "group": "مساحتي الشخصية",
+                    "order": 4,
+                    "perm": "FinRequests\/request_form.php"
+                }
+            ],
             "مشرف اسطول": [
                 {
                     "group": "العمل اليومي",
@@ -12399,10 +12029,45 @@
                     "perm": "FinRequests\/request_form.php"
                 }
             ],
+            "إدارة المالية": [
+                {
+                    "group": "مساحتي الشخصية",
+                    "order": 4,
+                    "perm": "FinRequests\/request_form.php"
+                }
+            ],
+            "محاسب الإدارة المالية": [
+                {
+                    "group": "مساحتي الشخصية",
+                    "order": 4,
+                    "perm": "FinRequests\/request_form.php"
+                }
+            ],
+            "مدير الإدارة المالية": [
+                {
+                    "group": "مساحتي الشخصية",
+                    "order": 4,
+                    "perm": "FinRequests\/request_form.php"
+                }
+            ],
+            "المراجع والمدقق المالي": [
+                {
+                    "group": "مساحتي الشخصية",
+                    "order": 4,
+                    "perm": "FinRequests\/request_form.php"
+                }
+            ],
             "أمين الخزينة": [
                 {
                     "group": "العمل اليومي",
                     "order": 30,
+                    "perm": "FinRequests\/request_form.php"
+                }
+            ],
+            "قارئ مالي": [
+                {
+                    "group": "مساحتي الشخصية",
+                    "order": 4,
                     "perm": "FinRequests\/request_form.php"
                 }
             ],
@@ -12419,10 +12084,39 @@
                     "order": 20,
                     "perm": "FinRequests\/request_form.php"
                 }
+            ],
+            "أمين المستودع": [
+                {
+                    "group": "مساحتي الشخصية",
+                    "order": 4,
+                    "perm": "FinRequests\/request_form.php"
+                }
+            ],
+            "إدارة التمويل": [
+                {
+                    "group": "مساحتي الشخصية",
+                    "order": 4,
+                    "perm": "FinRequests\/request_form.php"
+                }
+            ],
+            "القوى التشغيلية": [
+                {
+                    "group": "مساحتي الشخصية",
+                    "order": 4,
+                    "perm": "FinRequests\/request_form.php"
+                }
             ]
         },
-        "profiles_count": 19,
+        "profiles_count": 23,
         "profiles": [
+            {
+                "profile": "CEO-G9",
+                "dept": "مكتب الرئيس التنفيذي والنواب",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
             {
                 "profile": "GOV-G7",
                 "dept": "الحوكمة والالتزام",
@@ -12469,6 +12163,14 @@
                 "allow": 1,
                 "add": 1,
                 "edit": 1,
+                "del": 0
+            },
+            {
+                "profile": "CAP-G7",
+                "dept": "التمويل والملكية",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
                 "del": 0
             },
             {
@@ -12552,11 +12254,27 @@
                 "del": 0
             },
             {
+                "profile": "INV-G3",
+                "dept": "إدارة المخازن",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
                 "profile": "TRP-G7",
                 "dept": "النقل والترحيل",
                 "allow": 1,
                 "add": 1,
                 "edit": 1,
+                "del": 0
+            },
+            {
+                "profile": "WRK-G7",
+                "dept": "القوى التشغيلية",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
                 "del": 0
             },
             {
@@ -13525,8 +13243,8 @@
         "names_all": [
             "صندوق ما ينتظر اعتمادي"
         ],
-        "owner_dept": "مركز البلاغات",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -14199,7 +13917,7 @@
             "الإهلاك والقيمة الدفترية"
         ],
         "owner_dept": "المالية والخزينة",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة التمويل",
@@ -14552,7 +14270,7 @@
             "ميزانية إدارتي — التمويل"
         ],
         "owner_dept": "التمويل والملكية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -15532,8 +15250,8 @@
         "names_all": [
             "الموازنة العامة"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -16249,8 +15967,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -16258,7 +15976,7 @@
         "stage": null,
         "ledger": null,
         "nav09": null,
-        "deprecated": 1,
+        "deprecated": 0,
         "known_issue": [],
         "table_columns": 0,
         "form_fields": 0
@@ -16274,8 +15992,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -16299,8 +16017,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -16324,8 +16042,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -16333,7 +16051,7 @@
         "stage": null,
         "ledger": null,
         "nav09": null,
-        "deprecated": 1,
+        "deprecated": 0,
         "known_issue": [],
         "table_columns": 0,
         "form_fields": 0
@@ -16903,7 +16621,7 @@
             "أسعار الصرف"
         ],
         "owner_dept": "المالية والخزينة",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة التمويل",
@@ -17280,7 +16998,7 @@
             "الذمم والتحصيل"
         ],
         "owner_dept": "المالية والخزينة",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة التمويل",
@@ -17504,7 +17222,7 @@
             "توليد المستحق من العمل المعتمد"
         ],
         "owner_dept": "المالية والخزينة",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -18199,8 +17917,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -18756,8 +18474,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -18781,8 +18499,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -19602,7 +19320,7 @@
             "القوائم المالية"
         ],
         "owner_dept": "المالية والخزينة",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -21546,7 +21264,7 @@
             "طلبات الدفع والسداد"
         ],
         "owner_dept": "المالية والخزينة",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة التمويل",
@@ -22052,7 +21770,7 @@
             "كشف حساب المورد الشهري"
         ],
         "owner_dept": "المالية والخزينة",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -22921,7 +22639,7 @@
             "متابعة انحراف المنفَّذ عن المخطط"
         ],
         "owner_dept": "المالية والخزينة",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -23171,7 +22889,7 @@
             "توزيع تكلفة التمويل على المشاريع"
         ],
         "owner_dept": "التمويل والملكية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة التمويل",
@@ -23444,8 +23162,8 @@
         "names_all": [
             "فروق السداد والاستحقاق"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "التمويل والملكية",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة التمويل": [
@@ -24351,7 +24069,7 @@
             "ملّاك الأسطول"
         ],
         "owner_dept": "التمويل والملكية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة التمويل",
@@ -24571,7 +24289,7 @@
             "علاقات الملكية بين الكيانات"
         ],
         "owner_dept": "التمويل والملكية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة التمويل",
@@ -24673,8 +24391,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -24706,7 +24424,7 @@
             "جاهزية المعدات للتشغيل"
         ],
         "owner_dept": "إدارة الأسطول",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الموقع",
@@ -25413,7 +25131,7 @@
         "stage": null,
         "ledger": null,
         "nav09": null,
-        "deprecated": 1,
+        "deprecated": 0,
         "known_issue": [],
         "table_columns": 9,
         "form_fields": 0
@@ -25978,8 +25696,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -25987,7 +25705,7 @@
         "stage": null,
         "ledger": null,
         "nav09": null,
-        "deprecated": 1,
+        "deprecated": 0,
         "known_issue": [],
         "table_columns": 0,
         "form_fields": 0
@@ -26270,8 +25988,8 @@
             "سجل الشركات والكيانات",
             "سجل الكيانات"
         ],
-        "owner_dept": "الحوكمة والالتزام",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة التمويل",
@@ -26821,8 +26539,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -28033,8 +27751,8 @@
         "names_all": [
             "التفويض بالتوقيع"
         ],
-        "owner_dept": "الحوكمة والالتزام",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة التمويل",
@@ -28519,8 +28237,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -28544,8 +28262,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -28569,8 +28287,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -28694,7 +28412,7 @@
             "الفحص الفني اليومي"
         ],
         "owner_dept": "إدارة الصيانة",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الموقع",
@@ -28957,7 +28675,7 @@
             "أوامر الصيانة"
         ],
         "owner_dept": "إدارة الصيانة",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -29327,7 +29045,7 @@
             "خطط الصيانة الوقائية"
         ],
         "owner_dept": "إدارة الصيانة",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة الاسطول",
@@ -29618,7 +29336,7 @@
             "الحضور والانصراف"
         ],
         "owner_dept": "الموارد البشرية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الموقع",
@@ -29767,7 +29485,7 @@
             "الوحدات التعاقدية المرقَّمة"
         ],
         "owner_dept": "إدارة التشغيل",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة الاسطول",
@@ -30052,8 +29770,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -30061,7 +29779,7 @@
         "stage": null,
         "ledger": null,
         "nav09": null,
-        "deprecated": 1,
+        "deprecated": 0,
         "known_issue": [],
         "table_columns": 0,
         "form_fields": 0
@@ -30077,8 +29795,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -30086,7 +29804,7 @@
         "stage": null,
         "ledger": null,
         "nav09": null,
-        "deprecated": 1,
+        "deprecated": 0,
         "known_issue": [],
         "table_columns": 0,
         "form_fields": 0
@@ -30102,8 +29820,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -30111,7 +29829,7 @@
         "stage": null,
         "ledger": null,
         "nav09": null,
-        "deprecated": 1,
+        "deprecated": 0,
         "known_issue": [],
         "table_columns": 0,
         "form_fields": 0
@@ -30127,8 +29845,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -30136,7 +29854,7 @@
         "stage": null,
         "ledger": null,
         "nav09": null,
-        "deprecated": 1,
+        "deprecated": 0,
         "known_issue": [],
         "table_columns": 0,
         "form_fields": 0
@@ -30152,8 +29870,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -30161,7 +29879,7 @@
         "stage": null,
         "ledger": null,
         "nav09": null,
-        "deprecated": 1,
+        "deprecated": 0,
         "known_issue": [],
         "table_columns": 0,
         "form_fields": 0
@@ -30177,8 +29895,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -30186,7 +29904,7 @@
         "stage": null,
         "ledger": null,
         "nav09": null,
-        "deprecated": 1,
+        "deprecated": 0,
         "known_issue": [],
         "table_columns": 0,
         "form_fields": 0
@@ -30202,8 +29920,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -30211,7 +29929,7 @@
         "stage": null,
         "ledger": null,
         "nav09": null,
-        "deprecated": 1,
+        "deprecated": 0,
         "known_issue": [],
         "table_columns": 0,
         "form_fields": 0
@@ -30227,8 +29945,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -30252,8 +29970,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -30277,8 +29995,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -30310,7 +30028,7 @@
             "خطة عمل الغد"
         ],
         "owner_dept": "إدارة الموقع",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الموقع",
@@ -30482,7 +30200,7 @@
             "توزيع المعدات والمشغّلين"
         ],
         "owner_dept": "إدارة التشغيل",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الموقع",
@@ -30820,7 +30538,7 @@
             "توزيع وحدات المورد على معداته"
         ],
         "owner_dept": "إدارة التشغيل",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة التشغيل",
@@ -31241,7 +30959,7 @@
             "الإقفال الشهري للوحدة"
         ],
         "owner_dept": "إدارة التشغيل",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -31631,7 +31349,7 @@
             "الإنتاج والقياس"
         ],
         "owner_dept": "إدارة التشغيل",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الموقع",
@@ -31879,7 +31597,7 @@
             "سجل الوردية"
         ],
         "owner_dept": "القوى التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الموقع",
@@ -32607,7 +32325,7 @@
             "الأعمال غير المفوترة"
         ],
         "owner_dept": "المبيعات والعقود",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة التشغيل",
@@ -32969,8 +32687,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -33422,7 +33140,7 @@
             "نماذج العمل ووحدات القياس"
         ],
         "owner_dept": "المبيعات والعقود",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة المبيعات",
@@ -33570,8 +33288,8 @@
             "اعتمادات الرئيس التنفيذي",
             "اعتمادات المدير التنفيذي"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "الإدارة التنفيذية",
@@ -33830,8 +33548,8 @@
             "لوحة الرئيس التنفيذي",
             "لوحة المدير التنفيذي"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "الإدارة التنفيذية",
@@ -33918,8 +33636,8 @@
             "العقود والالتزامات المحجوزة أو المصعَّدة",
             "توقيع العقود والالتزامات"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "الإدارة التنفيذية",
@@ -34068,8 +33786,8 @@
         "names_all": [
             "المخاطر والقرارات العليا"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "الإدارة التنفيذية",
@@ -34155,8 +33873,8 @@
         "names_all": [
             "مراجعة العقود وملاحظاتها"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة المبيعات",
@@ -34266,7 +33984,7 @@
             "إنجاز الإدارة"
         ],
         "owner_dept": "التمويل والملكية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -35025,8 +34743,8 @@
         "names_all": [
             "وضع التأسيس وإغلاقه"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الصلاحيات",
@@ -35204,8 +34922,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -35236,8 +34954,8 @@
         "names_all": [
             "إنجازي"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -36449,8 +36167,8 @@
         "names_all": [
             "بوابتي"
         ],
-        "owner_dept": "مساحة العمل الشخصية",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -37267,8 +36985,8 @@
         "names_all": [
             "مهامي"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -38120,8 +37838,8 @@
         "names_all": [
             "قرار فتح مشروع جديد"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "الإدارة التنفيذية",
@@ -38207,8 +37925,8 @@
         "names_all": [
             "بصمة الإصدار وتقرير النشر"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الصلاحيات",
@@ -38359,8 +38077,8 @@
         "names_all": [
             "من يرى ماذا ومكوّنات البوابة"
         ],
-        "owner_dept": "مساحة العمل الشخصية",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة التمويل",
@@ -38712,8 +38430,8 @@
         "names_all": [
             "استهلاك المعدة ومعدله"
         ],
-        "owner_dept": "إدارة المخازن",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -39026,7 +38744,7 @@
             "صرف المخزون والعهدة"
         ],
         "owner_dept": "إدارة المشتريات التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -39286,7 +39004,7 @@
             "كتالوج الأصناف والقطع الحرجة"
         ],
         "owner_dept": "إدارة المشتريات التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -39482,7 +39200,7 @@
             "البيانات المرجعية"
         ],
         "owner_dept": "إدارة المشتريات التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -39566,7 +39284,7 @@
             "أوامر الشراء"
         ],
         "owner_dept": "إدارة المشتريات التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -39676,7 +39394,7 @@
             "مطابقة الفاتورة بالأمر والاستلام"
         ],
         "owner_dept": "إدارة المشتريات التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المشتريات",
@@ -39762,7 +39480,7 @@
             "الاستلام المؤقت"
         ],
         "owner_dept": "إدارة المشتريات التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -40000,7 +39718,7 @@
             "طلبات الشراء"
         ],
         "owner_dept": "إدارة المشتريات التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -40209,7 +39927,7 @@
             "طلب العروض ومقارنتها"
         ],
         "owner_dept": "إدارة المشتريات التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المشتريات",
@@ -40334,7 +40052,7 @@
             "أرصدة المخزون بحالاتها"
         ],
         "owner_dept": "إدارة المشتريات التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -40864,8 +40582,8 @@
         "names_all": [
             "الجرد ومعالجة الفروقات"
         ],
-        "owner_dept": "إدارة المخازن",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -40951,8 +40669,8 @@
         "names_all": [
             "الاستلام المؤقت قبل الإدخال"
         ],
-        "owner_dept": "إدارة المخازن",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -41095,8 +40813,8 @@
         "names_all": [
             "التحويل بين المخازن"
         ],
-        "owner_dept": "إدارة المخازن",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -41281,7 +40999,7 @@
             "المشاريع والمواقع"
         ],
         "owner_dept": "المبيعات والعقود",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الموقع",
@@ -42414,8 +42132,8 @@
         "names_all": [
             "هامش الربح للعقد والواقعة"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -43796,7 +43514,7 @@
             "القبول والاستثناءات"
         ],
         "owner_dept": "إدارة المخاطر المؤسسية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المخاطر",
@@ -43915,8 +43633,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -44071,7 +43789,7 @@
             "تقييم الخطر ونسخه التاريخية"
         ],
         "owner_dept": "إدارة المخاطر المؤسسية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المخاطر",
@@ -44197,7 +43915,7 @@
             "لوحة المخاطر المؤسسية"
         ],
         "owner_dept": "إدارة المخاطر المؤسسية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المخاطر",
@@ -44296,7 +44014,7 @@
             "ملف الخطر"
         ],
         "owner_dept": "إدارة المخاطر المؤسسية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المخاطر",
@@ -44423,7 +44141,7 @@
             "لجنة المخاطر"
         ],
         "owner_dept": "إدارة المخاطر المؤسسية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المخاطر",
@@ -44550,7 +44268,7 @@
             "التحقق من الضوابط الحرجة"
         ],
         "owner_dept": "إدارة المخاطر المؤسسية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المخاطر",
@@ -44669,7 +44387,7 @@
             "الضوابط والضوابط الحرجة"
         ],
         "owner_dept": "إدارة المخاطر المؤسسية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المخاطر",
@@ -46587,7 +46305,7 @@
             "الحوادث والوقائع"
         ],
         "owner_dept": "إدارة المخاطر المؤسسية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المخاطر",
@@ -46735,7 +46453,7 @@
             "مؤشرات المخاطر والضوابط"
         ],
         "owner_dept": "إدارة المخاطر المؤسسية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المخاطر",
@@ -46827,7 +46545,7 @@
             "سجل المخاطر المركزي"
         ],
         "owner_dept": "إدارة المخاطر المؤسسية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المخاطر",
@@ -47097,7 +46815,7 @@
             "مراجعات المخاطر وقراراتها"
         ],
         "owner_dept": "إدارة المخاطر المؤسسية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المخاطر",
@@ -47338,7 +47056,7 @@
             "إشارات الخطر والفرز"
         ],
         "owner_dept": "إدارة المخاطر المؤسسية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المخاطر",
@@ -47454,7 +47172,7 @@
             "إجراءات المعالجة"
         ],
         "owner_dept": "إدارة المخاطر المؤسسية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المخاطر",
@@ -47545,7 +47263,7 @@
             "وحدات المخاطر والتصنيف"
         ],
         "owner_dept": "إدارة المخاطر المؤسسية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المخاطر",
@@ -48523,8 +48241,8 @@
         "names_all": [
             "معدات المورد ومالكوها"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة الموردين",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة الموردين": [
@@ -48613,8 +48331,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -48813,7 +48531,7 @@
             "تسويات ومستحقات الموردين"
         ],
         "owner_dept": "إدارة الموردين",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -49016,7 +48734,7 @@
             "دفتر استهلاك حصص الموردين"
         ],
         "owner_dept": "إدارة الموردين",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة التشغيل",
@@ -49716,8 +49434,8 @@
         "names_all": [
             "أداء الموردين وجاهزيتهم"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة الموردين",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة الموردين": [
@@ -49959,8 +49677,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -50494,7 +50212,7 @@
             "الموردون"
         ],
         "owner_dept": "إدارة الموردين",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المشتريات",
@@ -50977,7 +50695,7 @@
             "كشفُ وحداتِ المورد"
         ],
         "owner_dept": "إدارة الموردين",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة الموردين",
@@ -51120,8 +50838,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -51400,8 +51118,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -52008,8 +51726,8 @@
             "أبلغ عن مشكلة من هذه الشاشة",
             "بلاغ سياقي جديد"
         ],
-        "owner_dept": "مركز البلاغات",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -53975,8 +53693,8 @@
         "names_all": [
             "صندوقُ بلاغاتِ الإدارة"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة التشغيل": [
@@ -54423,8 +54141,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -54448,8 +54166,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -54473,8 +54191,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -54498,8 +54216,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -54523,8 +54241,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -54557,7 +54275,7 @@
             "تسجيل التايم شيت والإنتاج — الموقع"
         ],
         "owner_dept": "إدارة الموقع",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -54633,20 +54351,6 @@
             }
         ],
         "roles_nav": {
-            "ادارة التشغيل": [
-                {
-                    "group": "التايم شيت والقياس",
-                    "order": 20,
-                    "perm": "Timesheet\/timesheet.php"
-                }
-            ],
-            "ادارة الموردين": [
-                {
-                    "group": "التايم شيت",
-                    "order": 24,
-                    "perm": "Timesheet\/timesheet.php"
-                }
-            ],
             "ادارة الاسطول": [
                 {
                     "group": "العدّادات",
@@ -55126,6 +54830,13 @@
                     "perm": "Timesheet\/timesheet_type.php"
                 }
             ],
+            "ادارة الموردين": [
+                {
+                    "group": "التايم شيت",
+                    "order": 25,
+                    "perm": "Timesheet\/timesheet_type.php"
+                }
+            ],
             "إدارة الموقع": [
                 {
                     "group": "مجموعةُ مجالِ الإدارةِ اليومية",
@@ -55216,14 +54927,32 @@
         "surface_type": "SCREEN",
         "on_disk": 1,
         "sources": [
-            "disk"
+            "disk",
+            "nav"
         ],
-        "name_ar": "UNKNOWN",
-        "names_all": [],
+        "name_ar": "تسجيل التايم شيت والإنتاج",
+        "names_all": [
+            "تسجيل التايم شيت والإنتاج"
+        ],
         "owner_dept": "UNKNOWN",
         "owner_basis": "NONE",
         "workspaces": [],
-        "roles_nav": [],
+        "roles_nav": {
+            "ادارة التشغيل": [
+                {
+                    "group": "التايم شيت والقياس",
+                    "order": 20,
+                    "perm": "Timesheet\/view_timesheet.php"
+                }
+            ],
+            "ادارة الموردين": [
+                {
+                    "group": "التايم شيت",
+                    "order": 24,
+                    "perm": "Timesheet\/view_timesheet.php"
+                }
+            ]
+        },
         "profiles_count": 15,
         "profiles": [
             {
@@ -55366,8 +55095,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -55538,7 +55267,7 @@
             "إقفال الأمر وتحميل تكلفته"
         ],
         "owner_dept": "النقل والترحيل",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -55978,8 +55707,8 @@
         "names_all": [
             "متابعة الرحلات في الطريق"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "النقل والترحيل",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة النقل والترحيل": [
@@ -56053,7 +55782,7 @@
             "أوامر الترحيل"
         ],
         "owner_dept": "النقل والترحيل",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -56341,7 +56070,7 @@
             "طلبات الترحيل"
         ],
         "owner_dept": "النقل والترحيل",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "أمين المستودع",
@@ -56824,8 +56553,8 @@
             "سجل العقود الموحَّد",
             "سجل العقود الموحّد"
         ],
-        "owner_dept": "مكتب الرئيس التنفيذي والنواب",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الصلاحيات",
@@ -56981,7 +56710,7 @@
             "الخصومات والجزاءات"
         ],
         "owner_dept": "القوى التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة الموارد البشرية",
@@ -57091,8 +56820,8 @@
             "السلف والعهد المالية",
             "سلفيات الموظفين"
         ],
-        "owner_dept": "الموارد البشرية",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -57789,7 +57518,7 @@
             "الأداء الشهري للمشغّل"
         ],
         "owner_dept": "الموارد البشرية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة الموارد البشرية",
@@ -57899,7 +57628,7 @@
             "تأهيل المشغّلين على أنواع المعدات"
         ],
         "owner_dept": "القوى التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة الموارد البشرية",
@@ -58010,8 +57739,8 @@
         "names_all": [
             "مسيّر الرواتب"
         ],
-        "owner_dept": "الموارد البشرية",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة المالية",
@@ -58172,7 +57901,7 @@
             "عقود المشاريع المؤقتة"
         ],
         "owner_dept": "القوى التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة الموارد البشرية",
@@ -58282,7 +58011,7 @@
             "خصومات المشغّلين المقترحة"
         ],
         "owner_dept": "القوى التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة الموارد البشرية",
@@ -58394,7 +58123,7 @@
             "التوظيف من الشاغر إلى المباشرة"
         ],
         "owner_dept": "القوى التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "ادارة الموارد البشرية",
@@ -58733,7 +58462,7 @@
             "الإجازات والغياب"
         ],
         "owner_dept": "القوى التشغيلية",
-        "owner_basis": "MAJORITY",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الموقع",
@@ -59203,8 +58932,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -59228,8 +58957,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -59253,8 +58982,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -59278,8 +59007,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -59303,8 +59032,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -59328,8 +59057,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -59353,8 +59082,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -59403,8 +59132,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -59490,8 +59219,8 @@
         "names_all": [
             "التكليفات التنظيمية"
         ],
-        "owner_dept": "الحوكمة والالتزام",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الصلاحيات",
@@ -59796,8 +59525,8 @@
             "الهيكل التنظيمي والمسميات",
             "الهيكل التنظيمي"
         ],
-        "owner_dept": "الحوكمة والالتزام",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الصلاحيات",
@@ -59978,8 +59707,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -60003,8 +59732,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -60028,8 +59757,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -60078,8 +59807,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -60103,8 +59832,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -60128,8 +59857,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -60153,8 +59882,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -60322,8 +60051,8 @@
         "names_all": [
             "فصل الواجبات المتعارضة"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة الصلاحيات": [
@@ -60355,8 +60084,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -60380,8 +60109,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -60405,8 +60134,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -60430,8 +60159,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -60455,8 +60184,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -61153,8 +60882,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -61178,8 +60907,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -61203,8 +60932,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -61228,8 +60957,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -61253,8 +60982,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -61278,8 +61007,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -61287,7 +61016,7 @@
         "stage": null,
         "ledger": null,
         "nav09": null,
-        "deprecated": 1,
+        "deprecated": 0,
         "known_issue": [],
         "table_columns": 0,
         "form_fields": 0
@@ -61303,8 +61032,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -61328,8 +61057,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -61852,8 +61581,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -61984,8 +61713,8 @@
         "names_all": [
             "المعاونون والنيابة المؤقتة"
         ],
-        "owner_dept": "الحوكمة والالتزام",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الصلاحيات",
@@ -62064,8 +61793,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -65005,8 +64734,8 @@
             "حسابات المستخدمين",
             "الصلاحيات"
         ],
-        "owner_dept": "الحوكمة والالتزام",
-        "owner_basis": "MAJORITY",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [
             {
                 "space": "إدارة الصلاحيات",
@@ -65553,8 +65282,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -65578,8 +65307,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,
@@ -65603,8 +65332,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 0,

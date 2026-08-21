@@ -456,16 +456,16 @@
         "seeded_from": "role_permissions:9"
     },
     {
-        "item_id": "4",
+        "item_id": "3725",
         "company_id": "0",
         "profile_id": "9",
         "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
+        "item_ref": "FinRequests\/request_form.php",
         "allow": "1",
         "can_add": "0",
         "can_edit": "0",
         "can_delete": "0",
-        "seeded_from": "role_permissions:9"
+        "seeded_from": "finreq_merge_20260821"
     },
     {
         "item_id": "111",
@@ -2357,18 +2357,6 @@
         "profile_id": "16",
         "item_kind": "screen",
         "item_ref": "FinRequests\/dept_inbox.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:15"
-    },
-    {
-        "item_id": "134",
-        "company_id": "0",
-        "profile_id": "16",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
         "allow": "1",
         "can_add": "0",
         "can_edit": "0",
@@ -6696,18 +6684,6 @@
         "seeded_from": "role_permissions:22"
     },
     {
-        "item_id": "3354",
-        "company_id": "0",
-        "profile_id": "38",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:22"
-    },
-    {
         "item_id": "3353",
         "company_id": "0",
         "profile_id": "38",
@@ -7973,18 +7949,6 @@
         "profile_id": "39",
         "item_kind": "screen",
         "item_ref": "FinRequests\/finance_gateway.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:18"
-    },
-    {
-        "item_id": "661",
-        "company_id": "0",
-        "profile_id": "39",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
         "allow": "1",
         "can_add": "0",
         "can_edit": "0",
@@ -9864,18 +9828,6 @@
         "seeded_from": "role_permissions:19"
     },
     {
-        "item_id": "819",
-        "company_id": "0",
-        "profile_id": "43",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:19"
-    },
-    {
         "item_id": "818",
         "company_id": "0",
         "profile_id": "43",
@@ -11228,18 +11180,6 @@
         "allow": "1",
         "can_add": "0",
         "can_edit": "1",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:4"
-    },
-    {
-        "item_id": "975",
-        "company_id": "0",
-        "profile_id": "52",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:4"
     },
@@ -13044,18 +12984,6 @@
         "seeded_from": "role_permissions:12"
     },
     {
-        "item_id": "1102",
-        "company_id": "0",
-        "profile_id": "61",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:12"
-    },
-    {
         "item_id": "1101",
         "company_id": "0",
         "profile_id": "61",
@@ -14304,16 +14232,16 @@
         "seeded_from": "role_permissions:26"
     },
     {
-        "item_id": "1322",
+        "item_id": "3726",
         "company_id": "0",
         "profile_id": "70",
         "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
+        "item_ref": "FinRequests\/request_form.php",
         "allow": "1",
         "can_add": "0",
         "can_edit": "0",
         "can_delete": "0",
-        "seeded_from": "role_permissions:26"
+        "seeded_from": "finreq_merge_20260821"
     },
     {
         "item_id": "1330",
@@ -15056,18 +14984,6 @@
         "allow": "1",
         "can_add": "0",
         "can_edit": "1",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:8"
-    },
-    {
-        "item_id": "1408",
-        "company_id": "0",
-        "profile_id": "76",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:8"
     },
@@ -16412,18 +16328,6 @@
         "allow": "1",
         "can_add": "0",
         "can_edit": "1",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:2"
-    },
-    {
-        "item_id": "1536",
-        "company_id": "0",
-        "profile_id": "79",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:2"
     },
@@ -17856,18 +17760,6 @@
         "seeded_from": "role_permissions:11"
     },
     {
-        "item_id": "1664",
-        "company_id": "0",
-        "profile_id": "83",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:11"
-    },
-    {
         "item_id": "1663",
         "company_id": "0",
         "profile_id": "83",
@@ -18888,18 +18780,6 @@
         "seeded_from": "role_permissions:10"
     },
     {
-        "item_id": "1775",
-        "company_id": "0",
-        "profile_id": "85",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:10"
-    },
-    {
         "item_id": "1774",
         "company_id": "0",
         "profile_id": "85",
@@ -19904,18 +19784,6 @@
         "allow": "1",
         "can_add": "0",
         "can_edit": "1",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:3"
-    },
-    {
-        "item_id": "1919",
-        "company_id": "0",
-        "profile_id": "88",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:3"
     },
@@ -21020,18 +20888,6 @@
         "allow": "1",
         "can_add": "0",
         "can_edit": "1",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:7"
-    },
-    {
-        "item_id": "2038",
-        "company_id": "0",
-        "profile_id": "94",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:7"
     },
@@ -22524,18 +22380,6 @@
         "seeded_from": "role_permissions:1"
     },
     {
-        "item_id": "2173",
-        "company_id": "0",
-        "profile_id": "97",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:1"
-    },
-    {
         "item_id": "2172",
         "company_id": "0",
         "profile_id": "97",
@@ -23892,18 +23736,6 @@
         "seeded_from": "role_permissions:14"
     },
     {
-        "item_id": "2414",
-        "company_id": "0",
-        "profile_id": "103",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:14"
-    },
-    {
         "item_id": "2413",
         "company_id": "0",
         "profile_id": "103",
@@ -24684,18 +24516,6 @@
         "seeded_from": "role_permissions:13"
     },
     {
-        "item_id": "2542",
-        "company_id": "0",
-        "profile_id": "106",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:13"
-    },
-    {
         "item_id": "2541",
         "company_id": "0",
         "profile_id": "106",
@@ -25452,18 +25272,6 @@
         "seeded_from": "role_permissions:16"
     },
     {
-        "item_id": "2667",
-        "company_id": "0",
-        "profile_id": "115",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:16"
-    },
-    {
         "item_id": "2666",
         "company_id": "0",
         "profile_id": "115",
@@ -26100,16 +25908,16 @@
         "seeded_from": "role_permissions:25"
     },
     {
-        "item_id": "3233",
+        "item_id": "3728",
         "company_id": "0",
         "profile_id": "120",
         "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
+        "item_ref": "FinRequests\/request_form.php",
         "allow": "1",
         "can_add": "0",
         "can_edit": "0",
         "can_delete": "0",
-        "seeded_from": "role_permissions:25"
+        "seeded_from": "finreq_merge_20260821"
     },
     {
         "item_id": "3263",
@@ -26789,18 +26597,6 @@
         "profile_id": "133",
         "item_kind": "screen",
         "item_ref": "FinRequests\/dept_inbox.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:23"
-    },
-    {
-        "item_id": "2727",
-        "company_id": "0",
-        "profile_id": "133",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
         "allow": "1",
         "can_add": "0",
         "can_edit": "0",
@@ -27504,16 +27300,16 @@
         "seeded_from": "role_permissions:27"
     },
     {
-        "item_id": "2783",
+        "item_id": "3727",
         "company_id": "0",
         "profile_id": "142",
         "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
+        "item_ref": "FinRequests\/request_form.php",
         "allow": "1",
         "can_add": "0",
         "can_edit": "0",
         "can_delete": "0",
-        "seeded_from": "role_permissions:27"
+        "seeded_from": "finreq_merge_20260821"
     },
     {
         "item_id": "2830",
@@ -28181,18 +27977,6 @@
         "profile_id": "151",
         "item_kind": "screen",
         "item_ref": "FinRequests\/dept_inbox.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:24"
-    },
-    {
-        "item_id": "2907",
-        "company_id": "0",
-        "profile_id": "151",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
         "allow": "1",
         "can_add": "0",
         "can_edit": "0",
@@ -29201,18 +28985,6 @@
         "profile_id": "160",
         "item_kind": "screen",
         "item_ref": "FinRequests\/dept_inbox.php",
-        "allow": "1",
-        "can_add": "0",
-        "can_edit": "0",
-        "can_delete": "0",
-        "seeded_from": "role_permissions:6"
-    },
-    {
-        "item_id": "3008",
-        "company_id": "0",
-        "profile_id": "160",
-        "item_kind": "screen",
-        "item_ref": "FinRequests\/my_requests.php",
         "allow": "1",
         "can_add": "0",
         "can_edit": "0",

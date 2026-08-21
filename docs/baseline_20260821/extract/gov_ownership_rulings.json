@@ -1,5 +1,95 @@
 [
     {
+        "route": "ActivityLogs\/activity_logs.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: FORBIDDEN+CONTROL_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "admin\/companies\/action.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/cron_backup.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/dashboard.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: FORBIDDEN+CONTROL_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/forgot_password.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/includes\/auth.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/index.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: PERSONAL_SPACE",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/login.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/managers.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
         "route": "admin\/ops_manager_board.php",
         "owner_before": "الحوكمة والالتزام",
         "owner_after": "إدارة التشغيل",
@@ -8,6 +98,626 @@
         "ruling": "OWNER_CHANGED",
         "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: لوحةُ مديرِ التشغيل — دورةُ عملِ التشغيلِ نفسِها",
         "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "admin\/org_assignments.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: CONTEXTUAL_READ_ONLY+EXECUTIVE_OVERSIGHT+CONTROL_OVERSIGHT+FORBIDDEN",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/org_structure.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: FORBIDDEN+EXECUTIVE_OVERSIGHT+CONTROL_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/permissions\/link_groups.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/permissions\/modules.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/permissions\/nav_items.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/permissions\/roles.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/permissions\/screen_guide.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/plans.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/reset_password.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/sec_governance.php?view=v001c44",
+        "owner_before": "UNKNOWN",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: CONTROL_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/settings.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/subscriptions\/requests.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/support\/view.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "admin\/update_permission_quick.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "api\/bootstrap.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Approvals\/approval_api.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Approvals\/hours_approval_handler.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Clients\/clients.php",
+        "owner_before": "المبيعات والعقود",
+        "owner_after": "المبيعات والعقود",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Clients\/commercial_risks.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: EXECUTIVE_OVERSIGHT+CONTEXTUAL_READ_ONLY",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "company\/register.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "company\/request_subscription.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "company\/team.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "config.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Contracts\/claims.php",
+        "owner_before": "المبيعات والعقود",
+        "owner_after": "المبيعات والعقود",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Contracts\/client_statement.php#2",
+        "owner_before": "UNKNOWN",
+        "owner_after": "المالية والخزينة",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة · ولا مالكَ سابقًا فهو إثباتٌ لا نقض",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Contracts\/collections.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المبيعات والعقود",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CHANGED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة · صُحِّح من «المالية والخزينة»",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Contracts\/contract_actions_handler.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Contracts\/contract_card.php",
+        "owner_before": "المبيعات والعقود",
+        "owner_after": "المبيعات والعقود",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Contracts\/contract_coverage.php",
+        "owner_before": "المبيعات والعقود",
+        "owner_after": "المبيعات والعقود",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Contracts\/contractequipments_handler.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Contracts\/contracts.php",
+        "owner_before": "المبيعات والعقود",
+        "owner_after": "المبيعات والعقود",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Contracts\/cron_price_adjustment.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Contracts\/get_contract_equipments.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Contracts\/get_equipments.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Contracts\/tax_invoices.php#2",
+        "owner_before": "UNKNOWN",
+        "owner_after": "المالية والخزينة",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة · ولا مالكَ سابقًا فهو إثباتٌ لا نقض",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Contracts\/unit_client_match.php",
+        "owner_before": "المبيعات والعقود",
+        "owner_after": "المبيعات والعقود",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Contracts\/unit_statement_client.php",
+        "owner_before": "المبيعات والعقود",
+        "owner_after": "المبيعات والعقود",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Contracts\/update_contract_details.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "cron_events.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "cron_jobs.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "cron_proc_replenish.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "cron_requests.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Employees\/employee_contract_actions_handler.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Employees\/equipment_operators.php",
+        "owner_before": "الموارد البشرية",
+        "owner_after": "الموارد البشرية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Employees\/get_employee_contract_equipments.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Employees\/get_employee_data.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Employees\/get_mine_contracts.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Employees\/get_project_hours.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Equipments\/approve_card.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Equipments\/equipment_card_fields.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Equipments\/equipment_child_save.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Equipments\/equipment_documents.php",
+        "owner_before": "إدارة الأسطول",
+        "owner_after": "إدارة الأسطول",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Equipments\/equipment_sourcing.php#2",
+        "owner_before": "UNKNOWN",
+        "owner_after": "إدارة الأسطول",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة · ولا مالكَ سابقًا فهو إثباتٌ لا نقض",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Equipments\/equipments.php",
+        "owner_before": "إدارة الأسطول",
+        "owner_after": "إدارة الأسطول",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Equipments\/fin_assets.php",
+        "owner_before": "إدارة الأسطول",
+        "owner_after": "إدارة الأسطول",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Equipments\/fleet_models.php",
+        "owner_before": "إدارة الأسطول",
+        "owner_after": "إدارة الأسطول",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Equipments\/get_contract_stats.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Equipments\/get_equipment_details.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Equipments\/get_model_data.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Equipments\/manage_failure_codes.php",
+        "owner_before": "إدارة الأسطول",
+        "owner_after": "إدارة الأسطول",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Equipments\/meter_readings.php",
+        "owner_before": "إدارة الأسطول",
+        "owner_after": "إدارة الأسطول",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "excel.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
     },
     {
         "route": "Finance\/acc_approval_chain.php",
@@ -58,6 +768,86 @@
         "ruling": "APPEARANCE_MISSING",
         "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: تخصّصاتُ المحاسبين — بنيةُ فريقِ المالية · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
         "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/approvals_inbox.php",
+        "owner_before": "مركز البلاغات",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: PERSONAL_SPACE",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/assets_fin.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/budget_dept.php",
+        "owner_before": "التمويل والملكية",
+        "owner_after": "التمويل والملكية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/budget_master.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: EXECUTIVE_OVERSIGHT+FORBIDDEN",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/cron_depreciation_fin.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/cron_finance_fin.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/cron_obligation_alerts.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/cron_periodic_fin.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
     },
     {
         "route": "Finance\/ctrl_authority_limits.php",
@@ -130,6 +920,46 @@
         "decided_at": "2026-08-20 03:20:39"
     },
     {
+        "route": "Finance\/currencies_fin.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/dues_fin.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/entitlement.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/fin_analysis_actions.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
         "route": "Finance\/fin_cashflow_stmt.php",
         "owner_before": "المالية والخزينة",
         "owner_after": "المالية والخزينة",
@@ -168,6 +998,26 @@
         "ruling": "APPEARANCE_MISSING",
         "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
         "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Finance\/fin_helpers.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/fin_m10_actions.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
     },
     {
         "route": "Finance\/fin_posting_matrix.php",
@@ -230,6 +1080,36 @@
         "decided_at": "2026-08-20 03:20:39"
     },
     {
+        "route": "Finance\/financial_statements_fin.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/payments_fin.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/supplier_statement_fin.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
         "route": "Finance\/tre_cycle_stages.php",
         "owner_before": "المالية والخزينة",
         "owner_after": "المالية والخزينة",
@@ -260,6 +1140,116 @@
         "decided_at": "2026-08-20 03:20:39"
     },
     {
+        "route": "Finance\/variance_monitor_fin.php",
+        "owner_before": "المالية والخزينة",
+        "owner_after": "المالية والخزينة",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Financing\/cost_allocation.php",
+        "owner_before": "التمويل والملكية",
+        "owner_after": "التمويل والملكية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Financing\/deviations.php#2",
+        "owner_before": "UNKNOWN",
+        "owner_after": "التمويل والملكية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة · ولا مالكَ سابقًا فهو إثباتٌ لا نقض",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Financing\/owners_registry.php",
+        "owner_before": "التمويل والملكية",
+        "owner_after": "التمويل والملكية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Financing\/ownership_links.php",
+        "owner_before": "التمويل والملكية",
+        "owner_after": "التمويل والملكية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "FinRequests\/my_requests.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: PERSONAL_SPACE",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "FinRequests\/request_actions.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Fleet\/cron_doc_expiry_escalation.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Fleet\/readiness_board.php",
+        "owner_before": "إدارة الأسطول",
+        "owner_after": "إدارة الأسطول",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Governance\/cron_permissions.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Governance\/entities_registry.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: CONTEXTUAL_READ_ONLY+CONTROL_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
         "route": "Governance\/gov_dept.php",
         "owner_before": "الحوكمة والالتزام",
         "owner_after": "الحوكمة والالتزام",
@@ -268,6 +1258,16 @@
         "ruling": "APPEARANCE_MISSING",
         "reason": "لا شاهدَ آليّ — يبقى المالكُ المسجَّلُ ولا يُبدَّل بلا دليل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
         "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Governance\/gov_m14_actions.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
     },
     {
         "route": "Governance\/gov_reports.php",
@@ -290,6 +1290,106 @@
         "decided_at": "2026-08-20 03:20:39"
     },
     {
+        "route": "Governance\/signing_authority.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: CONTEXTUAL_READ_ONLY+EXECUTIVE_OVERSIGHT+CONTROL_OVERSIGHT+FORBIDDEN",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "main\/all_assistants.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: CONTROL_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "main\/check_username_availability.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "main\/users.php",
+        "owner_before": "الحوكمة والالتزام",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: FORBIDDEN+CONTROL_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Maintenance\/get_breakdown_count.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Maintenance\/get_open_orders_count.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Maintenance\/get_project_equipment.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Maintenance\/inspections.php",
+        "owner_before": "إدارة الصيانة",
+        "owner_after": "إدارة الصيانة",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Maintenance\/orders.php",
+        "owner_before": "إدارة الصيانة",
+        "owner_after": "إدارة الصيانة",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Maintenance\/preventive_plans.php",
+        "owner_before": "إدارة الصيانة",
+        "owner_after": "إدارة الصيانة",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
         "route": "movement\/map_page.php",
         "owner_before": "الحوكمة والالتزام",
         "owner_after": "إدارة التشغيل",
@@ -308,6 +1408,186 @@
         "ruling": "OWNER_CHANGED",
         "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: عملياتُ الحركة — واقعتُها من التشغيل",
         "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "movement\/save_equipment_drivers.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "movement\/update_operation_shift_type.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "movement\/update_shift_type.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/attendance.php",
+        "owner_before": "الموارد البشرية",
+        "owner_after": "الموارد البشرية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/containers.php",
+        "owner_before": "إدارة التشغيل",
+        "owner_after": "إدارة التشغيل",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/cron_asset_reconciliation.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/cron_capacity_rollup.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/cron_container_gate_report.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/cron_fin_posting.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/cron_job_worker.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/cron_org_assignments.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/cron_rotation_transfer.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/cron_unit_chain_sla.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/cron_unit_chain_weekly.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/cron_wfm_engine.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/daily_plan.php",
+        "owner_before": "إدارة الموقع",
+        "owner_after": "إدارة الموقع",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/distribution_space.php",
+        "owner_before": "إدارة التشغيل",
+        "owner_after": "إدارة التشغيل",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/equipment_quota.php",
+        "owner_before": "إدارة التشغيل",
+        "owner_after": "إدارة التشغيل",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
     },
     {
         "route": "Operations\/fleet_calendar.php",
@@ -330,6 +1610,56 @@
         "decided_at": "2026-08-20 03:20:39"
     },
     {
+        "route": "Operations\/monthly_close.php",
+        "owner_before": "إدارة التشغيل",
+        "owner_after": "إدارة التشغيل",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/production.php",
+        "owner_before": "إدارة التشغيل",
+        "owner_after": "إدارة التشغيل",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/shift_log.php",
+        "owner_before": "القوى التشغيلية",
+        "owner_after": "القوى التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/unbilled.php",
+        "owner_before": "المبيعات والعقود",
+        "owner_after": "المبيعات والعقود",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Oprators\/get_contract_suppliers.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
         "route": "Oprators\/select_project.php",
         "owner_before": "الحوكمة والالتزام",
         "owner_after": "القوى التشغيلية",
@@ -338,6 +1668,256 @@
         "ruling": "OWNER_CHANGED",
         "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: اختيارُ مشروعِ المشغِّل — خطوةٌ في دورةِ القوى التشغيلية",
         "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Portal\/business_models.php",
+        "owner_before": "المبيعات والعقود",
+        "owner_after": "المبيعات والعقود",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Portal\/ceo_approvals.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: SHARED_WORK_ITEM",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Portal\/ceo_board.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: EXECUTIVE_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Portal\/ceo_contracts.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: EXECUTIVE_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Portal\/ceo_risk.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: EXECUTIVE_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Portal\/contract_review.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: EXECUTIVE_OVERSIGHT+CONTEXTUAL_READ_ONLY",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Portal\/dept_achievement.php",
+        "owner_before": "التمويل والملكية",
+        "owner_after": "التمويل والملكية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Portal\/founding_mode.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: EXECUTIVE_OVERSIGHT+CONTROL_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Portal\/journey_action.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Portal\/my_achievement.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: PERSONAL_SPACE",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Portal\/my_portal.php",
+        "owner_before": "مساحة العمل الشخصية",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: PERSONAL_SPACE",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Portal\/my_tasks.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: PERSONAL_SPACE",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Portal\/project_charter.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: EXECUTIVE_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Portal\/release_stamp.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: EXECUTIVE_OVERSIGHT+CONTROL_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Portal\/visibility_keys.php",
+        "owner_before": "مساحة العمل الشخصية",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: CONTEXTUAL_READ_ONLY+CONTROL_OVERSIGHT+FORBIDDEN",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Procurement\/consumption_rate.php",
+        "owner_before": "إدارة المخازن",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: FORBIDDEN",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Procurement\/issue_proc.php",
+        "owner_before": "إدارة المشتريات التشغيلية",
+        "owner_after": "إدارة المشتريات التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Procurement\/items_proc.php",
+        "owner_before": "إدارة المشتريات التشغيلية",
+        "owner_after": "إدارة المشتريات التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Procurement\/master_data_proc.php",
+        "owner_before": "إدارة المشتريات التشغيلية",
+        "owner_after": "إدارة المشتريات التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Procurement\/orders_proc.php",
+        "owner_before": "إدارة المشتريات التشغيلية",
+        "owner_after": "إدارة المشتريات التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Procurement\/po_match.php",
+        "owner_before": "إدارة المشتريات التشغيلية",
+        "owner_after": "إدارة المشتريات التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Procurement\/receipt_custody_proc.php",
+        "owner_before": "إدارة المشتريات التشغيلية",
+        "owner_after": "إدارة المشتريات التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Procurement\/requests_proc.php",
+        "owner_before": "إدارة المشتريات التشغيلية",
+        "owner_after": "إدارة المشتريات التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Procurement\/rfq_compare_award.php",
+        "owner_before": "إدارة المشتريات التشغيلية",
+        "owner_after": "إدارة المشتريات التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Procurement\/stock_proc.php",
+        "owner_before": "إدارة المشتريات التشغيلية",
+        "owner_after": "إدارة المشتريات التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
     },
     {
         "route": "Procurement\/warehouse_board.php",
@@ -350,6 +1930,206 @@
         "decided_at": "2026-08-20 03:20:39"
     },
     {
+        "route": "Procurement\/wh_count.php",
+        "owner_before": "إدارة المخازن",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: FORBIDDEN",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Procurement\/wh_receipt.php",
+        "owner_before": "إدارة المخازن",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: CONTEXTUAL_READ_ONLY+FORBIDDEN",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Procurement\/wh_transfer.php",
+        "owner_before": "إدارة المخازن",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: FORBIDDEN",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Projects\/projects.php",
+        "owner_before": "المبيعات والعقود",
+        "owner_after": "المبيعات والعقود",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Reports\/margin_report.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: FORBIDDEN+EXECUTIVE_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_acceptance.php",
+        "owner_before": "إدارة المخاطر المؤسسية",
+        "owner_after": "إدارة المخاطر المؤسسية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_actions.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_assessment.php",
+        "owner_before": "إدارة المخاطر المؤسسية",
+        "owner_after": "إدارة المخاطر المؤسسية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_board.php",
+        "owner_before": "إدارة المخاطر المؤسسية",
+        "owner_after": "إدارة المخاطر المؤسسية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_card.php",
+        "owner_before": "إدارة المخاطر المؤسسية",
+        "owner_after": "إدارة المخاطر المؤسسية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_committee.php",
+        "owner_before": "إدارة المخاطر المؤسسية",
+        "owner_after": "إدارة المخاطر المؤسسية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_control_verify.php",
+        "owner_before": "إدارة المخاطر المؤسسية",
+        "owner_after": "إدارة المخاطر المؤسسية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_controls.php",
+        "owner_before": "إدارة المخاطر المؤسسية",
+        "owner_after": "إدارة المخاطر المؤسسية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_incidents.php",
+        "owner_before": "إدارة المخاطر المؤسسية",
+        "owner_after": "إدارة المخاطر المؤسسية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_kris.php",
+        "owner_before": "إدارة المخاطر المؤسسية",
+        "owner_after": "إدارة المخاطر المؤسسية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_register.php",
+        "owner_before": "إدارة المخاطر المؤسسية",
+        "owner_after": "إدارة المخاطر المؤسسية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_reviews.php",
+        "owner_before": "إدارة المخاطر المؤسسية",
+        "owner_after": "إدارة المخاطر المؤسسية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_signals.php",
+        "owner_before": "إدارة المخاطر المؤسسية",
+        "owner_after": "إدارة المخاطر المؤسسية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_treatments.php",
+        "owner_before": "إدارة المخاطر المؤسسية",
+        "owner_after": "إدارة المخاطر المؤسسية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Risk\/risk_units.php",
+        "owner_before": "إدارة المخاطر المؤسسية",
+        "owner_after": "إدارة المخاطر المؤسسية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
         "route": "Settings\/guard_classification.php",
         "owner_before": "الحوكمة والالتزام",
         "owner_after": "الحوكمة والالتزام",
@@ -360,6 +2140,106 @@
         "decided_at": "2026-08-20 03:20:39"
     },
     {
+        "route": "Suppliers\/equipment_plan.php#2",
+        "owner_before": "UNKNOWN",
+        "owner_after": "إدارة الموردين",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة · ولا مالكَ سابقًا فهو إثباتٌ لا نقض",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Suppliers\/get_supplier_contract_equipments.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Suppliers\/settlements.php",
+        "owner_before": "إدارة الموردين",
+        "owner_after": "إدارة الموردين",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Suppliers\/shares_coverage.php",
+        "owner_before": "إدارة الموردين",
+        "owner_after": "إدارة الموردين",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Suppliers\/supplier_capacity.php#2",
+        "owner_before": "UNKNOWN",
+        "owner_after": "إدارة الموردين",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة · ولا مالكَ سابقًا فهو إثباتٌ لا نقض",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Suppliers\/supplier_contract_actions_handler.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Suppliers\/suppliers.php",
+        "owner_before": "إدارة الموردين",
+        "owner_after": "إدارة الموردين",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Suppliers\/unit_statement_supplier.php",
+        "owner_before": "إدارة الموردين",
+        "owner_after": "إدارة الموردين",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Tickets\/cron_tickets.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Tickets\/get_tickets_count.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
         "route": "Tickets\/my_tickets.php",
         "owner_before": "مركز البلاغات",
         "owner_after": "مركز البلاغات",
@@ -368,6 +2248,16 @@
         "ruling": "APPEARANCE_MISSING",
         "reason": "نقضُ الشاهدِ الآليِّ بالدورةِ المستندية: بلاغاتي — بندٌ شخصيٌّ يملكه مركزُ البلاغات · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
         "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Tickets\/ticket_contextual_open.php",
+        "owner_before": "مركز البلاغات",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: PERSONAL_SPACE",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
     },
     {
         "route": "Tickets\/ticket_dashboard.php",
@@ -410,6 +2300,216 @@
         "decided_at": "2026-08-20 03:20:39"
     },
     {
+        "route": "Tickets\/tickets_list.php?tab=dept",
+        "owner_before": "UNKNOWN",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: PERSONAL_SPACE",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Timesheet\/get_contract_hours.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Timesheet\/get_failure_codes.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Timesheet\/get_timesheet_data.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Timesheet\/get_timesheet_failures.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Timesheet\/get_timesheet.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=HANDLER",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Timesheet\/timesheet.php",
+        "owner_before": "إدارة الموقع",
+        "owner_after": "إدارة الموقع",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Transport\/cron_transfer.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "غيرُ منطبق — مِلكيتُه مِلكيةُ مُنادِيه",
+        "witness": "Surface_Type=CRON",
+        "witness_kind": "NONE",
+        "ruling": "NOT_APPLICABLE",
+        "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Transport\/transfer_close_cost.php",
+        "owner_before": "النقل والترحيل",
+        "owner_after": "النقل والترحيل",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Transport\/transfer_in_transit.php#2",
+        "owner_before": "UNKNOWN",
+        "owner_after": "النقل والترحيل",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة · ولا مالكَ سابقًا فهو إثباتٌ لا نقض",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Transport\/transfer_orders_list.php",
+        "owner_before": "النقل والترحيل",
+        "owner_after": "النقل والترحيل",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Transport\/transfer_requests.php",
+        "owner_before": "النقل والترحيل",
+        "owner_after": "النقل والترحيل",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Workforce\/contract_registry.php",
+        "owner_before": "مكتب الرئيس التنفيذي والنواب",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: FORBIDDEN+EXECUTIVE_OVERSIGHT+CONTROL_OVERSIGHT",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Workforce\/deductions.php",
+        "owner_before": "القوى التشغيلية",
+        "owner_after": "القوى التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Workforce\/employee_advances.php",
+        "owner_before": "الموارد البشرية",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: FORBIDDEN",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Workforce\/op_monthly.php",
+        "owner_before": "الموارد البشرية",
+        "owner_after": "الموارد البشرية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Workforce\/op_qual.php",
+        "owner_before": "القوى التشغيلية",
+        "owner_after": "القوى التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Workforce\/payroll_runs.php",
+        "owner_before": "الموارد البشرية",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "ظهوراتُه كلُّها: FORBIDDEN",
+        "witness_kind": "DATA_READ",
+        "ruling": "SHARED_PLATFORM",
+        "reason": "INJFIX02-NF14 · صفرُ ظهورٍ أصليٍّ (OWNED) في أيِّ مساحة — فلا مالكَ أصليًّا يُدَّعى",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Workforce\/project_contracts.php",
+        "owner_before": "القوى التشغيلية",
+        "owner_after": "القوى التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Workforce\/proposed_deductions.php",
+        "owner_before": "القوى التشغيلية",
+        "owner_after": "القوى التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Workforce\/recruitment_pipeline.php",
+        "owner_before": "القوى التشغيلية",
+        "owner_after": "القوى التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
+    },
+    {
         "route": "Workforce\/worker_contract.php",
         "owner_before": "القوى التشغيلية",
         "owner_after": "القوى التشغيلية",
@@ -418,6 +2518,16 @@
         "ruling": "APPEARANCE_MISSING",
         "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
         "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Workforce\/worker_leave_absence.php",
+        "owner_before": "القوى التشغيلية",
+        "owner_after": "القوى التشغيلية",
+        "witness": "gov_space_appearances.cls=OWNED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_CONFIRMED",
+        "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
+        "decided_at": "2026-08-21 15:17:28"
     },
     {
         "route": "Workforce\/worker_register.php",
