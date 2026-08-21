@@ -93,7 +93,12 @@
             "GAP-12_NF-09": "7 سياساتٍ بهدفٍ وهميٍّ أُعلنت في gov_sensitive_policy_debt · وسقّاطةٌ في pre-commit · حزامٌ سلبيٌّ 4\/4 · الفاحص 8\/8",
             "migration": "database\/migrations\/2027_08_31_sensitive_policy_target_integrity.php",
             "rollback_proven": "تطبيق 8\/0 (خروج 0) ⇐ رجوع 4\/3 (خروج 1) ⇐ إعادةُ تطبيق 8\/0 (خروج 0)",
-            "OWNER_ITEM": "employees.salary تحرس عمودًا وهميًّا والحقيقيُّ employees.monthly_salary مكشوفٌ بلا سترٍ في أيِّ سجل. وسترُه تغييرُ وصولٍ حيّ — أُعلن ولم يُنفَّذ"
-        }
+            "OWNER_ITEM": "employees.salary تحرس عمودًا وهميًّا والحقيقيُّ employees.monthly_salary مكشوفٌ بلا سترٍ في أيِّ سجل. وسترُه تغييرُ وصولٍ حيّ — أُعلن ولم يُنفَّذ",
+            "GAP-22_NF-24": "14 مسارًا نشطًا خارجَ سجلِّ التصنيف (الملحقُ قدَّرها ~50) — سقّاطةٌ في pre-commit تمنع الازدياد وتطلب الشدَّ عند الانخفاض · حزامٌ سلبيٌّ مُجرَّبٌ (عُطِّل الأساسُ فرسب بخروج 1) · والقلبُ إلى الإغلاقِ الافتراضيِّ قرارُ مالك"
+        },
+        "GATE_RATCHETS": [
+            "tests\/injfix02_sensitive_target_integrity_proof.php — NF-09\/GAP-12",
+            "tests\/injfix02_space_classification_ratchet.php — NF-24\/GAP-22"
+        ]
     }
 }
