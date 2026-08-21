@@ -1,9 +1,9 @@
 {
     "gap": "GAP-19 · NF-04",
     "nav_total": 1629,
-    "derivable": 255,
-    "ambiguous": 356,
-    "no_cycle_row": 1018,
-    "pct": 15.7,
+    "derivable": 324,
+    "ambiguous": 384,
+    "no_cycle_row": 921,
+    "pct": 19.9,
     "enable_threshold_pct": 95
 }

@@ -73,9 +73,21 @@ echo "     ◆ وهذا **هو** ما يمنعه NF-04 آخرَ الأمر — �
 
 echo "\n══ ③ تغطيةُ الاشتقاقِ — الشرطُ السابقُ للتفعيل ══\n";
 function bnn($r) { return mb_strtolower(basename(preg_replace('/[?\#].*$/', '', (string) $r))); }
+/* ◆ **حكمُ NF-13 يُقرأ هنا لا يُتجاهل**: للشاشةِ العابرةِ مرحلةٌ قانونيةٌ في
+ *   بيتِها وقراءةٌ سياقيةٌ في غيرِه. فصفوفُ `contextual` **ليست مرحلةً منافِسة**
+ *   ولا تصنع تضاربًا. وقبلَ وجودِ العمودِ كان صفُّ القراءةِ يُحسب مرحلةً فيُخرج
+ *   الرابطَ من «قابلٍ للاشتقاق» — وهو تضاربٌ يصنعه القياسُ لا الدورة.
+ *   والعمودُ قد لا يكون موجودًا في نسخةٍ أقدم، فيُجَسُّ ولا يُفترض. */
+$hasKind = (int) $conn->query(
+    "SELECT COUNT(*) FROM information_schema.COLUMNS
+      WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='gov_screen_cycle'
+        AND COLUMN_NAME='stage_kind'")->fetch_row()[0];
 $cyc = array();
-$q = $conn->query("SELECT screen_file, layer_name, stage_name FROM `gov_screen_cycle`");
+$sqlCyc = "SELECT screen_file, layer_name, stage_name FROM `gov_screen_cycle`"
+        . ($hasKind ? " WHERE `stage_kind` = 'canonical'" : '');
+$q = $conn->query($sqlCyc);
 while ($q && $x = $q->fetch_assoc()) { $b = bnn($x['screen_file']); if ($b !== '') { $cyc[$b][] = $x; } }
+echo '  ' . ($hasKind ? '◆ المراحلُ القانونيةُ وحدَها تُحتسب (NF-13 مُفعَّل)' : '⚠ العمودُ `stage_kind` غيرُ موجود — تُحتسب كلُّ الصفوف') . "\n";
 $tot = 0; $hit = 0; $amb = 0; $none = 0;
 $q = $conn->query("SELECT route FROM `nav_items` WHERE active = 1 AND COALESCE(route,'') <> ''");
 while ($q && $x = $q->fetch_row()) {

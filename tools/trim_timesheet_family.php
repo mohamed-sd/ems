@@ -10,9 +10,12 @@
  * ◆ **الترتيبُ هو الأمان**: تُبنى مجموعاتُ «الإبقاء» كاملةً أولًا، ثم يُحذَف
  *   ما عداها. فلا يُحذَف أبٌ قبلَ أن يُعلَم أنَّ ابنَه ذاهبٌ معه.
  *
- * ◆ **سجلُّ الوقائعِ يُقلَّص معها**: 5203 واقعةً من نوع `timesheet` لا يستهلكها
- *   `fin_event_links` (صفرُ روابط) — فحذفُ ما فقدَ مصدرَه لا يقطع سلسلةً مالية.
- *   وبـ`--keep-events` يُترك السجلُّ كما هو (وتبقى إشاراتٌ يتيمة).
+ * ◆ **وسجلُّ الوقائعِ لا يُمَسّ افتراضًا**: من 5203 واقعةٍ من نوع `timesheet`
+ *   تُثبِّت 5198 واقعةً سلسلةً ماليةً عبرَ `fin_financial_events.root_event_id`
+ *   (قيدُ FK بـRESTRICT). وحمولةُ الواقعةِ **مكتفيةٌ بذاتها** (ساعاتٌ وإنتاجٌ
+ *   وتاريخٌ ومراجعُ خام)، فحذفُ صفِّ التايم‑شيت لا يُفقد الدفترَ تفسيرَه —
+ *   تبقى إشارةٌ رخوةٌ (`entity_id`) بلا هدفٍ فحسب، ويُعلَن عددُها في الحصيلة.
+ *   وبـ`--trim-events` تُحذَف الوقائعُ اليتيمةُ **غيرُ المثبَّتةِ** ماليًّا فقط.
  *
  * التشغيل:
  *   php tools/trim_timesheet_family.php                    # خطةٌ فقط (لا حذف)
@@ -23,10 +26,10 @@ if (PHP_SAPI !== 'cli') { die("CLI only\n"); }
 require_once __DIR__ . '/../includes/env.php';
 
 /* ── الخيارات ───────────────────────────────────────────────────────────── */
-$opt = array('apply' => false, 'ts' => 600, 'ue' => 300, 'floor' => 200, 'keep_events' => false, 'no_optimize' => false);
+$opt = array('apply' => false, 'ts' => 600, 'ue' => 300, 'floor' => 200, 'trim_events' => false, 'no_optimize' => false);
 foreach (array_slice($argv, 1) as $a) {
     if ($a === '--apply')           { $opt['apply'] = true; }
-    elseif ($a === '--keep-events') { $opt['keep_events'] = true; }
+    elseif ($a === '--trim-events') { $opt['trim_events'] = true; }
     elseif ($a === '--no-optimize') { $opt['no_optimize'] = true; }
     elseif (preg_match('/^--ts=(\d+)$/', $a, $m))    { $opt['ts'] = (int) $m[1]; }
     elseif (preg_match('/^--ue=(\d+)$/', $a, $m))    { $opt['ue'] = (int) $m[1]; }
@@ -116,8 +119,17 @@ echo "  تقليصُ عائلةِ التايم‑شيت " . ($opt['apply'] ? "�
 echo "  الهدف: timesheet≈{$opt['ts']} · unit_entries≈{$opt['ue']} · الأرضية {$opt['floor']}\n";
 echo "══════════════════════════════════════════════════════════════\n\n";
 
+/* ◆ **الأداةُ تُعاد بلا أثرٍ ثانٍ**: بلا هذا الحارسِ تحلق كلُّ إعادةِ تشغيلٍ
+     طبقةً جديدةً — فمجموعةُ الإبقاءِ تُشتَقُّ في المرةِ الثانيةِ من مجتمَعٍ
+     أصغرَ فتخرج أصغرَ منه، وهكذا حتى تستقرَّ عندَ ما يفرضه التنوُّعُ وحدَه.
+     وذلك انحدارٌ لا فائدةَ فيه: فما دخلَ نطاقَ هدفِه (١٫٥ ضعفًا فأقلَّ) يُعَدُّ
+     مستقرًّا ولا يُمَسّ — وإلا كان كلُّ تشغيلٍ يقضم بلا مقابل. */
+function converged($current, $target) { return $current !== null && $current <= (int) ceil($target * 1.5); }
+$atTarget = converged($before['timesheet'], $opt['ts']);
+
 /* ═══════════ ① مجموعةُ إبقاءِ timesheet ═══════════════════════════════════ */
 $kTs = array();
+if ($atTarget) { addAll($kTs, col($pdo, "SELECT id FROM timesheet")); }
 
 /* (أ) كلُّ أبٍ لسجلٍّ في جدولٍ ابنٍ صغيرٍ يبقى — وإلا يتيتَّم الابن */
 foreach (array('timesheet_approvals', 'timesheet_approval_notes', 'timesheet_failure_hours') as $child) {
@@ -154,13 +166,20 @@ if (hasTable($pdo, 'unit_party_awards')) {
 fillTo($pdo, $kTs, 'timesheet', $opt['ts']);
 $tsKeep = count($kTs);
 
-printf("① timesheet: %s → %s   (أبٌ لأبناءَ %d · تنوُّعٌ فئويٌّ %d · حيُّ السلسلة %d · إكمالٌ %d)\n",
-    number_format($before['timesheet']), number_format($tsKeep),
-    $nParents, $nDiverse, $nAward, $tsKeep - $nParents - $nDiverse - $nAward);
+if ($atTarget) {
+    printf("① timesheet: %s — مستقرٌّ في نطاقِ هدفِه سلفًا (≤ %s) فلا يُمَسّ\n",
+        number_format($before['timesheet']), number_format((int) ceil($opt['ts'] * 1.5)));
+} else {
+    printf("① timesheet: %s → %s   (أبٌ لأبناءَ %d · تنوُّعٌ فئويٌّ %d · حيُّ السلسلة %d · إكمالٌ %d)\n",
+        number_format($before['timesheet']), number_format($tsKeep),
+        $nParents, $nDiverse, $nAward, $tsKeep - $nParents - $nDiverse - $nAward);
+}
 
 /* ═══════════ ② مجموعةُ إبقاءِ unit_entries ════════════════════════════════ */
 $kUe = array();
 $nUeParents = 0;
+$ueAtTarget = converged($before['unit_entries'], $opt['ue']);
+if ($ueAtTarget) { addAll($kUe, col($pdo, "SELECT id FROM unit_entries")); }
 if (hasTable($pdo, 'unit_entries')) {
     /* (أ) أبناءُ FK — والأبُ يبقى مع ابنِه (fk_umo_entry بقيدِ RESTRICT) */
     foreach (array('unit_capacity_flags', 'unit_match_overrides') as $child) {
@@ -206,8 +225,13 @@ if (hasTable($pdo, 'unit_entries')) {
     fillTo($pdo, $kUe, 'unit_entries', $opt['ue']);
 }
 $ueKeep = count($kUe);
-printf("② unit_entries: %s → %s   (أبٌ لأبناءَ %d · وبقيتُها تنوُّعٌ وتغطيةٌ وإكمال)\n",
-    number_format($before['unit_entries']), number_format($ueKeep), $nUeParents);
+if ($ueAtTarget) {
+    printf("② unit_entries: %s — مستقرٌّ في نطاقِ هدفِه سلفًا (≤ %s) فلا يُمَسّ\n",
+        number_format($before['unit_entries']), number_format((int) ceil($opt['ue'] * 1.5)));
+} else {
+    printf("② unit_entries: %s → %s   (أبٌ لأبناءَ %d · وبقيتُها تنوُّعٌ وتغطيةٌ وإكمال)\n",
+        number_format($before['unit_entries']), number_format($ueKeep), $nUeParents);
+}
 
 /* ═══════════ ③ الأبناءُ المشتقَّة — تنبُّؤٌ قبلَ أيِّ حذف ═══════════════════ */
 $tsIn = idList($kTs);
@@ -219,9 +243,14 @@ $predict['unit_time_log']     = (int) one($pdo, "SELECT COUNT(*) FROM unit_time_
 $predict['unit_party_awards'] = (int) one($pdo, "SELECT COUNT(*) FROM unit_party_awards
                                                  WHERE (source_kind='timesheet'   AND source_ref IN ($tsIn))
                                                     OR (source_kind='unit_record' AND source_ref IN ($ueIn))");
-$predict['ems_business_events'] = $opt['keep_events']
-    ? (int) $before['ems_business_events']
-    : (int) one($pdo, "SELECT COUNT(*) FROM ems_business_events WHERE NOT (entity_type='timesheet' AND entity_id NOT IN ($tsIn))");
+/* ◆ **الواقعةُ المثبَّتةُ ماليًّا لا تُحذَف**: `fin_financial_events.root_event_id`
+     قيدُ FK بـRESTRICT — فمحاولةُ حذفِها تُفشل العمليةَ كلَّها (1451). ولذا
+     تُستثنى صراحةً، لا أن يُترَك القيدُ يكتشفها. */
+$pinnedEvents = "SELECT 1 FROM fin_financial_events f WHERE f.root_event_id = ems_business_events.id";
+$predict['ems_business_events'] = $opt['trim_events']
+    ? (int) one($pdo, "SELECT COUNT(*) FROM ems_business_events
+                       WHERE NOT (entity_type='timesheet' AND entity_id NOT IN ($tsIn) AND NOT EXISTS ($pinnedEvents))")
+    : (int) $before['ems_business_events'];
 
 echo "\n③ الأبناءُ بعدَ الاشتقاق:\n";
 $breach = 0;
@@ -250,31 +279,49 @@ if (!$opt['apply']) {
 echo "\n④ التنفيذ…\n";
 $deleted = array();
 
-/* الترتيب: الأبناءُ الرخوةُ (بلا FK) أولًا، ثم الآباء — وCASCADE يتكفَّل بالباقي */
-$deleted['unit_party_awards'] = $pdo->exec("DELETE FROM unit_party_awards
-    WHERE NOT ((source_kind='timesheet' AND source_ref IN ($tsIn)) OR (source_kind='unit_record' AND source_ref IN ($ueIn)))");
-$deleted['unit_time_log'] = $pdo->exec("DELETE FROM unit_time_log WHERE entry_id IS NULL OR entry_id NOT IN ($ueIn)");
+/* ◆ **الحذفُ كتلةٌ واحدةٌ أو لا شيء**: بلا معاملةٍ يترك أيُّ إخفاقٍ في المنتصف
+     أبناءً مقلَّصين وآباءً كاملين — حالةٌ لا يُنبِّه إليها شيء. وOPTIMIZE بعدَ
+     الإيداعِ حصرًا لأنه DDL يُودِع ضمنيًّا فيُبطل التراجع. */
+$pdo->beginTransaction();
+try {
+    /* الترتيب: الأبناءُ الرخوةُ (بلا FK) أولًا، ثم الآباء — وCASCADE يتكفَّل بالباقي */
+    $deleted['unit_party_awards'] = $pdo->exec("DELETE FROM unit_party_awards
+        WHERE NOT ((source_kind='timesheet' AND source_ref IN ($tsIn)) OR (source_kind='unit_record' AND source_ref IN ($ueIn)))");
+    $deleted['unit_time_log'] = $pdo->exec("DELETE FROM unit_time_log WHERE entry_id IS NULL OR entry_id NOT IN ($ueIn)");
 
-if (!$opt['keep_events']) {
-    /* التوصيلاتُ قبلَ الوقائع — والوقائعُ من نوعِ timesheet لا يستهلكها fin_event_links */
-    $deleted['ems_event_deliveries'] = $pdo->exec("DELETE d FROM ems_event_deliveries d
-        JOIN ems_business_events e ON e.id = d.event_id WHERE e.entity_type='timesheet' AND e.entity_id NOT IN ($tsIn)");
-    $deleted['ems_business_events'] = $pdo->exec("DELETE FROM ems_business_events WHERE entity_type='timesheet' AND entity_id NOT IN ($tsIn)");
+    if ($opt['trim_events']) {
+        /* التوصيلاتُ تسقط بـCASCADE (fk_evdeliv_event) — والمثبَّتُ ماليًّا مستثنًى */
+        $deleted['ems_business_events'] = $pdo->exec("DELETE FROM ems_business_events
+            WHERE entity_type='timesheet' AND entity_id NOT IN ($tsIn) AND NOT EXISTS ($pinnedEvents)");
+    }
+
+    $deleted['unit_entries'] = $pdo->exec("DELETE FROM unit_entries WHERE id NOT IN ($ueIn)");  // CASCADE ⇒ unit_approvals · unit_capacity_flags
+    $deleted['timesheet']    = $pdo->exec("DELETE FROM timesheet    WHERE id NOT IN ($tsIn)");
+
+    $pdo->commit();
+} catch (Exception $e) {
+    $pdo->rollBack();
+    fwrite(STDERR, "\n✘ أُحبطت العملية وتراجعت كاملةً — لم يُحذَف صفٌّ واحد:\n   " . $e->getMessage() . "\n");
+    exit(1);
 }
-
-$deleted['unit_entries'] = $pdo->exec("DELETE FROM unit_entries WHERE id NOT IN ($ueIn)");  // CASCADE ⇒ unit_approvals · unit_capacity_flags
-$deleted['timesheet']    = $pdo->exec("DELETE FROM timesheet    WHERE id NOT IN ($tsIn)");
 
 foreach ($deleted as $t => $n) { printf("   ✂ %-24s حُذف %s\n", $t, number_format((int) $n)); }
 
 /* ═══════════ ⑤ استرجاعُ المساحةِ فعليًّا ═══════════════════════════════════ */
 if (!$opt['no_optimize']) {
     echo "\n⑤ إعادةُ بناءِ الجداولِ لاسترجاعِ المساحة…\n";
-    foreach (array('timesheet', 'unit_entries', 'unit_approvals', 'unit_time_log',
-                   'unit_party_awards', 'ems_business_events', 'ems_event_deliveries') as $t) {
+    $rebuild = array('timesheet', 'unit_entries', 'unit_approvals', 'unit_time_log', 'unit_party_awards');
+    if ($opt['trim_events']) { $rebuild[] = 'ems_business_events'; $rebuild[] = 'ems_event_deliveries'; }
+    /* ◆ **`OPTIMIZE TABLE` لا يُصغِّر الملفَّ هنا**: يرجع «status OK» ولا يُعيد
+         بناءَ المِساحة — بقي `timesheet.ibd` عند 30 م.ب لـ587 صفًّا بعدَه.
+         و`ALTER TABLE … FORCE` يُعيد البناءَ فعلًا (30 م.ب ← 0.31). فالشاهدُ
+         حجمُ الملفِّ على القرصِ لا رمزُ نجاحِ الأمر. */
+    foreach ($rebuild as $t) {
         if ($before[$t] === null) { continue; }
-        $pdo->exec("OPTIMIZE TABLE `$t`");
-        printf("   ⟳ %s\n", $t);
+        $kbBefore = (int) one($pdo, "SELECT ROUND((data_length+index_length)/1024) FROM information_schema.TABLES WHERE table_schema=DATABASE() AND table_name=?", array($t));
+        $pdo->exec("ALTER TABLE `$t` FORCE");
+        $kbAfter = (int) one($pdo, "SELECT ROUND((data_length+index_length)/1024) FROM information_schema.TABLES WHERE table_schema=DATABASE() AND table_name=?", array($t));
+        printf("   ⟳ %-24s %s KB ← %s KB\n", $t, number_format($kbAfter), number_format($kbBefore));
     }
 }
 
@@ -290,6 +337,14 @@ foreach ($before as $t => $b) {
     if ($mark !== '') { $fail++; }
     printf("   %-26s %10s %10s %10s%s\n", $t, number_format($b), number_format($a), number_format($kb), $mark);
 }
+/* الإشاراتُ الرخوةُ التي فقدت هدفَها — تُعلَن ولا تُخفى */
+$orphan = (int) one($pdo, "SELECT COUNT(*) FROM ems_business_events e
+    WHERE e.entity_type='timesheet' AND NOT EXISTS (SELECT 1 FROM timesheet t WHERE t.id = e.entity_id)");
+if ($orphan > 0) {
+    echo "\n   ⓘ $orphan واقعةً في `ems_business_events` تشير إلى صفِّ تايم‑شيتٍ محذوف.\n"
+       . "      لا قيدَ FK بينهما، وحمولةُ الواقعةِ مكتفيةٌ بذاتها — فالدفترُ سليمٌ والسلسلةُ المالية قائمة.\n";
+}
+
 $total = one($pdo, "SELECT ROUND(SUM(data_length+index_length)/1024/1024,1) FROM information_schema.TABLES WHERE table_schema=DATABASE()");
 echo "\n   إجماليُّ القاعدةِ الآن: {$total} MB\n";
 echo $fail > 0
