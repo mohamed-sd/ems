@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="ff200a839dbc09cfdc5518df9e0d5a223d0fb98bfe5626cc9e1795be3592a3ef">    <!-- CSRF: يُلحق التوكن تلقائياً بكل طلب POST/PUT/DELETE (يجب أن يُحمّل قبل أي سكربت يطلب البيانات)
+         بصمةُ الإصدار إلزامية: Cache-Control شهرٌ كامل، فنسخةٌ معطوبةٌ بلا بصمةٍ تبقى في
+         متصفحات المستخدمين ثلاثين يومًا بعد إصلاحها (وقع فعلًا 2026-08-01). -->
+    <script src="/ems/assets/js/csrf.js?v=1785615187"></script>
+    <!-- M-46: المسودةُ التلقائية كل 30 ثانية — تلتقط النماذجَ الطويلة آليًّا (UI-01 §3) -->
+        <script src="/ems/includes/js/ems-autosave.js?v=1787079281" defer></script>
+    <title>إيكوبيشن | طلباتي المالية</title>
+
+    <!-- Font awsome icon link مكتبة الايقونات -->
+    <link rel="stylesheet" href="/ems/assets/css/all.min.css">
+
+    <!-- Call bootstrap 5 -->
+    <link href="../assets/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/jquery.dataTables.min.css">
+    <!-- إضافةُ Responsive مرفوعةٌ من النظام (قرار المالك 2026-08-09): لا طيَّ أعمدةٍ
+         تحت سهمٍ — كلُّ الأعمدة جنبًا إلى جنبٍ بتمريرٍ أفقيٍّ كالإكسل (ems-tables.css). -->
+    <link rel="stylesheet" href="/ems/assets/vendor/datatables/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" href="/ems/assets/css/local-fonts.css">
+    <!-- لوحةُ الألوانِ: تُحمَّل أولًا وكلُّ لونٍ في النظامِ يشير إليها. وكاسرُ
+         الذاكرةِ إلزاميٌّ هنا كما لأخواتها — بدونه يخدم المتصفحُ نسخةً قديمةً
+         فتسقط كلُّ `var()` إلى الافتراضيّ والنظامُ بلا ألوان. -->
+    <link rel="stylesheet" href="/ems/assets/css/design-tokens.css?v=1786973952">
+    <!-- INJAZ-UXUI-01 ف١٢: رموزُ جولةِ الواجهةِ ومكتبةُ مكوّناتِها (بادئة ux-) —
+         طبقةٌ فوق الرموزِ القائمة، خاملةٌ حتى تستعملَها شاشةٌ مرحَّلة -->
+    <link rel="stylesheet" href="/ems/assets/css/uxui-tokens.css?v=1787192617">
+    <link rel="stylesheet" href="/ems/assets/css/uxui-components.css?v=1787167465">
+    <!-- Unified page styles: Dashboard + Chat -->
+    <link rel="stylesheet" href="/ems/assets/css/ems.main.all.style.css?v=1787281605">
+    <!-- Unified Form Styles — loaded LAST so ems-forms.css is the single authoritative source for ALL form design -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-forms.css?v=1787131378">
+    <!-- أنماطُ الأزرارِ الأربعةُ — تُحمَّل بعد بوتستراب لتَغلبَ أزرقَه بذهبيِّ العلامة -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-buttons.css?v=1786975893">
+    <!-- شريط الرحلة الموحّد (الدستور §5) — مكوّنٌ واحدٌ للطلب والبلاغ والوحدة -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-journey.css?v=1786944565">
+    <!-- نظام الرسائل الموحّد: توست عابر + لافتة سطرية بلغةٍ بصريةٍ واحدة -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-alerts.css?v=1786460190">
+    <!-- قشرة التطبيق الموحدة (UXR-01 · AS-01..08) — تُحمَّل بعد الهوية فتحكم القياسات -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-shell.css?v=1787281485">
+    <!-- UXW-01: حالاتُ الشاشةِ التسعُ والخطوةُ التالية — مكوّنٌ واحدٌ لكلِّ الشاشات -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-states.css?v=1786939127">
+    <!-- INJ-0442: أنماطُ الشاشاتِ الخاصةُ — تُحمَّل **آخرًا** كما كانت كتلُها
+         داخلَ الصفحة، فالنقلُ لا يغيّر مَن يغلب مَن. -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-screens.css?v=1787291547">
+    <!-- شاشةُ التذكرة — مكوّناتُها مُنطاقةٌ تحت .tkt-form-main فلا تتسرّب لغيرها -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-ticket.css?v=1786944144">
+    <!-- بطاقاتُ الكيانات (عميل · موظف · مشروع · مورِّد · معدّة) — مصدرٌ واحدٌ
+         لتصميمِها كلِّها، مُنطاقٌ تحت .ems-profile فلا يتسرّب لشاشةٍ أخرى.
+         يُحمَّل بعد ems-screens.css فيغلب أيَّ بقيةٍ صفحيةٍ لم تُرحَّل بعدُ. -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-profile.css?v=1786937289">
+    <!-- صندوقُ فلاترِ البحثِ — مصدرٌ واحدٌ لتصميمِه في النظامِ كلِّه (أصلُه
+         شاشةُ العملاء). يُحمَّل **آخرًا** عمدًا: `ems-screens.css` يحمل بقايا
+         الفلاترِ الموضعيةَ للشاشاتِ المهاجرة (`fc-filter-bar` · `mkpi-filter`
+         · `rpt-du-filter` …) فلا يُغلَب إلا بمن يليه. -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-filters.css?v=1787285639">
+    <!-- بطاقةُ الإحصاء — مصدرٌ واحدٌ لتصميمِها (أصلُه شاشتا المشاريعِ والعملاء،
+         وقد قِيستا متطابقتَين). كان مكرَّرًا ثلاثَ مرّاتٍ في `ems-screens.css`
+         تحت `.clients-main`/`.projects-main`/`.suppliers-main` فنُقل هنا مرةً
+         ونُزع تنطيقُه بالإدارة. يُحمَّل بعدَ `ems-screens.css` ليغلبَ بقاياه. -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-statcards.css?v=1787281880">
+    <!-- ══ تصميمُ الجداول — آخرُ ورقةٍ فعلًا (توحيد 2026-08-17) ══
+         كان الوسمُ في موضعه السابقِ يحمل تعليقَ "loaded LAST" وهو ليس آخرًا:
+         خمسةُ ملفاتٍ تُحمَّل بعدَه — أثقلُها ems-screens.css بستٍّ وعشرين قاعدةً
+         جدولية. ولا يكفي نقلُه إلى الذيلِ هنا، لأن الصفحاتِ تُدرج أوراقَها
+         بعدَ القشرةِ كلِّها. فالإدراجُ صار عبرَ مكوّنٍ واحدٍ يفرضُ الأخيريةَ
+         وقتَ التشغيل. التفصيلُ في includes/table_design.php. -->
+    <link rel="stylesheet" href="/ems/assets/css/ems-tables.css?v=1786946881" data-ems-table-design>
+<script>
+(function () {
+    var HREF = "/ems/assets/css/ems-tables.css?v=1786946881";
+
+    function enforce() {
+        var head = document.head || document.getElementsByTagName('head')[0];
+        if (!head) return;
+
+        var link = head.querySelector('link[data-ems-table-design]')
+                || head.querySelector('link[rel="stylesheet"][href*="ems-tables.css"]');
+
+        if (!link) {
+            link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = HREF;
+            link.setAttribute('data-ems-table-design', '');
+            head.appendChild(link);
+            return;
+        }
+        link.setAttribute('data-ems-table-design', '');
+
+        /* نُسخٌ مكرّرةٌ من الورقةِ نفسِها — أدرجتها قشرتان معًا. تُزال الزائدة. */
+        var all = document.querySelectorAll('link[rel="stylesheet"][href*="ems-tables.css"]');
+        for (var i = 0; i < all.length; i++) if (all[i] !== link) all[i].parentNode.removeChild(all[i]);
+
+        /* ── «آخرُ ورقةٍ» تُقاس بترتيبِ المستندِ لا بترتيبِ <head> ──────────────
+           قِيس حيًّا: `includes/excel_ui.php` يحقن `ems-excel.css` داخلَ <body>
+           لا <head>. وورقةُ الجسدِ تأتي بعدَ كلِّ أوراقِ الرأسِ في التتالي، فلو
+           اكتفينا بذيلِ <head> لبقيت ورقةٌ تغلبنا ونحن نظنُّنا آخِرين.
+           فيُلتقط آخرُ وسمِ ورقةٍ في المستندِ كلِّه ونُوضَع بعدَه مباشرةً. */
+        var sheets = document.querySelectorAll('link[rel="stylesheet"]');
+        var last = sheets.length ? sheets[sheets.length - 1] : null;
+        if (!last || last === link) return;                 // نحن آخِرون أصلًا
+        last.parentNode.insertBefore(link, last.nextSibling);
+    }
+
+    /* تُنشر عالميًّا كي تستدعيَها القشرةُ مرّةً أخرى من متنِ الصفحة: الصفحاتُ
+       تُدرج أوراقَها بين القشرتَين، فاستدعاءٌ متأخّرٌ يلتقطُها قبلَ الرسمِ
+       فلا يومضُ المظهرُ انتظارًا لـDOMContentLoaded. */
+    window.emsTableDesignEnforce = enforce;
+
+    enforce();
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', enforce);
+    }
+    window.addEventListener('load', enforce);
+
+    /* ── المراقبُ: الأخيريّةُ بنيويّةٌ لا سباقٌ زمنيّ ──────────────────────────
+       قِيس حيًّا: `includes/excel_ui.php` يحقن `ems-excel.css` **بعدَ** حدثِ
+       load، ومعالِجُنا مُسجَّلٌ قبلَه فيعمل قبلَه — فتبقى ورقتُنا في الترتيب ٢١
+       من ٢٣. قواعدُ ems-excel الجدوليةُ السبعُ ضعيفةٌ فلم تُغيّر لونًا فعلًا،
+       لكنّ «لم يضرَّنا لأنه ضعيف» ليس ضمانًا: يكفي أن يُضاف `!important` غدًا.
+       فالمراقبُ يُعيد الورقةَ إلى الذيلِ كلَّما أُدرجت ورقةٌ بعدَها — أيًّا كان
+       مَن أدرجَها ومتى. وهو رخيصٌ: لا يعمل إلا عندَ تغيُّرِ أبناءِ <head>. */
+    if (typeof MutationObserver === 'function' && document.documentElement) {
+        var scheduled = false;
+        new MutationObserver(function (records) {
+            if (scheduled) return;
+            for (var i = 0; i < records.length; i++) {
+                var added = records[i].addedNodes;
+                for (var j = 0; j < added.length; j++) {
+                    var n = added[j];
+                    if (n.nodeType !== 1 || n.tagName !== 'LINK') continue;
+                    if ((n.getAttribute('rel') || '').toLowerCase() !== 'stylesheet') continue;
+                    if (n.hasAttribute('data-ems-table-design')) continue;
+                    /* التأجيلُ لدورةٍ صغرى يمنع التكرارَ حين تُدرَج عدّةُ أوراقٍ
+                       دفعةً واحدة، ويمنع تغذيةَ المراقبِ لنفسِه بنقلِ عقدتِنا. */
+                    scheduled = true;
+                    setTimeout(function () { scheduled = false; enforce(); }, 0);
+                    return;
+                }
+            }
+        }).observe(document.documentElement, { childList: true, subtree: true });
+    }
+    /* الطبقةُ الكونيّةُ في ems-tables.css لا تشترط ems-site، لكنّ طبقةَ
+       ems-site أدقُّ وأقوى. فمنحُ الجسدِ الصنفَ يجعل الشاشاتِ اليتيمةَ تُصمَّم
+       بالطبقةِ نفسِها التي تُصمَّم بها أخواتُها لا بطبقةٍ أضعف. */
+    function markBody() {
+        if (document.body && !document.body.classList.contains('ems-site')) {
+            document.body.classList.add('ems-site');
+        }
+    }
+    markBody();
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', markBody);
+    }
+})();
+</script>
+    <!-- INJ-0378 · INJ-0548: صندوقُ الإرسالِ دونَ اتصالٍ وعاملُ الخدمة —
+         الطابورُ يعمل على النماذجِ الموسومةِ صراحةً وحدَها، والعاملُ يخزّن
+         الأصولَ الساكنةَ لا صفحاتِ PHP (صفحةٌ محفوظةٌ ببياناتٍ قديمةٍ أخطرُ
+         من غيابها). -->
+    <script src="/ems/assets/js/ems-outbox.js?v=1786647771" defer></script>
+    <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('/ems/sw.js', { scope: '/ems/' })
+                .catch(function () { /* بلا عاملِ خدمةٍ يبقى النظامُ عاملًا — تحسينٌ لا شرط */ });
+        });
+    }
+    </script>
+    <!-- نظام الرسائل الموحّد — بلا defer عمدًا: 50 رسالةً يطبعها الخادمُ داخل
+         <script>alert(…)</script> في متن الصفحة، ولو تأخّر التقاطُ alert()
+         لسبقتنا وخرجت بنافذة المتصفح الحاجزة. التوستُ يُصفُّ حتى يجهز body. -->
+    <script src="/ems/assets/js/ems-alerts.js?v=1786460190"></script>
+    <script src="../assets/js/performance-boost.js" defer></script>
+    <script src="/ems/assets/js/ui-unification.js?v=1786965077" defer></script>
+    <!-- حارس الحد الأدنى للأعمدة (AC-U4): مصدرٌ واحدٌ يقيس ويبيّن — يسبق مستهلكيه -->
+    <script src="/ems/assets/js/ems-column-floor.js?v=1787150824"></script>
+    <!-- نواة مكونات الواجهة (UXR-01 UI-01..20): الحالات والبطاقات وحارس صفر الأعمدة -->
+    <script src="/ems/assets/js/ems-components.js?v=1786630267" defer></script>
+    <!-- Unified column-groups show/hide (activated per-page via EmsColumnGroups.init) -->
+    <script src="/ems/assets/js/column-groups.js?v=1787150915" defer></script>
+    <!-- Unified Details/View Modal System (نظام نافذة العرض الموحّد) -->
+    <script src="/ems/assets/js/ems-details-modal.js?v=1780744967" defer></script>
+    <!-- بطاقة «عن الشاشة» الموحّدة: تبني القالبَ الصادرَ من screen_contract.php
+         في موضعه الصحيح (تحت الرأس) وتزرع زرَّه — راجع رأس الملف للعلّة. -->
+    <script src="/ems/assets/js/ems-screen-about.js?v=1786647120" defer></script>
+    <!-- عونُ صندوقِ الفلاتر: يسم أغلفةَ الحقولِ ويعدُّ المفعَّلَ ويمنع حفرةَ
+         سطرِ الأزرار. لا ينقل عقدةً ولا يعيد بناءَ شجرةٍ — إضافةُ أصنافٍ فقط،
+         فالبنيةُ مكتوبةٌ في PHP ظاهرةً للمراجعة. والصندوقُ صحيحٌ بدونه. -->
+    <script src="/ems/assets/js/ems-filters.js?v=1787284460" defer></script>
+    <!-- عونُ بطاقةِ الإحصاء: يسم البطاقةَ وأجزاءَها **بالدورِ لا بالاسم** —
+         فـ٤٣ اسمًا مختلفًا في ٨٤ صفحةً لا يمسكها خُطّافٌ واحدٌ بغيرِ ذلك. -->
+    <script src="/ems/assets/js/ems-statcards.js?v=1787278718" defer></script>
+    <!-- Unified Custom Select dropdown for forms (نظام القوائم المنسدلة الموحّد) -->
+    <script src="/ems/assets/js/ems-select.js?v=1784344664" defer></script>
+    <!-- Bootstrap Bundle JS (local, CSP-safe) -->
+    <script src="/ems/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    
+<script>window.emsGovCtx = {"values":{"entity":"ايكوبيشن","base_currency":"USD"}};</script>
+<script>window.csrfToken="ff200a839dbc09cfdc5518df9e0d5a223d0fb98bfe5626cc9e1795be3592a3ef";</script></head>
+<body class="ems-site" data-ems-ax-permission="full" data-ems-ax-edit="editable" data-ems-ax-connection="online" data-ems-ax-freshness="fresh">
+<!-- AC-U8 · SH-08: رابطُ التخطّي — أولُ ما تبلغه لوحةُ المفاتيح.
+     بدونَه تُجبَر الدورةُ على المرورِ بالشريطِ الجانبيِّ كلِّه (عشراتُ الروابط)
+     قبلَ بلوغِ المحتوى، فتصير الدورةُ «كاملةً» ورقيًّا لا عمليًّا. مخفيٌّ حتى
+     يُركَّز عليه — لا يزاحم البصرَ ويحضر للوحةِ المفاتيح. -->
+<a class="ems-skip-link" href="#ems-main-content">تخطّي إلى المحتوى</a>
+<script>
+  (function () {
+    var head = document.head || document.getElementsByTagName('head')[0];
+    if (!head) return;
+
+    var cssFiles = [
+      '/ems/assets/css/local-fonts.css',
+      // كاسرُ الذاكرةِ إلزاميّ — بدونه تُخدَم لوحةُ ألوانٍ قديمةٌ فتسقط كلُّ var()
+      '/ems/assets/css/design-tokens.css?v=1786973952',
+      '/ems/assets/css/ems.main.all.style.css?v=1787281605',
+      '/ems/assets/css/ems-forms.css?v=1787131378',
+      // أنماطُ الأزرارِ الأربعةُ — بعد بوتستراب لتَغلبَ أزرقَه بذهبيِّ العلامة
+      '/ems/assets/css/ems-buttons.css?v=1786975893',
+      '/ems/assets/css/ems-nav-groups.css?v=1786961884',
+      // واجهةُ الجوّال — آخرُ الملفات كي تفوز على طبقات التجاوز المتراكمة،
+      // وكلُّ ما فيها محبوسٌ في @media (max-width:768px) فلا تمسّ الحاسوب.
+      '/ems/assets/css/ems-sidebar-mobile.css?v=1786460190',
+      '/ems/assets/css/ems-topbar-mobile.css?v=1786950201'
+      // ems-tables.css خرج من هذه المصفوفةِ عمدًا (توحيد 2026-08-17): الحاقنُ
+      // أدناه يتخطّى أيَّ ورقةٍ حاضرةٍ أصلًا، وورقةُ الجداولِ حاضرةٌ دائمًا من
+      // inheader — فكان وجودُها هنا بلا أثرٍ منذ كُتب. صارت عبرَ مكوّنٍ يفرض
+      // الأخيريةَ نقلًا لا إدراجًا: includes/table_design.php
+    ];
+
+    cssFiles.forEach(function (href) {
+      if (document.querySelector('link[rel="stylesheet"][href="' + href + '"]')) return;
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = href;
+      head.appendChild(link);
+    });
+
+    if (!document.querySelector('script[src^="/ems/assets/js/ui-unification.js"]')) {
+      var script = document.createElement('script');
+      script.src = '/ems/assets/js/ui-unification.js?v=1786965077';
+      script.defer = true;
+      head.appendChild(script);
+    }
+
+    if (!document.querySelector('script[src^="/ems/assets/js/ems-select.js"]')) {
+      var emsSelectScript = document.createElement('script');
+      emsSelectScript.src = '/ems/assets/js/ems-select.js';
+      emsSelectScript.defer = true;
+      head.appendChild(emsSelectScript);
+    }
+
+    // ورقةُ الجداولِ إلى الذيلِ مرّةً أخرى — الصفحةُ أدرجت أوراقَها بين
+    // القشرتَين، وهذه النقطةُ بعدَها فتلتقطُها قبلَ الرسم. (توحيد 2026-08-17)
+    if (typeof window.emsTableDesignEnforce === 'function') window.emsTableDesignEnforce();
+
+    if (document.body) {
+      document.body.classList.add('ems-site');
+    } else {
+      document.addEventListener('DOMContentLoaded', function () {
+        document.body.classList.add('ems-site');
+      }, { once: true });
+    }
+  })();
+</script>
+
+<!-- الهيدر/التوببار المشترك (مكوّن واحد لكل الصفحات التي بها Sidebar) -->
+    <header class="ems-topbar ems-topbar--icon">
+                <button type="button" class="mobile-menu-btn" id="mobileMenuBtn"
+                aria-label="القائمة الجانبية" aria-expanded="false" aria-controls="sidebar">
+            <i class="fa fa-bars" aria-hidden="true"></i>
+        </button>
+
+        <div class="ems-topbar-logo">
+            <img src="/ems/assets/images/icon.png" alt="Equipation">
+        </div>
+
+        <div class="ems-topbar-center">
+                        <div class="ems-ctx-switcher" id="emsCtxSwitcher">
+                <button type="button" class="ems-topbar-pill ems-ctx-btn" aria-haspopup="true" aria-expanded="false"
+                        title="مبدّل السياق — الإدارة والصفة والنطاق"
+                        data-value="ادارة التشغيل">
+                    <i class="fas fa-user-shield"></i>ادارة التشغيل                                        <i class="fa fa-chevron-down" style="font-size:.7em;opacity:.55"></i>
+                </button>
+                <div class="ems-ctx-panel" role="menu" dir="rtl">
+                    <div class="ems-ctx-row"><i class="fas fa-user-shield"></i><span class="ems-ctx-k">الإدارة</span><span class="ems-ctx-v">ادارة التشغيل</span></div>
+                                                            <div class="ems-ctx-row"><i class="fas fa-user-circle"></i><span class="ems-ctx-k">المسمى الوظيفي</span><span class="ems-ctx-v">إداري</span></div>
+                                        <div class="ems-ctx-row"><i class="fas fa-id-card-alt"></i><span class="ems-ctx-k">الموظف المسؤول</span><span class="ems-ctx-v">مسؤول التشغيل</span></div>
+                                        <div class="ems-ctx-actions">
+                        <a href="/ems/user_capacities.php"><i class="fas fa-repeat"></i> تبديل الصفة والنطاق</a>
+                    </div>
+                                    </div>
+            </div>
+        </div>
+
+        <div class="ems-topbar-actions">
+                                    <div class="ems-account-menu" id="emsAccountMenu">
+                <button type="button" class="ems-topbar-icon" title="الحساب" aria-label="الحساب" aria-haspopup="true" aria-expanded="false"
+                        style="background:none;border:0;cursor:pointer"><i class="far fa-user"></i></button>
+                <div class="ems-account-panel" role="menu" dir="rtl">
+                    <div class="ems-acct-head">
+                        <strong>مسؤول التشغيل</strong>
+                        <small>مسؤول التشغيل</small>                    </div>
+                    <a href="/ems/Portal/my_portal.php"><i class="fas fa-id-card"></i> بوابتي</a>
+                    <a href="/ems/main/profile.php"><i class="far fa-user"></i> الملف الشخصي</a>
+                    <a href="/ems/Settings/settings.php"><i class="fas fa-gear"></i> الإعدادات</a>
+                    <a href="/ems/logout.php" style="color:var(--danger-deep)"><i class="fas fa-power-off"></i> تسجيل الخروج</a>
+                </div>
+            </div>
+                        <a href="/ems/chats/index.php"
+               class="ems-topbar-icon ems-topbar-icon--badged" id="emsTopbarMessages"
+               data-count-src="/ems/chats/get_unread_count.php"
+               title="المراسلات — 1 غير مقروءة"
+               aria-label="المراسلات — 1 غير مقروءة"><i class="fas fa-envelope"></i><span id="emsMessagesBadge" class="ems-topbar-badge" aria-label="1 رسالة غير مقروءة">1</span></a>
+                        <a href="/ems/Approvals/hours_approval.php"
+               class="ems-topbar-icon ems-topbar-icon--badged" id="emsTopbarApprovals"
+               title="الاعتمادات — 48704 سجلَّ ساعاتٍ ينتظر اعتمادَ إدارتك"
+               aria-label="الاعتمادات — 48704 سجلَّ ساعاتٍ ينتظر اعتمادَ إدارتك"><i class="fas fa-stamp"></i><span id="emsApprovalsBadge" class="ems-topbar-badge" aria-label="48704 سجلًّا ينتظر الاعتماد">99+</span></a>
+                                                <a href="/ems/Tickets/tickets_list.php" class="ems-topbar-icon ems-topbar-icon--badged" id="emsTopbarTickets" title="البلاغات" aria-label="البلاغات"><i class="fas fa-bullhorn"></i><span id="emsBreakdownBadge" class="ems-topbar-badge" style="display:none;"></span></a>
+                        <a href="/ems/main/global_search.php" class="ems-topbar-icon" title="البحث الموحد — بالكود أو الاسم" aria-label="البحث الموحد"><i class="fas fa-search"></i></a>
+        </div>
+    </header>
+    <style>
+        /* شارة عدّاد البلاغات على أيقونة التوبار — بنفس روح ألوان النظام (تنبيه أحمر). */
+        /* و`--badged` اسمٌ محايدٌ لمرساةِ الشارةِ نفسِها: `breakdowns` وُلد لأيقونةِ
+           البلاغات ثم استُعمل لمساحةِ عملي أيضًا، فصار اسمًا لا يصف ما يفعل.
+           ولم يبقَ له مستعملٌ بعدَ دمجِ أيقونتَي البلاغاتِ ورفعِ مساحةِ عملي،
+           فرُفع من المُحدِّد — ولا يُترك اسمٌ ميتٌ يوهم قارئَه بأنه حيّ. */
+        .ems-topbar-icon--badged { position: relative; }
+
+        /* ══ الشارةُ تركب الزاويةَ ولا تجلس على الرمز (قرارُ المالك 2026-08-17) ══
+           ◆ **المقيسُ قبلَ التعديل**: الأيقونةُ قرصٌ 28×28 والرمزُ داخلَها 16×13
+             فقط. والشارةُ كانت 18 ارتفاعًا (أي ثُلثَي الأيقونة) بإزاحةِ 4 بكسلات
+             لا غير — فتقع أكثرُها **على** القرصِ لا خارجَه، وتغطّي من الرمزِ
+             نفسِه 32٪ عند «7» و**50٪ عند «33»** و**58٪ عند «99+»**. فيرى
+             المستخدمُ رقمًا فوق شكلٍ لا يتبيّنه، ولا يعرف أيَّ بابٍ يُنبِّهه.
+           ◆ **والعلاجُ إزاحةٌ لا تصغيرٌ وحدَه**: القرصُ يُدفع إلى خارجِ حدودِ
+             الأيقونةِ حتى يقع **فوقَ حافّتِها العلويّةِ الداخلية**، فيلامس الرمزَ
+             بشريطٍ رفيعٍ في زاويتِه ولا يغطّي وسطَه. وارتفاعُه 16 لا 18، وحشوتُه
+             أضيق — فالشارةُ تابعٌ للأيقونةِ لا ندٌّ لها.
+           ◆ **والفجوةُ بين الأيقوناتِ رُفعت 8 ← 10**: الشارةُ المدفوعةُ خارجًا
+             تحتاج بكسلَين تتنفّسهما وإلا لامست حلقتُها البيضاءُ جارتَها.
+           ◆ **واللونُ مُعلَنٌ صراحةً**: خلفيةٌ حمراءُ `--c-state-danger` (#dc2626)
+             وحبرٌ أبيض — وبقيمةٍ احتياطيةٍ صريحةٍ لكلٍّ منهما، فلو تعذّر رمزٌ
+             بقيت الشارةُ حمراءَ بيضاءَ لا شفّافةً بلا لون. */
+        .ems-topbar-actions { gap: 12px; }
+        .ems-topbar-badge {
+            position: absolute; top: -7px;
+            /* ◆ **المرساةُ على الحافّةِ الخارجيةِ لا الداخلية** — وهذا بيتُ القصيد:
+                 `inset-inline-end: -7px` يُثبّت الحافّةَ **الداخليّة** فينمو القرصُ
+                 نحوَ الرمز كلّما طال الرقم — 5٪ عند «7» و10٪ عند «33» و17٪ عند
+                 «99+». وبتثبيتِ الحافّةِ الخارجيةِ ينمو الرقمُ **بعيدًا** عن الرمز،
+                 فالتغطيةُ تبقى **5٪ ثابتةً مهما طال العدد** (مقيسٌ للثلاثة).
+               ◆ **وفيزيائيّةٌ لا منطقيّة عن قصد**: القرصُ يحمل `direction: ltr`
+                 لتُقرأ أرقامُه، فالخواصُّ المنطقيّةُ تنقلب عليه ولا تستقرّ على
+                 جهةٍ — قِستُ الثلاثَ صيغٍ فوقعت المنطقيّةُ في الجهةِ المعاكسة.
+                 والصريحُ هنا أصدقُ من المنطقيِّ الملتبس، ومعه مرآتُه للإنجليزية. */
+            right: calc(100% - 9px); left: auto;
+            min-width: 16px; height: 16px; padding: 0 4px;
+            display: inline-flex; align-items: center; justify-content: center;
+            background: var(--c-state-danger, #dc2626);
+            color: var(--white, #ffffff);
+            font-size: .62rem; font-weight: 800;
+            border-radius: 999px; line-height: 1;
+            font-variant-numeric: tabular-nums;
+            direction: ltr; unicode-bidi: isolate;
+            /* الحلقةُ بلونِ الشريطِ لا بالأبيض: نصفُها فوقَ الأيقونةِ البيضاءِ
+               ونصفُها فوقَ الشريطِ الرماديّ، فالأبيضُ يذوب في أحدِهما. */
+            box-shadow: 0 0 0 2px var(--ems-topbar-bg, #e2e2e2);
+            pointer-events: none;
+        }
+        html[dir="ltr"] .ems-topbar-badge,
+        body[dir="ltr"] .ems-topbar-badge { right: auto; left: calc(100% - 9px); }
+        /* شريطُ اللوحةِ أصفرُ لا رماديّ — فحلقتُه تتبع لونَه */
+        .ems-topbar--dash .ems-topbar-badge {
+            box-shadow: 0 0 0 2px var(--ems-topbar-bg-dash, #f3be00);
+        }
+    </style>
+    <script>
+        // ===== شارات عدّادات الشريط (البلاغات · المراسلات) =====
+        // العدّ ضمن نطاق رؤية المستخدم، فلا تكشف الشارة ما لا يراه على الشاشة.
+        //
+        // عدّادان بمنطقٍ واحد: كانت حلقةُ البلاغاتِ مكتوبةً بعينِها، فأيُّ عدّادٍ
+        // ثانٍ يعني نسخَ اثنين وعشرين سطرًا — ونسختان تتفرّقان عند أولِ إصلاح.
+        // فصارت واحدةً تأخذ (الشارة · مصدرَ الرقم · صياغةَ الاسمِ الميسور)، وكلُّ
+        // عدّادٍ لاحقٍ سطرٌ في القائمةِ لا حلقةٌ جديدة.
+        //
+        // ◆ ومصدرُ الرقمِ يُقرأ من `data-count-src` على الأيقونةِ نفسِها لا يُثبَّت
+        //   هنا: المسارُ يُبنى في PHP بـ`ems_url()` فيتبع موضعَ التطبيق.
+        // ◆ والعنوانُ (`title`/`aria-label`) على الأيقونةِ يتبع الرقمَ أيضًا، فمن
+        //   لا يرى الشارةَ يسمع العدد.
+        (function () {
+            var FEEDS = [
+                { id: 'emsBreakdownBadge', icon: 'emsTopbarTickets',  url: '/ems/Tickets/get_tickets_count.php',
+                  base: 'البلاغات',   one: function (c) { return c + ' بلاغ مفتوح'; } },
+                { id: 'emsMessagesBadge',  icon: 'emsTopbarMessages', url: null,
+                  base: 'المراسلات', one: function (c) { return c + ' رسالة غير مقروءة'; } }
+            ];
+
+            FEEDS.forEach(function (f) {
+                var badge = document.getElementById(f.id);
+                if (!badge) return;
+                var icon = f.icon ? document.getElementById(f.icon) : null;
+                var url  = (icon && icon.getAttribute('data-count-src')) || f.url;
+                if (!url) return;
+                var inFlight = false;
+
+                function paint(c) {
+                    if (c > 0) {
+                        badge.textContent = c > 99 ? '99+' : String(c);
+                        badge.style.display = 'inline-flex';
+                        badge.setAttribute('aria-label', f.one(c));
+                        if (icon) {
+                            icon.setAttribute('title', f.base + ' — ' + f.one(c));
+                            icon.setAttribute('aria-label', f.base + ' — ' + f.one(c));
+                        }
+                    } else {
+                        badge.style.display = 'none';
+                        badge.removeAttribute('aria-label');
+                        if (icon) { icon.setAttribute('title', f.base); icon.setAttribute('aria-label', f.base); }
+                    }
+                }
+
+                function refresh() {
+                    if (document.hidden || inFlight) return;
+                    inFlight = true;
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', url, true);
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                    xhr.onload = function () {
+                        try { paint(parseInt(JSON.parse(xhr.responseText).count, 10) || 0); } catch (e) {}
+                        inFlight = false;
+                    };
+                    xhr.onerror = function () { inFlight = false; };
+                    xhr.onabort = function () { inFlight = false; };
+                    xhr.send();
+                }
+
+                refresh();
+                document.addEventListener('visibilitychange', function () {
+                    if (!document.hidden) refresh();
+                });
+                setInterval(refresh, 60000);
+            });
+        })();
+
+        // ===== AS-02/قائمة الحساب: فتح/إغلاق اللوحتين (نقرة خارجية تُغلق · Esc تُغلق) =====
+        (function () {
+            /* حاضنُ الأفعالِ يقصُّ اللوحةَ ما دام `overflow` فيه غيرَ `visible`
+               (حزامُ التمريرِ على الجوّال). فيُرفع القصُّ ما دامت مفتوحةً ويُعاد
+               عند الإغلاق — والقاعدةُ نفسُها في ems-shell.css لا نمطًا سطريًّا. */
+            function syncClip() {
+                document.querySelectorAll('.ems-topbar-actions').forEach(function (row) {
+                    row.classList.toggle('ems-actions-menu-open', !!row.querySelector('.ems-account-menu.open'));
+                });
+            }
+            function closeAll() {
+                document.querySelectorAll('.ems-ctx-switcher.open, .ems-account-menu.open')
+                    .forEach(function (b) {
+                        b.classList.remove('open');
+                        var t = b.querySelector('button');
+                        if (t) t.setAttribute('aria-expanded', 'false');
+                    });
+                syncClip();
+            }
+            ['emsCtxSwitcher', 'emsAccountMenu'].forEach(function (id) {
+                var box = document.getElementById(id);
+                if (!box) return;
+                var btn = box.querySelector('button');
+                btn.addEventListener('click', function (ev) {
+                    ev.stopPropagation();
+                    var open = box.classList.toggle('open');
+                    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    syncClip();
+                });
+            });
+            document.addEventListener('click', closeAll);
+            document.addEventListener('keydown', function (ev) {
+                if (ev.key === 'Escape') { closeAll(); }
+            });
+        })();
+    </script>
+    
+<!-- زرُّ القائمة في الموبايل: انتقل إلى داخل الشريط العلويّ (includes/topbar.php)
+     ليحجز مكانَه في صفّه بدل أن يطفو فوق أيقونات الإجراءات. المعرّفُ نفسُه
+     `mobileMenuBtn`، وهو مطبوعٌ قبل هذا الموضع فيبقى سكربتُ الأسفل يجده. -->
+
+<!-- طبقة الخلفية المعتمة (للموبايل) -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="sidebar closed" id="sidebar" role="navigation" aria-label="التنقلُ الرئيسيّ">
+    <div class="sidebar-mobile-head" id="sidebarMobileHead">
+    <img src="/ems/assets/images/icon.png" alt="" aria-hidden="true">
+    <span class="sidebar-mobile-id">
+      <span class="sidebar-mobile-brand">إيكوبيشن</span>
+              <span class="sidebar-mobile-role">ادارة التشغيل</span>
+          </span>
+    <button type="button" class="sidebar-mobile-close" id="sidebarMobileClose" aria-label="إغلاق القائمة">
+      <i class="fa fa-xmark" aria-hidden="true"></i>
+    </button>
+  </div>
+  <div>
+    <div class="toggle-btn" id="toggleBtn"><i class="fa fa-bars"></i></div>
+    <!-- <h2 class="logo">Equipation</h2> -->
+
+        <script>
+    (function () {
+      try {
+        var sb = document.getElementById('sidebar');
+        if (!sb || window.matchMedia('(max-width: 768px)').matches) return;
+        var saved = localStorage.getItem('ems.nav.closed');
+        if (saved === '0') { sb.classList.remove('closed'); }
+        var tb = document.getElementById('toggleBtn');
+        if (tb) {
+          tb.addEventListener('click', function () {
+            // القراءة بعد معالِج التبديل نفسه (مسجَّل لاحقًا في هذا الملف)
+            setTimeout(function () {
+              try { localStorage.setItem('ems.nav.closed', sb.classList.contains('closed') ? '1' : '0'); } catch (e) {}
+            }, 0);
+          });
+        }
+      } catch (e) {}
+    })();
+    </script>
+
+    
+            <div class="nav-filter" id="navFilterBox">
+      <i class="fa fa-search nav-filter-icon" aria-hidden="true"></i>
+      <input type="search" id="navFilterInput" autocomplete="off"
+             placeholder="ابحث في القائمة…" aria-label="ابحث في قائمة التنقل"
+             aria-controls="sidebarNavList">
+      <button type="button" class="nav-filter-clear" id="navFilterClear" aria-label="مسح البحث">✕</button>
+      <div class="nav-filter-empty" role="status" aria-live="polite">لا رابطَ يطابق بحثك.</div>
+    </div>
+    
+    <ul id="sidebarNavList">
+            <li class="nav-group" data-group-key="g-mine">
+  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-g-mine" aria-label="مساحتي" title="مساحتي"><i class="fa fa-house" aria-hidden="true"></i> <span class="nav-group-name">مساحتي</span><i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>
+  <ul class="nav-group-items" id="navgrp-g-mine">
+<li><a href="../main/role_board.php"><i class="fa fa-house"></i> <span>الرئيسية</span></a></li>
+<li><a href="../chats/index.php"><i class="fa fa-circle-dot"></i> <span>المراسلات</span></a></li>
+<li><a href="../Portal/dept_achievement.php"><i class="fa fa-circle-dot"></i> <span>إنجاز الإدارة</span></a></li>
+<li><a href="../Portal/my_portal.php"><i class="fa fa-circle-dot"></i> <span>بوابتي</span></a></li>
+<li><a href="../main/my_workspace.php"><i class="fa fa-user-circle"></i> <span>مساحة عملي</span></a></li>
+<li class="nav-subhead" aria-hidden="true"><span>ما ينتظرني</span></li>
+<li><a href="../Approvals/hours_approval.php"><i class="fa fa-stamp"></i> <span>ما ينتظر اعتمادي</span> <span class="nav-count-badge">99+</span></a></li>
+<li><a href="../FinRequests/dept_inbox.php"><i class="fa fa-inbox"></i> <span>موافقات إدارتي</span> <span class="nav-count-badge">1</span></a></li>
+<li><a href="../Approvals/attribution_board.php"><i class="fa fa-scale-unbalanced"></i> <span>لوحة الإسناد اليومي</span></a></li>
+<li><a href="../Approvals/requests.php"><i class="fa fa-list-check"></i> <span>صندوقُ موافقاتي — ما ينتظر يدي</span></a></li>
+<li class="nav-subhead" aria-hidden="true"><span>المركز التنفيذي</span></li>
+<li><a href="../Portal/my_tasks.php"><i class="fa fa-circle-dot"></i> <span>مهامي</span></a></li>
+<li><a href="../Portal/my_achievement.php"><i class="fa fa-circle-dot"></i> <span>إنجازي</span></a></li>
+  </ul>
+</li>
+<li class="nav-group" data-group-key="g-daily">
+  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-g-daily" aria-label="التشغيل اليومي" title="التشغيل اليومي"><i class="fa fa-briefcase" aria-hidden="true"></i> <span class="nav-group-name">التشغيل اليومي</span><i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>
+  <ul class="nav-group-items" id="navgrp-g-daily">
+<li><a href="../Timesheet/view_timesheet.php"><i class="fa fa-circle-dot"></i> <span>تسجيل التايم شيت والإنتاج</span></a></li>
+<li><a href="../Transport/transfer_requests.php"><i class="fa fa-circle-dot"></i> <span>طلبات الترحيل</span></a></li>
+<li><a href="../Maintenance/orders.php"><i class="fa fa-circle-dot"></i> <span>أوامر الصيانة</span></a></li>
+<li class="nav-subhead" aria-hidden="true"><span>التخطيط وتخصيص الموارد</span></li>
+<li><a href="../Operations/distribution_space.php"><i class="fa fa-circle-dot"></i> <span>تكليف المشغّل على المعدة</span></a></li>
+<li><a href="../Operations/containers.php"><i class="fa fa-circle-dot"></i> <span>إسناد المعدات للوحدات</span></a></li>
+<li><a href="../Operations/distribution_space.php#2"><i class="fa fa-circle-dot"></i> <span>توزيع المعدات والمشغّلين</span></a></li>
+<li class="nav-subhead" aria-hidden="true"><span>التنفيذ اليومي</span></li>
+<li><a href="../Operations/production.php"><i class="fa fa-circle-dot"></i> <span>الإنتاج والقياس</span></a></li>
+<li><a href="../Operations/stops_unattributed.php"><i class="fa fa-circle-dot"></i> <span>التوقفات وتحديد المتحمل</span></a></li>
+<li class="nav-subhead" aria-hidden="true"><span>الانحرافات وإقفال الفترة</span></li>
+<li><a href="../Operations/unit_perf.php"><i class="fa fa-circle-dot"></i> <span>الأداء الشهري للوحدة</span></a></li>
+<li><a href="../Operations/monthly_close.php"><i class="fa fa-circle-dot"></i> <span>الإقفال الشهري للوحدة</span></a></li>
+  </ul>
+</li>
+<li class="nav-group" data-group-key="g-commercial">
+  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-g-commercial" aria-label="العقود والعملاء" title="العقود والعملاء"><i class="fa fa-file-signature" aria-hidden="true"></i> <span class="nav-group-name">العقود والعملاء</span> <span class="nav-count-badge nav-group-badge">1</span><i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>
+  <ul class="nav-group-items" id="navgrp-g-commercial">
+<li><a href="../Contracts/penalties.php"><i class="fa fa-gavel"></i> <span>الجزاءات والحوافز التعاقدية</span></a></li>
+<li><a href="../Contracts/contracts.php"><i class="fa fa-circle-dot"></i> <span>عقود العملاء</span></a></li>
+<li><a href="../Operations/equipment_quota.php"><i class="fa fa-circle-dot"></i> <span>توزيع وحدات المورد على معداته</span></a></li>
+<li><a href="../Contracts/claims.php"><i class="fa fa-file-invoice-dollar"></i> <span>المستخلصات والمطالبات</span> <span class="nav-count-badge">1</span></a></li>
+<li><a href="../Operations/unbilled.php"><i class="fa fa-circle-dot"></i> <span>الأعمال غير المفوترة</span></a></li>
+  </ul>
+</li>
+<li class="nav-group" data-group-key="g-supply">
+  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-g-supply" aria-label="الموردون والمشتريات" title="الموردون والمشتريات"><i class="fa fa-truck-ramp-box" aria-hidden="true"></i> <span class="nav-group-name">الموردون والمشتريات</span><i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>
+  <ul class="nav-group-items" id="navgrp-g-supply">
+<li><a href="../Procurement/requests_proc.php"><i class="fa fa-circle-dot"></i> <span>طلبات الشراء</span></a></li>
+  </ul>
+</li>
+<li class="nav-group" data-group-key="g-finance">
+  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-g-finance" aria-label="المالية والمحاسبة" title="المالية والمحاسبة"><i class="fa fa-calculator" aria-hidden="true"></i> <span class="nav-group-name">المالية والمحاسبة</span><i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>
+  <ul class="nav-group-items" id="navgrp-g-finance">
+<li><a href="../Finance/budget_dept.php"><i class="fa fa-circle-dot"></i> <span>ميزانية إدارتي — التمويل</span></a></li>
+<li><a href="../FinRequests/request_form.php"><i class="fa fa-paper-plane"></i> <span>طلباتي المالية</span></a></li>
+  </ul>
+</li>
+<li class="nav-group" data-group-key="g-governance">
+  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-g-governance" aria-label="الحوكمة والتدقيق" title="الحوكمة والتدقيق"><i class="fa fa-scale-balanced" aria-hidden="true"></i> <span class="nav-group-name">الحوكمة والتدقيق</span><i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>
+  <ul class="nav-group-items" id="navgrp-g-governance">
+<li><a href="../Governance/entities_registry.php"><i class="fa fa-building-columns"></i> <span>سجل الكيانات</span></a></li>
+<li><a href="../Governance/signing_authority.php"><i class="fa fa-file-signature"></i> <span>التفويض بالتوقيع</span></a></li>
+  </ul>
+</li>
+<li class="nav-group" data-group-key="g-risk">
+  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-g-risk" aria-label="المخاطر والبلاغات" title="المخاطر والبلاغات"><i class="fa fa-shield-halved" aria-hidden="true"></i> <span class="nav-group-name">المخاطر والبلاغات</span><i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>
+  <ul class="nav-group-items" id="navgrp-g-risk">
+<li><a href="../Tickets/tickets_list.php?tab=dept"><i class="fa fa-circle-dot"></i> <span>صندوقُ بلاغاتِ الإدارة</span></a></li>
+<li><a href="../Risk/dept_risk_space.php"><i class="fa fa-building-shield"></i> <span>مساحة مخاطر الإدارة</span></a></li>
+  </ul>
+</li>
+<li class="nav-group" data-group-key="g-reports">
+  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-g-reports" aria-label="التقارير والتحليلات" title="التقارير والتحليلات"><i class="fa fa-chart-column" aria-hidden="true"></i> <span class="nav-group-name">التقارير والتحليلات</span><i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>
+  <ul class="nav-group-items" id="navgrp-g-reports">
+<li><a href="../Reports/approval_lag_report.php"><i class="fa fa-hourglass-half"></i> <span>الاعتمادات المتأخرة والوثائق</span></a></li>
+<li><a href="../admin/ops_manager_board.php"><i class="fa fa-tachometer-alt"></i> <span>لوحة مدير التشغيل</span></a></li>
+<li><a href="../Operations/operations_room.php"><i class="fa fa-circle-dot"></i> <span>غرفة عمليات المواقع</span></a></li>
+<li><a href="../Procurement/stock_proc.php"><i class="fa fa-circle-dot"></i> <span>أرصدة المخزون بحالاتها</span></a></li>
+<li><a href="../emsreports/index.php"><i class="fa fa-circle-dot"></i> <span>مركز التقارير — الحوكمة</span></a></li>
+  </ul>
+</li>
+<li class="nav-group" data-group-key="g-setup">
+  <button type="button" class="nav-group-head" aria-expanded="false" aria-controls="navgrp-g-setup" aria-label="الإعدادات" title="الإعدادات"><i class="fa fa-sliders-h" aria-hidden="true"></i> <span class="nav-group-name">الإعدادات</span><i class="fa fa-chevron-down nav-group-caret" aria-hidden="true"></i></button>
+  <ul class="nav-group-items" id="navgrp-g-setup">
+<li><a href="../admin/org_assignments.php"><i class="fa fa-id-badge"></i> <span>التكليفات التنظيمية</span></a></li>
+<li><a href="../admin/org_permits.php"><i class="fa fa-key"></i> <span>أذون الزيارة والمركبات الخارجية</span></a></li>
+<li><a href="../Governance/activation_patterns.php"><i class="fa fa-toggle-on"></i> <span>أنماط تفعيل المزايا</span></a></li>
+<li><a href="../main/project_users.php"><i class="fa fa-users-gear"></i> <span>إدارة المعاونين</span></a></li>
+  </ul>
+</li>
+
+      
+      
+              <!-- <li><a href="../Clients/clients.php"><i class="fa fa-users"></i> <span>قائمة العملاء</span></a></li> -->
+        <!-- <li><a href="../Projects/project_mines.php"><i class="fa fa-list-alt"></i> <span> المشاريع </span></a></li> -->
+        <!-- <li><a href="../Projects/projects.php"><i class="fa fa-folder-open"></i> <span></span></a></li> -->
+        <!-- <li><a href="../main/users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li> -->
+        <!-- <li><a href="../Reports/new_reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
+        <!-- <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>تقارير العقد</span></a></li>
+        <li><a href="../Equipments/equipments_types.php"><i class="fa-solid fa-screwdriver-wrench"></i> <span> انواع
+              المعدات</span></a></li> -->
+      
+      
+      
+      
+      
+      
+      
+      
+        
+      
+
+      <!--
+            <li><a href="../Projects/projects.php"><i class="fa fa-folder-open"></i> <span>المشاريع</span></a></li>
+      <li><a href="../Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>
+      <li><a href="../users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
+                  
+       -->
+    </ul>
+  </div>
+
+  <!-- زر تسجيل الخروج -->
+  <!-- <a href="../logout.php" class="logout">
+    <i class="fa fa-sign-out-alt"></i>
+    <span>تسجيل الخروج</span>
+  </a> -->
+</div>
+
+<style>
+/* الصفحة الحالية في الشريط الجانبي — لون الأيقونة والاسم من الرمز --c-brand-gold (عدا عدّاد الرقم) */
+.ems-site .sidebar ul li.active > a,
+.ems-site .sidebar ul li.active > a .sidebar-link-text,
+.ems-site .sidebar ul li.active > a span:not(.nav-count-badge) { color: var(--c-nav-active) !important; }
+.ems-site .sidebar ul li.active > a i { color: var(--c-nav-active) !important; }
+/* عدّاد الرقم (الرسائل/الاعتمادات) يبقى بلونٍ ثابت (عادي + hover + active) كي يظل ظاهراً.
+   SH-08/4: كان أبيضَ على البرتقاليِّ = 2.3:1 — أسوأُ زوجٍ في الشجرة، ونصُّه رقمٌ
+   يُقرأ لا زخرفة. والبرتقاليُّ لونُ هُويةٍ لا يُمَسّ، فتغيّر الحبرُ إلى الداكن:
+   8.9:1. ويبقى `!important` لأن قواعدَ الحالةِ أعلاه تلوّن كلَّ span في الصف. */
+.ems-site .sidebar ul li .nav-count-badge,
+.ems-site .sidebar ul li:hover .nav-count-badge,
+.ems-site .sidebar ul li.active .nav-count-badge { color: var(--c-nav-active-ink) !important; }
+</style>
+
+<script>
+  // تحديد الصفحة المفتوحة حالياً في الشريط الجانبي (تلوين أيقونتها واسمها)
+  (function () {
+    var sb = document.getElementById('sidebar');
+    if (sb) {
+      var current = (window.location.pathname || '').replace(/\/+$/, '').toLowerCase();
+      sb.querySelectorAll('li a[href]').forEach(function (a) {
+        var p = (a.pathname || '').replace(/\/+$/, '').toLowerCase();
+        if (p && p === current) {
+          var li = a.closest('li');
+          if (li) li.classList.add('active');
+          // المجموعة الحاوية تتلوّن ذهبيًّا وهي مطويّة — الافتراض أن الكل مطويّ،
+          // ولولا ذلك لَما عرف المستخدم موضعه.
+          var grp = a.closest('li.nav-group');
+          if (grp) grp.classList.add('has-active');
+        }
+      });
+    }
+  })();
+
+  /* ═════════════════════════════════════════════════════════════════════════
+   * مجموعات الروابط: الطيّ، وحفظ الحالة، وقيادة بلاطات الوصول السريع
+   * ─────────────────────────────────────────────────────────────────────────
+   * الافتراض عند أول فتح: كل المجموعات مطويّة (قرار المستخدم). ثم تُحفظ
+   * اختيارات الطيّ في localStorage فتصمد بين الصفحات.
+   *
+   * «المجموعة المختارة» تقود بلاطات الوصول السريع في لوحة التحكم: افتراضها
+   * أول مجموعة، وتتغيّر بنقر رأس أي مجموعة — يُبثّ ذلك حدثًا تلتقطه اللوحة.
+   * ═════════════════════════════════════════════════════════════════════════ */
+  (function () {
+    var sb = document.getElementById('sidebar');
+    if (!sb) return;
+
+    var groups = Array.prototype.slice.call(sb.querySelectorAll('li.nav-group'));
+    if (!groups.length) return;
+
+    var OPEN_KEY = 'ems.navGroups.open';
+    var SEL_KEY  = 'ems.navGroups.selected';
+
+    function readOpen() {
+      try {
+        var raw = window.localStorage.getItem(OPEN_KEY);
+        var arr = raw ? JSON.parse(raw) : [];
+        return Array.isArray(arr) ? arr : [];
+      } catch (e) { return []; }
+    }
+
+    function writeOpen(keys) {
+      try { window.localStorage.setItem(OPEN_KEY, JSON.stringify(keys)); } catch (e) {}
+    }
+
+    function currentOpenKeys() {
+      return groups.filter(function (g) { return g.classList.contains('open'); })
+                   .map(function (g) { return g.getAttribute('data-group-key'); });
+    }
+
+    function setSelected(key, broadcast) {
+      groups.forEach(function (g) {
+        g.classList.toggle('is-selected', g.getAttribute('data-group-key') === key);
+      });
+      try { window.localStorage.setItem(SEL_KEY, key); } catch (e) {}
+      if (broadcast) {
+        document.dispatchEvent(new CustomEvent('ems:navgroup-selected', { detail: { key: key } }));
+      }
+    }
+
+    function toggleGroup(g) {
+      var head = g.querySelector('.nav-group-head');
+      var open = !g.classList.contains('open');
+      // أكورديون (قرار المالك 2026-08-02): مجموعةٌ واحدةٌ مفتوحةٌ لا غير —
+      // فتحُ واحدةٍ يطوي سواها، والقائمةُ تبقى بسيطةً مهما طالت.
+      if (open) {
+        groups.forEach(function (other) {
+          if (other === g) return;
+          if (other.classList.contains('open')) {
+            other.classList.remove('open');
+            var oh = other.querySelector('.nav-group-head');
+            if (oh) oh.setAttribute('aria-expanded', 'false');
+          }
+        });
+      }
+      g.classList.toggle('open', open);
+      if (head) head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      writeOpen(currentOpenKeys());
+      return open;
+    }
+
+    // الاسترجاع (قرار المالك 2026-08-02): أولُ زيارةٍ = الكلُّ مطويٌّ ·
+    // والعائدُ يجد آخرَ مجموعةٍ فتحها وحدَها (أكورديون — واحدةٌ على الأكثر)
+    /* ═══════════════════════════════════════════════════════════════════════
+     * INJ-0527 — أوّلُ زيارةٍ تحترم افتراضَ الخادم · والعائدُ يجد ما تركه
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ **أوّلُ زيارةٍ** (لا شيءَ محفوظ): لا نلمس شيئًا — فالخادمُ يفتح المراحلَ
+     *   ٠ و١ و٢ (`unified_nav.php`) وهو حكمُ الملفِّ المكتوب. وكان المستخدمُ
+     *   الجديدُ يفتح النظامَ على **كلِّ** المجموعاتِ مطويّةً فلا يرى رابطًا.
+     * ◆ **والعائدُ**: يُسترجَع **كلُّ** ما كان مفتوحًا لا آخرُه وحدَه، و**يُغلَق
+     *   ما فتحه الخادمُ ولم يكن في المحفوظ** — وإلا عادت مرحلةٌ طواها المستخدمُ
+     *   مفتوحةً في كلِّ زيارة، وهو أسوأُ من ألّا نحفظ.
+     * ◆ ولا يُمَسُّ سلوكُ النقرِ (أكورديون بقرارِ المالك 2026-08-02) — هذا
+     *   **الافتراضُ والاسترجاعُ** لا التفاعل.
+     * ═══════════════════════════════════════════════════════════════════════ */
+    /* ── تحديثُ 2026-08-17 (قرارُ المالك): «مجموعةٌ واحدةٌ فاتحةٌ في كلِّ مرّة»
+     *   ◆ الافتراضُ صار **الكلُّ مطويّ** من الخادمِ نفسِه (`unified_nav.php`)،
+     *     فلا وميضَ فتحٍ ثم طيٍّ عند التحميل — الترميزُ يصل مطويًّا أصلًا.
+     *   ◆ **والاسترجاعُ يحترم الأكورديون**: كان يُعيد فتحَ **كلِّ** مفتاحٍ
+     *     محفوظ. والنقرُ لا يحفظ إلا واحدًا اليوم، لكنّ خبيئةً قديمةً في متصفّحٍ
+     *     زار النظامَ قبلَ الأكورديون تحمل عدّةَ مفاتيح — فيعود المستخدمُ إلى
+     *     ثلاثِ مجموعاتٍ مفتوحةٍ ويُنقض القرارُ من حيث لا يُرى. فيُؤخذ **آخرُ**
+     *     مفتاحٍ محفوظٍ لا غير، ويُعاد كتبُ المحفوظِ مُشذَّبًا فلا يتكرّر الأمر. */
+    var saved = readOpen();
+    if (saved.length) {
+      var only = null;
+      for (var si = saved.length - 1; si >= 0 && only === null; si--) {
+        for (var gi = 0; gi < groups.length; gi++) {
+          if (groups[gi].getAttribute('data-group-key') === saved[si]) { only = saved[si]; break; }
+        }
+      }
+      groups.forEach(function (g) {
+        var want = g.getAttribute('data-group-key') === only;
+        g.classList.toggle('open', want);
+        var h = g.querySelector('.nav-group-head');
+        if (h) h.setAttribute('aria-expanded', want ? 'true' : 'false');
+      });
+      writeOpen(only ? [only] : []);
+    }
+
+    // المجموعة المختارة: المحفوظة إن كانت لا تزال مرئيّة، وإلا فأوّل مجموعة.
+    var savedSel = null;
+    try { savedSel = window.localStorage.getItem(SEL_KEY); } catch (e) {}
+    var keys = groups.map(function (g) { return g.getAttribute('data-group-key'); });
+    setSelected((savedSel && keys.indexOf(savedSel) !== -1) ? savedSel : keys[0], false);
+
+    groups.forEach(function (g) {
+      var head = g.querySelector('.nav-group-head');
+      if (!head) return;
+      head.addEventListener('click', function () {
+        // في الوضع المطويّ (شريط أيقونات) النقرُ يوسّع السايدبار أولًا ثم يفتح.
+        if (sb.classList.contains('closed') && !isMobile()) {
+          sb.classList.remove('closed');
+          if (!g.classList.contains('open')) { toggleGroup(g); }
+          refreshPageLayoutAfterAnimation();
+        } else {
+          toggleGroup(g);
+        }
+        setSelected(g.getAttribute('data-group-key'), true);
+      });
+    });
+
+    /* ═══════════════════════════════════════════════════════════════════════
+     * مُرشِّحُ القائمة — حرفانِ بدل نقرتين ومسحٍ بصريّ
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ **العلّةُ المقيسة**: الدورُ الثقيلُ يرى ٦٢–٩٢ رابطًا، وأكبرُ مجموعاتِه
+     *   خمسةٌ وثلاثون رابطًا، والطيُّ **أكورديونٌ** (واحدةٌ مفتوحةٌ لا غير) —
+     *   فالوصولُ إلى رابطٍ خارجَ المفتوحةِ نقرتان ومسحٌ بالعين.
+     * ◆ **ولا يُخرج رابطًا من مجموعتِه** (قرارُ المالك): الترشيحُ **إظهارٌ
+     *   وإخفاءٌ داخلَ البنيةِ نفسِها** — الرابطُ يبقى تحتَ رأسِ مجموعتِه.
+     * ◆ **ويردُّ ما كان**: تُلتقط حالةُ الفتحِ قبلَ أولِ حرفٍ وتُعاد عند المسح،
+     *   فلا يسرق الترشيحُ اختيارَ المستخدمِ المحفوظ.
+     * ◆ ولا يُلمس `localStorage` أثناءَ الترشيح — وإلا حُفظ فتحُ الترشيحِ كأنه
+     *   اختيارُ المستخدم. */
+    (function () {
+      var box = document.getElementById('navFilterBox');
+      var inp = document.getElementById('navFilterInput');
+      if (!box || !inp) return;
+      var clearBtn = document.getElementById('navFilterClear');
+      var snapshot = null;
+
+      function norm(s) {
+        return (s || '').toString().toLowerCase()
+          .replace(/[ً-ْٰ]/g, '')      /* التشكيل */
+          .replace(/[آأإٱ]/g, 'ا')  /* الألف بأشكالها */
+          .replace(/ى/g, 'ي').replace(/ة/g, 'ه')
+          .replace(/\s+/g, ' ').trim();
+      }
+
+      function restore() {
+        sb.classList.remove('is-filtering');
+        box.classList.remove('is-empty');
+        Array.prototype.forEach.call(sb.querySelectorAll('.nav-hidden'), function (el) {
+          el.classList.remove('nav-hidden');
+        });
+        if (snapshot) {
+          groups.forEach(function (g) {
+            var want = snapshot.indexOf(g.getAttribute('data-group-key')) !== -1;
+            g.classList.toggle('open', want);
+            var h = g.querySelector('.nav-group-head');
+            if (h) h.setAttribute('aria-expanded', want ? 'true' : 'false');
+          });
+          snapshot = null;
+        }
+      }
+
+      function apply(qRaw) {
+        var q = norm(qRaw);
+        box.classList.toggle('has-value', q !== '');
+        if (q === '') { restore(); return; }
+        if (snapshot === null) { snapshot = currentOpenKeys(); }
+        sb.classList.add('is-filtering');
+
+        var hits = 0;
+        groups.forEach(function (g) {
+          var found = 0;
+          Array.prototype.forEach.call(g.querySelectorAll('li'), function (li) {
+            var a = li.querySelector(':scope > a[href]');
+            if (!a) return;
+            var match = norm(a.textContent).indexOf(q) !== -1;
+            li.classList.toggle('nav-hidden', !match);
+            if (match) { found++; }
+          });
+          hits += found;
+          g.classList.toggle('nav-hidden', found === 0);
+          g.classList.toggle('open', found > 0);
+          var h = g.querySelector('.nav-group-head');
+          if (h) h.setAttribute('aria-expanded', found > 0 ? 'true' : 'false');
+        });
+        box.classList.toggle('is-empty', hits === 0);
+      }
+
+      inp.addEventListener('input', function () { apply(inp.value); });
+      inp.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { inp.value = ''; apply(''); inp.blur(); }
+      });
+      if (clearBtn) {
+        clearBtn.addEventListener('click', function () { inp.value = ''; apply(''); inp.focus(); });
+      }
+    })();
+  })();
+
+  const sidebar       = document.getElementById('sidebar');
+  const toggleBtn     = document.getElementById('toggleBtn');
+  const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+  const sidebarOverlay = document.getElementById('sidebarOverlay');
+  const SIDEBAR_ANIMATION_MS = 420;
+  let layoutRefreshTimer = null;
+  let lastLayoutRefreshAt = 0;
+
+  function isMobile() { return window.innerWidth <= 768; }
+
+  function refreshPageLayout() {
+    // Recalculate DataTables widths after layout changes.
+    // محصَّنة: جدولٌ واحدٌ برأسٍ لا يطابق خلاياه (علة عدّ الأعمدة tn/18) كان
+    // يرمي «reading 'style'» فيقتل المعالجَ كلَّه لكل الجداول — الخطأ يُسجَّل ولا يُفشل.
+    if (window.jQuery && window.jQuery.fn && window.jQuery.fn.dataTable) {
+      try {
+        const tablesApi = window.jQuery.fn.dataTable.tables({ visible: true, api: true });
+        tablesApi.columns.adjust();
+        // إضافةُ Responsive مرفوعة: لا recalc — التمرير الأفقي يتكفّل بالعرض.
+      } catch (e) {
+        if (window.console && console.debug) { console.debug('refreshPageLayout skipped:', e.message); }
+      }
+    }
+  }
+
+  function refreshPageLayoutAfterAnimation() {
+    if (layoutRefreshTimer) {
+      clearTimeout(layoutRefreshTimer);
+    }
+    layoutRefreshTimer = setTimeout(function() {
+      layoutRefreshTimer = null;
+      refreshPageLayout();
+      lastLayoutRefreshAt = Date.now();
+    }, SIDEBAR_ANIMATION_MS);
+  }
+
+  function openSidebar() {
+    sidebar.classList.add('active');
+    sidebarOverlay.classList.add('active');
+    document.body.style.overflow = 'hidden'; // منع التمرير خلف السايدبار
+    // صنفٌ على <body> يقود إخفاءَ الزرّ العائم على الجوّال — الزرّ يسبق
+    // السايدبار في الـDOM فلا يصله محدِّدُ الشقيق من حالة اللوح.
+    document.body.classList.add('ems-sidebar-open');
+    if (mobileMenuBtn) { mobileMenuBtn.setAttribute('aria-expanded', 'true'); }
+    refreshPageLayoutAfterAnimation();
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove('active');
+    sidebarOverlay.classList.remove('active');
+    document.body.style.overflow = '';
+    document.body.classList.remove('ems-sidebar-open');
+    if (mobileMenuBtn) { mobileMenuBtn.setAttribute('aria-expanded', 'false'); }
+    refreshPageLayoutAfterAnimation();
+  }
+
+  // زر السهم داخل السايدبار (للحاسوب فقط)
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      if (!isMobile()) {
+        sidebar.classList.toggle('closed');
+        refreshPageLayoutAfterAnimation();
+      }
+    });
+  }
+
+  // زر الهامبرغر الخارجي (للموبايل)
+  if (mobileMenuBtn) {
+    mobileMenuBtn.addEventListener('click', () => {
+      if (sidebar.classList.contains('active')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
+  }
+
+  // إغلاق عند النقر على الخلفية المعتمة
+  if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', () => {
+      closeSidebar();
+    });
+  }
+
+  // إغلاق عند الضغط على أي رابط داخل السايدبار (موبايل)
+  sidebar.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (isMobile()) closeSidebar();
+    });
+  });
+
+  /* ── إغلاقُ لوح الجوّال: زرٌّ صريحٌ في رأسه · Escape · سحبةٌ نحو اليمين ──
+     الخلفيةُ المعتمة وحدَها لم تكن كافية: زرُّ الطيّ مخفيٌّ على الهاتف،
+     والزرُّ العائم يختفي عند الفتح. كلُّ ما يلي محروسٌ بـisMobile() فلا
+     يغيّر حرفًا من سلوك الحاسوب. */
+  const sidebarMobileClose = document.getElementById('sidebarMobileClose');
+  if (sidebarMobileClose) {
+    sidebarMobileClose.addEventListener('click', closeSidebar);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+      closeSidebar();
+    }
+  });
+
+  (function () {
+    // سحبةٌ أفقيّةٌ نحو اليمين تغلق اللوح (اتجاه انزلاقه في RTL).
+    // العتبةُ 60px، ويُلغى الالتقاطُ إن غلب الميلُ الرأسيُّ — كي لا تُختطف
+    // حركةُ تمرير القائمة الطويلة.
+    let sx = 0, sy = 0, tracking = false;
+    sidebar.addEventListener('touchstart', (e) => {
+      if (!isMobile() || !sidebar.classList.contains('active') || e.touches.length !== 1) return;
+      sx = e.touches[0].clientX;
+      sy = e.touches[0].clientY;
+      tracking = true;
+    }, { passive: true });
+
+    sidebar.addEventListener('touchmove', (e) => {
+      if (!tracking || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - sx;
+      const dy = e.touches[0].clientY - sy;
+      if (Math.abs(dy) > Math.abs(dx)) { tracking = false; return; }
+      if (dx > 60) { tracking = false; closeSidebar(); }
+    }, { passive: true });
+
+    sidebar.addEventListener('touchend', () => { tracking = false; }, { passive: true });
+  })();
+
+  // إغلاق عند تغيير حجم الشاشة للكمبيوتر
+  window.addEventListener('resize', () => {
+    if (!isMobile()) {
+      closeSidebar();
+    }
+    // Prevent resize storms from triggering endless expensive reflows.
+    if (Date.now() - lastLayoutRefreshAt > 250) {
+      refreshPageLayoutAfterAnimation();
+    }
+  });
+
+  // ===== شارة الرسائل غير المقروءة =====
+  let navBadgeReqInFlight = false;
+
+  function updateChatNavBadge() {
+    if (document.hidden || navBadgeReqInFlight) {
+      return;
+    }
+    navBadgeReqInFlight = true;
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/ems/chats/get_unread_count.php', true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.onload = function() {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        var badge = document.getElementById('nav-unread-badge');
+        if (badge) {
+          if (data.count > 0) {
+            badge.textContent = data.count > 99 ? '99+' : String(data.count);
+            badge.style.display = 'inline-flex';
+            badge.setAttribute('aria-label', data.count > 99 ? 'أكثر من 99 رسالة غير مقروءة' : (String(data.count) + ' رسائل غير مقروءة'));
+          } else {
+            badge.style.display = 'none';
+            badge.removeAttribute('aria-label');
+          }
+        }
+      } catch(e) {}
+      navBadgeReqInFlight = false;
+    };
+    xhr.onerror = function() { navBadgeReqInFlight = false; };
+    xhr.onabort = function() { navBadgeReqInFlight = false; };
+    xhr.send();
+  }
+  updateChatNavBadge();
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+      updateChatNavBadge();
+    }
+  });
+  setInterval(updateChatNavBadge, 60000);
+
+  // Initial pass after page load to ensure any table wrapper starts with correct width.
+  refreshPageLayoutAfterAnimation();
+</script>
+<template class="ems-about-tpl" data-src="registry" data-screen-key="FinRequests/request_form.php"><p class="ems-about__purpose">شاشة «طلب مالي جديد».</p><p class="ems-about__purpose">تعرض بياناتِها في جدولٍ يمكن البحثُ فيه وترتيبُه وتصديرُه، وفيها نموذجٌ لإضافةِ البيانات وتعديلِها من الشاشة نفسِها.</p></template><div id="emsOfflineBar" style="display:none;position:fixed;top:0;right:0;left:0;z-index:9999;background:#8a1f1f;color:#fff;text-align:center;padding:6px;font-weight:700">⚠ لا اتصالَ بالشبكة — ما تكتبه محفوظٌ محليًّا (المسودةُ التلقائية) ولن يضيع</div><script>window.addEventListener("offline",function(){document.getElementById("emsOfflineBar").style.display="block"});window.addEventListener("online",function(){document.getElementById("emsOfflineBar").style.display="none"});</script><template class="ems-about-tpl" data-src="auto" data-screen-key="FinRequests/request_form.php"><p class="ems-about__purpose">شاشة «طلباتي المالية».</p></template><div class="main ems-unified-page-shell finreq-main ems-doc-cycle">
+    <div class="main_head">
+    <div class="head_actions">
+        <a aria-label="إنشاء طلب مالي" href="javascript:void(0)" id="toggleForm" class="add-btn ems-head-circle" title="إنشاء طلب مالي"><i class="fa-solid fa-plus"></i></a><a href="javascript:void(0)" id="toggleStats" class="btn" title="إظهار أو إخفاء الإحصائيات"><i class="fas fa-eye"></i><span class="frq-toggle-stats-text">إظهار الإحصائيات</span></a>    </div>
+
+    <h1 class="head-title">
+        <div class="title-icon"><i class="fa fa-list-check"></i></div>
+        طلباتي المالية    </h1>
+
+        <div class="head_back">
+        <a aria-label="رجوع" href="../main/dashboard.php" class="back-btn ems-head-circle" title="رجوع"><i class="fa-solid fa-share"></i></a>    </div>
+    
+    </div>
+<div class="ems-page-context" dir="rtl"><span>النطاق: <b>ايكوبيشن</b></span><span>صلاحيتك: <b>تحرير</b></span><span>لحظةُ القراءة: <b>2026-08-21 09:53</b></span></div><span class="ems-next-step"><span class="ems-next-step-label">الخطوةُ التالية</span><span class="ems-next-step-value">إنشاءُ طلبٍ أو متابعةُ المعادِ إليك للاستكمال</span></span><div class="ems-state ems-state-loading" hidden role="status" aria-live="polite"><span class="ems-spinner" aria-hidden="true"></span><div class="ems-state-title">جارٍ تحميلُ البيانات</div></div><div class="ems-state ems-state-empty" hidden role="status" aria-live="polite"><div class="ems-state-title">لا طلباتٍ ضمن هذا الترشيح</div><div class="ems-state-hint">أنشئ طلبَك الأول من زرِّ «إنشاء طلب مالي» أعلى الشاشة أو غيّر المرشِّحات</div></div><div class="ems-state ems-state-error" hidden role="status" aria-live="polite"><div class="ems-state-title">تعذّر عرضُ البيانات</div><div class="ems-state-hint">أعد المحاولةَ — وإن استمر الخللُ أبلغ عن مشكلةٍ من هذه الشاشة</div></div>    
+    
+        
+    
+    
+                        <div class="stats-section" id="frqStatsSection">
+            <div class="stats-grid ems-statgrid ems-statgrid--fill" data-cols="4">
+                <a class="stats-card stats-primary frq-stat-on"
+                   href="request_form.php" title="رفعُ ترشيحِ الحالة">
+                    <div class="stats-icon"><i class="fa fa-layer-group"></i></div>
+                    <div class="stats-value">9</div>
+                    <div class="stats-title">إجمالي طلباتي</div>
+                </a>
+                                    <a class="stats-card stats-slate"
+                       href="request_form.php?state=draft"
+                       title="ترشيحُ الجدولِ على «مسودات»">
+                        <div class="stats-icon"><i class="fa fa-pen-ruler"></i></div>
+                        <div class="stats-value">1</div>
+                        <div class="stats-title">مسودات</div>
+                    </a>
+                                    <a class="stats-card stats-orange"
+                       href="request_form.php?state=cycle"
+                       title="ترشيحُ الجدولِ على «قيدَ الدورة»">
+                        <div class="stats-icon"><i class="fa fa-hourglass-half"></i></div>
+                        <div class="stats-value">1</div>
+                        <div class="stats-title">قيدَ الدورة</div>
+                    </a>
+                                    <a class="stats-card stats-danger"
+                       href="request_form.php?state=returned"
+                       title="ترشيحُ الجدولِ على «معادةٌ للاستكمال»">
+                        <div class="stats-icon"><i class="fa fa-rotate-left"></i></div>
+                        <div class="stats-value">0</div>
+                        <div class="stats-title">معادةٌ للاستكمال</div>
+                    </a>
+                                    <a class="stats-card stats-primary"
+                       href="request_form.php?state=approved"
+                       title="ترشيحُ الجدولِ على «معتمدةٌ أو مقيَّدة»">
+                        <div class="stats-icon"><i class="fa fa-circle-check"></i></div>
+                        <div class="stats-value">0</div>
+                        <div class="stats-title">معتمدةٌ أو مقيَّدة</div>
+                    </a>
+                                    <a class="stats-card stats-success"
+                       href="request_form.php?state=settled"
+                       title="ترشيحُ الجدولِ على «مدفوعةٌ أو مُغلقة»">
+                        <div class="stats-icon"><i class="fa fa-hand-holding-dollar"></i></div>
+                        <div class="stats-value">3</div>
+                        <div class="stats-title">مدفوعةٌ أو مُغلقة</div>
+                    </a>
+                                    <a class="stats-card stats-purple"
+                       href="request_form.php?state=refused"
+                       title="ترشيحُ الجدولِ على «مرفوضةٌ أو مسحوبة»">
+                        <div class="stats-icon"><i class="fa fa-circle-xmark"></i></div>
+                        <div class="stats-value">4</div>
+                        <div class="stats-title">مرفوضةٌ أو مسحوبة</div>
+                    </a>
+                                                <div class="stats-card stats-cyan">
+                    <div class="stats-icon"><i class="fa fa-coins"></i></div>
+                                            <div class="stats-value ems-statcard__value--text">
+                            2,032 USD · 86 بلا عملة                        </div>
+                        <div class="ems-statcard__meta">مجموعٌ لكلِّ عملةٍ على حدة</div>
+                                        <div class="stats-title">قيمةُ الطلباتِ الحيّة</div>
+                </div>
+            </div>
+        </div>
+    
+        
+                                <div class="alert alert-info fr-alert" id="finreqHint">
+            <i class="fa fa-arrow-up"></i> اضغط زر <strong>«إنشاء طلب مالي»</strong> أعلى الصفحة لفتح النموذج.
+        </div>
+                <form id="finreqForm" action="request_actions.php" method="post" class="allforms"><input type="hidden" name="csrf_token" value="ff200a839dbc09cfdc5518df9e0d5a223d0fb98bfe5626cc9e1795be3592a3ef">
+        <input type="hidden" name="csrf_token" value="ff200a839dbc09cfdc5518df9e0d5a223d0fb98bfe5626cc9e1795be3592a3ef">        <input type="hidden" name="action" value="create">
+                <div class="card">
+                        <div class="card-header"><h5 title="تُراجَع دواعي الطلبِ ومبرراتُه قبل إنشائِه"><i class="fa fa-scale-balanced"></i> مبررات الطلب</h5></div>
+            <div class="card-body"><div class="form-grid">
+                <div>
+                    <label for="emsf_173_c599f">الإدارة صاحبة الاحتياج *</label>
+                    <select name="source_module" aria-label="الإدارة صاحبة الاحتياج" required  id="emsf_173_c599f">
+                                                    <option value="projects" >
+                                المشاريع والتشغيل                            </option>
+                                                    <option value="general" >
+                                طلبات عامة (النقل والحركة والمواقع)                            </option>
+                                            </select>
+                                    </div>
+                <div>
+                    <label for="emsf_174_4439f">نوع الطلب *</label>
+                    <select name="request_type" aria-label="نوع الطلب" required  id="emsf_174_4439f">
+                                                    <option value="purchase" >طلب شراء</option>
+                                                    <option value="disbursement" >طلب صرف (مصروف)</option>
+                                                    <option value="advance" >طلب سلفة</option>
+                                                    <option value="supplier_payment" >طلب دفعة مورد</option>
+                                                    <option value="employee_payment" >طلب دفعة موظف</option>
+                                                    <option value="transfer" >طلب تحويل</option>
+                                                    <option value="settlement" >طلب تسوية</option>
+                                                    <option value="refund" >طلب استرداد</option>
+                                                    <option value="discount" >طلب خصم</option>
+                                                    <option value="collection" >طلب تحصيل</option>
+                                                    <option value="other" >طلب آخر</option>
+                                            </select>
+                                    </div>
+                <div>
+                    <label for="emsf_175_3421b">لماذا نحتاج هذا الآن؟ (المبرّر) *</label>
+                    <input type="text" name="justification" aria-label="مبرّر الاحتياج" maxlength="255" required value="" placeholder="لا طلب بلا لماذا" id="emsf_175_3421b">
+                </div>
+                <div>
+                    <label for="emsf_176_1cbe3">تصنيف الحاجة *</label>
+                    <select name="need_class" id="emsf_176_1cbe3">
+                                                    <option value="planned" >مخطط</option>
+                                                    <option value="unplanned" >غير مخطط</option>
+                                                    <option value="urgent" >عاجل</option>
+                                                    <option value="emergency" >طارئ</option>
+                                            </select>
+                </div>
+                <div>
+                    <label for="emsf_177_2393b">المرجع المصدري (أمر شراء/بلاغ/عقد)</label>
+                    <input type="text" name="source_ref" aria-label="المرجع المصدري (أمر شراء/بلاغ/عقد)" maxlength="60" value="" id="emsf_177_2393b">
+                </div>
+                <div>
+                    <label for="emsf_178_6febc">البديل المدروس إن وُجد (ملاحظات)</label>
+                    <input type="text" name="notes" aria-label="البديل المدروس (ملاحظات)" maxlength="255" value="" id="emsf_178_6febc">
+                </div>
+                                <div>
+                    <label for="emsf_179_5d929" title="يُسجَّل صاحبُ الطلبِ والمُدخِلُ معًا في سجلِّ الطلب">الإدخال نيابةً عن (اختياري)</label>
+                    <select name="requester_id" id="emsf_179_5d929">
+                        <option value="">— أنا صاحب الطلب —</option>
+                                                    <option value="909">ACC-05@equipation.sd</option>
+                                                    <option value="910">ACC-09@equipation.sd</option>
+                                                    <option value="917">acc.10@equipation.sd</option>
+                                                    <option value="918">acc.11@equipation.sd</option>
+                                                    <option value="919">acc.12@equipation.sd</option>
+                                                    <option value="920">acc.13@equipation.sd</option>
+                                                    <option value="921">acc.14@equipation.sd</option>
+                                                    <option value="922">acc.15@equipation.sd</option>
+                                                    <option value="923">acc.16@equipation.sd</option>
+                                                    <option value="924">acc.17@equipation.sd</option>
+                                                    <option value="925">acc.18@equipation.sd</option>
+                                                    <option value="926">acc.19@equipation.sd</option>
+                                                    <option value="927">acc.20@equipation.sd</option>
+                                                    <option value="911">acc.4@equipation.sd</option>
+                                                    <option value="912">acc.5@equipation.sd</option>
+                                                    <option value="913">acc.6@equipation.sd</option>
+                                                    <option value="914">acc.7@equipation.sd</option>
+                                                    <option value="915">acc.8@equipation.sd</option>
+                                                    <option value="916">acc.9@equipation.sd</option>
+                                                    <option value="905">FIN-CFO@equipation.sd</option>
+                                                    <option value="904">FIN-CTRL@equipation.sd</option>
+                                                    <option value="907">FIN-PAY@equipation.sd</option>
+                                                    <option value="908">FIN-REC@equipation.sd</option>
+                                                    <option value="73">fin.accountant@equipation.sd</option>
+                                                    <option value="74">fin.deptmgr@equipation.sd</option>
+                                                    <option value="77">fin.reader@equipation.sd</option>
+                                                    <option value="75">fin.reviewer@equipation.sd</option>
+                                                    <option value="76">fin.treasury@equipation.sd</option>
+                                                    <option value="906">IAF-AUD@equipation.sd</option>
+                                                    <option value="78">transport_mgr</option>
+                                                    <option value="43">wf_mnt_probe</option>
+                                                    <option value="882">أمين المستودع</option>
+                                                    <option value="9">احمد</option>
+                                                    <option value="7">اروينا</option>
+                                                    <option value="324">بلاغات</option>
+                                                    <option value="859">تمويل</option>
+                                                    <option value="881">تنفيذ</option>
+                                                    <option value="11">حركة - الروسية</option>
+                                                    <option value="18">حركة - جديد</option>
+                                                    <option value="70">حركة-صافولا</option>
+                                                    <option value="56">حسابات</option>
+                                                    <option value="69">صافولا</option>
+                                                    <option value="19">صيانة</option>
+                                                    <option value="13">مبيعات</option>
+                                                    <option value="898">محلل مخاطر</option>
+                                                    <option value="897">مخاطر</option>
+                                                    <option value="883">مدير القوى</option>
+                                                    <option value="14">مدير المنجم MB1</option>
+                                                    <option value="12">مدير موقع الروسية</option>
+                                                    <option value="72">مديرمالي</option>
+                                                    <option value="928">مراجع</option>
+                                                    <option value="71">مشتريات</option>
+                                                    <option value="58">مشرف</option>
+                                                    <option value="885">مشرف الأسطول</option>
+                                                    <option value="894">مشرف التمويل</option>
+                                                    <option value="887">مشرف التنفيذ</option>
+                                                    <option value="889">مشرف الصلاحيات</option>
+                                                    <option value="896">مشرف القوى</option>
+                                                    <option value="891">مشرف المالية</option>
+                                                    <option value="888">مشرف المبيعات</option>
+                                                    <option value="895">مشرف المستودع</option>
+                                                    <option value="890">مشرف المشتريات</option>
+                                                    <option value="886">مشرف الموارد</option>
+                                                    <option value="884">مشرف الموردين</option>
+                                                    <option value="892">مشرف النقل</option>
+                                                    <option value="899">مشرف مخاطر</option>
+                                                    <option value="10">مشغل الروسية</option>
+                                                    <option value="5">مصعب</option>
+                                                    <option value="20">مصيانة</option>
+                                                    <option value="8">موقع</option>
+                                                    <option value="17">موقعmb1</option>
+                                                    <option value="6">يسن</option>
+                                            </select>
+                </div>
+                            </div></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h5><i class="fa fa-user-tag"></i> بيانات الطلب والمستفيد (§5)</h5></div>
+            <div class="card-body"><div class="form-grid">
+                <div>
+                    <label for="emsf_180_63fe2">نوع المستفيد *</label>
+                    <select name="beneficiary_type" id="emsf_180_63fe2">
+                                                    <option value="supplier" >مورد</option>
+                                                    <option value="employee" >موظف</option>
+                                                    <option value="customer" >عميل</option>
+                                                    <option value="internal" >داخلي</option>
+                                                    <option value="other" >آخر</option>
+                                            </select>
+                </div>
+                <div>
+                    <label for="emsf_181_cf074">اسم الجهة المستفيدة</label>
+                    <input type="text" name="beneficiary_name" aria-label="اسم الجهة المستفيدة" maxlength="160" value="" id="emsf_181_cf074">
+                </div>
+                <div>
+                    <label for="emsf_182_c391e">مرجع المستفيد (معرّف المورد/الموظف)</label>
+                    <input type="number" name="beneficiary_ref" aria-label="مرجع المستفيد (معرّف المورد/الموظف)" min="1" value="" id="emsf_182_c391e">
+                </div>
+                <div>
+                    <label for="emsf_183_6701d">المبلغ *</label>
+                    <input type="number" step="0.01" min="0.01" name="amount" aria-label="مبلغ الطلب" required value="" id="emsf_183_6701d">
+                </div>
+                <div>
+                    <label for="emsf_184_b3d0b">العملة</label>
+                    <input type="text" name="currency" aria-label="عملة الطلب" maxlength="8" value="SDG" id="emsf_184_b3d0b">
+                </div>
+                <div>
+                    <label for="emsf_185_c942d">طريقة الدفع المقترحة</label>
+                    <select name="payment_method" id="emsf_185_c942d">
+                        <option value="">— تقرّرها الخزينة —</option>
+                                                    <option value="cash" >نقدًا</option>
+                                                    <option value="bank" >بنكي</option>
+                                                    <option value="transfer" >تحويل</option>
+                                                    <option value="cheque" >شيك</option>
+                                            </select>
+                </div>
+                <div>
+                    <label for="emsf_186_ea366">البيان</label>
+                    <input type="text" name="statement" aria-label="بيان الطلب" maxlength="255" value="" id="emsf_186_ea366">
+                </div>
+                <div>
+                    <label for="emsf_187_e60a0">تاريخ الاستحقاق المطلوب</label>
+                    <input type="date" name="needed_by" aria-label="تاريخ الاستحقاق المطلوب" value="" id="emsf_187_e60a0">
+                </div>
+                <div>
+                    <label for="emsf_188_4e044">الأولوية</label>
+                    <select name="priority" id="emsf_188_4e044">
+                                                    <option value="normal" >اعتيادية</option>
+                                                    <option value="high" >مرتفعة</option>
+                                                    <option value="critical" >حرجة</option>
+                                            </select>
+                </div>
+                <div>
+                    <label for="emsf_189_3f6bd">المشروع (اختياري)</label>
+                    <input type="number" name="project_id" aria-label="المشروع (اختياري)" min="1" value="" id="emsf_189_3f6bd">
+                </div>
+                <div>
+                    <label for="emsf_190_c5077">المعدة (اختياري)</label>
+                    <input type="number" name="equipment_id" aria-label="المعدة (اختياري)" min="1" value="" id="emsf_190_c5077">
+                </div>
+                <div>
+                    <label for="emsf_191_85665">مركز التكلفة (اختياري)</label>
+                    <input type="text" name="cost_center" aria-label="مركز التكلفة (اختياري)" maxlength="60" value="" id="emsf_191_85665">
+                </div>
+            </div>
+            <div class="fr-mt14">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> حفظ مسودة برقمٍ خادمي</button>
+            </div>
+            </div>
+        </div>
+    </form>
+    
+                <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
+                <form method="get" action="request_form.php">
+                    <div class="filter-field">
+                        <label for="frq_f_state"><i class="fa fa-flag"></i> الحالة</label>
+                        <select name="state" id="frq_f_state" class="form-control">
+                            <option value="">— كل الحالات —</option>
+                            <optgroup label="مجموعاتُ الحالة">
+                                                                    <option value="draft" >
+                                        مسودات (1)</option>
+                                                                    <option value="cycle" >
+                                        قيدَ الدورة (1)</option>
+                                                                    <option value="returned" >
+                                        معادةٌ للاستكمال (0)</option>
+                                                                    <option value="approved" >
+                                        معتمدةٌ أو مقيَّدة (0)</option>
+                                                                    <option value="settled" >
+                                        مدفوعةٌ أو مُغلقة (3)</option>
+                                                                    <option value="refused" >
+                                        مرفوضةٌ أو مسحوبة (4)</option>
+                                                            </optgroup>
+                            <optgroup label="حالةٌ مفردة">
+                                                                    <option value="draft" >مسودة</option>
+                                                                    <option value="under_review" >تحت المراجعة</option>
+                                                                    <option value="pending_approval" >بانتظار الاعتماد</option>
+                                                                    <option value="approved" >معتمد</option>
+                                                                    <option value="rejected" >مرفوض</option>
+                                                                    <option value="returned" >معاد للاستكمال</option>
+                                                                    <option value="posted" >مقيد</option>
+                                                                    <option value="paid" >مدفوع</option>
+                                                                    <option value="collected" >محصل</option>
+                                                                    <option value="closed" >مغلق</option>
+                                                                    <option value="archived" >مؤرشف</option>
+                                                                    <option value="withdrawn" >مسحوب</option>
+                                                                    <option value="cancelled" >ملغى</option>
+                                                                    <option value="suspended" >معلّق</option>
+                                                                    <option value="expired" >منتهٍ</option>
+                                                                    <option value="merged" >مدموج</option>
+                                                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <label for="frq_f_type"><i class="fa fa-tags"></i> نوع الطلب</label>
+                        <select name="type" id="frq_f_type" class="form-control">
+                            <option value="">— كل الأنواع —</option>
+                                                            <option value="purchase" >طلب شراء</option>
+                                                            <option value="disbursement" >طلب صرف (مصروف)</option>
+                                                            <option value="advance" >طلب سلفة</option>
+                                                            <option value="supplier_payment" >طلب دفعة مورد</option>
+                                                            <option value="employee_payment" >طلب دفعة موظف</option>
+                                                            <option value="transfer" >طلب تحويل</option>
+                                                            <option value="settlement" >طلب تسوية</option>
+                                                            <option value="refund" >طلب استرداد</option>
+                                                            <option value="discount" >طلب خصم</option>
+                                                            <option value="collection" >طلب تحصيل</option>
+                                                            <option value="other" >طلب آخر</option>
+                                                    </select>
+                    </div>
+                    <div class="filter-field">
+                        <label for="frq_f_q"><i class="fa fa-magnifying-glass"></i> بحثٌ نصّي</label>
+                        <input type="text" name="q" id="frq_f_q" class="form-control" maxlength="80"
+                               value=""
+                               placeholder="رقم الطلب · المبرّر · المستفيد · المرجع">
+                    </div>
+                    <div class="filter-field">
+                        <label for="frq_f_from"><i class="fa fa-calendar"></i> من تاريخ</label>
+                        <input type="date" name="from" id="frq_f_from" class="form-control" value="">
+                    </div>
+                    <div class="filter-field">
+                        <label for="frq_f_to"><i class="fa fa-calendar"></i> إلى تاريخ</label>
+                        <input type="date" name="to" id="frq_f_to" class="form-control" value="">
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn-primary"><i class="fa fa-search"></i> عرض</button>
+                        <a href="request_form.php" class="btn" title="إعادة ضبط"><i class="fa fa-rotate-right"></i></a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    
+                <div class="card">
+            <div class="card-header"><h5><i class="fas fa-table"></i> طلباتي
+                                    (آخر 9)
+                            </h5></div>
+            <div class="card-body table-container">
+                <table class="display frq-table">
+                    <thead>
+                        <tr>
+                            <th>رقم الطلب</th><th>نوع الطلب</th><th>المبرّر</th><th>المستفيد</th>
+                            <th>المبلغ</th><th>الحالة</th><th>الحدث</th><th>أُنشئ</th><th></th>
+                                                        <th class="ems-fn-th" data-fn="1" data-fn-src="req_date">تاريخ الطلب</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="requester">مقدّم الطلب</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="dept">الإدارة</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="descr">الوصف</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="party">الجهة المعنية</th>
+                            <th class="ems-fn-th" data-fn="1" data-fn-src="reject">سبب الرفض</th>
+                                                        <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صفَّ بلا كيانٍ مالك">الكيان</th>
+                            <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمِد — تفويض أو سلطة أصلية">مرجع التفويض</th>
+                            <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
+                            <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
+                            <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
+                            <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المُنشئ — الاسم والصفة</th>
+                            <th class="ems-gov-th" data-gov="required_approver" data-slice="1" title="من يلزم اعتماده بحسب سلسلة الاعتماد">المعتمِد المطلوب</th>
+                            <th class="ems-gov-th none" data-gov="attachments" data-slice="3" title="مرفقات الإثبات">المرفقات</th>
+                            </tr>
+                    </thead>
+                    <tbody>
+                                            <tr data-xf="{&quot;req_date&quot;:&quot;2026-08-06&quot;,&quot;requester&quot;:&quot;محمد&quot;,&quot;dept&quot;:&quot;المشاريع والتشغيل&quot;,&quot;descr&quot;:&quot;اختبار تجاوز السقف الدولاري&quot;,&quot;party&quot;:&quot;مورد تجربة BR-CEO-05&quot;,&quot;reject&quot;:&quot;&quot;}">
+                            <td><strong>FR-2026-0009</strong></td>
+                            <td>طلب صرف (مصروف)</td>
+                            <td>إثبات BR-CEO-05 حي</td>
+                            <td>مورد تجربة BR-CEO-05</td>
+                                                        <td>15,500.00 USD</td>
+                            <td><span class="badge bg-secondary">مسحوب</span></td>
+                            <td>—</td>
+                            <td>2026-08-06</td>
+                            <td>
+                                <a href="request_form.php?id=619" class="action-btn view" title="فتح"><i class="fa fa-eye"></i></a>
+                            </td>
+                        </tr>
+                                            <tr data-xf="{&quot;req_date&quot;:&quot;2025-05-16&quot;,&quot;requester&quot;:&quot;#16&quot;,&quot;dept&quot;:&quot;الإدارة والصلاحيات&quot;,&quot;descr&quot;:&quot;يخضع لمراجعة الربع القادم · UAT-2026&quot;,&quot;party&quot;:&quot;الصديق عبد الماجد النور&quot;,&quot;reject&quot;:&quot;طلب مكرر — FIN_-00016&quot;}">
+                            <td><strong>FIN_-00016</strong> <span class="badge bg-warning">تكرار؟</span></td>
+                            <td>طلب دفعة موظف</td>
+                            <td>يخضع لمراجعة الربع القادم · UAT-2026</td>
+                            <td>الصديق عبد الماجد النور</td>
+                                                        <td>2,305.50 USD</td>
+                            <td><span class="badge bg-secondary">مدموج</span></td>
+                            <td>#16</td>
+                            <td>2025-05-16</td>
+                            <td>
+                                <a href="request_form.php?id=581" class="action-btn view" title="فتح"><i class="fa fa-eye"></i></a>
+                            </td>
+                        </tr>
+                                            <tr data-xf="{&quot;req_date&quot;:&quot;2024-06-12&quot;,&quot;requester&quot;:&quot;#15&quot;,&quot;dept&quot;:&quot;البلاغات&quot;,&quot;descr&quot;:&quot;مُدرجٌ ضمن الدورة الشهرية · UAT-2026&quot;,&quot;party&quot;:&quot;سيف الدين حامد بابكر&quot;,&quot;reject&quot;:&quot;مخالفة سياسة — FIN_-00015&quot;}">
+                            <td><strong>FIN_-00015</strong> <span class="badge bg-warning">تكرار؟</span></td>
+                            <td>طلب دفعة مورد</td>
+                            <td>مُدرجٌ ضمن الدورة الشهرية · UAT-2026</td>
+                            <td>سيف الدين حامد بابكر</td>
+                                                        <td>2,168.50 USD</td>
+                            <td><span class="badge bg-secondary">منتهٍ</span></td>
+                            <td>#15</td>
+                            <td>2024-06-12</td>
+                            <td>
+                                <a href="request_form.php?id=580" class="action-btn view" title="فتح"><i class="fa fa-eye"></i></a>
+                            </td>
+                        </tr>
+                                            <tr data-xf="{&quot;req_date&quot;:&quot;2026-01-07&quot;,&quot;requester&quot;:&quot;مدير المنجم MB1&quot;,&quot;dept&quot;:&quot;النقل والترحيل&quot;,&quot;descr&quot;:&quot;بناءً على طلب الموقع · UAT-2026&quot;,&quot;party&quot;:&quot;مأمون عادل الطيب&quot;,&quot;reject&quot;:&quot;خارج الميزانية — FIN_-00014&quot;}">
+                            <td><strong>FIN_-00014</strong> <span class="badge bg-warning">تكرار؟</span></td>
+                            <td>طلب سلفة</td>
+                            <td>بناءً على طلب الموقع · UAT-2026</td>
+                            <td>مأمون عادل الطيب</td>
+                                                        <td>2,031.50 USD</td>
+                            <td><span class="badge bg-warning">معلّق</span></td>
+                            <td>#14</td>
+                            <td>2026-01-07</td>
+                            <td>
+                                <a href="request_form.php?id=579" class="action-btn view" title="فتح"><i class="fa fa-eye"></i></a>
+                            </td>
+                        </tr>
+                                            <tr data-xf="{&quot;req_date&quot;:&quot;2024-03-04&quot;,&quot;requester&quot;:&quot;مدير موقع الروسية&quot;,&quot;dept&quot;:&quot;المواقع&quot;,&quot;descr&quot;:&quot;مراجَعٌ من المالية ومطابق · UAT-2026&quot;,&quot;party&quot;:&quot;وليد الهادي عثمان&quot;,&quot;reject&quot;:&quot;سبب آخر — FIN_-00012&quot;}">
+                            <td><strong>FIN_-00012</strong> <span class="badge bg-warning">تكرار؟</span></td>
+                            <td>طلب شراء</td>
+                            <td>مراجَعٌ من المالية ومطابق · UAT-2026</td>
+                            <td>وليد الهادي عثمان</td>
+                                                        <td>1,757.50 USD</td>
+                            <td><span class="badge bg-secondary">مسحوب</span></td>
+                            <td>#12</td>
+                            <td>2024-03-04</td>
+                            <td>
+                                <a href="request_form.php?id=577" class="action-btn view" title="فتح"><i class="fa fa-eye"></i></a>
+                            </td>
+                        </tr>
+                                            <tr data-xf="{&quot;req_date&quot;:&quot;2025-09-29&quot;,&quot;requester&quot;:&quot;حركة - الروسية&quot;,&quot;dept&quot;:&quot;طلبات عامة (النقل والحركة والمواقع)&quot;,&quot;descr&quot;:&quot;بانتظار اعتماد الإدارة المختصة · UAT-2026&quot;,&quot;party&quot;:&quot;ياسر الأمين محمد خير&quot;,&quot;reject&quot;:&quot;بلا مبرر كافٍ — FIN_-00011&quot;}">
+                            <td><strong>FIN_-00011</strong> <span class="badge bg-warning">تكرار؟</span></td>
+                            <td>طلب آخر</td>
+                            <td>بانتظار اعتماد الإدارة المختصة · UAT-202</td>
+                            <td>ياسر الأمين محمد خير</td>
+                                                        <td>1,620.50 USD</td>
+                            <td><span class="badge bg-dark">مؤرشف</span></td>
+                            <td>#11</td>
+                            <td>2025-09-29</td>
+                            <td>
+                                <a href="request_form.php?id=576" class="action-btn view" title="فتح"><i class="fa fa-eye"></i></a>
+                            </td>
+                        </tr>
+                                            <tr data-xf="{&quot;req_date&quot;:&quot;2024-10-27&quot;,&quot;requester&quot;:&quot;مشغل الروسية&quot;,&quot;dept&quot;:&quot;الخزينة&quot;,&quot;descr&quot;:&quot;مطابقٌ للمستند المرفق · UAT-2026&quot;,&quot;party&quot;:&quot;منتصر الخير عبد الله&quot;,&quot;reject&quot;:&quot;طلب مكرر — FIN_-00010&quot;}">
+                            <td><strong>FIN_-00010</strong> <span class="badge bg-warning">تكرار؟</span></td>
+                            <td>طلب تحصيل</td>
+                            <td>مطابقٌ للمستند المرفق · UAT-2026</td>
+                            <td>منتصر الخير عبد الله</td>
+                                                        <td>1,483.50 USD</td>
+                            <td><span class="badge bg-dark">مؤرشف</span></td>
+                            <td>#10</td>
+                            <td>2024-10-27</td>
+                            <td>
+                                <a href="request_form.php?id=575" class="action-btn view" title="فتح"><i class="fa fa-eye"></i></a>
+                            </td>
+                        </tr>
+                                            <tr data-xf="{&quot;req_date&quot;:&quot;2026-05-24&quot;,&quot;requester&quot;:&quot;احمد&quot;,&quot;dept&quot;:&quot;الأسطول والمعدات&quot;,&quot;descr&quot;:&quot;وفق المعتمد في محضر الإدارة · UAT-2026&quot;,&quot;party&quot;:&quot;هيثم عبد الرازق يوسف&quot;,&quot;reject&quot;:&quot;مخالفة سياسة — FIN_-00009&quot;}">
+                            <td><strong>FIN_-00009</strong> <span class="badge bg-warning">تكرار؟</span></td>
+                            <td>طلب خصم</td>
+                            <td>وفق المعتمد في محضر الإدارة · UAT-2026</td>
+                            <td>هيثم عبد الرازق يوسف</td>
+                                                        <td>1,346.50 USD</td>
+                            <td><span class="badge bg-success">محصل</span></td>
+                            <td>#9</td>
+                            <td>2026-05-24</td>
+                            <td>
+                                <a href="request_form.php?id=574" class="action-btn view" title="فتح"><i class="fa fa-eye"></i></a>
+                            </td>
+                        </tr>
+                                            <tr data-xf="{&quot;req_date&quot;:&quot;2026-07-27&quot;,&quot;requester&quot;:&quot;اروينا&quot;,&quot;dept&quot;:&quot;المشاريع والتشغيل&quot;,&quot;descr&quot;:&quot;Accusantium irure velit ratione aut est error ad repellendus Magna ipsum&quot;,&quot;party&quot;:&quot;Kirk Lopez&quot;,&quot;reject&quot;:&quot;&quot;}">
+                            <td><strong>FR-2026-0007</strong></td>
+                            <td>طلب تحويل</td>
+                            <td>Et lorem velit assumenda incididunt et l</td>
+                            <td>Kirk Lopez</td>
+                                                        <td>86.00 بلا عملة</td>
+                            <td><span class="badge bg-secondary">مسودة</span></td>
+                            <td>—</td>
+                            <td>2026-07-27</td>
+                            <td>
+                                <a href="request_form.php?id=184" class="action-btn view" title="فتح"><i class="fa fa-eye"></i></a>
+                            </td>
+                        </tr>
+                                        </tbody>
+                </table>
+            </div>
+        </div>
+    
+        </div>
+
+<script>
+// إظهار/إخفاء نموذج الإنشاء بزر الرأس (#toggleForm) — نمط شاشات المجموعة أ:
+// النموذج .allforms مخفيٌّ افتراضيًا بالـCSS ويُفتح بإضافة .allforms-visible.
+// وزرُّ (#toggleStats) يطوي قسمَ الإحصاءِ كما في شاشة العملاء.
+(function () {
+    function ready(fn) {
+        if (document.readyState !== 'loading') { fn(); }
+        else { document.addEventListener('DOMContentLoaded', fn); }
+    }
+    ready(function () {
+        var btn  = document.getElementById('toggleForm');
+        var form = document.getElementById('finreqForm');
+        var hint = document.getElementById('finreqHint');
+        if (btn && form) {
+            var setState = function (open) {
+                form.classList.toggle('allforms-visible', open);
+                btn.classList.toggle('is-active', open);
+                btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                if (hint) { hint.style.display = open ? 'none' : ''; }
+                if (open) { form.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+            };
+            setState(form.classList.contains('allforms-visible'));
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                setState(!form.classList.contains('allforms-visible'));
+            });
+        }
+
+        var sBtn = document.getElementById('toggleStats');
+        var sBox = document.getElementById('frqStatsSection');
+        if (sBtn && sBox) {
+            /* الحالةُ تُحفظ محليًّا فلا تُنسى بين الزيارات — والمفتاحُ باسمِ الشاشة */
+            var KEY = 'ems.finreq.stats';
+            var lbl = sBtn.querySelector('.frq-toggle-stats-text');
+            var ico = sBtn.querySelector('i');
+            var apply = function (open) {
+                sBox.classList.toggle('frq-hidden', !open);
+                sBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                if (lbl) { lbl.textContent = open ? 'إخفاء الإحصائيات' : 'إظهار الإحصائيات'; }
+                if (ico) { ico.className = open ? 'fas fa-eye-slash' : 'fas fa-eye'; }
+            };
+            /* الافتراضُ **ظاهرٌ** — والمخزَّنُ يغلبه إن سبق للمستخدمِ أن اختار */
+            var saved = null;
+            try { saved = window.localStorage.getItem(KEY); } catch (e) { saved = null; }
+            apply(saved === null ? true : saved === '1');
+            sBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                var open = sBox.classList.contains('frq-hidden');
+                apply(open);
+                try { window.localStorage.setItem(KEY, open ? '1' : '0'); } catch (e2) { /* التخزينُ زينةٌ لا شرط */ }
+            });
+        }
+    });
+})();
+</script>
+<div style="position:fixed;bottom:14px;inset-inline-end:14px;z-index:1050;direction:rtl" class="ems-report-fallback"><form method="post" action="../Tickets/ticket_contextual_open.php" style="display:inline" class="ems-report-btn-secondary"><input type="hidden" name="csrf_token" value="ff200a839dbc09cfdc5518df9e0d5a223d0fb98bfe5626cc9e1795be3592a3ef"><input type="hidden" name="ctx_screen" value="request_form"><button type="submit" class="action-btn" title="أبلغ عن مشكلة" style="color:#c0392b"><i class="fas fa-bullhorn"></i> أبلغ عن مشكلة</button></form></div><script>window.EMS_DIGIT_SYSTEM="latin";</script><script src="/ems/assets/js/number-format-unifier.js" defer></script></body>
+</html>

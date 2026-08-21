@@ -30,25 +30,47 @@ ok('العلم: المذكور يفعَّل وغيره لا (حتميًّا بت
     roleBoardEnabled(17, '17') === true && roleBoardEnabled(1, '17') === false
     && roleBoardEnabled(17, '') === false && roleBoardEnabled(13, '17,13') === true);
 
-ok('الخريطة كاملة: أربعُ لوحاتٍ مخصصة + تسعٌ على العامة (ومنها التشغيل بعد وصول UX-03)',
-    roleBoardRoute(17) === 'Finance/cfo_daily_board_fin.php'
+// قرارُ المالك 2026-08-21: «الرئيسية» صارت لوحةَ كلِّ صاحبِ إعدادٍ عام — والأربعُ
+// المخصصةُ الباقيةُ (13·16·23·26) شاشاتٌ قائمةٌ بذاتها لا إعدادَ عامًّا لها.
+$boardRoles = array(1, 2, 3, 4, 5, 6, 12, 15, 17, 24);
+$routeOk = true;
+foreach ($boardRoles as $r) { if (roleBoardRoute($r) !== 'main/dashboard.php') { $routeOk = false; } }
+ok('الخريطة: أربعُ لوحاتٍ مخصصةٌ باقيةٌ في شاشاتها + عشرةُ أدوارٍ على «الرئيسية»',
+    $routeOk
     && roleBoardRoute(13) === 'Maintenance/dashboard_mnt.php'
     && roleBoardRoute(16) === 'Procurement/dashboard_proc.php'
     && roleBoardRoute(23) === 'Transport/transfer_dashboard.php'
-    && roleBoardRoute(24) === 'main/role_board.php' && roleBoardRoute(15) === 'main/role_board.php'
-    && roleBoardRoute(1) === 'main/role_board.php'
+    && roleBoardRoute(26) === 'Financing/financing_board.php'
     && roleBoardRoute(999) === null);
 
-// إعدادُ اللوحة العامة كاملٌ للأدوار التسعة — وكلُّ بطاقةٍ ومهمةٍ بقفزة (href)
-$cfgOk = true;
-foreach (array(1, 24, 12, 2, 3, 4, 5, 6, 15) as $r) {
+// «الفرعيُّ يرث أباه، ومَن له مدخلٌ صريحٌ لا يرث»
+ok('الوراثة: الفرعيُّ بلا مدخلٍ يرث أباه — وصاحبُ المدخلِ الصريحِ لا يرث',
+    roleBoardRoute(7, 1) === 'main/dashboard.php'
+    && roleBoardRoute(18, 17) === 'main/dashboard.php'
+    && roleBoardRoute(14, 13) === 'Maintenance/dashboard_mnt.php'
+    && roleBoardRoute(24, 1) === 'main/dashboard.php');
+
+// إعدادُ اللوحة كاملٌ لكلِّ دورٍ عليها — وكلُّ بطاقةٍ ومهمةٍ بقفزة (href)
+$cfgOk = true; $permOk = true;
+foreach ($boardRoles as $r) {
     $cfg = roleBoardGenericConfig($r);
     if ($cfg === null || empty($cfg['cards']) || empty($cfg['pulse'])) { $cfgOk = false; continue; }
     foreach (array_merge($cfg['cards'], $cfg['tasks']) as $def) {
         if (empty($def[0]) || empty($def[4])) { $cfgOk = false; }
     }
 }
-ok('إعداد الأدوار التسعة كامل — كل بطاقةٍ ومهمةٍ باسمٍ وقفزة', $cfgOk);
+ok('إعدادُ الأدوارِ العشرةِ كامل — كل بطاقةٍ ومهمةٍ باسمٍ وقفزة', $cfgOk);
+
+// ولوحةٌ نُقلت من شاشةٍ محروسةٍ تحمل معها قفلَها: `perm` تُعلن الشاشةَ التي
+// يحكم can_view عليها رؤيتَها، وإلا سقط الحارسُ بالتضمين.
+ok('اللوحةُ المالية تحمل قفلَ شاشتها الأصلية (perm)',
+    roleBoardGenericConfig(17)['perm'] === 'Finance/cfo_daily_board_fin.php');
+foreach ($boardRoles as $r) {
+    $cfg = roleBoardGenericConfig($r);
+    $p = isset($cfg['perm']) ? $cfg['perm'] : 'main/role_board.php';
+    if ($p === '') { $permOk = false; }
+}
+ok('كلُّ لوحةٍ تُعلن شاشةَ صلاحيتِها (صراحةً أو بالافتراض)', $permOk);
 ok('دورٌ غير معرَّفٍ يعيد null', roleBoardGenericConfig(999) === null);
 
 // تنبيهات التشغيل (UX-03 §1 · UX-01 §8.1): ثلاثةٌ من أربعة — «انحرافُ الالتزام»
@@ -58,11 +80,6 @@ ok('تنبيهات التشغيل ثلاثةٌ كاملة — و«انحراف �
     count($ops) === 3
     && count(array_filter($ops, function ($s) { return empty($s['href']) || empty($s['label']); })) === 0
     && count(array_filter($ops, function ($s) { return $s['key'] === 'commitment_variance'; })) === 0);
-
-ok('الوراثة: الدور الفرعي يرث لوحةَ أبيه (18→17 · 14→13 · 7→1)',
-    roleBoardRoute(18, 17) === 'Finance/cfo_daily_board_fin.php'
-    && roleBoardRoute(14, 13) === 'Maintenance/dashboard_mnt.php'
-    && roleBoardRoute(7, 1) === 'main/role_board.php');
 
 echo "── ② قاعدة «كل رقمٍ ينقر إلى مصدره» (UX-00 §7) ──\n";
 

@@ -13,8 +13,8 @@
  *   كلُّها — والدمجُ لا يُشترى بإسقاطِ حارس.
  *
  * ◆ **وضعان في ملفٍّ واحد**:
- *   ① بلا `?id=` ⇒ وضعُ القائمة: بطاقاتُ إحصاءٍ (كلٌّ منها مُرشِّحٌ بنقرة) ·
- *      صندوقُ فلاترَ · جدولُ طلباتي · نموذجُ الإنشاءِ مطويًّا.
+ *   ① بلا `?id=` ⇒ وضعُ القائمة بهذا الترتيب: بطاقاتُ إحصاءٍ (كلٌّ منها مُرشِّحٌ
+ *      بنقرة) · **نموذجُ الإنشاءِ مطويًّا** · صندوقُ فلاترَ · جدولُ طلباتي.
  *   ② بـ`?id=N` ⇒ وضعُ السجل: شريطُ الرحلةِ · رأسُ الحالةِ · التفريعُ ·
  *      التحريرُ · المستنداتُ · البنودُ · الإرسالُ والسحبُ · السجلُّ الإلحاقي.
  *   والنطاقُ لم يتغيّر: القائمةُ طلباتي أنا (مُنشئًا أو صاحبًا)، والسجلُّ يُفتح
@@ -369,61 +369,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         </div>
     <?php endif; ?>
 
-    <?php /* ═════ وضعُ القائمة ② — صندوقُ فلاترِ البحث (ems-filters.css) ═════ */ ?>
-    <?php if (!$is_record && $my_rows): ?>
-        <div class="filter">
-            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
-            <div class="filter-body">
-                <form method="get" action="request_form.php">
-                    <div class="filter-field">
-                        <label for="frq_f_state"><i class="fa fa-flag"></i> الحالة</label>
-                        <select name="state" id="frq_f_state" class="form-control">
-                            <option value="">— كل الحالات —</option>
-                            <optgroup label="مجموعاتُ الحالة">
-                                <?php foreach ($groups as $gk => $gv): ?>
-                                    <option value="<?php echo $gk; ?>" <?php echo $f_state === $gk ? 'selected' : ''; ?>>
-                                        <?php echo htmlspecialchars($gv['label']); ?> (<?php echo intval($g_count[$gk]); ?>)</option>
-                                <?php endforeach; ?>
-                            </optgroup>
-                            <optgroup label="حالةٌ مفردة">
-                                <?php foreach ($state_defs as $sk => $sv): ?>
-                                    <option value="<?php echo $sk; ?>" <?php echo $f_state === $sk ? 'selected' : ''; ?>><?php echo htmlspecialchars($sv['label']); ?></option>
-                                <?php endforeach; ?>
-                            </optgroup>
-                        </select>
-                    </div>
-                    <div class="filter-field">
-                        <label for="frq_f_type"><i class="fa fa-tags"></i> نوع الطلب</label>
-                        <select name="type" id="frq_f_type" class="form-control">
-                            <option value="">— كل الأنواع —</option>
-                            <?php foreach ($catalog as $tk => $tv): ?>
-                                <option value="<?php echo $tk; ?>" <?php echo $f_type === $tk ? 'selected' : ''; ?>><?php echo htmlspecialchars($tv['label']); ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                    <div class="filter-field">
-                        <label for="frq_f_q"><i class="fa fa-magnifying-glass"></i> بحثٌ نصّي</label>
-                        <input type="text" name="q" id="frq_f_q" class="form-control" maxlength="80"
-                               value="<?php echo htmlspecialchars($f_q); ?>"
-                               placeholder="رقم الطلب · المبرّر · المستفيد · المرجع">
-                    </div>
-                    <div class="filter-field">
-                        <label for="frq_f_from"><i class="fa fa-calendar"></i> من تاريخ</label>
-                        <input type="date" name="from" id="frq_f_from" class="form-control" value="<?php echo htmlspecialchars($f_from); ?>">
-                    </div>
-                    <div class="filter-field">
-                        <label for="frq_f_to"><i class="fa fa-calendar"></i> إلى تاريخ</label>
-                        <input type="date" name="to" id="frq_f_to" class="form-control" value="<?php echo htmlspecialchars($f_to); ?>">
-                    </div>
-                    <div class="filter-actions">
-                        <button type="submit" class="btn-primary"><i class="fa fa-search"></i> عرض</button>
-                        <a href="request_form.php" class="btn" title="إعادة ضبط"><i class="fa fa-rotate-right"></i></a>
-                    </div>
-                </form>
-            </div>
-        </div>
-    <?php endif; ?>
-
+    <?php /* ═════ وضعُ القائمة ② — نموذجُ الإنشاءِ **فوقَ الفلاتر** (قرارُ المالك)
+             فعلُ الإضافةِ يسبق فعلَ البحث: مَن فتح النموذجَ لا يمرُّ على مرشِّحاتٍ
+             لا تخصُّه، ومَن جاء يبحث يجد الفلاترَ فوقَ الجدولِ مباشرةً لأن
+             النموذجَ مطويٌّ لا يشغل ارتفاعًا. (والكتلةُ نفسُها هي نموذجُ التحرير
+             في وضعِ السجل — ولم يتغيّر موضعُها هناك لأن ① و③ لا يُصيَّران.) ═════ */ ?>
     <?php if (!$is_record && !$can_add): ?>
         <div class="card"><div class="card-body">
             <h5>⛔ لا تملك صلاحية إنشاء طلبٍ مالي</h5>
@@ -594,7 +544,62 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     </form>
     <?php endif; ?>
 
-    <?php /* ═════ وضعُ القائمة ③ — جدولُ طلباتي ═════ */ ?>
+    <?php /* ═════ وضعُ القائمة ③ — صندوقُ فلاترِ البحث (ems-filters.css) ═════ */ ?>
+    <?php if (!$is_record && $my_rows): ?>
+        <div class="filter">
+            <div class="filter-title"><span class="filter-title-icon"><i class="fa-solid fa-sliders"></i></span> فلاتر البحث</div>
+            <div class="filter-body">
+                <form method="get" action="request_form.php">
+                    <div class="filter-field">
+                        <label for="frq_f_state"><i class="fa fa-flag"></i> الحالة</label>
+                        <select name="state" id="frq_f_state" class="form-control">
+                            <option value="">— كل الحالات —</option>
+                            <optgroup label="مجموعاتُ الحالة">
+                                <?php foreach ($groups as $gk => $gv): ?>
+                                    <option value="<?php echo $gk; ?>" <?php echo $f_state === $gk ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($gv['label']); ?> (<?php echo intval($g_count[$gk]); ?>)</option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                            <optgroup label="حالةٌ مفردة">
+                                <?php foreach ($state_defs as $sk => $sv): ?>
+                                    <option value="<?php echo $sk; ?>" <?php echo $f_state === $sk ? 'selected' : ''; ?>><?php echo htmlspecialchars($sv['label']); ?></option>
+                                <?php endforeach; ?>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <label for="frq_f_type"><i class="fa fa-tags"></i> نوع الطلب</label>
+                        <select name="type" id="frq_f_type" class="form-control">
+                            <option value="">— كل الأنواع —</option>
+                            <?php foreach ($catalog as $tk => $tv): ?>
+                                <option value="<?php echo $tk; ?>" <?php echo $f_type === $tk ? 'selected' : ''; ?>><?php echo htmlspecialchars($tv['label']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="filter-field">
+                        <label for="frq_f_q"><i class="fa fa-magnifying-glass"></i> بحثٌ نصّي</label>
+                        <input type="text" name="q" id="frq_f_q" class="form-control" maxlength="80"
+                               value="<?php echo htmlspecialchars($f_q); ?>"
+                               placeholder="رقم الطلب · المبرّر · المستفيد · المرجع">
+                    </div>
+                    <div class="filter-field">
+                        <label for="frq_f_from"><i class="fa fa-calendar"></i> من تاريخ</label>
+                        <input type="date" name="from" id="frq_f_from" class="form-control" value="<?php echo htmlspecialchars($f_from); ?>">
+                    </div>
+                    <div class="filter-field">
+                        <label for="frq_f_to"><i class="fa fa-calendar"></i> إلى تاريخ</label>
+                        <input type="date" name="to" id="frq_f_to" class="form-control" value="<?php echo htmlspecialchars($f_to); ?>">
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="btn-primary"><i class="fa fa-search"></i> عرض</button>
+                        <a href="request_form.php" class="btn" title="إعادة ضبط"><i class="fa fa-rotate-right"></i></a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    <?php endif; ?>
+
+    <?php /* ═════ وضعُ القائمة ④ — جدولُ طلباتي ═════ */ ?>
     <?php if (!$is_record): ?>
         <div class="card">
             <div class="card-header"><h5><i class="fas fa-table"></i> طلباتي

@@ -18,6 +18,15 @@ if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dash
 
 $perms = fin_page_perms($conn, 'Finance/cfo_daily_board_fin.php', $is_super_admin);
 if (!$perms['can_view']) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية العرض ❌', 'GOV-PERM-403', ''); exit(); }
+
+// لوحتان لصاحبٍ واحدٍ لا تجتمعان: بطاقاتُ هذه اللوحةِ العشرُ صارت تُصيَّر في
+// «الرئيسية» (قرارُ المالك 2026-08-21 — انظر roleBoardGenericConfig(17))، فمَن
+// لوحتُه هناك يُردُّ إليها. والجسدُ أدناه يبقى **مسارَ رجوع**: إعادةُ الدورِ إلى
+// هذه الشاشةِ سطرٌ واحدٌ في خريطة roleBoardRoute لا إعادةُ بناء.
+require_once __DIR__ . '/../includes/role_board.php';
+$cfo_role = isset($_SESSION['user']['role']) ? intval($_SESSION['user']['role']) : 0;
+$cfo_home = roleBoardRoute($cfo_role, roleBoardConfigRole(fin_gate($is_super_admin), $cfo_role));
+if ($cfo_home === 'main/dashboard.php') { header('Location: ../main/dashboard.php'); exit(); }
 $cid = intval($company_id);
 fin_handle_notif_read($conn, $company_id, 'cfo_daily_board_fin.php');
 // قياس مُعزَّل مفرد الجدول عبر scopedQuery (§10) — بديل cfoV الخام

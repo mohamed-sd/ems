@@ -571,9 +571,70 @@ class SettlementService
         $company   = intval($st['company_id']);
         $no        = (string) $st['settlement_no'];
 
+        /* ══ INJ-FIX-01 · الموجة ب · الحاجز ② — سلامةُ التسوية (GAP-16) ═══════
+           ◆ **العطبُ الذي يسدُّه — نصُّ المالك**: «لا يُبتلع فشلُ إنشاءِ الذمة …
+             failure → rollback → no approved downstream state».
+             وكان إنشاءُ الذمةِ المدينةِ (`fin_dues`) **خارجَ المعاملةِ وبـ`catch`
+             يبتلع**: فإن فشل، يُسجَّل السطرُ في `error_log` **وتمضي التسويةُ إلى
+             `approved` بـ`receivable_due_id = null`** — فيسقط دَينٌ على الطرفِ
+             صامتًا وتبدو التسويةُ مكتملة. وهذا أخطرُ من فشلٍ صريح.
+           ◆ **وترتيبٌ جديدٌ لا لفٌّ حولَ القديم**: كان الحدثُ يُنشر **أولًا**
+             ويُلتزَم، ثم تُنشأ الذمةُ ثم تُحدَّث الحالة. فأيُّ تعثُّرٍ بعدَ النشرِ
+             يترك **حدثَ اعتمادٍ منشورًا لتسويةٍ لم تُعتمَد**. فصار الترتيب:
+             الذمةُ ⇐ طلبُ الدفعِ ⇐ الحالةُ ⇐ **الحدثُ آخرًا** — فالحدثُ يصف
+             واقعةً تمَّت لا نيّةً قد تتعثّر، وكلُّها في معاملةٍ واحدة.
+           ◆ **وما يبقى غيرَ قاتلٍ عمدًا** — والفرقُ مكتوبٌ لا متروكٌ للحدس:
+             `generatePaymentRequest` **مولِّدُ راحةٍ** لا ذمّة، وإخفاقُه قابلٌ
+             للإعادةِ من الشاشة، فيبقى بـ`catch` داخليٍّ ولا يُسقط الاعتماد.
+             و`applyRecoveries` عاطلةُ الأثرِ بمفتاح (سلفة × تسوية) فتُعاد بأمان
+             — وتبقى **بعدَ** الالتزامِ لا داخلَه. */
         require_once dirname(dirname(__DIR__)) . '/Core/EventPublisher.php';
         $conn->begin_transaction();
+        $recvId = null; $reqId = null; $reqNo = null;
         try {
+            /* ① الذمّةُ المدينةُ شرطُ اعتمادٍ لا أثرٌ جانبيّ — الصافي السالب
+                  يفتح دَينًا على الطرف (قرارُ المالك ①). وفشلُها يُرجع كلَّ شيء. */
+            if ($direction === 'receivable') {
+                $recvId = $gate->insert('fin_dues', array(
+                    'party_type'      => (string) $st['party_type'],
+                    'party_ref'       => (string) $st['party_ref'],
+                    'due_type'        => 'settlement',
+                    'direction'       => 'debit',
+                    'amount'          => abs($net),
+                    'currency'        => (string) $st['currency'],
+                    'fx_rate'         => 1.0,
+                    'base_amount'     => abs($net),
+                    'period_ref'      => substr((string) $st['period_to'], 0, 7),
+                    'settlement_id'   => $sid,
+                    // M-11: مصدرُ هذا الخصم تسويتُه — والقيدُ البنيويُّ يلزمه
+                    'source_doc_type' => 'settlement',
+                    'source_doc_id'   => $sid,
+                    'created_by'      => $userId,
+                ));
+                /* ◆ `config` يضبط mysqli على عدمِ الرمي، فلا يكفي انتظارُ استثناء:
+                     يُفحَص المُرجَعُ نفسُه — ومعرِّفٌ غيرُ موجبٍ فشلٌ صريح. */
+                if ((int) $recvId <= 0) {
+                    throw new \RuntimeException('fin_dues لم يُرجع معرِّفًا موجبًا للذمّة المدينة');
+                }
+            }
+
+            /* ② طلبُ الدفعِ — مولِّدُ راحةٍ: إخفاقُه لا يُسقط الاعتماد (بـcatch داخليّ). */
+            if ($direction === 'payable' && $net > 0) {
+                $gen = self::generatePaymentRequest($gate, $st, $net, $userId);
+                $reqId = $gen['id']; $reqNo = $gen['no'];
+            }
+
+            /* ③ الحالةُ — داخلَ المعاملةِ فلا تصير `approved` إلا وقد قُيّدت الذمّة. */
+            $gate->update('settlements', array(
+                'state'              => ($reqId !== null) ? self::ST_REQUESTED : self::ST_APPROVED,
+                'net_direction'      => $direction,
+                'approved_by'        => $userId,
+                'approved_at'        => date('Y-m-d H:i:s'),
+                'receivable_due_id'  => $recvId,
+                'payment_request_id' => $reqId,
+            ), array('id' => $sid));
+
+            /* ④ الحدثُ آخرًا — يصف واقعةً تمَّت. */
             \App\Core\EventPublisher::publish($conn, array(
                 'event_key'         => 'settlement.approved',
                 'category'          => 'financial',
@@ -606,9 +667,12 @@ class SettlementService
             ));
             $conn->commit();
         } catch (\Throwable $t) {
+            /* ◆ **فشلٌ صريحٌ يُرجع كلَّ شيء** — ولا حالةَ لاحقةً تمضي: لا ذمّةَ
+                 ولا طلبَ دفعٍ ولا `approved` ولا حدثَ منشور. والسببُ يُرفع إلى
+                 المُنادي نصًّا لا يُبتلع في سجلٍّ لا يقرؤه أحد. */
             $conn->rollback();
-            error_log('settlement approve publish #' . $sid . ': ' . $t->getMessage());
-            $out['reason'] = 'تعذّر نشرُ حدث التسوية';
+            error_log('settlement approve #' . $sid . ' rolled back: ' . $t->getMessage());
+            $out['reason'] = 'تعذّر اعتمادُ التسوية — أُرجعت المعاملةُ كاملةً: ' . $t->getMessage();
             return $out;
         }
 
@@ -623,51 +687,8 @@ class SettlementService
             }
         }
 
-        // الصافي السالب ⇒ ذمّةٌ مدينةٌ على الطرف (قرارُ المالك ①)
-        $recvId = null;
-        if ($direction === 'receivable') {
-            try {
-                $recvId = $gate->insert('fin_dues', array(
-                    'party_type'    => (string) $st['party_type'],
-                    'party_ref'     => (string) $st['party_ref'],
-                    'due_type'      => 'settlement',
-                    'direction'     => 'debit',
-                    'amount'        => abs($net),
-                    'currency'      => (string) $st['currency'],
-                    'fx_rate'       => 1.0,
-                    'base_amount'   => abs($net),
-                    'period_ref'    => substr((string) $st['period_to'], 0, 7),
-                    'settlement_id' => $sid,
-                    // M-11: مصدرُ هذا الخصم تسويتُه — والقيدُ البنيويُّ يلزمه
-                    'source_doc_type' => 'settlement',
-                    'source_doc_id'   => $sid,
-                    'created_by'    => $userId,
-                ));
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement receivable #');
-                error_log('settlement receivable #' . $sid . ': ' . $t->getMessage());
-            }
-        }
-
-        // الصافي الموجب ⇒ طلبُ الدفع آليًّا (§15.3 `Approved → PaymentRequested`)
-        $reqId = null; $reqNo = null;
-        if ($direction === 'payable' && $net > 0) {
-            $gen = self::generatePaymentRequest($gate, $st, $net, $userId);
-            $reqId = $gen['id']; $reqNo = $gen['no'];
-        }
-
-        try {
-            $gate->update('settlements', array(
-                'state'              => ($reqId !== null) ? self::ST_REQUESTED : self::ST_APPROVED,
-                'net_direction'      => $direction,
-                'approved_by'        => $userId,
-                'approved_at'        => date('Y-m-d H:i:s'),
-                'receivable_due_id'  => $recvId,
-                'payment_request_id' => $reqId,
-            ), array('id' => $sid));
-        } catch (\Throwable $t) {
-            error_log('settlement approve state #' . $sid . ': ' . $t->getMessage());
-            $out['reason'] = 'نُشر الحدثُ وتعذّر تحديثُ الحالة'; return $out;
-        }
+        /* ◆ الذمّةُ وطلبُ الدفعِ والحالةُ صارت داخلَ المعاملةِ أعلاه (الحاجز ②) —
+             فلا تُكرَّر هنا. وما بقي بعدَ الالتزامِ هو ما يُعاد بأمانٍ وحدَه. */
 
         // N-02: تدقيقُ الاعتماد بقيم قبل/بعد (الحالةُ والاتجاهُ والمعتمِد)
         require_once dirname(__DIR__, 3) . '/includes/audit_trail.php';

@@ -196,6 +196,20 @@ check(strpos($body, 'id="finreqForm"') !== false, 'نموذجُ الإنشاءِ
 check(strpos($body, 'id="toggleForm"') !== false, 'زرُّ فتحِ النموذج');
 check(strpos($body, 'id="toggleStats"') !== false, 'زرُّ طيِّ الإحصاء');
 
+/* ══ ③-ب الترتيبُ مطلبٌ لا صدفة ═══════════════════════════════════════════
+   قرارُ المالك 2026-08-21: «فورم الإضافة يكون فوق فلاتر البحث». والوجودُ
+   وحدَه لا يثبت الترتيبَ — فيُقاس **موضعُ كلٍّ في المُصيَّر**، وإلا مرَّ نقلٌ
+   عكسيٌّ أخضرَ لأن العناصرَ كلَّها ما تزال حاضرة. */
+head('③-ب ترتيبُ الشاشة: إحصاءٌ ⇐ نموذجٌ ⇐ فلاترُ ⇐ جدول');
+$pStats = strpos($body, 'id="frqStatsSection"');
+$pForm  = strpos($body, 'id="finreqForm"');
+$pFilt  = strpos($body, '<div class="filter">');
+$pTable = strpos($body, 'frq-table');
+check($pStats !== false && $pForm !== false && $pFilt !== false && $pTable !== false, 'الأربعةُ حاضرةٌ فيُقاس ترتيبُها');
+check($pForm > $pStats, 'النموذجُ بعد الإحصاء');
+check($pFilt > $pForm,  '**والفلاترُ بعد النموذج** — أي النموذجُ فوقَها');
+check($pTable > $pFilt, 'والجدولُ بعد الفلاتر');
+
 /* ══ ④ الأرقامُ تُقاس لا تُصدَّق ════════════════════════════════════════ */
 head('④ بطاقةُ الإحصاءِ = عدُّ القاعدةِ لمجموعتِها');
 $own = "(created_by = {$CREATOR_UID} OR requester_id = {$CREATOR_UID})";
