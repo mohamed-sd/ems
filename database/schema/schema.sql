@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 00:09:43
--- الجداول: 619 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-22 01:12:01
+-- الجداول: 628 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -502,6 +502,101 @@ CREATE TABLE `approval_workflow_rules` (
   CONSTRAINT `chk_keypure_approval_workflow_rules_action` CHECK (`action`  not like '% %' and `action`  not like '%·%'),
   CONSTRAINT `chk_awr_legacy_write_blocked` CHECK (`is_active` = 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: ar_accruals ──
+CREATE TABLE `ar_accruals` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `accrual_no` varchar(30) NOT NULL,
+  `period` char(7) NOT NULL,
+  `contract_id` int(10) unsigned NOT NULL,
+  `client_id` int(10) unsigned DEFAULT NULL,
+  `claim_id` int(10) unsigned DEFAULT NULL COMMENT 'المطالبةُ التجاريةُ مصدرُ الاستحقاق',
+  `qty` decimal(16,4) NOT NULL DEFAULT 0.0000,
+  `unit_type` varchar(16) NOT NULL DEFAULT 'hour',
+  `amount` decimal(18,2) NOT NULL,
+  `currency` varchar(8) NOT NULL,
+  `fx_rate` decimal(20,8) NOT NULL DEFAULT 1.00000000,
+  `base_amount` decimal(18,2) NOT NULL,
+  `policy_key` varchar(48) NOT NULL DEFAULT 'ar_accrual',
+  `prepared_by` int(10) unsigned NOT NULL,
+  `control_by` int(10) unsigned DEFAULT NULL,
+  `control_at` datetime DEFAULT NULL,
+  `journal_entry_id` bigint(20) unsigned DEFAULT NULL,
+  `state` enum('prepared','controlled','posted','reversed','rejected') NOT NULL DEFAULT 'prepared',
+  `idem_key` varchar(96) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ara_idem` (`idem_key`),
+  UNIQUE KEY `uq_ara_no` (`company_id`,`accrual_no`),
+  KEY `ix_ara_state` (`company_id`,`state`),
+  CONSTRAINT `chk_ara_sod` CHECK (`control_by` is null or `control_by` <> `prepared_by`),
+  CONSTRAINT `chk_ara_post_after_control` CHECK (`journal_entry_id` is null or `control_at` is not null),
+  CONSTRAINT `chk_ara_currency` CHECK (char_length(`currency`) >= 3)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='عقدة 16 — استحقاق عقد العميل · إجازة رئيس الحسابات قبل الترحيل';
+
+-- ── Table: ar_claim_invoices ──
+CREATE TABLE `ar_claim_invoices` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `invoice_no` varchar(30) NOT NULL,
+  `period` char(7) NOT NULL,
+  `claim_id` int(10) unsigned NOT NULL,
+  `cert_id` bigint(20) unsigned DEFAULT NULL COMMENT 'شهادةُ الإنجازِ التي تُبنى عليها',
+  `accrual_id` bigint(20) unsigned DEFAULT NULL,
+  `tax_invoice_id` int(10) unsigned DEFAULT NULL COMMENT 'الفاتورةُ الرسميةُ عند مالكِها — لا نسخةٌ ثانية',
+  `amount` decimal(18,2) NOT NULL,
+  `currency` varchar(8) NOT NULL,
+  `ladder_id` varchar(12) NOT NULL DEFAULT 'LD-06',
+  `instance_scope` varchar(24) NOT NULL DEFAULT 'LD-06-INST',
+  `prepared_by` int(10) unsigned NOT NULL COMMENT 'محاسبُ المبيعاتِ يهيّئ ولا يعتمد',
+  `approved_by` int(10) unsigned DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `control_by` int(10) unsigned DEFAULT NULL,
+  `control_at` datetime DEFAULT NULL,
+  `journal_entry_id` bigint(20) unsigned DEFAULT NULL,
+  `referred_to` enum('collections','on_hold','cancelled') DEFAULT NULL COMMENT 'الإحالةُ لقسمِ التحصيل',
+  `referred_at` datetime DEFAULT NULL,
+  `state` enum('prepared','approved','controlled','issued','referred','rejected') NOT NULL DEFAULT 'prepared',
+  `idem_key` varchar(96) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_aci_idem` (`idem_key`),
+  UNIQUE KEY `uq_aci_no` (`company_id`,`invoice_no`),
+  KEY `ix_aci_state` (`company_id`,`state`),
+  CONSTRAINT `chk_aci_sod_prep` CHECK (`approved_by` is null or `approved_by` <> `prepared_by`),
+  CONSTRAINT `chk_aci_sod_ctrl` CHECK (`control_by` is null or `control_by` <> `approved_by`),
+  CONSTRAINT `chk_aci_post_after_control` CHECK (`journal_entry_id` is null or `control_at` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='عقدة 18 — فاتورة المطالبة وإحالتها · LD-06';
+
+-- ── Table: ar_completion_certs ──
+CREATE TABLE `ar_completion_certs` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `cert_no` varchar(30) NOT NULL,
+  `period` char(7) NOT NULL,
+  `contract_id` int(10) unsigned NOT NULL,
+  `claim_id` int(10) unsigned DEFAULT NULL,
+  `approved_qty` decimal(16,4) NOT NULL DEFAULT 0.0000,
+  `unit_type` varchar(16) NOT NULL DEFAULT 'hour',
+  `measure_ref` varchar(120) DEFAULT NULL COMMENT 'مرجعُ القياسِ المعتمد',
+  `ladder_id` varchar(12) NOT NULL DEFAULT 'LD-06',
+  `instance_scope` varchar(24) NOT NULL DEFAULT 'LD-06-INST' COMMENT 'العقدتان 17 و18 مرحلتان في نسخةِ سلّمٍ واحدة — لا طلبَ اعتمادٍ ثانٍ',
+  `prepared_by` int(10) unsigned NOT NULL,
+  `approved_by` int(10) unsigned DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `state` enum('prepared','approved','issued','rejected') NOT NULL DEFAULT 'prepared',
+  `idem_key` varchar(96) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_acc_idem` (`idem_key`),
+  UNIQUE KEY `uq_acc_no` (`company_id`,`cert_no`),
+  KEY `ix_acc_state` (`company_id`,`state`),
+  CONSTRAINT `chk_acc_sod` CHECK (`approved_by` is null or `approved_by` <> `prepared_by`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='عقدة 17 — شهادة الإنجاز الشهرية · LD-06';
 
 -- ── Table: asset_hour_reconciliations ──
 CREATE TABLE `asset_hour_reconciliations` (
@@ -6334,6 +6429,31 @@ CREATE TABLE `gov_cap_proposals` (
   `applied_at` datetime DEFAULT NULL COMMENT 'يُملأ حين يعتمده المالكُ من الشاشة',
   PRIMARY KEY (`ladder_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='مقترحاتُ السقوفِ المشتقةُ آليًّا — تُعرض في شاشةِ حدودِ المبالغِ ويعتمدها المالك';
+
+-- ── Table: gov_chain_nodes ──
+CREATE TABLE `gov_chain_nodes` (
+  `node_no` tinyint(3) unsigned NOT NULL,
+  `declared_file` varchar(64) NOT NULL,
+  `title_ar` varchar(120) NOT NULL,
+  `technical_runtime` varchar(80) NOT NULL COMMENT 'أين تعيش الخدمة — وصفٌ هندسيٌّ لا ملكية',
+  `process_owner` varchar(80) NOT NULL COMMENT 'مالكُ الحدثِ أو المستند',
+  `embedded_accountant` varchar(80) DEFAULT NULL COMMENT 'المحاسبُ المنتدبُ — يراجع ويهيّئ ولا يعتمد',
+  `ladder_id` varchar(48) NOT NULL COMMENT 'LD-nn | NO_LADDER_REQUIRED | RESOLVE_FROM_POLICY:key',
+  `accounting_control` varchar(80) DEFAULT NULL COMMENT 'إجازةٌ مستقلةٌ تسبق الترحيل',
+  `cash_execution` varchar(80) DEFAULT NULL COMMENT 'الخزينةُ — ولا تملك قيدًا',
+  `gl_posting_approval` varchar(80) DEFAULT NULL COMMENT 'السلطةُ البشريةُ التي تُجيز الترحيل',
+  `gl_posting_executor` varchar(80) DEFAULT NULL COMMENT 'محرّكُ الترحيلِ وحدَه — لا كاتبَ بشريّ',
+  `instance_scope` varchar(24) DEFAULT NULL COMMENT 'عقدٌ يشترك في نسخةِ سلّمٍ واحدةٍ مع غيرِه',
+  `build_state` enum('BUILT','UNDER_OTHER_ROUTE','MISSING') NOT NULL,
+  `carrier_route` varchar(160) DEFAULT NULL COMMENT 'السطحُ الحاملُ إن كان باسمٍ آخر',
+  `build_wave` tinyint(3) unsigned DEFAULT NULL,
+  `governing_doc` varchar(32) NOT NULL DEFAULT 'INJ-CHAIN-CLOSE-01',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`node_no`),
+  KEY `ix_state` (`build_state`),
+  KEY `ix_ladder` (`ladder_id`),
+  CONSTRAINT `chk_chain_ladder_code` CHECK (`ladder_id` = 'NO_LADDER_REQUIRED' or `ladder_id` regexp '^LD-[0-9]{2}$' or `ladder_id` regexp '^RESOLVE_FROM_POLICY:[a-z_]+$')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='INJ-CHAIN-CLOSE-01 — 29 عقدةً بثماني خاناتِ ملكية';
 
 -- ── Table: gov_component_versions ──
 CREATE TABLE `gov_component_versions` (
@@ -14227,6 +14347,77 @@ CREATE TABLE `transfer_types` (
   UNIQUE KEY `uq_type_code` (`company_id`,`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: tre_beneficiaries ──
+CREATE TABLE `tre_beneficiaries` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `party_type` enum('supplier','employee','client','other') NOT NULL,
+  `party_ref` int(10) unsigned NOT NULL,
+  `beneficiary_ar` varchar(160) NOT NULL,
+  `bank_name` varchar(120) DEFAULT NULL,
+  `iban` varchar(64) DEFAULT NULL,
+  `account_no` varchar(64) DEFAULT NULL,
+  `currency` varchar(8) NOT NULL,
+  `verified_by` int(10) unsigned DEFAULT NULL COMMENT 'التحقُّقُ من الحسابِ شرطٌ لطلبِ الدفع',
+  `verified_at` datetime DEFAULT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_by` int(10) unsigned NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ben_party_acc` (`company_id`,`party_type`,`party_ref`,`account_no`),
+  KEY `ix_ben_active` (`company_id`,`is_active`),
+  CONSTRAINT `chk_ben_sod` CHECK (`verified_by` is null or `verified_by` <> `created_by`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='شرط سابق للموجة 7 — سجل المستفيدين والحسابات البنكية';
+
+-- ── Table: tre_pay_batch_lines ──
+CREATE TABLE `tre_pay_batch_lines` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `batch_id` bigint(20) unsigned NOT NULL,
+  `payment_id` int(10) unsigned NOT NULL COMMENT 'طلبُ الدفعِ المعتمد — العقدة 24',
+  `beneficiary_id` int(10) unsigned NOT NULL,
+  `amount` decimal(18,2) NOT NULL,
+  `currency` varchar(8) NOT NULL,
+  `line_state` enum('pending','executed','failed','returned') NOT NULL DEFAULT 'pending',
+  `bank_ref` varchar(120) DEFAULT NULL,
+  `failed_reason` varchar(160) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_tpbl` (`batch_id`,`payment_id`),
+  KEY `ix_tpbl_co` (`company_id`,`line_state`),
+  KEY `fk_tpbl_ben` (`beneficiary_id`),
+  CONSTRAINT `fk_tpbl_batch` FOREIGN KEY (`batch_id`) REFERENCES `tre_pay_batches` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_tpbl_ben` FOREIGN KEY (`beneficiary_id`) REFERENCES `tre_beneficiaries` (`id`),
+  CONSTRAINT `chk_tpbl_amount` CHECK (`amount` > 0)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='سطور دفعة الدفع — لا سطر بلا مستفيد متحقَّق';
+
+-- ── Table: tre_pay_batches ──
+CREATE TABLE `tre_pay_batches` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `batch_no` varchar(30) NOT NULL,
+  `value_date` date NOT NULL,
+  `bank_account` varchar(64) DEFAULT NULL,
+  `currency` varchar(8) NOT NULL,
+  `total_amount` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `policy_key` varchar(48) NOT NULL DEFAULT 'treasury_disbursement',
+  `prepared_by` int(10) unsigned NOT NULL COMMENT 'الخزينةُ تُعِدُّ الدفعة',
+  `executed_by` int(10) unsigned DEFAULT NULL COMMENT 'التنفيذُ النقديُّ — ولا يملك قيدًا',
+  `executed_at` datetime DEFAULT NULL,
+  `bank_ref` varchar(120) DEFAULT NULL COMMENT 'مرجعُ الحركةِ الذي ينتجه التنفيذ',
+  `state` enum('draft','ready','executed','partially_executed','cancelled') NOT NULL DEFAULT 'draft',
+  `idem_key` varchar(96) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_tpb_idem` (`idem_key`),
+  UNIQUE KEY `uq_tpb_no` (`company_id`,`batch_no`),
+  KEY `ix_tpb_state` (`company_id`,`state`),
+  CONSTRAINT `chk_tpb_sod` CHECK (`executed_by` is null or `executed_by` <> `prepared_by`),
+  CONSTRAINT `chk_tpb_ref` CHECK (`executed_at` is null or `bank_ref` is not null and `bank_ref` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='عقدة 25 — دفعات الدفع والتنفيذ · تنفيذ نقدي ولا قيد';
+
 -- ── Table: trs_locations ──
 CREATE TABLE `trs_locations` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -14382,6 +14573,38 @@ CREATE TABLE `unit_capacity_flags` (
   CONSTRAINT `fk_ucf_entry` FOREIGN KEY (`entry_id`) REFERENCES `unit_entries` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='D02 §3.10 — أعلام تجاوز الطاقة وتخليصها: لا اعتمادَ موقعٍ قبل الحسم';
 
+-- ── Table: unit_corrections ──
+CREATE TABLE `unit_corrections` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `entry_id` int(10) unsigned NOT NULL COMMENT 'الواقعةُ المُصحَّحة',
+  `correction_kind` enum('adjustment','reversal','split','merge') NOT NULL,
+  `field_changed` enum('quantity','responsible_party','time_state','classification') NOT NULL,
+  `value_before` varchar(120) NOT NULL,
+  `value_after` varchar(120) NOT NULL,
+  `reason` varchar(400) NOT NULL COMMENT 'سببٌ مكتوبٌ إلزامًا — لا تصحيحَ بلا سبب',
+  `doc_ref` varchar(120) DEFAULT NULL,
+  `requested_by` int(10) unsigned NOT NULL,
+  `client_ok_by` int(10) unsigned DEFAULT NULL,
+  `client_ok_at` datetime DEFAULT NULL,
+  `supplier_ok_by` int(10) unsigned DEFAULT NULL,
+  `supplier_ok_at` datetime DEFAULT NULL,
+  `worker_ok_by` int(10) unsigned DEFAULT NULL,
+  `worker_ok_at` datetime DEFAULT NULL,
+  `state` enum('draft','in_chain','approved','applied','rejected','reversed') NOT NULL DEFAULT 'draft',
+  `applied_at` datetime DEFAULT NULL,
+  `reversal_ref` varchar(120) DEFAULT NULL,
+  `idem_key` varchar(96) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_uc_idem` (`idem_key`),
+  KEY `ix_uc_co_state` (`company_id`,`state`),
+  KEY `ix_uc_entry` (`entry_id`),
+  CONSTRAINT `chk_uc_triple` CHECK (`applied_at` is null or `client_ok_at` is not null and `supplier_ok_at` is not null and `worker_ok_at` is not null),
+  CONSTRAINT `chk_uc_reason` CHECK (char_length(`reason`) >= 8)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='عقدة 13 — لا تصحيح إلا بمرور السلسلة الثلاثية كاملةً';
+
 -- ── Table: unit_effects ──
 CREATE TABLE `unit_effects` (
   `pe_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -14490,6 +14713,33 @@ CREATE TABLE `unit_entries` (
   CONSTRAINT `chk_ue_dispute_ref` CHECK (`client_decision` <> 'disputed' or `dispute_ref` is not null),
   CONSTRAINT `chk_ue_meter` CHECK (`meter_after` is null or `meter_before` is null or `meter_after` >= `meter_before`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='D02 §3.1 — سجلّ الواقعة: مصدر الحقيقة الوحيد للوحدة التشغيلية';
+
+-- ── Table: unit_final_approvals ──
+CREATE TABLE `unit_final_approvals` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `period` char(7) NOT NULL COMMENT 'YYYY-MM — الفترةُ المقفلة',
+  `entry_id` int(10) unsigned NOT NULL COMMENT 'الواقعةُ التي قُفل أثرُها',
+  `ladder_id` varchar(12) NOT NULL DEFAULT 'LD-07',
+  `prepared_by` int(10) unsigned NOT NULL COMMENT 'المحاسبُ المنتدبُ — إعدادُ بياناتِ القيدِ فقط',
+  `approved_by` int(10) unsigned DEFAULT NULL COMMENT 'الاعتمادُ الماليُّ النهائيّ',
+  `approved_at` datetime DEFAULT NULL,
+  `control_by` int(10) unsigned DEFAULT NULL COMMENT 'رئيسُ الحساباتِ — إجازةٌ مستقلةٌ تسبق الترحيل',
+  `control_at` datetime DEFAULT NULL,
+  `journal_entry_id` bigint(20) unsigned DEFAULT NULL COMMENT 'يملؤه محرّكُ الترحيلِ وحدَه',
+  `state` enum('prepared','approved','controlled','posted','rejected') NOT NULL DEFAULT 'prepared',
+  `reject_reason` varchar(160) DEFAULT NULL,
+  `idem_key` varchar(96) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ufa_idem` (`idem_key`),
+  KEY `ix_ufa_co_state` (`company_id`,`state`),
+  KEY `ix_ufa_entry` (`entry_id`),
+  CONSTRAINT `chk_ufa_sod_prep` CHECK (`approved_by` is null or `approved_by` <> `prepared_by`),
+  CONSTRAINT `chk_ufa_sod_ctrl` CHECK (`control_by` is null or `control_by` <> `approved_by`),
+  CONSTRAINT `chk_ufa_post_after_control` CHECK (`journal_entry_id` is null or `control_at` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='عقدة 9 — الاعتماد المالي النهائي · LD-07 · لا ترحيل قبل الإجازة';
 
 -- ── Table: unit_match_overrides ──
 CREATE TABLE `unit_match_overrides` (

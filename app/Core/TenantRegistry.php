@@ -343,6 +343,19 @@ class TenantRegistry
         'unit_approvals' => array('type' => self::T_TENANT, 'soft' => false),
         // D02 §3.10: أعلام تجاوز الطاقة وتخليصها — علمٌ يُرفع ويُخلَّص ولا يُمحى
         'unit_capacity_flags' => array('type' => self::T_TENANT, 'soft' => false),
+
+        /* ══ عقدُ سلسلةِ الأثرِ المبنيةُ في INJ-CHAIN-CLOSE-01 ═════════════════
+           كلُّها إلحاقيةٌ بلا حذفٍ ناعم: «المرفوضُ لا يُحذف — حالةٌ بسببِها في
+           السجل». والسطورُ أبناءٌ بمفتاحِ أبيها فلا تُقرأ خارجَ سياقِه. */
+        'unit_final_approvals' => array('type' => self::T_TENANT, 'soft' => false),   // عقدة 9
+        'unit_corrections'     => array('type' => self::T_TENANT, 'soft' => false),   // عقدة 13
+        'ar_accruals'          => array('type' => self::T_TENANT, 'soft' => false),   // عقدة 16
+        'ar_completion_certs'  => array('type' => self::T_TENANT, 'soft' => false),   // عقدة 17
+        'ar_claim_invoices'    => array('type' => self::T_TENANT, 'soft' => false),   // عقدة 18
+        'tre_beneficiaries'    => array('type' => self::T_TENANT, 'soft' => false),   // شرطٌ سابق
+        'tre_pay_batches'      => array('type' => self::T_TENANT, 'soft' => false),   // عقدة 25
+        'tre_pay_batch_lines'  => array('type' => self::T_CHILD,  'soft' => false,
+            'parent' => 'tre_pay_batches', 'fk' => 'batch_id'),
         'fin_request_routing' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_funding_facilities' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_funding_schedules' => array('type' => self::T_TENANT, 'soft' => false),

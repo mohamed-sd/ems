@@ -233,6 +233,27 @@ if ($ueAtTarget) {
         number_format($before['unit_entries']), number_format($ueKeep), $nUeParents);
 }
 
+/* ═══════════ ②-ب إغلاقُ رابطِ الكتابةِ المزدوجة ═══════════════════════════ */
+/* ◆ **`unit_entries.sync_uuid = 'ts:<id>'` رابطٌ رخوٌ لا يراه أيُّ قيدِ FK** —
+     وهو مرآةُ صفِّ الدوامِ في السجلِّ القانوني. وقطعُه من طرفٍ واحدٍ يخلق
+     «مرآةً يتيمة»: أسقطَ ذلك حزمتَي `unit_reconcile_test` (20/0 ← 11/9)
+     و`timesheet_time_lines_test` (17/0 ← 11/6) — وكلتاهما تُثبِّت نافذةَ
+     المطابقة 2027-02-01…14 عند **50 صفًّا و50 مرآةً** بالضبط.
+     فالزوجُ يبقى كاملًا أو يذهب كاملًا. و147 زوجًا فقط ⇒ يُبقى كلُّه،
+     فتُصان النافذةُ بلا تاريخٍ مكتوبٍ في الشيفرة. */
+$pairs = $pdo->query("SELECT id, CAST(SUBSTRING(sync_uuid, 4) AS UNSIGNED) ts
+                      FROM unit_entries WHERE sync_uuid LIKE 'ts:%'")->fetchAll(PDO::FETCH_ASSOC);
+$addedTs = 0; $addedUe = 0;
+foreach ($pairs as $p) {
+    if (!isset($kUe[(int) $p['id']])) { $kUe[(int) $p['id']] = true; $addedUe++; }
+    if (!isset($kTs[(int) $p['ts']])) { $kTs[(int) $p['ts']] = true; $addedTs++; }
+}
+$tsKeep = count($kTs);
+$ueKeep = count($kUe);
+printf("②-ب رابطُ الكتابةِ المزدوجة: %d زوجًا مُغلَقًا (+%d صفَّ دوامٍ · +%d مرآة)\n"
+     . "    ⇒ المُبقى نهائيًّا: timesheet %s · unit_entries %s\n",
+    count($pairs), $addedTs, $addedUe, number_format($tsKeep), number_format($ueKeep));
+
 /* ═══════════ ③ الأبناءُ المشتقَّة — تنبُّؤٌ قبلَ أيِّ حذف ═══════════════════ */
 $tsIn = idList($kTs);
 $ueIn = idList($kUe);
