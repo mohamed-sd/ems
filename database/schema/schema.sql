@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-21 17:20:43
--- الجداول: 616 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-21 18:03:05
+-- الجداول: 617 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -4665,7 +4665,7 @@ CREATE TABLE `fin_financial_periods` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_fin_period` (`company_id`,`fiscal_year`,`period_type`,`period_no`),
   KEY `ix_fin_period_state` (`company_id`,`state`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GAP-24: **سلطةُ الإقفالِ الوحيدة** — EventPublisher يتحقّق منها قبلَ نشرِ أيِّ واقعة';
 
 -- ── Table: fin_funding_facilities ──
 CREATE TABLE `fin_funding_facilities` (
@@ -6905,6 +6905,21 @@ CREATE TABLE `gov_ownership_rulings` (
   `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`route`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ثامنًا-٣ حسمُ المِلكيةِ المشكوكة — بالشاهدِ أو بالدورةِ المستندية';
+
+-- ── Table: gov_path_rulings ──
+CREATE TABLE `gov_path_rulings` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `gap` varchar(16) NOT NULL,
+  `path_key` varchar(96) NOT NULL,
+  `ruling` varchar(32) NOT NULL COMMENT 'AUTHORITY | NON_AUTHORITATIVE | SUBORDINATE | ACTIVE_ENGINE | STAGING_ONLY',
+  `authority_of` varchar(96) DEFAULT NULL COMMENT 'إن كان تابعًا فمن يحكمه',
+  `prod_readers` smallint(5) unsigned NOT NULL,
+  `evidence` varchar(300) NOT NULL,
+  `reason` varchar(500) NOT NULL,
+  `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_path` (`path_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='GAP-24 و GAP-31 — حكمٌ مكتوبٌ لكلِّ مسارٍ يحمل معنًى حاكمًا';
 
 -- ── Table: gov_permission_corrections ──
 CREATE TABLE `gov_permission_corrections` (
@@ -11367,7 +11382,7 @@ CREATE TABLE `scr_monthly_close` (
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `ix_monthly_close_live` (`company_id`,`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة monthly_close.php';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GAP-24: سجلُّ إقفالٍ تشغيليٌّ — **ليس سلطةَ الإقفال**. السلطةُ fin_financial_periods';
 
 -- ── Table: scr_op_codes ──
 CREATE TABLE `scr_op_codes` (
