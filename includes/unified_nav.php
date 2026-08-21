@@ -865,9 +865,25 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
     }
 
     /* ── ② ما يحمله السجلُّ ولا صفَّ تبعيةٍ له (الرئيسيةُ والمراسلاتُ لبعضِ
-           الأدوار) يُصطنع رابطُه — كما كان قبلَ هذه الطبقة: صفرُ فقد ───────── */
+           الأدوار) يُصطنع رابطُه — كما كان قبلَ هذه الطبقة: صفرُ فقد ─────────
+       ◆ **INJ-FIX-01 · GAP-19 — وثقبُ التعطيلِ هنا أيضًا**: `$items` نشطةٌ
+         وحدَها، فـ`$covered` لا يُعلَّم بالمعطَّل. وهذه هي **دالةُ التصيير**
+         نفسُها — فسدُّ الثقبِ في المُهيِّئِ وحدَه لا يكفي: قِيس أن ستةَ روابطَ
+         معطَّلةٍ ظلَّت تُصيَّر بعدَ سدِّه هناك، ومصدرُها هذه الحلقة.
+         ⇐ يُستثنى المعطَّلُ صراحةً — والاصطناعُ يبقى لما **لا صفَّ له إطلاقًا**. */
+    $navDisabled = array();
+    if (isset($GLOBALS['__uxui_cur_role'])) {
+        $__dq2 = @mysqli_query($conn, "SELECT `route` FROM `nav_items`
+                                        WHERE `role_id` = " . (int) $GLOBALS['__uxui_cur_role'] . "
+                                          AND `active` = 0");
+        while ($__dq2 && ($__dr2 = mysqli_fetch_assoc($__dq2))) {
+            $navDisabled[uxuiNavBaseRoute($__dr2['route'])] = true;
+        }
+    }
+
     foreach ($uxCurMap as $base => $cur) {
         if (isset($covered[$base]) || !isset($uxMap[$base])) { continue; }
+        if (isset($navDisabled[$base])) { continue; }   // معطَّلٌ بقرارٍ — لا يُصطنع
         $proper = $uxMap[$base]['route'];
         $icon = ($base === 'main/role_board.php') ? 'fa fa-house'
               : (($base === 'chats/index.php') ? 'fa fa-comments' : 'fa fa-link');
@@ -1190,8 +1206,26 @@ function renderUnifiedNavigationV2($conn, $roleId, $basePrefix = '../', $badges 
            تبعيةٍ له في nav_items لبعضِ الأدوار — والسجلُّ الحيُّ current يحمله.
            «لا سايدبارَ موروثٌ خلفَ المصفوفة»: يُصطنع رابطُه من السجلِّ نفسِه،
            بحرفِ مسارِه المعياريِّ (لا الصغيرِ) — وحارسُ التوأمِ يمنع أيَّ ازدواج. */
+        /* ══ INJ-FIX-01 · GAP-19 — ثقبُ التعطيل ══════════════════════════════
+           ◆ **العطبُ المقيس (٢٢ مسارًا)**: `$items` لا يحمل إلا الصفوفَ
+             **النشطة**، فـ`$covered` لا يُعلَّم إلا بها. والمسارُ الذي **صفُّه
+             موجودٌ ومعطَّلٌ عمدًا** (`active = 0`) لا يُعَدُّ مغطًّى — فتُعيد هذه
+             الحلقةُ اصطناعَه من السجلِّ بأيقونةِ `fa fa-link`.
+             ⇐ **فتعطيلُ الرابطِ لا يُخفيه**: يعود من بابٍ آخر، ومن عطَّله يظنُّه
+               مُزالًا. وهذا نقضٌ لقرارِ تعطيلٍ لا زلَّةُ عرض.
+           ◆ **والفرقُ الذي يجب أن تحفظه الحلقة**: الاصطناعُ لمسارٍ **لا صفَّ له
+             إطلاقًا** (تسعةٌ مقيسة — الثوابتُ الصلبةُ القديمة)، لا لمسارٍ له صفٌّ
+             أُطفئ بقرار. فيُستثنى المعطَّلُ صراحةً ويبقى الاصطناعُ لغرضِه. */
+        $uxDisabled = array();
+        $__dq = @mysqli_query($conn,
+            "SELECT `route` FROM `nav_items` WHERE `role_id` = " . (int) $roleId . " AND `active` = 0");
+        while ($__dq && ($__dr = mysqli_fetch_assoc($__dq))) {
+            $uxDisabled[uxuiNavBaseRoute($__dr['route'])] = true;
+        }
+
         foreach ($uxCurMap as $base => $cur) {
             if (isset($covered[$base]) || !isset($uxMap[$base])) { continue; }
+            if (isset($uxDisabled[$base])) { continue; }   // معطَّلٌ بقرارٍ — لا يُصطنع
             $properRoute = $uxMap[$base]['route'];
             $icon = ($base === 'main/role_board.php') ? 'fa fa-home'
                   : (($base === 'chats/index.php') ? 'fa fa-comments' : 'fa fa-link');
