@@ -293,3 +293,57 @@
   font-weight: var(--weight-semi);
 }
 .ems-entity-tab.is-unbuilt { color: var(--gray-500); opacity: 0.55; cursor: help; }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * صفُّ البذرِ — INJ-FIX-01 · GAP-24
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ **العطبُ المقيس**: تسعٌ وأربعون شاشةً تُصدر `data-seed="1"` على صفوفِ
+ *   البذر — **وصفرُ قاعدةِ تصميمٍ تقرؤها**. فالسمةُ بيانٌ في الوسمِ لا يراه
+ *   المستخدم، والصفُّ التجريبيُّ يظهر **كالحقيقيِّ حرفًا**.
+ *   وأوضحُ أثرِه `Operations/monthly_close.php`: عشرون صفَّ إقفالٍ **كلُّها
+ *   بذرٌ** (`is_seed=1`) تُعرض لتسعةِ أدوارٍ كإقفالاتٍ قائمة — وهو نصُّ
+ *   GAP-24: «إقفالٌ يبدو قائمًا وهو بياناتُ اختبار».
+ *
+ * ◆ **والعلاجُ قاعدةٌ واحدةٌ تصلح تسعًا وأربعين شاشة** — لا تعديلُ تسعٍ
+ *   وأربعين ملفًّا. والسمةُ موجودةٌ سلفًا فلا يُمَسُّ وسمٌ ولا يُحذف صفّ.
+ *
+ * ◆ **ولا لونًا وحدَه**: اللونُ إشارةٌ لا يراها كلُّ قارئ. فالوسمُ **نصٌّ**
+ *   («تجريبي») مع خلفيةٍ مخطَّطةٍ — ثلاثُ قنواتِ إدراكٍ لا واحدة.
+ * ◆ وكلُّ قيمةٍ من رموزِ `design-tokens.css` — ولا لونَ مثبَّت.
+ */
+tr[data-seed="1"] {
+  background-image: repeating-linear-gradient(
+      135deg,
+      transparent 0,
+      transparent 6px,
+      var(--warning-100) 6px,
+      var(--warning-100) 12px);
+}
+
+/* الوسمُ النصيُّ في أولِ خليةٍ — RTL أصلًا فالبدايةُ يمينًا */
+tr[data-seed="1"] > td:first-child::before {
+  content: "تجريبي";
+  display: inline-block;
+  margin-inline-end: var(--space-2);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--warning-600);
+  color: var(--warning-deep);
+  border-radius: var(--radius-pill);
+  font-size: .72rem;
+  line-height: 1.6;
+  font-weight: 700;
+  vertical-align: middle;
+  white-space: nowrap;
+  opacity: .85;
+}
+
+/* ولقارئِ الشاشة: الصفُّ يُعلَن تجريبيًّا لا يُستنتَج من لون */
+tr[data-seed="1"] > td:first-child::after {
+  content: " (صفٌّ تجريبيٌّ — ليس بيانًا حقيقيًّا)";
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

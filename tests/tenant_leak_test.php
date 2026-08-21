@@ -657,8 +657,23 @@ foreach ($cleanup as $c) {
 mysqli_query($conn, "DELETE FROM clients WHERE client_name LIKE 'LEAKTEST_%'");
 mysqli_query($conn, "DELETE FROM mnt_inspection_template_line WHERE item LIKE 'LEAKTEST_%'");
 mysqli_query($conn, "DELETE FROM mnt_inspection_template WHERE name LIKE 'LEAKTEST_%'");
+/* ══ INJ-FIX-01 — والأثرُ في سجلِّ التدقيقِ يُكنس كما تُكنس الصفوف ══════════
+   ◆ **ما وقع فعلًا**: هذا الفاحصُ ينشئ كياناتٍ اصطناعيةً ليُثبت العزل، ويكنس
+     **صفوفَه** — ولا يكنس **أثرَه في `activity_logs`** الذي كتبته البوابةُ عنه.
+     فتراكم عبرَ جولاتٍ حتى بلغ **4,397 صفًّا بـ338 كيانًا اصطناعيًّا**، وقرأه
+     `tools/tenant_leak_probe.php` «كياناتٍ شبح» فأعلن **تسريبَ عزل**.
+     ⇐ فاحصٌ يُنشئ العطبَ الذي يرصده فاحصٌ آخر.
+   ◆ **والكنسُ بالعائلةِ لا بالوسم**: صفوفُ التحديثِ والحذفِ حمولتُها أرقامٌ
+     لا أسماء، فلا تحمل `LEAKTEST_`. والمفتاحُ الصحيح: كيانٌ لم يبقَ مسجَّلًا
+     **مع** بوابةِ الكتابة — ويُنفَّذ **بعدَ** حذفِ الكياناتِ الاصطناعية أعلاه
+     فيصير «غيرُ المسجَّل» شاملًا لها. */
 mysqli_query($conn, "DELETE FROM admin_companies WHERE email LIKE '%@leaktest.local'");
-echo "\nteardown: نُظِّفت كل بيانات الاختبار.\n";
+mysqli_query($conn, "DELETE FROM activity_logs
+                      WHERE company_id NOT IN (SELECT id FROM admin_companies)
+                        AND company_id > 0
+                        AND module_name = 'tenant_gate'");
+$auditSwept = mysqli_affected_rows($conn);
+echo "\nteardown: نُظِّفت كل بيانات الاختبار · وأثرُ التدقيق: {$auditSwept} صفًّا.\n";
 
 echo str_repeat('═', 50) . "\n";
 echo "النتيجة: {$PASS} ناجح · {$FAIL} فاشل\n";

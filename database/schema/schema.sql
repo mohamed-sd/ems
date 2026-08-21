@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-21 11:19:23
--- الجداول: 605 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-21 12:49:28
+-- الجداول: 606 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -7006,6 +7006,54 @@ CREATE TABLE `gov_test_data_isolation` (
   KEY `ix_dom` (`policy_domain`),
   CONSTRAINT `chk_resolved_needs_source` CHECK (`resolution` <> 'RESOLVED' or `resolved_value` is not null and `resolved_source` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='عزلٌ بتسجيلٍ — النصُّ محفوظٌ وبياناتُ العملِ لم تُمَسّ';
+
+-- ── Table: gov_test_residue_archive ──
+CREATE TABLE `gov_test_residue_archive` (
+  `id` bigint(20) unsigned NOT NULL,
+  `company_id` bigint(20) unsigned DEFAULT NULL,
+  `project_id` bigint(20) unsigned DEFAULT NULL,
+  `contract_id` bigint(20) unsigned DEFAULT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `employee_id` bigint(20) unsigned DEFAULT NULL COMMENT 'لقطة الموظف الفاعل وقت الحدث',
+  `role_id` bigint(20) unsigned DEFAULT NULL,
+  `role_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `session_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `screen_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `module_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `action_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `button_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `field_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `record_id` bigint(20) unsigned DEFAULT NULL,
+  `old_value` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `new_value` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `url` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `http_method` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `request_payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `response_status` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `acted_by` bigint(20) unsigned DEFAULT NULL COMMENT 'الفاعلُ الحقيقيُّ في جلسةِ النيابة (A5)',
+  `acted_for` bigint(20) unsigned DEFAULT NULL COMMENT 'من نُفِّذ عنه',
+  `impersonation_id` int(10) unsigned DEFAULT NULL COMMENT 'مرجعُ جلسةِ impersonation_sessions',
+  `src_table` varchar(64) NOT NULL DEFAULT 'activity_logs',
+  `quarantined_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `reason` varchar(255) NOT NULL DEFAULT '',
+  KEY `idx_company_created` (`company_id`,`created_at`),
+  KEY `idx_user_created` (`user_id`,`created_at`),
+  KEY `idx_role_created` (`role_id`,`created_at`),
+  KEY `idx_action_created` (`action_type`,`created_at`),
+  KEY `idx_module_screen_created` (`module_name`,`screen_name`,`created_at`),
+  KEY `idx_record_module` (`record_id`,`module_name`),
+  KEY `idx_created_at` (`created_at`),
+  KEY `idx_screen_name` (`screen_name`),
+  KEY `idx_module_name` (`module_name`),
+  KEY `idx_action_type` (`action_type`),
+  KEY `idx_record_id` (`record_id`),
+  KEY `idx_employee_created` (`employee_id`,`created_at`),
+  KEY `ix_impersonation` (`impersonation_id`),
+  CONSTRAINT `chk_act_attribution` CHECK (`impersonation_id` is null or `acted_by` is not null and `acted_for` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ── Table: gov_visual_measurements ──
 CREATE TABLE `gov_visual_measurements` (
