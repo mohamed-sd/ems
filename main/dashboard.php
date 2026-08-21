@@ -497,6 +497,20 @@ $analyticsPayload = [
 $dash_board = null;
 if ($dash_board_role > 0) {
   $dash_board = roleBoardBuild($conn, $dash_gate, $dash_board_role, isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0);
+
+  /* حارسُ اللوحةِ المُضمَّنة: التضمينُ لا يُسقط قفلًا كانت الشاشةُ تحمله.
+     كلُّ لوحةٍ تُعلن في إعدادها الشاشةَ التي يحكم `can_view` عليها رؤيتَها
+     (`perm`) — اللوحةُ العامةُ افتراضًا، ولوحةُ المدير المالي لمن نُقلت
+     لوحتُه من `Finance/cfo_daily_board_fin.php`.
+     ◆ **المقيسُ الذي فرض هذا الحارس**: الأدوار 31 و34 و35 (رئيس الحسابات ·
+       منفّذ المدفوعات · معدُّ المطابقة) أبناءُ الدور 17 **بلا صفٍّ إطلاقًا**
+       في `role_permissions` للوحةِ المالية — فكانت الشاشةُ تردُّهم، ولولا
+       هذا الحارسُ لورثوا اللوحةَ داخلَ «الرئيسية» بلا فحص. */
+  if ($dash_board && !empty($dash_board['perm'])) {
+    require_once __DIR__ . '/../includes/permissions_helper.php';
+    $dash_board_perm = check_page_permissions($conn, $dash_board['perm']);
+    if (empty($dash_board_perm['can_view'])) { $dash_board = null; }
+  }
 }
 
 $AC = [

@@ -120,15 +120,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
          والمقارنة تُعلن غيابها صراحةً بدل ادعائها — أول تعميم للمكوّن (17 لوحة). -->
     <?php require_once __DIR__ . '/../includes/kpi_card.php'; ?>
     <div class="rbd-kpi-grid">
-        <?php foreach ($rb_cards as $c): list($icon, $val, $lbl, $tone, $href) = $c;
+        <?php foreach ($rb_cards as $c):
+            // الوحدةُ والفترةُ من إعدادِ البطاقةِ نفسِها — لا يفرضهما القالب
             echo ems_kpi_card(array(
-                'title'  => $lbl,
-                'value'  => (string) $val,
-                'unit'   => 'سجل',
-                'period' => 'لحظي (' . $today . ')',
-                'status' => in_array($tone, array('ok', 'warn', 'err'), true) ? $tone : 'neutral',
-                'drill'  => $href,
-                'icon'   => $icon,
+                'title'  => $c['label'],
+                'value'  => $c['display'],
+                'unit'   => $c['unit'],
+                'period' => $c['period'],
+                'status' => in_array($c['tone'], array('ok', 'warn', 'err'), true) ? $c['tone'] : 'neutral',
+                'drill'  => $c['href'],
+                'icon'   => $c['icon'],
+                'scope'  => $c['scope'],
             ));
         endforeach; ?>
     </div>

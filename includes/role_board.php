@@ -49,7 +49,6 @@ function roleBoardRoute($roleId, $parentRoleId = null)
 {
     $map = array(
         // لوحاتٌ مخصصةٌ قائمة
-        17 => 'Finance/cfo_daily_board_fin.php',
         13 => 'Maintenance/dashboard_mnt.php',
         16 => 'Procurement/dashboard_proc.php',
         23 => 'Transport/transfer_dashboard.php',
@@ -69,6 +68,7 @@ function roleBoardRoute($roleId, $parentRoleId = null)
         6  => 'main/dashboard.php',   // إدارة الموقع / الحركة والتشغيل
         12 => 'main/dashboard.php',   // ادارة المبيعات
         15 => 'main/dashboard.php',   // إدارة الصلاحيات
+        17 => 'main/dashboard.php',   // الإدارة المالية — بطاقاتُها العشرُ منقولةٌ حرفًا، وحارسُ can_view معها
         24 => 'main/dashboard.php',   // إدارة البلاغات (ابنُ 1 — ومدخلُه الصريحُ يسبق وراثةَ أبيه)
     );
     $rid = intval($roleId);
@@ -743,6 +743,94 @@ function roleBoardGenericConfig($rid)
             'pulse' => array('نبض الأداء — دخولُ المستخدمين (7 أيام)', array('دخلوا', ''),
                 array('t' => 'users', 'a' => 'u'), "SELECT COUNT(*) FROM users u WHERE {TENANT_SCOPE} AND DATE(u.last_login_at)=?",
                 null, null)),
+        /* ── §8.11 · الإدارة المالية ───────────────────────────────────────
+           نُقلت لوحتُها من `Finance/cfo_daily_board_fin.php` إلى «الرئيسية»
+           (قرار المالك 2026-08-21). البطاقاتُ العشرُ **منقولةٌ حرفًا**: نفسُ
+           الاستعلاماتِ ونفسُ النطاقاتِ ونفسُ النغمات — فلا يتبدّل رقمٌ ماليٌّ
+           بسببِ نقلِ مكان. ومهامُّها ② تأتي من `roleBoardTasks(17)` (منطقٌ
+           مكتوبٌ لا تصريحيّ)، وتنبيهاتُها ④ من `roleBoardAlertSpecs(17)`.
+           ◆ **الوحدةُ تُعلَن ولا تُلفَّق**: هذه مبالغُ لا سجلّات، وأربعةٌ من
+             مصادرِها تحمل عمودَ `currency` فالمجموعُ قد يخلط عملات — وهو
+             واقعٌ مقيسٌ في القاعدة (`fin_payments`: SDG وUSD · `fin_dues`:
+             أربعُ عملات). فتُعلن البطاقةُ ذلك في سطرِ نطاقِها بدل أن تسمّي
+             عملةً لا تملكها. والإصلاحُ (القراءةُ من `base_amount`) قرارُ
+             مالكٍ مستقلٌّ عن النقل — لأنه يغيّر أرقامًا لا مواضع. */
+        17 => array('title' => 'لوحة الإدارة المالية', 'icon' => 'fa fa-building-columns',
+            'perm' => 'Finance/cfo_daily_board_fin.php',
+            'cards' => array(
+                // ① النقد المتاح = افتتاحيُّ البنوك + صافي حركة الكشوف (قراءتان معزولتان تُجمعان)
+                array('النقد المتاح (البنوك)', 'fa-wallet', array('t' => 'fin_bank_accounts', 'a' => 'a'),
+                    function ($g) {
+                        return roleBoardScalar($g, array('scope' => array('a' => 'fin_bank_accounts')),
+                                "SELECT COALESCE(SUM(a.opening_balance),0) FROM fin_bank_accounts a WHERE {TENANT_SCOPE} AND COALESCE(a.is_deleted,0)=0")
+                             + roleBoardScalar($g, array('scope' => array('l' => 'fin_bank_statement_lines')),
+                                "SELECT COALESCE(SUM(CASE WHEN l.direction='deposit' THEN l.amount ELSE -l.amount END),0) FROM fin_bank_statement_lines l WHERE {TENANT_SCOPE}");
+                    },
+                    '../Finance/bank_reconciliation_fin.php', 'ok',
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملاتِ الحسابات')),
+
+                array('متحصّلات اليوم', 'fa-arrow-down', array('t' => 'fin_payments', 'a' => 'p'),
+                    "SELECT COALESCE(SUM(p.amount),0) FROM fin_payments p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0 AND p.direction='collection' AND p.state IN('executed','reconciled') AND DATE(COALESCE(p.paid_at,p.created_at))=CURDATE()",
+                    '../Finance/payments_fin.php', 'ok',
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملاتِ الدفعات')),
+
+                array('مدفوعات اليوم', 'fa-arrow-up', array('t' => 'fin_payments', 'a' => 'p'),
+                    "SELECT COALESCE(SUM(p.amount),0) FROM fin_payments p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0 AND p.direction='disbursement' AND p.state IN('executed','reconciled') AND DATE(COALESCE(p.paid_at,p.created_at))=CURDATE()",
+                    '../Finance/payments_fin.php', 'or',
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملاتِ الدفعات')),
+
+                // ④ صافي الأسبوع = ذممٌ تستحق خلال 7 أيام − (مستحقاتٌ معلّقة + أقساطُ 7 أيام)
+                array('صافي الأسبوع المتوقّع', 'fa-scale-unbalanced', array('t' => 'fin_receivables', 'a' => 'r'),
+                    function ($g) {
+                        $wk = date('Y-m-d', strtotime('+7 days'));
+                        $in  = roleBoardScalar($g, array('scope' => array('r' => 'fin_receivables')),
+                                "SELECT COALESCE(SUM(r.outstanding),0) FROM fin_receivables r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding>0 AND r.due_date IS NOT NULL AND r.due_date<=?", array($wk));
+                        $out = roleBoardScalar($g, array('scope' => array('d' => 'fin_dues')),
+                                "SELECT COALESCE(SUM(d.amount),0) FROM fin_dues d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.direction='credit' AND d.settlement_state='pending'")
+                             + roleBoardScalar($g, array('scope' => array('f' => 'fin_funding_schedules')),
+                                "SELECT COALESCE(SUM(f.total_due-f.paid_amount),0) FROM fin_funding_schedules f WHERE {TENANT_SCOPE} AND f.state<>'paid' AND f.due_date<=?", array($wk));
+                        return $in - $out;
+                    },
+                    '../Finance/cash_forecast_fin.php', 'ok',
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'period' => 'الأيامُ السبعةُ القادمة', 'scope' => 'يجمع عملاتِ الذممِ والمستحقات')),
+
+                array('وحدات أمس المعتمدة', 'fa-cubes', array('t' => 'fin_unit_records', 'a' => 'u'),
+                    "SELECT COALESCE(SUM(u.approved_qty),0) FROM fin_unit_records u WHERE {TENANT_SCOPE} AND COALESCE(u.is_deleted,0)=0 AND u.match_state='approved' AND u.record_date=DATE_SUB(CURDATE(), INTERVAL 1 DAY)",
+                    '../Finance/unit_records_fin.php', 'or',
+                    array('unit' => 'وحدة', 'decimals' => 2, 'period' => 'أمس')),
+
+                array('هامش الوحدة الجاري', 'fa-percent', array('t' => 'fin_unit_records', 'a' => 'u'),
+                    "SELECT COALESCE(SUM(u.unit_margin),0) FROM fin_unit_records u WHERE {TENANT_SCOPE} AND COALESCE(u.is_deleted,0)=0 AND u.match_state='approved' AND DATE_FORMAT(u.record_date,'%Y-%m')=DATE_FORMAT(CURDATE(),'%Y-%m')",
+                    '../Finance/unit_records_fin.php', 'ok',
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'period' => 'هذا الشهر')),
+
+                array('الذمم المتأخرة', 'fa-hourglass-end', array('t' => 'fin_receivables', 'a' => 'r'),
+                    "SELECT COALESCE(SUM(r.outstanding),0) FROM fin_receivables r WHERE {TENANT_SCOPE} AND COALESCE(r.is_deleted,0)=0 AND r.outstanding>0 AND r.due_date IS NOT NULL AND r.due_date<CURDATE()",
+                    '../Finance/dues_fin.php', 'err',
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملاتِ الذمم')),
+
+                array('المسوّى الجاهز للصرف', 'fa-hand-holding-dollar', array('t' => 'fin_dues', 'a' => 'd'),
+                    "SELECT COALESCE(SUM(d.amount),0) FROM fin_dues d WHERE {TENANT_SCOPE} AND COALESCE(d.is_deleted,0)=0 AND d.direction='credit' AND d.settlement_state='settled'",
+                    '../Finance/payments_fin.php', 'or',
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'scope' => 'يجمع عملاتِ المستحقات')),
+
+                array('انحرافات فوق 10%', 'fa-triangle-exclamation', array('t' => 'fin_budget_lines', 'a' => 'l', 'enrich' => array('b' => 'fin_budgets')),
+                    "SELECT COUNT(*) FROM fin_budget_lines l LEFT JOIN fin_budgets b ON b.id=l.budget_id WHERE {TENANT_SCOPE} AND b.id IS NOT NULL AND COALESCE(b.is_deleted,0)=0 AND l.variance_pct IS NOT NULL AND ABS(l.variance_pct)>10",
+                    '../Finance/budget_form_fin.php', 'err',
+                    array('unit' => 'سطرَ موازنة')),
+
+                array('أقساط تمويل خلال 7 أيام', 'fa-landmark', array('t' => 'fin_funding_schedules', 'a' => 'f'),
+                    "SELECT COALESCE(SUM(f.total_due-f.paid_amount),0) FROM fin_funding_schedules f WHERE {TENANT_SCOPE} AND f.state<>'paid' AND f.due_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY)",
+                    '../Finance/funding_fin.php', 'or',
+                    array('unit' => 'مبلغ', 'decimals' => 0, 'period' => 'الأيامُ السبعةُ القادمة')),
+            ),
+            // ② مهامُّ الدورِ منطقُها مكتوبٌ في roleBoardTasks(17) — لا تُكرَّر هنا
+            'tasks' => array(),
+            'pulse' => array('نبض الأداء — التحصيل مقابل الصرف (7 أيام)', array('تحصيل', 'صرف'),
+                array('t' => 'fin_payments', 'a' => 'p'),
+                "SELECT COALESCE(SUM(p.amount),0) FROM fin_payments p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0 AND p.direction='collection' AND p.state IN('executed','reconciled') AND DATE(COALESCE(p.paid_at,p.created_at))=?",
+                array('t' => 'fin_payments', 'a' => 'p'),
+                "SELECT COALESCE(SUM(p.amount),0) FROM fin_payments p WHERE {TENANT_SCOPE} AND COALESCE(p.is_deleted,0)=0 AND p.direction='disbursement' AND p.state IN('executed','reconciled') AND DATE(COALESCE(p.paid_at,p.created_at))=?")),
     );
     return isset($C[intval($rid)]) ? $C[intval($rid)] : null;
 }
@@ -781,27 +869,59 @@ function roleBoardBuild($conn, $gate, $roleId, $userId)
     $cfg = roleBoardGenericConfig($rid);
     if ($cfg === null) { return null; }
 
-    /** تنفيذُ عنصرِ إعدادٍ [label,icon,scope,sql,href(,tone)] عدًّا معزولًا. */
+    /**
+     * تنفيذُ عنصرِ إعدادٍ عدًّا معزولًا.
+     * العنصرُ: [label, icon, scope, sql, href, tone?, extras?]
+     *   • `sql` نصٌّ يُنفَّذ في نطاقِ `scope`، **أو دالّةٌ** `fn($gate): float`
+     *     لمؤشرٍ يُركَّب من قراءتين معزولتين (البوابةُ تشترط WHERE عليا واحدة،
+     *     فالنقدُ = افتتاحيُّ البنوك + صافي الكشوف قراءتان تُجمعان — كما في
+     *     `Finance/cfo_daily_board_fin.php` حرفًا).
+     *   • `extras` مصفوفةٌ اختيارية: unit · period · scope · decimals.
+     */
     $exec = function (array $def, array $params = array()) use ($gate) {
+        if (is_callable($def[3])) {
+            try { return (float) call_user_func($def[3], $gate); }
+            catch (\Throwable $t) { error_log('role_board calc: ' . $t->getMessage()); return 0.0; }
+        }
         $scopeArr = array('scope' => array($def[2]['a'] => $def[2]['t']));
         if (isset($def[2]['enrich'])) { $scopeArr['enrich'] = $def[2]['enrich']; }
         return roleBoardScalar($gate, $scopeArr, $def[3], $params);
     };
 
-    // ① مؤشرات اليوم
+    $today = date('Y-m-d');
+
+    // ① مؤشرات اليوم — البطاقةُ تخرج جاهزةً للعرضِ بعقدِها السباعيّ، فلا يخترع
+    //    القالبُ وحدةً ولا فترة (كان يفرض «سجل · لحظي» على كلِّ رقم — وهو صدقٌ
+    //    لعدّاداتِ COUNT وكذبٌ على مبلغٍ أو كميةٍ أو نافذةِ سبعةِ أيام).
     $cards = array();
     foreach ($cfg['cards'] as $def) {
-        $n = $exec($def);
+        $n  = $exec($def);
+        $ex = isset($def[6]) && is_array($def[6]) ? $def[6] : array();
         $tone = isset($def[5]) ? $def[5] : 'or';
         if ($tone === 'err' && $n <= 0) { $tone = 'ok'; }   // الحرجُ الصفري يهدأ لونًا لا يختفي
-        $cards[] = array($def[1], $n, $def[0], $tone, $def[4]);
+        $dec = array_key_exists('decimals', $ex) ? $ex['decimals'] : null;
+        $cards[] = array(
+            'icon'    => $def[1],
+            'value'   => $n,
+            'display' => ($dec === null) ? (string) (int) $n : number_format((float) $n, (int) $dec),
+            'label'   => $def[0],
+            'tone'    => $tone,
+            'href'    => $def[4],
+            'unit'    => isset($ex['unit'])   ? $ex['unit']   : 'سجل',
+            'period'  => isset($ex['period']) ? $ex['period'] : 'لحظي (' . $today . ')',
+            'scope'   => isset($ex['scope'])  ? $ex['scope']  : '',
+        );
     }
 
-    // ② مهامي (من الإعداد) — والصفريُّ يختفي
+    // ② مهامي — من الإعداد، ثم ما تكتبه roleBoardTasks لأدوارٍ منطقُ مهامِّها
+    //    مكتوبٌ لا تصريحيّ (17·13·16·23). والصفريُّ يختفي في الحالتين.
     $tasks = array();
     foreach ($cfg['tasks'] as $def) {
         $n = (int) $exec($def);
         if ($n > 0) { $tasks[] = array('label' => $def[0], 'icon' => $def[1], 'count' => $n, 'href' => $def[4]); }
+    }
+    foreach (roleBoardTasks($conn, $gate, $rid) as $wt) {
+        if ((int) $wt['count'] > 0) { $tasks[] = $wt; }
     }
 
     // ⑥ نبض الأداء من إعداده (سلسلةٌ ثانيةٌ اختيارية)
@@ -824,6 +944,10 @@ function roleBoardBuild($conn, $gate, $roleId, $userId)
         'role_id'      => $rid,
         'title'        => $cfg['title'],
         'icon'         => $cfg['icon'],
+        // الشاشةُ التي يحكم `can_view` عليها رؤيةَ هذه اللوحة: اللوحةُ العامة
+        // افتراضًا، ولوحةٌ مخصصةٌ لمن نُقلت لوحتُه (المالية). الحارسُ في
+        // `main/dashboard.php` — فالتضمينُ لا يُسقط قفلًا كانت الشاشةُ تحمله.
+        'perm'         => isset($cfg['perm']) ? $cfg['perm'] : 'main/role_board.php',
         'cards'        => $cards,
         'tasks'        => $tasks,
         'approvals'    => roleBoardApprovals($conn, $gate, $rid, $badges),

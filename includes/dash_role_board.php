@@ -49,15 +49,15 @@ $dash_ops_cols = ($dash_ops_n <= 1) ? 2 : (($dash_ops_n <= 5) ? $dash_ops_n : 4)
            «لحظي». والمقارنةُ تُعلن غيابَها ولا تُلفَّق. */ ?>
   <div class="shot-ops-kpis" data-cols="<?= (int) $dash_ops_cols ?>">
     <?php foreach ($dash_board['cards'] as $c):
-      list($icon, $val, $lbl, $tone, $href) = $c;
       echo ems_kpi_card(array(
-        'title'  => $lbl,
-        'value'  => (string) (int) $val,
-        'unit'   => 'سجل',
-        'period' => 'لحظي (' . $dash_ops_today . ')',
-        'status' => in_array($tone, array('ok', 'warn', 'err'), true) ? $tone : 'neutral',
-        'drill'  => $href,
-        'icon'   => $icon,
+        'title'  => $c['label'],
+        'value'  => $c['display'],
+        'unit'   => $c['unit'],
+        'period' => $c['period'],
+        'status' => in_array($c['tone'], array('ok', 'warn', 'err'), true) ? $c['tone'] : 'neutral',
+        'drill'  => $c['href'],
+        'icon'   => $c['icon'],
+        'scope'  => $c['scope'],
       ));
     endforeach; ?>
   </div>
