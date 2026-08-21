@@ -23,7 +23,14 @@ if (empty($dash_board)) { return; }
 require_once __DIR__ . '/kpi_card.php';
 
 $dash_ops_today = isset($today) ? $today : date('Y-m-d');
-$dash_ops_cols  = max(2, min(5, count($dash_board['cards'])));
+
+/* عدَدُ أعمدةِ المؤشرات: صفٌّ واحدٌ كاملٌ ما دام العدَدُ خمسةً فأقل، وإلا
+   أربعةٌ — وهو إيقاعُ الصفحةِ نفسُه (الأرقامُ الكبيرةُ والصناديقُ والبلاطاتُ
+   وشرائحُ الجلسةِ أربعةٌ). والمقيسُ: سبعةُ مؤشراتِ الموارد البشرية كانت
+   تُصَفُّ 5+2 فتُخلّف ثلاثَ خاناتٍ فارغةً في السطرِ الثاني — وبأربعةٍ تصير
+   4+3 بخانةٍ واحدة. (والمدى 2..6 هو ما يفهمه `data-cols` في ems-statcards.css.) */
+$dash_ops_n    = count($dash_board['cards']);
+$dash_ops_cols = ($dash_ops_n <= 1) ? 2 : (($dash_ops_n <= 5) ? $dash_ops_n : 4);
 ?>
 <section class="shot-ops" aria-label="<?= htmlspecialchars($dash_board['title'], ENT_QUOTES, 'UTF-8') ?>">
   <div class="shot-ops-head">

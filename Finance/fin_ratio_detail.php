@@ -6,6 +6,7 @@
  * حارسٌ واحدٌ وغلافٌ حاكمٌ واحدٌ وشريطُ فترةٍ واحدٌ لعشرِ شاشات — «لا مكوّنَ
  * جديدًا لوظيفةٍ قائمة» (المبدأ ١١). والجسمُ وحدَه يختلف.
  */
+require_once __DIR__ . '/../includes/sensitive_read_log.php'; // INJ-FIX-01 §أ② — نقطةُ قرارِ الحقلِ الحساسِ في العرض
 $FA_SCREEN = array(
     'file' => 'fin_ratio_detail.php',
     'title' => 'تفصيل نسبة مالية',
@@ -58,7 +59,7 @@ function fa_render_body($conn, $company_id, $period, $can_write, $uid)
             <tr><td>حسابات المقام</td><td class="fa-mono"><?php echo htmlspecialchars($t['denominator_codes']); ?></td></tr>
             <tr><td>قيمة البسط</td><td><?php echo $v && $v['numerator_value'] !== null ? number_format((float)$v['numerator_value'],2) : '—'; ?></td></tr>
             <tr><td>قيمة المقام</td><td><?php echo $v && $v['denominator_value'] !== null ? number_format((float)$v['denominator_value'],2) : '—'; ?></td></tr>
-            <tr><td>النتيجة</td><td><strong><?php echo $v && $v['result_value'] !== null ? number_format((float)$v['result_value'],4) : '— غير مقيسة'; ?></strong> <?php echo htmlspecialchars($t['unit_ar']); ?></td></tr>
+            <tr><td>النتيجة</td><td><strong><?php echo $v && $v['result_value'] !== null ? ems_sensitive_display($conn, "fin_ratio_values.result_value", number_format((float)$v["result_value"],4), "ratio:" . htmlspecialchars($code), "تفصيل النسبة") : '— غير مقيسة'; ?></strong> <?php echo htmlspecialchars($t['unit_ar']); ?></td></tr>
             <tr><td>الحد والمالك</td><td><?php echo htmlspecialchars($t['limit_text'] . ' · ' . $t['owner_role']); ?></td></tr>
             <tr><td>الاتجاه عبر الفترات</td><td><?php echo htmlspecialchars($v['trend_direction'] ?? 'na'); ?></td></tr>
             <tr><td>الأبعاد المطبَّقة</td><td>D1 الكيان · الفترة <?php echo htmlspecialchars($period); ?></td></tr>

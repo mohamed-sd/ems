@@ -98,7 +98,8 @@ foreach ($users as $u) {
 }
 $ok(!$mismatch, 'العدَّادُ = صفوفُ الشاشةِ في ' . $checked . ' حسابًا', implode(' · ', $mismatch));
 /* وما كان يُجمع خطأً صار له بلاطتُه وشاشتُه */
-$ok(strpos($ws, 'ems_my_fin_requests_count') !== false && strpos($ws, 'FinRequests/my_requests.php') !== false,
+/* الشاشةُ الماليةُ صارت `request_form.php` الموحَّدةَ بعدَ دمجِ «طلباتي» فيها (2026-08-21) */
+$ok(strpos($ws, 'ems_my_fin_requests_count') !== false && strpos($ws, 'FinRequests/request_form.php') !== false,
     'والماليةُ بلاطتُها وشاشتُها — لا تُجمع في رقمٍ لا شاشةَ له ولا تُخفى');
 
 /* ── ④ شارةُ الشريطِ = موافقاتي + مهامي **لهذا المستخدم** (0407) ──────────

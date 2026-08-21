@@ -38,3 +38,50 @@ if (!function_exists('ems_log_sensitive_read')) {
         return false;
     }
 }
+
+/* ═══ INJ-FIX-01 · الموجة أ ② — قناةُ العرضِ للحقلِ الحساس (GAP-10) ═══════════
+ * ◆ **الثغرةُ التي يسدُّها — مقيسةٌ بمسحٍ شجريّ**: خمسةُ أسطحِ ملفٍّ/بطاقةٍ تعرض
+ *   قيمةً حساسةً بلا مرورٍ بنقطةِ القرار — ملفُّ العميلِ (رصيدٌ افتتاحيّ) ·
+ *   ملفُّ الموظفِ (هاتف) · تفصيلُ النسبةِ (نتيجةُ نسبة) · بطاقةُ المورِّد
+ *   (رقمٌ ضريبيّ) · بطاقةُ الخطر (الوحدةُ المالكة). والإعلانُ لكلٍّ منها
+ *   إخفاءٌ مكتوبٌ في `scr_sensitive_fields.policy_masking` — كان حبرًا.
+ * ◆ **ولا مقرِّرَ سادس**: هذه الدالةُ تفوّض إلى `SensitiveFieldGuard` نفسِه
+ *   الذي تستهلكه الشاشةُ والتصديرُ والواجهةُ البرمجية — فالنقطةُ واحدةٌ
+ *   بأربعةِ مداخل، لا أربعةُ نقاطٍ بحكمٍ واحد.
+ * ◆ **وفشلٌ مغلق**: غيابُ الحارسِ يُخفي القيمةَ ولا يعرضها خامًّا.
+ * ◆ **وصيغةُ الإخفاءِ من الإعلانِ لا من الشاشة**: `full` ⇐ «•••» ·
+ *   `partial` ⇐ آخرُ أربعةٍ · `none` ⇐ يُعرض للمخوَّلِ وحدَه.
+ *
+ * @param  string $code   «جدول.حقل» — مثل employees.phone
+ * @param  mixed  $value  القيمةُ الخام
+ * @param  string $subjectRef مرجعُ الموضوع للسجل — مثل client:12
+ * @return string القيمةُ كما يستحقُّها القارئُ الحاليّ (جاهزةٌ للعرض)
+ */
+if (!function_exists('ems_sensitive_display')) {
+    function ems_sensitive_display(mysqli $conn, $code, $value, $subjectRef = '', $screen = '')
+    {
+        if ($value === null || $value === '') { return $value; }
+
+        $guardFile = dirname(__DIR__) . '/app/Services/Security/SensitiveFieldGuard.php';
+        if (!class_exists('\App\Services\Security\SensitiveFieldGuard', false)) {
+            if (!is_file($guardFile)) { return '•••'; }          // فشلٌ مغلق
+            require_once $guardFile;
+        }
+        $G = '\App\Services\Security\SensitiveFieldGuard';
+        $pol = $G::policy($conn, $code);
+        if (!$pol) { return $value; }                             // غيرُ مصنَّفٍ — يمرّ
+
+        $role      = isset($_SESSION['user']['role'])       ? (string) $_SESSION['user']['role'] : '';
+        $personId  = isset($_SESSION['user']['id'])         ? (int) $_SESSION['user']['id'] : 0;
+        $companyId = isset($_SESSION['user']['company_id']) ? (int) $_SESSION['user']['company_id'] : 0;
+
+        $v = $G::readerAllowed($conn, $pol, $personId, $role, $companyId, $code);
+        if (empty($v['ok'])) {
+            return $pol['masking_rule'] === 'partial' ? $G::maskPartial((string) $value) : '•••';
+        }
+        if ($subjectRef !== '') {
+            ems_log_sensitive_read($conn, str_replace('.', '_', $code), $subjectRef, $screen);
+        }
+        return $value;
+    }
+}

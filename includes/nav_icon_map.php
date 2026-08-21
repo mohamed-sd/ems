@@ -105,7 +105,7 @@ function ems_nav_route_icons() {
         'Finance/maintenance_provision_fin.php' => 'fa fa-piggy-bank',
         'Finance/variance_monitor_fin.php'      => 'fa fa-magnifying-glass-chart',
         'Finance/management_accounting_fin.php' => 'fa fa-book-open',
-        'FinRequests/my_requests.php'           => 'fa fa-paper-plane',
+        'FinRequests/request_form.php'          => 'fa fa-paper-plane',
         'FinRequests/effect_map.php'            => 'fa fa-arrows-turn-to-dots',
         'FinRequests/cycle_time_board.php'      => 'fa fa-stopwatch',
         'FinRequests/routing_admin.php'         => 'fa fa-signs-post',

@@ -264,9 +264,42 @@ class FieldGovernor
                 'exportable' => (mb_strpos((string) $r['exportable_flag'], 'نعم') !== false),
                 'logged'     => (mb_strpos((string) $r['log_views_flag'], 'نعم') !== false),
                 'label'      => (string) $r['classification_sensitivity'],
+                'declared'   => true,   // له إعلانُ تصديرٍ صريحٌ في القاموس
             );
         }
         $st->close();
+
+        /* ══ INJ-FIX-01 · GAP-10 — سجلّان للحساسيةِ لا سجلٌّ واحد ══════════════
+           ◆ **الثغرةُ التي يسدُّها — مقيسةٌ لا مفترَضة**: `sensitive_field_policies`
+             يُعلن ستةَ حقولٍ حساسةً (`employees.salary` · `employees.bank_account`
+             · `employees.medical_notes` · `equipment.owner_entity` ·
+             `financing.terms` · `contract.unit_price`) **ولا صفَّ لأيٍّ منها في
+             `scr_sensitive_fields`**. وهذه الدالةُ كانت تقرأ القاموسَ وحدَه،
+             فترجع دونَها — فيمرُّ الراتبُ والحسابُ المصرفيُّ وسعرُ الوحدةِ في
+             التصديرِ **أعمدةً عاديةً** لأن المقرِّرَ لم يرَها حساسةً أصلًا.
+           ◆ **والحساسيةُ تُعلَن في السجلَّين معًا** حتى يُوحَّدا في مجالِ السلطة
+             (الموجةُ ج). فالاتحادُ هنا ليس مسارًا ثالثًا — بل قراءةُ مقرِّرٍ
+             واحدٍ من كِلا الإعلانَين حتى يبقى إعلانٌ واحد.
+           ◆ **وما لا إعلانَ تصديرٍ له يُقرأ منعًا لا سماحًا** (`declared=false`):
+             فغيابُ الإعلانِ لا يصنع إذنًا. */
+        $st = $conn->prepare(
+            "SELECT field_code FROM sensitive_field_policies WHERE field_code LIKE CONCAT(?, '.%')");
+        if ($st) {
+            $st->bind_param('s', $table);
+            $st->execute();
+            $rs = $st->get_result();
+            while ($r = $rs->fetch_assoc()) {
+                $fld = substr((string) $r['field_code'], strlen($table) + 1);
+                if ($fld === '' || isset($out[$fld])) { continue; }   // القاموسُ أرجحُ عند التكرار
+                $out[$fld] = array(
+                    'exportable' => false,   // لا إعلانَ ⇒ لا يُبَتُّ بالسماح
+                    'logged'     => true,    // ويُسجَّل الاطّلاعُ احتياطًا
+                    'label'      => 'سياسةُ حقلٍ حساسة',
+                    'declared'   => false,
+                );
+            }
+            $st->close();
+        }
         return $out;
     }
 
@@ -330,8 +363,22 @@ class FieldGovernor
             if ($isSuperAdmin) { $allowed[] = $col; continue; }
             $personId  = isset($_SESSION['user']['id']) ? (int) $_SESSION['user']['id'] : 0;
             $companyId = isset($_SESSION['user']['company_id']) ? (int) $_SESSION['user']['company_id'] : 0;
-            $ok = $sensitive[$col]['exportable']
-                || self::roleHasFieldGrant($conn, $table, $col, $roleId, $personId, $companyId);
+            /* ══ INJ-FIX-01 · GAP-10 — «قابلٌ للتصدير» شرطٌ لازمٌ لا كافٍ ═════════
+               ◆ **الثغرةُ التي يسدُّها — مقيسةٌ حيّة**: كان الحكمُ
+                 `exportable || grant`، فرايةُ `exportable='نعم'` **تتخطّى فحصَ
+                 الأهليةِ كلَّه**. و`suppliers.tax_number` معلَنٌ لـ«المالية
+                 والحوكمة» ورايتُه «نعم» ⇒ فكان يُصدَّر لكلِّ دورٍ في النظام،
+                 ومنهم دورُ التشغيلِ الذي لا يخصُّه. أي أن الإعلانَ يقول
+                 «للمالية» والكودُ يقول «للجميع».
+               ◆ **والصوابُ عطفٌ لا فصل**: الرايةُ تجيب «أيخرج هذا الحقلُ في
+                 تصديرٍ أصلًا؟»، والأهليةُ تجيب «ومَن له أن يُخرجه؟». فلا يُصدَّر
+                 إلا **مؤهَّلٌ لحقلٍ مأذونٍ بالتصدير**.
+               ◆ **وما لا إعلانَ تصديرٍ له تحكمه الأهليةُ وحدَها** (`declared=false`)
+                 — وإلا حُجب الراتبُ عن الموارد البشريةِ بحجةِ إعلانٍ لا وجودَ له،
+                 فصار الإصلاحُ فقدًا. */
+            $eligible = self::roleHasFieldGrant($conn, $table, $col, $roleId, $personId, $companyId);
+            $exportPermitted = empty($sensitive[$col]['declared']) ? true : $sensitive[$col]['exportable'];
+            $ok = $eligible && $exportPermitted;
             if ($ok) { $allowed[] = $col; } else { $blocked[] = $col; }
         }
         return array('allowed' => $allowed, 'blocked' => $blocked, 'logged' => $logged);

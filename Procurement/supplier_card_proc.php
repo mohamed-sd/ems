@@ -11,6 +11,7 @@ if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
 require_once '../includes/permissions_helper.php';   // proc_page_perms تستدعي check_page_permissions — كانت غائبةً فتُسقط الشاشة 500
 require_once __DIR__ . '/proc_helpers.php';
+require_once __DIR__ . '/../includes/sensitive_read_log.php'; // INJ-FIX-01 §أ② — نقطةُ قرارِ الحقلِ الحساسِ في العرض
 require_once __DIR__ . '/../includes/screen_contract.php';
 
 $ctx = proc_ctx();
@@ -72,7 +73,11 @@ include '../insidebar.php';
                            'address' => 'العنوان', 'tax_number' => 'الرقم الضريبي',
                            'commercial_registration' => 'السجل التجاري') as $k => $lbl) {
                 if (array_key_exists($k, $sup)) {
-                    echo '<tr><th>' . $lbl . '</th><td>' . htmlspecialchars((string)($sup[$k] ?? '—')) . '</td></tr>';
+                    /* INJ-FIX-01 §أ② — الرقمُ الضريبيُّ حقلٌ حساسٌ (SEN-006): يمرُّ بنقطةِ
+                       القرارِ كغيرِه، والباقي يُعرض كما هو. */
+                    $cell = (string)($sup[$k] ?? '—');
+                    $cell = ems_sensitive_display($conn, 'suppliers.' . $k, $cell, 'supplier:' . (int)($sup['id'] ?? 0), 'بطاقة المورد');
+                    echo '<tr><th>' . $lbl . '</th><td>' . htmlspecialchars($cell) . '</td></tr>';
                 }
             }
             echo '</tbody></table></div>';

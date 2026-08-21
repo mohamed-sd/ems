@@ -196,6 +196,118 @@ class EventDispatcher
         }
     }
 
+    /* ══ INJ-FIX-01 · الموجة أ ① — إنذارُ تعثُّرِ المستهلك (GAP-07) ═════════════
+       ◆ **الثغرةُ التي يسدُّها — وقعت فعلًا**: `alertDeadLetter()` لا يُطلق إلا عند
+         العزلِ في `ems_event_dead_letter`، والجدولُ فارغٌ أبدًا. فمرَّ صفّان في
+         `ems_event_consumers` **بلا معالجٍ مسجَّلٍ في الشيفرة كلِّها** (`fx` منذ
+         2026-08-12 بتأخُّرِ 5054 واقعةً · و`finance_routing_replay`) ولم ينتبه أحد:
+         `runOnce()` يدور على `$this->handlers` وحدَها، فالصفُّ اليتيمُ لا يُقرأ
+         ولا يُنذَر عنه — **ولا يظهر عطبُه إلا في مؤشرٍ يقرؤه إنسان**.
+       ◆ **وحالتان لا حالةٌ واحدة** — والخلطُ بينهما يُخفي الأخطر:
+         ① **يتيم**: صفٌّ مُفعَّلٌ بلا معالجٍ مسجَّل. لا يُقاس بالزمنِ أصلًا —
+            فمهما مضى لن يتحرّك، وهو عطبُ تعريفٍ لا تعثُّرَ تشغيل.
+         ② **متعثِّر**: له معالجٌ ومؤشرُه متأخرٌ ولم يتقدّم منذ مهلةِ الإنذار.
+       ◆ **والمهلةُ تُقاس على `updated_at` لا على عمرِ الواقعة**: المستهلكُ الذي
+         لا وقائعَ له ليس متعثرًا، والمتأخرُ الذي يتقدّم كلَّ دورةٍ ليس متعثرًا.
+       ◆ **ودَورةُ إنذارٍ واحدةٍ في الساعةِ لكلِّ مستهلك** — بالنمطِ نفسِه الذي
+         تعتمده `JobScheduleService::alertStalled()`: وسمٌ في العنوانِ يُبحث عنه.
+         فلا يُخترع سجلٌّ ثانٍ للإنذارات ولا قناةٌ ثانيةٌ لقارئها. */
+
+    /** مهلةُ اعتبارِ المستهلكِ متعثرًا — ساعةٌ، بمحاذاةِ `alert_after_seconds`
+     *  للمهامِّ التي تعمل كلَّ خمسِ دقائق في `ems_job_schedule`. */
+    const CONSUMER_STALL_SECONDS = 3600;
+
+    /**
+     * المستهلكون المتعثرون أو اليتامى — قراءةٌ محضةٌ لا تكتب شيئًا.
+     * @return array<int, array{consumer:string, kind:string, lag:int, idle_seconds:?int, cursor:int}>
+     */
+    public function stalledConsumers()
+    {
+        $out = array();
+        $res = $this->conn->query(
+            "SELECT `consumer`, `cursor_event_id`,
+                    TIMESTAMPDIFF(SECOND, `updated_at`, NOW()) AS idle
+               FROM `ems_event_consumers`
+              WHERE `enabled` = 1
+              ORDER BY `consumer`"
+        );
+        if (!$res) { return $out; }
+
+        while ($row = $res->fetch_assoc()) {
+            $consumer = (string) $row['consumer'];
+            $cursor   = (int) $row['cursor_event_id'];
+            $idle     = $row['idle'] !== null ? (int) $row['idle'] : null;
+
+            /* المقامُ نفسُه الذي يقرأ منه `runConsumer` — وإلا قِيس تأخُّرٌ وهميّ:
+               فرقُ المعرِّفات ليس عددَ الوقائع (المعرِّفاتُ متفرقة). */
+            $st = $this->conn->prepare(
+                'SELECT COUNT(*) FROM `fin_financial_events`
+                  WHERE `id` > ? AND `event_key` IS NOT NULL AND COALESCE(`is_deleted`, 0) = 0'
+            );
+            $st->bind_param('i', $cursor);
+            $st->execute();
+            $st->bind_result($lag);
+            $st->fetch();
+            $st->close();
+            $lag = (int) $lag;
+
+            if (!isset($this->handlers[$consumer])) {
+                $out[] = array('consumer' => $consumer, 'kind' => 'orphan',
+                               'lag' => $lag, 'idle_seconds' => $idle, 'cursor' => $cursor);
+                continue;
+            }
+            if ($lag > 0 && $idle !== null && $idle >= self::CONSUMER_STALL_SECONDS) {
+                $out[] = array('consumer' => $consumer, 'kind' => 'stalled',
+                               'lag' => $lag, 'idle_seconds' => $idle, 'cursor' => $cursor);
+            }
+        }
+        return $out;
+    }
+
+    /**
+     * يرفع إنذارًا لكلِّ متعثرٍ أو يتيم — إنذارٌ واحدٌ في الساعةِ لكلِّ مستهلك.
+     * @return int عددُ الإنذاراتِ المرفوعة
+     */
+    public function alertStalledConsumers()
+    {
+        $n = 0;
+        foreach ($this->stalledConsumers() as $s) {
+            $tag = '[BUS-STALL:' . $s['consumer'] . ']';
+            $dupe = $this->conn->query(
+                "SELECT COUNT(*) FROM `fin_notifications`
+                  WHERE `title` LIKE '" . $this->conn->real_escape_string($tag) . "%'
+                    AND `created_at` > NOW() - INTERVAL 1 HOUR"
+            );
+            if ($dupe && (int) $dupe->fetch_row()[0] > 0) { continue; }
+
+            $why = $s['kind'] === 'orphan'
+                ? 'صفٌّ مُفعَّلٌ بلا معالجٍ مسجَّل — لن يتقدّم مهما مضى الزمن'
+                : 'لم يتقدّم منذ ' . $this->humanSeconds((int) $s['idle_seconds']);
+            $title = mb_substr(
+                $tag . ' المستهلك «' . $s['consumer'] . '» — ' . $why
+                . ' · متأخرٌ ' . $s['lag'] . ' واقعةً عند المؤشر ' . $s['cursor']
+                . '. وصمتُ المستهلكِ أخطرُ من فشلِه.', 0, 195);
+
+            $st = $this->conn->prepare(
+                "INSERT INTO `fin_notifications` (`company_id`,`target_level`,`title`,`link`)
+                 VALUES (1, 'finance_manager', ?, 'admin/bus_monitor.php')"
+            );
+            $st->bind_param('s', $title);
+            if ($st->execute()) { $n++; }
+            $st->close();
+        }
+        return $n;
+    }
+
+    /** صياغةٌ بشريةٌ للمدة — نسخةُ `JobScheduleService::humanSeconds` نفسِها. */
+    private function humanSeconds($sec)
+    {
+        if ($sec < 60)    { return $sec . ' ثانية'; }
+        if ($sec < 3600)  { return intval($sec / 60) . ' دقيقة'; }
+        if ($sec < 86400) { return intval($sec / 3600) . ' ساعة'; }
+        return intval($sec / 86400) . ' يومًا';
+    }
+
     /** تقدّم رتيب (monotonic): لا يعود الـCursor للخلف أبدًا. */
     private function advanceCursor($consumer, $eventId)
     {

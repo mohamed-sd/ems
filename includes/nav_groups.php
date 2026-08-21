@@ -89,7 +89,9 @@ if (!function_exists('ems_nav_group_pins')) {
             'portal/ceo_board.php'         => 'MINE',
             'oprators/select_project.php'  => 'MINE',
             'timesheet/timesheet_type.php' => 'MINE',
-            'finrequests/my_requests.php'  => 'MINE',
+            /* الشاشةُ الموحَّدةُ للطلبِ الماليّ (إنشاءٌ وقائمةٌ وسجل) — «طلباتي»
+               مساحةٌ شخصيةٌ لكلِّ دورٍ لا بابٌ من أبوابِ المالية (2026-08-21) */
+            'finrequests/request_form.php' => 'MINE',
             'tickets/my_tickets.php'       => 'MINE',
             'user_capacities.php'          => 'MINE',
 
@@ -125,7 +127,6 @@ if (!function_exists('ems_nav_group_pins')) {
 
             /* ⑦ المالية والمحاسبة */
             'finance/budget_dept.php'      => 'FINANCE',
-            'finrequests/request_form.php' => 'FINANCE',
 
             /* ⑩ المخاطر والبلاغات — البلاغُ وصندوقُه ومساحةُ المخاطرِ لكلِّ إدارة،
                   وشاشتا مخاطرَ سُجِّلتا تحت «الحوكمة والضوابط» وهما مخاطرُ صريحة */

@@ -9,6 +9,7 @@ require_once __DIR__ . '/_risk_common.php';
 $__pp = risk_guard_screen($conn, $is_super_admin);
 require_once __DIR__ . '/../includes/screen_contract.php';
 require_once __DIR__ . '/_risk_views.php';
+require_once __DIR__ . '/../includes/sensitive_read_log.php'; // INJ-FIX-01 §أ② — نقطةُ قرارِ الحقلِ الحساسِ في العرض
 ems_shell_axes($__pp);
 
 // CM-09/CM-10 (§6-2): ٢٤ حقلًا في أقسامٍ — والمنظرُ يقلّل المعروضَ لا المحفوظ.
@@ -88,7 +89,11 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
             <h5><?php echo htmlspecialchars($risk['title']); ?></h5>
             <p class="text-muted"><?php echo nl2br(htmlspecialchars((string) $risk['description'])); ?></p>
             <div class="ems-page-context">
-                <span>الإدارة المالكة (RK-01): <b><?php echo htmlspecialchars($risk['owner_unit_name'] ?: '—'); ?></b></span>
+                <span>الإدارة المالكة (RK-01): <b><?php /* INJ-FIX-01 §أ② — الوحدةُ المالكةُ حقلٌ حساسٌ (SEN-011 «يظهر ••• لغير
+                        المخول»). والقيمةُ المعروضةُ اسمُ الوحدةِ لا معرِّفُها، **والاسمُ
+                        يكشف ما يكشفه المعرِّف** — فيمرُّ بنقطةِ القرارِ بمفتاحِ الحقلِ
+                        المسجَّلِ نفسِه لا بمفتاحٍ ثانٍ للاسم. */
+                        echo htmlspecialchars(ems_sensitive_display($conn, 'risk_register.owner_unit_id', $risk['owner_unit_name'] ?: '—', 'risk:' . (int)$rid, 'بطاقة الخطر')); ?></b></span>
                 <span>مالك الخطر: <b><?php echo htmlspecialchars($risk['owner_name'] ?: '—'); ?></b></span>
                 <span>النطاق: <b><?php echo htmlspecialchars($risk['scope_type']); ?></b></span>
                 <span>السبب الجذري: <b><?php echo htmlspecialchars($risk['root_cause']); ?></b></span>

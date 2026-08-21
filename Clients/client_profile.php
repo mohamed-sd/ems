@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
+require_once __DIR__ . '/../includes/sensitive_read_log.php'; // INJ-FIX-01 §أ② — نقطةُ قرارِ الحقلِ الحساسِ في العرض
 session_start();
 if (!isset($_SESSION['user'])) {
     header("Location: ../login.php");
@@ -1186,7 +1187,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                                     <td><?php echo htmlspecialchars($s['stmt_code']); ?></td>
                                     <td><?php echo htmlspecialchars($s['period_from']); ?></td>
                                     <td><?php echo htmlspecialchars($s['period_to']); ?></td>
-                                    <td><?php echo number_format((float) $s['opening_balance'], 2); ?> <span class="ems-profile__unit"><?php echo htmlspecialchars($s['currency']); ?></span></td>
+                                    <td><?php echo ems_sensitive_display($conn, "fin_client_statements.opening_balance", number_format((float) $s["opening_balance"], 2), "client:" . (int)($client_id ?? 0), "ملف العميل"); ?> <span class="ems-profile__unit"><?php echo htmlspecialchars($s['currency']); ?></span></td>
                                     <td><?php echo number_format((float) $s['invoices_total'], 2); ?></td>
                                     <td><?php echo number_format((float) $s['credit_notes_total'], 2); ?></td>
                                     <td><?php echo number_format((float) $s['collections_total'], 2); ?></td>

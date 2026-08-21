@@ -82,7 +82,7 @@ $tiles = array(
     // INJ-0581: الماليةُ بلاطتُها وشاشتُها — فلا تُجمع في رقمٍ لا شاشةَ له ولا تُخفى
     array('group' => 'wait', 'ord' => '④-ب', 'title' => 'طلباتي المالية',
           'desc' => 'بوابةُ الطلبات المالية — عدُّها من شاشتها لا من غيرها',
-          'icon' => 'fa fa-file-invoice-dollar', 'href' => '../FinRequests/my_requests.php', 'count' => $myFinRequests),
+          'icon' => 'fa fa-file-invoice-dollar', 'href' => '../FinRequests/request_form.php', 'count' => $myFinRequests),
     array('group' => 'wait', 'ord' => '⑤', 'title' => 'المراسلات والتنبيهات',
           'desc' => 'تنبيهاتي (وذو الفعل يتحول مهمةً) والمراسلات من الشريط',
           'icon' => 'fa fa-bell', 'href' => '../Portal/notifications.php', 'count' => $myMsgs),

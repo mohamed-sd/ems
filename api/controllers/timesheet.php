@@ -620,7 +620,7 @@ function timesheet_refdata(): void
     $res = mysqli_query($conn, 'SELECT d.id, d.name, d.phone, d.employee_code FROM employees d WHERE ' . implode(' AND ', $dWhere) . ems_operation_types_in_sql($conn, 'd') . ' ORDER BY d.name ASC');
     if ($res) {
         while ($r = mysqli_fetch_assoc($res)) {
-            $drivers[] = ['id' => intval($r['id']), 'name' => $r['name'] ?? '', 'phone' => $r['phone'] ?? '', 'employee_code' => $r['employee_code'] ?? ''];
+            $drivers[] = ['id' => intval($r['id']), 'name' => $r['name'] ?? '', 'phone' => api_sensitive_value($ctx, 'employees.phone', $r['phone'] ?? ''), 'employee_code' => $r['employee_code'] ?? ''];
         }
     }
 
@@ -756,7 +756,7 @@ function timesheet_operation_drivers(int $operationId): void
     $res = mysqli_stmt_get_result($stmt);
     if ($res) {
         while ($r = mysqli_fetch_assoc($res)) {
-            $out[] = ['employee_id' => intval($r['id']), 'name' => $r['name'] ?? '', 'phone' => $r['phone'] ?? ''];
+            $out[] = ['employee_id' => intval($r['id']), 'name' => $r['name'] ?? '', 'phone' => api_sensitive_value($ctx, 'employees.phone', $r['phone'] ?? '')];
         }
     }
     mysqli_stmt_close($stmt);

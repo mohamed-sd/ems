@@ -269,7 +269,8 @@ function finreq_stamp_sla($gate, $request_id, $stage, $need_class)
 /** عدّادات شارات السايدبار حسب الدور: صندوق الإدارة · مكتب المحاسب · المعاد لمنشئه */
 function finreq_badge_counts($gate, $role, $user_id)
 {
-    $out = array('FinRequests/dept_inbox.php' => 0, 'FinRequests/accountant_desk.php' => 0, 'FinRequests/my_requests.php' => 0);
+    // مفتاحُ «المعادِ لمنشئه» صار على الشاشةِ الموحَّدة بعدَ الدمج (2026-08-21)
+    $out = array('FinRequests/dept_inbox.php' => 0, 'FinRequests/accountant_desk.php' => 0, 'FinRequests/request_form.php' => 0);
     try {
         $role = strval($role);
         $routes = finreq_active_routing($gate);
@@ -290,7 +291,7 @@ function finreq_badge_counts($gate, $role, $user_id)
                 'whereRaw' => "state = 'pending_approval' AND event_id IS NULL", 'params' => array(),
             )));
         }
-        $out['FinRequests/my_requests.php'] = intval($gate->count('fin_requests', array(
+        $out['FinRequests/request_form.php'] = intval($gate->count('fin_requests', array(
             'whereRaw' => "state = 'returned' AND (created_by = ? OR requester_id = ?)",
             'params' => array(intval($user_id), intval($user_id)),
         )));
@@ -674,6 +675,49 @@ function finreq_fetch($gate, $id)
     $row = $gate->selectOne('fin_requests', array('where' => array('id' => intval($id))));
     if ($row) { $row = finreq_sync_state($gate, $row); }
     return $row;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   الشاشةُ الموحَّدة (`request_form.php`) — مجموعاتُ الحالةِ وبناءُ رابطِ الترشيح
+   ───────────────────────────────────────────────────────────────────────────
+   مصدرٌ واحدٌ تقرؤه بطاقاتُ الإحصاءِ وقائمةُ المرشِّحِ والترشيحُ نفسُه، فلا
+   تفترق البطاقةُ عن الجدولِ في تعريفِ «قيدَ الدورة».
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/** مجموعاتُ حالاتِ الطلبِ التي تُقاس بها البطاقاتُ ويُرشَّح بها الجدول. */
+function finreq_state_groups()
+{
+    return array(
+        'draft'    => array('label' => 'مسودات',           'icon' => 'fa fa-pen-ruler',           'tone' => 'stats-slate',   'states' => array('draft')),
+        'cycle'    => array('label' => 'قيدَ الدورة',       'icon' => 'fa fa-hourglass-half',      'tone' => 'stats-orange',  'states' => array('under_review', 'pending_approval', 'suspended')),
+        'returned' => array('label' => 'معادةٌ للاستكمال',  'icon' => 'fa fa-rotate-left',         'tone' => 'stats-danger',  'states' => array('returned')),
+        'approved' => array('label' => 'معتمدةٌ أو مقيَّدة', 'icon' => 'fa fa-circle-check',        'tone' => 'stats-primary', 'states' => array('approved', 'posted')),
+        'settled'  => array('label' => 'مدفوعةٌ أو مُغلقة', 'icon' => 'fa fa-hand-holding-dollar', 'tone' => 'stats-success', 'states' => array('paid', 'collected', 'closed', 'archived')),
+        'refused'  => array('label' => 'مرفوضةٌ أو مسحوبة', 'icon' => 'fa fa-circle-xmark',        'tone' => 'stats-purple',  'states' => array('rejected', 'cancelled', 'withdrawn', 'expired', 'merged')),
+    );
+}
+
+/**
+ * سلسلةُ استعلامٍ تحفظ المرشِّحاتِ القائمةَ وتُبدِّل ما طُلب تبديلُه — فنقرُ
+ * بطاقةٍ يغيّر الحالةَ وحدَها ولا يُسقط بحثًا ولا مدًى زمنيًّا كتبه المستخدم.
+ * المفاتيحُ **قائمةُ سماحٍ صلبة**: ما ليس فيها لا يُنقَل ولو جاء في الرابط.
+ *
+ * @param array $override مفتاحٌ => قيمة (القيمةُ الفارغةُ تعني حذفَ المرشِّح)
+ * @return string '' أو '?a=1&b=2' مهرَّبةً للوسمِ
+ */
+function finreq_qs(array $override = array())
+{
+    $keys = array('state', 'type', 'q', 'from', 'to');
+    $out = array();
+    foreach ($keys as $k) {
+        $v = array_key_exists($k, $override)
+            ? strval($override[$k])
+            : (isset($_GET[$k]) ? strval($_GET[$k]) : '');
+        $v = trim($v);
+        if ($v !== '') { $out[$k] = $v; }
+    }
+    if (!$out) { return ''; }
+    return '?' . htmlspecialchars(http_build_query($out), ENT_QUOTES, 'UTF-8');
 }
 
 /** شارة حالةٍ جاهزة للعرض */

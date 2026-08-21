@@ -2180,6 +2180,36 @@ body.ems-site .main .shot-ops-kpis .ems-kpi-meta:not(:has(span:not(:empty))) {
         .fr-actions-flex { display:flex; gap:12px; flex-wrap:wrap; }
         .fr-form-row { display:flex; gap:8px; }
 
+/* ── الشاشةُ الموحَّدة (دمجُ `my_requests.php` في `request_form.php` · 2026-08-21) ──
+   ◆ قسمُ الإحصاءِ يُطوى بزرِّ الرأسِ كما في شاشةِ العملاء — والطيُّ `display:none`
+     لا `visibility` فلا يبقى للمطويِّ ارتفاعٌ يزيح ما بعدَه.
+   ◆ و`.frq-stat-on` تُعلِن **أيَّ بطاقةٍ رشَّحتِ الجدولَ الآن**: البطاقةُ رابطٌ،
+     ورابطٌ فعّالٌ بلا علامةٍ يترك القارئَ يخمّن مصدرَ ما يراه. والإعلانُ بحدٍّ
+     وظلٍّ لا بلونِ خلفيةٍ — فلونُ البطاقةِ نفسُه هو معناها (حالتُها). */
+        .frq-hidden { display:none !important; }
+        .frq-table { width:100% !important; }
+/* رقمُ السجلِّ في الترويسةِ: تابعٌ للتسميةِ لا بديلٌ عنها — أخفُّ وزنًا وبمسافةٍ
+   فاصلة. و`color:inherit` ليس زخرفة: قاعدةُ `.ems-site .main span` (0,2,1) في
+   `ems.main.all.style.css` **تبتلع لونَ أيِّ صنفٍ مفرد** فتصبغه أسودَ صريحًا
+   (المقيس: rgb(0,0,0) بينما العنوانُ rgb(17,17,17)) — فيتفرّق اللونان على
+   أرضيةٍ واحدةٍ اليوم، ويختفي الرقمُ كلَّه لو صارت الترويسةُ داكنةً غدًا.
+   والمحدِّدُ هنا (0,4,1) ليغلبها بالأصنافِ لا بالتعجّبِ وحدَه. */
+        body.ems-site .main .head-title .fr-title-no {
+            color: inherit !important;
+            margin-inline-start: 10px;
+            font-weight: 600;
+            opacity: .82;
+            letter-spacing: .5px;
+        }
+/* الحرَسان `:not(.dt-button):not(.btn-close)` منقولان حرفًا من قاعدةِ البطاقةِ
+   في `ems-statcards.css`: بدونهما عدُّ هذا المحدِّدِ (0,4,1) ويغلبه محدِّدُ
+   البطاقةِ (0,5,1) بـ`!important` على `border` — فتُرسَم العلامةُ ولا تُرى. */
+        body.ems-site .main :is(.stats-card, .ems-statcard).frq-stat-on:not(.dt-button):not(.btn-close) {
+            border-color: var(--c-0e7490, #0e7490) !important;
+            box-shadow: 0 0 0 3px rgba(14, 116, 144, .18),
+                        0 2px 8px rgba(26, 18, 8, .07) !important;
+        }
+
 /* ── Finance/approvals_inbox.php ── */
 .fin-inbox-counters { display: flex; gap: 14px; flex-wrap: wrap; }
         .fin-inbox-badge { font-size: 15px; padding: 8px 14px; }

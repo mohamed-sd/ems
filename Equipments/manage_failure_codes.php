@@ -323,7 +323,7 @@ $stat_eq3    = $fc_gate->count('failure_codes', array('whereRaw' => "equipment_t
     <?php endif; ?>
 
     <!-- ══ إحصائيات ══ -->
-    <div class="fc-stats">
+    <div class="fc-stats ems-statgrid" data-cols="5">
         <div class="fc-stat-card">
             <div class="sc-icon"><i class="fas fa-database"></i></div>
             <div class="sc-num"><?= number_format($stat_total) ?></div>

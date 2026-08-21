@@ -61,7 +61,8 @@ if (!function_exists('ems_my_requests_count')) {
 }
 
 if (!function_exists('ems_my_fin_requests_count')) {
-    /** عددُ طلباتي **المالية** — شاشتُها `FinRequests/my_requests.php`. */
+    /** عددُ طلباتي **المالية** — شاشتُها `FinRequests/request_form.php`
+     *  (الموحَّدةُ بعدَ دمجِ `my_requests.php` فيها — 2026-08-21). */
     function ems_my_fin_requests_count(mysqli $conn, $co, $uid)
     {
         $co = (int) $co; $uid = (int) $uid;

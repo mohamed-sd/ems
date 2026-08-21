@@ -471,3 +471,47 @@ function api_movement_perms(): array
         'can_edit' => (!empty($ops['can_edit']) || !empty($drv['can_edit'])),
     ];
 }
+
+/* ═══ INJ-FIX-01 · الموجة أ ② — نقطةُ قرارِ الحقلِ الحساسِ للواجهةِ البرمجية ═══
+ * ◆ **الثغرةُ التي يسدُّها — مقيسةٌ لا موصوفة**: مسحُ `api/` أخرج **صفرَ نداءٍ**
+ *   لـ`FieldGovernor` أو `SensitiveFieldGuard` في ثمانيةِ متحكِّمات، وثلاثةٌ منها
+ *   تُرجع `employees.phone` كاملًا في الاستجابة (`board` · `operations` ·
+ *   `timesheet`). والحقلُ مسجَّلٌ حساسًا (SEN-002) بإخفاءٍ معلَنٍ «آخر 3 أرقام
+ *   لغير المخول» — فكان الإعلانُ حبرًا والواجهةُ تبثُّ الرقمَ كاملًا لكلِّ
+ *   حاملِ رمز.
+ * ◆ **ونقطةُ قرارٍ واحدةٌ لا نسخةٌ رابعة**: هذه الدالةُ لا تقرّر شيئًا بنفسِها —
+ *   تفوّض إلى `SensitiveFieldGuard` الذي يعرف السياسةَ والمنحَ الفرديَّ النافذَ
+ *   والمديرَ الأعلى. فالإضافةُ **وصلٌ لمبنيٍّ غيرِ موصول** لا محرّكٌ جديد.
+ * ◆ **وفشلٌ مغلق**: إن غاب الحارسُ لأيِّ سببٍ يُخفى الحقلُ ولا يُبَثُّ خامًّا —
+ *   فغيابُ المقرِّرِ منعٌ لا سماح.
+ *
+ * @param  array  $ctx    سياقُ الرمزِ من api_require_auth()
+ * @param  string $code   رمزُ الحقلِ «جدول.حقل» — مثل employees.phone
+ * @param  mixed  $value  القيمةُ الخام
+ * @return mixed          القيمةُ كما يستحقُّها القارئ (كاملةً · مقنَّعةً · أو '')
+ */
+function api_sensitive_value(array $ctx, string $code, $value)
+{
+    global $conn;
+    if ($value === null || $value === '') { return $value; }
+
+    $guardFile = dirname(__DIR__) . '/app/Services/Security/SensitiveFieldGuard.php';
+    if (!class_exists('\App\Services\Security\SensitiveFieldGuard', false)) {
+        if (!is_file($guardFile)) { return ''; }        // فشلٌ مغلق
+        require_once $guardFile;
+    }
+    $G = '\App\Services\Security\SensitiveFieldGuard';
+    $pol = $G::policy($conn, $code);
+    if (!$pol) { return $value; }                        // حقلٌ غيرُ مصنَّفٍ — يمرّ
+
+    $v = $G::readerAllowed($conn, $pol, intval($ctx['id'] ?? 0), (string) ($ctx['role'] ?? ''),
+                           intval($ctx['company_id'] ?? 0), $code);
+    if (empty($v['ok'])) {
+        // الإعلانُ يقول «آخر 3 أرقام لغير المخول» ⇒ تقنيعٌ لا حجبٌ كاملٌ للهاتف؛
+        // وما كان إعلانُه حجبًا كاملًا (`masking_rule='full'`) لا يُبَثُّ أصلًا.
+        return $pol['masking_rule'] === 'full' ? '' : $G::maskPartial((string) $value);
+    }
+    $G::logRead($conn, intval($ctx['company_id'] ?? 0), intval($ctx['id'] ?? 0), $code,
+                'api:' . ($ctx['id'] ?? 0), $v['grant_ref'], 'api');
+    return $value;
+}

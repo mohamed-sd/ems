@@ -106,7 +106,7 @@ function operations_index(): void
                 'rel_id'       => intval($d['id']),
                 'employee_id'    => intval($d['employee_id']),
                 'driver_name'  => $d['driver_name'] ?? '',
-                'driver_phone' => $d['driver_phone'] ?? '',
+                'driver_phone' => api_sensitive_value($ctx, 'employees.phone', $d['driver_phone'] ?? ''),
                 'shift_type'   => $d['shift_type'] ?? 'B',
                 'start_date'   => $d['start_date'] ?? '',
                 'end_date'     => ((string)($d['end_date'] ?? '') === '2099-12-31') ? '' : (string)($d['end_date'] ?? ''),

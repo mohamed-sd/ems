@@ -54,17 +54,20 @@ function roleBoardRoute($roleId, $parentRoleId = null)
         16 => 'Procurement/dashboard_proc.php',
         23 => 'Transport/transfer_dashboard.php',
         26 => 'Financing/financing_board.php',   // FIN-26 — لوحة إدارة التمويل (الشاشة 214)
-        // إدارةُ التشغيل وإدارةُ الموردين: لوحتُهما هي «الرئيسية» نفسُها (قرار
-        // المالك 2026-08-21) — المكوّناتُ السبعةُ مُدمَجةٌ في main/dashboard.php
-        // بلغةِ تصميمِها بدل شاشةٍ ثانية. والرجوعُ بسطرٍ واحدٍ لكلِّ دور.
-        // ولا شيءَ في العرضِ يخصُّ دورًا بعينه: القالبُ يقرأ إعدادَ الدورِ
-        // من roleBoardGenericConfig، فإضافةُ دورٍ ثالثٍ سطرٌ واحدٌ هنا.
+        // التشغيلُ والموردون والأسطولُ والمواردُ البشريةُ والمبيعات: لوحتُها
+        // هي «الرئيسية» نفسُها (قرار المالك 2026-08-21) — المكوّناتُ السبعةُ
+        // مُدمَجةٌ في main/dashboard.php بلغةِ تصميمِها بدل شاشةٍ ثانية.
+        // والرجوعُ بسطرٍ واحدٍ لكلِّ دور. ولا شيءَ في العرضِ يخصُّ دورًا بعينه:
+        // القالبُ يقرأ إعدادَ الدورِ من roleBoardGenericConfig، فإضافةُ دورٍ
+        // سطرٌ واحدٌ هنا.
         1  => 'main/dashboard.php',
         2  => 'main/dashboard.php',
+        3  => 'main/dashboard.php',
+        4  => 'main/dashboard.php',
+        12 => 'main/dashboard.php',
         // الباقون على اللوحة العامة الواحدة (تصيَّر من إعداد الدور)
-        24 => 'main/role_board.php', 12 => 'main/role_board.php',
-        3  => 'main/role_board.php',
-        4  => 'main/role_board.php', 5  => 'main/role_board.php',
+        24 => 'main/role_board.php',
+        5  => 'main/role_board.php',
         6  => 'main/role_board.php', 15 => 'main/role_board.php',
     );
     $rid = intval($roleId);

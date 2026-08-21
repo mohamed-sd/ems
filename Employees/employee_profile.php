@@ -9,6 +9,7 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once '../includes/driver_contract_dates.php';
+require_once __DIR__ . '/../includes/sensitive_read_log.php'; // INJ-FIX-01 §أ② — نقطةُ قرارِ الحقلِ الحساسِ في العرض
 
 $current_role = isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '';
 $is_super_admin = ($current_role === '-1');
@@ -311,7 +312,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
     };
     $ep_facts[] = array('label' => 'نوع الهوية / رقمها',
         'value' => trim(($ep_pf('identity_type') ?: '—') . ' / ' . ($ep_pf('identity_number') ?: '—')));
-    $ep_facts[] = array('label' => 'رقم الهاتف',        'value' => $ep_pf('phone'));
+    $ep_facts[] = array('label' => 'رقم الهاتف',        'value' => ems_sensitive_display($conn, 'employees.phone', $ep_pf('phone'), 'employee:' . (int)($emp_id ?? 0), 'ملف الموظف'));
     $ep_facts[] = array('label' => 'واتساب',            'value' => $ep_pf('whatsapp'));
     $ep_facts[] = array('label' => 'الجنسية',           'value' => $ep_pf('nationality'));
     $ep_facts[] = array('label' => 'تاريخ الميلاد',     'value' => $ep_pf('birth_date'));
@@ -508,7 +509,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
                 <div class="ems-profile__fact">
                     <span class="ems-profile__fact-label">6) التواصل</span>
                     <span class="ems-profile__fact-value">الهاتف الأساسي:
-                        <?php echo htmlspecialchars($driver['phone'] ? $driver['phone'] : '-'); ?><br>الهاتف البديل:
+                        <?php echo htmlspecialchars(ems_sensitive_display($conn, 'employees.phone', $driver['phone'] ? $driver['phone'] : '-', 'employee:' . (int)($driver['id'] ?? 0), 'ملف الموظف — السائق')); ?><br>الهاتف البديل:
                         <?php echo htmlspecialchars($driver['phone_alternative'] ? $driver['phone_alternative'] : '-'); ?><br>البريد:
                         <?php echo htmlspecialchars($driver['email'] ? $driver['email'] : '-'); ?></span>
                 </div>

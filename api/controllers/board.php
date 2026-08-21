@@ -205,7 +205,7 @@ function board_index(): void
                     'employee_id'          => intval($dr['employee_id']),
                     'name'               => $dr['driver_name'] ?? '',
                     'employee_code'        => $dr['employee_code'] ?? '',
-                    'phone'              => $dr['phone'] ?? '',
+                    'phone'              => api_sensitive_value($ctx, 'employees.phone', $dr['phone'] ?? ''),
                     'skill_level'        => $dr['skill_level'] ?? '',
                     'license_type'       => $dr['license_type'] ?? '',
                     'years_in_field'     => $dr['years_in_field'] !== null ? intval($dr['years_in_field']) : 0,

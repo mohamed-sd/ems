@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-21 07:34:18
+-- المصدر: equipation_manage · التوليد: 2026-08-21 09:10:23
 -- الجداول: 603 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -11550,7 +11550,8 @@ CREATE TABLE `scr_sensitive_fields` (
   KEY `ix_sensitive_fields_live` (`company_id`,`status`),
   KEY `fk_scr_sensitive_fields_approver` (`approver_user_id`),
   CONSTRAINT `fk_scr_sensitive_fields_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
-  CONSTRAINT `chk_scr_sensitive_fields_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
+  CONSTRAINT `chk_scr_sensitive_fields_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null),
+  CONSTRAINT `chk_scr_sensitive_fields_status` CHECK (`status` in ('مسودة','معتمد','ملغاة'))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة sensitive_fields.php';
 
 -- ── Table: scr_shift_log ──

@@ -172,7 +172,7 @@ foreach ($sens as $s) {
          reason_classification, from_visible_to, policy_masking, log_views_flag, exportable_flag,
          date_effective, status, is_seed, created_by, created_by_name, created_at)
         SELECT 4, ?, ?, ?, 'سري — منح فردي', ?, 'المدير المالي والحوكمة بمنح فردي', 'يُحجب من الخادم',
-               '1', '0', CURDATE(), 'active', 0, 1, 'update0012', NOW() FROM DUAL
+               'نعم', 'لا', CURDATE(), 'معتمد', 0, 1, 'update0012', NOW() FROM DUAL
          WHERE NOT EXISTS (SELECT 1 FROM scr_sensitive_fields
                             WHERE company_id = 4 AND table_name = ? AND field_name = ?)");
     $st->bind_param('ssssss', $s[0], $s[1], $s[2], $s[3], $s[1], $s[2]);

@@ -43,8 +43,9 @@ if (!function_exists('ems_finreq_nav_links')) {
             $is_fin  = in_array($role, array('17', '18', '19', '20', '21', '22'), true) || $is_super;
 
             if ($can_create) {
-                $out['FinRequests/request_form.php'] = array('label' => 'طلب مالي جديد', 'icon' => 'fa fa-file-circle-plus');
-                $out['FinRequests/my_requests.php']  = array('label' => 'طلباتي المالية', 'icon' => 'fa fa-list-check');
+                /* رابطٌ واحدٌ بعدَ دمجِ `my_requests.php` في `request_form.php`
+                   (2026-08-21): الشاشةُ نفسُها تُنشئ وتَسرد وتفتح السجل. */
+                $out['FinRequests/request_form.php'] = array('label' => 'طلباتي المالية', 'icon' => 'fa fa-list-check');
             }
             if ($can_review) {
                 $out['FinRequests/dept_inbox.php'] = array('label' => 'موافقات إدارتي', 'icon' => 'fa fa-inbox');
@@ -147,7 +148,8 @@ if (!function_exists('ems_finreq_nav_badges')) {
                 'whereRaw' => "state = 'returned' AND (created_by = ? OR requester_id = ?)",
                 'params' => array($uid, $uid),
             )));
-            if ($n > 0) { $out['FinRequests/my_requests.php'] = $n; }
+            // الشارةُ تتبع الشاشةَ الباقيةَ بعدَ الدمج — والمعادُ يُستكمل فيها نفسِها
+            if ($n > 0) { $out['FinRequests/request_form.php'] = $n; }
         } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'شاراتٌ فقط — الواجهة لا تتأثر بأي فشل');
             // شاراتٌ فقط — الواجهة لا تتأثر بأي فشل
         }
