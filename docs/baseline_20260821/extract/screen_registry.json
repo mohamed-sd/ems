@@ -3559,7 +3559,7 @@
             "output_doc": "سجل جهة · فرصة مؤهَّلة · مستخلص · فاتورة · مستخلص · مطالبة",
             "resp_role": "المالية",
             "next_state": "الوحداتُ المعتمدةُ تُدرج بأسعار لقطتها",
-            "consumers": "المالية · المالية · العميل · التشغيل",
+            "consumers": "المالية · العميل · التشغيل",
             "fin_impact": "نعم — أثرٌ ماليٌّ تُحوِّله المالية"
         },
         "ledger": {
@@ -3889,7 +3889,7 @@
             "output_doc": "سجل جهة · فرصة مؤهَّلة · مستخلص · فاتورة · مستخلص · مطالبة",
             "resp_role": "المالية",
             "next_state": "الذمةُ تنخفض",
-            "consumers": "المالية · المبيعات · المالية",
+            "consumers": "المالية · المبيعات",
             "fin_impact": "نعم — أثرٌ ماليٌّ تُحوِّله المالية"
         },
         "ledger": {
@@ -7492,7 +7492,7 @@
             "output_doc": "تخصيصٌ ميداني · مشغّل مكوَّد بعقدٍ ساري",
             "resp_role": "مدير الموقع",
             "next_state": "الرقمُ يُربط بالشخص ولا يُعاد استعمالُه",
-            "consumers": "التشغيل · الموقع · الموارد · الموارد · التشغيل · الموردون",
+            "consumers": "التشغيل · الموقع · الموارد · الموردون",
             "fin_impact": "لا"
         },
         "ledger": {
@@ -8726,7 +8726,7 @@
                 "space": "ادارة الموردين",
                 "kind": "DEPARTMENT",
                 "tab": "سجل الأصول",
-                "cls": "CONTEXTUAL_READ_ONLY",
+                "cls": "FORBIDDEN",
                 "decision": "CONFIRMED",
                 "owner_kind": "BUSINESS_DEPARTMENT"
             },
@@ -8941,7 +8941,7 @@
             "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · حاويةُ كلِّ معدة",
             "resp_role": "مدير الموقع",
             "next_state": "كرتٌ بكودٍ دائم",
-            "consumers": "الصيانة · التشغيل · المالية · التمويل · المالية · التشغيل · الصيانة · التمويل",
+            "consumers": "الصيانة · التشغيل · المالية · التمويل",
             "fin_impact": "نعم — أثرٌ ماليٌّ تُحوِّله المالية"
         },
         "ledger": {
@@ -11795,7 +11795,7 @@
         },
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 23,
+        "table_columns": 0,
         "form_fields": 0
     },
     {
@@ -12299,8 +12299,8 @@
         "nav09": null,
         "deprecated": 0,
         "known_issue": [],
-        "table_columns": 26,
-        "form_fields": 35
+        "table_columns": 49,
+        "form_fields": 40
     },
     {
         "screen_id": "SCR-0119",
@@ -23987,7 +23987,7 @@
             "output_doc": "تحميل على مصدره · جدول أقساط · تحميل كلفة",
             "resp_role": "المالية",
             "next_state": "كلُّ قسطٍ حدثٌ ماليٌّ بمفتاح (العملية × رقم القسط) فلا يتكرر",
-            "consumers": "التمويل · المالية · المالية",
+            "consumers": "التمويل · المالية",
             "fin_impact": "نعم — أثرٌ ماليٌّ تُحوِّله المالية"
         },
         "ledger": {
@@ -24631,7 +24631,7 @@
             "output_doc": "◆ انتقالُ حالةٍ بلا مستندٍ رسمي",
             "resp_role": "مدير الموقع",
             "next_state": "المعدةُ تصير قابلةً للتخصيص وتظهر في لوحة الغد",
-            "consumers": "التشغيل · الأسطول · الموقع · التشغيل · الموقع · الأسطول · النقل",
+            "consumers": "التشغيل · الأسطول · الموقع · النقل",
             "fin_impact": "لا"
         },
         "ledger": {
@@ -28558,7 +28558,7 @@
             "output_doc": "◆ انتقالُ حالةٍ بلا مستندٍ رسمي",
             "resp_role": "مدير الموقع",
             "next_state": "بنودُ الملاحظة والحرج تُفتح",
-            "consumers": "التشغيل · الأسطول · الموقع · الصيانة · الأسطول",
+            "consumers": "التشغيل · الأسطول · الموقع · الصيانة",
             "fin_impact": "لا"
         },
         "ledger": {
@@ -28956,7 +28956,7 @@
             "output_doc": "◆ انتقالُ حالةٍ بلا مستندٍ رسمي",
             "resp_role": "مدير الموقع",
             "next_state": "زمنُ التوقف يبدأ «تحت التحقق»",
-            "consumers": "التشغيل · الأسطول · الموقع · المخازن · المالية · الأسطول · الموردون · التشغيل",
+            "consumers": "التشغيل · الأسطول · الموقع · المخازن · المالية · الموردون",
             "fin_impact": "نعم — أثرٌ ماليٌّ تُحوِّله المالية"
         },
         "ledger": {
@@ -30152,7 +30152,7 @@
             "output_doc": "◆ انتقالُ حالةٍ بلا مستندٍ رسمي",
             "resp_role": "مدير الموقع",
             "next_state": "الحارسُ يفحص التأهيلَ والجاهزيةَ والوثائق",
-            "consumers": "التشغيل · القوى · الأسطول · الموقع · القوى · الأسطول · النقل",
+            "consumers": "التشغيل · القوى · الأسطول · الموقع · النقل",
             "fin_impact": "لا"
         },
         "ledger": {
@@ -30616,7 +30616,7 @@
             "output_doc": "◆ انتقالُ حالةٍ بلا مستندٍ رسمي",
             "resp_role": "مدير التشغيل",
             "next_state": "الحارسُ يفحص Σ حصص المعدات ≤ حصة المورد",
-            "consumers": "التشغيل · المالية · التشغيل · الموقع · المالية · المبيعات",
+            "consumers": "التشغيل · المالية · الموقع · المبيعات",
             "fin_impact": "لا"
         },
         "ledger": {
@@ -31450,7 +31450,7 @@
             "output_doc": "صف وحدة · سجل قياس",
             "resp_role": "مدخل الساعات",
             "next_state": "الفرقُ يُسجَّل بسببه",
-            "consumers": "التشغيل · المبيعات · المبيعات · المالية",
+            "consumers": "التشغيل · المبيعات · المالية",
             "fin_impact": "نعم — أثرٌ ماليٌّ تُحوِّله المالية"
         },
         "ledger": {
@@ -31675,7 +31675,7 @@
             "output_doc": "إذنُ دخولٍ أو خروج · جدولُ عملٍ معتمد · جدولُ ورديات · صف وحدة · سجل قياس",
             "resp_role": "مدخل الساعات",
             "next_state": "الورديةُ تصير نافذةً",
-            "consumers": "القوى · الموقع · التايم شيت · الموقع · القوى · الأسطول",
+            "consumers": "القوى · الموقع · التايم شيت · الأسطول",
             "fin_impact": "لا"
         },
         "ledger": {
@@ -32124,8 +32124,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة التشغيل",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 1,
@@ -39347,7 +39347,7 @@
             "output_doc": "حركة إدخال · طلب تغيير حالة · مطابقة ثلاثية",
             "resp_role": "المالية",
             "next_state": "المخزنُ ينتظر الاستلام",
-            "consumers": "المخازن · المالية · الموردون · المشتريات · المالية",
+            "consumers": "المخازن · المالية · الموردون · المشتريات",
             "fin_impact": "نعم — أثرٌ ماليٌّ تُحوِّله المالية"
         },
         "ledger": {
@@ -39880,7 +39880,7 @@
             "output_doc": "◆ انتقالُ حالةٍ بلا مستندٍ رسمي",
             "resp_role": "—",
             "next_state": "الحارسُ يفحص المتاحَ في الميزانية",
-            "consumers": "المشتريات · المشتريات · المالية",
+            "consumers": "المشتريات · المالية",
             "fin_impact": "نعم — أثرٌ ماليٌّ تُحوِّله المالية"
         },
         "ledger": {
@@ -40288,7 +40288,7 @@
             "output_doc": "◆ انتقالُ حالةٍ بلا مستندٍ رسمي",
             "resp_role": "مدير الموقع",
             "next_state": "الرصيدُ يرتفع «متاحًا»",
-            "consumers": "المخازن · الصيانة · المشتريات · الصيانة",
+            "consumers": "المخازن · الصيانة · المشتريات",
             "fin_impact": "لا"
         },
         "ledger": {
@@ -48812,7 +48812,7 @@
             "output_doc": "◆ انتقالُ حالةٍ بلا مستندٍ رسمي",
             "resp_role": "مدير التشغيل",
             "next_state": "الحارسُ يفحص Σ الحصص ≤ التزامُ العقد",
-            "consumers": "التشغيل · المبيعات · المالية · الموردون · التشغيل",
+            "consumers": "التشغيل · المبيعات · المالية · الموردون",
             "fin_impact": "لا"
         },
         "ledger": {
@@ -49985,8 +49985,8 @@
         ],
         "name_ar": "UNKNOWN",
         "names_all": [],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة الموردين",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": [],
         "profiles_count": 8,
@@ -50337,7 +50337,7 @@
             "output_doc": "محضر مقارنة · قرار ترسية",
             "resp_role": "مدير المشتريات",
             "next_state": "الحارسُ يفحص الوثائقَ السارية",
-            "consumers": "التشغيل · المشتريات · المالية · المشتريات · التشغيل",
+            "consumers": "التشغيل · المشتريات · المالية",
             "fin_impact": "لا"
         },
         "ledger": {
@@ -55936,7 +55936,7 @@
             "output_doc": "◆ انتقالُ حالةٍ بلا مستندٍ رسمي",
             "resp_role": "مدير الموقع",
             "next_state": "المعدةُ «قيد الترحيل»",
-            "consumers": "الأسطول · الموقع · القوى · الصيانة · النقل · الأسطول · التشغيل",
+            "consumers": "الأسطول · الموقع · القوى · الصيانة · النقل · التشغيل",
             "fin_impact": "نعم — أثرٌ ماليٌّ تُحوِّله المالية"
         },
         "ledger": {
@@ -57964,7 +57964,7 @@
             "output_doc": "تخصيصٌ ميداني · مشغّل مكوَّد بعقدٍ ساري",
             "resp_role": "مدير القوى",
             "next_state": "العقدُ يبدأ من تاريخ التعاقد وينتهي بأولِ محفّزٍ يقع: انتهاءُ مدته",
-            "consumers": "القوى · التشغيل · المالية · الموارد · القوى · التشغيل · المالية",
+            "consumers": "القوى · التشغيل · المالية · الموارد",
             "fin_impact": "لا"
         },
         "ledger": {
@@ -62101,16 +62101,163 @@
         "on_disk": 1,
         "sources": [
             "disk",
+            "apps",
             "nav"
         ],
-        "name_ar": "إيكوبيشن | البحث الموحد",
+        "name_ar": "البحث الموحد",
         "names_all": [
+            "البحث الموحد",
             "إيكوبيشن | البحث الموحد",
             "الرئيسية"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
-        "workspaces": [],
+        "owner_dept": "مساحة العمل الشخصية",
+        "owner_basis": "CONSENSUS",
+        "workspaces": [
+            {
+                "space": "أمين المستودع",
+                "kind": "ROLE",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة التمويل",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة الصلاحيات",
+                "kind": "CONTROL",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة المالية",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة المخاطر",
+                "kind": "CONTROL",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة المشتريات",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة الموقع",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة النقل والترحيل",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة الاسطول",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة التشغيل",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة الصيانة",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة المبيعات",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة الموارد البشرية",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة الموردين",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "الإدارة التنفيذية",
+                "kind": "EXECUTIVE",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "القوى التشغيلية",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "المدير المالي",
+                "kind": "ROLE",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "المراجع الداخلي المستقل",
+                "kind": "CONTROL",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            }
+        ],
         "roles_nav": {
             "رئيس الحسابات": [
                 {
@@ -63097,6 +63244,7 @@
             "disk",
             "ledger",
             "cycle",
+            "apps",
             "nav09"
         ],
         "name_ar": "ملفي الشخصي",
@@ -63105,7 +63253,152 @@
         ],
         "owner_dept": "مساحة العمل الشخصية",
         "owner_basis": "MAJORITY",
-        "workspaces": [],
+        "workspaces": [
+            {
+                "space": "أمين المستودع",
+                "kind": "ROLE",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة التمويل",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة الصلاحيات",
+                "kind": "CONTROL",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة المالية",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة المخاطر",
+                "kind": "CONTROL",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة المشتريات",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة الموقع",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة النقل والترحيل",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة الاسطول",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة التشغيل",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة الصيانة",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة المبيعات",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة الموارد البشرية",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة الموردين",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "الإدارة التنفيذية",
+                "kind": "EXECUTIVE",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "القوى التشغيلية",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "المدير المالي",
+                "kind": "ROLE",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "المراجع الداخلي المستقل",
+                "kind": "CONTROL",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            }
+        ],
         "roles_nav": [],
         "profiles_count": 23,
         "profiles": [
@@ -65356,15 +65649,162 @@
             "disk",
             "ledger",
             "cycle",
+            "apps",
             "nav09"
         ],
-        "name_ar": "صفاتي والتبديل بينها",
+        "name_ar": "قدراتي وصلاحياتي",
         "names_all": [
+            "قدراتي وصلاحياتي",
             "صفاتي والتبديل بينها"
         ],
         "owner_dept": "مساحة العمل الشخصية",
         "owner_basis": "MAJORITY",
-        "workspaces": [],
+        "workspaces": [
+            {
+                "space": "أمين المستودع",
+                "kind": "ROLE",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة التمويل",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة الصلاحيات",
+                "kind": "CONTROL",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة المالية",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة المخاطر",
+                "kind": "CONTROL",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة المشتريات",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة الموقع",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "إدارة النقل والترحيل",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة الاسطول",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة التشغيل",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة الصيانة",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة المبيعات",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة الموارد البشرية",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "ادارة الموردين",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "الإدارة التنفيذية",
+                "kind": "EXECUTIVE",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "القوى التشغيلية",
+                "kind": "DEPARTMENT",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "المدير المالي",
+                "kind": "ROLE",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            },
+            {
+                "space": "المراجع الداخلي المستقل",
+                "kind": "CONTROL",
+                "tab": "مركز العمل",
+                "cls": "PERSONAL_SPACE",
+                "decision": "CONFIRMED",
+                "owner_kind": "PLATFORM_SHARED"
+            }
+        ],
         "roles_nav": [],
         "profiles_count": 19,
         "profiles": [

@@ -1297,7 +1297,7 @@
     },
     {
         "id": "114",
-        "name": "طلب مالي جديد",
+        "name": "طلباتي المالية",
         "code": "FinRequests\/request_form.php",
         "owner_role_id": "13",
         "group_id": null,
@@ -1309,11 +1309,11 @@
     },
     {
         "id": "115",
-        "name": "طلباتي المالية",
+        "name": "طلباتي المالية (مدموجة في الشاشة الموحّدة)",
         "code": "FinRequests\/my_requests.php",
         "owner_role_id": "13",
         "group_id": null,
-        "is_link": "1",
+        "is_link": "0",
         "is_quick": "0",
         "icon": "fa fa-list-check",
         "display_order": "182",

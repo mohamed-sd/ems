@@ -1,0 +1,16 @@
+[
+    {
+        "id": "1",
+        "route": "logout.php",
+        "kind": "SESSION_ACTION",
+        "reason": "إنهاءُ جلسةٍ لا شاشة — ولا معنى لعزلِ مساحةٍ فيها، وحجبُها يحبس المستخدمَ داخلَ النظام",
+        "declared_at": "2026-08-21 15:41:19"
+    },
+    {
+        "id": "2",
+        "route": "chats\/get_unread_count.php",
+        "kind": "COUNT_ENDPOINT",
+        "reason": "نقطةُ عدٍّ تُنادى بـfetch وتُرجع رقمًا ولا تُصيَّر — وحارسُها حارسُ وجهتِها chats\/index.php",
+        "declared_at": "2026-08-21 15:41:19"
+    }
+]

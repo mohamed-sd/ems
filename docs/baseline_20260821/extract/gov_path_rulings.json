@@ -1,0 +1,68 @@
+[
+    {
+        "id": "1",
+        "gap": "GAP-24",
+        "path_key": "fin_financial_periods",
+        "ruling": "AUTHORITY",
+        "authority_of": null,
+        "prod_readers": "11",
+        "evidence": "EventPublisher · HandoverService · ContractSignedEffects · periods_fin وغيرُها",
+        "reason": "سلطةُ الإقفالِ الوحيدة — وناشرُ الأحداثِ نفسُه يتحقّق منها قبلَ النشر، فلا واقعةَ تُنشر في فترةٍ مقفلة",
+        "decided_at": "2026-08-21 18:01:46"
+    },
+    {
+        "id": "2",
+        "gap": "GAP-24",
+        "path_key": "scr_monthly_close",
+        "ruling": "NON_AUTHORITATIVE",
+        "authority_of": "fin_financial_periods",
+        "prod_readers": "2",
+        "evidence": "TenantRegistry (إعلانُ جدول) · cmp03_registry (سجلّ) — وصفرُ قارئِ قرار",
+        "reason": "سجلُّ إقفالٍ تشغيليٌّ بالموقعِ والعقدِ والساعات — **بيانٌ حقيقيٌّ لا سلطة**. أُخرج من الخدمةِ حكمًا ولم يُحذف: الحذفُ فقدٌ والإبقاءُ بلا حكمٍ لبس",
+        "decided_at": "2026-08-21 18:01:46"
+    },
+    {
+        "id": "3",
+        "gap": "GAP-24",
+        "path_key": "fin_closing_items",
+        "ruling": "SUBORDINATE",
+        "authority_of": "fin_financial_periods",
+        "prod_readers": "2",
+        "evidence": "periods_fin.php — بنودُ قائمةِ فحصٍ داخلَ الفترة",
+        "reason": "بنودُ قائمةِ فحصِ الإقفالِ تابعةٌ لفترتِها بـperiod_id — ليست سلطةً ثانيةً بل تفصيلُ الأولى",
+        "decided_at": "2026-08-21 18:01:46"
+    },
+    {
+        "id": "4",
+        "gap": "GAP-31",
+        "path_key": "capacity_outbox",
+        "ruling": "STAGING_ONLY",
+        "authority_of": "ems_business_events",
+        "prod_readers": "1",
+        "evidence": "CapacityService — كاتبٌ واحدٌ وصفرُ مستهلكٍ يقرأ منه",
+        "reason": "صادرُ السعةِ **مرحلةُ تهيئةٍ لا مسارُ نشرٍ ثانٍ**: يُكتب فيه ثم يُنشر بـEventPublisher إلى الجذرِ الواحد ems_business_events. ولا يُقرأ منه إسقاطٌ — فليس مسارًا موازيًا يُطفأ بل مخزنٌ وسيط",
+        "decided_at": "2026-08-21 18:01:46"
+    },
+    {
+        "id": "5",
+        "gap": "GAP-31",
+        "path_key": "work_escalations_engine",
+        "ruling": "ACTIVE_ENGINE",
+        "authority_of": null,
+        "prod_readers": "2",
+        "evidence": "WorkItemService · Operations\/cron_wfm_engine.php — و2,008 بندًا مفتوحًا",
+        "reason": "محرّكُ تصعيدِ بنودِ العملِ حيٌّ بأثرٍ مقيس — يُعَدُّ مسارًا حاكمًا قائمًا ولا يُطفأ",
+        "decided_at": "2026-08-21 18:01:46"
+    },
+    {
+        "id": "6",
+        "gap": "GAP-31",
+        "path_key": "ticket_escalations_engine",
+        "ruling": "ACTIVE_ENGINE",
+        "authority_of": null,
+        "prod_readers": "3",
+        "evidence": "SlaMonitor · TicketRouter · TicketStateService — و74 تصعيدًا بـ20 قاعدةً نشطة",
+        "reason": "محرّكُ تصعيدِ البلاغاتِ حيٌّ بقواعدَ نشطةٍ وأثرٍ مقيس — مسارٌ حاكمٌ قائم",
+        "decided_at": "2026-08-21 18:01:46"
+    }
+]

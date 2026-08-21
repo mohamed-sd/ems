@@ -14,7 +14,9 @@
         "doc_ref": "LAD-01",
         "is_active": "1",
         "created_at": "2026-08-17 00:02:35",
-        "updated_at": "2026-08-17 00:02:35"
+        "updated_at": "2026-08-21 13:17:25",
+        "entity_type": "timesheet",
+        "action": "approve"
     },
     {
         "ladder_code": "LD-02",
@@ -31,7 +33,9 @@
         "doc_ref": "LAD-01",
         "is_active": "1",
         "created_at": "2026-08-17 00:02:35",
-        "updated_at": "2026-08-17 00:02:35"
+        "updated_at": "2026-08-17 00:02:35",
+        "entity_type": null,
+        "action": null
     },
     {
         "ladder_code": "LD-03",
@@ -48,7 +52,9 @@
         "doc_ref": "LAD-01",
         "is_active": "1",
         "created_at": "2026-08-17 00:02:35",
-        "updated_at": "2026-08-17 00:02:35"
+        "updated_at": "2026-08-17 00:02:35",
+        "entity_type": null,
+        "action": null
     },
     {
         "ladder_code": "LD-04",
@@ -65,7 +71,9 @@
         "doc_ref": "LAD-01",
         "is_active": "1",
         "created_at": "2026-08-17 00:02:35",
-        "updated_at": "2026-08-17 00:02:35"
+        "updated_at": "2026-08-17 00:02:35",
+        "entity_type": null,
+        "action": null
     },
     {
         "ladder_code": "LD-05",
@@ -82,7 +90,9 @@
         "doc_ref": "LAD-01",
         "is_active": "1",
         "created_at": "2026-08-17 00:05:41",
-        "updated_at": "2026-08-18 08:41:50"
+        "updated_at": "2026-08-18 08:41:50",
+        "entity_type": null,
+        "action": null
     },
     {
         "ladder_code": "LD-06",
@@ -99,7 +109,9 @@
         "doc_ref": "LAD-01",
         "is_active": "1",
         "created_at": "2026-08-17 00:05:41",
-        "updated_at": "2026-08-17 18:52:18"
+        "updated_at": "2026-08-17 18:52:18",
+        "entity_type": null,
+        "action": null
     },
     {
         "ladder_code": "LD-07",
@@ -116,7 +128,9 @@
         "doc_ref": "LAD-01",
         "is_active": "1",
         "created_at": "2026-08-17 00:05:41",
-        "updated_at": "2026-08-17 18:52:18"
+        "updated_at": "2026-08-17 18:52:18",
+        "entity_type": null,
+        "action": null
     },
     {
         "ladder_code": "LD-08",
@@ -133,7 +147,9 @@
         "doc_ref": "LAD-01",
         "is_active": "1",
         "created_at": "2026-08-18 15:29:54",
-        "updated_at": "2026-08-18 15:29:54"
+        "updated_at": "2026-08-18 15:29:54",
+        "entity_type": null,
+        "action": null
     },
     {
         "ladder_code": "LD-09",
@@ -150,7 +166,9 @@
         "doc_ref": "LAD-01",
         "is_active": "1",
         "created_at": "2026-08-18 15:29:54",
-        "updated_at": "2026-08-18 15:29:54"
+        "updated_at": "2026-08-18 15:29:54",
+        "entity_type": null,
+        "action": null
     },
     {
         "ladder_code": "LD-10",
@@ -167,7 +185,9 @@
         "doc_ref": "LAD-01",
         "is_active": "1",
         "created_at": "2026-08-18 15:29:54",
-        "updated_at": "2026-08-18 15:29:54"
+        "updated_at": "2026-08-18 15:29:54",
+        "entity_type": null,
+        "action": null
     },
     {
         "ladder_code": "LD-11",
@@ -184,7 +204,9 @@
         "doc_ref": "LAD-01",
         "is_active": "1",
         "created_at": "2026-08-18 15:29:54",
-        "updated_at": "2026-08-18 15:29:54"
+        "updated_at": "2026-08-18 15:29:54",
+        "entity_type": null,
+        "action": null
     },
     {
         "ladder_code": "LD-12",
@@ -201,7 +223,9 @@
         "doc_ref": "LAD-01",
         "is_active": "1",
         "created_at": "2026-08-18 15:29:54",
-        "updated_at": "2026-08-18 15:29:54"
+        "updated_at": "2026-08-18 15:29:54",
+        "entity_type": null,
+        "action": null
     },
     {
         "ladder_code": "LD-13",
@@ -218,6 +242,84 @@
         "doc_ref": "LAD-01",
         "is_active": "1",
         "created_at": "2026-08-18 15:29:54",
-        "updated_at": "2026-08-18 15:29:54"
+        "updated_at": "2026-08-18 15:29:54",
+        "entity_type": null,
+        "action": null
+    },
+    {
+        "ladder_code": "LD-14",
+        "company_id": "4",
+        "slug": "contract_renewal",
+        "name_ar": "تجديدُ العقدِ وتعديلُه",
+        "cycle_no": "1",
+        "escalate_after_hours": "48",
+        "cap_kind": "none",
+        "cap_amount": null,
+        "cap_currency": null,
+        "cap_state": "not_applicable",
+        "payload_note": null,
+        "doc_ref": "LAD-01",
+        "is_active": "1",
+        "created_at": "2026-08-21 13:17:54",
+        "updated_at": "2026-08-21 13:17:54",
+        "entity_type": "contract",
+        "action": "renewal"
+    },
+    {
+        "ladder_code": "LD-15",
+        "company_id": "4",
+        "slug": "driver_state_change",
+        "name_ar": "تفعيلُ السائقِ وتعطيلُه",
+        "cycle_no": "1",
+        "escalate_after_hours": "48",
+        "cap_kind": "none",
+        "cap_amount": null,
+        "cap_currency": null,
+        "cap_state": "not_applicable",
+        "payload_note": null,
+        "doc_ref": "LAD-01",
+        "is_active": "1",
+        "created_at": "2026-08-21 13:17:54",
+        "updated_at": "2026-08-21 13:17:54",
+        "entity_type": "driver",
+        "action": ""
+    },
+    {
+        "ladder_code": "LD-16",
+        "company_id": "4",
+        "slug": "equipment_state_change",
+        "name_ar": "تفعيلُ المعدةِ وتعطيلُها",
+        "cycle_no": "1",
+        "escalate_after_hours": "48",
+        "cap_kind": "none",
+        "cap_amount": null,
+        "cap_currency": null,
+        "cap_state": "not_applicable",
+        "payload_note": null,
+        "doc_ref": "LAD-01",
+        "is_active": "1",
+        "created_at": "2026-08-21 13:17:54",
+        "updated_at": "2026-08-21 13:17:54",
+        "entity_type": "equipment",
+        "action": ""
+    },
+    {
+        "ladder_code": "LD-17",
+        "company_id": "4",
+        "slug": "deduction_approve",
+        "name_ar": "اعتمادُ الخصمِ على الموظف",
+        "cycle_no": "1",
+        "escalate_after_hours": "48",
+        "cap_kind": "none",
+        "cap_amount": null,
+        "cap_currency": null,
+        "cap_state": "not_applicable",
+        "payload_note": null,
+        "doc_ref": "LAD-01",
+        "is_active": "1",
+        "created_at": "2026-08-21 13:17:54",
+        "updated_at": "2026-08-21 13:17:54",
+        "entity_type": "scr_deductions",
+        "action": "approve"
     }
 ]

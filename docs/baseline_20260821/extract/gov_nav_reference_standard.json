@@ -1,0 +1,121 @@
+[
+    {
+        "id": "1",
+        "layer_no": "1",
+        "layer_name": "مركز العمل",
+        "stage_order": "1",
+        "stage_name": "الاعتمادات الواردة"
+    },
+    {
+        "id": "2",
+        "layer_no": "1",
+        "layer_name": "مركز العمل",
+        "stage_order": "2",
+        "stage_name": "البلاغات والمهل"
+    },
+    {
+        "id": "3",
+        "layer_no": "1",
+        "layer_name": "مركز العمل",
+        "stage_order": "3",
+        "stage_name": "لوحة الإدارة"
+    },
+    {
+        "id": "4",
+        "layer_no": "2",
+        "layer_name": "دورة الإدارة",
+        "stage_order": "1",
+        "stage_name": "تأسيس السجل أو الكيان"
+    },
+    {
+        "id": "5",
+        "layer_no": "2",
+        "layer_name": "دورة الإدارة",
+        "stage_order": "2",
+        "stage_name": "التأهيل والوثائق"
+    },
+    {
+        "id": "6",
+        "layer_no": "2",
+        "layer_name": "دورة الإدارة",
+        "stage_order": "3",
+        "stage_name": "التعاقد والتغطية"
+    },
+    {
+        "id": "7",
+        "layer_no": "2",
+        "layer_name": "دورة الإدارة",
+        "stage_order": "4",
+        "stage_name": "التخطيط والتخصيص"
+    },
+    {
+        "id": "8",
+        "layer_no": "2",
+        "layer_name": "دورة الإدارة",
+        "stage_order": "5",
+        "stage_name": "التنفيذ اليومي"
+    },
+    {
+        "id": "9",
+        "layer_no": "2",
+        "layer_name": "دورة الإدارة",
+        "stage_order": "6",
+        "stage_name": "الاعتماد"
+    },
+    {
+        "id": "10",
+        "layer_no": "2",
+        "layer_name": "دورة الإدارة",
+        "stage_order": "7",
+        "stage_name": "الأثر المالي والتسوية"
+    },
+    {
+        "id": "11",
+        "layer_no": "2",
+        "layer_name": "دورة الإدارة",
+        "stage_order": "8",
+        "stage_name": "الفوترة أو الصرف"
+    },
+    {
+        "id": "12",
+        "layer_no": "2",
+        "layer_name": "دورة الإدارة",
+        "stage_order": "9",
+        "stage_name": "المطابقة والانحراف"
+    },
+    {
+        "id": "13",
+        "layer_no": "2",
+        "layer_name": "دورة الإدارة",
+        "stage_order": "10",
+        "stage_name": "الإقفال والتقييم"
+    },
+    {
+        "id": "14",
+        "layer_no": "3",
+        "layer_name": "المرجع والإدارة",
+        "stage_order": "1",
+        "stage_name": "البيانات المرجعية والإعدادات"
+    },
+    {
+        "id": "15",
+        "layer_no": "3",
+        "layer_name": "المرجع والإدارة",
+        "stage_order": "2",
+        "stage_name": "الميزانية ومؤشرات الأداء"
+    },
+    {
+        "id": "16",
+        "layer_no": "3",
+        "layer_name": "المرجع والإدارة",
+        "stage_order": "3",
+        "stage_name": "الحوكمة والضوابط"
+    },
+    {
+        "id": "17",
+        "layer_no": "3",
+        "layer_name": "المرجع والإدارة",
+        "stage_order": "4",
+        "stage_name": "التقارير والتحليلات"
+    }
+]

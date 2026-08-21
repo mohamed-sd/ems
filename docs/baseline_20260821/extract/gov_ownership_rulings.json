@@ -1640,6 +1640,16 @@
         "decided_at": "2026-08-21 15:17:28"
     },
     {
+        "route": "Operations\/sites_board.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "إدارة التشغيل",
+        "witness": "نظيرُ المجلَّدِ containers.php — OWNED · ودورُ الاختبارِ في gov_golden_approvals",
+        "witness_kind": "DATA_READ",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "INJFIX01-CHILD · سطحٌ ابنٌ يُفتح من سجلِّه لا من السايدبار — و`parent_file` فارغٌ في السجلِّ كلِّه فاستُخرج الأبُ **بمن يربطه**. نظيرُ المجلَّدِ containers.php — OWNED · ودورُ الاختبارِ في gov_golden_approvals",
+        "decided_at": "2026-08-21 19:58:39"
+    },
+    {
         "route": "Operations\/unbilled.php",
         "owner_before": "المبيعات والعقود",
         "owner_after": "المبيعات والعقود",
@@ -2198,6 +2208,16 @@
         "ruling": "NOT_APPLICABLE",
         "reason": "INJFIX02-NF14 · سطحٌ لا يُصيَّر في مساحة — والمِلكيةُ الإداريةُ حكمُ مساحةٍ لا حكمُ ملفّ",
         "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Suppliers\/supplier_profile.php",
+        "owner_before": "UNKNOWN",
+        "owner_after": "إدارة الموردين",
+        "witness": "الأبُ suppliers.php — OWNED\/OWNER_CONFIRMED",
+        "witness_kind": "DOC_CYCLE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "INJFIX01-CHILD · سطحٌ ابنٌ يُفتح من سجلِّه لا من السايدبار — و`parent_file` فارغٌ في السجلِّ كلِّه فاستُخرج الأبُ **بمن يربطه**. الأبُ suppliers.php — OWNED\/OWNER_CONFIRMED",
+        "decided_at": "2026-08-21 19:58:39"
     },
     {
         "route": "Suppliers\/suppliers.php",

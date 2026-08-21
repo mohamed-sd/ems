@@ -1,0 +1,62 @@
+[
+    {
+        "id": "1",
+        "source_register": "sensitive_field_policies",
+        "declared_target": "contract.unit_price",
+        "target_state": "NO_TABLE",
+        "real_column": null,
+        "real_column_protected": "0",
+        "note": "هدفٌ لا وجودَ له — السياسةُ تبدو حمايةً ولا تحمي شيئًا",
+        "detected_at": "2026-08-21 14:29:44"
+    },
+    {
+        "id": "2",
+        "source_register": "sensitive_field_policies",
+        "declared_target": "employees.bank_account",
+        "target_state": "NO_COLUMN",
+        "real_column": null,
+        "real_column_protected": "0",
+        "note": "هدفٌ لا وجودَ له — السياسةُ تبدو حمايةً ولا تحمي شيئًا",
+        "detected_at": "2026-08-21 14:29:44"
+    },
+    {
+        "id": "3",
+        "source_register": "sensitive_field_policies",
+        "declared_target": "employees.medical_notes",
+        "target_state": "NO_COLUMN",
+        "real_column": null,
+        "real_column_protected": "0",
+        "note": "هدفٌ لا وجودَ له — السياسةُ تبدو حمايةً ولا تحمي شيئًا",
+        "detected_at": "2026-08-21 14:29:44"
+    },
+    {
+        "id": "5",
+        "source_register": "sensitive_field_policies",
+        "declared_target": "equipment.owner_entity",
+        "target_state": "NO_TABLE",
+        "real_column": null,
+        "real_column_protected": "0",
+        "note": "هدفٌ لا وجودَ له — السياسةُ تبدو حمايةً ولا تحمي شيئًا",
+        "detected_at": "2026-08-21 14:29:44"
+    },
+    {
+        "id": "6",
+        "source_register": "sensitive_field_policies",
+        "declared_target": "financing.terms",
+        "target_state": "NO_TABLE",
+        "real_column": null,
+        "real_column_protected": "0",
+        "note": "هدفٌ لا وجودَ له — السياسةُ تبدو حمايةً ولا تحمي شيئًا",
+        "detected_at": "2026-08-21 14:29:44"
+    },
+    {
+        "id": "7",
+        "source_register": "scr_sensitive_fields",
+        "declared_target": "employee_card.salary_block",
+        "target_state": "NO_TABLE",
+        "real_column": null,
+        "real_column_protected": "0",
+        "note": "هدفٌ لا وجودَ له — السياسةُ تبدو حمايةً ولا تحمي شيئًا",
+        "detected_at": "2026-08-21 14:29:44"
+    }
+]

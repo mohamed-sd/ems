@@ -23,7 +23,7 @@
     {
         "TABLE_NAME": "achievement_snapshots",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "68",
+        "TABLE_ROWS": "72",
         "col_count": "9",
         "has_company": "1"
     },
@@ -44,7 +44,7 @@
     {
         "TABLE_NAME": "action_execution_log",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "297",
+        "TABLE_ROWS": "294",
         "col_count": "9",
         "has_company": "1"
     },
@@ -79,7 +79,7 @@
     {
         "TABLE_NAME": "activity_logs",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "224682",
+        "TABLE_ROWS": "223919",
         "col_count": "27",
         "has_company": "1"
     },
@@ -380,7 +380,7 @@
     {
         "TABLE_NAME": "contractequipments",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "28",
+        "TABLE_ROWS": "26",
         "col_count": "25",
         "has_company": "1"
     },
@@ -681,7 +681,7 @@
     {
         "TABLE_NAME": "ems_business_events",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "20927",
+        "TABLE_ROWS": "20949",
         "col_count": "37",
         "has_company": "1"
     },
@@ -702,8 +702,15 @@
     {
         "TABLE_NAME": "ems_event_deliveries",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "20835",
+        "TABLE_ROWS": "21000",
         "col_count": "20",
+        "has_company": "1"
+    },
+    {
+        "TABLE_NAME": "ems_event_delivery_orphans",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "82",
+        "col_count": "22",
         "has_company": "1"
     },
     {
@@ -723,7 +730,7 @@
     {
         "TABLE_NAME": "ems_job_queue",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "6185",
+        "TABLE_ROWS": "7461",
         "col_count": "23",
         "has_company": "1"
     },
@@ -733,6 +740,13 @@
         "TABLE_ROWS": "8",
         "col_count": "14",
         "has_company": "1"
+    },
+    {
+        "TABLE_NAME": "ems_job_schedule_alert_backup",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "8",
+        "col_count": "3",
+        "has_company": "0"
     },
     {
         "TABLE_NAME": "ems_post_idempotency",
@@ -961,7 +975,7 @@
     {
         "TABLE_NAME": "financing_deviations",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "202",
+        "TABLE_ROWS": "205",
         "col_count": "13",
         "has_company": "1"
     },
@@ -1220,7 +1234,7 @@
     {
         "TABLE_NAME": "fin_dues",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "23",
+        "TABLE_ROWS": "22",
         "col_count": "23",
         "has_company": "1"
     },
@@ -1283,7 +1297,7 @@
     {
         "TABLE_NAME": "fin_financial_periods",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "24",
+        "TABLE_ROWS": "23",
         "col_count": "16",
         "has_company": "1"
     },
@@ -1360,7 +1374,7 @@
     {
         "TABLE_NAME": "fin_notifications",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "7353",
+        "TABLE_ROWS": "7441",
         "col_count": "8",
         "has_company": "1"
     },
@@ -1745,8 +1759,15 @@
     {
         "TABLE_NAME": "gov_component_versions",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "5",
+        "TABLE_ROWS": "6",
         "col_count": "8",
+        "has_company": "0"
+    },
+    {
+        "TABLE_NAME": "gov_cycle_consumers_backup",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "55",
+        "col_count": "3",
         "has_company": "0"
     },
     {
@@ -1757,11 +1778,25 @@
         "has_company": "1"
     },
     {
+        "TABLE_NAME": "gov_dead_letter_rulings",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "2",
+        "col_count": "7",
+        "has_company": "0"
+    },
+    {
         "TABLE_NAME": "gov_delegations",
         "TABLE_TYPE": "BASE TABLE",
         "TABLE_ROWS": "0",
         "col_count": "10",
         "has_company": "1"
+    },
+    {
+        "TABLE_NAME": "gov_delegation_state",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "5",
+        "col_count": "8",
+        "has_company": "0"
     },
     {
         "TABLE_NAME": "gov_denial_reviews",
@@ -1813,6 +1848,13 @@
         "has_company": "1"
     },
     {
+        "TABLE_NAME": "gov_event_rulings",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "58",
+        "col_count": "12",
+        "has_company": "0"
+    },
+    {
         "TABLE_NAME": "gov_export_log",
         "TABLE_TYPE": "BASE TABLE",
         "TABLE_ROWS": "24",
@@ -1832,6 +1874,13 @@
         "TABLE_ROWS": "31",
         "col_count": "12",
         "has_company": "1"
+    },
+    {
+        "TABLE_NAME": "gov_finance_gate_policy",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "9",
+        "col_count": "6",
+        "has_company": "0"
     },
     {
         "TABLE_NAME": "gov_golden_approvals",
@@ -1865,14 +1914,21 @@
         "TABLE_NAME": "gov_journey_ladders",
         "TABLE_TYPE": "BASE TABLE",
         "TABLE_ROWS": "14",
-        "col_count": "9",
+        "col_count": "11",
+        "has_company": "0"
+    },
+    {
+        "TABLE_NAME": "gov_key_pollution_archive",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "68",
+        "col_count": "12",
         "has_company": "0"
     },
     {
         "TABLE_NAME": "gov_ladders",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "13",
-        "col_count": "15",
+        "TABLE_ROWS": "17",
+        "col_count": "17",
         "has_company": "1"
     },
     {
@@ -1885,7 +1941,7 @@
     {
         "TABLE_NAME": "gov_ladder_steps",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "28",
+        "TABLE_ROWS": "38",
         "col_count": "11",
         "has_company": "1"
     },
@@ -1894,6 +1950,20 @@
         "TABLE_TYPE": "BASE TABLE",
         "TABLE_ROWS": "606",
         "col_count": "24",
+        "has_company": "0"
+    },
+    {
+        "TABLE_NAME": "gov_nav_reference_standard",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "17",
+        "col_count": "5",
+        "has_company": "0"
+    },
+    {
+        "TABLE_NAME": "gov_nav_stage_bridge",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "111",
+        "col_count": "8",
         "has_company": "0"
     },
     {
@@ -1906,8 +1976,15 @@
     {
         "TABLE_NAME": "gov_ownership_rulings",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "46",
+        "TABLE_ROWS": "259",
         "col_count": "8",
+        "has_company": "0"
+    },
+    {
+        "TABLE_NAME": "gov_path_rulings",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "6",
+        "col_count": "9",
         "has_company": "0"
     },
     {
@@ -1934,7 +2011,7 @@
     {
         "TABLE_NAME": "gov_profile_items",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "2620",
+        "TABLE_ROWS": "2601",
         "col_count": "10",
         "has_company": "1"
     },
@@ -1960,9 +2037,16 @@
         "has_company": "1"
     },
     {
+        "TABLE_NAME": "gov_sensitive_policy_debt",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "7",
+        "col_count": "8",
+        "has_company": "0"
+    },
+    {
         "TABLE_NAME": "gov_space_appearances",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "836",
+        "TABLE_ROWS": "903",
         "col_count": "20",
         "has_company": "0"
     },
@@ -1988,6 +2072,20 @@
         "has_company": "0"
     },
     {
+        "TABLE_NAME": "gov_test_residue_archive",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "4146",
+        "col_count": "30",
+        "has_company": "1"
+    },
+    {
+        "TABLE_NAME": "gov_topbar_exemptions",
+        "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "2",
+        "col_count": "5",
+        "has_company": "0"
+    },
+    {
         "TABLE_NAME": "gov_visual_measurements",
         "TABLE_TYPE": "BASE TABLE",
         "TABLE_ROWS": "81",
@@ -2004,7 +2102,7 @@
     {
         "TABLE_NAME": "guard_denials",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "4296",
+        "TABLE_ROWS": "5244",
         "col_count": "7",
         "has_company": "1"
     },
@@ -2179,7 +2277,7 @@
     {
         "TABLE_NAME": "messages",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "53",
+        "TABLE_ROWS": "52",
         "col_count": "10",
         "has_company": "1"
     },
@@ -2319,7 +2417,7 @@
     {
         "TABLE_NAME": "nav_canonical_current",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "899",
+        "TABLE_ROWS": "876",
         "col_count": "5",
         "has_company": "0"
     },
@@ -2347,7 +2445,7 @@
     {
         "TABLE_NAME": "nav_items",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "1734",
+        "TABLE_ROWS": "1742",
         "col_count": "14",
         "has_company": "0"
     },
@@ -2445,7 +2543,7 @@
     {
         "TABLE_NAME": "opportunities",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "20",
+        "TABLE_ROWS": "21",
         "col_count": "30",
         "has_company": "1"
     },
@@ -2655,7 +2753,7 @@
     {
         "TABLE_NAME": "personal_notifications",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "7564",
+        "TABLE_ROWS": "7466",
         "col_count": "13",
         "has_company": "1"
     },
@@ -2690,7 +2788,7 @@
     {
         "TABLE_NAME": "portal_activity_log",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "268",
+        "TABLE_ROWS": "284",
         "col_count": "11",
         "has_company": "1"
     },
@@ -3089,7 +3187,7 @@
     {
         "TABLE_NAME": "role_permissions",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "2896",
+        "TABLE_ROWS": "2874",
         "col_count": "7",
         "has_company": "0"
     },
@@ -3467,14 +3565,14 @@
     {
         "TABLE_NAME": "sensitive_field_policies",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "6",
+        "TABLE_ROWS": "25",
         "col_count": "5",
         "has_company": "0"
     },
     {
         "TABLE_NAME": "sensitive_read_log",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "529",
+        "TABLE_ROWS": "522",
         "col_count": "11",
         "has_company": "1"
     },
@@ -3677,7 +3775,7 @@
     {
         "TABLE_NAME": "task_assignments",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "3963",
+        "TABLE_ROWS": "3927",
         "col_count": "15",
         "has_company": "1"
     },
@@ -3866,7 +3964,7 @@
     {
         "TABLE_NAME": "timesheet",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "48379",
+        "TABLE_ROWS": "48378",
         "col_count": "58",
         "has_company": "1"
     },
@@ -4083,14 +4181,14 @@
     {
         "TABLE_NAME": "unit_time_log",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "11910",
+        "TABLE_ROWS": "11909",
         "col_count": "27",
         "has_company": "1"
     },
     {
         "TABLE_NAME": "users",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "78",
+        "TABLE_ROWS": "79",
         "col_count": "26",
         "has_company": "1"
     },
@@ -4377,6 +4475,13 @@
     {
         "TABLE_NAME": "work_delegations",
         "TABLE_TYPE": "BASE TABLE",
+        "TABLE_ROWS": "0",
+        "col_count": "21",
+        "has_company": "1"
+    },
+    {
+        "TABLE_NAME": "work_delegations_seed_archive",
+        "TABLE_TYPE": "BASE TABLE",
         "TABLE_ROWS": "20",
         "col_count": "21",
         "has_company": "1"
@@ -4384,14 +4489,14 @@
     {
         "TABLE_NAME": "work_escalations",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "1905",
+        "TABLE_ROWS": "1924",
         "col_count": "13",
         "has_company": "1"
     },
     {
         "TABLE_NAME": "work_items",
         "TABLE_TYPE": "BASE TABLE",
-        "TABLE_ROWS": "2189",
+        "TABLE_ROWS": "2071",
         "col_count": "41",
         "has_company": "1"
     }

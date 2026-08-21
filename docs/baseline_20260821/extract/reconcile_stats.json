@@ -5,9 +5,9 @@
     "cron": 24,
     "registry_no_disk": 0,
     "disk_not_in_any_registry": 62,
-    "owner_unknown": 115,
+    "owner_unknown": 112,
     "owner_conflicts": 13,
     "with_stage": 272,
-    "fields_total": 12924,
+    "fields_total": 12929,
     "gpi_unknown_route": 3
 }

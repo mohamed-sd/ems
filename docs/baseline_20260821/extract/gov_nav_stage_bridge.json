@@ -1,0 +1,1112 @@
+[
+    {
+        "id": "1",
+        "cycle_layer": "المرجع والإدارة",
+        "cycle_stage": "أنواع المستندات وآلات الحالة",
+        "screens": "3",
+        "std_layer_no": "3",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "2",
+        "cycle_layer": "المرجع والإدارة",
+        "cycle_stage": "إعدادات النظام وبصمة الإصدار",
+        "screens": "2",
+        "std_layer_no": "3",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "3",
+        "cycle_layer": "المرجع والإدارة",
+        "cycle_stage": "الأحداث والمهام الخلفية",
+        "screens": "6",
+        "std_layer_no": "3",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "4",
+        "cycle_layer": "المرجع والإدارة",
+        "cycle_stage": "البيانات المرجعية والإعدادات",
+        "screens": "16",
+        "std_layer_no": "3",
+        "std_stage_order": "1",
+        "std_stage_name": "البيانات المرجعية والإعدادات",
+        "match_kind": "EXACT"
+    },
+    {
+        "id": "5",
+        "cycle_layer": "المرجع والإدارة",
+        "cycle_stage": "التقارير والتحليلات",
+        "screens": "16",
+        "std_layer_no": "3",
+        "std_stage_order": "4",
+        "std_stage_name": "التقارير والتحليلات",
+        "match_kind": "EXACT"
+    },
+    {
+        "id": "6",
+        "cycle_layer": "المرجع والإدارة",
+        "cycle_stage": "الحوكمة والضوابط",
+        "screens": "26",
+        "std_layer_no": "3",
+        "std_stage_order": "3",
+        "std_stage_name": "الحوكمة والضوابط",
+        "match_kind": "EXACT"
+    },
+    {
+        "id": "7",
+        "cycle_layer": "المرجع والإدارة",
+        "cycle_stage": "الظهور وضبط البوابة",
+        "screens": "4",
+        "std_layer_no": "3",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "8",
+        "cycle_layer": "المرجع والإدارة",
+        "cycle_stage": "الميزانية ومؤشرات الأداء",
+        "screens": "26",
+        "std_layer_no": "3",
+        "std_stage_order": "2",
+        "std_stage_name": "الميزانية ومؤشرات الأداء",
+        "match_kind": "EXACT"
+    },
+    {
+        "id": "9",
+        "cycle_layer": "المرجع والإدارة",
+        "cycle_stage": "سجل الحركة المالية",
+        "screens": "3",
+        "std_layer_no": "3",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "10",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "أوامر الترحيل",
+        "screens": "10",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "11",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "أوامر العمل",
+        "screens": "12",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "12",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "إقفال الفترة",
+        "screens": "9",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "13",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "إنهاء الخدمة",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "14",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "استقبال البلاغ",
+        "screens": "5",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "15",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "استقبال البلاغات",
+        "screens": "4",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "16",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "اعتماد التنفيذ ودورة الوحدات",
+        "screens": "14",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "17",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الأجور والمستحقات",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "18",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الأداء المؤسسي",
+        "screens": "4",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "19",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الأصول والحركة والصيانة",
+        "screens": "8",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "20",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الأعطال والاعتمادية",
+        "screens": "1",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "21",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الأقساط والسداد",
+        "screens": "4",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "22",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الإقفال والتكلفة",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "23",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الإهلاك والاستبعاد",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "24",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الاستحقاق وأحكام الأطراف",
+        "screens": "5",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "25",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الاستعداد والتعطل",
+        "screens": "1",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "26",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الاستلام",
+        "screens": "5",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "27",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الاستلام والمطابقة",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "28",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الالتزام والامتثال",
+        "screens": "5",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "29",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الالتزامات والتوجيه",
+        "screens": "11",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "30",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الانحرافات وإقفال الفترة",
+        "screens": "5",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "31",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الانحرافات والفروق",
+        "screens": "4",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "32",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التأسيس والهيكل المؤسسي",
+        "screens": "5",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "33",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التأهيل والقدرة",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "34",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التأهيل والوثائق والحركة",
+        "screens": "5",
+        "std_layer_no": "2",
+        "std_stage_order": "2",
+        "std_stage_name": "التأهيل والوثائق",
+        "match_kind": "TOKEN"
+    },
+    {
+        "id": "35",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التجديد والإقفال",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "36",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التحويل والإغلاق",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "37",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التخطيط وتخصيص الموارد",
+        "screens": "5",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "38",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التدقيق والمراجعة",
+        "screens": "6",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "39",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الترحيل والاعتمادات المالية",
+        "screens": "4",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "40",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الترسية والشراء",
+        "screens": "1",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "41",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التسويات والصرف",
+        "screens": "4",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "42",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التعاقد والتغطية والحصص",
+        "screens": "6",
+        "std_layer_no": "2",
+        "std_stage_order": "3",
+        "std_stage_name": "التعاقد والتغطية",
+        "match_kind": "TOKEN"
+    },
+    {
+        "id": "43",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التغطية التعاقدية",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "44",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التفويض والإنابة والصلاحيات",
+        "screens": "1",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "45",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التقييم والقياس",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "46",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التكلفة والإهلاك والهامش",
+        "screens": "9",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "47",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التكليف على المعدات",
+        "screens": "11",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "48",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التكليف والأداء",
+        "screens": "5",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "49",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التنفيذ التعاقدي",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "50",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التنفيذ اليومي",
+        "screens": "8",
+        "std_layer_no": "2",
+        "std_stage_order": "5",
+        "std_stage_name": "التنفيذ اليومي",
+        "match_kind": "EXACT"
+    },
+    {
+        "id": "51",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التنفيذ والإقفال",
+        "screens": "1",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "52",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التنفيذ والاستحقاق",
+        "screens": "4",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "53",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "التوظيف والتعيين",
+        "screens": "1",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "54",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الجاهزية التشغيلية",
+        "screens": "6",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "55",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الجرد",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "56",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الحضور والانصراف",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "57",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الخزينة والبنوك",
+        "screens": "17",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "58",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الخصومات والسلف",
+        "screens": "4",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "59",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الصرف",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "60",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الصيانة الوقائية",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "61",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الطلبات وحدود المخزون",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "62",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "العروض والتسعير",
+        "screens": "6",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "63",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "العقود",
+        "screens": "4",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "64",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "العقود والحصص",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "65",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "العملاء والفرص",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "66",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "العهد والصرف الميداني",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "67",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "القرارات المحجوزة",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "68",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "القوائم المالية",
+        "screens": "10",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "69",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الكيانات والتراخيص",
+        "screens": "4",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "70",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "المتابعة والتصعيد",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "71",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "المراجعة المحاسبية",
+        "screens": "26",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "72",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "المراقبة والمؤشرات",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "73",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "المستخلصات والذمم",
+        "screens": "4",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "74",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "المستخلصات والفوترة والتحصيل",
+        "screens": "4",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "75",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "المطابقة والمراجعة",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "76",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "المعالجة والضوابط",
+        "screens": "1",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "77",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "المعاملات المالية الواردة",
+        "screens": "10",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "78",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الملاحظات والتوصيات",
+        "screens": "1",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "79",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الملكية والضمانات",
+        "screens": "5",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "80",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الممولون والتسجيل",
+        "screens": "4",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "81",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الميثاق والخطة",
+        "screens": "4",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "82",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "الهيكل والأدوار",
+        "screens": "6",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "83",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "تسجيل الموردين",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "84",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "تقييم الأداء والإنهاء",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "85",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "تنفيذ المهمة وأدلتها",
+        "screens": "8",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "86",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "توزيع الحصص والحاويات",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "87",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "خطة الغد ورفعها",
+        "screens": "1",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "88",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "ساعات التشغيل وأساس الإهلاك",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "89",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "سجل الأصول",
+        "screens": "8",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "90",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "سجل المخاطر",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "91",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "سجل المشغّلين",
+        "screens": "6",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "92",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "سلاليم الاعتماد والسقوف",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "93",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "طلبات العروض",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "94",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "طلبات النقل",
+        "screens": "1",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "95",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "عمليات التمويل",
+        "screens": "10",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "96",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "قبول الخطر والتصعيد",
+        "screens": "2",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "97",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "متابعة الأداء",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "98",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "ملف الموظف وعقوده",
+        "screens": "5",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "99",
+        "cycle_layer": "دورة الإدارة",
+        "cycle_stage": "وثائق الأصول وصلاحيتها",
+        "screens": "3",
+        "std_layer_no": "2",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "100",
+        "cycle_layer": "مركز العمل",
+        "cycle_stage": "الاعتمادات الواردة",
+        "screens": "10",
+        "std_layer_no": "1",
+        "std_stage_order": "1",
+        "std_stage_name": "الاعتمادات الواردة",
+        "match_kind": "EXACT"
+    },
+    {
+        "id": "101",
+        "cycle_layer": "مركز العمل",
+        "cycle_stage": "الاعتمادات والمسائل المرفوعة",
+        "screens": "6",
+        "std_layer_no": "1",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "102",
+        "cycle_layer": "مركز العمل",
+        "cycle_stage": "البلاغات والمهل",
+        "screens": "21",
+        "std_layer_no": "1",
+        "std_stage_order": "2",
+        "std_stage_name": "البلاغات والمهل",
+        "match_kind": "EXACT"
+    },
+    {
+        "id": "103",
+        "cycle_layer": "مركز العمل",
+        "cycle_stage": "المركز التنفيذي",
+        "screens": "6",
+        "std_layer_no": "1",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "104",
+        "cycle_layer": "مركز العمل",
+        "cycle_stage": "بلاغاتي",
+        "screens": "1",
+        "std_layer_no": "1",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "105",
+        "cycle_layer": "مركز العمل",
+        "cycle_stage": "لوحة المخاطر المؤسسية",
+        "screens": "3",
+        "std_layer_no": "1",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "106",
+        "cycle_layer": "مركز العمل",
+        "cycle_stage": "لوحة المراجعة الداخلية",
+        "screens": "3",
+        "std_layer_no": "1",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "107",
+        "cycle_layer": "مركز العمل",
+        "cycle_stage": "ما ينتظر إجرائي",
+        "screens": "4",
+        "std_layer_no": "1",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "108",
+        "cycle_layer": "مركز العمل",
+        "cycle_stage": "مركز العمل",
+        "screens": "79",
+        "std_layer_no": "1",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "109",
+        "cycle_layer": "مركز العمل",
+        "cycle_stage": "ملفي الشخصي",
+        "screens": "3",
+        "std_layer_no": "1",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "110",
+        "cycle_layer": "مركز العمل",
+        "cycle_stage": "مهامي ومتابعتها",
+        "screens": "2",
+        "std_layer_no": "1",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    },
+    {
+        "id": "111",
+        "cycle_layer": "مركز العمل",
+        "cycle_stage": "نشاطي الأخير",
+        "screens": "2",
+        "std_layer_no": "1",
+        "std_stage_order": null,
+        "std_stage_name": null,
+        "match_kind": "LAYER_ONLY"
+    }
+]

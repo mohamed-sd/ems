@@ -1,8 +1,29 @@
 # INJ-ARCH-ASBUILT — المعمارية الفعلية الحالية لمنصة إنجاز (As-Built)
 
-> **اللقطة:** `BL-20260821-f0bc3e4e` · القياس: 2026-08-21 · التفصيل الكامل لنقطة القياس في [SNAPSHOT.md](SNAPSHOT.md)
-> **القاعدة:** هذه وثيقة **ما هو مبني فعلًا** — لا Target Architecture. كل حكم مسنود إما إلى `ملف:سطر` وإما إلى استعلام منفَّذ على القاعدة الحية `equipation_manage` (MariaDB 11.4.9). ما تعذّر تحديده وُسم `UNKNOWN`.
-> **المعرّفات المشتركة:** `SCR-xxxx` (شاشة — سجلها في INJ-SCREENS-MASTER.xlsx) · `GAP-xx` (فجوة — سجلها الكامل في INJ-CURRENT-STATUS) · `CAP-xx` (قدرة).
+> **اللقطة:** `BL-20260821b-dbba1ef0` · القياس: 2026-08-21 · 20:59→21:35 · التفصيل في [SNAPSHOT.md](SNAPSHOT.md)
+> **النسخة السابقة** (`BL-20260821-f0bc3e4e`) في [`historical/`](historical/BL-20260821-f0bc3e4e/) — أرقامها تاريخ.
+> **القاعدة:** وثيقة **ما هو مبني فعلًا** — لا Target Architecture. كل حكم مسنود إلى `ملف:سطر` أو استعلام منفَّذ على `equipation_manage` (MariaDB 11.4.9). ما تعذّر تحديده وُسم `UNKNOWN`.
+> **المعرّفات المشتركة:** `SCR-xxxx` (INJ-SCREENS-MASTER.xlsx) · `CAP-xx` (قدرة) · `GAP-xx` (INJ-CURRENT-STATUS §4).
+
+---
+
+## §0 ما تغيّر معماريًّا منذ اللقطة السابقة (43 التزامًا)
+
+جولتا `INJ-FIX-01` و`INJ-FIX-02` **لم تُضِف قدرات جديدة** — عملهما كان **تحويل الصمت إلى إعلان محكوم**: 15 جدول أحكام جديدًا، وقيود CHECK تقفل مسارات قديمة، وسقّاطات (ratchets) تُجمّد الديون عند رقمها. الأثر المعماري في ستة مواضع:
+
+| # | التغيير | الشاهد |
+|---|---|---|
+| ١ | **مفتاح السلالم جُسِر**: `gov_ladders` اكتسب `entity_type`/`action`، وأُضيفت LD-14..LD-17 ⇒ تقاطع الاعتماد **0 → 3** | `2027_08_22_ladder_entity_key_bridge.php` · `2027_08_29_ladders_for_produced_types.php` |
+| ٢ | **المسار القديم أُقفل بقيد لا بعُرف**: `chk_awr_legacy_write_blocked CHECK(is_active=0)` على `approval_workflow_rules` | `2027_09_11_approval_legacy_write_block.php` |
+| ٣ | **سجل حكم أنواع الأحداث**: `gov_event_rulings` — 58 نوعًا محكومًا (11 `business` · 47 `audit`) بمعيار `in_projection` | `2027_08_26` + `2027_08_28` |
+| ٤ | **قيد مرجعي للتسليمات**: `fk_evdeliv_event … ON DELETE CASCADE` بعد أرشفة 82 يتيمًا ⇒ اليتامى **60 → 0** | `2027_09_05_orphan_deliveries_and_fk.php` |
+| ٥ | **الحقول الحساسة دخلت الإنفاذ كاملةً**: توحيد ثلاثة أعمدة (`status`+`exportable_flag`+`log_views_flag`) ⇒ **15/34 → 34/34** + قيد يمنع الرجوع | `2027_08_21_sensitive_fields_enforcement_unify.php` |
+| ٦ | **العزل امتد إلى `api/`**: حجب قيم + نطاق شركة + CORS مضيَّق بحارس | `api/bootstrap.php:493,415-425` · `api/index.php:49-70` |
+
+**وثلاثة أنماط معمارية أدخلتها الجولتان — يجب فهمها لقراءة بقية الوثيقة:**
+1. ***«السقّاطة» (ratchet)*** — فاحص يقيس دَينًا ويرسُب **عند الزيادة وعند النقصان معًا** (`72 ≤ 72`، `608 ≤ 608`) بمبرّر معلن «سقّاطةٌ لا تُشدّ تصير سقفًا يُنسى». فأربعة ديون كبرى صارت **مقيسة ومجمّدة لا مُغلقة**.
+2. ***السجل بلا قارئ*** — سجلات أحكام كاملة (`gov_event_rulings` · `gov_path_rulings` · `gov_dead_letter_rulings`) **بلا قارئ إنتاج واحد**: سلطة معلنة بلا نفاذ (GAP-51).
+3. ***⚠ مقياس الإغلاق معطوب*** — `tools/injfix01_gap_coverage.php:37` يعدّ الفجوة مغطّاة إن **ذكر رمزَها** فاحصٌ أخضر، فأنتج «33/33» يخفي أربع فجوات حية إحداها ينفي فاحصُها إغلاقها بنصّه (GAP-56). **لا يُقرأ رقم إغلاق من وثائق الجولة إلا عبر جدول الادعاءات في INJ-CURRENT-STATUS §4.**
 
 ---
 
@@ -10,344 +31,330 @@
 
 ```
 ┌─ المتصفح ──────────────────────────────────────────────────────────────────┐
-│  شاشة PHP (444 مصيَّرة)   │ topbar (9 روابط مصلَّبة) │ AJAX POST │ /api (Bearer)│
-└──────┬──────────────────────────┬──────────────┬─────────────┬─────────────┘
-       ▼                          ▼              ▼             ▼
+│ شاشة PHP (443 مصيَّرة) │ topbar (10 روابط · مُعفاة بسجل) │ AJAX │ /api (Bearer)│
+└──────┬──────────────────────┬───────────────────┬────────────┬─────────────┘
+       ▼                      ▼                   ▼            ▼
 ┌─ طبقة الدخول والحراسة ─────────────────────────────────────────────────────┐
 │ session_bootstrap → config.php:                                            │
-│   ① ems_enforce_ajax_endpoint_security (config.php:466)                    │
-│   ② ems_enforce_action_permission — حارس الأفعال ADR-06 (config.php:471)   │
-│   ③ ems_enforce_csrf_protection (config.php:479)                           │
-│ ثم في الشاشة: فحص الجلسة → بوابة الشركة → check_page_permissions /         │
-│ enforce_current_page_view_permission → حارس الكتابة → insidebar            │
+│  ① ems_enforce_ajax_endpoint_security (:466) ② حارس الأفعال ADR-06 (:471)  │
+│  ③ CSRF (:479)   ثم في الشاشة: جلسة → بوابة الشركة → can_view →           │
+│  حارس الكتابة → insidebar                                                  │
 └──────┬─────────────────────────────────────────────────────────────────────┘
        ▼
 ┌─ الهوية والصلاحية ─────────────────┐  ┌─ التنقّل ────────────────────────────┐
-│ users(75) → roles(35) →            │  │ nav_items(1646 نشط) + nav_canonical  │
-│ مساران للحقيقة:                    │  │ + nav_route_group + nav_group_       │
-│  أ) gov_authority_grants→profiles→ │  │ taxonomy(12) → unified_nav.php →     │
-│     gov_profile_items (97٪ من      │  │ printEmsTenGroupNav → السايدبار      │
-│     المستخدمين — يُبطل ب كليًّا)   │  │ (dynamic_nav القديم: للسوبر فقط)     │
-│  ب) role_permissions(3041)         │  └──────────────────────────────────────┘
+│ users(76) → roles(35) → مساران:    │  │ nav_items(1629 نشط) + nav_canonical  │
+│  أ) gov_authority_grants(76) →     │  │ + nav_route_group + nav_group_       │
+│     profiles(28 active) →          │  │ taxonomy(12) + gov_nav_reference_    │
+│     gov_profile_items(2507)        │  │ standard(17) + stage_bridge(111)     │
+│     ⇒ يحكم 75/78 ويبطل (ب) كليًّا  │  │ → unified_nav → printEmsTenGroupNav  │
+│  ب) role_permissions(3019)         │  │ (dynamic_nav القديم: للسوبر فقط)     │
+│     ⇒ ما زال يقود القائمة والأزرار │  └──────────────────────────────────────┘
+│     (72 قارئ قرار — مجمَّد بسقّاطة)│
 └──────┬─────────────────────────────┘
        ▼
 ┌─ العزل ────────────────────────────────────────────────────────────────────┐
-│ TenantDb/scopedQuery (بوابة المستأجر — enforce) · space_scope (عزل         │
-│ المساحات بـcls=FORBIDDEN) · fin_project_scope (أدوار 5,6 fail-closed)      │
+│ TenantDb/scopedQuery (enforce · 7 بوابات رفض) · space_scope (FORBIDDEN=204) │
+│ · fin_project_scope (fail-closed بقائمتين معلنتين) · api scope · 608 ملفًّا  │
+│   ما زال بSQL خام (مجمَّد بسقّاطة)                                          │
 └──────┬─────────────────────────────────────────────────────────────────────┘
        ▼
-┌─ الخدمات ─ app/Services (193 ملفًا/33 نطاقًا) + includes (98) ─────────────┐
-│ Contract(27) Finance(17) Capacity(15) Security(13) Payroll(7) …            │
-└──┬───────────────┬───────────────────┬─────────────────────────────────────┘
+┌─ الخدمات ─ app/Services (33 نطاقًا) + includes ───────────────────────────┐
    ▼               ▼                   ▼
 ┌─ الاعتماد ─────┐ ┌─ الأحداث ───────┐ ┌─ المالية ──────────────────────────┐
 │ ٥ مصادر حقيقة  │ │ EventPublisher  │ │ fin_financial_events (5,256)       │
-│ متزامنة (§7) — │ │ → ems_business_ │ │ → EffectFanout → fin_event_effects │
-│ الحي: الموروث  │ │ events (21,284) │ │ → PostingService → fin_journal_    │
-│ بسقوط للسوبر   │ │ 58 نوعًا/0      │ │ entries(6,713)+lines(13,426)       │
-│                │ │ مستهلك أعمال    │ │ قيد مزدوج متوازن: فرق 0.00         │
+│ + سادس مقفل    │ │ → ems_business_ │ │ → EffectFanout → fin_event_effects │
+│   بـCHECK      │ │ events (21,285) │ │ → PostingService → journal_entries │
+│ التقاطع 3 لا 0 │ │ 58 نوعًا محكومًا│ │ (6,713) + lines (13,426)           │
+│ الاحتياط باقٍ  │ │ 11 business /   │ │ توازن: فرق 0.00 محروسًا بـCHECK    │
+│ (monitor)      │ │ 47 audit        │ │                                    │
 └────────────────┘ └───────┬─────────┘ └────────────────────────────────────┘
                            ▼
-┌─ الخلفية ──────────────────────────────────────────────────────────────────┐
-│ Task Scheduler (كل دقيقة) → cron_jobs.php → ems_job_queue (6,236 منجزًا)   │
-│ → 8 جدولات (event_retry كل 5د · fin_posting كل 10د · …)                    │
+┌─ الخلفية ─ Task Scheduler (php8.2.30 موحَّدًا) → cron_jobs.php كل دقيقة ───┐
+│ → ems_job_queue (7,444 منجزة) → 8 جدولات · مهمتان متأخرتان تُنذران الآن   │
 └────────────────────────────────────────────────────────────────────────────┘
-┌─ القاعدة ─ 603 جداول أساس · 478 بعمود company_id · FK 292 · CHECK 308 ────┐
+┌─ القاعدة ─ 618 جدول أساس · 481 بعمود company_id · FK 293 · CHECK 320 ─────┐
 ```
 
 ### من يستدعي من · من يكتب · من يقرأ · من يملك الحقيقة
 
 | العلاقة | الاتجاه المقيس | الدليل |
 |---|---|---|
-| الشاشات ← الخدمات | الشاشة تستدعي الخدمة؛ 1,985 ملفًا يستعمل `scopedQuery`، لكن 1,257 ملفًا ما زال يمرر SQL خامًّا | مسح شجرة (تقرير الصلاحيات §4ج) |
-| الخدمات ← الأحداث | 40 ملفًا منتِجًا · 60 نقطة نشر · **صفر** إدراج مباشر في `ems_business_events` خارج `EventPublisher.php:604` | مسح `INSERT INTO ems_business_events` |
-| الأحداث ← المالية | الكتابة مزدوجة ذرّية (جذر + إسقاط)؛ **القراءة العملية كلها من الإسقاط `fin_financial_events`** لا من الجذر | `EventDispatcher.php:99` |
-| المالية ← دفتر القيد | `PostingService.php:228` الكاتب المعتمد + 3 كتّاب مباشرون (`journal_form_fin.php:205`، `fin_helpers.php:642`، `fx.php:338`) | تقرير المالية §1 |
-| ملكية حقيقة الشاشة | الاسم: `nav_canonical` · المجموعة: `nav_route_group` · الترتيب: `nav_canonical.sort_no` · المالك: ثلاثة سجلات بلا تحكيم (§6) | تقرير التنقّل §2 |
+| الشاشات ← الخدمات | 983 ملف إنتاج ممسوح؛ **608 منها يلمس جدول مستأجر باستعلام خام** (المقام صُحِّح: العدد السابق 1,257 كان يعدّ tests/tools/migrations) | `tests/injfix01_raw_query_ratchet.php` |
+| الخدمات ← الأحداث | `EventPublisher` نقطة خنق وحيدة — **صفر إدراج مباشر** في كود الإنتاج | مسح `INSERT INTO ems_business_events` |
+| الأحداث ← المالية | الكتابة مزدوجة ذرّية؛ **القراءة العملية كلها من الإسقاط** — `finance`/`finance_routing` عند 17,985 (ملتحقان) و`fx` عند 6,613 (متوقف) | `EventDispatcher.php:99` · `ems_event_consumers` |
+| المالية ← دفتر القيد | `PostingService.php:228` + 3 كتّاب مباشرين | تقرير المالية |
+| ملكية حقيقة الشاشة | **الملكية صارت بحكم لا بترجيح**: `gov_ownership_rulings` **259 حكمًا** (كان 46) — والترجيح بالأغلبية تراجع من 126 تعارضًا إلى **13** | reconcile_stats |
 
 ---
 
 ## §2 مصدر الحقيقة لكل محرك
 
-لكل محرك: أين يعيش، ماذا يقرأ فعلًا، الجداول الحية، المسار القديم إن وُجد، وما يمنع الالتفاف.
-
 ### CAP-01 · الهوية والجلسات
-- **الملفات:** `includes/session_bootstrap.php` (مضمَّن في 289 ملفًا) · `includes/EmsDbSessionHandler.php` · `login.php`.
-- **Source of Truth:** `users` (75 نشطًا) + `sessions` (مخزن جلسات القاعدة).
-- **الحالة:** حي. الحارس: فحص `$_SESSION['user']` في رأس كل شاشة قبل أي شيء.
+`includes/session_bootstrap.php` (289 ملفًا) · `EmsDbSessionHandler` · SoT: `users` (76 نشطًا) + `sessions`. **حي · Closed.**
 
-### CAP-02 · الصلاحيات (مساران للحقيقة — GAP-11)
-- **المسار الحاكم فعليًّا:** `get_module_permissions()` (`includes/permissions_helper.php:298-384`): إن كان للمستخدم منحة نافذة في `gov_authority_grants` بقالب `gov_role_profiles.state='active'` → القرار **حصريًّا** من `gov_profile_items` (2,526 بند شاشة) **ويُبطل `role_permissions` كليًّا** — حتى المنع («لا شاشة خارج القالب»: `t_view=-1`). القياس: 76 منحة نافذة تغطي **76/78 مستخدمًا (97٪)**.
-- **المسار الثاني (ما زال حيًّا في مواضع):** `check_permission()` (`permissions_helper.php:191`) و`unified_nav.php:90` يقرآن `role_permissions` (3,041) مباشرة متجاهلَين القالب ⇒ **القائمة والأزرار من مصدر، ودخول الشاشة من آخر**.
-- **السوبر أدمن (`role='-1'`):** مُعفى في حراس الأفعال/التصدير/الحقول/النطاقات، **محجوب** في `get_module_permissions` (يهبط إلى `role_permissions` حيث **صفر صف له** ⇒ `can_view=false`) — فكل شاشة تحرسه بفحص `$is_super_admin` اليدوي قبل الفحص المركزي.
-- **الاختبارات:** `tests/sec_guards_test.php` · `tests/write_guard_negative_test.php` وحزام SEC.
+### CAP-02 · الصلاحيات — **مساران للحقيقة، أحدهما مجمَّد بسقّاطة**
+- **الحاكم للدخول:** `get_module_permissions()` (`includes/permissions_helper.php:298`، كتلة GOV-AUTH-01 عند `:320-360`، ارتداد `role_permissions` عند `:362`). منحة نافذة بقالب `active` ⇒ القرار حصريًّا من `gov_profile_items` — و«لا شاشة خارج القالب» (`t_view=-1` منعٌ). **التغطية 75/78 مستخدمًا (96.2٪)** — منحة واحدة تشير لقالب `draft` فتسقط للمسار القائم.
+- **الثاني الحي:** `check_permission()` (`:191`، الاستعلام الخام `:207-209`) و`unified_nav.php:88-94` يقرآن `role_permissions` (3,019) متجاهلَين القالب ⇒ القائمة والأزرار من مصدر والدخول من آخر.
+- **الجديد:** `tests/injfix01_permission_single_point_gate.php` يصنّف اللامسين ويُجمّد **72 «قارئ قرار»** ويرسُب على الزيادة **وعلى النقصان**. الفاحص يعلن في متنه أنه سقّاطة لا إغلاق ⇒ **GAP-11 مقيس ومجمَّد، غير مغلق**.
+- **السوبر (`-1`):** معفى في حراس الأفعال/التصدير/الحقول/النطاقات، **محجوب** في `get_module_permissions` (صفر صف له في `role_permissions`) — فيعمل بانضباط الشاشة.
 
-### CAP-03 · عزل المستأجر (ADR-02)
-- **الملفات:** `app/Core/TenantDb.php` · `app/Core/TenantRegistry.php` · `.env: EMS_TENANT_GATE=enforce`.
-- **ما يمنع الالتفاف:** 7 بوابات رفض في `scopedQuery` (`TenantDb.php:557-670`) كلها ترمي استثناء: إعلان فارغ، جدول غير مسجَّل، **ذكر `company_id` نصًّا مرفوض**، SELECT فقط، رمز نطاق واحد، لا UNION، جدول مستأجر بلا إعلان مرفوض، `enrich` بـLEFT JOIN حصرًا. التحقق **بنيوي** (مسح بعمق الأقواس بعد تجريد النصوص).
-- **الفجوة:** العزل في القاعدة نفسها غير موجود (لا CHECK على company_id)؛ و1,257 ملفًا ما زال بSQL خام (عزل بانضباط المطوّر) — GAP-20 جزئيًّا.
+### CAP-03 · عزل المستأجر (ADR-02) — **Closed**
+`app/Core/TenantDb.php` · `.env: EMS_TENANT_GATE=enforce`. سبع بوابات رفض في `scopedQuery` (`:557-670`) كلها ترمي: إعلان فارغ · جدول غير مسجَّل · **ذكر `company_id` نصًّا مرفوض** · SELECT فقط · رمز نطاق واحد · لا UNION · جدول مستأجر بلا إعلان. التحقق **بنيوي** (مسح بعمق الأقواس بعد تجريد النصوص). `guard_policies` تصنّف `tenant.isolation` = `absolute/legal_forbidden` بلا مسار استثناء.
 
 ### CAP-04 · حارس الأفعال (ADR-06)
-- **الملفات:** `includes/action_guard.php` (سجل ~45 معالجًا في `:36-146`) · سجل `actions` بالقاعدة (92 فعلًا/61 كتابيًّا) · `.env: EMS_ACTION_GUARD=enforce`.
-- **ما يمنع الالتفاف:** المعالج غير المسجَّل يُرفض 403 (`action_guard.php:216-220`). فوقه: أمن نقطة AJAX (ترويسة + جلسة + معدل 45/180 في الدقيقة، `config.php:435-464`) ثم CSRF.
-- **عيب حي (GAP-14):** `action_guard.php:232` يستعمل `$verb` قبل تعريفه (يُعرَّف في `:246`) ⇒ كل رفضِ مساحةٍ يُسجَّل بفعل فارغ.
+`includes/action_guard.php` (سجل ~45 معالجًا) + سجل `actions` (92/61 كتابة) · `EMS_ACTION_GUARD=enforce` ⇒ المعالج غير المسجَّل يُرفض 403. **عيب حي باقٍ:** `:232` يستعمل `$verb` قبل تعريفه في `:246` ⇒ رفض المساحة يُسجَّل بفعل فارغ (GAP-14 — تشخيصي لا تصريحي).
 
-### CAP-05 · التنقّل والسايدبار — التفصيل في §6
-### CAP-06 · محرك الاعتماد — التفصيل في §7 (٥ مصادر حقيقة)
-### CAP-07 · ناقل الأحداث ENG-01 — التفصيل في §8
+### CAP-05 · التنقّل — §6 · CAP-06 · الاعتماد — §7 · CAP-07 · الأحداث — §8
+
 ### CAP-08 · موزّع الأحداث K4 (القديم الحي)
-- `app/Core/EventDispatcher.php` يقرأ **`fin_financial_events`** (`:99`) بمؤشرات `ems_event_consumers` (4 صفوف: finance وfinance_routing ملاحقان عند 17,985؛ **fx متوقف عند 6,613 منذ 2026-08-12** — GAP-07). هذا هو المسار الذي يؤدي العمل المالي الفعلي — لا الجذر المحايد.
+`app/Core/EventDispatcher.php:99` يقرأ **`fin_financial_events`** بمؤشرات `ems_event_consumers` (4): `finance`/`finance_routing` ملتحقان عند 17,985 · `finance_routing_replay` متأخر 1 · **`fx` عند 6,613 متوقف منذ 2026-08-12** (GAP-07).
+**جديد مبنيّ وغير موصول:** `EventDispatcher::stalledConsumers()` (`:224`) و`alertStalledConsumers()` (`:271`) و`unwiredSubscriptions()` (`:319`) — موصولة في `cron_events.php:144,160-166`، **لكن `cron_events.php` متقاعد يدويًّا** (`ems_manual_run_retired` يخرج بالرمز 3 ما لم يُعرَّف `EMS_JOB_WORKER`، ولا ملف يعرّفه) والمهمة المجدولة `event_retry` تشغّل `EventDeliveryWorker` وحده الذي لا يذكر هذه الدوال ⇒ **NEW_BUT_UNWIRED**: صفر إشعار `[BUS-UNWIRED:*]` رغم 74 اشتراكًا غير موصول.
 
 ### CAP-09 · مروحة الأثر (EffectFanout)
-- `app/Services/EffectFanout.php` — تُستدعى **داخل معاملة المستدعي حصرًا**؛ العطالة بوجود صف في `fin_event_links` (10,519) بمفتاح `UNIQUE uq_link_parent_effect(company_id,parent_kind,parent_ref,effect_type)`. **98.6٪ من الروابط مصدرها timesheet** — المروحة عمليًّا أحادية المصدر.
-- تنبيه سجلّي: `event_consumers` يسجّلها بصنف خاطئ `App\Core\EffectFanout` (غير موجود — الصحيح `App\Services\`) وقد عُطّلت (`active=0`) — GAP-09 جزئيًّا.
+داخل معاملة المستدعي حصرًا؛ العطالة بوجود صف في `fin_event_links` (10,519 · **98.89٪ من timesheet**). السجل ما زال يحمل FQCN خاطئًا `App\Core\EffectFanout` (الصحيح `App\Services\`) بـ`active=0` — مُعلَن غير مُصلَح.
 
-### CAP-10 · الطابور والمهام الخلفية
-- **حي فعلًا لا جدول نائم:** Task Scheduler ينفّذ `cron_jobs.php` كل دقيقة (آخر تشغيل 04:24:01 نتيجة 0)؛ `ems_job_queue` = 6,253 (منها 6,236 done · 17 dead لpilot_monitor · صفر عالق)؛ 8 جدولات في `ems_job_schedule` كلها نشطة بآخر نجاح حديث (`event_retry */5` · `fin_posting */10` · `capacity_rollup */15` · `alert_dispatch */5` · `statement_build` يومي 01:00 · `settlement_recalc` يومي 03:00 · `depreciation_run` شهري · `pilot_monitor */30`).
-- **مخاطر تشغيلية (GAP-17):** ثلاث مهام مجدولة بثلاثة إصدارات PHP مختلفة (8.0.30/8.2.30/8.5.0) على الكود نفسه؛ و`cron_proc_replenish.php` غير مجدول أصلًا رغم أن رأسه يقترح «كل ساعة».
+### CAP-10 · الطابور والمهام الخلفية — **Closed تكوينًا · مفتوح تشغيلًا**
+Task Scheduler ينفّذ `cron_jobs.php` كل دقيقة (آخر تشغيل 21:05:01 نتيجة 0). **إصدار PHP وُحِّد على 8.2.30 لمهام EMS الثماني** (كان ثلاثة) و**`cron_proc_replenish` صار مجدولًا** (كل 30 د). `ems_job_queue` = 7,461 (7,444 done · 17 dead كلها بذر UAT قديم). عتبة الإنذار وُسِّعت SMALLINT→INT وصُحِّحت ثلاث عتبات ⇒ **الإنذار صار يعمل بحق**: `statement_build` متأخرة ~44h و`settlement_recalc` ~42h تُنذران الآن.
+**بند جديد:** `EMS_cron_events` يُرجع `Last Result = 3` باستمرار — خروج غير صفري خارج الطابور فلا يظهر في `ems_job_queue`.
 
-### CAP-11 · العمود المالي (القيد المزدوج)
-- **دفتر الحقيقة مزدوج الطبقة:** سجل الأحداث `fin_financial_events` (5,256 · 96.4٪ Posted) + دفتر قيد مزدوج حقيقي `fin_journal_entries` (6,713 كلها posted) / `fin_journal_lines` (13,426): مدين 37,694,775.13 = دائن 37,694,775.13 — **فرق 0.00**، ويحرسه `CHECK ck_je_balanced`.
-- **الكاتب المعتمد:** `PostingService.php:228` (والعكس يقلب الطرفين لا يمحو، `:403,426`). كتّاب مباشرون ثلاثة: `journal_form_fin.php:205` (1,644 قيدًا يدويًّا غير مربوط بحدث)، `fin_helpers.php:642`، `fx.php:338`.
-- **مصفوفة الترحيل الفعلية مصلَّبة في الكود** (`PostingService.php:44-51`، 7 مداخل) — و`fin_posting_matrix` (27 صفًّا) «نص وصفي لا قاعدة آلية» (`PostingService.php:21`).
+### CAP-11 · العمود المالي (القيد المزدوج) — **Closed**
+`fin_financial_events` 5,256 (5,069 posted) + `fin_journal_entries` 6,713 (كلها posted) / `fin_journal_lines` 13,426: مدين 37,694,775.13 = دائن، **فرق 0.00**، محروسًا بـ`ck_je_balanced`. 1,644 قيدًا يدويًّا بلا حدث (24.5٪). الكاتب المعتمد `PostingService.php:228`؛ مصفوفة الترحيل **مصلَّبة في الكود** (`:44-51`) و`fin_posting_matrix` نص وصفي.
+**ملاحظة تشغيلية:** أحدث حدث `2026-08-16` — **صفر حركة مالية منذ خمسة أيام**.
 
 ### CAP-12 · بوابة الطلبات المالية D-05
-- `FinRequests/` (11 ملفًا) · `fin_requests` = 22 طلبًا فقط · **1 حدث من 5,256 (0.019٪) وُلد عبر البوابة** — البوابة مبنية بالكامل ومتجاوَزة عمليًّا (الحجم الحقيقي يدخل من خطاف الدوام) — GAP-15. قيد بنيوي واحد نافذ: `chk_party_payment_needs_settlement`.
+`fin_requests` = 22 · **حدث واحد من 5,256 (0.019٪)** عبرها. الجديد: `2027_09_12_finance_gate_policy.php` **أعلن القرار** (إلزامية عند LD-11 وLD-13، سجل طلبات في LD-10/LD-12) ⇒ الفجوة **أُعيد تعريفها قرارًا معلنًا** لا سُدَّت عددًا.
 
 ### CAP-13 · الإقفال المالي
-- **الحقيقي في `fin_financial_periods`** (شاشة `Finance/periods_fin.php`): آلة 6 حالات، `soft_close/close/lock` تُطفئ `posting_allowed` و`PostingService::periodOpen()` (`:456-468`) يمنع الترحيل في فترة مقفلة؛ `reopen` بسبب إلزامي وختم مدقَّق. الواقع: 14 planned · 5 open · 1 soft_closed · 3 closed · **صفر locked**.
-- **`scr_monthly_close` ليس آلية إقفال** — جدول شاشة CMP-03 بأعمدة varchar نصية وبياناته UAT (GAP-24).
+الحقيقي في `fin_financial_periods` (23 صفًّا: 14 planned · 5 open · 1 soft_closed · 3 closed · **صفر locked**) — `PostingService::periodOpen()` يمنع الترحيل في المقفلة. `scr_monthly_close` ما زال 20 صف بذر UAT.
 
-### CAP-14 · الصرف والتسعير اليومي
-- `includes/fx.php`: الأساس من `admin_companies.currency` → `fin_currencies.is_base` (الشركتان USD)؛ `base=ROUND(amount×rate,2)` **مفروضة بقيد** `ck_ffe_fx_pair` و`ck_je_fx_pair`. السعر النافذ «آخر سعر سريانه ≤ التاريخ» (`fx.php:174`) — أي استمرار حتى سعر أحدث، وليس «يومها فقط».
-- **التسعير اليومي (قرار المالك 2026-08-12):** `Finance/daily_pricing_fin.php` + `PriceAdjustmentService`؛ «لا سعرُ يومٍ مرتين» بقيد `uq_price_index_reading(company,index,reading_date)`، ومرجع مستند إلزامي، و«من أنشأ لا يعتمد» 403. البيانات: 9 قراءات · 97 مراجعة سعر · 94 بند شرط.
-- **فجوة:** `fin_fx_rates` فيه **4 صفوف فقط** (GAP-25) — مع ذلك 5,256/5,256 حدثًا مُسعَّر (صفر فجوة صرف محسوبة).
+### CAP-14 · الصرف والتسعير — **عولج بالمقبض الصحيح**
+`fin_fx_rates` ما زال **4 أسعار** — لكن المقبض كان قائمة النشطات: `2027_09_10_currency_activation_by_use.php` عطّل خمس عملات نشطة بلا سعر ⇒ **النشط الآن ثلاث عملات، كلها مسعَّرة (3/3)**، وله `--revert`. الصيغة `base=ROUND(amount×rate,2)` مفروضة بقيدَي `ck_ffe_fx_pair`/`ck_je_fx_pair`. التسعير اليومي: `uq_price_index_reading` («لا سعر يوم مرتين») + «من أنشأ لا يعتمد».
 
 ### CAP-15 · الرواتب والتسويات
-- `payroll_runs` = 74 (100٪ Approved) · `payroll_lines` = 1,302 تغطي 73/74 دورة (دورة واحدة بلا سطور) · `payroll_run_blocks` = 0 (الفارغ الوحيد من جداول payroll_ السبعة).
-- `settlements` = 469 (draft 217 · approved 251 · payment_requested 1 · **صفر مدفوع/مقفل**). `SettlementService` يولّد طلب دفع آليًّا عند الصافي الموجب (`:652`).
-- **عيب كتم (GAP-16):** `SettlementService.php:630` يبتلع فشل إنشاء الذمة المدينة (error_log ويمضي) — لا يُرجع المعاملة ولا يمنع الانتقال إلى Approved.
+`settlements` 469 (251 approved · 217 draft · 1 payment_requested · **صفر مدفوع/مقفل**) · `payroll_runs` 74 (100٪ Approved) · `payroll_run_blocks` 0.
+**GAP-16 أُغلق:** `SettlementService` صار يُرجع المعاملة على فشل الذمة (`throw` بدل `error_log`) وأُعيد الترتيب فالحدث آخرًا. **بند جديد:** 13 موضع `error_log` مبتلَع في مسارات بناء سطور التسوية (سُلف/قطع غيار/صيانة/نقل/جزاء طاقة) ⇒ **تسوية ناقصة السطور بصمت**.
 
-### CAP-16 · التدقيق (Audit Trail)
-- `includes/audit_trail.php` → `activity_logs` (يسجّل **الفرق فقط**، لا يرمي أبدًا، CLI-safe، والنيابة تُختم `acted_by/acted_for` بقيد `chk_act_attribution`).
-- التغطية على مستويين: بوابة `TenantDb::auditWrite` (`TenantDb.php:171`) لكل عابر بالبوابة + نداءات صريحة في مواضع الخنق المالية. **الثغرة:** الكتّاب بـmysqli الخام (منهم `EventPublisher.php:373` نفسه) خارج التغطية الضمنية.
+### CAP-16 · التدقيق
+`includes/audit_trail.php` → `activity_logs` (الفرق فقط · لا يرمي · النيابة تُختم بقيد `chk_act_attribution`). التغطية: بوابة `TenantDb::auditWrite` لكل عابر + نداءات صريحة في مواضع الخنق المالية. الكتّاب بـmysqli الخام خارج التغطية الضمنية.
 
-### CAP-17 · الحقول الحساسة (ثلاث آليات لا تعرف بعضها — GAP-10/12)
-- **A العرض:** `ems_may_see_field()` (`includes/field_visibility.php`) — مغلق افتراضًا، السوبر استثناء معلَن، اطلاع مسجَّل في `sensitive_read_log`، والقيمة المحجوبة **لا تعبر الشبكة**. التبني: **6 شاشات فقط** في الشجرة كلها.
-- **B التصدير:** `FieldGovernor::exportableColumns` ضد `scr_sensitive_fields` — الحجب **قبل SELECT** (`ExcelService.php:243`)، إن حُجب الكل → 403، والتصدير مسجَّل في `gov_export_log`. **لكن الشرط الحرفي `status='معتمد'`** ⇒ 19 صفًّا من 34 بحالة `active` **خارج الإنفاذ** (GAP-10).
-- **C التحرير:** `gov_field_class` (630 حقلًا بأصناف DC-1..4) تُقرأ في مسار التحرير فقط (`FieldGovernor::classOf/assertClassified`) — **لا تحكم عرضًا ولا تصديرًا** (GAP-12). وصف ملوث فعّال في `gov_data_classes` (id=61 اسم شخص — GAP-09).
+### CAP-17 · الحقول الحساسة — **أُغلقت (كانت أخطر الفجوات)**
+- **قاموسان يتحدان الآن:** `FieldGovernor::sensitiveFieldsOf()` (`app/Services/Governance/FieldGovernor.php:285-306`) يضمّ ما في `sensitive_field_policies` (نمت 6→**27**) وليس في `scr_sensitive_fields` بـ`declared=false`+`exportable=false`.
+- **34/34 داخل الإنفاذ** (كان 15/34): العلاج في البيانات لا بتخفيف الشرط — وُحِّدت **ثلاثة أعمدة** لأن الحوكمة تقرأ الرايات بـ`mb_strpos('نعم')` فكانت `'1'` تُقرأ «لا». وقيد `chk_scr_sensitive_fields_status` يمنع الرجوع.
+- **العمود الوهمي زال:** سياسة كانت تحرس `employees.salary` (غير موجود) بينما `monthly_salary` مكشوف — حُوِّلت (`2027_09_14_salary_policy_repoint.php`).
+- **تشديد الحكم:** كان `exportable || grant` فصار **عطفًا** `$eligible && $exportPermitted` (`FieldGovernor.php:381-384`).
+- **`gov_field_class` (630) يحكم العرض فعلًا** — `includes/u13_screen_kit.php:46-69` ثم `:66` «بلا صنفٍ = لا يُصيَّر»، مستهلَكة من **41 شاشة إنتاج** (16 `Audit/iaf_*` · 7 `Finance/ob_*` · 7 `ctrl_*` · 5 `acc_*` · 4 `tre_*` · 2 `Portal/ceo_*`) — **كلها عبر العُدّة وصفرٌ منها يستعلم الجدول مباشرة**، فحوكمة العرض **نقطةٌ واحدة فعلًا** (على النقيض من حوكمة الصلاحية بقرّائها الـ72 المتفرّقين). *(تصحيح على القياس السابق الذي أغفل هذه العُدّة.)* **لكن التصدير ما زال لا يقرأ `is_sensitive`** — الشقّ المفتوح الوحيد.
+- الصف الملوّث `gov_data_classes id=61` **حُجر لا حُذف** (`active=0`) والحجر نافذ عبر `JOIN … active=1`.
 
-### CAP-18 · التصدير الموحَّد / CAP-19 · البحث العام / CAP-20 · API
-- **Excel** (`/excel.php` + ExcelRegistry): جلسة → عزل مساحة (SCOPE-403) → `authorize` → حجب أعمدة → عزل شركة → سجل تصدير. فشل مغلق مضاعف (غياب طبقة الصلاحيات = 500 ممنوع).
-- **البحث العام** (`main/global_search.php`): 11 كيانًا (لا 9)؛ **الفحص قبل الاستعلام** — ما لا يُملك لا يُستعلم عنه؛ عزل مساحة قبله. لا فحص حقول حساسة (النطاق ضيق بنيويًّا — حماية بالمصادفة). عيب: `gs_can_open` تعيد `true` للشاشة غير المسجَّلة (اتجاه فتح يناقض `_deny_all_permissions`).
-- **API** (`api/`): Bearer بـsha256 ضد `api_tokens`، فحص صلاحية `api/bootstrap.php:466`، معفى من CSRF (سليم بالتوكن). **صفر حجب حقول حساسة وصفر عزل مساحة** (GAP-13). `Access-Control-Allow-Origin: *` مقبول حاليًا وخطِر لو أُضيف توثيق كوكي.
+### CAP-18/19/20 · التصدير · البحث · API
+- **Excel:** جلسة → عزل مساحة → `authorize` → حجب أعمدة **قبل SELECT** → عزل شركة → `gov_export_log`. فشل مغلق مضاعف.
+- **البحث العام:** 11 كيانًا؛ الفحص قبل الاستعلام. **`gs_can_open` صارت fail-closed** (`main/global_search.php:79`: الشاشة غير المسجَّلة لا تُفتح) + عزل مساحة `:92-104`.
+- **API — أُغلق:** حجب قيم `api_sensitive_value()` (`api/bootstrap.php:493`) في 4 متحكمات + نطاق شركة (`:415-425`) + CORS بقائمة أصول معلنة ودالة نقية (`api_cors_origin`, `:530-548`) وحارس يزيل `Allow-Credentials` مع `*`. شاهد سلبي: «غير المخوَّل يُرجَع له `••••••5678`».
 
-### CAP-21..29 · محركات النطاقات (موجزة — تفاصيلها في وثائقها)
-| المحرك | SoT | الحالة المقيسة |
-|---|---|---|
-| Timesheet/الدوام | `timesheet` + `TimesheetEntryService` + خطاف `timesheet_event_hook.php` | **المصدر شبه الوحيد للمالية** (98.9٪ من الأحداث المالية) |
-| العقود | `contracts` + آلة حالة 12 (H-02) + `ContractStateMachine` | حي؛ ينشر حقائق تغيّر الحالة |
-| المشتريات/RFQ | `proc_*` (16 جدولًا) + `RFQService` | حي؛ rfq_award موقَّع بـAuthorityGuard (21 توقيعًا) |
-| الصيانة | `mnt_*` (11) | ينشر لكن **2 واقعتان فقط** — التكاليف لا تمر بالأحداث عمليًّا |
-| النقل | `trs_`/`transfer_*` (11) | **صفر واقعة حدث** — يكتب في جداوله مباشرة (مسار أحداث غير موصول) |
-| المخاطر | `risk_*` (17) + RiskEvents (M-16) | حقائق محايدة بلا إسقاط مالي — **مقصود موثَّق** (RK-06) |
-| السعة | `capacity_*` + صادر مستقل `capacity_outbox` | **مسار موازٍ ثالث** خارج الناقل الرئيس |
-| التذاكر | `ticket_*` (17) + تصعيد خاص `ticket_escalation_rules` | حي بمحرك تصعيد مستقل |
-| الحوكمة | `gov_*` (44 جدولًا) | سجلات حاكمة للقياس والملكية والقوالب — بعضها إنفاذ وبعضها توثيق (انظر §4) |
+### CAP-30 · سجلات الأحكام (طبقة مستجدّة — **سلطة معلنة بلا نفاذ**)
+ثمانية سجلات أنشأتها الجولتان لتحويل القرار الضمني إلى حكم مكتوب بـ`decided_at`/`decided_by` وقابلية نقض (`--revert`):
+`gov_event_rulings`(58) · `gov_ownership_rulings`(259) · `gov_path_rulings`(6) · `gov_finance_gate_policy`(9) · `gov_dead_letter_rulings`(2) · `gov_delegation_state`(5) · `gov_sensitive_policy_debt`(6) · `gov_topbar_exemptions`(2).
+**الحالة:** `gov_ownership_rulings` وحده له أثر مقيس (التعارض 126→13). والبقية **تُقرأ من الهجرات والفواحص فقط** — لا شاشة ولا خدمة ولا كرون يستشيرها (GAP-51). فهي **توثيق في قاعدة بيانات لا سلطة نافذة**: لا حارس يقارنها بالواقع ليُنذر حين ينحرف الحكم عن القياس.
+
+### CAP-21..29 · محركات النطاقات
+| المحرك | الحالة المقيسة الآن |
+|---|---|
+| Timesheet | المصدر شبه الوحيد للمالية (98.89٪ من روابط الأثر) |
+| العقود | آلة 12 حالة حية · `contract` صار له سلّم (LD-14) |
+| المشتريات/RFQ | حي · rfq_award موقَّع |
+| الصيانة | واقعتان فقط — التكاليف لا تمر بالأحداث عمليًّا |
+| النقل | **صفر واقعة حدث** — خارج الناقل كليًّا |
+| المخاطر | حقائق محايدة بلا إسقاط — مقصود (RK-06) |
+| السعة | صادر مستقل `capacity_outbox` — مسار موازٍ ثالث |
+| التذاكر | تصعيد مستقل حي (`ticket_escalation_rules`) |
+| الحوكمة | **56 جدولًا** (كان 44) — أغلب الزيادة سجلات أحكام |
 
 ---
 
 ## §3 الفصل الإلزامي: Decision / Implementation / Evidence
 
-| القدرة | Decision (القرار محسوم؟) | Implementation (الكود منفَّذ؟) | Evidence (مثبت على الحي؟) | الحكم |
+| القدرة | Decision | Implementation | Evidence | الحكم |
 |---|---|---|---|---|
-| عزل المستأجر | ✔ ADR-02 | ✔ بوابة 7 فحوص enforce | ✔ حزام سلبي + رفض حي مقيس | **Closed** |
-| حارس الأفعال | ✔ ADR-06 | ✔ enforce | ✔ 403 حي؛ لكن 113/465 فعلًا guard_verified | Closed مع دين توثيق |
-| ناقل الأحداث ENG-01 | ✔ ADR-15 | ✔ ناشر واحد + طابور + DLQ | ✔ 21,284 واقعة، 99.88٪ تسليم | Closed **بنيةً** — لكن انظر السطر التالي |
-| استهلاك الأحداث بالأعمال | ✔ (مبدأ «لا حدث بلا مستهلك») | ✘ 0 مستهلك أعمال من 58 نوعًا | ✘ | **Open — GAP-05** |
-| سلالم الاعتماد الحاكمة | ✔ LAD-01 (13 سلّمًا) | ✔ جداول+منظر جسر | ✘ **صفر تقاطع مفاتيح؛ 14/14 رحلة ladder_wired=0** | **Open — GAP-01** |
-| التفويض | ✔ GOV-AUTH-01 | ◐ جداول+قوادح بلا كود مستهلك | ✘ صفر صف، صفر منحة delegation | **Built-not-wired — GAP-03** |
-| القيد المزدوج | ✔ | ✔ PostingService+CHECK | ✔ توازن 0.00 على 13,426 سطرًا | **Closed** |
-| بوابة D-05 | ✔ | ✔ 11 ملفًا | ✘ 1/5,256 حدثًا عبرها | **Open — GAP-15** |
-| الإقفال الشهري | ✔ | ✔ فترات+قفل ترحيل | ◐ يعمل؛ صفر فترة `locked` حتى الآن | Implemented-not-fully-exercised |
-| الحقول الحساسة | ✔ SEN-001.. | ◐ 3 آليات منفصلة | ◐ 15/34 داخل الإنفاذ فقط | **Open — GAP-10/12** |
-| الشاشات الذهبية | ✔ (10 شاشات مختارة) | ✔ سجل `gov_golden_approvals` | ✘ **10/10 حالتها pending** | **Open — GAP-23** |
-| التسعير اليومي | ✔ قرار مالك 2026-08-12 | ✔ شاشة+خدمة+قيود | ✔ 9 قراءات + قيود فريدة حية | Closed |
+| عزل المستأجر | ✔ | ✔ enforce | ✔ حزام سلبي | **Closed** |
+| حارس الأفعال | ✔ | ✔ enforce | ◐ 82/465 فعلًا guard_verified | Closed مع دين توثيق |
+| ناقل الأحداث (بنية) | ✔ | ✔ | ✔ 21,285 واقعة · **صفر تسليم يتيم** · FK CASCADE | **Closed** |
+| استهلاك الأحداث بالأعمال | ✔ (حُكم: 11 business / 47 audit) | ✘ صفر مستهلك أعمال منتِج | ✘ | **Open — GAP-05** |
+| إنذار توقف المستهلكين | ✔ | ✔ مكتوب ومبرهَن | ✘ **غير موصول بالمجدول** | **Built-not-wired** |
+| سلالم الاعتماد | ✔ | ✔ جسر مفتاح + LD-14..17 | ◐ تقاطع 3 · **14/14 رحلة غير موصولة** · الاحتياط باقٍ | **Partially Open — GAP-01** |
+| قفل المسار القديم | ✔ | ✔ CHECK | ✔ مُجرَّب حيًّا | **Closed** |
+| التفويض | ✔ (قرار: لا يُتقاعد بلا مالك) | ◐ | ✘ صفر صف · صفر منحة delegation | Built-not-wired — GAP-03 |
+| القيد المزدوج | ✔ | ✔ | ✔ فرق 0.00 | **Closed** |
+| بوابة D-05 | ✔ (سياسة معلنة) | ✔ | ✘ 0.019٪ | Open — GAP-15 |
+| الحقول الحساسة | ✔ | ✔ ثلاث آليات + اتحاد قاموسين | ✔ **34/34 · شاهد 15 نجاح/0 رسوب** | **Closed** |
+| عزل API | ✔ | ✔ | ✔ شاهد سلبي 8/0 | **Closed** |
+| توحيد نقطة قرار الصلاحية | ◐ (مؤجَّل بقرار) | ✘ | ✔ مقيس 72 ومجمَّد | **Open — GAP-11** |
+| الشاشات الذهبية | ✔ | ✔ سجل | ✘ **10/10 pending** | Open — GAP-23 |
+| توحيد المجدول | ✔ | ✔ | ✔ 8/8 على 8.2.30 | **Closed** |
 
 ---
 
 ## §4 خريطة البيانات
 
-**الأرقام الحاكمة:** 603 جداول أساس + 25 منظرًا · 478 جدولًا بعمود `company_id` (والمنظر لا «يُعزل» — عزله عزل جدوله) · FK 292 · CHECK 308 · UNIQUE 384 · **Triggers صفر مرئي للمستخدم `ems_app` — لكن قوادح موجودة فعلًا** (منها `trg_approval_rules_retired`، `trg_delivery_backoff`، `trg_deleg_no_relay`، `trg_grant_issuer`) والامتياز يحجبها عن `information_schema.TRIGGERS` (گوتشا M-00 الموثقة: جسّ وظيفيًّا).
+**الأرقام:** 618 جدول أساس + 25 منظرًا · **481** بعمود `company_id` · FK **293** · CHECK **320** · UNIQUE **394** · Triggers **صفر مرئية للمستخدم `ems_app`** وهي موجودة فعلًا (امتياز يحجبها — تُقاس وظيفيًّا).
 
-### المجموعات بملكية الكتابة والقراءة
-
-| المجموعة (بادئة) | جداول | من يكتب | من يقرأ | العزل | ملاحظات القيود |
+| المجموعة | جداول | من يكتب | من يقرأ | العزل | القيود البارزة |
 |---|---|---|---|---|---|
-| مالية `fin_` | 89 (88 مأهولًا · فارغ وحيد: `fin_maint_provisions`) | EventPublisher/PostingService/خدمات المالية + 6 كتّاب مباشرون لـ`fin_dues` | شاشات المالية + موزّع K4 | company_id | `ck_je_balanced` · `ck_ffe_fx_pair` · `uq_ffe_idempotency` — **~35 جدولًا بحجم 20 صفًّا = بذور UAT لا حركة** |
-| حوكمة `gov_` | 44 | أدوات البذر/الترحيل + خدمات الحوكمة | الحراس + شاشات gov + هذه الحزمة | company_id=0 عام غالبًا | `chk_no_single_hand` · `chk_temp_has_end` · قوادح التفويض |
+| مالية `fin_` | 89 (88 مأهول · الفارغ الوحيد `fin_maint_provisions`) | EventPublisher/PostingService + 6 كتّاب مباشرين لـ`fin_dues` | شاشات المالية + موزّع K4 | company_id | `ck_je_balanced` · `ck_ffe_fx_pair` · `uq_ffe_idempotency` — **35 جدولًا بحجم 20 صفًّا = بذور UAT** |
+| حوكمة `gov_` | **56** (كان 44) | أدوات الترحيل + خدمات الحوكمة | الحراس + شاشات gov + هذه الحزمة | company_id=0 غالبًا | `chk_no_single_hand` · قوادح التفويض |
+| **سجلات الأحكام (جديدة)** | `gov_event_rulings`(58) · `gov_ownership_rulings`(259) · `gov_path_rulings`(6) · `gov_dead_letter_rulings`(2) · `gov_finance_gate_policy`(9) · `gov_delegation_state`(5) · `gov_sensitive_policy_debt`(6) · `gov_topbar_exemptions`(2) | هجرات الجولتين | **⚠ أغلبها بلا قارئ إنتاج** — تُقرأ من الهجرات والفواحص فقط | — | — |
+| **أرشيفات العزل (جديدة)** | `gov_test_residue_archive`(4,397) · `gov_key_pollution_archive`(68) · `ems_event_delivery_orphans`(82) | هجرات الكنس | مراجعة | — | — |
 | شاشات مرحّلة `scr_` | 42 (كلها ~20 صفًّا) | شاشات CMP-03 | شاشاتها | company_id | **بيانات UAT — «مأهول» ≠ «مستعمل»** |
-| عقود `contract_` | 20 | خدمات Contract | مبيعات/مالية/تشغيل | company_id | ENUM 12 حالة · قيود التسعير الفريدة |
-| مخاطر `risk_` (17) · تذاكر `ticket_` (17) · مشتريات `proc_` (16) · موردون `supplier_` (13) · صيانة `mnt_` (11) · نقل `transfer_` (11) · قوى عاملة `worker_`/`employee_`/`payroll_` (23) | — | خدمات نطاقاتها | نطاقاتها + المالية عبر الأحداث/المباشر | company_id | — |
-| تنقّل `nav_`/link_groups/modules | 16+ | أدوات البذر + شاشة admin | unified_nav وقت الطلب | بالدور | `chk_nav_door` · `chk_nav_route_not_relative` |
-| أحداث `ems_business_events`/deliveries/consumers | 5 + منظران | EventPublisher/Worker حصرًا | governance_watch + شاشات المراقبة | company_id | `chk_consumers>0` · `json_valid(payload)` · بصمة تسليم SHA2 في القاعدة |
-| اعتماد قديم `approval_*` (7) | | الشاشات الموروثة | شاشاتها | مصنَّفة T_RESTRICTED | `trg_approval_rules_retired` يرفض الكتابة في القواعد |
-| صلاحيات users/roles/role_permissions/gov_profile_items/permission_ (8) | | admin/permissions + بذر القوالب | كل حارس | — | — |
-| Audit: activity_logs · sensitive_read_log · gov_export_log · security_log · login_attempts | | البوابة والحراس (append-only عمليًّا) | شاشات الأمن | company_id | مستثناة من تدقيق ذاتها (`$AUDIT_SKIP`) |
-| **متقاعد/قديم** | `approval_workflow_rules` (مقفل بقادح) · `ems_event_dead_letter` (0) · `nav_items.door`+`sort_order` (يُقرآن ولا يقرّران) · `link_groups.stage_no` · `modules`+`dynamic_nav` (للسوبر فقط) · `scr_monthly_close` | — | — | — | GAP-24 وأخواتها |
-
-### العلاقات المفتاحية (عملية لا ERD-كامل)
-- `users.role_id→roles` · `users.employee_id UNIQUE→employees` · `users.project_id` (نطاق الدورين 5/6).
-- `ems_business_events ←root_event_id— fin_financial_events —event_id→ fin_journal_entries` · `fin_event_links(parent_kind,parent_ref)→` مصادر متعددة الأشكال (timesheet/unit_record/event/request).
-- `gov_authority_grants.profile_id→gov_role_profiles→gov_profile_items(item_ref=route)`.
-- `nav_items(role_id,route)` ↔ `nav_canonical(route)` ↔ `nav_route_group(route)` ↔ `gov_space_appearances(route,space)`.
-- الدفتران التوثيقيان للشاشات: `gov_migration_ledger(663)` ↔ `gov_screen_cycle(663)` **بتناظر معرّفات 1:1 مثبت 663/663**.
+| عقود/مخاطر/تذاكر/مشتريات/موردون/صيانة/نقل/قوى عاملة | 20/17/17/16/13/11/11/23 | خدمات نطاقاتها | نطاقاتها + المالية | company_id | — |
+| تنقّل | `nav_*`(16) + `link_groups` + `modules` + **`gov_nav_reference_standard`(17)** + **`gov_nav_stage_bridge`(111)** | بذر + admin | unified_nav وقت الطلب | بالدور | `chk_nav_door` · `chk_nav_route_not_relative` |
+| أحداث | `ems_business_events`(21,285) + `ems_event_deliveries`(21,295) + `event_consumers`(91) + منظران | EventPublisher/Worker حصرًا | governance_watch + شاشات المراقبة | company_id | `chk_consumers>0` · `json_valid` · **`fk_evdeliv_event` CASCADE (جديد)** |
+| اعتماد | `approval_*`(7) + `gov_ladder*`(4) | الشاشات + الخدمات | شاشاتها | T_RESTRICTED | **`chk_awr_legacy_write_blocked` (جديد)** |
+| صلاحيات | users/roles/role_permissions/gov_profile_items/permission_* | admin + بذر القوالب | كل حارس | — | — |
+| Audit | activity_logs · sensitive_read_log · gov_export_log · security_log · login_attempts | البوابة والحراس | شاشات الأمن | company_id | مستثناة من تدقيق ذاتها |
+| **متقاعد** | `approval_workflow_rules` (مقفل بقيد) · `ems_event_dead_letter` (0 أبدًا) · `nav_items.door/sort_order` · `link_groups.stage_no` · `scr_monthly_close` | — | — | — | — |
 
 ---
 
-## §5 معمارية الصلاحيات والعزل (السلسلة الكاملة)
+## §5 معمارية الصلاحيات والعزل
 
-**User → Role → Permission → Department Scope → Record Scope → Field Scope → Action** — أين يقع كل فحص:
+**User → Role → Permission → Department Scope → Record Scope → Field Scope → Action**
 
-| الطبقة | أين | متى | الدليل |
+| الطبقة | أين | متى | ملاحظة |
 |---|---|---|---|
-| الجلسة | رأس كل شاشة | قبل كل شيء | `Contracts/contracts.php:4-7` |
-| بوابة الشركة | الشاشة | قبل الصلاحية | `contracts.php:24-27` (GOV-SCOPE-403) |
-| صلاحية العرض | `check_page_permissions` أو `enforce_current_page_view_permission` — **نداء الشاشة نفسها، لا ضمني** | قبل التصيير | `permissions_helper.php:554/764` — شاشة تنسى النداء لا يحرسها إلا فحصها اليدوي |
-| صلاحية الكتابة | `ems_enforce_write_permission` | **قبل** الكتابة، على مستوى الطلب POST | `permissions_helper.php:919-1026` |
-| فعل AJAX | سلسلة config الثلاثية | قبل وصول المعالج | `config.php:466-481` |
-| نطاق السجل (شركة) | `TenantDb.scopedQuery` | حقن `company_id=?` بنيويًّا | `TenantDb.php:652` |
-| نطاق السجل (إدارة/مشروع) | `fin_project_scope` (5,6 — fail-closed: أي فشل=−1=صفر صف) / `fin_party_scope` (**fail-open للدور الجديد** — GAP-22) | داخل الخدمة | `fin_helpers.php:100-140` |
-| نطاق الحقل | 3 آليات (CAP-17) | عرض/تصدير/تحرير | — |
-| الفعل | سجل `actions` + `guard_policies` (`absolute` يمنع مهما بلغت الصلاحيات) | قبل التنفيذ | `permissions_helper.php:962-1009` |
-| القاعدة | لا CHECK عزل؛ قيود نوعية (توازن القيد، عطالة، فرادة السعر اليومي، `chk_no_single_hand`) | عند الإدراج | — |
+| الجلسة | رأس كل شاشة | أولًا | — |
+| بوابة الشركة | الشاشة | قبل الصلاحية | GOV-SCOPE-403 |
+| صلاحية العرض | نداء الشاشة نفسها (`check_page_permissions` أو `enforce_current_page_view_permission`) | قبل التصيير | **ليس ضمنيًّا** — شاشة تنسى النداء لا يحرسها إلا فحصها اليدوي |
+| صلاحية الكتابة | `ems_enforce_write_permission` | **قبل** الكتابة | `guard_policies` `absolute` يمنع مهما بلغت الصلاحيات |
+| فعل AJAX | سلسلة config الثلاثية | قبل المعالج | enforce |
+| نطاق الشركة | `scopedQuery` حقن بنيوي | — | **Closed** |
+| نطاق الإدارة | `fin_project_scope` **fail-closed بقائمتين معلنتين** (`FIN_SCOPE_PROJECT_ROLES` · 16 دورًا في `FIN_SCOPE_COMPANY_ROLES`، والمجهول ⇒ `-1`) / `fin_party_scope` **ما زال fail-open** (`:167 return null`) **ومستهلَكًا حيًّا** في `Finance/dues_fin.php:256` و`Finance/payments_fin.php:287` | داخل الخدمة | GAP-22 نصفه أُغلق — **والنصف المفتوح نافذ على سطحين ماليين** |
+| نطاق الحقل | ثلاث آليات (CAP-17) — **العرض والتصدير والتحرير** | — | **Closed عدا شق التصدير من `gov_field_class`** |
+| الفعل | `actions` + `guard_policies` | قبل التنفيذ | — |
+| القاعدة | قيود نوعية (توازن · عطالة · فرادة السعر · `chk_no_single_hand` · **قفل المسار القديم**) | عند الإدراج | لا CHECK عزل على company_id |
 
-**Direct URL:** يحرسه تتابع الشاشة (جلسة→شركة→can_view) لا السايدبار؛ `nav_items.active=0` (95 صفًّا) **إخفاء لا منع**. **Export/Search/API:** كلٌّ يعيد الفحص خادميًّا ولا يثق بالشاشة (الجدول المقارن الكامل في تقرير الأسطح الأربعة أعلاه CAP-18..20). **الحقول الحساسة:** القيمة المحجوبة لا تُرسل ثم تُخفى — لا تُقرأ من القاعدة أصلًا في مسار التصدير.
+**Direct URL** يحرسه تتابع الشاشة لا السايدبار · **Export/Search/API** كلٌّ يعيد الفحص خادميًّا ولا يثق بالشاشة · **الحقول الحساسة** لا تُقرأ من القاعدة أصلًا في مسار التصدير.
 
 ---
 
 ## §6 معمارية السايدبار والتنقّل
 
-**السلسلة الفعلية** (تصحيح جوهري: المصيِّر هو `unified_nav.php` لا `dynamic_nav.php`):
-
+السلسلة كما هي (المصيِّر `unified_nav.php::printEmsTenGroupNav` لا `dynamic_nav.php`):
 ```
-$_SESSION[role] → unifiedNavEnabled(.env EMS_NAV_UNIFIED_ROLES=1..33 ⇒ كل الأدوار)
-  → getUnifiedNavItems: SELECT nav_items WHERE role_id=? AND active=1
-       AND (permission_code IS NULL OR EXISTS role_permissions.can_view=1)   ← بوابة ①
-  → SupplierPortalGuard ② → OwnershipDomainGuard (FIN, fail-closed) ③
-  → space_scope (gov_space_appearances.cls='FORBIDDEN') ④ + مخنق printNavLinkItem
-  → renderUnifiedNavigationV2 → nav_group_taxonomy(12) موجود؟ → printEmsTenGroupNav
-       التبويب: nav_route_group(472) ← استدلال nav_groups.php ← سقوط DAILY
-       الاسم:   ANCHOR ← nav_canonical(APPROVED 280/372) ← cur_label ← label_ar
-       الترتيب: taxonomy.sort_no للرؤوس · nav_canonical.sort_no للروابط
-  → الأيقونة من عمود nav_items.icon مباشرة (nav_icon_map.php مولِّد بذرٍ لا محلِّل طلب)
-  → العدّادات: counter_source (35 صفًّا/7 مفاتيح) عبر finreq_badges + قاموس مركزي
+role → nav_items(role_id, active=1, permission_code×role_permissions.can_view)
+  → SupplierPortalGuard → OwnershipDomainGuard(FIN, fail-closed) → space_scope(FORBIDDEN=204)
+  → nav_group_taxonomy(12) → printEmsTenGroupNav
+     التبويب: nav_route_group ← استدلال ← سقوط DAILY
+     الاسم:   ANCHOR ← nav_canonical(APPROVED) ← cur_label ← label_ar
+     الترتيب: taxonomy.sort_no للرؤوس · nav_canonical.sort_no للروابط
+  → الأيقونة من عمود nav_items.icon · العدّادات من counter_source
 ```
-
-- **مالك الاسم:** `nav_canonical` (لا `nav_items.label_ar`) · **مالك المجموعة:** `nav_route_group` (لا `link_groups`) · **مالك الترتيب:** `nav_canonical.sort_no` (لا `sort_order`).
-- **سقف الـ12 مجموعة:** بنيوي (`nav_group_taxonomy` = 12 صفًّا بالضبط) ومقيس (أقصى دور = 12 رأسًا).
-- **صفر روابط مكسورة من 408 مسارات نشطة** — ويحرسه `chk_nav_route_not_relative`.
-- **Legacy مسمّى صراحة:** `dynamic_nav.php`+`modules` (السوبر فقط في السايدبار؛ **حي في لوحة التحكم** — فاللوحة والسايدبار يبوّبان من سجلَّين مختلفين بمنطقَي ملكية مختلفَين، GAP-19)؛ `link_groups` يُقرأ ولا يقرّر؛ `printStageNav` وأخواتها شيفرة حية لا تُنفَّذ؛ روابط insidebar اليدوية لا تعمل إلا للسوبر — **وفيها تعليق HTML غير مغلق (`insidebar.php:352`) يبتلع رابط اعتماد الوحدات**؛ `topbar.php` تسعة مسارات مصلَّبة **خارج كل السجلات وخارج عزل المساحة**.
-- **ثقب `active=0`:** `unified_nav.php:869-893` تصطنع روابط من `nav_canonical_current` لدورين صفهما معطَّل (17 و25 — مقرّ به نصًّا).
-- **ملكية `?view=`:** سجل مركزي مصلَّب (6 ملفات/8 رموز في `nav_views.php:43-87`) — الرمز غير المعلن يُرد 302 إلى الرابط العاري (`nav_view.php:61-68`) عبر مخنق `page_header.php:149`؛ والشاشة تعلن ملكيتها الذاتية بـ`ems_nav_view_claim()`.
+- **مالك الاسم** `nav_canonical` · **مالك المجموعة** `nav_route_group` · **مالك الترتيب** `nav_canonical.sort_no`. `link_groups`/`sort_order`/`door` تُقرأ ولا تقرّر.
+- **الجديد:** `gov_nav_reference_standard` (17 مرحلة معيارية) + `gov_nav_stage_bridge` (111 جسرًا) — جسرٌ بين مراحل دورة العمل والمعيار؛ الاشتقاق **لم يُفعَّل** لأن الدفتر والسايدبار مجتمعان (الالتزام `d08ec239`).
+- **الشريط العلوي:** عشرة مسارات لا تسعة (العاشر كشفه الفاحص) — وصار له سجل إعفاءات معلن `gov_topbar_exemptions` بدل أن يكون خارج كل سجل.
+- **ثقب `active=0`** (`unified_nav.php:869-893` تصطنع روابط من `nav_canonical_current`) — عولج بشاهد `tests/injfix01_nav_disable_hole_proof.php`.
 
 ---
 
 ## §7 محرك دورة العمل والاعتماد
 
-**الجواب على «مصدر واحد أم أكثر؟»: خمسة مصادر حقيقة متزامنة** — والحي فعليًّا هو الموروث معطوبًا:
+**خمسة مصادر حقيقة متزامنة + سادس مُقفل بقيد:**
 
-| # | المصدر | الحجم | الحالة |
-|---|---|---|---|
-| 1 | `approval_requests/steps` (الموروث) | 48 طلبًا/50 خطوة (44 pending) | **الحي** — لكن بالاحتياط |
-| 2 | `approval_links` (WFM/الورقة 09) | 70 (68 approved، آخرها 2026-08-19) | حي ومستعمل (`RequestService.php:155`) |
-| 3 | `approval_signatures` (AuthorityGuard) | 154 (entitlement 132 · rfq_award 21) | حي لنوعين، Insert-only |
-| 4 | `approval_chains` (PolicyResolver — سلسلة وحدات) | 22 على 8 سياسات | حي ومنفصل تمامًا (`PolicyResolver.php:54`) |
-| 5 | `gov_approval_decisions` | 20 — **event_id NULL في 20/20** | **مبذورة لا مُنتَجة** |
+| المصدر | الحجم | الحالة |
+|---|---|---|
+| `approval_requests`/`steps` | 48 / 50 | الحي — بالاحتياط |
+| `approval_links` (RequestService) | 70 | حي |
+| `approval_signatures` (AuthorityGuard) | 155 | حي لنوعين |
+| `approval_chains` (PolicyResolver) | 22 | حي ومنفصل |
+| `gov_approval_decisions` | 20 · **event_id NULL في 20/20** | مبذورة لا مُنتَجة |
+| ~~`approval_workflow_rules`~~ | 23 · صفر نشط | **مقفل بـ`chk_awr_legacy_write_blocked`** ✔ |
 
-**المسار الحقيقي الواحد (timesheet — الأكثر جريانًا):**
+**المسار الحقيقي — ما تغيّر:**
 ```
 Timesheet/aprovment.php:85 approval_create_request('timesheet',…)
-→ approval_workflow.php:144 يقرأ المنظر v_approval_rules_effective
-   (الجسر إلى gov_ladders — migration 2027_07_12)
-→ ⚠ المنظر مفهرس بـ slug السلّم (unit_daily_approve…) والشاشات ترسل
-   entity_type تطبيقيًّا (timesheet/contract/driver/equipment) ⇒ تقاطع = 0
-→ :189-217 الاحتياط: سلّم من خطوة واحدة بدور السوبر (EMS_APPROVAL_RULES=monitor)
-   — 27 سقطة fallback_default مسجَّلة في guard_denials خلال يومين
-→ :616 توليد الخطوات (43/50 خطوة حية دورها -1 = مولَّدة من الاحتياط)
-→ :629 اعتماد تلقائي إن طابق دور المنشئ → :514 التنفيذ → UPDATE timesheet
-→ لا نشر حدثًا (صفر EventPublisher في approval_workflow.php) ولا كتابة في
-   gov_approval_decisions ولا approval_signatures
+→ approval_workflow.php:144 يقرأ v_approval_rules_effective
+→ ✔ الجسر يعمل الآن: gov_ladders اكتسب entity_type/action
+     LD-01 timesheet · LD-14 contract · LD-15 driver · LD-16 equipment · LD-17 deduction
+     ⇒ التقاطع 3 (لا 0): contract · scr_deductions · timesheet
+     ⇒ صفر سقطة fallback على timesheet منذ 2026-08-13 (الـ27 مجمَّدة)
+→ ✘ الاحتياط ما زال قائمًا حرفًا (:186-217) و.env: EMS_APPROVAL_RULES=monitor
+     ⇒ أي مفتاح غير معروف (مثل project — لا سلّم له) يسقط لسلّم السوبر بخطوة
+→ ✘ 43/50 خطوة role_required=-1 (أثر تاريخي لم يُكنس) · 44 معلَّقة أقدمها 2025-08-24
 ```
-- **ما يُفحص فعلًا:** مطابقة الدور (`FIND_IN_SET`) + «لا يد تمشي خطوتين» (INJ-0219، `:708-720`) + حارس اعتماد الذات في `approval_api.php`. **ما لا يُفحص:** `gov_authority_grants/limits` لا تُستشار؛ السقف `cap_amount` يُقرأ في المنظر و**يُسقَط** (`:156-159`)؛ 6 سلالم `cap_state=unresolved` والوثيقة تقول «السقف غير المحسوم يوقف السلّم» ولا كود يفرض الإيقاف.
-- **الرحلات:** `gov_journey_ladders` 14/14 صفًّا `ladder_wired=0` بنص gap_note موحَّد: «الشاشة تقود الخطوة ولا تقرأ سلّمها». الشاشات القائدة كلها موجودة وحية في التنقّل.
-- **التصعيد:** `gov_ladders.escalate_after_hours` (24/48/72) **بلا معالج إطلاقًا**؛ التصعيد الحي الوحيد: `fin_requests.escalation_level` (`cron_requests.php:79-101`) والتذاكر (`ticket_escalation_rules`). و44 خطوة pending (أقدمها 2024) بلا آلية نبش.
-- **القديم مقفل للقراءة مفتوح للكتابة الميتة:** `trg_approval_rules_retired` يرفض الإدراج في `approval_workflow_rules`، و4 ملفات إنتاج ما زالت تحاول `INSERT IGNORE` فيها فتُبتلع بصمت (`movement/save_equipment_drivers.php:76`، `Oprators/oprators.php:206`، `move_oprators.php:238`، `delete_equipment_driver.php:62`).
-- **الاختبار الحارس `tests/ladder_engine_live_test.php` يثبت البنية لا الجريان** — يشتق حالته من المنظر نفسه فالمطابقة مضمونة بالإنشاء؛ ولا اختبار في `tests/` يمس مسار الاحتياط وهو المسار الفعلي 100٪.
-
-⇒ **GAP-01 (أعلى خطورة معمارية):** إصلاحه مفتاح واحد من جهتين — إما بذر `gov_ladders.slug` بأنواع الكيانات التطبيقية أو تمرير slug السلّم من الشاشات — ثم فرض السقف و«لا يد تمشي خطوتين» من السلّم.
+- **الرحلات:** `gov_journey_ladders` **14/14 `ladder_wired=0`** بنفس نص الفجوة — لم تتغير. عمودا `entity_type`/`action` أُضيفا وفُرِّغا عمدًا لأن موضع الربط انتقل إلى `gov_ladders`.
+- **التصعيد:** كُتب معالج حقيقي `tools/injfix01_approval_escalation_sweeper.php` (يقرأ `escalate_after_hours`، عاطل الأثر، يستثني بذر UAT) — **لكنه في `tools/` وغير مجدول** (8 مهام في `ems_job_schedule` بلا واحدة للتصعيد) ولم يُطبَّق: 44 معلَّقة كما هي.
+- **الشاهد:** أُضيف `tests/injfix01_ladder_key_intersection_proof.php` يقيس الأنواع المنتَجة **من الشيفرة الحية لا من الجدول** ويرفض صيغة «أكبر من صفر» ويُعلن رسوبه المتوقَّع. **لكن لا شاهد يمرّر طلبًا حيًّا عبر خطوتَي سلّم** ⇒ الجريان الحقيقي بلا شاهد.
+- **التفويض:** `gov_delegations` صفر صف · `gov_authority_grants` 77/77 `source='profile'` · قارئ إنتاج واحد. و`gov_delegation_state` (5 صفوف) **يُعلن الحالة مقيسةً** وينصّ: «لا يُقرَّر تقاعدُ التفويض — تقاعدُ قدرةِ عملٍ قرارُ مالكٍ لا حكمُ منفِّذ».
 
 ---
 
-## §8 معمارية الأحداث (Event Architecture)
+## §8 معمارية الأحداث
 
-- **الأنواع:** 58 مفتاحًا متمايزًا (`event_key` بصيغة `domain.entity.action`؛ **لا عمود `event_type` في الجذر** — التصنيف بـ`category`(7)+`source_module`(16)). 5 مفاتيح تُنشر من أكثر من وحدة (`source_module` ليس دالة في المفتاح).
-- **المنتجون:** 40 ملفًا/60 نقطة نشر عبر `EventPublisher` حصرًا (`publishFact` حقيقة محايدة / `publish` كتابة مزدوجة ذرّية) — **صفر إدراج مباشر** في كود الإنتاج؛ فحارس الفترة المقفلة يغطي كل منبع.
-- **التسليم:** Transactional Outbox (فتح صفوف التسليم داخل معاملة المصدر) + عامل كرون كل 5 دقائق (`JobHandlers::eventRetry` → `EventDeliveryWorker`): التقاط ذرّي بشرط WHERE، تباعد 1·4·16·64·256ث **بقادح قاعدة** `trg_delivery_backoff`، DLQ حالةً لا حذفًا (86 صفًّا)، قرار بشري إلزامي السبب (`decideDlq`)، تحرير العالق (STALE_CLAIM)، ورفض النجاح الصامت (`NO_RESULT_REF` + `chk_result`).
-- **العطالة ثلاث طبقات:** `uq_ebe_idempotency` (جذر) · `uq_ffe_idempotency` (إسقاط، مع شفاء ذاتي يربط الإسقاطات اليتيمة — بقي 3/5,256) · بصمة SHA2 للتسليم محسوبة في القاعدة. فوقها `fin_event_links` للمروحة و`ems_processed_events` احتياط.
-- **التدقيق:** `created_by` 100٪ · `payload` 100٪ صالح JSON · `idempotency_key` 100٪ · `correlation_id` ناقص في 10 · **`source_ref` فارغ في 13,312/21,284 (62.5٪)** — ونوعه `varchar(60)` لا TEXT (سقف بتر محتمل).
-- **الرقمان الحاكمان:** **58 نوعًا منتَجًا / 0 نوعًا له مستهلك أعمال حقيقي** — المستهلك النشط الوحيد `governance_watch` (3 قواعد مراقبة تُنذر في `fin_notifications`؛ 21,258 تسليمًا ناجحًا أغلبها فحص بلا أثر). المستهلكون التسعة الآخرون معطَّلون أو مشتركون على 10 مفاتيح **لا تُنتج أصلًا** (اشتراكات كُتبت لمعمارية لم يُنفَّذ منتجوها).
-- **الفرق بين «الناقل موجود تقنيًّا» و«الإدارات متكاملة بالأحداث»:** البنية التحتية متينة بمستوى نادر (99.88٪ تسليم، صفر واقعة بلا صف تسليم) — **لكن لا أحد يركبها**: المستهلكون الماليون الأربعة الحقيقيون (finance/finance_routing/replay/fx) يقرؤون `fin_financial_events` عبر `EventDispatcher` القديم؛ ADR-15 منفَّذ على الكتابة لا القراءة.
-- **أعطال حية:** fx متوقف منذ 2026-08-12 متأخرًا 11,372 صفًّا بلا إنذار توقف يغطيه (GAP-07) · 60 صف تسليم يتيم `NO_EVENT` ينقض وعد الذرّية (GAP-08) · 20 صف تسليم ملوث بنصوص UAT عربية في `consumer_key` ميتة صامتة (GAP-09) · FQCN خاطئ في السجل (GAP-09).
+- **الأنواع:** 58 مفتاحًا (`event_key` + `category`(7) + `source_module`(16)) — **كلها محكومة الآن** في `gov_event_rulings`: **11 `business`** (المعيار: `in_projection=1` أي تبلغ `fin_financial_events`) و**47 `audit`**، بقرار مالك موثَّق. التغطية **11/58 = 19٪**.
+- **المنتجون:** `EventPublisher` نقطة خنق وحيدة — صفر إدراج مباشر.
+- **المستهلكون — البسط ما زال صفرًا:** **0 / 58** نوعًا له مستهلك أعمال نشط. المشتركون النشطون غير الحارس **4 فقط** وكلهم على مفاتيح **لا تُنتَج أصلًا**. و`governance_watch` اتّسع **68 → 70** مفتاحًا فيُشبع `assertHasConsumer` وحده. المفاتيح المشترَك عليها ولا تُنتج: **16** (كانت 10).
+- **⚠ العطب استُنسخ:** `gov_event_rulings` نفسه **بلا قارئ في الإنتاج** — قرّاؤه هجرتان وأداة قياس وفاحصان. و`handler_class` فيه = `GovernanceWatchConsumer` للـ58 جميعًا: السجل يوثّق الحارس لا مستهلك أعمال.
+- **التسليم:** Outbox معاملاتي + عامل كل 5 دقائق · تباعد 1·4·16·64·256ث بقادح قاعدة · DLQ حالةً لا حذفًا.
+- **الأيتام — أُغلقت:** 60 تسليمًا `NO_EVENT` → **0**، بأرشفة 82 صفًّا في `ems_event_delivery_orphans` ثم **قيد مرجعي `fk_evdeliv_event ON DELETE CASCADE**` (اختير CASCADE عمدًا: «وقيدٌ يُنزع ليس قيدًا»). DLQ: 86 → **26** (25 `CONSUMER_RETIRED` + 1 `NO_SUB`).
+- **التلوّث — نصف إصلاح:** `consumer_key` العربي 20 → **10** (الحجر حيَّد عمود `consumer` وحده وترك `consumer_key`).
+- **التدقيق:** `created_by` 100٪ · `payload` 100٪ · `idempotency_key` 100٪ · **`source_ref` فارغ في 62.54٪** (13,312/21,285) بلا حركة.
 
 ---
 
-## §9 خريطة أثر التغيير (Architecture Change Impact Map)
+## §9 خريطة أثر التغيير
 
-| لو أردنا تغيير | أين نعدّل (بالترتيب) | من يتأثر | الاختبارات اللازمة | الخطر |
+| لو أردنا تغيير | أين نعدّل (بالترتيب) | من يتأثر | الاختبارات | الخطر |
 |---|---|---|---|---|
-| **ظهور شاشة/حقل بين إدارتين** | ① ملكية الشاشة: `gov_ownership_rulings` (الحكم الأعلى) / `gov_space_appearances.cls` ② التنقّل: `nav_items` (الدور المستهدف) + `nav_route_group` + `nav_canonical` ③ الصلاحية: **قوالب `gov_profile_items` أولًا** (تحكم 97٪) ثم `role_permissions` (القائمة والأزرار) ④ إسقاط الحقل: `gov_field_class` + `scr_sensitive_fields` (بحالة «معتمد» حصرًا) ⑤ التصدير: ExcelRegistry (يتبع ④ آليًّا) ⑥ البحث: يتبع can_open ⑦ API: **لا حجب حقول — فجوة يجب سدّها قبل الاعتماد عليه** | الدوران المعنيان + كل مساحة يظهر فيها المسار (`spaces_count`) | `tests/nav_view_ownership_test.php` · حزام space_scope السلبي · اختبار can_view للدورين · فحص التصدير بعمود محجوب | متوسط — **الفخ:** تعديل `role_permissions` وحده لا يغيّر دخول محكومي القوالب |
-| **«مدير التشغيل لا يرى سعر الوحدة»** (مثال إلزامي) | منع الحقل: صف في `scr_sensitive_fields` بحالة **«معتمد»** حرفيًّا (وإلا خارج الإنفاذ — GAP-10) + `from_visible_to` بلا دوره · منع الشاشة عرضًا: `ems_may_see_field` في الشاشة (إن لم تكن من الست المتبنية — أضف النداء) · منع التصدير: يتبع آليًّا (`ExcelService.php:243` يحجب قبل SELECT) · منع البحث: النطاق الحالي لا يخرج أسعارًا (بنيويًّا) · **API: غير محمي — لا تفتح كيان الأسعار فيه** | شاشات الوحدات/العقود/التقارير التي تعرض السعر (ابحث بـFIELD_REGISTRY عن التسمية) | تصدير الكيان بحساب دور 1 والتحقق من غياب العمود + `sensitive_read_log` | متوسط |
-| **تغيير سلّم اعتماد** | `gov_ladders`/`gov_ladder_steps`/`gov_ladder_actor_roles` — **لكن انتبه: السلالم غير موصولة (GAP-01)؛ التغيير الفعّال اليوم في كود الشاشة القائدة نفسها** أو في `approval_chains` لسلسلة الوحدات | الشاشات القائدة الثماني في `gov_journey_ladders.driver_route` | `ladder_engine_live_test` (بنية) + اختبار جريان حقيقي بكيان تطبيقي (غير موجود — يجب كتابته) | **عالٍ** — تعديل السلّم وحده لن يغيّر السلوك |
-| **إضافة حالة لآلة عقد** | ENUM في `contracts.status` (هجرة بعميل utf8mb4) + قائمة السماح في `ContractStateMachine` + `pause_state_before` | مبيعات/مالية/تشغيل + أي مؤشر يستعلم الحالة | اختبار آلة الحالة + فحص المؤشرات ضد ENUM | متوسط |
-| **تعديل عقد (بنود/تسعير)** | `contract_*` + `ContractStateMachine`/خدمات Contract + الإسقاط الحتمي في `contract_amendments` (مرّر company_id للسوبر) | المالية (أثر) + الالتزامات + التقارير | حزام Contract + إعادة بناء الإسقاط | متوسط |
-| **إضافة Event جديد** | ① سجّل مشتركًا في `event_consumers` **قبل** النشر (وإلا `BUS_NO_CONSUMER` يرمي) ② المفتاح بصيغة `domain.entity.action` وcategory/source من القوائم (`EventPublisher.php:67-77`) ③ الناشر عبر `publishFact/publish` حصرًا ④ إن أردت أثرًا ماليًّا: مدخل في مصفوفة `PostingService.php:44-51` (مصلَّبة) | الناقل + المالية إن كان بأثر | بذر واقعة والتحقق من التسليم والقيد | منخفض بنية/عالٍ إن ظُن أن مستهلكًا سيلتقطه تلقائيًّا (لن يفعل — GAP-05) |
-| **إضافة شاشة** | ① الملف بنمط الحراسة القياسي (جلسة→config→شركة→can_view) أو ببيان U13 ② `modules` + `role_permissions` أو بند قالب `gov_profile_items` ③ `nav_items` للأدوار + `nav_canonical`+`nav_route_group` ④ `gov_space_appearances` (وإلا «الغياب ليس منعًا» يفتحها لكل مساحة) ⑤ تسجيل أفعالها في `actions` إن كان لها POST/AJAX ⑥ الدفتران التوثيقيان + هذا السجل | الدور المستهدف + العزل | فحص 403 لغير المخول + رابط السايدبار + الحزام السلبي | متوسط — **الفخ:** نسيان ④ يجعلها مرئية عابرة للمساحات |
-| **تعديل حقل حساس** | كما في المثال الإلزامي أعلاه + إن كان بصنف تحريري: `gov_field_class.dc_code` (يحكم التحرير) | الشاشات الست المتبنية + التصدير | تصدير + سجل الاطلاع | متوسط |
-| **تغيير تجميع/ترتيب السايدبار** | `nav_group_taxonomy` (الرؤوس) · `nav_route_group` (العضوية) · `nav_canonical.sort_no` (الترتيب) — **لا تعدّل `link_groups` أو `sort_order` فلن يتغير شيء** | كل الأدوار | مقارنة المصيَّر قبل/بعد (عدّة UXUI) | منخفض |
+| **ظهور شاشة/حقل بين إدارتين** | ① **حكم الملكية `gov_ownership_rulings`** (صار الحاكم — 259 حكمًا) ② `gov_space_appearances.cls` ③ `nav_items` + `nav_route_group` + `nav_canonical` ④ **قوالب `gov_profile_items` أولًا** (تحكم 75/78) ثم `role_permissions` (القائمة والأزرار) ⑤ `scr_sensitive_fields` **بأعمدته الثلاثة** ⑥ التصدير يتبع ⑤ آليًّا ⑦ API يتبع `api_sensitive_value` | الدوران + كل مساحة يظهر فيها المسار | `injfix01_sensitive_fields_nine_channels_proof` · `injfix02_space_classification_ratchet` · `nav_view_ownership_test` | متوسط — **الفخ:** تعديل `role_permissions` وحده لا يغيّر دخول محكومي القوالب |
+| **«مدير التشغيل لا يرى سعر الوحدة»** (المثال الإلزامي) | صف في `scr_sensitive_fields` بحالة **«معتمد»** و`exportable_flag`=«لا» و`log_views_flag`=«نعم» — **الثلاثة معًا** (رايةٌ بـ`'1'` تُقرأ «لا») · وإن لم يكن للحقل صف، يكفي `sensitive_field_policies` (الاتحاد يضيفه بـ`declared=false`) · العرض: `ems_may_see_field` في الشاشة أو صنف في `gov_field_class` لشاشات U13 · التصدير والبحث وAPI: تتبع آليًّا | شاشات الوحدات/العقود/التقارير (ابحث في 02_FIELD_REGISTRY) | تصدير الكيان بحساب الدور + `sensitive_read_log` + الشاهد التساعي | **منخفض الآن** (كان متوسطًا — المسار صار مغلقًا افتراضًا) |
+| **تغيير سلّم اعتماد** | `gov_ladders` (بمفتاح `entity_type`/`action` — صار نافذًا للأنواع الخمسة) + `gov_ladder_steps` + `gov_ladder_actor_roles` · **ولنوع بلا سلّم (مثل `project`) يسقط للاحتياط بدور السوبر** | الشاشات القائدة الثماني | `injfix01_ladder_key_intersection_proof` + **شاهد جريان حقيقي غير موجود — يجب كتابته** | **عالٍ** للأنواع غير المجسورة · متوسط للخمسة |
+| **إضافة حالة** | ENUM (هجرة بعميل utf8mb4) + قائمة السماح في آلة الحالة + `pause_state_before` | نطاقها + المؤشرات | اختبار الآلة + فحص المؤشرات ضد ENUM | متوسط |
+| **تعديل عقد** | `contract_*` + خدمات Contract + الإسقاط الحتمي | المالية + الالتزامات + التقارير | حزام Contract | متوسط |
+| **إضافة Event** | ① سجّل مشتركًا في `event_consumers` **قبل** النشر ② **سجّل حكمه في `gov_event_rulings`** (business/audit) ③ المفتاح بالصيغة والقوائم ④ لأثر مالي: مدخل في `PostingService:44-51` المصلَّبة | الناقل + المالية | بذر واقعة والتحقق من التسليم | منخفض بنية · **عالٍ إن ظُن أن مستهلكًا سيلتقطه** (لن يفعل — 0/58) |
+| **إضافة شاشة** | ① الملف بنمط الحراسة أو ببيان U13 ② `modules` + قالب/`role_permissions` ③ `nav_items` + `nav_canonical` + `nav_route_group` ④ `gov_space_appearances` (وإلا «الغياب ليس منعًا») ⑤ **حكم ملكية في `gov_ownership_rulings`** ⑥ تسجيل أفعالها في `actions` | الدور + العزل | 403 لغير المخول + رابط السايدبار + الحزام السلبي | متوسط |
+| **تغيير تجميع/ترتيب السايدبار** | `nav_group_taxonomy` · `nav_route_group` · `nav_canonical.sort_no` — **لا تعدّل `link_groups`/`sort_order`** | كل الأدوار | مقارنة المصيَّر قبل/بعد | منخفض |
 
 ---
 
-## §10 سجل الديون والفجوات (مختصر — التفصيل والأدلة في INJ-CURRENT-STATUS §4)
+## §10 سجل الديون والفجوات (موجز — التفصيل والأدلة في INJ-CURRENT-STATUS §4)
 
-| Gap_ID | الاسم | المجال | يمنع الإنتاج؟ | الأولوية |
+**المحصّلة: من 26 فجوة سابقة — 9 أُغلقت بشاهد متحقَّق · 8 جزئية · 6 مفتوحة · 2 أُغلقت بتضييق مقام أو قرار معلن بلا تغيّر تشغيلي · 1 أُعيد فتحها بالجولة نفسها. وجولة الإصلاح تملك سجلها الخاص GAP-27..33 (والملحق يحجز 34..50)، ففجوات هذا القياس الجديدة تبدأ من GAP-51.**
+
+| Gap_ID | الاسم | يمنع الإنتاج؟ | الحالة الآن | الأولوية |
 |---|---|---|---|---|
-| GAP-01 | سلالم الاعتماد غير موصولة (تقاطع مفاتيح=0؛ الاحتياط سوبر بخطوة واحدة) | اعتماد | **نعم** | P0 |
-| GAP-02 | خمسة مصادر حقيقة للاعتماد | اعتماد | نعم (حوكمة) | P0 |
-| GAP-03 | التفويض/السلطة البديلة مبنية غير موصولة | حوكمة | لا | P2 |
-| GAP-04 | لا معالج تصعيد للسلالم و44 خطوة pending بلا نبش | اعتماد | جزئيًّا | P1 |
-| GAP-05 | 58 نوع حدث/0 مستهلك أعمال | أحداث | جزئيًّا (تكامل الإدارات وهمي عبر الناقل) | P1 |
-| GAP-06 | القراءة كلها من الإسقاط لا الجذر (ADR-15 نصف منفَّذ) | أحداث | لا | P2 |
-| GAP-07 | مستهلك fx متوقف 9 أيام/متأخر 11,372 بلا إنذار | مالية | **نعم** | P0 |
-| GAP-08 | 60 تسليمًا يتيمًا NO_EVENT ينقض الذرّية | أحداث | يلزم تحقيق | P1 |
-| GAP-09 | تلوث UAT حي (deliveries.consumer_key عربي · gov_data_classes#61 · FQCN خاطئ) | جودة بيانات | نعم (نظافة إطلاق) | P1 |
-| GAP-10 | 19/34 حقلًا حساسًا خارج الإنفاذ (status='active') | أمن حقول | **نعم** | P0 |
-| GAP-11 | مساران لحقيقة الصلاحية (قوالب مقابل role_permissions) | صلاحيات | جزئيًّا | P1 |
-| GAP-12 | gov_field_class (630) لا يحكم قراءة/تصدير | أمن حقول | لا | P2 |
-| GAP-13 | API بلا حجب حقول ولا عزل مساحة | أمن | نعم إن فُتح API خارجيًّا | P1 |
-| GAP-14 | `$verb` قبل تعريفه في action_guard.php:232 | كود | لا | P2 |
-| GAP-15 | بوابة D-05 متجاوَزة (1/5,256) | مالية | لا (قرار معماري مطلوب) | P2 |
-| GAP-16 | ابتلاع فشل الذمة في SettlementService:630 | مالية | نعم | P1 |
-| GAP-17 | 3 إصدارات PHP بالمجدول + proc_replenish غير مجدول | تشغيل | نعم (اتساق) | P1 |
-| GAP-18 | 35 هجرة مطبقة خارج دفتر schema_migrations | قاعدة | نعم (قابلية إعادة البناء عن بعد) | P1 |
-| GAP-19 | ازدواج تبويب اللوحة/السايدبار + ثقب active=0 + تعليق insidebar غير مغلق | تنقّل | لا | P2 |
-| GAP-20 | 63 شاشة قرص خارج كل السجلات · 126 تعارض ملكية · شاشات UNKNOWN المالك | سجل الشاشات | نعم (حوكمة) | P1 |
-| GAP-21 | 336/582 جدول شاشة بلا أسماء تقنية موثقة (NEEDS_REVIEW) | توثيق | لا | P3 |
-| GAP-22 | fin_party_scope يفتح افتراضيًّا للدور الجديد | صلاحيات | جزئيًّا | P2 |
-| GAP-23 | الشاشات الذهبية 10/10 pending بلا اعتماد | UX/حوكمة | نعم (بند اعتماد) | P1 |
-| GAP-24 | ازدواج الإقفال (scr_monthly_close الوهمي مقابل fin_financial_periods) | مالية | لا | P3 |
-| GAP-25 | fin_fx_rates أربعة أسعار فقط | مالية | نعم لتعدد العملات فعليًّا | P1 |
-| GAP-26 | تعديل CSS غير ملتزم ولا مسجل في gov_component_versions (بصمة الشجرة ≠ ux-1.4.0) | إصدار واجهة | لا | P2 |
+| GAP-01 | سلالم الاعتماد: الجسر بُني والرحلات 14/14 غير موصولة والاحتياط باقٍ | نعم | **جزئي** | P0 |
+| GAP-02 | خمسة مصادر حقيقة اعتماد | نعم (حوكمة) | مفتوح (سادس أُقفل) | P1 |
+| GAP-03 | التفويض مبني غير موصول | لا | مفتوح بقرار معلن | P2 |
+| GAP-04 | التصعيد: معالج مكتوب غير مجدول · 44 معلَّقة | جزئيًّا | **جزئي** | P1 |
+| GAP-05 | 58 نوعًا / 0 مستهلك أعمال | جزئيًّا | مفتوح (محكوم الآن) | P1 |
+| GAP-06 | القراءة من الإسقاط لا الجذر | لا | مفتوح | P2 |
+| GAP-07 | `fx` متوقف · والإنذار الجديد غير موصول | **نعم** | مفتوح | P0 |
+| GAP-08 | 60 تسليمًا يتيمًا | — | **مُغلق** ✔ | — |
+| GAP-09 | تلوث UAT حي | نعم | **جزئي** (10 باقية · 68 محجورة · 4,397 مؤرشفة) | P1 |
+| GAP-10 | حقول حساسة خارج الإنفاذ | — | **مُغلق** ✔ 34/34 | — |
+| GAP-11 | مساران لحقيقة الصلاحية | جزئيًّا | مفتوح مجمَّد (72) | P1 |
+| GAP-12 | `gov_field_class` بلا أثر | لا | **جزئي** (يحكم العرض · التصدير لا) | P2 |
+| GAP-13 | API بلا حجب ولا عزل | — | **مُغلق** ✔ | — |
+| GAP-14 | `$verb` قبل تعريفه | لا | مفتوح | P3 |
+| GAP-15 | بوابة D-05 متجاوَزة | لا | أُعيد تعريفها قرارًا | P2 |
+| GAP-16 | ابتلاع فشل الذمة | — | **مُغلق** ✔ | — |
+| GAP-17 | ثلاثة إصدارات PHP + مهمة غير مجدولة | — | **مُغلق** ✔ | — |
+| GAP-18 | هجرات خارج الدفتر | نعم | **تكرّر**: الـ35 قُيِّدت و**15 جديدة خارجه** | P1 |
+| GAP-19 | ازدواج التبويب وثقب `active=0` | لا | **جزئي** | P2 |
+| GAP-20 | شاشات خارج السجلات وتعارض ملكية | نعم (حوكمة) | **جزئي**: التعارض 126→13 · المالك المجهول 213→112 · 62 خارج السجلات | P1 |
+| GAP-21 | جداول بلا أسماء تقنية | لا | مفتوح (336) | P3 |
+| GAP-22 | نطاق fail-open **نافذ على سطحين ماليين** | نعم | **جزئي**: `fin_project_scope` قُلب · `fin_party_scope` لا | **P1** |
+| GAP-23 | الشاشات الذهبية 10/10 pending | نعم | مفتوح | P1 |
+| GAP-24 | ازدواج الإقفال | لا | **مُغلق** ✔ بحكم سلطة في تعليق الجدول | — |
+| GAP-25 | `fin_fx_rates` 4 أسعار | — | **مُغلق** ✔ بالمقبض الصحيح (3/3 نشطة مسعَّرة) | — |
+| GAP-26 | CSS غير ملتزم | — | **مُغلق** ✔ | — |
+| GAP-27..33 | **سجل جولة INJ-FIX-01 المعتمد** (كتّاب الدفتر · الشريط العلوي · الاستعلام الخام · البحث المفتوح · مسارات بلا حكم · الرسائل الميتة والأفعال · ترويسة الأصل) | متفاوت | 3 مُغلقة · 4 جزئية/مُسقَّطة | — |
+| GAP-34..50 | ملحق INJ-FIX-02 — **مسودة غير معتمدة** (أثقلها: صفر شاشة فوترة · عقد المعرّفات 663/663 · 242 ملفًّا بسنة قادمة) | نعم | مسودة | — |
+| **GAP-51** | سجل الأحكام الجديد بلا قارئ إنتاج (`gov_event_rulings` وأخواته) | لا | **جديد** | P2 |
+| **GAP-52** | إنذار توقف المستهلكين مبني وغير موصول (`cron_events.php` متقاعد) | **نعم** | **جديد** | P0 |
+| **GAP-53** | `EMS_cron_events` يُرجع Last Result=3 خارج الطابور | نعم | **جديد** | P1 |
+| **GAP-54** | 13 موضع ابتلاع في بناء سطور التسوية ⇒ تسوية ناقصة بصمت | نعم | **جديد** | P1 |
+| **GAP-55** | `ARCHITECTURE_CURRENT_SYSTEM_v26_ar.md` Baseline حالية مكرّرة بلقطة أقدم | لا | **جديد** | P2 |
+| **GAP-56** | **أداة التغطية تُخضِّر بالذِّكر لا بالإغلاق** — «33/33» تخفي أربع فجوات حية | **نعم (حوكمة القياس)** | **جديد** | P0 |
+| **GAP-57** | إنذار أبديّ: `fx` و`replay` مفعَّلان بلا معالج ⇒ `[BUS-STALL]` كل ساعة | نعم | **جديد** | P1 |
+| **GAP-58** | تعارض الشجرة المشتركة ⇒ قابلية إعادة إنتاج الدليل مهدَّدة | لا | **جديد** | P2 |
 
 ---
-*ولِّدت هذه الوثيقة قياسًا حيًّا على اللقطة `BL-20260821-f0bc3e4e`. أي قراءة لها بعد هجرة أو التزام جديد تستلزم إعادة قياس أو وسم الجزء المتغير `STALE`.*
+*مولَّدة قياسًا حيًّا على `BL-20260821b-dbba1ef0`. أي قراءة بعد هجرة أو التزام جديد تستلزم إعادة قياس أو وسم `STALE`.*

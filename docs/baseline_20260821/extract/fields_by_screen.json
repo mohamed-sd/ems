@@ -6464,6 +6464,13 @@
                 "table_index": 3,
                 "columns": [
                     {
+                        "label_ar": "الإجراءات",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "id"
+                    },
+                    {
                         "label_ar": "رقم البند",
                         "col_group": "",
                         "th_class": "",
@@ -6525,13 +6532,6 @@
                         "th_class": "",
                         "hidden_default": 0,
                         "technical": "state"
-                    },
-                    {
-                        "label_ar": "",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": "id"
                     }
                 ]
             }
@@ -24727,7 +24727,7 @@
         ]
     },
     {
-        "route": "FinRequests\/my_requests.php",
+        "route": "FinRequests\/request_form.php",
         "tables": [
             {
                 "table_index": 0,
@@ -24894,15 +24894,9 @@
                         "technical": null
                     }
                 ]
-            }
-        ],
-        "form_fields": []
-    },
-    {
-        "route": "FinRequests\/request_form.php",
-        "tables": [
+            },
             {
-                "table_index": 0,
+                "table_index": 1,
                 "columns": [
                     {
                         "label_ar": "#",
@@ -24942,7 +24936,7 @@
                 ]
             },
             {
-                "table_index": 1,
+                "table_index": 2,
                 "columns": [
                     {
                         "label_ar": "#",
@@ -25052,7 +25046,7 @@
                 ]
             },
             {
-                "table_index": 2,
+                "table_index": 3,
                 "columns": [
                     {
                         "label_ar": "#",
@@ -25364,6 +25358,56 @@
                 "name": "cost_center",
                 "input_type": "text",
                 "label_ar": "مركز التكلفة (اختياري)",
+                "required": 0,
+                "readonly": 0,
+                "section": "بيانات الطلب والمستفيد (§5)",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "state",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "بيانات الطلب والمستفيد (§5)",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "type",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "بيانات الطلب والمستفيد (§5)",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "q",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "بيانات الطلب والمستفيد (§5)",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "from",
+                "input_type": "date",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "بيانات الطلب والمستفيد (§5)",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "to",
+                "input_type": "date",
+                "label_ar": "",
                 "required": 0,
                 "readonly": 0,
                 "section": "بيانات الطلب والمستفيد (§5)",
@@ -54198,6 +54242,13 @@
                 "table_index": 0,
                 "columns": [
                     {
+                        "label_ar": "الإسناد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
                         "label_ar": "#",
                         "col_group": "",
                         "th_class": "",
@@ -54234,13 +54285,6 @@
                     },
                     {
                         "label_ar": "النوع",
-                        "col_group": "",
-                        "th_class": "",
-                        "hidden_default": 0,
-                        "technical": null
-                    },
-                    {
-                        "label_ar": "الإسناد",
                         "col_group": "",
                         "th_class": "",
                         "hidden_default": 0,
@@ -99288,7 +99332,7 @@
                         "technical": null
                     },
                     {
-                        "label_ar": "",
+                        "label_ar": "الإجراء",
                         "col_group": "",
                         "th_class": "",
                         "hidden_default": 0,

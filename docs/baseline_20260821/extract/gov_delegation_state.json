@@ -1,0 +1,52 @@
+[
+    {
+        "id": "1",
+        "pathway": "ESCALATION",
+        "store": "work_escalations",
+        "rows_live": "2008",
+        "readers": "WorkItemService · cron_wfm_engine",
+        "verdict": "LIVE_READABLE",
+        "note": "بنودُ عملٍ مفتوحةٌ مُصعَّدةٌ فعلًا",
+        "measured_at": "2026-08-21 15:58:58"
+    },
+    {
+        "id": "2",
+        "pathway": "ESCALATION",
+        "store": "ticket_escalations",
+        "rows_live": "74",
+        "readers": "SlaMonitor · TicketRouter · TicketStateService",
+        "verdict": "LIVE_READABLE",
+        "note": "ومعها 20 قاعدةَ تصعيدٍ نشطة",
+        "measured_at": "2026-08-21 15:58:58"
+    },
+    {
+        "id": "3",
+        "pathway": "ESCALATION",
+        "store": "risk_escalations",
+        "rows_live": "20",
+        "readers": "RiskService · RiskSignalEngine · 3 شاشات",
+        "verdict": "LIVE_READABLE",
+        "note": "تصعيدٌ آليٌّ من محرِّكِ الإشارات",
+        "measured_at": "2026-08-21 15:58:58"
+    },
+    {
+        "id": "4",
+        "pathway": "DELEGATION",
+        "store": "gov_delegations",
+        "rows_live": "0",
+        "readers": "ImpersonationService ⟵ Governance\/impersonations.php",
+        "verdict": "DORMANT",
+        "note": "صفرُ صفٍّ — الجدولُ مبنيٌّ وقارئُه واحدٌ ولا بيانَ فيه",
+        "measured_at": "2026-08-21 15:58:58"
+    },
+    {
+        "id": "5",
+        "pathway": "DELEGATION",
+        "store": "work_delegations",
+        "rows_live": "0",
+        "readers": "WorkItemService · cron_wfm_engine · Portal\/my_tasks.php",
+        "verdict": "DORMANT",
+        "note": "قرّاؤه ثلاثةٌ حقيقيّون — لكن صفرَ تفويضٍ نافذٍ بعدَ كنسِ بذرِ UAT",
+        "measured_at": "2026-08-21 15:58:58"
+    }
+]

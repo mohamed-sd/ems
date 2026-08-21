@@ -1024,14 +1024,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "asset.link",
@@ -1310,14 +1310,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "bus.dlq.decide",
@@ -1332,14 +1332,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "bus.event.publish",
@@ -1354,14 +1354,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "cal.approve",
@@ -1442,14 +1442,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "carrier.assign",
@@ -1992,14 +1992,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "collection.reverse",
@@ -2014,14 +2014,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "cons.flag",
@@ -2212,14 +2212,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "coverage.substitute.end",
@@ -2234,14 +2234,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "custody.return",
@@ -2432,14 +2432,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "depr.run",
@@ -2454,14 +2454,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "desk.post",
@@ -2542,14 +2542,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "dt.define",
@@ -2630,14 +2630,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "entitlement.gate.reverse",
@@ -2652,14 +2652,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "entity.create",
@@ -4786,14 +4786,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "invoice.issue",
@@ -4808,14 +4808,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "item.critical",
@@ -4874,14 +4874,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "job.enqueue",
@@ -4896,14 +4896,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "job.schedule.define",
@@ -4918,14 +4918,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "journey.escalate",
@@ -5556,14 +5556,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "payroll.run",
@@ -5578,14 +5578,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "pc.sign",
@@ -5732,14 +5732,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "perm.trace",
@@ -8900,14 +8900,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "supplier.settlement.reverse",
@@ -8922,14 +8922,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "svc.define",
@@ -8966,14 +8966,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "swap.approve.workforce",
@@ -8988,14 +8988,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "swap.end",
@@ -9010,14 +9010,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "swap.reject",
@@ -9032,14 +9032,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "tariff.set",
@@ -9692,14 +9692,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "unit.define",
@@ -9868,14 +9868,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "unit.state.revert",
@@ -9890,14 +9890,14 @@
         "reverse_text": null,
         "live_code": "",
         "state": "declared_unbuilt",
-        "guard_verified": "pending",
-        "guard_evidence": "",
+        "guard_verified": "n_a",
+        "guard_evidence": "GAP-32 · لا يُتحقَّق حارسُ فعلٍ على شاشةٍ غيرِ مبنية (state=declared_unbuilt) — ويعود إلى pending فورَ بنائِها",
         "idempotency_verified": "pending",
         "idempotency_evidence": "",
         "uat_verified": "pending",
         "uat_evidence": "",
         "write_class": "domain_write",
-        "updated_at": "2026-08-19 23:32:08"
+        "updated_at": "2026-08-21 17:15:56"
     },
     {
         "canonical_code": "unit.stmt.client",
