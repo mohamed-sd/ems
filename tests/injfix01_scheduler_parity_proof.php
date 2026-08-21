@@ -88,26 +88,54 @@ echo "  على القرص: " . implode(' · ', $onDisk) . "\n";
 ok(count($unscheduled) === 0, 'صفرُ عاملٍ على القرصِ بلا مهمةٍ مجدولة', $pass, $fail,
    count($unscheduled) ? 'غيرُ مجدول: ' . implode(' · ', $unscheduled) : '—');
 
-/* ── ③ خبرٌ خارجَ الحكم: العاملون المتعثِّرون ─────────────────────────────── */
-echo "\n── ③ خبرٌ خارجَ الحكم — تعثُّرُ الجدولات ──\n";
+/* ── ③ الحكم: عتبةُ الإنذارِ يجب أن تتجاوز دوريتَها ──────────────────────── */
+/* ◆ **عتبةٌ أقصرُ من دوريةِ الجدولةِ إنذارٌ كاذبٌ بالبناء** — تُنذر يقينًا في كلِّ
+ *   فترةٍ صحيحة. وكانت الثلاثُ الطويلاتُ عند ٦٥٥٣٥ بالضبط لأن العمودَ كان
+ *   `SMALLINT` وأقصاهُ ١٨٫٢ ساعة — **فالعتبةُ الصحيحةُ لم تكن قابلةً للتعبير**.
+ *   وُسِّع في `2027_09_01_schedule_alert_threshold_widen.php`، وهذا يمنع العودة. */
+echo "\n── ③ عتبةُ الإنذارِ مقابلَ الدورية ──\n";
+$period = function ($expr) {
+    $f = preg_split('/\s+/', trim((string) $expr));
+    if (count($f) !== 5) { return 86400; }
+    list($mi, $ho, $dm, $mo, $dw) = $f;
+    if (strpos($mi, '*/') === 0) { return max(60, (int) substr($mi, 2) * 60); }
+    if ($mi === '*')             { return 60; }
+    if (strpos($ho, '*/') === 0) { return max(3600, (int) substr($ho, 2) * 3600); }
+    if ($ho === '*')             { return 3600; }
+    if ($dm === '*' && $mo === '*' && $dw === '*') { return 86400; }
+    if ($dm === '*' && $mo === '*' && $dw !== '*') { return 604800; }
+    if ($dm !== '*' && $mo === '*')                { return 2678400; }
+    return 31622400;
+};
 $q = $conn->query("SELECT job_type, cron_expr, alert_after_seconds, last_success_at,
                           TIMESTAMPDIFF(SECOND, last_success_at, NOW()) late
                      FROM ems_job_schedule WHERE is_active = 1 ORDER BY job_type");
-$late = 0;
+$falseAlarm = array(); $trueLate = array();
 while ($q && $x = $q->fetch_assoc()) {
-    $isLate = $x['late'] !== null && (int) $x['late'] > (int) $x['alert_after_seconds'];
-    if ($isLate) {
-        $late++;
-        printf("  ◆ %-22s %-14s متأخرةٌ %s ساعة (المهلة %s ث)\n",
-               $x['job_type'], $x['cron_expr'], round($x['late'] / 3600, 1), $x['alert_after_seconds']);
+    $per = $period($x['cron_expr']);
+    if ((int) $x['alert_after_seconds'] <= $per) {
+        $falseAlarm[] = $x['job_type'] . ' (دورية ' . $per . 'ث · عتبة ' . $x['alert_after_seconds'] . 'ث)';
+    }
+    if ($x['late'] !== null && (int) $x['late'] > (int) $x['alert_after_seconds']) {
+        $trueLate[] = sprintf('%s متأخرةٌ %sس (العتبة %sس)', $x['job_type'],
+            round($x['late'] / 3600, 1), round($x['alert_after_seconds'] / 3600, 1));
     }
 }
-echo "  المتعثِّرون: {$late}\n";
-if ($late > 0) {
-    echo "    ⇐ **ولا يُقرأ كلُّ تأخُّرٍ عطبًا**: `depreciation_run` شهريةٌ (`0 2 1 * *`)\n";
-    echo "      ومهلةُ إنذارِها 65535 ثانيةً (~18 ساعة) — فهي **تُنذر أبدًا** بين\n";
-    echo "      شهرٍ وشهر. تلك **مهلةٌ مضبوطةٌ خطأً** لا مهمةٌ متوقفة.\n";
-    echo "      وأمّا اليوميّتان فتأخُّرُهما حقيقيّ: لم تعملا في موعدِهما.\n";
+ok(count($falseAlarm) === 0, '**صفرُ عتبةٍ أقصرَ من دوريتِها** — لا إنذارَ كاذبًا بالبناء',
+   $pass, $fail, count($falseAlarm) ? implode(' · ', $falseAlarm) : '—');
+
+echo "\n── ④ خبرٌ خارجَ الحكم — تأخُّرٌ حقيقيٌّ بعدَ تنقيةِ الإنذار ──\n";
+echo "  المتعثِّرون: " . count($trueLate) . "\n";
+foreach ($trueLate as $t) { echo "  ◆ {$t}\n"; }
+if (count($trueLate)) {
+    echo "    ⇐ **وهذا تأخُّرٌ صادقٌ لا ضجيجُ سقفِ عمود.** وسببُه المقيسُ هنا\n";
+    echo "      **انقطاعُ العامل** لا عطبُ الجدولة: تشغيلُه متقطِّعٌ على جهازِ تطوير،\n";
+    echo "      فما وافق ساعةَ الانقطاعِ سقطت نافذتُه.\n";
+    echo "    ⇐ ◆ **وهشاشةٌ كامنةٌ تُعلَن**: `JobScheduleService::isDue()` يطابق\n";
+    echo "      **الدقيقةَ الحاليةَ** مطابقةً لحظيّةً بلا استدراك — فأيُّ إعادةِ تشغيلٍ\n";
+    echo "      تتجاوز الدقيقةَ المقصودةَ **تُسقط نافذةَ اليومِ صامتةً** حتى في الإنتاج.\n";
+    echo "      والاستدراكُ **تغييرُ سلوكِ جدولةٍ حيّ** (قد يُطلق ترحيلًا ماليًّا شهريًّا)\n";
+    echo "      ⇒ يُعلَن ولا يُنفَّذ بلا قرارِ مالك.\n";
 }
 
 echo "───────────────────────────────────────────────────────────────\n";

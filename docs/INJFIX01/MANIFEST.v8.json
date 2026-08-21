@@ -100,5 +100,14 @@
             "tests\/injfix02_sensitive_target_integrity_proof.php — NF-09\/GAP-12",
             "tests\/injfix02_space_classification_ratchet.php — NF-24\/GAP-22"
         ]
+    },
+    "BARRIER_3_SCHEDULER": {
+        "STRUCTURAL_DEFECT_FOUND": "ems_job_schedule.alert_after_seconds كان SMALLINT UNSIGNED — أقصاهُ 65,535ث = 18.2 ساعة. ودوريةُ statement_build يوميّةٌ (24س) وdepreciation_run شهريّةٌ (~720س) ⇒ **العتبةُ الصحيحةُ غيرُ قابلةٍ للتعبير**. ولذلك وقفت الثلاثُ عند 65535 بالضبط: سقفُ العمودِ لا قرارُ مهندس",
+        "CONSEQUENCE": "عتبةٌ أقصرُ من الدوريةِ تُنذر يقينًا وهي سليمة ⇒ الإنذارُ ضجيجٌ ⇒ يُتجاهَل ⇒ فحين تتوقف مهمةٌ ماليةٌ فعلًا لا ينتبه أحد",
+        "FIXED": "database\/migrations\/2027_09_01_schedule_alert_threshold_widen.php — INT UNSIGNED + عتبةٌ = الدورية + ربعُها · 3 عتباتٍ صُحِّحت · رجوعٌ مُثبَتٌ بالتشغيل",
+        "SIGNAL_RECOVERED": "3 إنذاراتٍ دائمةٍ كاذبةٍ ⇐ 2 تأخُّرٍ حقيقيٍّ (statement_build 38س · settlement_recalc 36س)",
+        "INVARIANT_GATED": "tests\/injfix01_scheduler_parity_proof.php ③: صفرُ عتبةٍ ≤ دوريتِها",
+        "LATENT_FRAGILITY_DECLARED": "JobScheduleService::isDue() مطابقةٌ لحظيّةٌ للدقيقةِ الحاليةِ بلا استدراك — أيُّ إعادةِ تشغيلٍ تتجاوز الدقيقةَ تُسقط نافذةَ اليومِ صامتةً. وسببُ تأخُّرِ اليوم **انقطاعُ العاملِ على جهازِ تطوير** لا عطبُ الشفرة (قِيس من توزُّعِ ساعاتِ التشغيل). والاستدراكُ تغييرُ سلوكِ جدولةٍ حيّ ⇒ يُعلَن ولا يُنفَّذ",
+        "STILL_BLOCKED": "4 مهامَّ على 3 إصداراتِ PHP غيرِ الأساس · وcron_proc_replenish.php غيرُ مجدول — كلاهما يحتاج Set-ScheduledTask"
     }
 }
