@@ -15,6 +15,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/post_contract.php';
+require_once __DIR__ . '/../includes/ladder_gate.php';
 require_once __DIR__ . '/../app/Services/Chain/ChainNodeService.php';
 
 enforce_current_page_view_permission($conn, '../main/dashboard.php');
@@ -87,8 +88,15 @@ $__pcExec = ems_post_contract($conn, array(
 if (!$__pcExec['ok'] && $__pcExec['msg'] !== '') { $msg = $__pcExec['msg']; }
 if ($__pcExec['replay'])                          { $msg = $__pcExec['msg']; }
 if ($__pcExec['run'] && $__pcExec['ok']) {
+    /* ══ وصلُ السلّم LD-09 — تنفيذُ الخزينةِ والبنك ══ */
+    $__lg = ems_ladder_guard($conn, 'LD-09', $company_id, 'pay_batch',
+        (int) $__pcExec['data']['id'], $uid);
+    if (!$__lg['ok']) {
+        $res = array('ok' => false, 'code' => $__lg['code'], 'reason' => $__lg['reason']);
+    } else {
     $res = CN::executeBatch($conn, $gate, $company_id, (int) $__pcExec['data']['id'],
                             (string) $__pcExec['data']['bank_ref'], $uid);
+    }
     $msg = ($res['ok'] ? '✅ ' : '❌ ') . $res['reason'] . ' (' . $res['code'] . ')';
     if (!empty($res['ok'])) { ems_pc_idem_mark($conn, $__pcExec['idem'], $__pcExec['code'], 'tre_pay_batches#' . (int) $__pcExec['data']['id']); }
 }

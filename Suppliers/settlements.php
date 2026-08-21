@@ -25,6 +25,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/ladder_gate.php';
 require_once __DIR__ . '/../app/Services/Settlement/SettlementService.php';
 
 use App\Services\Settlement\SettlementService as SVC;
@@ -101,9 +102,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     } elseif ($act === 'resolve' && $can_edit) {
         $res = SVC::resolveObjection($gate, intval($_POST['line_id'] ?? 0), $uid);
     } elseif ($act === 'approve' && $can_approve) {
+        /* ══ وصلُ السلّم LD-13 — تسويةُ المورد · INJ-CHAIN-CLOSE-01 ══
+           ◆ كان الاعتمادُ يقع بلا قراءةِ سلّمِه، فبقي ترتيبُ الخطواتِ
+             و«لا يدَ تمشي خطوتَين» غيرَ منفَّذَين في سلّمِ التسوية.
+           ◆ والنمطُ `monitor` افتراضًا: يُسجَّل الخرقُ ولا يُمنع — فقلبُ
+             المنعِ تغييرُ وصولٍ حيٍّ يلزمه قياسٌ مستقرٌّ بصفرِ خرق. */
+        $__lg = ems_ladder_guard($conn, 'LD-13', $company_id, 'settlement', $sid, $uid);
+        if (!$__lg['ok']) {
+            $res = array('ok' => false, 'reason' => $__lg['reason'], 'net_direction' => '');
+        } else {
         $res = SVC::approve($gate, $conn, $sid, $uid);
         if ($res['ok'] && $res['net_direction'] === 'receivable') {
             $res['reason'] = 'اعتُمدت — والصافي سالبٌ ففُتحت ذمّةٌ مدينةٌ على المورد';
+        }
         }
     } elseif ($act === 'invoice' && $can_edit) {
         // M-13 · «استلامُ فاتورة المورد ومطابقتُها بالصافي المعتمد» (ENT-02 §4)

@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 01:12:01
--- الجداول: 628 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-22 01:39:53
+-- الجداول: 630 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6455,6 +6455,21 @@ CREATE TABLE `gov_chain_nodes` (
   CONSTRAINT `chk_chain_ladder_code` CHECK (`ladder_id` = 'NO_LADDER_REQUIRED' or `ladder_id` regexp '^LD-[0-9]{2}$' or `ladder_id` regexp '^RESOLVE_FROM_POLICY:[a-z_]+$')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='INJ-CHAIN-CLOSE-01 — 29 عقدةً بثماني خاناتِ ملكية';
 
+-- ── Table: gov_chain_state_corrections ──
+CREATE TABLE `gov_chain_state_corrections` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `entry_id` int(10) unsigned NOT NULL,
+  `entry_no` varchar(30) DEFAULT NULL,
+  `state_before` varchar(24) NOT NULL,
+  `state_after` varchar(24) NOT NULL,
+  `reason` varchar(400) NOT NULL,
+  `evidence` varchar(300) NOT NULL COMMENT 'ما قِيس في المصبِّ قبلَ التصحيح',
+  `corrected_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_csc_entry` (`entry_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='INJ-CHAIN-CLOSE-01 — تصحيحُ حالةٍ بلغت بلا سلّمِها · بالحالةِ السابقةِ ودليلِها';
+
 -- ── Table: gov_component_versions ──
 CREATE TABLE `gov_component_versions` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -6902,6 +6917,24 @@ CREATE TABLE `gov_ladder_actor_roles` (
   PRIMARY KEY (`actor_code`),
   KEY `ix_role` (`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جسرُ موضعِ السلطةِ في السلّمِ بدورِ النظام — والموضعُ لا شخص';
+
+-- ── Table: gov_ladder_decisions ──
+CREATE TABLE `gov_ladder_decisions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `ladder_code` varchar(12) NOT NULL,
+  `subject_kind` varchar(40) NOT NULL COMMENT 'نوعُ المستند — claim_invoice · payment · settlement …',
+  `subject_ref` bigint(20) unsigned NOT NULL,
+  `scope_key` varchar(96) NOT NULL COMMENT 'نسخةُ السلّم — عقدتان متصلتان تتشاركانها',
+  `step_no` tinyint(3) unsigned NOT NULL,
+  `actor_id` int(10) unsigned NOT NULL,
+  `note` varchar(190) DEFAULT NULL,
+  `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_gld` (`company_id`,`scope_key`,`step_no`,`actor_id`),
+  KEY `ix_gld_ladder` (`ladder_code`,`subject_kind`),
+  KEY `ix_gld_scope` (`scope_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='سجلُّ قراراتِ السلالمِ الواحد — INJ-CHAIN-CLOSE-01 · GAP-01';
 
 -- ── Table: gov_ladder_steps ──
 CREATE TABLE `gov_ladder_steps` (

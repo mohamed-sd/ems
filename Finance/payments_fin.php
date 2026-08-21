@@ -8,6 +8,7 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header("Location: ../login.php"); exit(); }
 include '../config.php';
+require_once __DIR__ . '/../includes/ladder_gate.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/fin_helpers.php';
 
@@ -145,6 +146,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
          برسالةٍ **تسمّي الفترةَ والسبب**، من كلِّ شاشاتِ المالية». والحارسُ
          `includes/period_guard.php` مبنيٌّ ويعطي الرسالةَ المسمّاة — وهذه الشاشةُ
          لم تكن تناديه، فتُكتب حركةُ خزينةٍ في شهرٍ مُقفَل. */
+    /* ══ وصلُ السلّم LD-08 — طلبُ الدفعِ والسداد · INJ-CHAIN-CLOSE-01 ══
+       ◆ **الصرفُ وحدَه محكوم**: التحصيلُ يُنشئ الأثرَ لا يستهلكه فلا سلّمَ له.
+       ◆ ويُقرأ السلّمُ **قبلَ** حارسِ الفترةِ والمستند — فالترتيبُ حكمٌ:
+         مَن لا يملك الخطوةَ لا تُقاس له بقيةُ الشروطِ أصلًا.
+       ◆ والنمطُ `monitor` فلا يُوقَف مسارٌ حيٌّ بلا قياسٍ مستقرّ. */
+    if ($direction === 'disbursement') {
+        $__lg = ems_ladder_guard($conn, 'LD-08', $company_id, 'payment_request',
+            intval($_POST['receivable_id'] ?? 0), $current_user_id);
+        if (!$__lg['ok']) {
+            ems_gov_flash_redirect('payments_fin.php', $__lg['reason'] . ' ❌', 'GOV-FAIL-422',
+                'الجهةُ تُحَلُّ من محرّكِ السلاليمِ لا من الشاشة');
+            exit();
+        }
+    }
     require_once __DIR__ . '/../includes/period_guard.php';
     $__pd = ems_period_check($conn, (int) $company_id, date('Y-m-d'));
     if (empty($__pd['ok'])) {

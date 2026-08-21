@@ -12,6 +12,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/post_contract.php';
+require_once __DIR__ . '/../includes/ladder_gate.php';
 require_once __DIR__ . '/../app/Services/Procurement/RfqAwardService.php';
 
 // CS-01 · RF-02 — الحارسُ فوقَ المعالج. كان ‎INSERT INTO rfq_awards‎ في السطرِ 33
@@ -43,6 +44,14 @@ $__pc = ems_post_contract($conn, array(
 ));
 if (!$__pc['ok'] && $__pc['msg'] !== '') { $msg = $__pc['msg']; }
 if ($__pc['replay'])                     { $msg = $__pc['msg']; }
+/* ══ وصلُ السلّم LD-11 — الترسيةُ وأمرُ الشراء · INJ-CHAIN-CLOSE-01 ══
+   ◆ حارسٌ **سابقٌ** للمعالج: يُبطل شرطَ تشغيلِه عند الخرق، فلا تُلَفُّ
+     كتلةٌ فيها أقواسٌ داخلَ نصوصٍ وتعليقات. */
+if ($__pc['run'] && $__pc['ok']) {
+    $__lg = ems_ladder_guard($conn, 'LD-11', $company_id, 'rfq_quote',
+        (int) $__pc['data']['qid'], $uid);
+    if (!$__lg['ok']) { $msg = $__lg['reason'] . ' ❌'; $__pc['ok'] = false; }
+}
 if ($__pc['run'] && $__pc['ok']) {
     $svc = new \App\Services\Procurement\RfqAwardService($conn);
     $res = $svc->award($company_id, (int) $__pc['data']['qid'], (string) $__pc['data']['why'], $uid);

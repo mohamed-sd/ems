@@ -10,6 +10,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/ladder_gate.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/proc_helpers.php';
 
@@ -76,6 +77,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
     // النمط المبرَّر: تحرير أبٍ يعيد كتابة تفاصيله). حذف/إدراج السطور ذرّيٌّ داخل
     // القناة؛ نافذة «رأسٌ محدَّث وسطور سابقة» الضيقة بين العمليتين لا تُفقد فيها
     // السطور أبدًا (تبقى القديمة كاملةً حتى ينجح الاستبدال ذرّيًا).
+    /* ══ وصلُ السلّم LD-12 — تأكيدُ الاستلامِ والمطابقة · INJ-CHAIN-CLOSE-01 ══
+       ◆ الانتقالُ إلى «مسلَّمة للوجهة» **قرارُ مطابقةٍ لا حفظُ حقل** — فيُقرأ
+         سلّمُه عند التنفيذ. والحفظُ في الحالتين الأوليَين تسجيلٌ لا قرار. */
+    if ($state === 'مسلَّمة للوجهة') {
+        $__lg = ems_ladder_guard($conn, 'LD-12', $company_id, 'proc_receipt',
+            intval($_POST['id'] ?? 0), $current_user_id);
+        if (!$__lg['ok']) {
+            ems_gov_flash_redirect('receipt_custody_proc.php', $__lg['reason'] . ' ❌', 'GOV-FAIL-422', '');
+            exit();
+        }
+    }
     $parent = array(
         'holder_name' => $holder_name, 'receipt_date' => $receipt_date,
         'supplier_id' => $supplier_id, 'order_id' => $order_id,

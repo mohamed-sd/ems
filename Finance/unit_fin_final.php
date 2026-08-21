@@ -14,6 +14,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/post_contract.php';
+require_once __DIR__ . '/../includes/ladder_gate.php';
 require_once __DIR__ . '/../app/Services/Chain/ChainNodeService.php';
 
 enforce_current_page_view_permission($conn, '../main/dashboard.php');
@@ -66,7 +67,14 @@ foreach (array(
     if (!$pc['ok'] && $pc['msg'] !== '') { $msg = $pc['msg']; }
     if ($pc['replay'])                    { $msg = $pc['msg']; }
     if ($pc['run'] && $pc['ok']) {
+        /* ══ وصلُ السلّم LD-07 — الاعتمادُ الماليُّ النهائيّ ══ */
+        $__lg = ems_ladder_guard($conn, 'LD-07', $company_id, 'unit_final',
+            (int) $pc['data']['id'], $uid);
+        if (!$__lg['ok']) {
+            $res = array('ok' => false, 'code' => $__lg['code'], 'reason' => $__lg['reason']);
+        } else {
         $res = CN::$method($conn, $gate, $company_id, (int) $pc['data']['id'], $uid);
+        }
         $msg = ($res['ok'] ? '✅ ' : '❌ ') . $res['reason'] . ' (' . $res['code'] . ')';
         if (!empty($res['ok'])) { ems_pc_idem_mark($conn, $pc['idem'], $pc['code'], 'unit_final_approvals#' . (int) $pc['data']['id']); }
     }

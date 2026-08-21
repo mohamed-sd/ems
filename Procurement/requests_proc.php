@@ -11,6 +11,7 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 include '../config.php';
+require_once __DIR__ . '/../includes/ladder_gate.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/proc_helpers.php';
 
@@ -182,6 +183,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'e21_d
     $req = proc_gate(false)->selectOne('proc_request', array('where' => array('id' => $rid)));
     if (!$req || (string)$req['state'] !== 'مقدَّم') {
         ems_gov_flash_redirect('requests_proc.php', 'القرارُ على «مقدَّم» وحدَه — الحالُ: ' . ($req['state'] ?? 'غير موجود') . ' ❌', 'GOV-REF-404', ''); exit();
+    }
+    /* ══ وصلُ السلّم LD-10 — اعتمادُ طلبِ الشراء · INJ-CHAIN-CLOSE-01 ══
+       ◆ «من أنشأ لا يعتمد» كان منفَّذًا، و**ترتيبُ الخطواتِ وصاحبُها**
+         لم يكونا يُقرآن من المحرك. والنمطُ `monitor` فلا يُوقَف مسارٌ حيّ. */
+    if ($decision === 'approve') {
+        $__lg = ems_ladder_guard($conn, 'LD-10', $company_id, 'proc_request', $rid, $current_user_id);
+        if (!$__lg['ok']) {
+            ems_gov_flash_redirect('requests_proc.php', $__lg['reason'] . ' ❌', 'GOV-FAIL-422', '');
+            exit();
+        }
     }
     // M-45: من أنشأ لا يعتمد — الحارسُ العام
     if ($decision === 'approve') {

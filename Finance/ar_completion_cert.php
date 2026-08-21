@@ -14,6 +14,7 @@ if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
 require_once __DIR__ . '/../includes/post_contract.php';
+require_once __DIR__ . '/../includes/ladder_gate.php';
 require_once __DIR__ . '/../app/Services/Chain/ChainNodeService.php';
 
 enforce_current_page_view_permission($conn, '../main/dashboard.php');
@@ -68,7 +69,19 @@ $__pcApp = ems_post_contract($conn, array(
 if (!$__pcApp['ok'] && $__pcApp['msg'] !== '') { $msg = $__pcApp['msg']; }
 if ($__pcApp['replay'])                         { $msg = $__pcApp['msg']; }
 if ($__pcApp['run'] && $__pcApp['ok']) {
+    /* ══ وصلُ السلّم LD-06 — ونسخةُ سلّمِه مشتركةٌ مع فاتورةِ المطالبة ══
+       فالعقدتان ١٧ و١٨ مرحلتان في نسخةٍ واحدة: لا طلبَ اعتمادٍ ثانٍ. */
+    $__cid = 0;
+    $__row = $gate->selectOne('ar_completion_certs', array(
+        'columns' => array('claim_id'), 'where' => array('id' => (int) $__pcApp['data']['id'])));
+    if ($__row) { $__cid = (int) $__row['claim_id']; }
+    $__lg = ems_ladder_guard($conn, 'LD-06', $company_id, 'completion_cert',
+        (int) $__pcApp['data']['id'], $uid, 'LD-06-INST:' . $__cid);
+    if (!$__lg['ok']) {
+        $res = array('ok' => false, 'code' => $__lg['code'], 'reason' => $__lg['reason']);
+    } else {
     $res = CN::approveCert($conn, $gate, $company_id, (int) $__pcApp['data']['id'], $uid);
+    }
     $msg = ($res['ok'] ? '✅ ' : '❌ ') . $res['reason'] . ' (' . $res['code'] . ')';
     if (!empty($res['ok'])) { ems_pc_idem_mark($conn, $__pcApp['idem'], $__pcApp['code'], 'ar_completion_certs#' . (int) $__pcApp['data']['id']); }
 }

@@ -276,3 +276,151 @@ function ems_uc_ladder_log(mysqli $conn, $companyId, $entryId, $stage, $actorId,
     $st->close();
     return $ok;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * بوابةُ السلّمِ العامة — تعميمُ ما بُني لسلسلةِ الوحدات
+ * ───────────────────────────────────────────────────────────────────────────
+ * ◆ **موضعُها هنا لا في ملفٍّ جديد**: منطقُ السلّمِ بيتُه واحد، وملفٌّ ثانٍ
+ *   يستعلم عن جداولِ المستأجِرِ **يزيد دَينَ الاستعلامِ الخامِّ بملفٍّ كامل**
+ *   فترسُب سقّاطتُه — وهي رسبت فعلًا (٦٠٩ فوقَ ٦٠٨) قبلَ هذا الدمج.
+ * ◆ فتُعمَّم الدالةُ ولا يُنشأ بيتٌ ثانٍ لها.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+
+if (!function_exists('ems_ladder_mode')) {
+    function ems_ladder_mode()
+    {
+        $m = function_exists('ems_env') ? strtolower((string) ems_env('EMS_LADDER_GATE', 'monitor')) : 'monitor';
+        return in_array($m, array('off', 'monitor', 'enforce'), true) ? $m : 'monitor';
+    }
+}
+
+if (!function_exists('ems_ladder_check')) {
+    /**
+     * @param string $ladder      رمزُ السلّم — LD-nn
+     * @param string $subjectKind نوعُ المستند (claim_invoice · payment · settlement …)
+     * @param int    $subjectRef  معرِّفُ المستند
+     * @param string $scope       نسخةُ السلّم — عقدتان في نسخةٍ واحدةٍ تتشاركانه
+     * @return array ok · mode · ladder · step · reasons[]
+     */
+    function ems_ladder_check(mysqli $conn, $ladder, $companyId, $subjectKind, $subjectRef,
+                              $actorId, $actorRole = null, $scope = '')
+    {
+        $mode = ems_ladder_mode();
+        $res = array('ok' => true, 'mode' => $mode, 'ladder' => (string) $ladder,
+                     'step' => null, 'reasons' => array());
+        if ($mode === 'off' || $ladder === '' || $ladder === null) { return $res; }
+        if (!preg_match('/^LD-\d{2}$/', (string) $ladder)) {
+            /* `NO_LADDER_REQUIRED` و`RESOLVE_FROM_POLICY:` ليسا سلّمًا — لا فحص */
+            return $res;
+        }
+
+        $steps = ems_uc_ladder_steps($conn, $ladder);
+        if (!$steps) {
+            $res['ok'] = false;
+            $res['reasons'][] = "السلّمُ {$ladder} بلا خطواتٍ مسجَّلة — ولا يُخترَع سلّمٌ عند التنفيذ";
+            return $res;
+        }
+        $ap = null;
+        foreach ($steps as $s) { if ((int) $s['may_approve'] === 1) { $ap = $s; } }
+        if ($ap === null) {
+            $res['ok'] = false;
+            $res['reasons'][] = "السلّمُ {$ladder} بلا خطوةِ اعتمادٍ مميَّزة (may_approve)";
+            return $res;
+        }
+        $res['step'] = (int) $ap['step_no'];
+
+        /* ② أهليةُ الدور — تُحَلُّ من المحرك */
+        if ($actorRole === null) {
+            $st = $conn->prepare("SELECT `role_id` FROM `users` WHERE `id` = ? LIMIT 1");
+            if ($st) { $st->bind_param('i', $actorId); $st->execute(); $st->bind_result($rr);
+                       if ($st->fetch()) { $actorRole = ($rr === null ? null : (int) $rr); } $st->close(); }
+        }
+        $roles = $ap['roles'];
+        if ($roles && $actorRole !== null && !in_array((int) $actorRole, $roles, true)) {
+            $res['ok'] = false;
+            $res['reasons'][] = "الدورُ {$actorRole} ليس صاحبَ خطوةِ الاعتمادِ في {$ladder}"
+                              . " (`{$ap['actor_code']}` ⇐ " . implode('،', $roles) . ')';
+        }
+
+        /* ③ لا يدَ تمشي خطوتَين — على المستندِ نفسِه أو نسخةِ سلّمِه */
+        $scopeKey = $scope !== '' ? $scope : ($subjectKind . ':' . (int) $subjectRef);
+        $st = $conn->prepare(
+            "SELECT GROUP_CONCAT(DISTINCT `step_no`) FROM `gov_ladder_decisions`
+              WHERE `company_id` = ? AND `scope_key` = ? AND `actor_id` = ? AND `step_no` <> ?");
+        if ($st) {
+            $stepNo = (int) $ap['step_no'];
+            $st->bind_param('isii', $companyId, $scopeKey, $actorId, $stepNo);
+            $st->execute(); $st->bind_result($prev); $st->fetch(); $st->close();
+            if ($prev !== null && $prev !== '') {
+                $res['ok'] = false;
+                $res['reasons'][] = "**لا يدَ تمشي خطوتَين**: هذا الفاعلُ قرّر الخطوةَ ({$prev}) في نسخةِ السلّمِ نفسِها";
+            }
+        }
+        return $res;
+    }
+}
+
+if (!function_exists('ems_ladder_record')) {
+    /** يقيّد القرارَ في السجلِّ الواحد — والتكرارُ عطالةٌ لا خطأ. */
+    function ems_ladder_record(mysqli $conn, $ladder, $companyId, $subjectKind, $subjectRef,
+                               $stepNo, $actorId, $scope = '', $note = '')
+    {
+        $scopeKey = $scope !== '' ? $scope : ($subjectKind . ':' . (int) $subjectRef);
+        $st = $conn->prepare(
+            "INSERT INTO `gov_ladder_decisions`
+               (`company_id`,`ladder_code`,`subject_kind`,`subject_ref`,`scope_key`,`step_no`,`actor_id`,`note`)
+             VALUES (?,?,?,?,?,?,?,?)
+             ON DUPLICATE KEY UPDATE `decided_at` = `decided_at`");
+        if (!$st) { return false; }
+        $sn = (int) $stepNo; $sr = (int) $subjectRef; $ai = (int) $actorId;
+        $nt = mb_substr((string) $note, 0, 190);
+        $st->bind_param('isssiiis', $companyId, $ladder, $subjectKind, $sr, $scopeKey, $sn, $ai, $nt);
+        $okRun = $st->execute();
+        $st->close();
+        return $okRun;
+    }
+}
+
+if (!function_exists('ems_ladder_log_denial')) {
+    /** خرقٌ مسجَّلٌ في سجلِّ الحرّاس — فالدَّينُ مقيسٌ لا مُخمَّن. */
+    function ems_ladder_log_denial(mysqli $conn, $companyId, $subjectKind, $subjectRef, $actorId, array $res)
+    {
+        $key = mb_substr('ladder:' . (string) $res['ladder'] . ':' . $subjectKind . ':' . (string) $res['mode'], 0, 64);
+        $sub = mb_substr($subjectKind . ':' . (int) $subjectRef, 0, 120);
+        $why = mb_substr(implode(' · ', $res['reasons']), 0, 78);
+        $st = @$conn->prepare(
+            "INSERT INTO `guard_denials` (`company_id`,`guard_code`,`person_id`,`attempted_ref`,`reason_code`,`at`)
+             VALUES (?,?,?,?,?,NOW())");
+        if (!$st) { return false; }
+        $ai = (int) $actorId;
+        $st->bind_param('isiss', $companyId, $key, $ai, $sub, $why);
+        $okRun = $st->execute();
+        $st->close();
+        return $okRun;
+    }
+}
+
+if (!function_exists('ems_ladder_guard')) {
+    /**
+     * الغلافُ الذي تنادِيه الشاشات: يفحص · يُسجِّل الخرقَ · يقيّد القرارَ عند القبول.
+     * @return array ok · code · reason · ladder · step
+     */
+    function ems_ladder_guard(mysqli $conn, $ladder, $companyId, $subjectKind, $subjectRef,
+                              $actorId, $scope = '', $note = '')
+    {
+        $r = ems_ladder_check($conn, $ladder, $companyId, $subjectKind, $subjectRef, $actorId, null, $scope);
+        if (!$r['ok']) {
+            ems_ladder_log_denial($conn, $companyId, $subjectKind, $subjectRef, $actorId, $r);
+            if ($r['mode'] === 'enforce') {
+                return array('ok' => false, 'code' => 422,
+                             'reason' => implode(' · ', $r['reasons']),
+                             'ladder' => $r['ladder'], 'step' => $r['step']);
+            }
+        }
+        if ($r['step'] !== null) {
+            ems_ladder_record($conn, $ladder, $companyId, $subjectKind, $subjectRef,
+                              $r['step'], $actorId, $scope, $note);
+        }
+        return array('ok' => true, 'code' => 200, 'reason' => '', 'ladder' => $r['ladder'], 'step' => $r['step']);
+    }
+}
