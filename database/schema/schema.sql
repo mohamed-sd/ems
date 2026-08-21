@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-21 13:28:21
--- الجداول: 606 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-21 17:20:43
+-- الجداول: 616 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -2708,6 +2708,43 @@ CREATE TABLE `ems_event_deliveries` (
   UNIQUE KEY `uq_idem` (`idempotency_key`),
   KEY `ix_state` (`state`,`next_attempt_at`),
   KEY `ix_outbox` (`outbox_id`),
+  KEY `fk_evdeliv_event` (`event_id`),
+  CONSTRAINT `fk_evdeliv_event` FOREIGN KEY (`event_id`) REFERENCES `ems_business_events` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `chk_result` CHECK (`state` <> 'processed' or `result_ref` is not null),
+  CONSTRAINT `chk_fail` CHECK (`state` not in ('failed','dlq') or `fail_code` is not null),
+  CONSTRAINT `chk_keypure_ems_event_deliveries_consumer` CHECK (`consumer`  not like '% %' and `consumer`  not like '%·%')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='K4: محاولات تسليمٍ جارية (تُحذف عند النجاح أو تنتقل للرسائل الميتة)';
+
+-- ── Table: ems_event_delivery_orphans ──
+CREATE TABLE `ems_event_delivery_orphans` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `consumer` varchar(64) NOT NULL,
+  `event_id` bigint(20) unsigned NOT NULL,
+  `attempts` int(10) unsigned NOT NULL DEFAULT 1,
+  `last_error` varchar(500) DEFAULT NULL,
+  `next_retry_at` datetime DEFAULT NULL COMMENT 'N-06: موعد المحاولة التالية (تصاعد 2^attempts دقيقة) — NULL = مستحقة الآن',
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `seed_tag` varchar(32) DEFAULT NULL COMMENT 'وسمُ البيانِ المبذور — الصفوفُ الملوَّثةُ تُوسَم ولا تُحذف',
+  `outbox_id` bigint(20) unsigned NOT NULL DEFAULT 0 COMMENT 'TSP-0229: ems_business_events.id — و0 للصفوفِ السابقةِ للدفتر',
+  `consumer_key` varchar(64) NOT NULL DEFAULT '' COMMENT 'TSP-0230: مفتاحُ المستهلك',
+  `state` enum('published','claimed','processing','processed','failed','dlq') NOT NULL DEFAULT 'published' COMMENT 'TSP-0231: الحالاتُ الست',
+  `attempt_no` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT 'TSP-0232',
+  `next_attempt_at` datetime(3) DEFAULT NULL COMMENT 'TSP-0233: التباعدُ المتزايد — F-13 POW(4,attempt_no) ثانية',
+  `claimed_at` datetime(3) DEFAULT NULL COMMENT 'TSP-0234',
+  `processed_at` datetime(3) DEFAULT NULL COMMENT 'TSP-0235',
+  `idempotency_key` char(64) DEFAULT NULL COMMENT 'TSP-0236 · F-14: SHA2(outbox_id|consumer_key,256) — خمسُ إعاداتٍ صفٌّ واحد',
+  `result_ref` varchar(128) DEFAULT NULL COMMENT 'TSP-0237: مرجعُ ما كتبه المستهلك — والقيدُ يمنع نجاحًا بلا مرجع',
+  `fail_code` varchar(32) DEFAULT NULL COMMENT 'TSP-0238',
+  `fail_text` text DEFAULT NULL COMMENT 'TSP-0239',
+  `company_id` int(10) unsigned NOT NULL DEFAULT 1 COMMENT 'عمودُ العزل — TS-02',
+  `orphan_reason` varchar(300) DEFAULT NULL,
+  `archived_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_legacy_consumer_event` (`consumer`,`event_id`),
+  UNIQUE KEY `uq_idem` (`idempotency_key`),
+  KEY `ix_state` (`state`,`next_attempt_at`),
+  KEY `ix_outbox` (`outbox_id`),
+  KEY `fk_evdeliv_event` (`event_id`),
   CONSTRAINT `chk_result` CHECK (`state` <> 'processed' or `result_ref` is not null),
   CONSTRAINT `chk_fail` CHECK (`state` not in ('failed','dlq') or `fail_code` is not null),
   CONSTRAINT `chk_keypure_ems_event_deliveries_consumer` CHECK (`consumer`  not like '% %' and `consumer`  not like '%·%')
@@ -2754,7 +2791,7 @@ CREATE TABLE `ems_job_schedule` (
   `job_type` varchar(48) NOT NULL COMMENT 'TSP-0264',
   `cron_expr` varchar(64) NOT NULL COMMENT 'TSP-0265: التعبيرُ الزمني',
   `max_runtime_seconds` smallint(5) unsigned NOT NULL DEFAULT 600 COMMENT 'TSP-0266',
-  `alert_after_seconds` smallint(5) unsigned NOT NULL DEFAULT 3600 COMMENT 'TSP-0267: مهلةُ إنذارِ التوقف',
+  `alert_after_seconds` int(10) unsigned NOT NULL DEFAULT 3600 COMMENT 'يجب أن تتجاوز دوريةَ الجدولة — وإلا فالإنذارُ كاذبٌ بالبناء',
   `last_success_at` datetime(3) DEFAULT NULL COMMENT 'TSP-0268',
   `owner_role_id` smallint(5) unsigned NOT NULL COMMENT 'TSP-0269: المسؤولُ عند التوقف',
   `is_active` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'TSP-0270',
@@ -2766,6 +2803,14 @@ CREATE TABLE `ems_job_schedule` (
   UNIQUE KEY `uq_sched` (`job_type`),
   KEY `ix_sched_active` (`is_active`,`last_success_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ENG-01 JB-06: جدولةُ المهامِّ الدورية — وتوقفُ العاملِ صامتًا أخطرُ من فشلِ مهمة';
+
+-- ── Table: ems_job_schedule_alert_backup ──
+CREATE TABLE `ems_job_schedule_alert_backup` (
+  `id` int(10) unsigned NOT NULL,
+  `alert_before` int(10) unsigned NOT NULL,
+  `saved_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- ── Table: ems_post_idempotency ──
 CREATE TABLE `ems_post_idempotency` (
@@ -6304,6 +6349,14 @@ CREATE TABLE `gov_component_versions` (
   UNIQUE KEY `uq_fp` (`fingerprint`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='إصداراتُ مكتبةِ المكوّنات — المرقَّى ثابتٌ ولا يُعدَّل في صمت';
 
+-- ── Table: gov_cycle_consumers_backup ──
+CREATE TABLE `gov_cycle_consumers_backup` (
+  `cycle_id` int(10) unsigned NOT NULL,
+  `consumers_before` varchar(255) NOT NULL,
+  `swept_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`cycle_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- ── Table: gov_data_classes ──
 CREATE TABLE `gov_data_classes` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -6325,6 +6378,33 @@ CREATE TABLE `gov_data_classes` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_dc` (`company_id`,`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-OBL-01 §4-17 — التصنيفُ الرباعيُّ للبيانات';
+
+-- ── Table: gov_dead_letter_rulings ──
+CREATE TABLE `gov_dead_letter_rulings` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `fail_code` varchar(32) NOT NULL,
+  `messages` int(10) unsigned NOT NULL,
+  `ruling` varchar(32) NOT NULL COMMENT 'UNDELIVERABLE_BY_DESIGN | RETRY | INVESTIGATE',
+  `owner_role` varchar(64) NOT NULL,
+  `reason` varchar(400) NOT NULL,
+  `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_fail` (`fail_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='GAP-32 — قرارٌ ومالكٌ وسببٌ لكلِّ صنفِ رسالةٍ ميتة';
+
+-- ── Table: gov_delegation_state ──
+CREATE TABLE `gov_delegation_state` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `pathway` varchar(48) NOT NULL COMMENT 'DELEGATION | ESCALATION',
+  `store` varchar(64) NOT NULL,
+  `rows_live` int(10) unsigned NOT NULL,
+  `readers` varchar(300) NOT NULL COMMENT 'قرّاءُ الإنتاجِ المقيسون',
+  `verdict` varchar(32) NOT NULL COMMENT 'LIVE_READABLE | DORMANT',
+  `note` varchar(400) NOT NULL,
+  `measured_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_store` (`store`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='GAP-03 — حالةُ مساراتِ التفويضِ والتصعيدِ مقيسةً بالبياناتِ والقرّاء';
 
 -- ── Table: gov_delegations ──
 CREATE TABLE `gov_delegations` (
@@ -6674,6 +6754,8 @@ CREATE TABLE `gov_key_pollution_archive` (
   `reason` varchar(191) NOT NULL,
   `quarantined_at` datetime NOT NULL DEFAULT current_timestamp(),
   `restored_at` datetime DEFAULT NULL,
+  `superseded_to` varchar(64) DEFAULT NULL COMMENT 'الجدولُ الذي انتقل إليه الصفُّ — فلا موضعَ حيًّا يُردُّ إليه',
+  `superseded_reason` varchar(300) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `ix_kpa_src` (`src_table`,`src_column`,`src_row_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -6767,6 +6849,31 @@ CREATE TABLE `gov_migration_ledger` (
   KEY `ix_state` (`migration_state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='سجلُّ الترحيلِ — 663 موضعًا بأعمدةِ الدفترِ التسعةَ عشرَ وحالةٍ مقيسة';
 
+-- ── Table: gov_nav_reference_standard ──
+CREATE TABLE `gov_nav_reference_standard` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `layer_no` tinyint(3) unsigned NOT NULL COMMENT '1 مركز العمل · 2 دورة الإدارة · 3 المرجع والإدارة',
+  `layer_name` varchar(60) NOT NULL,
+  `stage_order` tinyint(3) unsigned NOT NULL,
+  `stage_name` varchar(160) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_stage` (`layer_no`,`stage_order`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='INJ-FIX-02 NF-04 — المعيارُ المرجعيُّ للترتيب: طبقةٌ ثم مرحلةٌ ثم رتبةٌ مستندية';
+
+-- ── Table: gov_nav_stage_bridge ──
+CREATE TABLE `gov_nav_stage_bridge` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `cycle_layer` varchar(60) NOT NULL,
+  `cycle_stage` varchar(160) NOT NULL,
+  `screens` smallint(5) unsigned NOT NULL,
+  `std_layer_no` tinyint(3) unsigned DEFAULT NULL,
+  `std_stage_order` tinyint(3) unsigned DEFAULT NULL,
+  `std_stage_name` varchar(160) DEFAULT NULL,
+  `match_kind` varchar(24) NOT NULL COMMENT 'EXACT | TOKEN | LAYER_ONLY | UNMAPPED',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_cycle` (`cycle_layer`,`cycle_stage`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='INJ-FIX-02 NF-04 — جسرُ مراحلِ دفترِ الدورةِ برؤوسِ المعيارِ المرجعيّ';
+
 -- ── Table: gov_orphan_links ──
 CREATE TABLE `gov_orphan_links` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -6793,7 +6900,7 @@ CREATE TABLE `gov_ownership_rulings` (
   `owner_after` varchar(120) NOT NULL,
   `witness` varchar(255) NOT NULL COMMENT 'الشاهدُ ومصدرُه',
   `witness_kind` enum('DOMAIN_WRITE','DATA_READ','DOC_CYCLE','NONE') NOT NULL,
-  `ruling` enum('OWNER_CONFIRMED','OWNER_CHANGED','APPEARANCE_MISSING') NOT NULL,
+  `ruling` enum('OWNER_CONFIRMED','OWNER_CHANGED','APPEARANCE_MISSING','SHARED_PLATFORM','NOT_APPLICABLE','OWNER_ESTABLISHED') NOT NULL,
   `reason` varchar(400) NOT NULL DEFAULT '',
   `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`route`)
@@ -6924,6 +7031,20 @@ CREATE TABLE `gov_screen_cycle` (
   KEY `ix_file` (`screen_file`),
   KEY `ix_dept` (`dept_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXW-01 §7-1 — مصفوفةُ التحققِ الحاكمةُ: عناصرُ الدورةِ السبعةُ لكلِّ شاشة';
+
+-- ── Table: gov_sensitive_policy_debt ──
+CREATE TABLE `gov_sensitive_policy_debt` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `source_register` varchar(48) NOT NULL COMMENT 'أيُّ سجلٍّ أعلن السياسة',
+  `declared_target` varchar(160) NOT NULL COMMENT 'الهدفُ كما كُتب',
+  `target_state` varchar(32) NOT NULL COMMENT 'NO_TABLE | NO_COLUMN',
+  `real_column` varchar(160) DEFAULT NULL COMMENT 'العمودُ الحقيقيُّ إن عُرف يقينًا',
+  `real_column_protected` tinyint(1) NOT NULL DEFAULT 0,
+  `note` varchar(400) NOT NULL,
+  `detected_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_target` (`source_register`,`declared_target`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='INJ-FIX-02 NF-09 — سياساتٌ تُعلن حمايةً لهدفٍ لا وجودَ له';
 
 -- ── Table: gov_space_appearances ──
 CREATE TABLE `gov_space_appearances` (
@@ -7056,6 +7177,17 @@ CREATE TABLE `gov_test_residue_archive` (
   KEY `ix_impersonation` (`impersonation_id`),
   CONSTRAINT `chk_act_attribution` CHECK (`impersonation_id` is null or `acted_by` is not null and `acted_for` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ── Table: gov_topbar_exemptions ──
+CREATE TABLE `gov_topbar_exemptions` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `route` varchar(190) NOT NULL,
+  `kind` varchar(32) NOT NULL COMMENT 'SESSION_ACTION | COUNT_ENDPOINT',
+  `reason` varchar(400) NOT NULL,
+  `declared_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_route` (`route`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='GAP-28 — مساراتُ شريطٍ علويٍّ لا يسري عليها عزلُ المساحة، بسببٍ مكتوب';
 
 -- ── Table: gov_visual_measurements ──
 CREATE TABLE `gov_visual_measurements` (
@@ -14583,6 +14715,34 @@ CREATE TABLE `waivers_reversals` (
 
 -- ── Table: work_delegations ──
 CREATE TABLE `work_delegations` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `kind` varchar(20) NOT NULL COMMENT 'task_assign|role_assign|deputize|delegate_approval|reassign|workload_move',
+  `from_user_id` int(10) unsigned NOT NULL,
+  `to_user_id` int(10) unsigned NOT NULL,
+  `scope_ref` varchar(160) NOT NULL COMMENT 'المهمة/الدور/نوع المستند — لا تفويض مفتوح النطاق',
+  `cap_amount` decimal(14,2) DEFAULT NULL COMMENT 'سقف تفويض الاعتماد',
+  `cap_currency` varchar(3) DEFAULT NULL,
+  `starts_at` datetime NOT NULL,
+  `ends_at` datetime NOT NULL COMMENT 'لا تفويض مفتوح المدة',
+  `status` varchar(12) NOT NULL DEFAULT 'active' COMMENT 'active|ended|revoked',
+  `effect_on_open` varchar(200) NOT NULL DEFAULT 'تعود للأصل فورًا بانتهائها',
+  `approval_ref` varchar(60) DEFAULT NULL COMMENT 'جهة الموافقة — الحوكمة',
+  `created_by` int(10) unsigned NOT NULL DEFAULT 0 COMMENT 'المنشئ',
+  `created_capacity` varchar(60) DEFAULT NULL COMMENT 'صفة المنشئ لحظة الفعل',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `approved_by` int(10) unsigned DEFAULT NULL COMMENT 'المعتمِد',
+  `approved_capacity` varchar(60) DEFAULT NULL COMMENT 'صفة المعتمِد',
+  `approved_at` datetime DEFAULT NULL,
+  `delegation_ref` varchar(60) DEFAULT NULL COMMENT 'مرجع التفويض إن اعتُمد به',
+  `parent_ref` varchar(60) DEFAULT NULL COMMENT 'المرجع الأب',
+  PRIMARY KEY (`id`),
+  KEY `ix_wd_to` (`company_id`,`to_user_id`,`status`),
+  KEY `ix_wd_window` (`status`,`starts_at`,`ends_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WF-08: انتهاء التفويض يوقف التوليد ولا يلغي المفتوح';
+
+-- ── Table: work_delegations_seed_archive ──
+CREATE TABLE `work_delegations_seed_archive` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `company_id` int(10) unsigned NOT NULL,
   `kind` varchar(20) NOT NULL COMMENT 'task_assign|role_assign|deputize|delegate_approval|reassign|workload_move',
