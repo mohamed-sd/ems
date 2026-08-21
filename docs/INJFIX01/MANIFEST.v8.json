@@ -139,5 +139,16 @@
         "migration": "database\/migrations\/2027_09_04_topbar_routes_into_registry.php — رجوعٌ مُثبَت (888 ⇐ 888)",
         "proof": "tests\/injfix01_topbar_registry_proof.php — 4\/4 · ويفحص الإعفاءَ المتقادمَ أيضًا",
         "side_effect": "NF-24 انخفض 14 ⇐ 13 والسقّاطةُ طلبت الشدَّ فشُدَّت"
+    },
+    "GAP_08_ORPHAN_DELIVERIES": {
+        "status": "CLOSED — المعاييرُ الثلاثةُ مُنفَّذةٌ ومُجرَّبة",
+        "measured": "**82 يتيمًا لا 60** (نما منذ القياسِ الأول) · المدى 2026-08-18 ← 2026-08-21",
+        "root_cause": "ems_business_events **يُكنَس** (أقصى id 44,624 مقابلَ 21,285 صفًّا — فجوةُ 23,339) و ems_event_deliveries **بلا قيدٍ مرجعيٍّ واحد**. وقِيس أن صفرَ يتيمٍ يشير إلى id أكبرَ من الموجود ⇒ الجذورُ كانت ثم حُذفت",
+        "two_populations": "66 رصدها الحارسُ وأعلنها (fail_code=NO_EVENT · dlq) — أثرُ الحارسِ لا خللُه · و10 بقايا اختبارٍ ببذرِ UAT-2026 · و6 أخرى",
+        "constraint": "fk_evdeliv_event: event_id ⇒ ems_business_events.id **ON DELETE CASCADE** — لا RESTRICT: التسليمُ لا معنى له بلا جذرِه، وRESTRICT كان سيُفشل كلَّ كنسٍ فيُنزع القيدُ بعدَ أسبوع — وقيدٌ يُنزع ليس قيدًا",
+        "live_tested": "جُرِّب حيًّا: رُفض إدراجُ تسليمٍ بجذرٍ غيرِ موجود (errno 1452) — لا يُقرأ من المخطَّطِ وحدَه",
+        "no_swallow": "لا INSERT IGNORE — التكرارُ بـON DUPLICATE KEY UPDATE الذي يُبلّغ، **ويُعَدُّ المؤرشَفُ فعلًا قبلَ الحذفِ فلا يُحذف ما لم يُؤرشَف**",
+        "migration": "database\/migrations\/2027_09_05_orphan_deliveries_and_fk.php — رجوعٌ مُثبَت (21377 ⇐ 21377)",
+        "proof": "tests\/injfix01_orphan_delivery_proof.php — 6\/6"
     }
 }
