@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-21 09:37:28
--- الجداول: 603 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-21 10:39:35
+-- الجداول: 604 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -422,7 +422,9 @@ CREATE TABLE `approval_requests` (
   KEY `idx_approval_entity` (`entity_type`,`entity_id`),
   KEY `idx_approval_status` (`status`),
   KEY `idx_approval_user` (`requested_by`),
-  CONSTRAINT `chk_nopollute_7a64618103b0238d` CHECK (`approved_at` <= '2026-08-10 20:24:28' or `entity_type` is null or `entity_type`  not like '% %' or octet_length(`entity_type`) <= char_length(`entity_type`))
+  CONSTRAINT `chk_nopollute_7a64618103b0238d` CHECK (`approved_at` <= '2026-08-10 20:24:28' or `entity_type` is null or `entity_type`  not like '% %' or octet_length(`entity_type`) <= char_length(`entity_type`)),
+  CONSTRAINT `chk_keypure_approval_requests_entity_type` CHECK (`entity_type`  not like '% %' and `entity_type`  not like '%·%'),
+  CONSTRAINT `chk_keypure_approval_requests_action` CHECK (`action`  not like '% %' and `action`  not like '%·%')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: approval_rules_quarantine ──
@@ -495,7 +497,9 @@ CREATE TABLE `approval_workflow_rules` (
   UNIQUE KEY `uniq_workflow_rule` (`entity_type`,`action`,`step_order`),
   KEY `idx_workflow_rule_lookup` (`entity_type`,`action`,`is_active`),
   CONSTRAINT `chk_rules_retired` CHECK (`is_active` = 0),
-  CONSTRAINT `chk_nopollute_d662685283921e14` CHECK (`created_at` <= '2026-08-10 19:39:36' or `entity_type` is null or `entity_type`  not like '% %' or octet_length(`entity_type`) <= char_length(`entity_type`))
+  CONSTRAINT `chk_nopollute_d662685283921e14` CHECK (`created_at` <= '2026-08-10 19:39:36' or `entity_type` is null or `entity_type`  not like '% %' or octet_length(`entity_type`) <= char_length(`entity_type`)),
+  CONSTRAINT `chk_keypure_approval_workflow_rules_entity_type` CHECK (`entity_type`  not like '% %' and `entity_type`  not like '%·%'),
+  CONSTRAINT `chk_keypure_approval_workflow_rules_action` CHECK (`action`  not like '% %' and `action`  not like '%·%')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: asset_hour_reconciliations ──
@@ -2705,7 +2709,8 @@ CREATE TABLE `ems_event_deliveries` (
   KEY `ix_state` (`state`,`next_attempt_at`),
   KEY `ix_outbox` (`outbox_id`),
   CONSTRAINT `chk_result` CHECK (`state` <> 'processed' or `result_ref` is not null),
-  CONSTRAINT `chk_fail` CHECK (`state` not in ('failed','dlq') or `fail_code` is not null)
+  CONSTRAINT `chk_fail` CHECK (`state` not in ('failed','dlq') or `fail_code` is not null),
+  CONSTRAINT `chk_keypure_ems_event_deliveries_consumer` CHECK (`consumer`  not like '% %' and `consumer`  not like '%·%')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='K4: محاولات تسليمٍ جارية (تُحذف عند النجاح أو تنتقل للرسائل الميتة)';
 
 -- ── Table: ems_job_queue ──
@@ -6640,6 +6645,22 @@ CREATE TABLE `gov_journey_ladders` (
   KEY `ix_gjl_ladder` (`ladder_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='خامسًا/سابعًا — الـ13 سلّمًا مرتّبةً بحسبِ الرحلاتِ الثلاث';
 
+-- ── Table: gov_key_pollution_archive ──
+CREATE TABLE `gov_key_pollution_archive` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `src_table` varchar(64) NOT NULL,
+  `src_column` varchar(64) NOT NULL,
+  `src_row_id` bigint(20) NOT NULL,
+  `original_value` text NOT NULL,
+  `replacement` varchar(191) NOT NULL,
+  `row_snapshot` longtext DEFAULT NULL,
+  `reason` varchar(191) NOT NULL,
+  `quarantined_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `restored_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_kpa_src` (`src_table`,`src_column`,`src_row_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ── Table: gov_ladder_actor_roles ──
 CREATE TABLE `gov_ladder_actor_roles` (
   `actor_code` varchar(40) NOT NULL,
@@ -7037,7 +7058,8 @@ CREATE TABLE `guard_denials` (
   `reason_code` varchar(80) DEFAULT NULL,
   `at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`deny_id`),
-  KEY `ix_gd_guard` (`guard_code`,`at`)
+  KEY `ix_gd_guard` (`guard_code`,`at`),
+  CONSTRAINT `chk_denial_ref_present` CHECK (`attempted_ref` is not null and `attempted_ref` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-01 §9: سجل المنع — مقياس ملاءمة الحماية لا سجل مخالفات المستخدمين';
 
 -- ── Table: guard_override_policies ──
