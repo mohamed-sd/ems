@@ -79,8 +79,14 @@ if (isset($_GET['post_id'])) {
     // فينكفئ الترحيل كله (rollback) بدل تباعد جذر/مشتق (المسار اليدوي بلا idempotency يمرّ).
     try {
         $gate->runInTransaction(function ($g) use ($pid, $entryRow, $current_user_id) {
+            /* ◆ **مرجعُ الاعتمادِ يُولَد عندَ الترحيلِ لا عندَ الإنشاء** (FR-FIN-006):
+                 المسوَّدةُ لا معتمِدَ لها بعد، والقيدُ في القاعدةِ يطلبه للمرحَّلِ
+                 وحدَه. والمرجعُ **يشهد على اليدِ الثانية**: مَن رحَّل ومتى —
+                 وحارسُ عدمِ اعتمادِ النفسِ فوقَه سلفًا. */
+            $__apr = 'JV-APR-' . $pid . '-U' . (int) $current_user_id . '-' . date('YmdHis');
             $g->update('fin_journal_entries',
-                array('state' => 'posted', 'posted_by' => $current_user_id, 'posted_at' => date('Y-m-d H:i:s')),
+                array('state' => 'posted', 'posted_by' => $current_user_id,
+                      'posted_at' => date('Y-m-d H:i:s'), 'approval_ref' => $__apr),
                 array('id' => $pid), "state='draft'");
             $eid = $entryRow ? intval($entryRow['event_id']) : 0;
             if ($eid > 0) {
@@ -158,6 +164,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
     if (!$pchk['ok']) { ems_gov_flash_redirect(ems_flash_to('journal_form_fin.php', "+❌"), $pchk['reason'], 'GOV-INFO-200', ''); exit(); }
     // M-38: اليدويُّ الاستثنائي بسببٍ موثَّق إلزامًا (SPEC-01 #13: POST /journal/manual بسببٍ إلزامي)
     if ($memo === '') { ems_gov_flash_redirect('journal_form_fin.php', 'بيان القيد (السبب) إلزامي للقيد اليدوي ❌', 'GOV-FAIL-409', ''); exit(); }
+
+    /* ══ FR-FIN-006 · §سابعًا — القيدُ اليدويُّ لا يُقبل ناقصَ الحوكمة ══════
+       ◆ قيدُ `chk_manual_journal_governed` يرفضه من القاعدة، **لكنَّ الرفضَ
+         من القاعدةِ يصل المستخدمَ استثناءً غامضًا**. فيُفحَص هنا أوّلًا
+         برسالةٍ تسمّي الناقص، **ويبقى قيدُ القاعدةِ هو الحدَّ الأخيرَ** لمن
+         يتجاوز الشاشة. حارسان لا حارسٌ واحد.
+       ◆ ولا يُطلب هذا من القيدِ الآليّ (له `event_id`) — الشرطُ على اليدويّ. */
+    $manual_kind    = trim($_POST['manual_kind'] ?? '');
+    $source_doc_ref = trim($_POST['source_doc_ref'] ?? '');
+    $reversal_link  = (int) ($_POST['reversal_link'] ?? 0);
+    $period_code    = substr($posting_date, 0, 7);
+    if ($event_id <= 0) {
+        if ($manual_kind === '') {
+            ems_gov_flash_redirect('journal_form_fin.php',
+                'نوع القيد إلزامي للقيد اليدوي (تسوية/تصحيح/إقفال/عكس) ❌', 'GOV-FAIL-409', ''); exit();
+        }
+        if ($source_doc_ref === '') {
+            ems_gov_flash_redirect('journal_form_fin.php',
+                'المستند المصدر إلزامي للقيد اليدوي — ولا قيدَ بلا مستند ❌', 'GOV-FAIL-409', ''); exit();
+        }
+        if ($manual_kind === 'عكس' && $reversal_link <= 0) {
+            ems_gov_flash_redirect('journal_form_fin.php',
+                'قيد العكس يلزمه رابط القيد المعكوس ❌', 'GOV-FAIL-409', ''); exit();
+        }
+    }
     // M-38: العملة من الدليل المسجَّل حصرًا
     require_once __DIR__ . '/../includes/fx.php';
     $jr_code = ems_fx_code($jr_currency !== '' ? $jr_currency : 'SDG');
@@ -201,13 +232,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['posting_date'])) {
 
     $entry_no = fin_gen_code($conn, 'fin_journal_entries', 'FIN-JV', $company_id);
     // رأس + سطور = زوجٌ ذرّي (§9): إمّا القيد كاملًا أو لا شيء (لا رأسٌ بلا سطوره)
-    ems_tenant_db()->runInTransaction(function ($g) use ($entry_no, $event_id, $posting_date, $txn_date, $jr_code, $jr_fx, $jr_base, $tot_d, $tot_c, $memo, $current_user_id, $lines) {
+    ems_tenant_db()->runInTransaction(function ($g) use ($entry_no, $event_id, $posting_date, $txn_date, $jr_code, $jr_fx, $jr_base, $tot_d, $tot_c, $memo, $current_user_id, $lines, $manual_kind, $source_doc_ref, $period_code, $reversal_link) {
         $entry_id = $g->insert('fin_journal_entries', array(
             'entry_no' => $entry_no, 'event_id' => $event_id, 'posting_date' => $posting_date,
             'txn_date' => $txn_date, 'currency' => $jr_code,
             'fx_rate' => $jr_fx, 'base_amount' => $jr_base,
             'total_debit' => $tot_d, 'total_credit' => $tot_c, 'memo' => $memo,
             'state' => 'draft', 'created_by' => $current_user_id,
+            /* FR-FIN-006 — بنودُ §سابعًا الخمسةُ الناقصة */
+            'manual_kind' => $manual_kind, 'source_doc_ref' => $source_doc_ref,
+            'period_code' => $period_code,
+            'reversal_link' => $reversal_link > 0 ? $reversal_link : null,
+            'manual_gov_state' => 'GOVERNED',
         ));
         foreach ($lines as $ln) {
             $g->insert('fin_journal_lines', array(
@@ -281,6 +317,30 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                             }
                             ?>
                         </select>
+                    </div>
+                    <!-- ══ FR-FIN-006 — حوكمةُ القيدِ اليدويّ (§سابعًا) ═══════════════
+                         ◆ ثمانيةُ بنودٍ يشترطها الأمرُ الحاكم لكلِّ Manual Journal.
+                           ثلاثةٌ كانت قائمةً (السببُ · المُعِدُّ · المعتمِد) وخمسةٌ
+                           تُطلب هنا. **وقيدُ القاعدةِ يرفض الناقصَ** — فالحقلُ
+                           إلزاميٌّ في الشاشةِ وفي القاعدةِ معًا لا في إحداهما.
+                         ◆ ولا تُطلب من القيدِ الآليِّ (له حدثٌ) — الشرطُ على اليدويِّ وحدَه. -->
+                    <div class="form-group">
+                        <label for="j_kind">نوع القيد <span class="req">*</span></label>
+                        <select name="manual_kind" id="j_kind">
+                            <option value="">— اختر —</option>
+                            <option value="تسوية">تسوية</option>
+                            <option value="تصحيح">تصحيح</option>
+                            <option value="إقفال">إقفال</option>
+                            <option value="عكس">عكس</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="j_doc">المستند المصدر <span class="req">*</span></label>
+                        <input type="text" name="source_doc_ref" id="j_doc" placeholder="رقم المستند أو مرجعه">
+                    </div>
+                    <div class="form-group">
+                        <label for="j_rev">رابط العكس</label>
+                        <input type="number" name="reversal_link" id="j_rev" placeholder="رقم القيد المعكوس (إن كان عكسًا)">
                     </div>
                     <div class="form-group fin-jrn-span-all">
                         <label for="j_memo">بيان القيد</label>

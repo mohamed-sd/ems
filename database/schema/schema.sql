@@ -1,14 +1,20 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 16:39:24
--- الجداول: 645 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-22 17:02:08
+-- الجداول: 646 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
 -- ═══════════════════════════════════════════════════════════════════════════
 SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
 SET FOREIGN_KEY_CHECKS = 0;
+
+-- ── Table: _trg_probe ──
+CREATE TABLE `_trg_probe` (
+  `id` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: achievement_attributions ──
 CREATE TABLE `achievement_attributions` (
@@ -4916,6 +4922,12 @@ CREATE TABLE `fin_journal_entries` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `manual_kind` varchar(40) NOT NULL DEFAULT '' COMMENT 'النوع — تسويةٌ/تصحيحٌ/إقفالٌ/عكس',
+  `source_doc_ref` varchar(120) NOT NULL DEFAULT '' COMMENT 'المستندُ المصدر',
+  `approval_ref` varchar(120) NOT NULL DEFAULT '' COMMENT 'مرجعُ الاعتماد',
+  `reversal_link` bigint(20) DEFAULT NULL COMMENT 'رابطُ العكس — القيدُ المعكوس',
+  `period_code` varchar(16) NOT NULL DEFAULT '' COMMENT 'الفترةُ YYYY-MM',
+  `manual_gov_state` varchar(20) NOT NULL DEFAULT 'GOVERNED' COMMENT 'GOVERNED · PRE_GOVERNANCE',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_fin_entry_no` (`company_id`,`entry_no`),
   KEY `ix_fin_entry_state` (`company_id`,`state`),
@@ -4924,7 +4936,8 @@ CREATE TABLE `fin_journal_entries` (
   KEY `ix_je_txn_date` (`company_id`,`txn_date`),
   KEY `ix_je_request_no` (`company_id`,`request_no`),
   CONSTRAINT `ck_je_balanced` CHECK (round(`total_debit`,2) = round(`total_credit`,2)),
-  CONSTRAINT `ck_je_fx_pair` CHECK (`fx_rate` is null and `base_amount` is null or `fx_rate` is not null and `base_amount` = round(`total_debit` * `fx_rate`,2))
+  CONSTRAINT `ck_je_fx_pair` CHECK (`fx_rate` is null and `base_amount` is null or `fx_rate` is not null and `base_amount` = round(`total_debit` * `fx_rate`,2)),
+  CONSTRAINT `chk_manual_journal_governed` CHECK (`event_id` is not null and `event_id` > 0 or `manual_gov_state` = 'PRE_GOVERNANCE' or trim(`manual_kind`) <> '' and trim(`source_doc_ref`) <> '' and trim(coalesce(`memo`,'')) <> '' and trim(`period_code`) <> '' and `created_by` > 0 and (`state` <> 'posted' or trim(`approval_ref`) <> '' and coalesce(`posted_by`,0) > 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_journal_lines ──
