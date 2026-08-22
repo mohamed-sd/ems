@@ -142,29 +142,62 @@ if (!function_exists('fin_project_scope')) {
         }
     }
 }
+/* ◆ **رمزانِ صريحانِ بدل `null` الغامض**: كان `null` يعني «كلَّ الصفوف»
+ *   وهو أيضًا ما يعود عند الغياب — فالغيابُ والانفتاحُ لهما القيمةُ نفسُها.
+ *   ⇒ يُفصلان: `ALL` انفتاحٌ مُعلَن · `NONE` إغلاقٌ افتراضيّ. */
+if (!defined('PARTY_SCOPE_ALL'))  { define('PARTY_SCOPE_ALL',  '__ALL__'); }
+if (!defined('PARTY_SCOPE_NONE')) { define('PARTY_SCOPE_NONE', '__NONE__'); }
 if (!function_exists('fin_party_scope')) {
     /**
-     * نطاق نوع الطرف للأدوار التشغيلية الممنوحة عرض الذمم/المدفوعات
-     * (قرار 2026-07-17 — كل إدارةٍ ترى بيانات أطرافها هي):
-     *   الموارد البشرية (4)            ← الموظفون حصرًا (الرواتب شأنها)
-     *   الموردون (2/8) والمشتريات (16) ← الموردون حصرًا (لا رواتب موظفين)
-     * عائلة المالية والسوبر بلا نطاق (null = الكل).
+     * نطاق نوع الطرف للأدوار الممنوحة عرض الذمم/المدفوعات.
      *
-     * @return string|null 'employee' · 'supplier' · null
+     * ◆ FR-SEC-001 · FR-SEC-002 (GAP-22) — **يفشل مغلقًا**:
+     *   كان يعود `null` لأيِّ دورٍ لم تسمِّه الدالة، و`null` تعني عند
+     *   مستهلكَيها **كلَّ الصفوف**. فخمسةٌ وعشرون دورًا غيرَ مصنَّفٍ كانت ترى
+     *   ذممَ المنشأةِ ومدفوعاتِها كاملةً — **انفتاحٌ بالصمتِ لا بقرار**.
+     *   الآن: الدورُ غيرُ المسجَّلِ يُرجع `PARTY_SCOPE_NONE` ⇒ **صفرُ صفٍّ**.
+     *
+     * ◆ والنطاقُ يُقرأ من **مصدرٍ واحدٍ مُعلَن** — `fin_party_scope_registry` —
+     *   لا من شيفرةِ هذه الدالةِ ولا من كودِ الشاشة. والانفتاحُ المشروعُ
+     *   يُكتب `ALL` صراحةً فلا يبقى فراغٌ يُقرأ انفتاحًا.
+     *
+     * ◆ **وتعذُّرُ قراءةِ السجلِّ يفشل مغلقًا أيضًا** — لا يُقرأ عطبُ الاتصالِ
+     *   إذنًا. (والسوبر أدمن وحدَه يعبر — وهو استثناءٌ قائمٌ قبلَ هذا المطلب.)
+     *
+     * @return string 'employee' · 'supplier' · 'client' · PARTY_SCOPE_ALL · PARTY_SCOPE_NONE
      */
     function fin_party_scope($ctx)
     {
         if (!empty($ctx['is_super'])) {
-            return null;
+            return PARTY_SCOPE_ALL;
         }
-        $r = strval($ctx['role']);
-        if ($r === '4') {
-            return 'employee';
+        $role = intval(isset($ctx['role']) ? $ctx['role'] : 0);
+        if ($role <= 0) {
+            return PARTY_SCOPE_NONE;
         }
-        if (in_array($r, array('2', '8', '16'), true)) {
-            return 'supplier';
+        static $cache = array();
+        if (array_key_exists($role, $cache)) { return $cache[$role]; }
+
+        $scope = PARTY_SCOPE_NONE;
+        try {
+            $conn = isset($GLOBALS['conn']) ? $GLOBALS['conn'] : null;
+            if ($conn instanceof mysqli) {
+                $st = $conn->prepare(
+                    'SELECT `party_scope` FROM `fin_party_scope_registry` WHERE `role_id` = ? LIMIT 1');
+                if ($st) {
+                    $st->bind_param('i', $role);
+                    $st->execute();
+                    $st->bind_result($found);
+                    if ($st->fetch()) {
+                        $scope = ($found === 'ALL') ? PARTY_SCOPE_ALL : (string) $found;
+                    }
+                    $st->close();
+                }
+            }
+        } catch (\Throwable $e) {
+            $scope = PARTY_SCOPE_NONE;   /* أيُّ فشلٍ = لا صفوف، لا كل الصفوف */
         }
-        return null;
+        return $cache[$role] = $scope;
     }
 }
 if (!function_exists('fin_can_perform')) {

@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 07:46:54
--- الجداول: 640 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-22 07:54:52
+-- الجداول: 641 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -5305,6 +5305,15 @@ CREATE TABLE `fin_operator_pay` (
   UNIQUE KEY `uq_op_pay` (`company_id`,`employee_id`),
   KEY `ix_mode` (`company_id`,`pay_mode`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: fin_party_scope_registry ──
+CREATE TABLE `fin_party_scope_registry` (
+  `role_id` int(11) NOT NULL,
+  `party_scope` varchar(16) NOT NULL COMMENT 'employee · supplier · client · ALL',
+  `decision_source` varchar(160) NOT NULL,
+  `decided_at` date NOT NULL,
+  PRIMARY KEY (`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FR-SEC-002 — مصدرٌ واحدٌ لنطاقِ الأطراف · الدورُ غيرُ المسجَّلِ يفشل مغلقًا';
 
 -- ── Table: fin_payments ──
 CREATE TABLE `fin_payments` (

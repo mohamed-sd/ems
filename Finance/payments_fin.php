@@ -301,7 +301,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 // الموردين حصرًا — لا رواتب موظفين ولا تحصيلات عملاء. المالية ترى الكل.
                 $party_scope = fin_party_scope($ctx);
                 $pay_opts = array('orderBy' => 'id DESC');
-                if ($party_scope !== null) {
+                /* ◆ FR-SEC-001 — الإغلاقُ الافتراضيُّ يُرجع صفرَ صفٍّ لا كلَّ الصفوف */
+                if ($party_scope === PARTY_SCOPE_NONE) {
+                    $pay_opts['whereRaw'] = '1=0';
+                } elseif ($party_scope !== PARTY_SCOPE_ALL) {
                     $pay_opts['whereRaw'] = 'party_type = ?';
                     $pay_opts['params'] = array($party_scope);
                 }

@@ -256,7 +256,13 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
                 $party_scope = fin_party_scope($ctx);
                 $pd_whereRaw = "COALESCE(d.is_deleted,0)=0";
                 $pd_params = array();
-                if ($party_scope !== null) { $pd_whereRaw .= " AND d.party_type = ?"; $pd_params[] = $party_scope; }
+                /* ◆ FR-SEC-001 — ثلاثُ حالاتٍ لا حالتان: انفتاحٌ مُعلَنٌ · نطاقٌ
+                 *   محدَّد · **وإغلاقٌ افتراضيٌّ يُرجع صفرَ صفٍّ** لا كلَّ الصفوف. */
+                if ($party_scope === PARTY_SCOPE_NONE) {
+                    $pd_whereRaw .= " AND 1=0";            /* دورٌ غيرُ مصنَّف ⇒ صفرُ صفّ */
+                } elseif ($party_scope !== PARTY_SCOPE_ALL) {
+                    $pd_whereRaw .= " AND d.party_type = ?"; $pd_params[] = $party_scope;
+                }
                 $due_rows = fin_gate($is_super_admin)->scopedQuery(
                     array('scope' => array('d' => 'fin_dues'),
                           'enrich' => array('s' => 'suppliers', 'e' => 'employees')),
