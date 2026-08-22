@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 04:33:39
--- الجداول: 639 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-22 07:46:54
+-- الجداول: 640 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6491,6 +6491,20 @@ CREATE TABLE `gov_cycle_consumers_backup` (
   `consumers_before` varchar(255) NOT NULL,
   `swept_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`cycle_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: gov_cycle_name_log ──
+CREATE TABLE `gov_cycle_name_log` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `row_id` int(11) NOT NULL,
+  `field` varchar(32) NOT NULL,
+  `old_value` varchar(255) NOT NULL,
+  `new_value` varchar(255) NOT NULL,
+  `requirement_id` varchar(32) NOT NULL,
+  `changed_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `k_row` (`row_id`),
+  KEY `k_req` (`requirement_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: gov_data_classes ──
