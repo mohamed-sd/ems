@@ -18,6 +18,12 @@
  *   تفصيلٍ إرثيّتان. وتُترك مرصودةً في بوابةِ `injfrd66_xc04_gate.php` حتى
  *   يُحسم موضعُها — **ولا تُحذف** («لا حذفَ مسار»).
  *
+ * ◆ **و`placement_kind` قائمةُ ENUM مغلقة** (`SINGLE`·`CROSS_ROLE_ENTRY`·
+ *   `UNJUSTIFIED_SPLIT`) — و«SERVICE» ليست فيها. وENUM **يبتلع القيمةَ
+ *   غيرَ المعلومةِ '' صامتًا** بلا خطأ، فيبدو الصفُّ مكتوبًا وحقلُه فارغ.
+ *   فتُكتب `SINGLE`، ويحمل المعنى `nature` و`placement_basis` — وكلاهما
+ *   نصٌّ حرٌّ يسع التوصيف.
+ *
  * التشغيل:  php database/migrations/2027_10_31_injfrd66_xc04_service_surface.php
  * الرجوع :  php database/migrations/2027_10_31_injfrd66_xc04_service_surface.php --revert
  * ═══════════════════════════════════════════════════════════════════════════
@@ -80,7 +86,7 @@ if ($cur) {
             (`route`,`canonical_ar`,`group_name`,`status`,`decision_state`,`application_state`,
              `placement_kind`,`placement_basis`,`decision_source`,`retirement_status`,`nature`)
          VALUES (?,?,'الحوكمة والضوابط','APPROVED','APPROVED','DEPLOYED',
-                 'SERVICE',?,?,'ACTIVE','سطحٌ خدميّ')");
+                 'SINGLE',?,?,'ACTIVE','سطحٌ خدميّ')");
     $st->bind_param('ssss', $ROUTE, $NAME, $BASIS, $SOURCE);
     if (!$st->execute()) { fwrite(STDERR, "✘ تعذّر الإنشاء: {$conn->error}\n"); exit(1); }
     $st->close();
