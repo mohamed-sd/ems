@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 13:56:58
+-- المصدر: equipation_manage · التوليد: 2026-08-22 15:25:06
 -- الجداول: 642 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -4284,7 +4284,8 @@ CREATE TABLE `fin_contract_types` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_ctype` (`company_id`,`type_code`),
-  KEY `ix_ctype_family` (`company_id`,`family`,`active`)
+  KEY `ix_ctype_family` (`company_id`,`family`,`active`),
+  CONSTRAINT `chk_contract_type_code_shape` CHECK (`active` = 0 or `type_code` regexp '^[A-Z]{2}-[0-9]{2}$')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='COA §03/§04: ثمانيةُ عقودِ موظفينَ وعشرةُ عقودِ ممولينَ — البُعد D9';
 
 -- ── Table: fin_cost_centers ──
@@ -5776,7 +5777,8 @@ CREATE TABLE `fin_signal_rules` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_fsrule` (`company_id`,`signal_code`),
-  KEY `ix_fsrule_active` (`company_id`,`active`,`cadence`)
+  KEY `ix_fsrule_active` (`company_id`,`active`,`cadence`),
+  CONSTRAINT `chk_signal_code_shape` CHECK (`active` = 0 or `signal_code` regexp '^[A-Z]{2}-[0-9]{2}$')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='MAP-7 الورقة 36: كلُّ إشارةٍ تُنشر لإدارةِ المخاطرِ فتدخل الفرزَ الرباعي';
 
 -- ── Table: fin_tax_codes ──
