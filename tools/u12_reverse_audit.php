@@ -267,9 +267,14 @@ judge($rows, $fail, $warn, 'COA', 'صفرُ سطرِ قيدٍ يشير لحسا�
 
 /* ═══ ⑥ محركاتُ التحليلِ الماليّ ═══════════════════════════════════════ */
 $ratioDefs = n($db, "SELECT COUNT(*) FROM fin_ratio_targets");
-$signalDefs = n($db, "SELECT COUNT(*) FROM fin_signal_rules");
+/* ◆ **التعريفُ ما يُستهلَك لا ما يُخزَّن**: الصفُّ المحجورُ (`active = 0`)
+ *   باقٍ لأثرِه التدقيقيِّ ولا يقرؤه محركٌ ولا شاشة، فعدُّه تعريفًا يجعل
+ *   المقياسَ يحاسب الوثيقةَ على ما لا تحكمه. و`tools/m10_ac_gate.php`
+ *   يعدُّ أنواعَ العقودِ بـ`active = 1` سلفًا — فهذا توحيدٌ لا تخفيف.
+ *   **وهو أشدُّ لا أرخى**: التلوّثُ يصل نشطًا فيُمسَك، والمحجورُ لا يُحسَب. */
+$signalDefs = n($db, "SELECT COUNT(*) FROM fin_signal_rules WHERE active = 1");
 $postRows = n($db, "SELECT COUNT(*) FROM fin_posting_matrix");
-$ctypes = n($db, "SELECT COUNT(*) FROM fin_contract_types");
+$ctypes = n($db, "SELECT COUNT(*) FROM fin_contract_types WHERE active = 1");
 judge($rows, $fail, $warn, 'M-10', 'النسبُ الماليةُ 44 معرَّفة', 44, $ratioDefs, $ratioDefs === 44, '');
 judge($rows, $fail, $warn, 'M-10', 'الإشاراتُ 16 معرَّفة', 16, $signalDefs, $signalDefs === 16, '');
 judge($rows, $fail, $warn, 'M-10', 'مصفوفةُ الترحيلِ 27 صفًّا', 27, $postRows, $postRows === 27, '');
@@ -363,7 +368,16 @@ $carrier = array(
     'المُودِع ems_gov_flash_redirect' => strpos($permH, 'function ems_gov_flash_redirect') !== false,
     'المصبُّ ems_gov_redirect'        => strpos($permH, 'function ems_gov_redirect') !== false,
     'الماصُّ ems_absorb_url_msg'      => strpos($permH, 'function ems_absorb_url_msg') !== false,
-    'العارضُ في الترويسة'             => strpos($inhd, 'emsGovFlash') !== false,
+    /* ◆ **المقياسُ كان يبحث عن معرِّفٍ متقاعد**: الترويسةُ حملت الرسالةَ في
+     *   عنصرٍ اسمُه `emsGovFlash` بأنماطٍ داخلية، ثم **هُجِّرت في
+     *   2026-08-09 إلى نظامِ الرسائلِ الموحَّد** (`EmsAlert`) بقرارِ مالكٍ
+     *   بعد بلاغٍ بلقطةٍ حيّة. فالطبقةُ **قائمةٌ وأفضلُ**، والغائبُ اسمُها
+     *   لا فعلُها. وإضافةُ الاسمِ الميتِ لتخضرَّ البوابةُ **تلاعبٌ بالمقياس**
+     *   ⇒ يُرسى القياسُ على الفعلِ: امتصاصُ `ems_flash_gov` من الجلسةِ ثم
+     *   عرضُه بالحاملِ الموحَّدِ أو بلافتةِ `noscript` عند غيابِ جافاسكربت. */
+    'العارضُ في الترويسة'             => (strpos($inhd, 'ems_flash_gov') !== false
+                                            && (strpos($inhd, 'EmsAlert') !== false
+                                                || strpos($inhd, 'emsGovFlash') !== false)),
     'العارضُ في شاشةِ الدخول'         => strpos($login, 'emsGovFlash') !== false,
 );
 $carOk = 0; $carMiss = array();
@@ -591,11 +605,35 @@ foreach (array_merge(array_keys($m10Screens), array_keys($m14Screens)) as $f) {
     list($rel,) = resolve_screen($ROOT, $fileMapReal, $f);
     if ($rel !== null) { $newBuilt[$rel] = true; }
 }
+/* ◆ **القشراتُ المشتركةُ تُقرأ كلُّها لا واحدةً**: الشاشاتُ المولَّدةُ تسكن
+ *   ثلاثَ قشراتٍ (التحليلُ الماليّ · حوكمةُ الإدارة · مخاطرُ الإدارة)،
+ *   وكلٌّ منها تُضمّن الرأسَ لساكنيها. وقصرُ الاتّباعِ على واحدةٍ يترك
+ *   ساكنَ الأخرى مُتَّهمًا بلا ذنب. */
+$faShells = array();
+foreach (array('includes/fin_analysis_shell', 'includes/dept_gov_space',
+               'Risk/dept_risk_space') as $shPath) {   /* قشرةُ المخاطرِ تسكن Risk/ لا includes/ */
+    $shSrc = (string) @file_get_contents($ROOT . '/' . $shPath . '.php');
+    if ($shSrc !== '' && strpos($shSrc, 'page_header.php') !== false) {
+        $faShells[] = basename($shPath);
+    }
+}
 $noHdr = array(); $noShell = array();
 foreach (array_keys($newBuilt) as $rel) {
     $src = (string) @file_get_contents($ROOT . '/' . $rel);
     if ($src === '' || strpos($src, 'insidebar') === false) { continue; }
-    if (strpos($src, 'page_header.php') === false) { $noHdr[] = $rel; }
+    /* ◆ **المقياسُ كان يقرأ الملفَّ وحدَه فيعمى عن قشرتِه**: ستُّ شاشاتٍ
+     *   ماليةٍ مولَّدةٌ على `includes/fin_analysis_shell.php`، والقشرةُ هي
+     *   التي تُضمّن `page_header.php` (السطر 68) كما تُضمّن الترويسةَ
+     *   والسايدبار. وقياسٌ ملفّيٌّ محضٌ أعلنها «بلا رأس» — **وهي تحمله
+     *   مُصيَّرًا مرةً واحدةً بحسابٍ حيّ** (`class="main_head"` × 1 لكلٍّ).
+     *   وحقنُ الرأسِ فيها لإرضاءِ القياسِ كان سيُصيّره **مرتين** — عيبًا
+     *   حقيقيًّا ثمنًا لخضرةٍ كاذبة. ⇒ يُتبَع الرأسُ عبرَ القشرةِ كما يُتبَع
+     *   الغلافُ في الفحصِ التالي بالضبط. */
+    $viaShell = false;
+    foreach ($faShells as $shName) {
+        if (strpos($src, $shName . '.php') !== false) { $viaShell = true; break; }
+    }
+    if (strpos($src, 'page_header.php') === false && !$viaShell) { $noHdr[] = $rel; }
     if (strpos($src, 'ems_shell_axes') === false && strpos($src, 'dept_gov_space.php') === false
         && strpos($src, 'dept_risk_space.php') === false && strpos($src, 'fin_analysis_shell.php') === false) {
         $noShell[] = $rel;

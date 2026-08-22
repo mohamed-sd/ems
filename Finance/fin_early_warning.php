@@ -22,7 +22,7 @@ $FA_SCREEN = array(
 function fa_render_body($conn, $company_id, $period, $can_write, $uid)
 {
     $rules = array();
-    $r = $conn->query("SELECT * FROM fin_signal_rules WHERE company_id = {$company_id} ORDER BY signal_code");
+    $r = $conn->query("SELECT * FROM fin_signal_rules WHERE company_id = {$company_id} AND active = 1 ORDER BY signal_code");
     while ($x = $r->fetch_assoc()) { $rules[] = $x; }
     $sigs = array();
     $r = $conn->query("SELECT sg_code, title, state, created_at, rule_key FROM risk_signals
