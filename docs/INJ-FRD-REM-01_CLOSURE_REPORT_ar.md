@@ -105,7 +105,7 @@
 
 ## ⑨ المستودعُ والانحدار
 
-- الفرع: `fix/remediation-2026-08` · الالتزام: `13a3064d`
+- الفرع: `fix/remediation-2026-08` · الالتزام: `30066b97`
 - بواباتُ السلسلة وحزامُ الانحدارِ يُقاسان بـ`php tests/injchain01_ten_gates.php`.
 
 ## ⑩ BUILT · WIRED · ENFORCED · EXERCISED
