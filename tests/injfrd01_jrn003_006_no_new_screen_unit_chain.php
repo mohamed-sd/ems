@@ -51,7 +51,15 @@ echo "══ FR-JRN-003 · FR-JRN-006 ══\n";
 /* ── ① FR-JRN-003 — صفرُ شاشةٍ أُنشئت لأجلِ الرحلة ───────────────────────── */
 echo "\n── ① أشاشاتٌ أُنشئت في هذه الجولة؟ ──\n";
 /* المدى: من أوّلِ التزامٍ في حزمةِ INJ-FRD-REM-01 إلى الرأس */
-$firstSha = trim(git($ROOT, "log --reverse --format=%h --grep=INJ-FRD-REM-01 -1"));
+/* ◆ **`--reverse` مع `-1` يعطي الأحدثَ لا الأقدم**: git يطبّق `-1` قبلَ
+ *   القلب، فعاد **آخرُ التزامٍ** لا أوّلَه — **والمدى يتقلّص مع كلِّ
+ *   التزامٍ جديدٍ حتى يصير صفرًا**، فينقلب الشاهدُ أحمرَ من نفسِه.
+ *   وقد أمسكه حزامُ الشواهدِ في أوّلِ دورةٍ بعدَ وصلِه. ⇒ تُؤخَذ القائمةُ
+ *   كاملةً ويُقرأ **آخرُ سطرٍ** فيها — وهو الأقدم. */
+$__log = array_values(array_filter(array_map('trim',
+    explode("
+", git($ROOT, "log --format=%h --grep=INJ-FRD-REM-01")))));
+$firstSha = $__log ? end($__log) : '';
 if ($firstSha === '' || strpos($firstSha, 'fatal') !== false) {
     $firstSha = trim(git($ROOT, "log --format=%h -1 --skip=40"));
 }
