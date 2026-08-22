@@ -265,6 +265,24 @@ class EventDispatcher
     }
 
     /**
+     * أَلِهذا اليتيمِ حكمٌ مقيَّد؟ — FR-EVT-003.
+     * ◆ **والغيابُ ليس سكوتًا**: جدولٌ غيرُ موجودٍ أو صفٌّ غيرُ مقيَّدٍ يعني
+     *   `false` — فيُنذَر عنه. فالإعفاءُ **بقيدٍ مكتوبٍ لا بغيابِ سجل**.
+     */
+    private function orphanIsRuled($consumer)
+    {
+        $st = @$this->conn->prepare(
+            'SELECT COUNT(*) FROM `gov_orphan_consumer_rulings` WHERE `consumer_key` = ?');
+        if (!$st) { return false; }
+        $st->bind_param('s', $consumer);
+        if (!$st->execute()) { $st->close(); return false; }
+        $st->bind_result($n);
+        $st->fetch();
+        $st->close();
+        return ((int) $n) > 0;
+    }
+
+    /**
      * يرفع إنذارًا لكلِّ متعثرٍ أو يتيم — إنذارٌ واحدٌ في الساعةِ لكلِّ مستهلك.
      * @return int عددُ الإنذاراتِ المرفوعة
      */
@@ -272,6 +290,16 @@ class EventDispatcher
     {
         $n = 0;
         foreach ($this->stalledConsumers() as $s) {
+            /* ══ FR-EVT-003 — **ولا يُنذَر لمستهلكٍ بلا معالج** ═══════════════
+               ◆ اليتيمُ **لن يتقدّم مهما مضى الزمن**، فإنذارٌ دوريٌّ عنه ليس
+                 خبرًا بل ضجيجٌ يُعوِّد القارئَ على تجاهلِ القناة. وقيس: 42 من
+                 252 إنذارَ توقفٍ (16.7٪) عن يتيمَين اثنَين لا غير.
+               ◆ **ولا يختفي بذلك**: يُقيَّد حكمُه مرّةً في
+                 `gov_orphan_consumer_rulings` بمالكِه وسببِه — فيصير مرئيًّا
+                 مرّةً بدل أن يكون مسموعًا كلَّ ساعة.
+               ◆ **واليتيمُ بلا حكمٍ ما يزال يُنذَر عنه** — فالسكوتُ عنه بلا
+                 قيدٍ هو العطبُ نفسُه بوجهٍ آخر. */
+            if ($s['kind'] === 'orphan' && $this->orphanIsRuled($s['consumer'])) { continue; }
             $tag = '[BUS-STALL:' . $s['consumer'] . ']';
             $dupe = $this->conn->query(
                 "SELECT COUNT(*) FROM `fin_notifications`

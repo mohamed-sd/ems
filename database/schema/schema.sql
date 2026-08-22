@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 16:21:16
--- الجداول: 644 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-22 16:39:24
+-- الجداول: 645 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -7113,6 +7113,18 @@ CREATE TABLE `gov_nav_stage_bridge` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_cycle` (`cycle_layer`,`cycle_stage`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='INJ-FIX-02 NF-04 — جسرُ مراحلِ دفترِ الدورةِ برؤوسِ المعيارِ المرجعيّ';
+
+-- ── Table: gov_orphan_consumer_rulings ──
+CREATE TABLE `gov_orphan_consumer_rulings` (
+  `consumer_key` varchar(64) NOT NULL,
+  `event_codes` varchar(400) NOT NULL COMMENT 'الأحداثُ المشترَكُ فيها — مقيسة',
+  `ruling` varchar(32) NOT NULL COMMENT 'NO_HANDLER_ON_DISK · NEEDS_OWNER_DECISION',
+  `owner` varchar(96) NOT NULL,
+  `reason` varchar(500) NOT NULL,
+  `evidence` varchar(300) NOT NULL,
+  `ruled_at` datetime NOT NULL,
+  PRIMARY KEY (`consumer_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FR-EVT-003 — اليتيمُ يُحكَم مرّةً ولا يُنذَر كلَّ ساعة';
 
 -- ── Table: gov_orphan_links ──
 CREATE TABLE `gov_orphan_links` (
