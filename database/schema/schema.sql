@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 17:08:36
+-- المصدر: equipation_manage · التوليد: 2026-08-22 17:19:18
 -- الجداول: 646 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -7166,7 +7166,7 @@ CREATE TABLE `gov_ownership_rulings` (
   `owner_before` varchar(120) NOT NULL,
   `owner_after` varchar(120) NOT NULL,
   `witness` varchar(255) NOT NULL COMMENT 'الشاهدُ ومصدرُه',
-  `witness_kind` enum('DOMAIN_WRITE','DATA_READ','DOC_CYCLE','NONE') NOT NULL,
+  `witness_kind` enum('DOMAIN_WRITE','DATA_READ','DOC_CYCLE','NONE','VARIANT_OF_BASE') NOT NULL,
   `ruling` enum('OWNER_CONFIRMED','OWNER_CHANGED','APPEARANCE_MISSING','SHARED_PLATFORM','NOT_APPLICABLE','OWNER_ESTABLISHED') NOT NULL,
   `reason` varchar(400) NOT NULL DEFAULT '',
   `decided_at` datetime NOT NULL DEFAULT current_timestamp(),

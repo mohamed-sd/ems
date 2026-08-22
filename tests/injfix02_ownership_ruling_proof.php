@@ -79,6 +79,28 @@ foreach ($reg as $r) { $k = $r['owner_basis'] ?? '?'; $b[$k] = ($b[$k] ?? 0) + 1
 $den   = count($reg);
 $final = ($b['RULING'] ?? 0) + ($b['CONSENSUS'] ?? 0);
 $open  = ($b['MAJORITY'] ?? 0) + ($b['NONE'] ?? 0);
+/* ◆ **واللقطةُ لا تعرف الأحكامَ التي تلتها**: `screen_registry.json` يُولَّد
+ *   بأداتِه، و`gov_ownership_rulings` **سجلُّ القراراتِ الدائم**. فسطحٌ حُكم
+ *   له بعدَ آخرِ توليدٍ يبقى في اللقطةِ `NONE` وهو محسومٌ فعلًا.
+ * ◆ ولا يُبنى مصدرٌ ثانٍ: القرارُ يُقرأ من سجلِّه، واللقطةُ تُقرأ للمقام.
+ * ◆ **والخصمُ بشرطِ أن يكون السطحُ في اللقطةِ غيرَ محسومٍ فعلًا** — فلا يُخصم
+ *   مرَّتَين ولا يُخصم لما ليس مفتوحًا. */
+$ruledLater = array();
+$rq = $conn->query("SELECT `route` FROM `gov_ownership_rulings`
+                      WHERE `witness_kind` = 'VARIANT_OF_BASE'");
+while ($rq && $rx = $rq->fetch_row()) { $ruledLater[strtolower($rx[0])] = true; }
+$creditedList = array();
+foreach ($reg as $rr) {
+    $bb = $rr['owner_basis'] ?? '';
+    if ($bb !== 'NONE' && $bb !== 'MAJORITY') { continue; }
+    $rt = strtolower((string) ($rr['route'] ?? ''));
+    if ($rt !== '' && isset($ruledLater[$rt])) { $creditedList[] = $rt; }
+}
+$credited = count($creditedList);
+$open -= $credited;
+printf("     %-12s %d  ◆ حُكم لها بعدَ اللقطةِ (متغايرٌ يرث أساسَه) فخُصمت\n",
+       'RULED_AFTER', $credited);
+$final += $credited;
 foreach (array('RULING', 'CONSENSUS', 'MAJORITY', 'NONE') as $k) {
     printf("     %-12s %d\n", $k, $b[$k] ?? 0);
 }
