@@ -31,8 +31,20 @@ $db = new mysqli($host, $u, $p, ems_env('DB_NAME'), $port);
 if ($db->connect_errno) { exit("تعذّر الاتصال: {$db->connect_error}\n"); }
 $db->set_charset('utf8mb4');
 
-/** أسماءٌ تبدأ بالنونِ وليست أفعالًا — استثناءٌ **معلَنٌ باسمِه** لا بالنمط. */
-$NOUN_WHITELIST = array('ناقلُ الأحداث', 'نماذج العمل ووحدات القياس', 'نماذج التمويل');
+/** أسماءٌ تبدأ بالنونِ وليست أفعالًا — استثناءٌ **معلَنٌ باسمِه** لا بالنمط.
+ *  ◆ ولكلِّ اسمٍ سببُ استثنائِه مكتوبًا: كلُّها **مصادرُ لا أفعالُ متكلِّم**
+ *    (ناقل · نموذج/نماذج · نطاقات) — فالنمطُ `^ن` وحدَه لا يفرّق بينهما،
+ *    والفارقُ يُعلَن بالاسمِ لا يُخمَّن بالحرف. **ولا يُضاف إلى هذه القائمةِ
+ *    فعلُ متكلِّمٍ لتخضرَّ البوابةُ** — فذلك تبييضٌ لا استثناء. */
+$NOUN_WHITELIST = array(
+    'ناقلُ الأحداث',                  /* اسمُ فاعلٍ — مكوّنُ الأحداثِ المركزيّ */
+    'نماذج العمل ووحدات القياس',      /* جمعُ «نموذج» */
+    'نماذج العمل ووحداتها',           /* جمعُ «نموذج» — صيغةٌ أقصر */
+    'نماذج التمويل',                  /* جمعُ «نموذج» */
+    'نماذج التمويل ومعالجتها',        /* جمعُ «نموذج» — صيغةُ الكنسيّ */
+    'نموذج التعاقد ووحدته',           /* مفردُ «نموذج» */
+    'نطاقات العقد التشغيلية',         /* جمعُ «نطاق» */
+);
 
 /* القائمةُ المحظورةُ من نصِّ الوثيقةِ الحاكمة — لا من ذاكرةِ الكاتب */
 function docx_text($path)
@@ -74,6 +86,19 @@ if ($neg) {
         (`company_id`,`dept_name`,`layer_name`,`stage_order`,`stage_name`,`group_name`,
          `screen_title`,`screen_file`,`stage_kind`)
         VALUES (4,'{$MARK}','اختبار',999,'مرحلةُ حزام','نحاسبه ونصرف','شاشةُ حزام','belt/{$MARK}.php','عادي')");
+    /* ◆ **والبذرُ في الجدولِ الذي يُرسَم منه أيضًا** (البند ٠-٤): مجموعةٌ نشطةٌ
+     *   في `link_groups` **ومعها بندُ تنقّلٍ نشط** — فمجموعةٌ بلا بندٍ لا تُصيَّر
+     *   ولا تُقاس، وبذرٌ لا يُصيَّر لا يُجرّب الحارسَ في موضعِ عملِه. */
+    $db->query("INSERT INTO `link_groups` (`name`,`group_code`,`icon`,`display_order`,`is_active`)
+                VALUES ('نحاسبه ونصرف','{$MARK}','fa fa-folder',9999,1)");
+    $BELT_GID = (int) $db->insert_id;
+    if ($BELT_GID > 0) {
+        $d = @$db->query("SELECT `door` FROM `nav_items` WHERE `role_id` = 12 LIMIT 1");
+        $door = ($d && ($x = $d->fetch_row())) ? $db->real_escape_string($x[0]) : '';
+        $db->query("INSERT INTO `nav_items`
+                     (`role_id`,`door`,`label_ar`,`route`,`group_id`,`sort_order`,`active`)
+                     VALUES (12,'{$door}','بندُ حزام','__belt/{$MARK}.php',{$BELT_GID},9999,1)");
+    }
     echo "  ◆ دُسَّت صيغةٌ ممنوعةٌ حيّةٌ للحزامِ السلبيّ\n";
 }
 
@@ -125,13 +150,78 @@ $logged = n($db, "SELECT COUNT(*) FROM `gov_cycle_name_log` WHERE `requirement_i
 chk($logged > 0, 'وكلُّ تغييرٍ محفوظٌ بقيمتِه السابقةِ فالرجوعُ ممكن',
     "{$logged} قيدَ تغيير");
 
+/* ═══ الجدولُ الذي يُرسَم منه — لا الجدولُ الذي نُظِّف (البند ٠-٤) ═══════════
+ * ◆ **الحارسُ كان يفحص ما نظَّفه لا ما يُقرأ منه.** فحوصُ ①..⑤ أعلاه تقيس
+ *   `gov_screen_cycle` — وهو **سجلُّ دورةٍ حاكم**، والسايدبارُ لا يُرسَم منه.
+ *   المُصيَّرُ يأتي من `link_groups` (الاسمُ وعنوانُ المرحلة) عبر
+ *   `includes/unified_nav.php` حيث `LEFT JOIN link_groups g ... g.is_active = 1`.
+ *   فبقيت `gov_screen_cycle` خمسةَ صفوفٍ مشروعةً ⇒ أخضر، بينما `link_groups`
+ *   تحمل أفعالَ متكلِّمٍ **مُصيَّرةً للمستخدم**. وخضرةٌ كهذه أسوأُ من حمرة.
+ * ◆ والمقامُ هنا **ما يُصيَّر فعلًا**: مجموعةٌ نشطةٌ لها بندُ تنقّلٍ نشطٌ واحدٌ
+ *   على الأقل — فمجموعةٌ بلا بندٍ لا يراها أحد، ولا تُحسب خرقًا ولا تُخفى.
+ */
+$RENDERED = "FROM `link_groups` g
+              JOIN `nav_items` n ON n.`group_id` = g.`id` AND n.`active` = 1
+             WHERE g.`is_active` = 1";
+$rendTot = n($db, "SELECT COUNT(DISTINCT g.`id`) {$RENDERED}");
+
+/* ⑥ صفرُ صيغةٍ محظورةٍ في **المُصيَّر** — الاسمُ وعنوانُ المرحلةِ والكنسيّ */
+$hitsLG = array(); $rowsLG = 0;
+foreach ($banned as $b) {
+    $e = $db->real_escape_string($b);
+    foreach (array('name' => 'الاسم', 'stage_title' => 'عنوانُ المرحلة') as $col => $lbl) {
+        $c = n($db, "SELECT COUNT(DISTINCT g.`id`) {$RENDERED} AND g.`{$col}` = '{$e}'");
+        if ($c > 0) { $hitsLG[] = "{$lbl}«{$b}»×{$c}"; $rowsLG += $c; }
+    }
+    $c = n($db, "SELECT COUNT(*) FROM `nav_canonical` WHERE `canonical_ar` = '{$e}'");
+    if ($c > 0) { $hitsLG[] = "كنسيّ«{$b}»×{$c}"; $rowsLG += $c; }
+}
+chk(empty($hitsLG), '**صفرُ صيغةٍ محظورةٍ في المُصيَّرِ** (`link_groups` و`nav_canonical`)',
+    empty($hitsLG) ? "0 من {$rendTot} مجموعةً مُصيَّرة"
+                   : "{$rowsLG}: " . implode(' · ', array_slice($hitsLG, 0, 5)));
+
+/* ⑦ صفرُ فعلِ متكلِّمٍ مُصيَّرٍ خارجَ الاستثناءِ المُعلَن */
+$verbLG = array(); $verbGroups = 0;
+foreach (array('name' => 'اسمُ مجموعة', 'stage_title' => 'عنوانُ مرحلة') as $col => $lbl) {
+    $r = $db->query("SELECT g.`{$col}` AS v, COUNT(DISTINCT g.`id`) c {$RENDERED}
+                       AND (g.`{$col}` REGEXP '^ن[^ ]+' OR g.`{$col}` LIKE 'نحن%'
+                            OR g.`{$col}` LIKE 'دعنا%' OR g.`{$col}` LIKE 'هيا%')
+                     GROUP BY 1");
+    while ($r && $x = $r->fetch_assoc()) {
+        if ($x['v'] === null || $x['v'] === '') { continue; }
+        if (in_array($x['v'], $NOUN_WHITELIST, true)) { continue; }
+        $verbLG[] = "{$lbl}«{$x['v']}»×{$x['c']}";
+        $verbGroups += (int) $x['c'];
+    }
+}
+chk(empty($verbLG), 'وصفرُ فعلِ متكلِّمٍ **مُصيَّرٍ** خارجَ الاستثناءِ المُعلَن',
+    empty($verbLG) ? "صفر من {$rendTot} مجموعةً مُصيَّرة · والمُعلَنُ " . count($NOUN_WHITELIST) . ' اسمًا'
+                   : "{$verbGroups} مجموعةً مُصيَّرة: " . implode(' · ', $verbLG));
+
 if ($neg) {
+    /* ◆ **الحكمُ مُصوَّبٌ على البذرِ بعينِه لا على «رسوبٍ ما»**: الشاهدُ اليومَ
+     *   يرسُب لسببٍ قائمٍ (أفعالُ متكلِّمٍ مُصيَّرة)، فحزامٌ يكتفي بـ`bad > 0`
+     *   يخضرُّ من غيرِ أن يُجرَّب. فيُشترط أن **يُسمّى البذرُ** في مخرَجِ الفحصَين. */
+    $caughtSrc = false;
+    foreach ($hits as $h)   { if (strpos($h, 'نحاسبه ونصرف') !== false) { $caughtSrc = true; } }
+    $caughtRend = false;
+    foreach ($hitsLG as $h) { if (strpos($h, 'نحاسبه ونصرف') !== false) { $caughtRend = true; } }
+    echo "\n── حكمُ الحزامِ السلبيّ ──\n";
+    chk($caughtSrc,  '**البذرُ في مصدرِ الدورةِ أُمسك باسمِه**',
+        $caughtSrc ? 'نحاسبه ونصرف' : 'مرَّ — والحارسُ لا يراه');
+    chk($caughtRend, '**والبذرُ في الجدولِ الذي يُرسَم منه أُمسك باسمِه**',
+        $caughtRend ? 'نحاسبه ونصرف' : 'مرَّ — والحارسُ لا يراه');
+    /* الكنسُ بالعائلةِ — الوسمُ ثابتٌ لا بـ`getmypid` فيُكنس أثرُ جولةٍ انهارت */
     $db->query("DELETE FROM `gov_screen_cycle` WHERE `dept_name` = '{$MARK}'");
-    $left = n($db, "SELECT COUNT(*) FROM `gov_screen_cycle` WHERE `dept_name` = '{$MARK}'");
-    chk($left === 0, 'وكُنس الحزامُ أثرَه', "المتبقي: {$left}");
-    echo "\n◆ الحزامُ السلبيّ: **يُتوقَّع رسوبٌ أعلاه** — فإن مرَّ كلُّه فالشاهدُ أعمى.\n";
-    printf("النتيجة: %d نجاح · %d رسوب\n", $ok, $bad);
-    exit($bad > 0 ? 0 : 1);          /* الحزامُ ينجح حين يرسُب الشاهد */
+    $db->query("DELETE FROM `nav_items` WHERE `route` = '__belt/{$MARK}.php'");
+    $db->query("DELETE FROM `link_groups` WHERE `group_code` = '{$MARK}'");
+    $left = n($db, "SELECT COUNT(*) FROM `gov_screen_cycle` WHERE `dept_name` = '{$MARK}'")
+          + n($db, "SELECT COUNT(*) FROM `link_groups` WHERE `group_code` = '{$MARK}'")
+          + n($db, "SELECT COUNT(*) FROM `nav_items` WHERE `route` = '__belt/{$MARK}.php'");
+    chk($left === 0, 'وكُنس الحزامُ أثرَه من الجداولِ الثلاثة', "المتبقي: {$left}");
+    echo "\n◆ والحزامُ **يُثبت الإمساكَ لا الرسوبَ المجرَّد** — فالشاهدُ يرسُب اليومَ\n";
+    echo "  لسببٍ قائم، ورسوبٌ لا يُنسب إلى البذرِ لا يُثبت أن الحارسَ يراه.\n";
+    exit(($caughtSrc && $caughtRend && $left === 0) ? 0 : 1);
 }
 
 echo "\n" . str_repeat('─', 66) . "\n";
