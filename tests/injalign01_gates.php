@@ -11,11 +11,15 @@
  *   (589/589 و 717/717) تلزمهما المصنَّفان الحاكمان، وهما **ليسا في الحزمة
  *   المرفقة**. فتُعلَن `BLOCKED_EXTERNAL_INPUT` بمالكِها ومطلوبِها.
  *
- * التشغيل: php tests/injalign01_gates.php [--json=<ملف>] [--negative] [--a8-only]
+ * التشغيل: php tests/injalign01_gates.php [--json=<ملف>] [--negative] [--a8-only] [--a3-only]
  *
  * ◆ **وبوابةُ الهرمِ A8 تقيس فعلًا لا وجودَ ملفّ** (البند ٠-١): كانت `is_file()`
  *   على حارسَين خاليَين من الفحصِ أصلًا — فكانت خضراءَ على نظامٍ يقبل حصةً
  *   بلا التزام. و`--negative` **يعطبها عمدًا** ويشترط رسوبَها قبلَ تصديقِ مرورِها.
+ *
+ * ◆ **وبوابةُ التنقّلِ A3 تُعلن الرقمَين معًا** (البند ٠-٢): كانت تطرح المرساتَين
+ *   من البسطِ ومن عدِّ المجموعاتِ معًا فتقول «٦/١٣» والمستخدمُ يرى **٨/١٥**.
+ *   فالخامُ أولًا ثم المستثنى مسمًّى بمسارِه — واستثناءٌ ينمو صامتًا يُرسِّب.
  * ═══════════════════════════════════════════════════════════════════════════
  */
 if (php_sapi_name() !== 'cli') { exit("CLI فقط\n"); }
@@ -202,20 +206,142 @@ function a8_pyramid_behavior_isolated($ROOT, mysqli $conn)
     return array('score' => -1, 'state' => 'OPEN');
 }
 
+/**
+ * ── حزامُ صدقِ البوابةِ A3 — `--negative` (البند ٠-٢) ────────────────────────
+ * ◆ الاختبارُ السالبُ المنصوصُ عليه: **أضفْ بندًا ثالثًا خارجَ الهدف ⇒ يجب أن
+ *   يظهر في الرقمِ الخام**. فالحزامُ يبذر بندَ تنقّلٍ بمسارٍ موسومٍ لدورِ المبيعات،
+ *   ويشترط: ارتفاعَ الخامِ بواحد · ورسوبَ البوابةِ · ثم عودةَ الرقمَين بالكنس.
+ * ◆ والبذرُ معزولٌ بمسارِ `__belt/a3_probe.php` — يُكنس قبلَ البذرِ وبعدَه وعندَ
+ *   الخروجِ أيًّا كان سببُه، فالكنسُ بالعائلةِ لا بالجلسة.
+ */
+function a3_honesty_belt($ROOT, mysqli $conn)
+{
+    $ROUTE = '__belt/a3_probe.php';
+    $sweep = function () use ($conn, $ROUTE) {
+        @$conn->query("DELETE FROM `nav_items` WHERE `route` = '{$ROUTE}'");
+    };
+    $sweep();
+    register_shutdown_function($sweep);
+
+    echo "\n══ حزامُ صدقِ البوابة A3 — بندٌ ثالثٌ خارجَ الهدف ══\n";
+    $before = a3_probe($ROOT);
+    printf("  ① قبلَ البذر: الخام=**%d** · المستثنى=**%d** · الحال=%s\n",
+           $before['raw'], $before['exc'], $before['state']);
+
+    $grp = one($conn, "SELECT `group_id` FROM `nav_items`
+                        WHERE `role_id` = 12 AND `active` = 1 AND `group_id` IS NOT NULL LIMIT 1");
+    $door = 0;
+    $d = @$conn->query("SELECT `door` FROM `nav_items` WHERE `role_id` = 12 AND `active` = 1 LIMIT 1");
+    if ($d && ($x = $d->fetch_row())) { $door = $x[0]; }
+    $ok = @$conn->query("INSERT INTO `nav_items` (`role_id`, `door`, `label_ar`, `route`,
+                          `group_id`, `sort_order`, `active`)
+                         VALUES (12, '{$door}', 'بندُ حزامٍ خارجَ الهدف', '{$ROUTE}',
+                                 " . ($grp > 0 ? (int) $grp : 'NULL') . ", 9999, 1)");
+    if (!$ok) {
+        echo "  ✘ تعذّر بذرُ البند: " . $conn->error . " — والحزامُ لا يدّعي\n";
+        $sweep();
+        return 0;
+    }
+    $after = a3_probe($ROOT);
+    printf("  ② بعدَ البذر: الخام=**%d** · المستثنى=**%d** · الحال=%s\n",
+           $after['raw'], $after['exc'], $after['state']);
+    $rose    = ($after['raw'] === $before['raw'] + 1);
+    $failed  = ($after['state'] !== 'PASS');
+    $sweep();
+    $back = a3_probe($ROOT);
+    printf("  ③ بعدَ الكنس: الخام=**%d** · الحال=%s\n", $back['raw'], $back['state']);
+    $restored = ($back['raw'] === $before['raw'] && $back['state'] === $before['state']);
+
+    $verdict = $rose && $failed && $restored;
+    echo '  ' . ($rose ? '✔' : '✘') . " البندُ الثالثُ **ظهر في الرقمِ الخام**\n";
+    echo '  ' . ($failed ? '✔' : '✘') . " والبوابةُ **رسبت** به — لا يبتلعه الاستثناء\n";
+    echo '  ' . ($restored ? '✔' : '✘') . " وعاد الرقمانِ بالكنس — صفرُ أثرٍ باقٍ\n";
+    echo $verdict ? "  ✔ **A3 جُرِّبت معطوبةً ورسبت ثم مرّت سليمة**\n"
+                  : "  ✘ **A3 لم ترسُبْ بالعطب** — فليست حارسًا\n";
+    return $verdict ? 1 : 0;
+}
+
+/** قياسُ A3 لدورِ المبيعاتِ في عمليةٍ نظيفة. */
+function a3_probe($ROOT)
+{
+    $cmd = escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg(__FILE__) . ' --a3-only 2>&1';
+    $out = (string) @shell_exec($cmd);
+    if (preg_match('/A3RAW=(\d+) A3EXC=(\d+) A3STATE=(\w+)/', $out, $m)) {
+        return array('raw' => (int) $m[1], 'exc' => (int) $m[2], 'state' => $m[3]);
+    }
+    return array('raw' => -1, 'exc' => -1, 'state' => 'ERR');
+}
+
+/**
+ * ── قياسُ بوابةِ التنقّلِ A3 — موضعٌ واحدٌ للمنطق (البند ٠-٢) ────────────────
+ * ◆ **الرقمانِ يُعلَنان معًا**: كانت البوابةُ تطرح المرساتَين من البسطِ ومن عدِّ
+ *   المجموعاتِ معًا فتقول «٦/١٣» والمستخدمُ يرى **٨/١٥** — واستثناءٌ يُطرح من
+ *   طرفَي الكسرِ بلا إعلانٍ يُخفي ما يُظهره. فالخامُ أولًا ثم المستثنى، والمستثنى
+ *   **يُسمّى بمسارِه** ويُشترط أن يبقى اثنين لا أكثر، وإلا نمت قائمةُ الاستثناءِ
+ *   صامتةً فخضَّرت البوابةَ بالطرحِ لا بالإنجاز.
+ * ◆ والمنطقُ هنا وحدَه — يستعمله العرضُ العامُّ و`--a3-only` معًا فلا يتفرّقان.
+ */
+function a3_measure(mysqli $conn, $role, $items, $ANCH)
+{
+    $liveRaw = one($conn, "SELECT COUNT(*) FROM `nav_items`
+                            WHERE `role_id` = {$role} AND `active` = 1");
+    $grpRaw  = one($conn, "SELECT COUNT(DISTINCT `group_id`) FROM `nav_items`
+                            WHERE `role_id` = {$role} AND `active` = 1");
+    $live = one($conn, "SELECT COUNT(*) FROM `nav_items`
+                         WHERE `role_id` = {$role} AND `active` = 1 AND `route` NOT IN ({$ANCH})");
+    $grp  = one($conn, "SELECT COUNT(DISTINCT `group_id`) FROM `nav_items`
+                         WHERE `role_id` = {$role} AND `active` = 1 AND `route` NOT IN ({$ANCH})");
+    $empty = one($conn, "SELECT COUNT(*) FROM `link_groups` g
+                          WHERE g.`group_code` LIKE 'n9t_align_r{$role}_%'
+                            AND NOT EXISTS (SELECT 1 FROM `nav_items` n
+                                             WHERE n.`group_id` = g.`id` AND n.`active` = 1)");
+    /* المستثنى مسمًّى بمسارِه — لا عددًا مبهمًا */
+    $excRows = array();
+    $er = @$conn->query("SELECT DISTINCT `route` FROM `nav_items`
+                          WHERE `role_id` = {$role} AND `active` = 1 AND `route` IN ({$ANCH})
+                          ORDER BY `route`");
+    if ($er) { while ($x = $er->fetch_row()) { $excRows[] = $x[0]; } }
+    $excN = $liveRaw - $live;
+    $ok = ($live === $items && $grp === 6 && $empty === 0 && $excN === 2 && count($excRows) === 2);
+    return array(
+        'state' => $ok ? 'PASS' : 'OPEN',
+        'raw' => $liveRaw, 'rawGroups' => $grpRaw, 'live' => $live, 'groups' => $grp,
+        'exc' => $excN, 'excRoutes' => $excRows, 'empty' => $empty,
+        'measure' => "الخامُ كما يراه المستخدم: **{$grpRaw} مجموعات / {$liveRaw} بندًا** · "
+                   . "وبعدَ استثناءِ المرساتَين: **{$grp}/{$live}** — المستهدَف 6/{$items} · "
+                   . "مستثنًى: **{$excN}** · مجموعةٌ فارغة: {$empty}",
+        'note' => 'والمرساتانِ خارجَ المقامِ بقرارِ مالكٍ سابق — وهما بأعيانِهما: '
+                . (count($excRows) ? '`' . implode('` · `', $excRows) . '`' : '**غائبتان**')
+                . ' · وأيُّ بندٍ ثالثٍ خارجَ الهدفِ يظهر في الخامِ ويرفع المستثنى فترسُب البوابة',
+    );
+}
+
+$SAL = 'SAL'; $SUP = 'SUP';
+/* المرساتانِ المستثنَيانِ بقرارِ مالكٍ سابق — **مُعلَنتان لا مطويّتان** (البند ٠-٢) */
+$ANCH = "'main/role_board.php','chats/index.php'";
+
 /* ── الأوضاعُ الخاصة — تسبق العرضَ العامّ ─────────────────────────────────── */
-/* `--a8-only`: قياسُ بوابةِ الهرمِ وحدَها في عمليةٍ نظيفة (يستعملها الحزامُ السلبيّ
- *   لأن صنفَ الخدمةِ يُحمَّل مرةً واحدةً فلا يُعاد تحميلُه بعدَ تعديلِ مصدرِه). */
+/* `--a8-only` و`--a3-only`: قياسُ بوابةٍ واحدةٍ في عمليةٍ نظيفة — يستعملهما الحزامُ
+ *   السلبيُّ لأن الصنفَ يُحمَّل مرةً واحدةً فلا يُعاد تحميلُه بعدَ تعديلِ مصدرِه،
+ *   ولأن قياسًا في العمليةِ نفسِها بعدَ البذرِ يقرأ حالةً ملوَّثةً بما بذر. */
 if (in_array('--a8-only', $argv, true)) {
     $r = a8_pyramid_behavior($ROOT, $conn);
     echo "A8SCORE={$r['score']}\n";
     exit(0);
 }
-/* `--negative`: **تُجرَّب البوابةُ معطوبةً قبلَ تصديقِ مرورِها.** */
-if (in_array('--negative', $argv, true)) {
-    exit(a8_honesty_belt($ROOT, $conn) === 1 ? 0 : 1);
+if (in_array('--a3-only', $argv, true)) {
+    $r = a3_measure($conn, 12, 13, $ANCH);
+    echo "A3RAW={$r['raw']} A3EXC={$r['exc']} A3STATE={$r['state']}\n";
+    exit(0);
 }
-$SAL = 'SAL'; $SUP = 'SUP';
-$ANCH = "'main/role_board.php','chats/index.php'";
+/* `--negative`: **تُجرَّب البواباتُ معطوبةً قبلَ تصديقِ مرورِها.** */
+if (in_array('--negative', $argv, true)) {
+    $belts = array(a8_honesty_belt($ROOT, $conn), a3_honesty_belt($ROOT, $conn));
+    $pass = array_sum($belts); $tot = count($belts);
+    echo "\n" . str_repeat('─', 66) . "\n";
+    printf("◆ **صدقُ البوابات: %d/%d جُرِّبت معطوبةً ورسبت**\n", $pass, $tot);
+    exit($pass === $tot ? 0 : 1);
+}
 
 echo "══ بواباتُ قبولِ مواءمةِ المبيعاتِ والموردين ══\n";
 
@@ -242,19 +368,11 @@ foreach (array(
          'المصنَّفُ الحاكمُ ليس في الحزمة · المطلوب: المصنَّفُ نفسُه ليُقيَّد لكلِّ '
        . 'عمودٍ حكمُ مصدرِه أو سببُ غيابِه · المالك: مالكُ الوثيقة');
 
-    /* ── ③ التنقّل بعد الدمج ──────────────────────────────────────────── */
-    $live = one($conn, "SELECT COUNT(*) FROM `nav_items`
-                         WHERE `role_id` = {$role} AND `active` = 1 AND `route` NOT IN ({$ANCH})");
-    $grp  = one($conn, "SELECT COUNT(DISTINCT `group_id`) FROM `nav_items`
-                         WHERE `role_id` = {$role} AND `active` = 1 AND `route` NOT IN ({$ANCH})");
-    $empty = one($conn, "SELECT COUNT(*) FROM `link_groups` g
-                          WHERE g.`group_code` LIKE 'n9t_align_r{$role}_%'
-                            AND NOT EXISTS (SELECT 1 FROM `nav_items` n
-                                             WHERE n.`group_id` = g.`id` AND n.`active` = 1)");
-    gate($G, $k, 'A3', ($live === $items && $grp === 6 && $empty === 0) ? 'PASS' : 'OPEN',
-         'التنقّل بعد الدمج',
-         "**{$grp} مجموعات / {$live} بندًا** — المستهدَف 6/{$items} · مجموعةٌ فارغة: {$empty}",
-         'والمرساتانِ خارجَ المقامِ بقرارِ مالكٍ سابق');
+    /* ── ③ التنقّل بعد الدمج — الرقمانِ معًا (البند ٠-٢) ───────────────── */
+    $a3 = a3_measure($conn, $role, $items, $ANCH);
+    gate($G, $k, 'A3', $a3['state'],
+         'التنقّل بعد الدمج — الرقمانِ معًا',
+         $a3['measure'], $a3['note']);
 
     /* ── ④ التبويبات — كلُّ مُخفًى له منفذٌ مُثبَت ───────────────────────── */
     $hid  = one($conn, "SELECT COUNT(*) FROM `gov_nav_hidden_log` WHERE `role_id` = {$role}");
