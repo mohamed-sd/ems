@@ -230,9 +230,7 @@ function ems_uc_ladder_check(mysqli $conn, $companyId, $entryId, $round, $stage,
 
     /* ① أهليةُ الدور — الجهةُ تُحَلُّ من المحرك لا تُكتب هنا */
     if ($actorRole === null) {
-        $st = $conn->prepare("SELECT role_id FROM users WHERE id = ? LIMIT 1");
-        if ($st) { $st->bind_param('i', $actorId); $st->execute(); $st->bind_result($rr);
-                   if ($st->fetch()) { $actorRole = (int) $rr; } $st->close(); }
+        $actorRole = ems_resolve_actor_role($conn, $actorId);
     }
     $roles = $approveStep['roles'];
     if ($roles && $actorRole !== null && !in_array((int) $actorRole, $roles, true)) {
@@ -288,6 +286,39 @@ function ems_uc_ladder_log(mysqli $conn, $companyId, $entryId, $stage, $actorId,
  * ◆ فتُعمَّم الدالةُ ولا يُنشأ بيتٌ ثانٍ لها.
  * ═══════════════════════════════════════════════════════════════════════════ */
 
+if (!function_exists('ems_resolve_actor_role')) {
+    /**
+     * دورُ الفاعلِ من `users` — **بالعمودَين لا بأحدِهما**.
+     * ═══════════════════════════════════════════════════════════════════════
+     * ◆ **العطبُ المقيس**: `users` يحمل `role` و`role_id` لحقيقةٍ واحدة.
+     *   و`role` مملوءٌ في **76 من 76**، و`role_id` **فارغٌ في 31 منها**.
+     *   فحلُّ الدورِ من `role_id` وحدَه يُرجِع NULL لواحدٍ وثلاثينَ مستخدمًا
+     *   لهم أدوارٌ صحيحةٌ — منهم الحسابُ **الوحيدُ** لإدارةِ الموردين (#5).
+     * ◆ **وأثرُه يظهر عندَ الإنفاذِ لا قبلَه**: بوابةُ السلّمِ fail-closed
+     *   بنصِّ FR-APP-001 («مَن لا يُعرف دورُه ليس صاحبَ اليدِ بالشكّ»)، فلو
+     *   أُعلنت `EMS_LADDER_GATE=enforce` **لمُنع أولئك الواحدُ والثلاثونَ من
+     *   كلِّ اعتماد** بحجّةِ تعذُّرِ حلِّ الدور — وهو منعٌ بعطبِ قراءةٍ لا
+     *   بقاعدةِ حوكمة.
+     * ◆ **والقياسُ قبلَ التغيير**: الواحدُ والثلاثونَ **كلُّهم** يُحَلُّون من
+     *   `role`، و**صفرُ تعارضٍ** بين العمودَين حيث امتلآ معًا. فالضمُّ يُصلح
+     *   ولا يُغيّر حكمًا قائمًا.
+     * ◆ **وfail-closed محفوظ**: من لا يُحَلُّ دورُه بأيِّ العمودَين يبقى NULL.
+     */
+    function ems_resolve_actor_role(mysqli $conn, $actorId)
+    {
+        $actorId = (int) $actorId;
+        if ($actorId <= 0) { return null; }
+        $st = $conn->prepare(
+            "SELECT COALESCE(`role_id`, NULLIF(CAST(`role` AS UNSIGNED), 0))
+               FROM `users` WHERE `id` = ? LIMIT 1");
+        if (!$st) { return null; }
+        $st->bind_param('i', $actorId);
+        $st->execute(); $st->bind_result($r);
+        $val = $st->fetch() ? $r : null;
+        $st->close();
+        return ($val === null) ? null : (int) $val;
+    }
+}
 if (!function_exists('ems_ladder_mode')) {
     function ems_ladder_mode()
     {
@@ -333,9 +364,7 @@ if (!function_exists('ems_ladder_check')) {
 
         /* ② أهليةُ الدور — تُحَلُّ من المحرك */
         if ($actorRole === null) {
-            $st = $conn->prepare("SELECT `role_id` FROM `users` WHERE `id` = ? LIMIT 1");
-            if ($st) { $st->bind_param('i', $actorId); $st->execute(); $st->bind_result($rr);
-                       if ($st->fetch()) { $actorRole = ($rr === null ? null : (int) $rr); } $st->close(); }
+            $actorRole = ems_resolve_actor_role($conn, $actorId);
         }
         $roles = $ap['roles'];
         /* ◆ **فاعلٌ لا يُحَلُّ دورُه ⇐ منعٌ لا مرور** — كشفه شاهدُ FR-APP-001:

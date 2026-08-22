@@ -203,9 +203,12 @@ class ContractStateMachine
             $actorRole = '';
             if ((int) $actor > 0) {
                 try {
-                    $rs = mysqli_query($conn, 'SELECT role_id FROM users WHERE id = ' . (int) $actor);
+                    /* بالعمودَين لا بأحدِهما — `role_id` فارغٌ في 31 من 76
+                       مستخدمًا، فقراءتُه وحدَه تُسقط صفةَ فاعلٍ قائمة. */
+                    $rs = mysqli_query($conn, 'SELECT COALESCE(`role_id`, NULLIF(CAST(`role` AS UNSIGNED), 0)) AS r
+                                                  FROM users WHERE id = ' . (int) $actor);
                     $u = $rs ? mysqli_fetch_assoc($rs) : null;
-                    $actorRole = $u ? strval($u['role_id']) : '';
+                    $actorRole = ($u && $u['r'] !== null) ? strval($u['r']) : '';
                 } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل بقيمةِ \'\' — $actorRole'); $actorRole = ''; }
             }
             $isExec = ($actorRole === '9' || $actorRole === '-1');
