@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 16:01:44
--- الجداول: 643 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-22 16:21:16
+-- الجداول: 644 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -7403,6 +7403,20 @@ CREATE TABLE `gov_space_roles` (
   PRIMARY KEY (`role_id`),
   KEY `ix_gsr_space` (`space_ar`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='رابعًا — الدورُ ⇄ مساحتُه، مقيسًا بتقاطعِ المساراتِ المُصيَّرة';
+
+-- ── Table: gov_space_url_shadow ──
+CREATE TABLE `gov_space_url_shadow` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `route` varchar(200) NOT NULL,
+  `space_ar` varchar(120) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `mode` varchar(12) NOT NULL COMMENT 'observe · enforce',
+  `seen_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `ix_route_space` (`route`,`space_ar`),
+  KEY `ix_seen` (`seen_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FR-SEC-008 — ما كان سيُمنَع لو أُنفِذ حارسُ العنوانِ المباشر';
 
 -- ── Table: gov_stage_outputs ──
 CREATE TABLE `gov_stage_outputs` (
