@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 17:19:18
+-- المصدر: equipation_manage · التوليد: 2026-08-22 17:31:26
 -- الجداول: 646 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -7629,9 +7629,12 @@ CREATE TABLE `guard_denials` (
   `attempted_ref` varchar(120) DEFAULT NULL,
   `reason_code` varchar(80) DEFAULT NULL,
   `at` datetime NOT NULL DEFAULT current_timestamp(),
+  `verb` varchar(32) NOT NULL DEFAULT '' COMMENT 'الفعلُ الذي رُفض — view/add/edit/delete أو رمزُ الفعل',
+  `verb_state` varchar(16) NOT NULL DEFAULT 'REQUIRED' COMMENT 'REQUIRED · PRE_VERB (موروثٌ قبلَ العمود)',
   PRIMARY KEY (`deny_id`),
   KEY `ix_gd_guard` (`guard_code`,`at`),
-  CONSTRAINT `chk_denial_ref_present` CHECK (`attempted_ref` is not null and `attempted_ref` <> '')
+  CONSTRAINT `chk_denial_ref_present` CHECK (`attempted_ref` is not null and `attempted_ref` <> ''),
+  CONSTRAINT `chk_denial_verb_present` CHECK (`verb_state` = 'PRE_VERB' or trim(`verb`) <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-01 §9: سجل المنع — مقياس ملاءمة الحماية لا سجل مخالفات المستخدمين';
 
 -- ── Table: guard_override_policies ──

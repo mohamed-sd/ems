@@ -268,10 +268,12 @@ function ems_uc_ladder_log(mysqli $conn, $companyId, $entryId, $stage, $actorId,
                         . ':' . (string) $res['mode'], 0, 64);
     $sub    = 'unit_entry:' . (int) $entryId;
     $st = @$conn->prepare(
-        "INSERT INTO guard_denials (company_id, guard_code, person_id, attempted_ref, reason_code, at)
-         VALUES (?,?,?,?,?,NOW())");
+        /* FR-GOV-004 — الفعلُ عمودٌ: `advance` هو ما رُفض في سلّمِ الوحدة. */
+        "INSERT INTO guard_denials (company_id, guard_code, person_id, attempted_ref, reason_code, verb, at)
+         VALUES (?,?,?,?,?,?,NOW())");
     if (!$st) { return false; }
-    $st->bind_param('isiss', $companyId, $key, $actorId, $sub, $reason);
+    $verb = 'advance';
+    $st->bind_param('isisss', $companyId, $key, $actorId, $sub, $reason, $verb);
     $ok = $st->execute();
     $st->close();
     return $ok;
@@ -397,11 +399,13 @@ if (!function_exists('ems_ladder_log_denial')) {
         $sub = mb_substr($subjectKind . ':' . (int) $subjectRef, 0, 120);
         $why = mb_substr(implode(' · ', $res['reasons']), 0, 78);
         $st = @$conn->prepare(
-            "INSERT INTO `guard_denials` (`company_id`,`guard_code`,`person_id`,`attempted_ref`,`reason_code`,`at`)
-             VALUES (?,?,?,?,?,NOW())");
+            /* FR-GOV-004 — الفعلُ عمودٌ: الفعلُ المرفوضُ في هذا الحارسِ تقدُّمُ سلّم. */
+            "INSERT INTO `guard_denials` (`company_id`,`guard_code`,`person_id`,`attempted_ref`,`reason_code`,`verb`,`at`)
+             VALUES (?,?,?,?,?,?,NOW())");
         if (!$st) { return false; }
         $ai = (int) $actorId;
-        $st->bind_param('isiss', $companyId, $key, $ai, $sub, $why);
+        $vb = 'advance';
+        $st->bind_param('isisss', $companyId, $key, $ai, $sub, $why, $vb);
         $okRun = $st->execute();
         $st->close();
         return $okRun;

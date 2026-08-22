@@ -229,15 +229,19 @@ if (!function_exists('approval_record_rule_gap')) {
         $prev = mysqli_report(MYSQLI_REPORT_OFF);
         try {
             $stmt = mysqli_prepare($conn,
-                'INSERT INTO guard_denials (company_id, guard_code, person_id, attempted_ref, reason_code, at)
-                 VALUES (?, ?, ?, ?, ?, NOW())');
+                /* FR-GOV-004 — الفعلُ عمودٌ لا استنتاج: القيدُ يردُّ الفارغَ. */
+                'INSERT INTO guard_denials (company_id, guard_code, person_id, attempted_ref, reason_code, verb, at)
+                 VALUES (?, ?, ?, ?, ?, ?, NOW())');
             if (!$stmt) { throw new RuntimeException(mysqli_error($conn)); }
             $co     = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
             $guard  = 'approval_rules_missing';
             $person = approval_get_user_id();
             $ref    = mb_substr((string) $lookupKey, 0, 120);
             $rc     = (string) $reason;
-            mysqli_stmt_bind_param($stmt, 'isiss', $co, $guard, $person, $ref, $rc);
+            /* FR-GOV-004 — الفعلُ الذي رُفض هنا **اعتمادٌ**: الحارسُ يمنع سلّمَ
+               اعتمادٍ بلا قاعدة. ويُمرَّر عمودًا لا يُستنتَج من نصِّ السبب. */
+            $verb   = 'approve';
+            mysqli_stmt_bind_param($stmt, 'isisss', $co, $guard, $person, $ref, $rc, $verb);
             mysqli_stmt_execute($stmt);
             mysqli_stmt_close($stmt);
         } catch (\Throwable $e) {
