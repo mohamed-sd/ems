@@ -1383,8 +1383,8 @@
         "sheet": "م23 لوحة إدارة الموردين",
         "fields": 5,
         "gates": {
-            "built": "لا",
-            "linked": "لا",
+            "built": "نعم",
+            "linked": "نعم",
             "data": "لا",
             "tested": "لا",
             "accepted": "لا"
