@@ -51,11 +51,15 @@ $conn->set_charset('utf8mb4');
 $CO = 4; $ACTOR = 999907;
 $gate = new TenantDb($conn, TenantContext::forSystem($CO, $ACTOR, '', true));
 
+/* ◆ **البنودُ قبلَ الالتزامِ في الكنس** (البند ٢-١): المفتاحُ الأجنبيُّ
+ *   `fk_sup_line_obligation` بـ`RESTRICT` — فحذفُ التزامٍ تحتَه بندٌ يُردّ.
+ *   والترتيبُ هنا ليس ذوقًا: بندٌ ← رأسٌ ← التزام. */
 $teardown = function () use ($conn) {
     $conn->query("DELETE l FROM supplier_contract_lines l
                    JOIN supplier_contracts h ON h.id = l.contract_id
                   WHERE h.notes LIKE 'H07T%'");
     $conn->query("DELETE FROM supplier_contracts WHERE notes LIKE 'H07T%'");
+    $conn->query("DELETE FROM contract_commitments WHERE commitment_code LIKE 'H07T%'");
 };
 register_shutdown_function($teardown);
 $teardown();
@@ -104,6 +108,21 @@ head('② حراسُ §6-Validation');
 $SUP = intval($conn->query("SELECT id FROM suppliers WHERE company_id={$CO} ORDER BY id LIMIT 1")->fetch_assoc()['id']);
 $CC  = intval($conn->query("SELECT id FROM contracts WHERE company_id={$CO} ORDER BY id LIMIT 1")->fetch_assoc()['id']);
 
+/* ◆ **«لا حصةَ بلا التزام» صارت مُنفَذةً لا مكتوبةً** (البند ٢-١ من
+ *   INJ-EXEC-CLOSE-01): `saveLine` تردُّ ٤٢٢ على غيابِ `contract_obligation_ref`
+ *   بلا شرط. فالتجهيزةُ تبذر التزامَ نوعِ معدةٍ حقيقيًّا على عقدِ العميلِ نفسِه —
+ *   **وليس تليينًا للفحصِ بل استيفاءً لعقدٍ صار نافذًا**. والفحوصُ السابقةُ
+ *   للالتزامِ في الترتيب (نموذجُ العمل · الوحدةُ · السعرُ · الاستعداد) تبقى
+ *   كما هي، فالمرجعُ لا يبتلع أحكامَها. */
+$conn->query("INSERT INTO contract_commitments
+    (company_id, commitment_code, party_scope, contract_ref, commitment_type,
+     equipment_type_code, primary_units_contracted, standby_units_required,
+     standby_units_allowed, valid_from)
+    VALUES ({$CO}, 'H07T-CMT', 'client', {$CC}, 'equipment_count',
+            'H07T_EXC', 5, 1, 2, '2042-01-01')");
+$H07T_OBL = intval($conn->insert_id);
+check($H07T_OBL > 0, 'بُذر التزامُ نوعِ معدةٍ للاختبار — «لا حصةَ بلا التزام»');
+
 $r = SCS::createContract($conn, $gate, $CO, array(
     'supplier_id' => $SUP, 'client_contract_id' => $CC,
     'start_date' => '2042-01-01', 'end_date' => '2042-12-31',
@@ -121,47 +140,47 @@ $r = SCS::createContract($conn, $gate, $CO, array(
 check(!$r['ok'] && $r['code'] === 422, 'عملةٌ لا يعرفها محرّكُ الفوترة → 422');
 
 $r = SCS::saveLine($conn, $gate, $CO, $CID, array(
-    'work_model' => 'kilogram', 'unit' => 'كجم', 'unit_price' => 5), $ACTOR);
+    'contract_obligation_ref' => $H07T_OBL, 'work_model' => 'kilogram', 'unit' => 'كجم', 'unit_price' => 5), $ACTOR);
 check(!$r['ok'] && $r['code'] === 422 && strpos($r['reason'], '§2-②') !== false,
       'نموذجُ تشغيلٍ خارج الأربعة → 422 بنص المصدر');
 
 $r = SCS::saveLine($conn, $gate, $CO, $CID, array(
-    'work_model' => 'hour', 'unit' => 'ساعه', 'unit_price' => 5), $ACTOR);
+    'contract_obligation_ref' => $H07T_OBL, 'work_model' => 'hour', 'unit' => 'ساعه', 'unit_price' => 5), $ACTOR);
 check(!$r['ok'] && $r['code'] === 422, 'وحدةٌ لا يعرفها المحرّك (إملاءٌ مغاير) → 422');
 
 $r = SCS::saveLine($conn, $gate, $CO, $CID, array(
-    'work_model' => 'hour', 'unit' => 'ساعة', 'unit_price' => 0), $ACTOR);
+    'contract_obligation_ref' => $H07T_OBL, 'work_model' => 'hour', 'unit' => 'ساعة', 'unit_price' => 0), $ACTOR);
 check(!$r['ok'] && $r['code'] === 422, 'سعرُ وحدةٍ صفريٌّ → 422 («صفرُ بندٍ بلا سعرٍ مكتوب»)');
 
 $r = SCS::saveLine($conn, $gate, $CO, $CID, array(
-    'work_model' => 'hour', 'unit' => 'ساعة', 'unit_price' => 20, 'standby_basis' => 'rate'), $ACTOR);
+    'contract_obligation_ref' => $H07T_OBL, 'work_model' => 'hour', 'unit' => 'ساعة', 'unit_price' => 20, 'standby_basis' => 'rate'), $ACTOR);
 check(!$r['ok'] && $r['code'] === 422, 'أساسُ استعدادٍ بلا معدل → 422');
 
 $r = SCS::saveLine($conn, $gate, $CO, $CID, array(
-    'work_model' => 'hour', 'unit' => 'ساعة', 'unit_price' => 20,
+    'contract_obligation_ref' => $H07T_OBL, 'work_model' => 'hour', 'unit' => 'ساعة', 'unit_price' => 20,
     'standby_basis' => 'none', 'standby_rate' => 7), $ACTOR);
 check(!$r['ok'] && $r['code'] === 422, 'معدلٌ بلا أساسٍ مشترط → 422');
 
 $r = SCS::saveLine($conn, $gate, $CO, $CID, array(
-    'work_model' => 'ton', 'unit' => 'طن', 'unit_price' => 30,
+    'contract_obligation_ref' => $H07T_OBL, 'work_model' => 'ton', 'unit' => 'طن', 'unit_price' => 30,
     'standby_basis' => 'percent', 'standby_rate' => 140), $ACTOR);
 check(!$r['ok'] && $r['code'] === 422, 'نسبةُ استعدادٍ > 100٪ من سعر الوحدة → 422');
 
 // ── السليم ──
 $r = SCS::saveLine($conn, $gate, $CO, $CID, array(
-    'work_model' => 'hour', 'unit' => 'ساعة', 'unit_price' => 20, 'currency' => 'USD',
+    'contract_obligation_ref' => $H07T_OBL, 'work_model' => 'hour', 'unit' => 'ساعة', 'unit_price' => 20, 'currency' => 'USD',
     'standby_basis' => 'rate', 'standby_rate' => 6.5, 'valid_from' => '2042-01-01'), $ACTOR);
 check($r['ok'], 'بندُ ساعةٍ بمعدل استعدادٍ 6.5 حُفظ');
 $L_HOUR = intval($r['line_id']);
 
 $r = SCS::saveLine($conn, $gate, $CO, $CID, array(
-    'work_model' => 'ton', 'unit' => 'طن', 'unit_price' => 40, 'currency' => 'USD',
+    'contract_obligation_ref' => $H07T_OBL, 'work_model' => 'ton', 'unit' => 'طن', 'unit_price' => 40, 'currency' => 'USD',
     'standby_basis' => 'percent', 'standby_rate' => 25, 'valid_from' => '2042-01-01'), $ACTOR);
 check($r['ok'], 'بندُ طنٍّ باستعدادٍ 25٪ من سعر الوحدة حُفظ');
 $L_TON = intval($r['line_id']);
 
 $r = SCS::saveLine($conn, $gate, $CO, $CID, array(
-    'work_model' => 'ton', 'unit' => 'طن', 'unit_price' => 55), $ACTOR);
+    'contract_obligation_ref' => $H07T_OBL, 'work_model' => 'ton', 'unit' => 'طن', 'unit_price' => 55), $ACTOR);
 check(!$r['ok'] && $r['code'] === 409, 'بندٌ مكررٌ على (عقد × نموذج × وحدة) → 409');
 
 // ═══ ③ 423 المزدوج ═══
@@ -169,7 +188,7 @@ head('③ الحارسان 423: المرحَّلُ بمصدره · والناف�
 $migrated = $conn->query("SELECT id FROM supplier_contracts WHERE source_table='supplierscontracts' ORDER BY id LIMIT 1")->fetch_assoc();
 $MIG = intval($migrated['id']);
 $r = SCS::saveLine($conn, $gate, $CO, $MIG, array(
-    'work_model' => 'hour', 'unit' => 'ساعة', 'unit_price' => 99), $ACTOR);
+    'contract_obligation_ref' => $H07T_OBL, 'work_model' => 'hour', 'unit' => 'ساعة', 'unit_price' => 99), $ACTOR);
 check(!$r['ok'] && $r['code'] === 423 && strpos($r['reason'], 'supplierscontracts') !== false,
       'بندٌ على عقدٍ مرحَّل → 423 **بمصدره**');
 
@@ -186,7 +205,7 @@ $now = SCS::head($gate, $CID);
 check((string) $now['state'] === CSM::EFFECTIVE, 'السلسلةُ المشروعة بلغت «نافذ» بأربع خطوات');
 
 $r = SCS::saveLine($conn, $gate, $CO, $CID, array(
-    'line_id' => $L_HOUR, 'work_model' => 'hour', 'unit' => 'ساعة', 'unit_price' => 21,
+    'contract_obligation_ref' => $H07T_OBL, 'line_id' => $L_HOUR, 'work_model' => 'hour', 'unit' => 'ساعة', 'unit_price' => 21,
     'standby_basis' => 'rate', 'standby_rate' => 6.5), $ACTOR);
 check(!$r['ok'] && $r['code'] === 423 && strpos($r['reason'], 'بملحق') !== false,
       'تعديلُ بندٍ في عقدٍ **نافذ** → 423 «التغيير بملحق»');
@@ -254,7 +273,7 @@ $r2 = SCS::createContract($conn, $gate, $CO, array(
     'supplier_id' => $SUP, 'start_date' => '2042-03-01', 'notes' => 'H07T للإنهاء'), $ACTOR);
 $CID2 = intval($r2['contract_id']);
 $r2 = SCS::saveLine($conn, $gate, $CO, $CID2, array(
-    'work_model' => 'meter', 'unit' => 'متر طولي', 'unit_price' => 15), $ACTOR);
+    'contract_obligation_ref' => $H07T_OBL, 'work_model' => 'meter', 'unit' => 'متر طولي', 'unit_price' => 15), $ACTOR);
 $L2 = intval($r2['line_id']);
 $r2 = SCS::endLine($conn, $gate, $CO, $CID2, $L2, '2042-05-31', $ACTOR);
 $row = $conn->query("SELECT state, valid_to FROM supplier_contract_lines WHERE id={$L2}")->fetch_assoc();

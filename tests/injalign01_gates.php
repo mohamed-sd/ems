@@ -159,11 +159,12 @@ function a8_honesty_belt($ROOT, mysqli $conn)
     echo "\n══ حزامُ صدقِ البوابة A8 — تُجرَّب معطوبةً قبلَ تصديقِ مرورِها ══\n";
     printf("  ① الدرجةُ بالمصدرِ السليم: **%d/3** (%s)\n", $intact['score'], $intact['state']);
 
-    if ($intact['score'] !== 3) {
-        echo "  ◆ **الحارسُ غيرُ مبنيٍّ بعد** — فلا يُعطَب ما ليس قائمًا، ولا يُدَّعى\n";
-        echo "    إثباتٌ لم يُقَس. والمثبَتُ اليومَ أن البوابةَ **ترسُب على العطبِ القائم**\n";
-        echo "    حيث كانت تخضرُّ بـ`is_file()` — وتمامُ الحزامِ عند بناءِ الحارس (البند ٢-١).\n";
-        return $intact['score'] !== 3 ? 0 : 1;
+    /* ◆ **يكفي فعلٌ محروسٌ واحدٌ ليُجرَّب**: الشرطُ ليس اكتمالَ الثلاثة، بل أن
+     *   يكون ثمَّ حارسٌ يُعطَب. وكان الشرطُ `!== 3` فامتنع الحزامُ عن العملِ بعدَ
+     *   بناءِ الفعلِ الأولِ في البند ٢-١ — **وحارسٌ ينتظر الكمالَ لا يُجرَّب أبدًا**. */
+    if ($intact['score'] < 1) {
+        echo "  ◆ **صفرُ فعلٍ محروسٍ** — فلا يُعطَب ما ليس قائمًا، ولا يُدَّعى إثباتٌ لم يُقَس.\n";
+        return 0;
     }
 
     $orig = file_get_contents($src);
@@ -171,13 +172,27 @@ function a8_honesty_belt($ROOT, mysqli $conn)
     register_shutdown_function($restore);
     $dropped = false; $broken = null;
     try {
-        $needle = "if (\$oblRef === null) {";
-        if (strpos($orig, $needle) === false) {
-            echo "  ✘ مرساةُ العطبِ غيرُ موجودةٍ في المصدر — الحزامُ لا يدّعي\n";
-            $restore();
-            return 0;
+        /* ◆ **والعطبُ يُعيد الحالَ الذي كان، لا يقصُّ نصفَه**: للقاعدةِ اليومَ
+         *   طبقتان — ردٌّ صريحٌ على الغياب، ثم بحثٌ **غيرُ مشروطٍ** عن المرجعِ
+         *   يردُّ ٤٢٢ أيضًا حين يكون `null`. فتحييدُ الأولى وحدَها لا يفتح ثغرةً،
+         *   وكان الحزامُ يقول «لم ترسُبْ» فينسب العطبَ إلى البوابةِ لا إلى نفسِه.
+         *   فالعطبُ الآن **يُعيد الشكلَ الأصليَّ بعينِه**: يشرط البحثَ بوجودِ
+         *   المرجعِ ويُسقط الردَّ الصريح — وهو الحالُ الذي كانت عليه الخدمةُ فعلًا. */
+        $needles = array(
+            'if ($oblRef === null) {' => 'if (false) {',
+            "        {\n            \$obl = \$gate->scopedQuery("
+                => "        if (\$oblRef !== null) {\n            \$obl = \$gate->scopedQuery(",
+        );
+        $brokenSrc = $orig;
+        foreach ($needles as $from => $to) {
+            if (strpos($brokenSrc, $from) === false) {
+                echo "  ✘ مرساةُ العطبِ غيرُ موجودةٍ في المصدر — الحزامُ لا يدّعي\n";
+                $restore();
+                return 0;
+            }
+            $brokenSrc = str_replace($from, $to, $brokenSrc);
         }
-        file_put_contents($src, str_replace($needle, "if (false) {", $orig));
+        file_put_contents($src, $brokenSrc);
         $broken = a8_pyramid_behavior_isolated($ROOT, $conn);
         $dropped = ($broken['score'] < $intact['score']);
         printf("  ② الدرجةُ بالحارسِ مُحيَّدًا: **%d/3** (%s)\n", $broken['score'], $broken['state']);

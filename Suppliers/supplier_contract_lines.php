@@ -498,8 +498,15 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
                 </div>
                 <div class="form-group">
                     <label for="f_obl">التزام نوع المعدة في عقد العميل <small>— لا حصةَ بلا التزام</small></label>
-                    <select name="contract_obligation_ref" id="f_obl">
-                        <option value="">— غير مرتبط —</option>
+                    <?php /* ◆ **الملصقُ كان يقول القاعدةَ والحقلُ ينقضها** (البند ٢-١):
+                             «— غير مرتبط —» كان **الخيارَ الأول** وبلا `required`،
+                             فالقيمةُ الافتراضيةُ للحقلِ كانت نقضَ القاعدةِ المكتوبةِ فوقه.
+                             والآن: `required` · وخيارُ الفراغِ عنوانُ اختيارٍ لا قيمةٌ
+                             مقبولة (`disabled` فلا يُرسَل، و`selected` فلا يُختار غيرُه
+                             صدفةً). والخادمُ يردُّ ٤٢٢ على الغيابِ أيًّا كانت الواجهة —
+                             فهذا تيسيرٌ لا حراسة. */ ?>
+                    <select name="contract_obligation_ref" id="f_obl" required>
+                        <option value="" disabled selected>— اختر التزامَ نوعِ المعدة —</option>
                         <?php foreach ($obligation_options as $ob): ?>
                             <option value="<?php echo intval($ob['id']); ?>">
                                 <?php echo htmlspecialchars($ob['commitment_code'] . ' · ' . $ob['equipment_type_code']

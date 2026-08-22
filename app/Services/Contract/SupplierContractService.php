@@ -432,9 +432,22 @@ class SupplierContractService
 
         // ── CAP-01 §8.2: بندُ نوع المعدة والاحتياطي في عقد المورد ──────────
         // «لا حصةَ بلا التزامِ نوعِ معدةٍ في عقد عميلٍ نافذ» — المرجعُ يُفحص وجودًا ونفاذًا
+        //
+        // ◆ **الحارسُ كان مشروطًا بوجودِ ما يحرسه** (البند ٢-١ من INJ-EXEC-CLOSE-01):
+        //   كان `if ($oblRef !== null)` — فمن حذف الحقلَ من الطلبِ تخطّى القاعدةَ
+        //   كلَّها. والقاعدةُ كانت مكتوبةً في ثلاثةِ مواضعَ (الوثيقةِ، وهذا التعليقِ،
+        //   وملصقِ الحقلِ نفسِه) ومنفَّذةً في **صفر**. والمقيسُ يومَها: `saveLine`
+        //   بلا مرجعٍ تعود **200**، و**٦ من ٦** بنودٍ حيةٍ بلا مرجعِ التزام.
+        // ◆ والغيابُ الآن **يُردُّ ٤٢٢ قبلَ أيِّ فحصٍ آخر** — فالشرطُ على الغيابِ لا
+        //   على الحضور، ولا يُتخطّى بحذفِ الحقل.
         $oblRef = isset($args['contract_obligation_ref']) && (int) $args['contract_obligation_ref'] > 0
                   ? (int) $args['contract_obligation_ref'] : null;
-        if ($oblRef !== null) {
+        if ($oblRef === null) {
+            $out['code'] = 422;
+            $out['reason'] = 'لا حصةَ بلا التزام — مرجعُ التزامِ نوعِ المعدةِ في عقدِ العميلِ مطلوبٌ ولا يُترك فارغًا (CAP-01 §8.2)';
+            return $out;
+        }
+        {
             $obl = $gate->scopedQuery(array('scope' => array('cc' => 'contract_commitments', 'k' => 'contracts')),
                 "SELECT cc.id, cc.equipment_type_code FROM contract_commitments cc
                    JOIN contracts k ON k.id = cc.contract_ref AND k.is_deleted = 0
