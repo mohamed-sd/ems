@@ -138,7 +138,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
         echo '<div class="alert alert-info">' . htmlspecialchars($_GET['msg']) . '</div>';
     }
     ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'العقودُ والحصص'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier_contract', 'مصفوفةُ المسؤولياتِ والتكاليف'); ?>
 
     <?= ems_states_bundle('لا قواعدَ لهذا العقدِ بعدُ', 'اختر عقدًا آخرَ أو دوِّن قاعدةً مسعَّرةً من النموذجِ أعلاه') ?>
 

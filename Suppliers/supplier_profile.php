@@ -153,7 +153,7 @@ if ($sf_supplier_id > 0) include __DIR__ . '/../includes/supplier_file_tabs.php'
     $header_back = array('href' => 'suppliers.php', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
     include('../includes/page_header.php');
     ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'نظرةٌ عامة'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'البيانات'); ?>
 
     <?php echo ems_states_bundle('لا بياناتَ مسجَّلةً لهذا المورد بعد', 'ستظهر معداتُه وعقودُه هنا فورَ تسجيلِها'); ?>
 

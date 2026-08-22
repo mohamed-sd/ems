@@ -181,6 +181,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     array('href' => 'suppliers.php', 'class' => 'back-btn', 'icon' => 'fas fa-arrow-right', 'label' => 'العودة للموردين'),
     array('href' => '../main/dashboard.php', 'class' => 'back-btn', 'icon' => 'fa-solid fa-house', 'label' => 'الرئيسية'),
   );
+  require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier_contract', 'بياناتُ العقد');
   include('../includes/page_header.php');
   // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
   echo ems_states_bundle('لا عقودَ مورِّدين مسجَّلةً بعدُ', 'أضف أولَ عقدِ مورِّدٍ بزرِّ «عقد جديد» في رأسِ الشاشة');

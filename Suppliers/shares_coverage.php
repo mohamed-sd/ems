@@ -48,7 +48,7 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
-require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'العقودُ والحصص');
+require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier_contract', 'الحصصُ والتغطية');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <div class="main" dir="rtl">

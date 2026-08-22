@@ -646,7 +646,7 @@ require_once __DIR__ . '/../includes/profile_kit.php';
        والإرشادُ يشير إلى بابٍ قائم: «رأسُ الشاشة» لم يعد يحمل زرَّ المشاريع. */
     echo ems_states_bundle('لا مشاريعَ مسجَّلةً لهذا العميلِ بعدُ', 'افتح تبويبَ «المشاريعُ والمواقع» من شريطِ رحلةِ العميلِ وأضف أولَ مشروعٍ له');
     ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('client', 'نظرةٌ عامة'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('client', 'البيانات الأساسية'); ?>
 
     <?php
     /* ══ لوحُ الهوية ═══════════════════════════════════════════════════════

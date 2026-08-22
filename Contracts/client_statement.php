@@ -83,7 +83,7 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا حركاتٍ في كشفِ هذا العميلِ للفترة', 'وسّع الفترةَ أو اختر عميلًا آخر — والكشفُ يقرأ الفواتيرَ والتحصيلاتِ الحية');
     ?>
-<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('client', 'الذمم'); ?>
+<?php require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('client', 'المركز المالي'); ?>
 
     <div class="card"><div class="card-body">
                 <!-- صندوقُ الفلاترِ الموحَّد — التصميمُ في assets/css/ems-filters.css -->

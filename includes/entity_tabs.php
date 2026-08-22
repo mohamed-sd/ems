@@ -17,30 +17,67 @@ if (!function_exists('ems_entity_tabs')) {
     {
         /* اسمُ التبويبِ (§8-2 حرفًا) => المسارُ الحيُّ المقيسُ أو '' (غيرُ مبنيةٍ بعد) */
         return array(
+            /* SUP-01: «ستةُ تبويبات: البيانات · جهاتُ الاتصالِ والمفوضون ·
+               التأهيلُ والوثائقُ والحسابُ البنكي · المعداتُ المقدَّمة · الطاقةُ
+               والجاهزية · التقييمُ والمخاطر». و«الحاوياتُ والتوزيع» سقطت — لفظٌ
+               متقاعدٌ كُنس نظيرُه في XC-02. */
             'supplier' => array(
-                'label' => 'رحلةُ المورد',
+                'label' => 'ملفُّ المورد',
                 'tabs' => array(
-                    'نظرةٌ عامة' => 'Suppliers/suppliers.php',
-                    'التأهيلُ والقدرة' => 'Suppliers/supplier_capacity.php',
-                    'العقودُ والحصص' => 'Suppliers/shares_coverage.php',
-                    'الحاوياتُ والتوزيع' => '',
-                    'المعداتُ والمشغّلون' => 'Suppliers/supplierscontracts.php',
-                    'التنفيذُ والاستحقاق' => 'Suppliers/unit_statement_supplier.php',
-                    'التسوياتُ والصرف' => 'Suppliers/supplier_advances.php',
-                    'التقييم' => 'Suppliers/supplier_evaluation.php',
-                    'المستندات' => 'Suppliers/supplier_documents.php',
+                    'البيانات' => 'Suppliers/suppliers.php',
+                    'جهاتُ الاتصالِ والمفوضون' => '',           /* SUP-02 — يُبنى */
+                    'التأهيلُ والوثائقُ والحساب' => 'Suppliers/supplier_documents.php',
+                    'المعداتُ المقدَّمة' => 'Suppliers/equipment_plan.php',
+                    'الطاقةُ والجاهزية' => 'Suppliers/supplier_capacity.php',
+                    'التقييمُ والمخاطر' => 'Suppliers/supplier_evaluation.php',
                 ),
             ),
-            'client' => array(
-                'label' => 'رحلةُ العميل',
+            /* SAL-07: «أربعةُ تبويبات: بيانات العرض · بنوده · سجلُّ التفاوض ·
+               مراجعةُ ما قبل التعاقد» — كيانٌ لم يكن مسجَّلًا البتة. */
+            'quotation' => array(
+                'label' => 'ملفُّ العرض',
                 'tabs' => array(
-                    'نظرةٌ عامة' => 'Clients/clients.php',
-                    'المشاريعُ والمواقع' => 'Projects/projects.php',
+                    'بيانات العرض' => 'Clients/quotations.php',
+                    'بنودُ العرض' => 'Clients/quotation_lines.php',
+                    'سجلُّ التفاوض' => 'Clients/quotation_negotiation.php',
+                    'مراجعةُ ما قبل التعاقد' => 'Clients/readiness_lines.php',
+                ),
+            ),
+            /* SUP-08: «خمسةُ تبويبات» — ونصُّ المتطلبِ هو الحاكمُ على ملاحظةِ
+               `gov_target_nav` التي تقول أربعة، لأنَّ معيارَ القبولِ معلَّقٌ به. */
+            'supplier_contract' => array(
+                'label' => 'ملفُّ عقدِ المورد',
+                'tabs' => array(
+                    'بياناتُ العقد' => 'Suppliers/supplierscontracts.php',
+                    'بنودُ العقد' => 'Suppliers/supplier_contract_lines.php',
+                    'مصفوفةُ المسؤولياتِ والتكاليف' => 'Suppliers/supplier_rules.php',
+                    'الحصصُ والتغطية' => 'Suppliers/shares_coverage.php',
+                    'الملاحقُ والتصفية' => 'Suppliers/supplier_closure.php',
+                ),
+            ),
+            /* SUP-19: «كشفُ الحسابِ التجاريُّ تبويبٌ فيه» — والاستحقاقاتُ
+               (SUP-18) والسلفُ (SUP-17) والمخالفاتُ (SUP-23) وحالةُ الصرفِ
+               (SUP-20) أبناؤه. وحالةُ الصرفِ **إسقاطٌ من المالية** لا سطحٌ هنا. */
+            'settlement' => array(
+                'label' => 'ملفُّ التسوية',
+                'tabs' => array(
+                    'التسوياتُ وكشفُ الحساب' => 'Suppliers/settlements.php',
+                    'الاستحقاقات' => '',                        /* SUP-18 — يُبنى */
+                    'السلفُ والنيابية' => 'Suppliers/supplier_advances.php',
+                    'المخالفاتُ والجزاءات' => 'Suppliers/supplier_violations.php',
+                    'طلباتُ الدفعِ وحالةُ الصرف' => 'Finance/payments_fin.php',
+                ),
+            ),
+            /* SAL-01: «خمسةُ تبويبات: البيانات الأساسية · جهات الاتصال ·
+               المشاريع · العقود · المركز المالي إسقاطًا مقيَّدًا». */
+            'client' => array(
+                'label' => 'ملفُّ العميل',
+                'tabs' => array(
+                    'البيانات الأساسية' => 'Clients/clients.php',
+                    'جهات الاتصال' => '',                      /* SAL-02 — يُبنى */
+                    'المشاريع' => 'Projects/projects.php',
                     'العقود' => 'Contracts/contracts.php',
-                    'الفوترةُ والتحصيل' => 'Contracts/claims.php',
-                    'الذمم' => 'Contracts/client_statement.php',
-                    'المستندات' => '',
-                    'سجلُّ التغييرات' => 'Clients/contract_events.php',
+                    'المركز المالي' => 'Contracts/client_statement.php',
                 ),
             ),
             'equipment' => array(
