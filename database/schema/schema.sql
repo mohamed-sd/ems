@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-23 00:18:34
--- الجداول: 647 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-23 00:33:58
+-- الجداول: 648 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -7970,6 +7970,22 @@ CREATE TABLE `incentive_rules` (
   KEY `ix_ir_contract` (`contract_id`),
   KEY `ix_ir_company` (`company_id`),
   CONSTRAINT `fk_ir_contract` FOREIGN KEY (`contract_id`) REFERENCES `employee_contracts` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: injfrd66_xc01_backup ──
+CREATE TABLE `injfrd66_xc01_backup` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `route` varchar(160) NOT NULL,
+  `canonical_ar` varchar(255) DEFAULT NULL,
+  `old_names` text DEFAULT NULL,
+  `status` varchar(40) DEFAULT NULL,
+  `decision_state` varchar(40) DEFAULT NULL,
+  `application_state` varchar(40) DEFAULT NULL,
+  `decision_source` text DEFAULT NULL,
+  `items_json` text DEFAULT NULL,
+  `current_json` text DEFAULT NULL,
+  `at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: injfrd66_xc02_backup ──
