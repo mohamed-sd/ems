@@ -15,18 +15,19 @@
  *      السطحُ الذي **لا تملكه** إدارةُ الوثيقة: سابقةُ هجرة `2027_10_06`
  *      المقيَّدةُ في القاعدة قضت بأنَّ «وثيقةَ إدارةٍ لا تملك تسميةَ سطحٍ
  *      مشترك»، وأنَّ تسميتَها لبندٍ في مجموعتِها وصفٌ لدورِه لا اسمٌ كنسيّ.
- *   ② **محورُ المجموعة** — وهو **قرارُ بنيةٍ لا تسمية**، ويُقاس ولا يُحكم عليه
- *      بالرسوب: `gov_target_nav` يصف مجموعاتٍ **لكلِّ دور**، بينما رأسُ الطيِّ
- *      المُصيَّرَ يأتي من `nav_route_group` وهو **مفتاحُه المسارُ وحدَه**
- *      (472 صفًّا · 472 مسارًا · لا `role_id` فيه) ضمن تصنيفٍ مشتركٍ سقفُه
- *      اثنتا عشرةَ مجموعةً لكلِّ الأدوار. فالنموذجان مختلفان بنيويًّا،
- *      وتسويتُهما قرارُ معماريةٍ لا تُنتحَل في بوابةِ قياس.
+ *   ② **محورُ المجموعة** — يُقاس على **القسمِ الفرعيِّ** لا على رأسِ الطيّ.
+ *      فرأسُ الطيِّ يأتي من `nav_route_group` **ومفتاحُه المسارُ وحدَه**
+ *      (472 صفًّا · لا `role_id`) ضمن تصنيفٍ سقفُه اثنتا عشرةَ مجموعةً مشتركةً
+ *      بين الأدوارِ التسعةَ عشر — فلا يحمل مجموعةً لكلِّ دور. و`gov_target_nav`
+ *      يصف مجموعاتٍ **لكلِّ دور**، فحُمِلت على القسمِ الذي مفتاحُه الدورُ سلفًا
+ *      (`uxuiDeclaredSections`). والقسمُ يسري على **المُعلَنِ وحدَه**: قِيس أنَّ
+ *      تفضيلَ الحاليِّ عامًّا يغيّر 791 زوجًا من 870 في تسعةَ عشرَ دورًا.
  *
  * ◆ قراءةٌ خالصة — لا كتابةَ في القاعدةِ إطلاقًا.
  *
  * التشغيل:
  *   php tools/injfrd66_nav_gate.php            التقريرُ التفصيلي
- *   php tools/injfrd66_nav_gate.php --gate     رمزُ خروجٍ 1 عند خرقٍ في محورِ الاسم
+ *   php tools/injfrd66_nav_gate.php --gate     رمزُ خروجٍ 1 عند خرقٍ في أيِّ محور
  * ═══════════════════════════════════════════════════════════════════════════
  */
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit('CLI only'); }
@@ -86,7 +87,7 @@ $q = mysqli_query($conn, "SELECT route, COUNT(DISTINCT role_id) c FROM nav_items
 while ($q && ($x = mysqli_fetch_assoc($q))) { $PLATFORM[strtolower(uxp_norm($x['route']))] = (int) $x['c']; }
 
 $users = uxp_role_users($conn);
-$nameFail = 0; $summary = array();
+$nameFail = 0; $groupFail = 0; $summary = array();
 
 foreach ($target as $roleId => $items) {
     $live = uxp_render_role($conn, $roleId, $users[$roleId] ?? null);
@@ -161,35 +162,42 @@ foreach ($target as $roleId => $items) {
         $nameFail += count($extraOther);
     }
 
-    /* ── محورُ المجموعة: يُقاس ويُعرض ولا يُرسِّب ─────────────────────────── */
-    echo "\n◆ محورُ المجموعة (قياسٌ لا حكم):\n";
-    $byTargetGroup = array();
+    /* ── محورُ المجموعة: القسمُ المُصيَّرُ مقابلَ المجموعةِ المستهدفة ─────────
+       ◆ رأسُ الطيِّ مفتاحُه المسارُ فلا يحمل مجموعةً لكلِّ دور — فالمجموعةُ
+         المستهدفةُ تُحمَل على **القسمِ الفرعيِّ** (`nav-subhead`) وهو لكلِّ
+         دورٍ سلفًا. والقياسُ هنا على القسمِ لا على الرأس. */
+    echo "\n◆ محورُ المجموعة — القسمُ المُصيَّر:\n";
+    $gOk = 0; $gBad = array();
     foreach ($items as $t) {
         $hits = $liveByRoute[$t['norm']] ?? array();
-        $byTargetGroup[$t['gn']][] = $hits ? $hits[0]['group'] : '—';
+        if (!$hits) { continue; }
+        $sec = $hits[0]['section'];
+        if ($sec === $t['gn']) { $gOk++; continue; }
+        if (!$t['owns']) { continue; }          /* المشتركُ مُستثنًى في المحورَين */
+        $gBad[] = array('t' => $t, 'sec' => $sec, 'head' => $hits[0]['group']);
     }
-    foreach ($byTargetGroup as $gn => $heads) {
-        $u = array_count_values($heads);
-        arsort($u);
-        $shown = array();
-        foreach ($u as $h => $c) { $shown[] = "{$h}×{$c}"; }
-        printf("   · «%s» ⇐ %s\n", $gn, implode(' · ', $shown));
+    printf("   مطابقٌ %d/%d\n", $gOk, count($items));
+    foreach ($gBad as $b) {
+        printf("   ✘ «%s» المستهدف «%s» · القسمُ الحيُّ «%s» (رأسُ «%s»)\n",
+            $b['t']['item'], $b['t']['gn'], $b['sec'], $b['head']);
     }
+    $groupFail += count($gBad);
 
     $summary[$roleId] = array('ok' => count($ok), 'n' => count($items),
-        'bad' => count($bad), 'miss' => count($missing), 'ex' => count($exempt));
+        'bad' => count($bad), 'miss' => count($missing), 'ex' => count($exempt),
+        'gok' => $gOk, 'gbad' => count($gBad));
     echo "\n";
 }
 
 echo str_repeat('─', 78) . "\n";
 foreach ($summary as $rid => $s) {
-    printf("  دور %-3d اسمٌ مطابقٌ %2d/%2d · مخالفٌ مملوك %d · ناقص %d · مُستثنًى %d\n",
-        $rid, $s['ok'], $s['n'], $s['bad'], $s['miss'], $s['ex']);
+    printf("  دور %-3d اسمٌ %2d/%2d (مخالفٌ مملوك %d · ناقص %d · مُستثنًى %d) · مجموعةٌ %2d/%2d (مخالف %d)\n",
+        $rid, $s['ok'], $s['n'], $s['bad'], $s['miss'], $s['ex'], $s['gok'], $s['n'], $s['gbad']);
 }
-printf("\n%s محورُ الاسم: %d خرقًا\n",
-    $nameFail === 0 ? '✔' : '✘', $nameFail);
-echo "◆ محورُ المجموعةِ مفتوحٌ ببيانِه: `nav_route_group` مفتاحُه المسارُ وحدَه\n"
-   . "   (لا role_id) وسقفُ التصنيفِ اثنتا عشرةَ مجموعةً مشتركةً بين الأدوارِ كلِّها،\n"
-   . "   و`gov_target_nav` يصف مجموعاتٍ لكلِّ دور — والتسويةُ قرارُ معمارية.\n";
+printf("\n%s محورُ الاسم: %d خرقًا\n", $nameFail === 0 ? '✔' : '✘', $nameFail);
+printf("%s محورُ المجموعة: %d خرقًا\n", $groupFail === 0 ? '✔' : '✘', $groupFail);
+echo "◆ والمجموعةُ محمولةٌ على القسمِ الفرعيِّ لا على رأسِ الطيّ — فرأسُ الطيِّ\n"
+   . "   مفتاحُه المسارُ (nav_route_group بلا role_id) ولا يحمل مجموعةً لكلِّ دور،\n"
+   . "   والقسمُ يُشتقُّ من gov_target_nav فيسري على المُعلَنِ وحدَه.\n";
 
-exit($GATE && $nameFail > 0 ? 1 : 0);
+exit($GATE && ($nameFail > 0 || $groupFail > 0) ? 1 : 0);

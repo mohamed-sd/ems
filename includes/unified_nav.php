@@ -587,6 +587,42 @@ function uxuiCanonicalMap($conn) {
     return $map;
 }
 
+/**
+ * القسمُ المُعلَنُ لكلِّ دور — من `gov_target_nav` وحدَه (INJ-FRD-01 · XC-01)
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ **المشكلةُ المقيسة**: `gov_target_nav` يصف **ستَّ مجموعاتٍ لكلِّ دور**
+ *   (مفتاحُه `role_id`+`group_no`)، بينما رأسُ الطيِّ المُصيَّرَ يأتي من
+ *   `nav_route_group` **ومفتاحُه المسارُ وحدَه** (472 صفًّا · لا `role_id`)
+ *   ضمنَ تصنيفٍ سقفُه اثنتا عشرةَ مجموعةً مشتركةً بين الأدوارِ التسعةَ عشر.
+ *   فمجموعتانِ مستهدفتانِ تنهاران على رأسٍ واحد.
+ *
+ * ◆ **والحلُّ الأقلُّ تدخّلًا**: الطبقةُ الثانيةُ للسايدبار — **القسمُ الفرعيُّ**
+ *   (`nav-subhead`) — **لكلِّ دورٍ سلفًا**، والمُصيِّرُ يدعمها منذ 2026-08-17
+ *   («عشرُ رؤوسٍ للتوجُّهِ وأقسامٌ للمسح»). فتُحمَل المجموعاتُ المستهدفةُ عليها
+ *   بلا مساسٍ بسقفِ التصنيفِ ولا بالأدوارِ الأخرى.
+ *
+ * ◆ **ولماذا لم يُقلَبِ الترتيبُ عامًّا**: قِيس أنَّ `cur_group` يخالف
+ *   `group_name` في **791 زوجًا من 870 في تسعةَ عشرَ دورًا** — فتفضيلُ
+ *   الحاليِّ عامًّا يُعيد رسمَ بنيةِ المعلوماتِ للمنصّةِ كلِّها. **فالإعلانُ
+ *   وحدَه يسري**: لا يُطبَّق إلا حيث نشرت الإدارةُ جدولَها المستهدَف.
+ *
+ * ◆ قراءةٌ خالصةٌ ومحفوظةٌ ساكنًا — والجدولُ الغائبُ يعني «لا إعلان» فيبقى
+ *   السلوكُ السابقُ حرفًا (fail-open للعرض كنظائرِه في هذا الملف).
+ */
+function uxuiDeclaredSections($conn, $roleId) {
+    static $byRole = array();
+    $rid = (int) $roleId;
+    if (isset($byRole[$rid])) { return $byRole[$rid]; }
+    $byRole[$rid] = array();
+    $res = @mysqli_query($conn, "SELECT route, group_ar FROM gov_target_nav WHERE role_id = {$rid}");
+    if ($res) {
+        while ($row = mysqli_fetch_assoc($res)) {
+            $byRole[$rid][uxuiNavBaseRoute($row['route'])] = (string) $row['group_ar'];
+        }
+    }
+    return $byRole[$rid];
+}
+
 /** موضعُ المعلَّقِ الحاليُّ لكلِّ دور — من nav_canonical_current (المصفوفةُ وحدَها) */
 function uxuiCurrentMap($conn, $roleId) {
     static $byRole = array();
@@ -800,6 +836,11 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
     if (!function_exists('ems_nav_group_for_route')) {
         require_once __DIR__ . '/nav_groups.php';
     }
+    /* الأقسامُ المُعلَنةُ لهذا الدور — من `gov_target_nav` وحدَه (XC-01).
+       والدورُ يُقرأ من مقبضِ الجلسةِ نفسِه الذي تقرأ منه بقيةُ هذه الدالّة. */
+    $declSec = isset($GLOBALS['__uxui_cur_role'])
+        ? uxuiDeclaredSections($conn, (int) $GLOBALS['__uxui_cur_role'])
+        : array();
 
     /* مرساتا كلِّ سايدبار — اسمٌ واحدٌ وموضعٌ واحدٌ في كلِّ إدارة */
     $ANCHOR_LABEL = array('main/role_board.php' => 'الرئيسية', 'chats/index.php' => 'المراسلات');
@@ -849,6 +890,13 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
         $pinSec = ems_nav_pin_section($base);
         if ($pinSec === '-') { $section = ''; }
         elseif ($pinSec !== '') { $section = $pinSec; }
+        /* ◆ **والقسمُ المُعلَنُ يغلب** (INJ-FRD-01 · XC-01): إن نشرت الإدارةُ
+             جدولَها المستهدَفَ في `gov_target_nav` فمجموعتُه هناك هي القسمُ —
+             وهي **لكلِّ دورٍ** فتُحمَل عليها المجموعاتُ الستُّ المستهدفةُ التي
+             يعجز عنها رأسُ الطيِّ (مفتاحُه المسارُ لا الدور). ولا يسري هذا إلا
+             على المُعلَن: من لا صفَّ له في الجدولِ يبقى على سلوكِه السابقِ حرفًا. */
+        $isDecl = 0;
+        if (!$isVariant && isset($declSec[$base])) { $section = $declSec[$base]; $isDecl = 1; }
         /* والمرساتانِ تسبقان كلَّ شيءٍ داخلَ «مساحتي» — بلا قسمٍ وبأصغرِ ترتيب */
         if (!$isVariant && isset($ANCHOR_ORDER[$base])) { $section = ''; }
         $sort = $c ? (int) $c['sort_no'] : ($cur ? (int) $cur['cur_order'] : 999);
@@ -861,7 +909,7 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
 
         $rows[] = array('code' => $raw, 'name' => $name, 'icon' => $it['icon'],
                         'group' => $code, 'section' => $section, 'sort' => $sort,
-                        'variant' => $isVariant ? 1 : 0, 'idx' => $idx);
+                        'variant' => $isVariant ? 1 : 0, 'idx' => $idx, 'decl' => $isDecl);
     }
 
     /* ── ② ما يحمله السجلُّ ولا صفَّ تبعيةٍ له (الرئيسيةُ والمراسلاتُ لبعضِ
@@ -998,7 +1046,15 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
            ◆ وما بقي فوقَ التسعةِ بالمحورِ الأولِ يُعاد تقسيمُه بالثاني والعكس. */
         $flat = array();
         foreach ($bodies as $B) { foreach ($B['kept'] as $k) { $flat[] = $k; } }
-        $useSubheads = ($liveLinks > 9);
+        /* ◆ **والقسمُ المُعلَنُ يتخطّى عتبةَ التسعة** (INJ-FRD-01 · XC-01):
+             عتبةُ `> 9` قاعدةُ قراءةٍ تمنع تفتيتَ المجموعةِ القصيرةِ بعناوين.
+             لكنَّ المرجعَ الحاكمَ يشترط ظهورَ المجموعاتِ الستِّ المستهدفةِ
+             نصًّا، ومجموعاتُ الإدارتَين ستةٌ وثمانيةُ روابطَ — فتُدفن العتبةُ
+             ما يطلبه المتطلَّب. **فالإعلانُ يرفع العتبةَ لمجموعتِه وحدَها**،
+             ومن لا إعلانَ له تبقى عتبتُه كما كانت حرفًا. */
+        $hasDecl = false;
+        foreach ($flat as $k) { if (!empty($k['r']['decl'])) { $hasDecl = true; break; } }
+        $useSubheads = ($liveLinks > 9) || $hasDecl;
         $lead = $flat; $headed = array();
 
         /* ── ⑤-أ قسمٌ مفروضٌ يظهر عنوانُه ولو قصُرت المجموعة ─────────────────
@@ -1018,7 +1074,9 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
                 $lead = $flat;
                 $liveLinks = count($flat);
                 foreach ($forcedOut as $B) { $liveLinks += count($B['kept']); }
-                $useSubheads = ($liveLinks > 9);
+                $hasDecl = false;
+                foreach ($flat as $k) { if (!empty($k['r']['decl'])) { $hasDecl = true; break; } }
+                $useSubheads = ($liveLinks > 9) || $hasDecl;
             }
         }
 
@@ -1029,16 +1087,33 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
                 return ($dc === $code || !isset($tax[$dc])) ? '' : $tax[$dc]['name_ar'];
             };
             $bySection = function ($k) { return (string) $k['r']['section']; };
-            $primary = $crossCut ? $byDomain  : $bySection;
+            /* ◆ **والمُعلَنُ يغلب محورَ المجال**: المجموعتانِ العابرتان
+                 («التقارير» و«الإعدادات») تُقسَّمان بالمجالِ لا بالقسم، لأن
+                 عنوانَ القسمِ فيهما مفردٌ لكلِّ رابطٍ تقريبًا فلا يبني شيئًا.
+                 لكنَّ الرابطَ **المُعلَنَ** له مجموعةٌ يشترطها المرجعُ نصًّا،
+                 فيُقسَّم بها هو ويبقى المجالُ محورًا لما سواه. (وبدونِ هذا
+                 قِيس أن «البيانات المرجعية» تظهر تحتَ «العقود والعملاء» —
+                 مجالُها — وهو ضدُّ SAL-21 حرفًا.) */
+            $primary = function ($k) use ($crossCut, $byDomain, $bySection) {
+                if (!empty($k['r']['decl'])) { return $bySection($k); }
+                return $crossCut ? $byDomain($k) : $bySection($k);
+            };
             $second  = $crossCut ? $bySection : $byDomain;
 
             /* دلوٌ يُبنى بمفتاحٍ ثم يُنقّى: المفردُ وبلا اسمٍ يصعد إلى الصدرِ المكشوف */
+            /* ◆ **والمُعلَنُ المفردُ يبقى عنوانًا**: القاعدةُ العامةُ ترفع الدلوَ
+                 المفردَ إلى الصدرِ المكشوف (عنوانٌ لرابطٍ واحدٍ ضجيجٌ لا بناء).
+                 لكنَّ مجموعةً مستهدَفةً برابطٍ واحدٍ — «الأداءُ والمطالباتُ
+                 التجارية» للدورِ ١٢ مثلًا — **مجموعةٌ يشترطها المرجعُ نصًّا**،
+                 ورفعُها يُسقط اسمَها من القائمةِ فيُقاس نقصٌ حيث لا نقص. */
             $bucketize = function ($items, $key) {
                 $b = array();
                 foreach ($items as $k) { $b[$key($k)][] = $k; }
                 $ld = array(); $out = array();
                 foreach ($b as $n => $ks) {
-                    if ($n === '' || count($ks) < 2) { foreach ($ks as $k) { $ld[] = $k; } }
+                    $declared = false;
+                    foreach ($ks as $k) { if (!empty($k['r']['decl'])) { $declared = true; break; } }
+                    if ($n === '' || (count($ks) < 2 && !$declared)) { foreach ($ks as $k) { $ld[] = $k; } }
                     else { $out[] = array('name' => (string) $n, 'kept' => $ks); }
                 }
                 return array($ld, $out);
