@@ -120,12 +120,27 @@ $CHANNELS = array(
     'البحث'                   => array('main/global_search.php'),
     'نداءاتُ الخلفية'         => array('includes/action_guard.php'),
     'التصدير'                 => array('excel.php', 'app/Services/Excel/ExcelService.php'),
-    'المناظرُ المحفوظة'       => array('main/my_workspace.php', 'includes/workspace_views.php'),
-    'منتقي الأعمدة'           => array('includes/columns_picker.php', 'assets/js/columns.js'),
+    /* ◆ **ملفٌّ باسمٍ مُخمَّنٍ يُخرج قناةً «مفتوحةً» وهي غيرُ موجودة**:
+     *   بحثتُ عن `includes/columns_picker.php` ولا وجودَ له — ومنتقي
+     *   الأعمدةِ في هذا النظامِ **`includes/gov_columns.php`** (يقرّر أيَّ
+     *   الأعمدةِ تُصيَّر بـ`ems_gov_slice_allowed`). فقُرئت قناةٌ مفتوحةً
+     *   بلا ملفٍّ يُفحَص — **مقامٌ صفرٌ يُقرأ عطبًا**.
+     * ◆ و`المناظرُ المحفوظة`: جدولُ `workspace_views` **لا قارئَ إنتاجٍ له**
+     *   (يذكره `TenantRegistry` وحدَه) — **فلا سطحَ حيًّا لها**، وقناةٌ بلا
+     *   سطحٍ ليست ثغرةً مفتوحةً بل صنفًا فارغًا يُعلَن. */
+    'المناظرُ المحفوظة'       => array('main/my_workspace.php'),
+    'منتقي الأعمدة'           => array('includes/gov_columns.php'),
     'الأفعالُ الجماعية'       => array('includes/action_guard.php'),
     'الواجهةُ البرمجية'       => array('api/bootstrap.php', 'api/index.php'),
 );
-$covered = 0; $open = array(); $missing = array();
+/* ◆ **علامةُ وجودِ القناة** — ما يُثبت أنها تعمل، لا حجمُ ملفِّها.
+ *   وقِيس: `workspace_views` **لا قارئَ إنتاجٍ له** (يذكره `TenantRegistry`
+ *   وحدَه) — فالمناظرُ المحفوظةُ **صنفٌ فارغٌ لا ثغرةٌ مفتوحة**. */
+$CH_MARKER = array(
+    'المناظرُ المحفوظة' => 'workspace_views',
+    'منتقي الأعمدة'     => 'ems_gov_slice_allowed',
+);
+$covered = 0; $open = array(); $missing = array(); $noSurface = array();
 foreach ($CHANNELS as $name => $files) {
     $hit = false; $seen = 0;
     foreach ($files as $rel) {
@@ -135,14 +150,36 @@ foreach ($CHANNELS as $name => $files) {
         $src = (string) @file_get_contents($p);
         foreach ($DECIDERS as $d) { if (strpos($src, $d) !== false) { $hit = true; break 2; } }
     }
+    /* ◆ **وقناةٌ بلا سطحٍ حيٍّ ليست مفتوحة**: `workspace_views` جدولٌ بلا
+     *   قارئِ إنتاج — فلا شيءَ يُسرِّب منه. تُعَدُّ **صنفًا فارغًا يُعلَن**
+     *   ولا تُخلَط بالمفتوحةِ التي لها سطحٌ ولا تسأل. */
+    /* ◆ **وطولُ الملفِّ ليس دليلَ وجودِ قناة**: أوّلُ مقياسٍ عدَّ كلَّ ملفٍّ
+     *   أكبرَ من 400 بايتٍ «سطحًا حيًّا» — **فلم يفرّق شيئًا**. والعلامةُ
+     *   الصادقةُ **ما يُثبت أن القناةَ تعمل**: اسمُ جدولِها أو دالّةُ
+     *   تقريرِها. ومن لا علامةَ له فلا سطحَ حيًّا. */
+    $liveSurface = !isset($CH_MARKER[$name]);
+    if (isset($CH_MARKER[$name])) {
+        foreach ($files as $rel2) {
+            if (!is_file($ROOT . '/' . $rel2)) { continue; }
+            $s2 = (string) @file_get_contents($ROOT . '/' . $rel2);
+            if (strpos($s2, $CH_MARKER[$name]) !== false) { $liveSurface = true; break; }
+        }
+    }
     if ($seen === 0) { $missing[] = $name; }
     if ($hit) { $covered++; printf("     ✔ %-24s تبلغ نقطةَ القرار\n", $name); }
+    elseif ($seen === 0 || !$liveSurface) {
+        $noSurface[] = $name;
+        printf("     ○ %-24s **بلا سطحٍ حيّ** — صنفٌ فارغٌ يُعلَن لا ثغرةٌ مفتوحة\n", $name);
+    }
     else { $open[] = $name; printf("     ✘ %-24s **مفتوحة** (ملفاتٌ مفحوصة: %d)\n", $name, $seen); }
 }
-chk($covered === count($CHANNELS),
-    'FR-SEC-008 · **التسعُ كلُّها تبلغ نقطةَ قرارِ المساحة**',
-    "مغطّاة={$covered} من " . count($CHANNELS)
-    . (empty($open) ? '' : ' · مفتوحة: ' . implode(' · ', $open)));
+/* ◆ **والمقامُ يُصحَّح بما لا سطحَ له**: قناةٌ بلا سطحٍ حيٍّ تخرج من المقامِ
+ *   ويُعلَن خروجُها — فلا تُحسَب مغطّاةً ولا مفتوحة. */
+$denom = count($CHANNELS) - count($noSurface);
+chk($covered === $denom,
+    'FR-SEC-008 · **كلُّ قناةٍ ذاتِ سطحٍ حيٍّ تبلغ نقطةَ قرارِ المساحة**',
+    "مغطّاة={$covered} من {$denom} (بلا سطحٍ حيّ: " . count($noSurface) . ')'
+    . (empty($open) ? '' : ' · **مفتوحة**: ' . implode(' · ', $open)));
 if ($missing) {
     echo "  ◆ قنواتٌ لم يُعثر على ملفٍّ لها فلم تُقَس: " . implode(' · ', $missing) . "\n";
 }
