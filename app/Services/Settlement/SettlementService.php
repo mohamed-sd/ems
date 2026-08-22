@@ -92,7 +92,16 @@ class SettlementService
             return $out;
         }
 
-        $lines = self::collectLines($gate, $partyType, $partyRef, $from, $to);
+        /* ◆ FR-FIN-001 — **الجمعُ داخلَ الحمايةِ أيضًا**: مكوِّنٌ يفشل يرفع
+         *   صراحةً الآن، فلو خرج الرفعُ من غيرِ معالجٍ لانفجرت الشاشةُ بدل أن
+         *   تُرجع سببًا مسمّى. والمطلبُ «إرجاعٌ كاملٌ + إنذارٌ + أثرٌ في السجل». */
+        try {
+            $lines = self::collectLines($gate, $partyType, $partyRef, $from, $to);
+        } catch (\Throwable $t) {
+            error_log('settlement collect: ' . $t->getMessage());
+            $out['reason'] = self::failureReason($t);
+            return $out;
+        }
 
         $entitlements = 0; $charges = 0;
         foreach ($lines as $l) { if ($l['line_kind'] === 'entitlement') { $entitlements++; } else { $charges++; } }
@@ -175,8 +184,11 @@ class SettlementService
                 }
             }, 'توليد تسوية ' . $no);
         } catch (\Throwable $t) {
+            /* ◆ FR-FIN-001 — **الإرجاعُ الكاملُ مع إنذارٍ وأثرٍ في السجل**:
+             *   `runInTransaction` أرجعت كلَّ شيءٍ سلفًا، ويبقى أن **يُسمّى
+             *   المكوِّنُ الذي فشل** فلا يبحث أحدٌ في سجلٍّ عامّ. */
             error_log('settlement generate: ' . $t->getMessage());
-            $out['reason'] = 'تعذّر توليدُ التسوية';
+            $out['reason'] = self::failureReason($t);
             return $out;
         }
 
@@ -268,7 +280,14 @@ class SettlementService
                         'currency'    => 'SDG',
                     );
                 }
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement employee advances'); error_log('settlement employee advances: ' . $t->getMessage()); }
+            } catch (\Throwable $t) {
+            /* ◆ FR-FIN-002 · FR-FIN-003 — **لا نجاحَ جزئيًّا ولا ابتلاع**:
+             *   كان الفشلُ هنا يُسجَّل ويمضي، فيُحذف مكوِّنُ التحميلِ صامتًا
+             *   وتُكتب تسويةٌ «ناجحة» **ناقصةُ تحميل** — أي أقلُّ مما يجب
+             *   على الطرف. ⇒ يُرفَع صريحًا فتُرجَع التسويةُ كاملةً قبلَ
+             *   أن يُكتب صفٌّ واحد. */
+            throw new \RuntimeException('SETTLEMENT_COMPONENT_FAILED:settlement employee advances: ' . $t->getMessage(), 0, $t);
+        }
         }
 
         // التحميلان المباشران للمورد وحده (العاملُ لا تُصرف له قطعٌ ولا أوامرُ صيانة)
@@ -282,7 +301,14 @@ class SettlementService
             foreach (SupplierAdvanceService::chargeLines($gate, $partyRef, $from, $to) as $adv) {
                 $lines[] = $adv;
             }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement supplier advances'); error_log('settlement supplier advances: ' . $t->getMessage()); }
+        } catch (\Throwable $t) {
+            /* ◆ FR-FIN-002 · FR-FIN-003 — **لا نجاحَ جزئيًّا ولا ابتلاع**:
+             *   كان الفشلُ هنا يُسجَّل ويمضي، فيُحذف مكوِّنُ التحميلِ صامتًا
+             *   وتُكتب تسويةٌ «ناجحة» **ناقصةُ تحميل** — أي أقلُّ مما يجب
+             *   على الطرف. ⇒ يُرفَع صريحًا فتُرجَع التسويةُ كاملةً قبلَ
+             *   أن يُكتب صفٌّ واحد. */
+            throw new \RuntimeException('SETTLEMENT_COMPONENT_FAILED:settlement supplier advances: ' . $t->getMessage(), 0, $t);
+        }
 
         // ── ② قطعُ الغيار من الصرف بعمودِ التحميل الصريح ────────────────────
         try {
@@ -317,7 +343,14 @@ class SettlementService
                                      ? (string) $x['currency'] : 'SDG',
                 );
             }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement parts'); error_log('settlement parts: ' . $t->getMessage()); }
+        } catch (\Throwable $t) {
+            /* ◆ FR-FIN-002 · FR-FIN-003 — **لا نجاحَ جزئيًّا ولا ابتلاع**:
+             *   كان الفشلُ هنا يُسجَّل ويمضي، فيُحذف مكوِّنُ التحميلِ صامتًا
+             *   وتُكتب تسويةٌ «ناجحة» **ناقصةُ تحميل** — أي أقلُّ مما يجب
+             *   على الطرف. ⇒ يُرفَع صريحًا فتُرجَع التسويةُ كاملةً قبلَ
+             *   أن يُكتب صفٌّ واحد. */
+            throw new \RuntimeException('SETTLEMENT_COMPONENT_FAILED:settlement parts: ' . $t->getMessage(), 0, $t);
+        }
 
         // ── ③ الصيانة من أمرها بعمودِ التحميل الصريح ────────────────────────
         try {
@@ -349,7 +382,14 @@ class SettlementService
                     'currency'    => 'SDG',   // أمرُ الصيانة بلا عمود عملة — عملةُ التشغيل
                 );
             }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement maintenance'); error_log('settlement maintenance: ' . $t->getMessage()); }
+        } catch (\Throwable $t) {
+            /* ◆ FR-FIN-002 · FR-FIN-003 — **لا نجاحَ جزئيًّا ولا ابتلاع**:
+             *   كان الفشلُ هنا يُسجَّل ويمضي، فيُحذف مكوِّنُ التحميلِ صامتًا
+             *   وتُكتب تسويةٌ «ناجحة» **ناقصةُ تحميل** — أي أقلُّ مما يجب
+             *   على الطرف. ⇒ يُرفَع صريحًا فتُرجَع التسويةُ كاملةً قبلَ
+             *   أن يُكتب صفٌّ واحد. */
+            throw new \RuntimeException('SETTLEMENT_COMPONENT_FAILED:settlement maintenance: ' . $t->getMessage(), 0, $t);
+        }
 
         // ── ④ M-52 · الترحيلُ من أمره المسلَّم بتعرفته ───────────────────────
         // ENT-02 §3-④: «**أمرُ الترحيل المسلَّم · بتعرفته**» — والمبلغُ يُقرأ من
@@ -361,7 +401,14 @@ class SettlementService
                          $gate, $partyRef, $from, $to) as $trp) {
                 $lines[] = $trp;
             }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement transport'); error_log('settlement transport: ' . $t->getMessage()); }
+        } catch (\Throwable $t) {
+            /* ◆ FR-FIN-002 · FR-FIN-003 — **لا نجاحَ جزئيًّا ولا ابتلاع**:
+             *   كان الفشلُ هنا يُسجَّل ويمضي، فيُحذف مكوِّنُ التحميلِ صامتًا
+             *   وتُكتب تسويةٌ «ناجحة» **ناقصةُ تحميل** — أي أقلُّ مما يجب
+             *   على الطرف. ⇒ يُرفَع صريحًا فتُرجَع التسويةُ كاملةً قبلَ
+             *   أن يُكتب صفٌّ واحد. */
+            throw new \RuntimeException('SETTLEMENT_COMPONENT_FAILED:settlement transport: ' . $t->getMessage(), 0, $t);
+        }
 
         // ── ⑤ M-16 · جزاءُ الجاهزية والتغطية من بطاقة الطاقة ────────────────
         // CON-03 §6.1-Q3: «جاهزيةُ شهرٍ 81٪ والحد 85٪ ← جزاءٌ محسوبٌ بقاعدته
@@ -385,7 +432,14 @@ class SettlementService
                     $lines[] = $p;
                 }
             }
-        } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement capacity penalty'); error_log('settlement capacity penalty: ' . $t->getMessage()); }
+        } catch (\Throwable $t) {
+            /* ◆ FR-FIN-002 · FR-FIN-003 — **لا نجاحَ جزئيًّا ولا ابتلاع**:
+             *   كان الفشلُ هنا يُسجَّل ويمضي، فيُحذف مكوِّنُ التحميلِ صامتًا
+             *   وتُكتب تسويةٌ «ناجحة» **ناقصةُ تحميل** — أي أقلُّ مما يجب
+             *   على الطرف. ⇒ يُرفَع صريحًا فتُرجَع التسويةُ كاملةً قبلَ
+             *   أن يُكتب صفٌّ واحد. */
+            throw new \RuntimeException('SETTLEMENT_COMPONENT_FAILED:settlement capacity penalty: ' . $t->getMessage(), 0, $t);
+        }
 
         return $lines;
     }
@@ -394,6 +448,34 @@ class SettlementService
      * وسمُ المستند المصدر بلغة المهمة (M-11) — «كلُّ رقمٍ ينقر إلى مستنده».
      * والفجوةُ المعلَنةُ تُقال باسمها: صمتُها أخطرُ من إعلانها.
      */
+    /**
+     * سببُ الفشلِ **باسمِ مكوِّنِه** — FR-FIN-001/003.
+     *
+     * ◆ «تعذّر توليدُ التسوية» جملةٌ لا يُبنى منها فعل. والمطلبُ يشترط
+     *   «إرجاعٌ كاملٌ + إنذارٌ + أثرٌ في السجل» — والإنذارُ الذي لا يسمّي
+     *   موضعَه إنذارٌ ناقص.
+     */
+    private static function failureReason(\Throwable $t)
+    {
+        $msg = $t->getMessage();
+        if (strpos($msg, 'SETTLEMENT_COMPONENT_FAILED:') === 0) {
+            $parts = explode(':', $msg, 3);
+            $comp  = isset($parts[1]) ? trim($parts[1]) : '';
+            $NAMES = array(
+                'settlement employee advances' => 'أقساطُ سلفِ العامل',
+                'settlement supplier advances' => 'أقساطُ سلفِ المورّد',
+                'settlement parts'             => 'قطعُ الغيار',
+                'settlement maintenance'       => 'أوامرُ الصيانة',
+                'settlement transport'         => 'أوامرُ الترحيل',
+                'settlement capacity penalty'  => 'جزاءُ الجاهزيةِ والتغطية',
+            );
+            $ar = isset($NAMES[$comp]) ? $NAMES[$comp] : $comp;
+            return 'أُرجعت التسويةُ كاملةً — تعذّر بناءُ مكوِّنِ «' . $ar
+                 . '»، ولا تُعلَن تسويةٌ ناقصةُ تحميل';
+        }
+        return 'أُرجعت التسويةُ كاملةً — تعذّر توليدُها';
+    }
+
     private static function sourceLabel($type, $id)
     {
         if ($type === null || $type === '') { return ''; }
@@ -665,6 +747,17 @@ class SettlementService
                     'direction'     => $direction,
                 ),
             ));
+
+            /* ◆ FR-FIN-001/002 — **الاستردادُ داخلَ المعاملةِ لا بعدَها**:
+             *   كان يقع **بعدَ `commit()`** ويُبتلع فشلُه. فتُعتمد التسويةُ
+             *   وتُحمَّل السلفةُ على المورّدِ في سطورِها، **ورصيدُ سلفتِه لا
+             *   ينقص** — فيبقى مدينًا بها مرتين. وهو نجاحٌ جزئيٌّ صامتٌ في
+             *   المال. ⇒ نُقل قبلَ الإيداعِ فصار يُرجع كلَّ شيءٍ إن فشل. */
+            if ((string) $st['party_type'] === 'supplier') {
+                require_once __DIR__ . '/SupplierAdvanceService.php';
+                SupplierAdvanceService::applyRecoveries($conn, $gate, $company, $sid, $userId);
+            }
+
             $conn->commit();
         } catch (\Throwable $t) {
             /* ◆ **فشلٌ صريحٌ يُرجع كلَّ شيء** — ولا حالةَ لاحقةً تمضي: لا ذمّةَ
@@ -678,14 +771,7 @@ class SettlementService
 
         // ── M-12 · الاستردادُ يقع **باعتماد التسوية** لا بتوليدها ────────────
         // المسودةُ نيّةٌ والمعتمَدةُ واقعة — والعطالةُ بمفتاح (سلفة × تسوية).
-        if ((string) $st['party_type'] === 'supplier') {
-            try {
-                require_once __DIR__ . '/SupplierAdvanceService.php';
-                SupplierAdvanceService::applyRecoveries($conn, $gate, $company, $sid, $userId);
-            } catch (\Throwable $t) { ems_catch_ignored($t, __METHOD__, 'settlement advance recovery #');
-                error_log('settlement advance recovery #' . $sid . ': ' . $t->getMessage());
-            }
-        }
+        // ◆ ونُقل داخلَ المعاملةِ أعلاه (FR-FIN-001/002) — فلا يبقى هنا فعل.
 
         /* ◆ الذمّةُ وطلبُ الدفعِ والحالةُ صارت داخلَ المعاملةِ أعلاه (الحاجز ②) —
              فلا تُكرَّر هنا. وما بقي بعدَ الالتزامِ هو ما يُعاد بأمانٍ وحدَه. */

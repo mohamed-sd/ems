@@ -176,7 +176,13 @@ class SupplierAdvanceService
                 "SELECT l.source_ref, l.amount FROM settlement_lines l
                   WHERE {TENANT_SCOPE} AND l.settlement_id = ? AND l.source_kind = 'supplier_advance'",
                 array((int) $settlementId));
-        } catch (\Throwable $t) { ems_catch_log($t, __METHOD__); ems_catch_ignored($t, __METHOD__, 'قراءةٌ/كتابةٌ فاشلةٌ تُعامَل كقائمةٍ فارغة — $rows'); $rows = array(); }
+        } catch (\Throwable $t) {
+            /* ◆ FR-FIN-002/003 — **الفشلُ ليس قائمةً فارغة**: كان فشلُ قراءةِ
+             *   سطورِ السلفةِ يُعامَل «لا سلفةَ تُسترد»، فتُعتمد التسويةُ ورصيدُ
+             *   المورّدِ لا ينقص — **مالٌ لا يُسترَدُّ بصمتِ عطب**. ⇒ يُرفَع. */
+            throw new \RuntimeException('SETTLEMENT_COMPONENT_FAILED:advance recovery read: '
+                . $t->getMessage(), 0, $t);
+        }
 
         foreach ($rows as $r) {
             $advId = (int) $r['source_ref'];
