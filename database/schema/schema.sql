@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-23 02:27:16
--- الجداول: 652 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-23 02:38:21
+-- الجداول: 653 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -8045,6 +8045,15 @@ CREATE TABLE `injfrd66_xc02_backup` (
   `swept_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `k_tbl` (`tbl`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: injfrd66_xc12_backup ──
+CREATE TABLE `injfrd66_xc12_backup` (
+  `route` varchar(160) NOT NULL,
+  `nature` varchar(120) DEFAULT NULL,
+  `owner_dept` varchar(120) DEFAULT NULL,
+  `at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`route`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: intercompany_dues ──
