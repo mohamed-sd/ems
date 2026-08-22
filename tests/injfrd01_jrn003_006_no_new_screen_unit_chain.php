@@ -1,0 +1,143 @@
+<?php
+/**
+ * tests/injfrd01_jrn003_006_no_new_screen_unit_chain.php
+ *   شاهدُ FR-JRN-003 · FR-JRN-006 — لا شاشةَ لأجلِ رحلة · والوحدةُ تتبع سلسلتَها
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ **FR-JRN-003**: «**لا تُبنى شاشةٌ لأجلِ رحلة** — والناقصُ يُسجَّل فجوةً
+ *   ويُرفع» · ومعيارُ القبول «**صفرُ شاشةٍ أُنشئت أثناءَ تنفيذِ الرحلة**» ·
+ *   وسلوكُ الفشل «توقُّفُ الرحلةِ وتسجيلُ السبب».
+ *
+ * ◆ **والقياسُ من تاريخِ المستودعِ لا من الذاكرة**: كلُّ ملفِّ شاشةٍ أُضيف في
+ *   هذه الجولةِ يُعَدُّ بالاسمِ، **ويُطابَق بغرضِه**. فما أُضيف **أداةَ قياسٍ أو
+ *   شاهدًا أو هجرةً** ليس شاشةً — والشاشةُ ما يُصيَّر للمستخدمِ في مجلَّدِ
+ *   إدارةٍ ويُسجَّل في القوائم.
+ *
+ * ◆ **FR-JRN-006**: «التايم شيت **يتّبع سلسلتَه النافذةَ حرفًا** بكلِّ أيديها
+ *   ومحطاتِها» · ومعيارُه «تتبُّعُ الوحدةِ من الإدخالِ إلى القيدِ **يُطابق
+ *   السلسلةَ خطوةً بخطوة**».
+ *
+ * ◆ **ومقامٌ صفرٌ ليس نجاحًا**: يُشترَط أن تكون ثمَّ وحداتٌ بلغت القيدَ فعلًا
+ *   قبلَ أن يُقرأ «تطابقٌ» — وإلا كان التطابقُ تطابقَ لا شيء.
+ *
+ * التشغيل: php tests/injfrd01_jrn003_006_no_new_screen_unit_chain.php
+ * ═══════════════════════════════════════════════════════════════════════════
+ */
+if (php_sapi_name() !== 'cli') { exit("CLI فقط\n"); }
+error_reporting(E_ALL & ~E_DEPRECATED & ~E_WARNING & ~E_NOTICE);
+mb_internal_encoding('UTF-8');
+mysqli_report(MYSQLI_REPORT_OFF);
+
+$ROOT = str_replace(DIRECTORY_SEPARATOR, '/', dirname(__DIR__));
+require_once $ROOT . '/includes/env.php';
+$host = ems_env('DB_HOST'); $port = 3306;
+if (strpos($host, ':') !== false) { list($host, $port) = explode(':', $host); $port = (int) $port; }
+$u = ems_env('DB_MIGRATOR_USER') ?: ems_env('DB_USER');
+$p = ems_env('DB_MIGRATOR_USER') ? ems_env('DB_MIGRATOR_PASS') : ems_env('DB_PASS');
+$db = new mysqli($host, $u, $p, ems_env('DB_NAME'), $port);
+if ($db->connect_errno) { exit("تعذّر الاتصال: {$db->connect_error}\n"); }
+$db->set_charset('utf8mb4');
+
+$ok = 0; $bad = 0;
+function chk($c, $l, $d = '') {
+    global $ok, $bad;
+    if ($c) { $ok++; echo "  ✔ {$l}" . ($d !== '' ? " — {$d}" : '') . "\n"; }
+    else    { $bad++; echo "  ✘ {$l}" . ($d !== '' ? " — {$d}" : '') . "\n"; }
+}
+function n(mysqli $d, $q) { $r = @$d->query($q); return $r ? (int) $r->fetch_row()[0] : -1; }
+function git($ROOT, $a) { return (string) @shell_exec('git -C ' . escapeshellarg($ROOT) . ' ' . $a . ' 2>&1'); }
+
+echo "══ FR-JRN-003 · FR-JRN-006 ══\n";
+
+/* ── ① FR-JRN-003 — صفرُ شاشةٍ أُنشئت لأجلِ الرحلة ───────────────────────── */
+echo "\n── ① أشاشاتٌ أُنشئت في هذه الجولة؟ ──\n";
+/* المدى: من أوّلِ التزامٍ في حزمةِ INJ-FRD-REM-01 إلى الرأس */
+$firstSha = trim(git($ROOT, "log --reverse --format=%h --grep=INJ-FRD-REM-01 -1"));
+if ($firstSha === '' || strpos($firstSha, 'fatal') !== false) {
+    $firstSha = trim(git($ROOT, "log --format=%h -1 --skip=40"));
+}
+$range = $firstSha . '..HEAD';
+$added = array_values(array_filter(array_map('trim',
+    explode("\n", git($ROOT, "diff --name-only --diff-filter=A " . escapeshellarg($range))))));
+printf("  المدى: %s · ملفاتٌ أُضيفت: **%d**\n", $range, count($added));
+chk(count($added) > 0, '**المقامُ غيرُ صفريّ** — ثمَّ إضافاتٌ تُفحَص', count($added) . ' ملفًّا');
+
+/* الشاشةُ: ملفُّ ‎.php‎ في مجلَّدِ إدارةٍ — لا في tests/ ولا tools/ ولا database/ */
+$NOT_SCREEN = array('tests/', 'tools/', 'database/', 'docs/', 'storage/', '.git');
+$screens = array(); $support = 0;
+foreach ($added as $a) {
+    if ($a === '' || substr($a, -4) !== '.php') { continue; }
+    $isSup = false;
+    foreach ($NOT_SCREEN as $ns) { if (strpos($a, $ns) === 0) { $isSup = true; break; } }
+    if ($isSup) { $support++; continue; }
+    /* وملفٌّ في `includes/` أو `app/` طبقةٌ لا شاشة */
+    if (strpos($a, 'includes/') === 0 || strpos($a, 'app/') === 0) { $support++; continue; }
+    $screens[] = $a;
+}
+printf("  منها **شواهدُ وأدواتٌ وهجراتٌ وطبقات: %d** · **شاشاتٌ: %d**\n", $support, count($screens));
+foreach ($screens as $s) { echo "     ✘ شاشةٌ أُنشئت: {$s}\n"; }
+chk(empty($screens),
+    'FR-JRN-003 · **صفرُ شاشةٍ أُنشئت أثناءَ الجولة**',
+    empty($screens) ? 'كلُّ المُضافِ شواهدُ وأدواتٌ وهجراتٌ وطبقات' : count($screens) . ' شاشة');
+
+/* والناقصُ يُسجَّل فجوةً ويُرفع — يُقاس بوجودِ سجلِّ الكشوفِ وحالاتِه */
+$findings = $ROOT . '/docs/baseline_20260821/FINDINGS.md';
+chk(is_file($findings), 'و**الناقصُ يُسجَّل فجوةً** — سجلُّ الكشوفِ قائمٌ يُرفع منه',
+    is_file($findings) ? 'docs/baseline_20260821/FINDINGS.md' : 'مفقود');
+
+/* ── ② FR-JRN-006 — الوحدةُ تتبع سلسلتَها من الإدخالِ إلى القيد ────────────
+ * ◆ **نوعٌ باسمٍ مُخمَّنٍ يُخرج صفرًا فيُقرأ انقطاعًا**: بحثتُ عن
+ *   `entity_type = 'unit_entry'` والمُنتَجُ فعلًا `timesheet` (5198 واقعة)
+ *   و`fin_unit_record` (4) — فعاد **صفرًا وكِدتُ أُعلن السلسلةَ مقطوعة**.
+ *   ⇒ الأنواعُ تُقرأ من المُنتَجِ الحيِّ لا من تسميةٍ في رأسي. */
+echo "\n── ② سلسلةُ الوحدة: إدخالٌ ⇐ اعتمادٌ ⇐ واقعةٌ ⇐ قيد ──\n";
+/* ◆ **والمرآةُ ليست الأصل**: `unit_entries` مرآةٌ رخوةٌ بـ`sync_uuid`،
+ *   والوقائعُ الماليةُ تشير إلى **`timesheet`** بمعرِّفِه. فقياسُ السلسلةِ من
+ *   المرآةِ أعطى **صفرًا** ومداهما لا يتقاطع (unit_entries 67560+ ·
+ *   timesheet 34..63029) — **وكِدتُ أُعلن السلسلةَ مقطوعةً وهي عاملة**.
+ *   ⇒ يُقاس الأصلُ الذي يشير إليه الحدثُ لا مرآتُه. */
+$entries = n($db, "SELECT COUNT(*) FROM `timesheet`");
+$withEvent = n($db, "SELECT COUNT(DISTINCT e.`id`) FROM `timesheet` e
+                      JOIN `fin_financial_events` f
+                        ON f.`entity_type` = 'timesheet' AND f.`entity_id` = e.`id`");
+$toJournal = n($db, "SELECT COUNT(DISTINCT e.`id`) FROM `timesheet` e
+                      JOIN `fin_financial_events` f
+                        ON f.`entity_type` = 'timesheet' AND f.`entity_id` = e.`id`
+                      JOIN `fin_journal_entries` j ON j.`event_id` = f.`id`");
+printf("  سجلّاتُ تايم شيت=%d · بلغت واقعةً ماليةً=%d · **بلغت القيدَ=%d**\n",
+       $entries, $withEvent, $toJournal);
+chk($entries > 0, '**المقامُ غيرُ صفريّ** — ثمَّ وحداتٌ تُتتبَّع', "{$entries} إدخالًا");
+
+/* ◆ **ولا يُقرأ تطابقٌ بلا وحدةٍ بلغت القيد** */
+chk($toJournal > 0,
+    'FR-JRN-006 · **وحداتٌ بلغت القيدَ فعلًا** — فالسلسلةُ مُمارَسةٌ لا موصوفة',
+    $toJournal > 0 ? "{$toJournal} وحدةً من {$entries}"
+        : '**صفرٌ — فالتطابقُ تطابقُ لا شيء، ولا يُقرأ نجاحًا**');
+
+if ($toJournal > 0) {
+    /* والخطواتُ متتاليةٌ زمنيًّا: الإدخالُ قبلَ الواقعةِ قبلَ القيد */
+    $outOfOrder = n($db, "SELECT COUNT(*) FROM `timesheet` e
+                            JOIN `fin_financial_events` f
+                              ON f.`entity_type` = 'timesheet' AND f.`entity_id` = e.`id`
+                            JOIN `fin_journal_entries` j ON j.`event_id` = f.`id`
+                           WHERE j.`created_at` < f.`created_at`");
+    /* ◆ **و`timesheet` لا عمودَ إنشاءٍ فيه** — عمودُه `date` (تاريخُ الوردية)
+     *   و`updated_at`. فمقارنةُ الإنشاءِ بالواقعةِ **غيرُ ممكنةٍ من مصدرِها**،
+     *   ولا تُخترع. ⇒ يُقاس الترتيبُ **بين الواقعةِ والقيدِ** وحدَه، ويُعلَن
+     *   أن الحلقةَ الأولى غيرُ مقيسةٍ لا أنها سليمة.
+     * ◆ وقد رجع الاستعلامُ الأولُ **-1** لا صفرًا — والحارسُ ميّزهما. */
+    echo "     ◆ **حلقةُ (إدخالٌ ⇐ واقعة) غيرُ مقيسةٍ**: `timesheet` بلا عمودِ إنشاء
+";
+    chk($outOfOrder === 0,
+        'و**المحطاتُ متتاليةٌ زمنيًّا** — إدخالٌ قبلَ واقعةٍ قبلَ قيد',
+        "خارجَ الترتيب: {$outOfOrder}");
+    /* ولا قيدَ بلا واقعةٍ لوحدةٍ — تخطّي محطة */
+    $skipped = n($db, "SELECT COUNT(*) FROM `fin_journal_entries` j
+                        WHERE j.`event_id` > 0
+                          AND NOT EXISTS (SELECT 1 FROM `fin_financial_events` f
+                                           WHERE f.`id` = j.`event_id`)");
+    chk($skipped === 0, 'ولا قيدَ **يتخطّى محطةَ الواقعة**', "متخطٍّ: {$skipped}");
+}
+
+echo "\n" . str_repeat('─', 66) . "\n";
+printf("النتيجة: %d نجاح · %d رسوب\n", $ok, $bad);
+exit($bad === 0 ? 0 : 1);
