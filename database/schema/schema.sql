@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-23 01:03:15
--- الجداول: 650 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-23 01:18:01
+-- الجداول: 651 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -7970,6 +7970,14 @@ CREATE TABLE `incentive_rules` (
   KEY `ix_ir_contract` (`contract_id`),
   KEY `ix_ir_company` (`company_id`),
   CONSTRAINT `fk_ir_contract` FOREIGN KEY (`contract_id`) REFERENCES `employee_contracts` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: injfrd66_sal19_backup ──
+CREATE TABLE `injfrd66_sal19_backup` (
+  `amendment_id` int(11) NOT NULL,
+  `set_to` date NOT NULL,
+  `at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`amendment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: injfrd66_sup01_backup ──

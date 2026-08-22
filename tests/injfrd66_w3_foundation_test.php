@@ -85,6 +85,37 @@ if ($fmt > 1) {
     echo "      وتوحيدُها يغيّر معرّفاتٍ يعرفها الناسُ ويطبعونها — قرارُ مالك.\n";
 }
 
+/* ── ⑤ سالبٌ: حارسُ الجدولِ الفارغِ في بوابةِ الموجةِ ③ ────────────────
+   معيارٌ صيغتُه «صفرُ س خارجَ ص» **لا يُثبته جدولٌ فارغ** — صفرُه عدمُ
+   بياناتٍ لا صحّةُ حارس. و`sup_violations` فارغٌ (`COUNT(*)=0`) بينما
+   `TABLE_ROWS` يقول 1؛ فلو صُدِّق التقديرُ لأُعلن معيارُ SUP-23 أخضرَ وهو
+   لم يُمارَس قط. وهذا الشاهدُ يُبقي الحارسَ حيًّا. */
+echo "\n⑤ سالبٌ — حارسُ الجدولِ الفارغِ يمنع الأخضرَ الكاذب:\n";
+$out = array(); $rc = 0;
+exec('"' . PHP_BINARY . '" ' . escapeshellarg($ROOT . '/tools/injfrd66_w3_gate.php') . ' 2>&1', $out, $rc);
+$txt = implode("\n", $out);
+$empty = $scalar("SELECT COUNT(*) FROM sup_violations");
+if ($empty === 0) {
+    if (mb_strpos($txt, 'لا صفوفَ تُقاس في sup_violations') !== false) {
+        $pass++; echo "   ✔ الجدولُ فارغٌ والبوابةُ تعلن «لا صفوفَ تُقاس» لا «✔ 0»\n";
+    } else {
+        $fail++; echo "   ✘ الجدولُ فارغٌ والبوابةُ لم تُعلن ذلك — أخضرُ كاذبٌ محتمل\n";
+    }
+} else {
+    $pass++; printf("   ✔ الجدولُ صار به %d صفًّا — الحارسُ لم يعد لازمًا هنا\n", $empty);
+}
+
+/* ── ⑥ سالبٌ: العدُّ بـCOUNT(*) لا بـTABLE_ROWS ─────────────────────── */
+echo "\n⑥ سالبٌ — التقديرُ لا يُعتمد عدًّا:\n";
+$est = $scalar("SELECT IFNULL(TABLE_ROWS,-1) FROM information_schema.TABLES
+                 WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='sup_violations'");
+$real = $scalar("SELECT COUNT(*) FROM sup_violations");
+if ($est !== $real) {
+    $pass++; printf("   ✔ التقديرُ %d والعدُّ %d — والفرقُ يثبت لزومَ COUNT(*)\n", $est, $real);
+} else {
+    $pass++; printf("   ✔ التقديرُ والعدُّ متفقانِ اليومَ (%d) — والقاعدةُ تبقى: COUNT(*)\n", $real);
+}
+
 printf("\n%s  ناجح %d · راسب %d · محجوز %d\n",
     $fail === 0 ? '✔ الموجة ③ · الأساس' : '✘ الموجة ③ · الأساس', $pass, $fail, $held);
 exit($fail === 0 ? 0 : 1);

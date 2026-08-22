@@ -330,9 +330,9 @@
         "sheet": "12-2 مصفوفة الالتزامات",
         "fields": 35,
         "gates": {
-            "built": "—",
-            "linked": "—",
-            "data": "—",
+            "built": "نعم",
+            "linked": "جزئي",
+            "data": "نعم",
             "tested": "لا",
             "accepted": "لا"
         },
@@ -357,9 +357,9 @@
         "sheet": "13 خط الأساس والمستهدفات",
         "fields": 19,
         "gates": {
-            "built": "—",
-            "linked": "—",
-            "data": "—",
+            "built": "نعم",
+            "linked": "جزئي",
+            "data": "نعم",
             "tested": "لا",
             "accepted": "لا"
         },
@@ -492,10 +492,10 @@
         "sheet": "17 الملحقات والتجديد والإغلاق",
         "fields": 20,
         "gates": {
-            "built": "—",
-            "linked": "—",
-            "data": "—",
-            "tested": "لا",
+            "built": "نعم",
+            "linked": "جزئي",
+            "data": "نعم",
+            "tested": "نعم",
             "accepted": "لا"
         },
         "reason": "يُحسم بالقياس",
@@ -1113,9 +1113,9 @@
         "sheet": "م16 استحقاقات الموردين",
         "fields": 36,
         "gates": {
-            "built": "—",
-            "linked": "—",
-            "data": "—",
+            "built": "لا",
+            "linked": "لا",
+            "data": "لا",
             "tested": "لا",
             "accepted": "لا"
         },
