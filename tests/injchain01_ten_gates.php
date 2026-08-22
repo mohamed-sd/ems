@@ -13,7 +13,12 @@
  * ◆ **وحجمُ البياناتِ متقلبٌ خارجَ هذه الجلسة** (جولاتُ بذرٍ وتقليصٍ متوازية)،
  *   فالبواباتُ تقيس **خصائصَ وقواعدَ** لا أحجامًا: صفرُ خرقٍ لا «كذا صفًّا».
  *
- * التشغيل: php tests/injchain01_ten_gates.php [--json=<ملف>]
+ * التشغيل: php tests/injchain01_ten_gates.php [--json=<ملف>] [--negative]
+ *
+ * ◆ **وبوابةُ العقد G8 كانت عاجزةً عن الرسوبِ بنيويًّا** (البند ٠-٣): كانت تعدُّ
+ *   `build_state = 'MISSING'` و`ENUM` يحمل القيمةَ بصفرِ صفٍّ يحملها. فصارت
+ *   تعدُّ `<> 'BUILT'` وتفحص لكلِّ `UNDER_OTHER_ROUTE` أن حاملَه **يؤدي وظيفتَه
+ *   بسلّمِه** — و`--negative` يبذر عقدةً بحاملٍ لا ينادي سلّمَها ويشترط رسوبَها.
  * ═══════════════════════════════════════════════════════════════════════════
  */
 if (php_sapi_name() !== 'cli') { exit("CLI فقط\n"); }
@@ -38,6 +43,188 @@ $G = array();   /* code => [green(bool), title, measure, note] */
 function gate(&$G, $code, $green, $title, $measure, $note = '')
 {
     $G[$code] = array('green' => (bool) $green, 'title' => $title, 'measure' => $measure, 'note' => $note);
+}
+
+/**
+ * ── حكمُ عقدِ السلسلة — G8 مقيسًا بالوظيفةِ لا بالقيمةِ الغائبة (البند ٠-٣) ──
+ * ◆ **بوابةٌ لا تقدر أن ترسُبَ لا تُحسب.** كانت G8 تَعُدُّ `build_state='MISSING'`،
+ *   و`ENUM` يحمل القيمةَ لكنّ الجدولَ فيه **صفرُ صفٍّ بها** — فالبوابةُ كانت
+ *   **عاجزةً عن الرسوبِ بنيويًّا** لا خضراءَ بإنجاز.
+ * ◆ والعدُّ الآن `<> 'BUILT'`، ولكلِّ `UNDER_OTHER_ROUTE` يُفحص أن حاملَه
+ *   **يؤدي وظيفتَه بسلّمِه** لا أن ملفَّه موجود:
+ *     · كلُّ حاملٍ مُعلَنٍ **قائمٌ على القرص**؛
+ *     · و`LD-nn` **يُقرأ من نقطةِ قرارٍ حيّة** — يُشتقُّ من الشجرةِ بالقاعدتَين
+ *       نفسِهما اللتين وسمتا `gov_journey_ladders` (نداءُ `ems_ladder_guard`
+ *       برمزِه · أو خريطةُ المراحلِ في `unit_chain_helpers` وقد استُهلكت بنداءِ
+ *       `ems_uc_ladder_check` من ملفِّ إنتاج) — **اشتقاقًا لا قراءةَ رايةٍ مخزَّنة**،
+ *       فرايةٌ كُتبت مرةً تتعفّن وقارئانِ يتفرّقان؛
+ *     · و`RESOLVE_FROM_POLICY:key` يلزمه **محلٌّ حيٌّ للمفتاح** في شجرةِ الإنتاج؛
+ *     · و`NO_LADDER_REQUIRED` تكفيه حياةُ حاملِه — فالإعفاءُ مصدرُه السجلُّ نفسُه.
+ */
+function chain_node_verdicts($ROOT, mysqli $conn)
+{
+    $SKIP = array('vendor', 'node_modules', '.git', 'docs', 'tests', 'tools', 'storage',
+                  'database', 'logs', '.ssdiff');
+    $prod = array();
+    $it = new RecursiveIteratorIterator(new RecursiveCallbackFilterIterator(
+        new RecursiveDirectoryIterator($ROOT, FilesystemIterator::SKIP_DOTS),
+        function ($cur) use ($ROOT, $SKIP) {
+            if (!$cur->isDir()) { return true; }
+            $rel = str_replace('\\', '/', substr($cur->getPathname(), strlen($ROOT) + 1));
+            return !in_array(explode('/', $rel)[0], $SKIP, true);
+        }));
+    foreach ($it as $f) {
+        if (!$f->isFile() || strtolower($f->getExtension()) !== 'php') { continue; }
+        $rel = str_replace('\\', '/', substr($f->getPathname(), strlen($ROOT) + 1));
+        $prod[$rel] = (string) @file_get_contents($f->getPathname());
+    }
+
+    /* ① سلاليمُ يُنادى عليها بالرمزِ صراحةً من نقطةِ قرارٍ حيّة */
+    $wired = array(); $where = array();
+    foreach ($prod as $rel => $src) {
+        if (preg_match_all("/ems_ladder_guard\s*\([^;]*?'(LD-\d{2})'/s", $src, $m)) {
+            foreach ($m[1] as $ld) { $wired[$ld] = true; $where[$ld][] = $rel; }
+        }
+    }
+    /* ② خريطةُ مراحلِ سلسلةِ الوحدات — نقطةُ قرارٍ واحدةٌ لسبعِ مراحل.
+     *   ولا تُحتسب إلا إن كانت الخريطةُ **مستهلَكةً فعلًا**: `ems_uc_ladder_check`
+     *   مُنادًى من ملفِّ إنتاجٍ ليس ملفَّ التعريفِ نفسَه. */
+    $mapSrc = isset($prod['includes/unit_chain_helpers.php']) ? $prod['includes/unit_chain_helpers.php'] : '';
+    $consumers = array();
+    foreach ($prod as $rel => $src) {
+        if ($rel === 'includes/unit_chain_helpers.php' || $rel === 'includes/ladder_gate.php') { continue; }
+        if (preg_match("/(?<!function )\bems_uc_ladder_check\s*\(/", $src)) { $consumers[] = $rel; }
+    }
+    if ($mapSrc !== '' && $consumers && preg_match_all("/=>\s*'(LD-\d{2})'/", $mapSrc, $m2)) {
+        foreach ($m2[1] as $ld) {
+            $wired[$ld] = true;
+            $where[$ld][] = 'includes/unit_chain_helpers.php ⟵ ' . $consumers[0];
+        }
+    }
+
+    /* ── الحكمُ عقدةً عقدة ─────────────────────────────────────────────── */
+    $rows = array(); $bad = array(); $missing = 0;
+    $r = @$conn->query("SELECT `node_no`, `declared_file`, `ladder_id`,
+                        COALESCE(`carrier_route`, '') AS `carrier`, `build_state`
+                          FROM `gov_chain_nodes` WHERE `build_state` <> 'BUILT'
+                         ORDER BY `node_no`");
+    while ($r && ($x = $r->fetch_assoc())) {
+        $no = (int) $x['node_no']; $ld = $x['ladder_id'];
+        $why = array();
+        if ($x['build_state'] === 'MISSING') { $missing++; $why[] = 'العقدةُ **مفقودة**'; }
+
+        /* الحاملُ قائمٌ على القرص — كلُّ حاملٍ مُعلَن */
+        $carriers = array_values(array_filter(array_map('trim', explode('·', $x['carrier']))));
+        if (!$carriers) {
+            $why[] = 'صفرُ حاملٍ مُعلَن — و`UNDER_OTHER_ROUTE` بلا حاملٍ دعوى بلا سطح';
+        }
+        foreach ($carriers as $c) {
+            if (!is_file($ROOT . '/' . $c)) { $why[] = "حاملٌ غيرُ قائم: `{$c}`"; }
+        }
+
+        /* السلّمُ يؤدي وظيفتَه */
+        if ($ld === 'NO_LADDER_REQUIRED') {
+            /* الإعفاءُ مصدرُه السجلُّ نفسُه — ولا يُفحص ما لا يُدَّعى */
+        } elseif (preg_match('/^LD-\d{2}$/', $ld)) {
+            if (empty($wired[$ld])) {
+                $why[] = "السلّم `{$ld}` **لا يُقرأ من نقطةِ قرارٍ حيّة** — "
+                       . 'فالحاملُ يقود الخطوةَ بلا ترتيبٍ ولا سقفٍ ولا «لا يدَ تمشي خطوتَين»';
+            }
+        } elseif (strpos($ld, 'RESOLVE_FROM_POLICY:') === 0) {
+            $key = substr($ld, strlen('RESOLVE_FROM_POLICY:'));
+            $res = array();
+            foreach ($prod as $rel => $src) {
+                if (strpos($src, "'" . $key . "'") !== false
+                    && preg_match("/(?<!function )\b(ems_ladder_guard|ems_ladder_check|ems_ladder_resolve)\s*\(/", $src)) {
+                    $res[] = $rel;
+                }
+            }
+            if (!$res) {
+                $why[] = "مفتاحُ السياسة `{$key}` **بلا محلٍّ حيّ** — "
+                       . 'وإعلانُ «يُحَلُّ من السياسة» دون محلٍّ إحالةٌ إلى لا شيء';
+            }
+        } else {
+            $why[] = "رمزُ سلّمٍ خارجَ الرموزِ الثلاثة: `{$ld}`";
+        }
+
+        $rows[] = array('no' => $no, 'file' => $x['declared_file'], 'ladder' => $ld,
+                        'state' => $x['build_state'], 'why' => $why);
+        if ($why) { $bad[] = $no; }
+    }
+    $tot = one($conn, "SELECT COUNT(*) FROM `gov_chain_nodes`");
+    $built = one($conn, "SELECT COUNT(*) FROM `gov_chain_nodes` WHERE `build_state` = 'BUILT'");
+    return array('rows' => $rows, 'bad' => $bad, 'missing' => $missing,
+                 'total' => $tot, 'built' => $built,
+                 'wiredLadders' => array_keys($wired), 'where' => $where);
+}
+
+/**
+ * ── حزامُ صدقِ البوابةِ G8 — `--negative` (البند ٠-٣) ────────────────────────
+ * ◆ الاختبارُ السالبُ المنصوصُ عليه: **اجعلْ عقدةً `UNDER_OTHER_ROUTE` بحاملٍ
+ *   لا ينادي سلّمَها ⇒ رسوب**. فالحزامُ يبذر العقدة 99 بحاملٍ قائمٍ على القرصِ
+ *   وسلّمٍ `LD-99` لا يُنادى من أيِّ نقطةِ قرار، ويشترط ارتفاعَ عددِ العقدِ
+ *   الراسبةِ بواحد — ثم يكنس ويشترط عودةَ العدد.
+ * ◆ وقبلَ الإصلاحِ كانت البوابةُ تعدُّ `build_state='MISSING'` و**صفرَ صفٍّ
+ *   يحملها** — فهذا البذرُ نفسُه كان يمرُّ عليها أخضرَ.
+ */
+function g8_honesty_belt($ROOT, mysqli $conn)
+{
+    $NODE = 99;
+    $sweep = function () use ($conn, $NODE) {
+        @$conn->query("DELETE FROM `gov_chain_nodes` WHERE `node_no` = {$NODE}");
+    };
+    $sweep();
+    register_shutdown_function($sweep);
+
+    echo "\n══ حزامُ صدقِ البوابة G8 — عقدةٌ بحاملٍ لا ينادي سلّمَها ══\n";
+    $before = chain_node_verdicts($ROOT, $conn);
+    printf("  ① قبلَ البذر: عقدٌ راسبة=**%d** · غيرُ مبنيةٍ باسمِها=%d\n",
+           count($before['bad']), count($before['rows']));
+
+    /* حاملٌ **قائمٌ على القرص** فلا يرسُب لغيابِ الملفّ — يرسُب لغيابِ نداءِ السلّمِ وحدَه */
+    $carrier = 'includes/env.php';
+    $ok = @$conn->query("INSERT INTO `gov_chain_nodes`
+        (`node_no`, `declared_file`, `title_ar`, `technical_runtime`, `process_owner`,
+         `ladder_id`, `build_state`, `carrier_route`)
+        VALUES ({$NODE}, 'belt_probe.php', 'عقدةُ حزامٍ — حاملٌ بلا نداءِ سلّم',
+                'حزام', 'حزام', 'LD-99', 'UNDER_OTHER_ROUTE', '{$carrier}')");
+    if (!$ok) {
+        echo "  ✘ تعذّر بذرُ العقدة: " . $conn->error . " — والحزامُ لا يدّعي\n";
+        $sweep();
+        return 0;
+    }
+    $after = chain_node_verdicts($ROOT, $conn);
+    printf("  ② بعدَ البذر: عقدٌ راسبة=**%d**\n", count($after['bad']));
+    $why = '';
+    foreach ($after['rows'] as $rw) {
+        if ((int) $rw['no'] === $NODE) { $why = implode(' · ', $rw['why']); }
+    }
+    echo "     ◆ سببُ رسوبِ العقدة 99: " . ($why !== '' ? $why : '**لم ترسُبْ**') . "\n";
+    $rose   = (count($after['bad']) === count($before['bad']) + 1);
+    $carrOk = (strpos($why, 'حاملٌ غيرُ قائم') === false);
+    $ldWhy  = (strpos($why, 'LD-99') !== false);
+    $sweep();
+    $back = chain_node_verdicts($ROOT, $conn);
+    printf("  ③ بعدَ الكنس: عقدٌ راسبة=**%d**\n", count($back['bad']));
+    $restored = (count($back['bad']) === count($before['bad'])
+                 && count($back['rows']) === count($before['rows']));
+
+    echo '  ' . ($rose ? '✔' : '✘') . " العقدةُ الجديدةُ **رسبت** — والعددُ ارتفع بواحد\n";
+    echo '  ' . ($carrOk && $ldWhy ? '✔' : '✘')
+       . " والرسوبُ **لغيابِ نداءِ السلّمِ** لا لغيابِ الملفّ — حاملُها قائمٌ على القرص\n";
+    echo '  ' . ($restored ? '✔' : '✘') . " وعاد العددُ بالكنس — صفرُ أثرٍ باقٍ\n";
+    $v = $rose && $carrOk && $ldWhy && $restored;
+    echo $v ? "  ✔ **G8 جُرِّبت معطوبةً ورسبت** — وكانت قبلَ الإصلاحِ تمرُّ على هذا البذرِ نفسِه\n"
+            : "  ✘ **G8 لم ترسُبْ بالعطب** — فليست حارسًا\n";
+    return $v ? 1 : 0;
+}
+
+/* `--negative`: **تُجرَّب البوابةُ معطوبةً قبلَ تصديقِ مرورِها** (البند ٠-٣). */
+if (in_array('--negative', $argv, true)) {
+    $v = g8_honesty_belt($ROOT, $conn);
+    echo "\n" . str_repeat('─', 66) . "\n";
+    printf("◆ **صدقُ البوابة G8: %d/1 جُرِّبت معطوبةً ورسبت**\n", $v);
+    exit($v === 1 ? 0 : 1);
 }
 
 echo "══ بواباتُ إغلاقِ سلسلةِ الأثرِ العشر ══\n";
@@ -159,19 +346,25 @@ gate($G, 'G7', count($missSrc) === 0,
      'قبلَ هذه الجولةِ كانت حالةُ التحصيلِ والصرفِ بلا سطحٍ يُقرأ منه');
 
 /* ══ ⑧ الرحلتان تعملان ═══════════════════════════════════════════════ */
-/* تُقاس بالبنيةِ: كلُّ عقدةِ رحلةٍ لها سطحٌ مبنيٌّ أو حاملٌ مقيس */
-$revNodes = array(1, 2, 3, 4, 5, 8, 9, 15, 16, 17, 18, 19, 20, 21);
-$supNodes = array(1, 2, 3, 6, 22, 23, 24, 25, 26, 27);
-$gapRev = one($conn, "SELECT COUNT(*) FROM `gov_chain_nodes`
-                       WHERE `node_no` IN (" . implode(',', $revNodes) . ")
-                         AND `build_state` = 'MISSING'");
-$gapSup = one($conn, "SELECT COUNT(*) FROM `gov_chain_nodes`
-                       WHERE `node_no` IN (" . implode(',', $supNodes) . ")
-                         AND `build_state` = 'MISSING'");
-gate($G, 'G8', $gapRev === 0 && $gapSup === 0,
-     'الرحلتان تعبران بنيويًّا',
-     "رحلةُ الإيراد: عقدٌ مفقودة={$gapRev} · رحلةُ الدفع: {$gapSup}",
-     '**والعبورُ البشريُّ بحسابٍ حقيقيٍّ لم يقع** — يلزمه موظفٌ لا منفِّذ، ويُعلَن مفتوحًا');
+/* ◆ **العدُّ `<> 'BUILT'` لا `= 'MISSING'`** (البند ٠-٣): القيمةُ الأخيرةُ في
+ *   `ENUM` بصفرِ صفٍّ يحملها — فبوابةٌ تعدُّها كانت عاجزةً عن الرسوبِ بنيويًّا.
+ *   ولكلِّ `UNDER_OTHER_ROUTE` يُفحص أن حاملَه **يؤدي وظيفتَه بسلّمِه**. */
+$cn = chain_node_verdicts($ROOT, $conn);
+$badList = array();
+foreach ($cn['rows'] as $rw) {
+    if ($rw['why']) {
+        $badList[] = 'العقدة ' . $rw['no'] . ' (`' . $rw['file'] . '` · ' . $rw['ladder'] . '): '
+                   . implode(' · ', $rw['why']);
+    }
+}
+gate($G, 'G8', count($cn['bad']) === 0,
+     'الرحلتان تعبران — الحاملُ يؤدي وظيفتَه بسلّمِه',
+     'عقدٌ مبنيةٌ باسمِها: **' . $cn['built'] . '/' . $cn['total'] . '** · '
+   . 'غيرُ ذلك: **' . count($cn['rows']) . '** (مفقودةٌ فعلًا: ' . $cn['missing'] . ') · '
+   . '**حاملٌ لا يؤدي وظيفتَه بسلّمِه: ' . count($cn['bad']) . '** · '
+   . 'سلاليمُ تُقرأ من نقطةِ قرارٍ حيّة: ' . count($cn['wiredLadders']),
+     '**والعبورُ البشريُّ بحسابٍ حقيقيٍّ لم يقع** — يلزمه موظفٌ لا منفِّذ، ويُعلَن مفتوحًا'
+   . ($badList ? "\n        ◆ " . implode("\n        ◆ ", $badList) : ''));
 
 /* ══ ⑨ صفرُ ارتداد ═══════════════════════════════════════════════════ */
 /* الحزامُ كلُّه أخضر ⇒ ما كان يعمل يعمل. ويُقاس بمُرجَعِ الفاحصاتِ لا بالادّعاء */
