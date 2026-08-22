@@ -11,7 +11,11 @@
  *   (589/589 و 717/717) تلزمهما المصنَّفان الحاكمان، وهما **ليسا في الحزمة
  *   المرفقة**. فتُعلَن `BLOCKED_EXTERNAL_INPUT` بمالكِها ومطلوبِها.
  *
- * التشغيل: php tests/injalign01_gates.php [--json=<ملف>]
+ * التشغيل: php tests/injalign01_gates.php [--json=<ملف>] [--negative] [--a8-only]
+ *
+ * ◆ **وبوابةُ الهرمِ A8 تقيس فعلًا لا وجودَ ملفّ** (البند ٠-١): كانت `is_file()`
+ *   على حارسَين خاليَين من الفحصِ أصلًا — فكانت خضراءَ على نظامٍ يقبل حصةً
+ *   بلا التزام. و`--negative` **يعطبها عمدًا** ويشترط رسوبَها قبلَ تصديقِ مرورِها.
  * ═══════════════════════════════════════════════════════════════════════════
  */
 if (php_sapi_name() !== 'cli') { exit("CLI فقط\n"); }
@@ -36,6 +40,179 @@ function gate(&$G, $doc, $code, $state, $title, $measure, $note = '')
 {
     $G[] = array('doc' => $doc, 'code' => $code, 'state' => $state,
                  'title' => $title, 'measure' => $measure, 'note' => $note);
+}
+
+/**
+ * ── حارسُ الهرمِ مقيسًا بالفعل — A8 (البند ٠-١) ─────────────────────────────
+ * «لا حصةَ بلا التزامِ نوعِ معدةٍ في عقدِ عميلٍ نافذ» (CAP-01 §8.2).
+ * يعيد: state · score/3 · detail · note. ولا يُعلَن أخضرَ إلا بثلاثةِ أفعال.
+ * وإن غابت أرضيةُ القياسِ (لا عقدَ عميلٍ ولا موردَ في شركةٍ واحدة) فالحالُ
+ * `BLOCKED` بمالكٍ ومطلوبٍ مُعلَنَين — **ولا يُدَّعى نجاحٌ ولا يُحسب رسوبًا**.
+ */
+function a8_pyramid_behavior($ROOT, mysqli $conn)
+{
+    $MARK = 'INJA8PROBE';
+    $sweep = function () use ($conn, $MARK) {
+        @$conn->query("DELETE l FROM `supplier_contract_lines` l
+                        JOIN `supplier_contracts` h ON h.`id` = l.`contract_id`
+                       WHERE h.`notes` LIKE '{$MARK}%'");
+        @$conn->query("DELETE FROM `supplier_contracts` WHERE `notes` LIKE '{$MARK}%'");
+    };
+    $sweep();
+    register_shutdown_function($sweep);
+
+    /* ③ الصفوفُ الحيةُ المخالفة — تُعَدُّ قبلَ البذر */
+    $bad = one($conn, "SELECT COUNT(*) FROM `supplier_contract_lines`
+                        WHERE `contract_obligation_ref` IS NULL AND COALESCE(`is_deleted`, 0) = 0");
+    $live = one($conn, "SELECT COUNT(*) FROM `supplier_contract_lines`
+                         WHERE COALESCE(`is_deleted`, 0) = 0");
+
+    /* أرضيةُ القياس */
+    $g = @$conn->query("SELECT k.`company_id` AS co, k.`id` AS cc,
+                        (SELECT s.`id` FROM `suppliers` s
+                          WHERE s.`company_id` = k.`company_id` ORDER BY s.`id` LIMIT 1) AS sup
+                          FROM `contracts` k
+                         WHERE COALESCE(k.`is_deleted`, 0) = 0
+                           AND EXISTS (SELECT 1 FROM `suppliers` s WHERE s.`company_id` = k.`company_id`)
+                         ORDER BY k.`id` LIMIT 1");
+    $ground = $g ? $g->fetch_assoc() : null;
+    if (!$ground) {
+        return array('state' => 'BLOCKED', 'score' => 0,
+            'detail' => "لا أرضيةَ للقياس — صفرُ شركةٍ فيها عقدُ عميلٍ ومورّدٌ معًا",
+            'note' => 'المطلوب: صفٌّ واحدٌ في `contracts` وآخرُ في `suppliers` لشركةٍ واحدة '
+                    . '· المالك: مالكُ البيانات — **ولا يُدَّعى نجاحٌ ولا يُحسب رسوبًا**');
+    }
+    $CO = (int) $ground['co']; $CC = (int) $ground['cc']; $SUPP = (int) $ground['sup'];
+    $ACTOR = 999905;
+
+    require_once $ROOT . '/app/Core/TenantRegistry.php';
+    require_once $ROOT . '/app/Core/TenantContext.php';
+    require_once $ROOT . '/app/Core/TenantGateException.php';
+    require_once $ROOT . '/app/Core/TenantDb.php';
+    require_once $ROOT . '/app/Services/Contract/ContractStateMachine.php';
+    require_once $ROOT . '/app/Services/Contract/SupplierContractService.php';
+
+    $svc422 = false; $dbRefuses = false; $why = '';
+    try {
+        $gateDb = new \App\Core\TenantDb($conn, \App\Core\TenantContext::forSystem($CO, $ACTOR, '', true));
+        $r = \App\Services\Contract\SupplierContractService::createContract($conn, $gateDb, $CO, array(
+            'supplier_id' => $SUPP, 'client_contract_id' => $CC,
+            'start_date' => '2043-01-01', 'end_date' => '2043-12-31',
+            'currency' => 'USD', 'notes' => $MARK . ' عقدُ قياسِ بوابةِ الهرم'), $ACTOR);
+        if (empty($r['ok'])) {
+            $why = 'تعذّر بذرُ عقدِ القياس: ' . (isset($r['reason']) ? $r['reason'] : '?');
+        } else {
+            $SCID = (int) $r['contract_id'];
+
+            /* ① الخدمةُ — حصةٌ بلا مرجعِ التزامٍ ⇐ ٤٢٢ */
+            $r2 = \App\Services\Contract\SupplierContractService::saveLine($conn, $gateDb, $CO, $SCID,
+                array('work_model' => 'hour', 'unit' => 'ساعة', 'unit_price' => 100), $ACTOR);
+            $svc422 = (empty($r2['ok']) && (int) $r2['code'] === 422);
+            if (!$svc422) {
+                $why = 'الخدمةُ قبلت حصةً بلا مرجعِ التزامٍ (code='
+                     . (isset($r2['code']) ? (int) $r2['code'] : '?') . ')';
+                if (!empty($r2['line_id'])) {
+                    @$conn->query("DELETE FROM `supplier_contract_lines` WHERE `id` = " . (int) $r2['line_id']);
+                }
+            }
+
+            /* ② القاعدةُ — إدراجٌ مباشرٌ بلا مرجعٍ يلتفُّ على الخدمة */
+            $ins = @$conn->query("INSERT INTO `supplier_contract_lines`
+                (`company_id`, `contract_id`, `work_model`, `unit`, `unit_price`)
+                VALUES ({$CO}, {$SCID}, 'hour', 'ساعة', 1)");
+            $dbRefuses = ($ins === false);
+            if ($ins) { @$conn->query("DELETE FROM `supplier_contract_lines` WHERE `id` = " . (int) $conn->insert_id); }
+        }
+    } catch (\Throwable $e) {
+        $why = 'استثناءٌ أثناءَ القياس: ' . $e->getMessage();
+    }
+    $sweep();
+
+    $score = ($svc422 ? 1 : 0) + ($dbRefuses ? 1 : 0) + ($bad === 0 ? 1 : 0);
+    $detail = '① الخدمةُ ترد ٤٢٢: ' . ($svc422 ? '✔' : '✘')
+            . ' · ② القاعدةُ ترفض الإدراجَ المباشر: ' . ($dbRefuses ? '✔' : '✘')
+            . ' · ③ بنودٌ حيةٌ بلا مرجعِ التزام: **' . $bad . '/' . $live . '**';
+    $note = 'والإسنادُ الإضافيُّ لا يرفع الحصةَ ولا المستهدف — والقاعدةُ في '
+          . '`SupplierContractService::saveLine` موضعًا واحدًا';
+    if ($why !== '') { $note .= "\n          ◆ " . $why; }
+    return array('state' => ($score === 3) ? 'PASS' : 'OPEN',
+                 'score' => $score, 'detail' => $detail, 'note' => $note);
+}
+
+/**
+ * ── حزامُ صدقِ البوابةِ A8 — `--negative` (البند ٠-١) ────────────────────────
+ * ◆ **حارسٌ لم يرسُبْ مرةً واحدةً ليس حارسًا.** فهذا الوضعُ يعطب الشرطَ عمدًا —
+ *   يُحيّد فحصَ مرجعِ الالتزامِ في `SupplierContractService::saveLine` — ثم يقيس
+ *   البوابةَ مرةً ثانية، ويشترط أن **تنقص** درجتُها. ثم يُعيد المصدرَ كما كان
+ *   في `finally` وفي خطّافِ الخروجِ معًا، فلا يبقى عطبٌ ولو انهار التنفيذ.
+ * ◆ وما دام الحارسُ غيرَ مبنيٍّ بعد (الدرجةُ السليمةُ نفسُها دونَ ٣) فالحزامُ
+ *   **يُعلن ذلك ولا يدّعي إثباتًا** — فالادعاءُ بلا قياسٍ هو العطبُ عينُه.
+ */
+function a8_honesty_belt($ROOT, mysqli $conn)
+{
+    $src = $ROOT . '/app/Services/Contract/SupplierContractService.php';
+    $intact = a8_pyramid_behavior($ROOT, $conn);
+    echo "\n══ حزامُ صدقِ البوابة A8 — تُجرَّب معطوبةً قبلَ تصديقِ مرورِها ══\n";
+    printf("  ① الدرجةُ بالمصدرِ السليم: **%d/3** (%s)\n", $intact['score'], $intact['state']);
+
+    if ($intact['score'] !== 3) {
+        echo "  ◆ **الحارسُ غيرُ مبنيٍّ بعد** — فلا يُعطَب ما ليس قائمًا، ولا يُدَّعى\n";
+        echo "    إثباتٌ لم يُقَس. والمثبَتُ اليومَ أن البوابةَ **ترسُب على العطبِ القائم**\n";
+        echo "    حيث كانت تخضرُّ بـ`is_file()` — وتمامُ الحزامِ عند بناءِ الحارس (البند ٢-١).\n";
+        return $intact['score'] !== 3 ? 0 : 1;
+    }
+
+    $orig = file_get_contents($src);
+    $restore = function () use ($src, $orig) { file_put_contents($src, $orig); };
+    register_shutdown_function($restore);
+    $dropped = false; $broken = null;
+    try {
+        $needle = "if (\$oblRef === null) {";
+        if (strpos($orig, $needle) === false) {
+            echo "  ✘ مرساةُ العطبِ غيرُ موجودةٍ في المصدر — الحزامُ لا يدّعي\n";
+            $restore();
+            return 0;
+        }
+        file_put_contents($src, str_replace($needle, "if (false) {", $orig));
+        $broken = a8_pyramid_behavior_isolated($ROOT, $conn);
+        $dropped = ($broken['score'] < $intact['score']);
+        printf("  ② الدرجةُ بالحارسِ مُحيَّدًا: **%d/3** (%s)\n", $broken['score'], $broken['state']);
+    } catch (\Throwable $e) {
+        echo "  ✘ استثناءٌ أثناءَ العطب: " . $e->getMessage() . "\n";
+    } finally {
+        $restore();
+    }
+    $after = a8_pyramid_behavior($ROOT, $conn);
+    printf("  ③ وأُعيد المصدرُ — الدرجةُ عادت: **%d/3**\n", $after['score']);
+    $ok = $dropped && $after['score'] === $intact['score'];
+    echo $ok ? "  ✔ **البوابةُ رسبت معطوبةً ومرّت سليمةً** — صدقُها مقيسٌ لا مُدَّعى\n"
+             : "  ✘ **البوابةُ لم ترسُبْ بالعطب** — فليست حارسًا\n";
+    return $ok ? 1 : 0;
+}
+
+/** يُعيد القياسَ في عمليةٍ منفصلةٍ لأن الصنفَ محمَّلٌ سلفًا فلا يُعاد تحميلُه. */
+function a8_pyramid_behavior_isolated($ROOT, mysqli $conn)
+{
+    $php = PHP_BINARY;
+    $cmd = escapeshellarg($php) . ' ' . escapeshellarg(__FILE__) . ' --a8-only 2>&1';
+    $out = @shell_exec($cmd);
+    if (preg_match('/A8SCORE=(\d)/', (string) $out, $m)) {
+        return array('score' => (int) $m[1], 'state' => (int) $m[1] === 3 ? 'PASS' : 'OPEN');
+    }
+    return array('score' => -1, 'state' => 'OPEN');
+}
+
+/* ── الأوضاعُ الخاصة — تسبق العرضَ العامّ ─────────────────────────────────── */
+/* `--a8-only`: قياسُ بوابةِ الهرمِ وحدَها في عمليةٍ نظيفة (يستعملها الحزامُ السلبيّ
+ *   لأن صنفَ الخدمةِ يُحمَّل مرةً واحدةً فلا يُعاد تحميلُه بعدَ تعديلِ مصدرِه). */
+if (in_array('--a8-only', $argv, true)) {
+    $r = a8_pyramid_behavior($ROOT, $conn);
+    echo "A8SCORE={$r['score']}\n";
+    exit(0);
+}
+/* `--negative`: **تُجرَّب البوابةُ معطوبةً قبلَ تصديقِ مرورِها.** */
+if (in_array('--negative', $argv, true)) {
+    exit(a8_honesty_belt($ROOT, $conn) === 1 ? 0 : 1);
 }
 $SAL = 'SAL'; $SUP = 'SUP';
 $ANCH = "'main/role_board.php','chats/index.php'";
@@ -139,15 +316,22 @@ gate($G, 'ALL', 'A7', ($manual === 0) ? 'PASS' : 'OPEN',
      'فالواقعةُ بيتُها التايم شيت — وتُقرأ هنا لا تُدخَل');
 
 /* ── ⑧ الهرم — لا حصةَ بلا التزامٍ ولا معدةَ تُنشئ حصة ──────────────────── */
-$guard = 0;
-foreach (array('app/Services/Capacity/CapacityContextResolver.php',
-               'app/Services/Unit/CapacityGuard.php') as $f) {
-    if (is_file($ROOT . '/' . $f)) { $guard++; }
-}
-gate($G, $SUP, 'A8', ($guard === 2) ? 'PASS' : 'OPEN',
+/* ◆ **البوابةُ تقيس فعلًا لا وجودَ ملفّ** (البند ٠-١ · من عائلةِ GAP-56 — القياسُ يقيس غيرَ ما يدّعي):
+ *   كانت `is_file()` على حارسَين — فتخضرُّ ولو كان الملفّانِ خاليَين من الفحصِ
+ *   أصلًا، وهذا واقعُهما: `CapacityGuard.php` فيه **صفرُ ذكرٍ** للالتزام.
+ *   والمقياسُ الآن ثلاثةُ أفعالٍ تُجرَّب حيًّا:
+ *     ① الخدمةُ ترفض حصةً بلا مرجعِ التزامٍ ⇐ ٤٢٢
+ *     ② القاعدةُ ترفض الإدراجَ المباشرَ بلا مرجع
+ *     ③ صفرُ بندٍ حيٍّ يخالف القاعدة
+ *   والبذرُ معزولٌ بوسمِ `INJA8PROBE` وسنةِ 2043 — يُكنس قبلَ المحاولةِ وبعدَها
+ *   وعندَ الخروجِ أيًّا كان سببُه، فالكنسُ بالعائلةِ لا بالجلسة. والصفوفُ الحيةُ
+ *   تُعَدُّ **قبلَ** البذرِ فلا يلوّثها بذرُ القياسِ نفسُه.
+ */
+$a8 = a8_pyramid_behavior($ROOT, $conn);
+gate($G, $SUP, 'A8', $a8['state'],
      'الهرم — الحصةُ من الالتزامِ لا من المعدة',
-     "حرّاسُ الطاقةِ والسياقِ المبنيّون: **{$guard}/2**",
-     'والإسنادُ الإضافيُّ لا يرفع الحصةَ ولا المستهدف — محروسٌ في `CapacityGuard`');
+     "أفعالٌ محروسةٌ مقيسةً حيًّا: **{$a8['score']}/3** · {$a8['detail']}",
+     $a8['note']);
 
 /* ── ⑨ السلامةُ والبيانات — صفرُ ارتدادٍ وصفرُ فقد ─────────────────────── */
 $lost = one($conn, "SELECT COUNT(*) FROM `gov_nav_hidden_log` h
