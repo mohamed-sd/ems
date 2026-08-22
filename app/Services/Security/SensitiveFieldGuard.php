@@ -79,7 +79,12 @@ class SensitiveFieldGuard
 
     public static function policy(\mysqli $conn, $fieldCode)
     {
-        $stmt = $conn->prepare('SELECT * FROM sensitive_field_policies WHERE field_code = ? LIMIT 1');
+        $stmt = $conn->prepare(/* ◆ **الملغاةُ لا تُقرأ** (FR-SEC-005): سياسةٌ حُكم بإلغائِها لأن هدفَها
+               وهميٌّ تبقى في الجدولِ أثرًا تدقيقيًّا — ولا تُطبَّق. وإسقاطُها
+               من القراءةِ هنا **وفي `FieldGovernor`** كلاهما لازم: وصلٌ في
+               موضعٍ واحدٍ يجعل الإلغاءَ زخرفةً في الآخر. */
+            "SELECT * FROM sensitive_field_policies
+              WHERE field_code = ? AND status = 'نافذة' LIMIT 1");
         $stmt->bind_param('s', $fieldCode);
         $stmt->execute();
         $row = $stmt->get_result()->fetch_assoc();

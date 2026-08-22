@@ -50,9 +50,35 @@ while ($r && $x = $r->fetch_assoc()) {
 $tables = array_keys($fields);
 echo "  القاموس: " . count($pairs) . " حقلًا معتمَدًا في " . count($tables) . " جدولًا\n";
 
-$r = $conn->query("SELECT COUNT(*) FROM `scr_sensitive_fields` WHERE `status` <> 'معتمد'");
-$outside = $r ? (int) $r->fetch_row()[0] : -1;
-ok($outside === 0, 'صفرُ حقلٍ حساسٍ خارجَ الإنفاذ', $pass, $fail, "خارجَ الإنفاذ = {$outside}");
+/* ◆ **«خارجَ الإنفاذ» كان يخلط حالتَين لا تُخلَطان**: `status <> 'معتمد'` يعدُّ
+ *   **المسودةَ المنسيّةَ** — إعلانُ حساسيةٍ لم يُعتمَد فلا شيءَ ينفّذه، وهو
+ *   المقصودُ — و**الملغاةَ بحكم** — إعلانٌ حُكم بإلغائِه لأن هدفَه وهميّ
+ *   (FR-SEC-005)، وهي أثرٌ تدقيقيٌّ لا ثغرةٌ إنفاذ. فلمّا أُلغيت واحدةٌ بحكمٍ
+ *   انقلب الشاهدُ أحمرَ على **تغييرٍ مشروع**.
+ * ◆ **ولا يُفتح بذلك بابُ إسكات**: الملغاةُ تُستثنى **بشرطِ أن يكون لها حكمٌ
+ *   مسجَّل** في `gov_phantom_policy_rulings`. فمن يُلغي صفًّا بلا حكمٍ يبقى
+ *   راسبًا — والاستثناءُ أضيقُ من القاعدةِ السابقةِ لا أوسع. */
+$draft = (int) $conn->query("SELECT COUNT(*) FROM `scr_sensitive_fields`
+                              WHERE `status` = 'مسودة'")->fetch_row()[0];
+$hasRulings = (int) $conn->query("SELECT COUNT(*) FROM information_schema.TABLES
+                                   WHERE TABLE_SCHEMA = DATABASE()
+                                     AND TABLE_NAME = 'gov_phantom_policy_rulings'")->fetch_row()[0];
+$unruled = 0;
+if ($hasRulings === 1) {
+    $unruled = (int) $conn->query("SELECT COUNT(*) FROM `scr_sensitive_fields` s
+        WHERE s.`status` = 'ملغاة'
+          AND NOT EXISTS (SELECT 1 FROM `gov_phantom_policy_rulings` g
+                           WHERE g.`declared_target` = CONCAT(s.`table_name`,'.',s.`field_name`))")
+        ->fetch_row()[0];
+} else {
+    $unruled = (int) $conn->query("SELECT COUNT(*) FROM `scr_sensitive_fields`
+                                    WHERE `status` = 'ملغاة'")->fetch_row()[0];
+}
+$cancelled = (int) $conn->query("SELECT COUNT(*) FROM `scr_sensitive_fields`
+                                  WHERE `status` = 'ملغاة'")->fetch_row()[0];
+$outside = $draft + $unruled;
+ok($outside === 0, 'صفرُ حقلٍ حساسٍ خارجَ الإنفاذ', $pass, $fail,
+   "مسودةٌ منسيّة={$draft} · ملغاةٌ **بلا حكم**={$unruled} · ملغاةٌ بحكم=" . ($cancelled - $unruled));
 
 $r = $conn->query("SELECT COUNT(*) FROM `scr_sensitive_fields`
                     WHERE `log_views_flag` NOT IN ('نعم','لا') OR `exportable_flag` NOT IN ('نعم','لا')");

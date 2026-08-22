@@ -283,7 +283,9 @@ class FieldGovernor
            ◆ **وما لا إعلانَ تصديرٍ له يُقرأ منعًا لا سماحًا** (`declared=false`):
              فغيابُ الإعلانِ لا يصنع إذنًا. */
         $st = $conn->prepare(
-            "SELECT field_code FROM sensitive_field_policies WHERE field_code LIKE CONCAT(?, '.%')");
+            /* ◆ والملغاةُ لا تُعَدُّ حساسةً (FR-SEC-005) — وإلا بقي الوهمُ يُصنِّف. */
+            "SELECT field_code FROM sensitive_field_policies
+              WHERE field_code LIKE CONCAT(?, '.%') AND status = 'نافذة'");
         if ($st) {
             $st->bind_param('s', $table);
             $st->execute();

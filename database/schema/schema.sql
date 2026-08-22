@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 15:25:06
--- الجداول: 642 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-22 16:01:44
+-- الجداول: 643 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -7175,6 +7175,21 @@ CREATE TABLE `gov_permission_corrections` (
   KEY `ix_mod_role` (`module_code`,`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='تصحيحاتُ صلاحياتٍ تُعبّر عن سياسةٍ منصوصة — بأثرٍ مقروءٍ لا صامت';
 
+-- ── Table: gov_phantom_policy_rulings ──
+CREATE TABLE `gov_phantom_policy_rulings` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `source_register` varchar(64) NOT NULL,
+  `declared_target` varchar(160) NOT NULL,
+  `ruling` varchar(32) NOT NULL COMMENT 'NO_REAL_TARGET · SUPERSEDED · NEEDS_OWNER_DECISION',
+  `candidates` varchar(600) NOT NULL COMMENT 'أعمدةٌ حقيقيةٌ مرشَّحةٌ — مقيسة',
+  `candidate_count` int(11) NOT NULL,
+  `reason` varchar(600) NOT NULL,
+  `owner` varchar(96) NOT NULL,
+  `ruled_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_target` (`declared_target`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FR-SEC-005 — لا سياسةَ وهميةً بلا حكم';
+
 -- ── Table: gov_policy_changes ──
 CREATE TABLE `gov_policy_changes` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -12765,6 +12780,8 @@ CREATE TABLE `sensitive_field_policies` (
   `classification` enum('payroll','bank','medical','personal','ownership','pricing') NOT NULL,
   `masking_rule` enum('full','partial','none') NOT NULL DEFAULT 'full',
   `allowed_roles_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`allowed_roles_json`)),
+  `status` varchar(16) NOT NULL DEFAULT 'نافذة' COMMENT 'نافذة · ملغاة — الإلغاءُ بديلُ الحذف (§تاسعًا)',
+  `ruling_note` varchar(400) DEFAULT NULL COMMENT 'سببُ الحجرِ ومرجعُ حكمِه',
   PRIMARY KEY (`pol_id`),
   UNIQUE KEY `uq_sfp_field` (`field_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §10⑦: الحقل الذي لا يُملك لا يُجلب أصلًا';
