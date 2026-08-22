@@ -97,6 +97,52 @@ if (count($decision) < $blN) {
     chk(false, '◆ انخفض إلى ' . count($decision) . " من {$blN} — **تُشدُّ السقّاطة** بـ--retighten");
 }
 
+
+/* ══ ②-ب محورُ المساحةِ — القرارُ الواحدُ يشمل «Active Workspace» ═══════════
+ * ◆ **FR-SEC-003 يعدُّ سبعةَ محاور** في نقطةِ القرارِ الواحدة: الدورُ والشركةُ
+ *   **والمساحةُ الفعّالة** والمشروعُ ونطاقُ الطرفِ والفعلُ وحساسيةُ الحقل.
+ *   وهذا الفاحصُ كان يعدُّ محورَ **الصلاحيةِ** وحدَه — فقارئُ مساحةٍ خارجَ
+ *   نقطتِه كان **يمرُّ غيرَ معدود**، والمقامُ يبدو أنظفَ مما هو.
+ * ◆ **وقِيس واحدٌ فعلًا**: `excel.php` ينفّذ عزلَ المساحةِ باستعلامٍ مباشرٍ على
+ *   `gov_space_appearances … cls='FORBIDDEN'` لا بنداءِ `ems_scope_forbids`.
+ *   فهو **يحرس صحيحًا ويقرأ من خارجِ النقطة** — والأمران يُقالان معًا.
+ * ◆ ونقطةُ المساحةِ هي `includes/space_scope.php` وحدَها. */
+echo "\n══ ②-ب محورُ المساحةِ في النقطةِ الواحدة ══\n";
+$SPACE_POINT = 'includes/space_scope.php';
+$SPACE_VIA   = '/(ems_scope_forbids|ems_scope_forbidden_set|ems_scope_class|ems_active_scope'
+             . '|ems_scope_allowed|ems_scope_home|ems_scope_switch)\s*\(/';
+$spaceOutside = array();
+$it2 = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT, FilesystemIterator::SKIP_DOTS));
+foreach ($it2 as $f2) {
+    if (!$f2->isFile() || strtolower($f2->getExtension()) !== 'php') { continue; }
+    $rel2 = str_replace(DIRECTORY_SEPARATOR, '/', substr($f2->getPathname(), strlen($ROOT) + 1));
+    $top2 = (strpos($rel2, '/') !== false) ? substr($rel2, 0, strpos($rel2, '/')) : '';
+    if ($top2 !== '' && in_array($top2, $SKIP, true)) { continue; }
+    if ($rel2 === $SPACE_POINT) { continue; }
+    $src2 = (string) @file_get_contents($f2->getPathname());
+    if (strpos($src2, 'gov_space_appearances') === false) { continue; }
+    /* ◆ **ونداءُ النقطةِ لا يُعفي من قرارٍ محليّ**: `excel.php` ينادي
+     *   `ems_active_scope()` **ثم يحكم بنفسِه** بـ`cls = FORBIDDEN`.
+     *   فالعبرةُ بمن **يصنع القرارَ** لا بمن يذكر النقطة. ⇒ يُعَدُّ قارئًا
+     *   خارجَها كلُّ من كتب محمولَ المنعِ في نفسِه. */
+    if (strpos($src2, "cls = 'FORBIDDEN'") === false
+        && strpos($src2, "cls='FORBIDDEN'") === false) { continue; }
+    $spaceOutside[] = $rel2;
+}
+sort($spaceOutside);
+$SPACE_BASELINE = 1;   /* excel.php — مقيسٌ 2026-08-22 · يُخفَّض ولا يُرفع */
+chk(count($spaceOutside) <= $SPACE_BASELINE,
+    '**لا قارئَ مساحةٍ جديدٍ خارجَ نقطتِها**',
+    count($spaceOutside) . ' ≤ ' . $SPACE_BASELINE
+    . (count($spaceOutside) ? ' — ' . implode(' · ', array_slice($spaceOutside, 0, 4)) : ''));
+chk(count($spaceOutside) >= $SPACE_BASELINE,
+    'وخطُّ أساسِ المساحةِ مطابقٌ — والانخفاضُ يطلب شدَّه',
+    count($spaceOutside) < $SPACE_BASELINE
+        ? 'انخفض إلى ' . count($spaceOutside) . ': **اخفِض $SPACE_BASELINE**' : 'مطابق');
+echo "  ◆ ومحاورُ القرارِ السبعةُ (FR-SEC-003): الدورُ · الشركةُ · **المساحةُ** ·\n";
+echo "    المشروعُ · نطاقُ الطرفِ · الفعلُ · حساسيةُ الحقل. ويُقاس منها هنا اثنان\n";
+echo "    (الصلاحيةُ والمساحةُ) — والباقيةُ تُقاس في شواهدِها، ولا يُدَّعى شمولٌ.\n";
+
 echo "\n══ ③ النقطةُ الواحدةُ قائمةٌ وتحكم ══\n";
 $ps = (string) @file_get_contents($ROOT . '/' . $POINT);
 chk($ps !== '', "النقطةُ موجودة — {$POINT}");
