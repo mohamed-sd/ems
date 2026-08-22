@@ -77,14 +77,21 @@ D($rows, 4, 'قلبُ نطاقِ الأطرافِ إلى الإغلاقِ الا
   ($reg > 0 && $fnFail) ? 'DONE' : 'OPEN',
   "سجلٌّ واحدٌ بـ{$reg} دورًا · الدالةُ تفشل مغلقةً: " . ($fnFail ? '✔' : '✘'));
 
-/* ⑤ NF-28 — مقامانِ بلا جسر */
-$base = (string) @file_get_contents($ROOT . '/docs/BASELINE_INJEXEC01_20260822_ar.md');
-$bridge = (mb_strpos($base, '147') !== false && mb_strpos($base, '663') !== false);
-D($rows, 5, 'NF-28 · مقاما عقدِ المعرِّفاتِ بجسر',
-  $bridge ? 'DONE' : 'DEFERRED_BY_DECISION',
-  $bridge ? 'المقامانِ مُعلَنانِ معًا'
-          : 'مؤجَّلٌ: **إعلانُ المقامَين معًا يقع في تقريرِ الإغلاقِ النهائيّ** '
-          . 'المشتقِّ من الدفتر — ولا يُكتب رقمٌ يدًا في وثيقةٍ قبله');
+/* ⑤ NF-28 — مقامانِ بلا جسر
+ * ◆ **كان الحكمُ وجودَ رقمٍ في ملفِّ ماركداون** (`mb_strpos($base,'147')`) — فكتابةُ
+ *   «147» في أيِّ سياقٍ تُخضِّر البوابة، **ولو كان الرقمُ منقولًا لا مقيسًا**.
+ *   وهو كذلك: المُعلَنُ ١٤٧ والمقيسُ حيًّا **صفر**. والحكمُ الآن **مخرَجُ شاهدٍ
+ *   يُشغَّل** يُصدِّر المقامَين معًا وجدولَ التحويلِ بينهما. (البند ١-٣) */
+$nf28Rc = 1; $nf28Out = array();
+@exec('"' . PHP_BINARY . '" ' . escapeshellarg($ROOT . '/tests/injfrd01_nf028_id_denominators.php')
+      . ' 2>&1', $nf28Out, $nf28Rc);
+$nf28 = '';
+foreach ($nf28Out as $l) { if (strpos($l, '#NF028') === 0) { $nf28 = trim(substr($l, 6)); } }
+$bridge = ($nf28Rc === 0 && $nf28 !== '');
+D($rows, 5, 'NF-28 · مقاما عقدِ المعرِّفاتِ بجسر', $bridge ? 'DONE' : 'OPEN',
+  $bridge
+    ? 'المقامانِ **مقيسانِ ومُصدَّرانِ معًا** بجدولِ تحويل — `tests/injfrd01_nf028_id_denominators.php` ·' . $nf28
+    : 'الشاهدُ يرسُب — ولا جسرَ بين المقامَين');
 
 /* ⑥ NF-30 — فحصُ حياةِ الأعمدة */
 $live = (mb_strpos((string) @file_get_contents($ROOT . '/tests/install_proof.php'),
