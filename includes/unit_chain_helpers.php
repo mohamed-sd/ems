@@ -336,7 +336,15 @@ if (!function_exists('ems_ladder_check')) {
                        if ($st->fetch()) { $actorRole = ($rr === null ? null : (int) $rr); } $st->close(); }
         }
         $roles = $ap['roles'];
-        if ($roles && $actorRole !== null && !in_array((int) $actorRole, $roles, true)) {
+        /* ◆ **فاعلٌ لا يُحَلُّ دورُه ⇐ منعٌ لا مرور** — كشفه شاهدُ FR-APP-001:
+         *   كان الشرطُ `$actorRole !== null` **يتخطّى الفحصَ كلَّه** عند تعذُّرِ
+         *   حلِّ الدور، فيمرُّ فاعلٌ مجهولٌ بوصفِه صاحبَ اليد. وهو نقضُ
+         *   «Default Deny» (§سادسًا) ونقضُ FR-APP-002: «فاعلٌ ليس صاحبَ اليد
+         *   ← رفض» — ومَن لا يُعرف دورُه ليس صاحبَها يقينًا. */
+        if ($roles && $actorRole === null) {
+            $res['ok'] = false;
+            $res['reasons'][] = "تعذّر حلُّ دورِ الفاعلِ {$actorId} — ولا يُعَدُّ صاحبَ اليدِ بالشكّ";
+        } elseif ($roles && !in_array((int) $actorRole, $roles, true)) {
             $res['ok'] = false;
             $res['reasons'][] = "الدورُ {$actorRole} ليس صاحبَ خطوةِ الاعتمادِ في {$ladder}"
                               . " (`{$ap['actor_code']}` ⇐ " . implode('،', $roles) . ')';
@@ -409,6 +417,13 @@ if (!function_exists('ems_ladder_guard')) {
                               $actorId, $scope = '', $note = '')
     {
         $r = ems_ladder_check($conn, $ladder, $companyId, $subjectKind, $subjectRef, $actorId, null, $scope);
+
+        /* ◆ FR-APP-001 — **الظلُّ يرصد ولا يمنع**: يُسجَّل كلُّ تقييمٍ سماحًا
+         *   ومنعًا، لا المنعُ وحدَه — فمقامُ نافذةِ الملاحظةِ لا يُعرف بغيرِه،
+         *   و«صفرُ تباين» على مقامٍ مجهولٍ لا معنى له. */
+        ems_ladder_shadow_observe($conn, $ladder, $companyId, $subjectKind, $subjectRef,
+                                  $actorId, $r);
+
         if (!$r['ok']) {
             ems_ladder_log_denial($conn, $companyId, $subjectKind, $subjectRef, $actorId, $r);
             if ($r['mode'] === 'enforce') {
@@ -422,5 +437,63 @@ if (!function_exists('ems_ladder_guard')) {
                               $r['step'], $actorId, $scope, $note);
         }
         return array('ok' => true, 'code' => 200, 'reason' => '', 'ladder' => $r['ladder'], 'step' => $r['step']);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * FR-APP-001 · نمطُ الظلِّ لبوابةِ السلّم — يرصد ولا يمنع
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ◆ **القاعدةُ الحاكمةُ بنصِّ الدفتر**: «لا يوقف الظلُّ معاملةً أبدًا — وفشلُ
+ *   المقارنِ يُسجَّل ولا يمنع». فكلُّ ما هنا داخلَ `try` واسعٍ يبتلع **عمدًا
+ *   وبنصِّ المطلب**، وهو الموضعُ الوحيدُ الذي يكون فيه الابتلاعُ صوابًا —
+ *   لأن البديلَ أن يوقف مقياسٌ معاملةَ عمل.
+ *
+ * ◆ **ويُسجَّل السماحُ كما يُسجَّل المنع**: المقامُ هو كلُّ تقييم، والبسطُ هو
+ *   التباين. وعدُّ المنعِ وحدَه يجعل «صفرَ تباين» جملةً بلا مقام.
+ *
+ * ◆ **والعطالةُ بمفتاح** (كيان × مرجع × خطوة × فاعل): تكرارُ المحاولةِ لا
+ *   يضخّم المقامَ ولا يُنشئ تباينًا ثانيًا.
+ * ═══════════════════════════════════════════════════════════════════════════ */
+if (!function_exists('ems_ladder_shadow_observe')) {
+    function ems_ladder_shadow_observe(mysqli $conn, $ladder, $companyId, $subjectKind,
+                                       $subjectRef, $actorId, array $res)
+    {
+        try {
+            $ladder = (string) $ladder;
+            if (!preg_match('/^LD-\d{2}$/', $ladder)) { return; }
+
+            /* في نمطِ الظلِّ والمراقبةِ تمضي المعاملةُ دائمًا — فقرارُ السلوكِ
+               الحاليِّ «سماح». وفي الإنفاذِ يصير القراران واحدًا فلا تباين. */
+            $mode    = isset($res['mode']) ? (string) $res['mode'] : 'monitor';
+            $ladderD = empty($res['ok']) ? 'deny' : 'allow';
+            $currentD = ($mode === 'enforce') ? $ladderD : 'allow';
+            $diverged = ($currentD !== $ladderD) ? 1 : 0;
+
+            $step   = isset($res['step']) && $res['step'] !== null ? (int) $res['step'] : null;
+            $reason = isset($res['reasons']) && is_array($res['reasons'])
+                    ? mb_substr(implode(' · ', $res['reasons']), 0, 500) : '';
+            $idem   = substr(sha1(implode('|', array(
+                        (int) $companyId, $ladder, (string) $subjectKind,
+                        (int) $subjectRef, (string) $step, (int) $actorId))), 0, 40);
+
+            $st = $conn->prepare(
+                'INSERT INTO `gov_ladder_shadow`
+                   (`company_id`,`ladder_code`,`subject_kind`,`subject_ref`,`step_no`,
+                    `actor_id`,`current_decision`,`ladder_decision`,`diverged`,`reason`,
+                    `idem_key`,`observed_at`)
+                 VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW())
+                 ON DUPLICATE KEY UPDATE `observed_at` = `observed_at`');
+            if (!$st) { return; }
+            $st->bind_param('issiiississ',
+                $companyId, $ladder, $subjectKind, $subjectRef, $step,
+                $actorId, $currentD, $ladderD, $diverged, $reason, $idem);
+            $st->execute();
+            $st->close();
+        } catch (\Throwable $t) {
+            /* ◆ **بنصِّ المطلب**: «فشلُ المقارنِ يُسجَّل ولا يمنع» — فلا يُرفَع. */
+            if (function_exists('error_log')) {
+                error_log('ladder shadow observe: ' . $t->getMessage());
+            }
+        }
     }
 }

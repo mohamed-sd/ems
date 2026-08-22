@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 07:54:52
--- الجداول: 641 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-22 10:00:21
+-- الجداول: 642 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6970,6 +6970,27 @@ CREATE TABLE `gov_ladder_decisions` (
   KEY `ix_gld_ladder` (`ladder_code`,`subject_kind`),
   KEY `ix_gld_scope` (`scope_key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='سجلُّ قراراتِ السلالمِ الواحد — INJ-CHAIN-CLOSE-01 · GAP-01';
+
+-- ── Table: gov_ladder_shadow ──
+CREATE TABLE `gov_ladder_shadow` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `ladder_code` varchar(16) NOT NULL,
+  `subject_kind` varchar(48) NOT NULL,
+  `subject_ref` bigint(20) NOT NULL,
+  `step_no` int(11) DEFAULT NULL,
+  `actor_id` int(11) NOT NULL,
+  `current_decision` enum('allow','deny') NOT NULL,
+  `ladder_decision` enum('allow','deny') NOT NULL,
+  `diverged` tinyint(1) NOT NULL DEFAULT 0,
+  `reason` varchar(500) NOT NULL DEFAULT '',
+  `idem_key` varchar(128) NOT NULL,
+  `observed_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `u_idem` (`idem_key`),
+  KEY `k_div` (`diverged`,`observed_at`),
+  KEY `k_kind` (`subject_kind`,`observed_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FR-APP-001 — ظلُّ بوابةِ السلّم · يرصد ولا يمنع';
 
 -- ── Table: gov_ladder_steps ──
 CREATE TABLE `gov_ladder_steps` (
