@@ -1,44 +1,40 @@
 {
-    "action_dict_total": "465",
+    "action_dict_total": "490",
     "action_guard_verified": "82",
     "action_idem_verified": "113",
     "action_live": "375",
     "golden_total": "10",
     "golden_pending": "10",
-    "a11y_rows": "10",
-    "visual_rows": "85",
-    "pollution_findings": "560",
-    "pollution_archive": "68",
-    "test_isolation": "991",
-    "test_residue_archive": "4397",
-    "appearance_gaps": "42",
-    "orphan_links": "174",
-    "dup_semantics": "59",
-    "saved_views": "736",
+    "golden_approved": "0",
+    "chain_nodes": "29",
+    "ladder_decisions": "0",
+    "sheet_decisions": "57",
     "event_rulings_business": "11",
     "event_rulings_audit": "47",
+    "settlements": "469",
+    "settlements_paid": "0",
+    "payroll_runs": "74",
+    "journal_entries": "6713",
+    "journal_lines": "13426",
+    "journal_balance_diff": "0.00",
+    "fin_requests": "22",
+    "job_queue_done": "8050",
+    "job_queue_total": "8067",
+    "saved_views": "736",
     "ledger_states": {
         "NOT_STARTED": "147",
         "TECHNICALLY_ELIGIBLE": "516"
     },
-    "ledger_resolve": {
-        "RESOLVED": "516",
-        "AMBIGUOUS": "12",
-        "NOT_FOUND": "135"
-    },
     "app_cls": {
-        "CONTEXTUAL_READ_ONLY": "65",
+        "CONTEXTUAL_READ_ONLY": "70",
         "CONTROL_OVERSIGHT": "78",
         "EXECUTIVE_OVERSIGHT": "23",
-        "FORBIDDEN": "204",
-        "OWNED": "235",
+        "FORBIDDEN": "265",
+        "OWNED": "247",
         "PERSONAL_SPACE": "286",
         "SHARED_WORK_ITEM": "51"
     },
-    "app_decisions": {
-        "CONFIRMED": "942"
-    },
-    "ownership_rulings": {
+    "ownership": {
         "OWNER_CONFIRMED": "80",
         "OWNER_CHANGED": "5",
         "APPEARANCE_MISSING": "42",

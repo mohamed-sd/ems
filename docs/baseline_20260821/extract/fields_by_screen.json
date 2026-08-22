@@ -4674,6 +4674,344 @@
         ]
     },
     {
+        "route": "Clients\/quotation_lines.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "العرض",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "#",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الوصف",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكمية",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "سعر الوحدة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الخصم ٪",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الإجمالي",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "العملة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "أضافه",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "العملة",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "quotation_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "product_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "description",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "qty",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "unit_type",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "unit_price",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "currency",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "discount_pct",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
+        "route": "Clients\/quotation_negotiation.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "العرض",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "النسخة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الواقعة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الطرف",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "النص",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "قبل",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "بعد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "السريان",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "سجّلها",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مفتاح منع التكرار",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "quotation_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "event_kind",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "party",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "note",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "amount_before",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "amount_after",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "currency",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "valid_until",
+                "input_type": "date",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
         "route": "Clients\/quotations.php",
         "tables": [
             {
@@ -26765,6 +27103,580 @@
         "form_fields": []
     },
     {
+        "route": "Finance\/ar_accrual_gen.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "الإجراء",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "رقم الاستحقاق",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الفترة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "العقد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المطالبة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المبلغ",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "بالعملة الأساس",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "أعدَّه",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "أجازه",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "رقم القيد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تاريخ الإنشاء",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مفتاح منع التكرار",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "العملة",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "سعر الصرف",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "contract_id",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "claim_id",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "period",
+                "input_type": "month",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "amount",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "currency",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "fx_rate",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "control_accrual",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
+        "route": "Finance\/ar_claim_invoice.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "الإجراء",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "رقم الفاتورة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الفترة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المطالبة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الشهادة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المبلغ",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الإحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "أعدَّها",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "اعتمدها",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "أجازها",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تاريخ الاعتماد",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "العملة",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "claim_id",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "cert_id",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "period",
+                "input_type": "month",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "amount",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "currency",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "approve_inv",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
+                "name": "control_inv",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
+                "name": "refer_inv",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
+                "name": "refer_to",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
+        "route": "Finance\/ar_completion_cert.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "الإجراء",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "رقم الشهادة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الفترة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "العقد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المطالبة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكمية",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مرجع القياس",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "السلّم",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "أعدَّها",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "اعتمدها",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تاريخ الاعتماد",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مفتاح منع التكرار",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "contract_id",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "claim_id",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "period",
+                "input_type": "month",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "approved_qty",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "unit_type",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "measure_ref",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "approve_cert",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
         "route": "Finance\/assets_fin.php",
         "tables": [
             {
@@ -35731,9 +36643,348 @@
         "form_fields": []
     },
     {
+        "route": "Finance\/tre_beneficiary.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "الإجراء",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الطرف",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المستفيد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "البنك",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الآيبان",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "رقم الحساب",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "العملة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "سجّله",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تحقَّق منه",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المُنشئ",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "العملة",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "party_type",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "party_ref",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "beneficiary_ar",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "bank_name",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "iban",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "account_no",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "currency",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "verify_ben",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
         "route": "Finance\/tre_cycle_stages.php",
         "tables": [],
         "form_fields": []
+    },
+    {
+        "route": "Finance\/tre_pay_batch.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "الإجراء",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "رقم الدفعة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تاريخ القيمة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحساب",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "العملة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "السطور",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "أعدَّها",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "نفَّذها",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مرجع الحركة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مفتاح منع التكرار",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "العملة",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "value_date",
+                "input_type": "date",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "bank_account",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "currency",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "ready_batch",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
+                "name": "exec_batch",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
+                "name": "bank_ref",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/tre_sod_matrix.php",
@@ -35744,6 +36995,149 @@
         "route": "Finance\/tre_unit_roles.php",
         "tables": [],
         "form_fields": []
+    },
+    {
+        "route": "Finance\/unit_fin_final.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "الإجراء",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الفترة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الواقعة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "حالة الواقعة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "السلّم",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "أعدَّه",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "اعتمده",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "أجازه",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "رقم القيد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تاريخ الاعتماد",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مفتاح منع التكرار",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "entry_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "period",
+                "input_type": "month",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "approve_final",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
+                "name": "control_final",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            }
+        ]
     },
     {
         "route": "Finance\/unit_records_fin.php",
@@ -55051,6 +56445,196 @@
         ]
     },
     {
+        "route": "Operations\/unit_correction.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "قرار الأطراف",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الواقعة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "النوع",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحقل",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "قبل",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "بعد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "السبب",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "العميل",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المورّد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المشغّل",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المُنشئ",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مفتاح منع التكرار",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "entry_id",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "correction_kind",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "field_changed",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "value_before",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "value_after",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "reason",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "party_ok",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
+                "name": "party",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
         "route": "Operations\/unit_perf.php",
         "tables": [
             {
@@ -55555,6 +57139,172 @@
                 "readonly": 0,
                 "section": "إضافة — الأداء الشهري للوحدة",
                 "is_system": 0,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
+        "route": "Opportunities\/client_need_rfq.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "الإجراء",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "رقم الاحتياج",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الفرصة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "نوع الخدمة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكمية",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المدة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مطلوبٌ من",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "سجّله",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تاريخ الإنشاء",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مفتاح منع التكرار",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "opportunity_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "service_type",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "qty",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "unit_type",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "duration_months",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "required_from",
+                "input_type": "date",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "submit_need",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
                 "dup_count": 1
             }
         ]
@@ -76851,6 +78601,139 @@
         ]
     },
     {
+        "route": "Suppliers\/supplier_board.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "العملة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "عدد المخالفات",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "إجمالي الجزاء",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "العملة",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            },
+            {
+                "table_index": 1,
+                "columns": [
+                    {
+                        "label_ar": "الرقم",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المورّد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "النوع",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الوقوع",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الجزاء",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "التعمّق",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            },
+            {
+                "table_index": 2,
+                "columns": [
+                    {
+                        "label_ar": "المورّد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "مخالفات مسجَّلة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "منها معتمَدة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "التعمّق",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": []
+    },
+    {
         "route": "Suppliers\/supplier_capacity.php",
         "tables": [
             {
@@ -79428,6 +81311,219 @@
                 "required": 0,
                 "readonly": 0,
                 "section": "قاعدةُ جزاءٍ بسقفها",
+                "is_system": 0,
+                "dup_count": 1
+            }
+        ]
+    },
+    {
+        "route": "Suppliers\/supplier_violations.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "الإجراء",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الرقم",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "المورّد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "النوع",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الوقوع",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الوصف",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الجزاء",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "رصدها",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "اعتمدها",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "الكيان",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "تاريخ الاعتماد",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    },
+                    {
+                        "label_ar": "العملة",
+                        "col_group": "",
+                        "th_class": "ems-gov-th none",
+                        "hidden_default": 0,
+                        "technical": null
+                    }
+                ]
+            }
+        ],
+        "form_fields": [
+            {
+                "name": "supplier_id",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "violation_kind",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "occurred_on",
+                "input_type": "date",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "description",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "evidence_ref",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "penalty_amount",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "currency",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "settlement_id",
+                "input_type": "number",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "approve_violation",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
+                "name": "waive_violation",
+                "input_type": "hidden",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "",
+                "is_system": 1,
+                "dup_count": 1
+            },
+            {
+                "name": "waive_reason",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 1,
+                "readonly": 0,
+                "section": "",
                 "is_system": 0,
                 "dup_count": 1
             }

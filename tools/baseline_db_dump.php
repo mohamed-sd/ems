@@ -79,11 +79,16 @@ dump_q($db, 'event_types', "SELECT event_type, COUNT(*) AS cnt, MIN(created_at) 
     FROM ems_business_events GROUP BY event_type ORDER BY cnt DESC", $OUT);
 
 /* بنية القاعدة: الجداول وأعمدتها وملكية company_id */
+/* ◆ صُحِّح (F-B04 · BL-20260822): كانت باستعلامَين مترابطَين لكل جدول فتعثّرت
+ *   أكثر من نصف ساعة عند 618 جدولًا. التجميع يعطي الناتج نفسه في ثوانٍ. */
 dump_q($db, 'db_tables', "SELECT t.TABLE_NAME, t.TABLE_TYPE, t.TABLE_ROWS,
-    (SELECT COUNT(*) FROM information_schema.COLUMNS c WHERE c.TABLE_SCHEMA=t.TABLE_SCHEMA AND c.TABLE_NAME=t.TABLE_NAME) AS col_count,
-    (SELECT COUNT(*) FROM information_schema.COLUMNS c WHERE c.TABLE_SCHEMA=t.TABLE_SCHEMA AND c.TABLE_NAME=t.TABLE_NAME AND c.COLUMN_NAME='company_id') AS has_company
+        COUNT(c.COLUMN_NAME) AS col_count,
+        SUM(c.COLUMN_NAME = 'company_id') AS has_company
     FROM information_schema.TABLES t
-    WHERE t.TABLE_SCHEMA=DATABASE()
+    LEFT JOIN information_schema.COLUMNS c
+           ON c.TABLE_SCHEMA = t.TABLE_SCHEMA AND c.TABLE_NAME = t.TABLE_NAME
+    WHERE t.TABLE_SCHEMA = DATABASE()
+    GROUP BY t.TABLE_NAME, t.TABLE_TYPE, t.TABLE_ROWS
     ORDER BY t.TABLE_NAME", $OUT);
 dump_q($db, 'db_fks', "SELECT TABLE_NAME, COLUMN_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME
     FROM information_schema.KEY_COLUMN_USAGE

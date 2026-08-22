@@ -444,6 +444,18 @@
         "stage_desc": null
     },
     {
+        "id": "4073",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r1",
+        "owner_role_id": "1",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9902",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "3982",
         "name": "أخرى — للمراجعة (د)",
         "group_code": "n9s99_others_r1_4",
@@ -528,6 +540,18 @@
         "stage_desc": null
     },
     {
+        "id": "4081",
+        "name": "المهام والاعتمادات",
+        "group_code": "n9t_align_r2_1",
+        "owner_role_id": "2",
+        "icon": "fa fa-layer-group",
+        "display_order": "101",
+        "stage_no": "1",
+        "stage_title": "المهام والاعتمادات",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "3437",
         "name": "السجل",
         "group_code": "n9s09_1_2_r2",
@@ -538,6 +562,18 @@
         "stage_title": "أولًا: نبدأ من المورد",
         "is_active": "1",
         "stage_desc": "نسجّل الموردَ وبياناتِه وحسابَه البنكيَّ قبلَ أيِّ عقد"
+    },
+    {
+        "id": "4082",
+        "name": "إدارة الموردين والتأهيل",
+        "group_code": "n9t_align_r2_2",
+        "owner_role_id": "2",
+        "icon": "fa fa-layer-group",
+        "display_order": "102",
+        "stage_no": "2",
+        "stage_title": "إدارة الموردين والتأهيل",
+        "is_active": "1",
+        "stage_desc": null
     },
     {
         "id": "3438",
@@ -552,6 +588,18 @@
         "stage_desc": "نسجّل الموردَ وبياناتِه وحسابَه البنكيَّ قبلَ أيِّ عقد"
     },
     {
+        "id": "4083",
+        "name": "الاحتياج والتعاقد",
+        "group_code": "n9t_align_r2_3",
+        "owner_role_id": "2",
+        "icon": "fa fa-layer-group",
+        "display_order": "103",
+        "stage_no": "3",
+        "stage_title": "الاحتياج والتعاقد",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "3439",
         "name": "الحسابات البنكية",
         "group_code": "n9s09_1_4_r2",
@@ -562,6 +610,42 @@
         "stage_title": "أولًا: نبدأ من المورد",
         "is_active": "1",
         "stage_desc": "نسجّل الموردَ وبياناتِه وحسابَه البنكيَّ قبلَ أيِّ عقد"
+    },
+    {
+        "id": "4084",
+        "name": "الحصص والتغطية والأداء",
+        "group_code": "n9t_align_r2_4",
+        "owner_role_id": "2",
+        "icon": "fa fa-layer-group",
+        "display_order": "104",
+        "stage_no": "4",
+        "stage_title": "الحصص والتغطية والأداء",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "4085",
+        "name": "الاستحقاقات والتسويات",
+        "group_code": "n9t_align_r2_5",
+        "owner_role_id": "2",
+        "icon": "fa fa-layer-group",
+        "display_order": "105",
+        "stage_no": "5",
+        "stage_title": "الاستحقاقات والتسويات",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "4086",
+        "name": "المرجعيات والحوكمة",
+        "group_code": "n9t_align_r2_6",
+        "owner_role_id": "2",
+        "icon": "fa fa-layer-group",
+        "display_order": "106",
+        "stage_no": "6",
+        "stage_title": "المرجعيات والحوكمة",
+        "is_active": "1",
+        "stage_desc": null
     },
     {
         "id": "3440",
@@ -932,6 +1016,18 @@
         "display_order": "9900",
         "stage_no": "99",
         "stage_title": "خارج الوثيقة — بانتظار قرار المالك",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "4074",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r2",
+        "owner_role_id": "2",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9901",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
         "is_active": "1",
         "stage_desc": null
     },
@@ -1724,6 +1820,18 @@
         "display_order": "9902",
         "stage_no": "99",
         "stage_title": "خارج الوثيقة — بانتظار قرار المالك",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "4075",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r4",
+        "owner_role_id": "4",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9902",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
         "is_active": "1",
         "stage_desc": null
     },
@@ -2868,6 +2976,18 @@
         "stage_desc": null
     },
     {
+        "id": "4076",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r8",
+        "owner_role_id": "8",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9901",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "3253",
         "name": "مساحتي الشخصية",
         "group_code": "n9s01_0_1_r9",
@@ -3840,6 +3960,18 @@
         "stage_desc": null
     },
     {
+        "id": "4087",
+        "name": "المهام والاعتمادات",
+        "group_code": "n9t_align_r12_1",
+        "owner_role_id": "12",
+        "icon": "fa fa-layer-group",
+        "display_order": "101",
+        "stage_no": "1",
+        "stage_title": "المهام والاعتمادات",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "3412",
         "name": "العملاء",
         "group_code": "n9s08_1_2_r12",
@@ -3850,6 +3982,18 @@
         "stage_title": "أولًا: نبدأ من العميل",
         "is_active": "1",
         "stage_desc": "نسجّل العميلَ ومشروعَه وموقعَه قبلَ أيِّ عقد"
+    },
+    {
+        "id": "4088",
+        "name": "إدارة العملاء والفرص",
+        "group_code": "n9t_align_r12_2",
+        "owner_role_id": "12",
+        "icon": "fa fa-layer-group",
+        "display_order": "102",
+        "stage_no": "2",
+        "stage_title": "إدارة العملاء والفرص",
+        "is_active": "1",
+        "stage_desc": null
     },
     {
         "id": "3413",
@@ -3864,6 +4008,18 @@
         "stage_desc": "نسجّل العميلَ ومشروعَه وموقعَه قبلَ أيِّ عقد"
     },
     {
+        "id": "4089",
+        "name": "العروض والتعاقد",
+        "group_code": "n9t_align_r12_3",
+        "owner_role_id": "12",
+        "icon": "fa fa-layer-group",
+        "display_order": "103",
+        "stage_no": "3",
+        "stage_title": "العروض والتعاقد",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "3414",
         "name": "المشاريع والمواقع",
         "group_code": "n9s08_1_4_r12",
@@ -3874,6 +4030,42 @@
         "stage_title": "أولًا: نبدأ من العميل",
         "is_active": "1",
         "stage_desc": "نسجّل العميلَ ومشروعَه وموقعَه قبلَ أيِّ عقد"
+    },
+    {
+        "id": "4090",
+        "name": "الأداء والمطالبات التجارية",
+        "group_code": "n9t_align_r12_4",
+        "owner_role_id": "12",
+        "icon": "fa fa-layer-group",
+        "display_order": "104",
+        "stage_no": "4",
+        "stage_title": "الأداء والمطالبات التجارية",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "4091",
+        "name": "البيانات المرجعية والتقارير",
+        "group_code": "n9t_align_r12_5",
+        "owner_role_id": "12",
+        "icon": "fa fa-layer-group",
+        "display_order": "105",
+        "stage_no": "5",
+        "stage_title": "البيانات المرجعية والتقارير",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "4092",
+        "name": "الحوكمة والضوابط",
+        "group_code": "n9t_align_r12_6",
+        "owner_role_id": "12",
+        "icon": "fa fa-layer-group",
+        "display_order": "106",
+        "stage_no": "6",
+        "stage_title": "الحوكمة والضوابط",
+        "is_active": "1",
+        "stage_desc": null
     },
     {
         "id": "3415",
@@ -4232,6 +4424,18 @@
         "display_order": "9902",
         "stage_no": "99",
         "stage_title": "خارج الوثيقة — بانتظار قرار المالك",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "4080",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r12",
+        "owner_role_id": "12",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9902",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
         "is_active": "1",
         "stage_desc": null
     },
@@ -5520,6 +5724,18 @@
         "stage_desc": null
     },
     {
+        "id": "4077",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r16",
+        "owner_role_id": "16",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9901",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "138",
         "name": "لوحة الإدارة",
         "group_code": "g1",
@@ -6156,6 +6372,18 @@
         "stage_desc": null
     },
     {
+        "id": "4066",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r17",
+        "owner_role_id": "17",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9901",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "3976",
         "name": "أخرى — للمراجعة (ج)",
         "group_code": "n9s99_others_r17_3",
@@ -6692,6 +6920,18 @@
         "display_order": "9900",
         "stage_no": "99",
         "stage_title": "خارج الوثيقة — بانتظار قرار المالك",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "4067",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r18",
+        "owner_role_id": "18",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9901",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
         "is_active": "1",
         "stage_desc": null
     },
@@ -7248,6 +7488,18 @@
         "stage_desc": null
     },
     {
+        "id": "4068",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r19",
+        "owner_role_id": "19",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9903",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "3686",
         "name": "مساحتي الشخصية",
         "group_code": "n9s13_0_1_r20",
@@ -7736,6 +7988,18 @@
         "display_order": "9900",
         "stage_no": "99",
         "stage_title": "خارج الوثيقة — بانتظار قرار المالك",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "4069",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r20",
+        "owner_role_id": "20",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9901",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
         "is_active": "1",
         "stage_desc": null
     },
@@ -8256,6 +8520,18 @@
         "stage_desc": null
     },
     {
+        "id": "4070",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r21",
+        "owner_role_id": "21",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9901",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "3756",
         "name": "مساحتي الشخصية",
         "group_code": "n9s13_0_1_r22",
@@ -8748,6 +9024,18 @@
         "stage_desc": null
     },
     {
+        "id": "4071",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r22",
+        "owner_role_id": "22",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9901",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "3371",
         "name": "مساحتي الشخصية",
         "group_code": "n9s05_0_1_r23",
@@ -8972,6 +9260,18 @@
         "display_order": "9900",
         "stage_no": "99",
         "stage_title": "خارج الوثيقة — بانتظار قرار المالك",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "4078",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r23",
+        "owner_role_id": "23",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9901",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
         "is_active": "1",
         "stage_desc": null
     },
@@ -9804,6 +10104,18 @@
         "stage_desc": null
     },
     {
+        "id": "4079",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r26",
+        "owner_role_id": "26",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9901",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
         "id": "3492",
         "name": "مساحتي الشخصية",
         "group_code": "n9s10_0_1_r27",
@@ -10124,6 +10436,18 @@
         "display_order": "9800",
         "stage_no": "98",
         "stage_title": "فريق العمل",
+        "is_active": "1",
+        "stage_desc": null
+    },
+    {
+        "id": "4072",
+        "name": "سلسلة الأثر — الاستحقاق والفوترة والصرف",
+        "group_code": "n9c_chain_r27",
+        "owner_role_id": "27",
+        "icon": "fa fa-diagram-project",
+        "display_order": "9801",
+        "stage_no": "9",
+        "stage_title": "سلسلة الأثر — من الوحدة المعتمدة إلى القبض والصرف",
         "is_active": "1",
         "stage_desc": null
     },

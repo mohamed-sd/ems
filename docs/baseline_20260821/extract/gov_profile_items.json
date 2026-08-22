@@ -6168,6 +6168,42 @@
         "seeded_from": "role_permissions:22"
     },
     {
+        "item_id": "3736",
+        "company_id": "0",
+        "profile_id": "38",
+        "item_kind": "screen",
+        "item_ref": "Finance\/ar_accrual_gen.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
+        "item_id": "3744",
+        "company_id": "0",
+        "profile_id": "38",
+        "item_kind": "screen",
+        "item_ref": "Finance\/ar_claim_invoice.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
+        "item_id": "3740",
+        "company_id": "0",
+        "profile_id": "38",
+        "item_kind": "screen",
+        "item_ref": "Finance\/ar_completion_cert.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
         "item_id": "3347",
         "company_id": "0",
         "profile_id": "38",
@@ -6598,6 +6634,42 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:22"
+    },
+    {
+        "item_id": "3754",
+        "company_id": "0",
+        "profile_id": "38",
+        "item_kind": "screen",
+        "item_ref": "Finance\/tre_beneficiary.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
+        "item_id": "3764",
+        "company_id": "0",
+        "profile_id": "38",
+        "item_kind": "screen",
+        "item_ref": "Finance\/tre_pay_batch.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
+        "item_id": "3732",
+        "company_id": "0",
+        "profile_id": "38",
+        "item_kind": "screen",
+        "item_ref": "Finance\/unit_fin_final.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
     },
     {
         "item_id": "3351",
@@ -7032,6 +7104,18 @@
         "seeded_from": "role_permissions:22"
     },
     {
+        "item_id": "3828",
+        "company_id": "0",
+        "profile_id": "38",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_violations.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
+    },
+    {
         "item_id": "3402",
         "company_id": "0",
         "profile_id": "38",
@@ -7390,6 +7474,42 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:18"
+    },
+    {
+        "item_id": "3733",
+        "company_id": "0",
+        "profile_id": "39",
+        "item_kind": "screen",
+        "item_ref": "Finance\/ar_accrual_gen.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
+        "item_id": "3741",
+        "company_id": "0",
+        "profile_id": "39",
+        "item_kind": "screen",
+        "item_ref": "Finance\/ar_claim_invoice.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
+        "item_id": "3737",
+        "company_id": "0",
+        "profile_id": "39",
+        "item_kind": "screen",
+        "item_ref": "Finance\/ar_completion_cert.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
     },
     {
         "item_id": "654",
@@ -7836,6 +7956,18 @@
         "seeded_from": "role_permissions:18"
     },
     {
+        "item_id": "3745",
+        "company_id": "0",
+        "profile_id": "39",
+        "item_kind": "screen",
+        "item_ref": "Finance\/tre_beneficiary.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
         "item_id": "3615",
         "company_id": "0",
         "profile_id": "39",
@@ -7848,6 +7980,18 @@
         "seeded_from": "role_permissions:21"
     },
     {
+        "item_id": "3755",
+        "company_id": "0",
+        "profile_id": "39",
+        "item_kind": "screen",
+        "item_ref": "Finance\/tre_pay_batch.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
         "item_id": "3616",
         "company_id": "0",
         "profile_id": "39",
@@ -7858,6 +8002,18 @@
         "can_edit": "1",
         "can_delete": "0",
         "seeded_from": "role_permissions:21"
+    },
+    {
+        "item_id": "3729",
+        "company_id": "0",
+        "profile_id": "39",
+        "item_kind": "screen",
+        "item_ref": "Finance\/unit_fin_final.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
     },
     {
         "item_id": "658",
@@ -8314,6 +8470,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:18"
+    },
+    {
+        "item_id": "3823",
+        "company_id": "0",
+        "profile_id": "39",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_violations.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
         "item_id": "712",
@@ -9132,6 +9300,42 @@
         "seeded_from": "role_permissions:19"
     },
     {
+        "item_id": "3734",
+        "company_id": "0",
+        "profile_id": "43",
+        "item_kind": "screen",
+        "item_ref": "Finance\/ar_accrual_gen.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
+        "item_id": "3742",
+        "company_id": "0",
+        "profile_id": "43",
+        "item_kind": "screen",
+        "item_ref": "Finance\/ar_claim_invoice.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
+        "item_id": "3738",
+        "company_id": "0",
+        "profile_id": "43",
+        "item_kind": "screen",
+        "item_ref": "Finance\/ar_completion_cert.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
         "item_id": "918",
         "company_id": "0",
         "profile_id": "43",
@@ -9706,6 +9910,42 @@
         "can_edit": "1",
         "can_delete": "0",
         "seeded_from": "role_permissions:19"
+    },
+    {
+        "item_id": "3746",
+        "company_id": "0",
+        "profile_id": "43",
+        "item_kind": "screen",
+        "item_ref": "Finance\/tre_beneficiary.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
+        "item_id": "3756",
+        "company_id": "0",
+        "profile_id": "43",
+        "item_kind": "screen",
+        "item_ref": "Finance\/tre_pay_batch.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
+        "item_id": "3730",
+        "company_id": "0",
+        "profile_id": "43",
+        "item_kind": "screen",
+        "item_ref": "Finance\/unit_fin_final.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
     },
     {
         "item_id": "816",
@@ -10438,6 +10678,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:17"
+    },
+    {
+        "item_id": "3824",
+        "company_id": "0",
+        "profile_id": "43",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_violations.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "1",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
         "item_id": "3479",
@@ -11772,6 +12024,18 @@
         "seeded_from": "role_permissions:4"
     },
     {
+        "item_id": "3829",
+        "company_id": "0",
+        "profile_id": "52",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_board.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
+    },
+    {
         "item_id": "1042",
         "company_id": "0",
         "profile_id": "52",
@@ -12382,6 +12646,30 @@
         "can_edit": "1",
         "can_delete": "1",
         "seeded_from": "role_permissions:12"
+    },
+    {
+        "item_id": "3821",
+        "company_id": "0",
+        "profile_id": "61",
+        "item_kind": "screen",
+        "item_ref": "Clients\/quotation_lines.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
+    },
+    {
+        "item_id": "3822",
+        "company_id": "0",
+        "profile_id": "61",
+        "item_kind": "screen",
+        "item_ref": "Clients\/quotation_negotiation.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
         "item_id": "1093",
@@ -13260,6 +13548,18 @@
         "seeded_from": "role_permissions:12"
     },
     {
+        "item_id": "3765",
+        "company_id": "0",
+        "profile_id": "61",
+        "item_kind": "screen",
+        "item_ref": "Operations\/unit_correction.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
         "item_id": "1159",
         "company_id": "0",
         "profile_id": "61",
@@ -13270,6 +13570,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:12"
+    },
+    {
+        "item_id": "3820",
+        "company_id": "0",
+        "profile_id": "61",
+        "item_kind": "screen",
+        "item_ref": "Opportunities\/client_need_rfq.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
         "item_id": "1089",
@@ -13702,6 +14014,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:12"
+    },
+    {
+        "item_id": "3830",
+        "company_id": "0",
+        "profile_id": "61",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_board.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
         "item_id": "1184",
@@ -15180,6 +15504,18 @@
         "seeded_from": "role_permissions:8"
     },
     {
+        "item_id": "3766",
+        "company_id": "0",
+        "profile_id": "76",
+        "item_kind": "screen",
+        "item_ref": "Operations\/unit_correction.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
         "item_id": "1446",
         "company_id": "0",
         "profile_id": "76",
@@ -15660,6 +15996,18 @@
         "seeded_from": "role_permissions:8"
     },
     {
+        "item_id": "3831",
+        "company_id": "0",
+        "profile_id": "76",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_board.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
+    },
+    {
         "item_id": "1419",
         "company_id": "0",
         "profile_id": "76",
@@ -15718,6 +16066,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:8"
+    },
+    {
+        "item_id": "3825",
+        "company_id": "0",
+        "profile_id": "76",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_violations.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
         "item_id": "1474",
@@ -16536,6 +16896,18 @@
         "seeded_from": "role_permissions:2"
     },
     {
+        "item_id": "3767",
+        "company_id": "0",
+        "profile_id": "79",
+        "item_kind": "screen",
+        "item_ref": "Operations\/unit_correction.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
+    },
+    {
         "item_id": "1579",
         "company_id": "0",
         "profile_id": "79",
@@ -17040,6 +17412,18 @@
         "seeded_from": "role_permissions:2"
     },
     {
+        "item_id": "3832",
+        "company_id": "0",
+        "profile_id": "79",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_board.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
+    },
+    {
         "item_id": "1548",
         "company_id": "0",
         "profile_id": "79",
@@ -17122,6 +17506,18 @@
         "can_edit": "1",
         "can_delete": "0",
         "seeded_from": "role_permissions:2"
+    },
+    {
+        "item_id": "3826",
+        "company_id": "0",
+        "profile_id": "79",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_violations.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
         "item_id": "1608",
@@ -18322,6 +18718,18 @@
         "can_edit": "1",
         "can_delete": "1",
         "seeded_from": "role_permissions:11"
+    },
+    {
+        "item_id": "3833",
+        "company_id": "0",
+        "profile_id": "83",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_board.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
         "item_id": "1718",
@@ -20422,6 +20830,18 @@
         "can_edit": "1",
         "can_delete": "1",
         "seeded_from": "role_permissions:3"
+    },
+    {
+        "item_id": "3834",
+        "company_id": "0",
+        "profile_id": "88",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_board.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
         "item_id": "1982",
@@ -22810,6 +23230,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:1"
+    },
+    {
+        "item_id": "3768",
+        "company_id": "0",
+        "profile_id": "97",
+        "item_kind": "screen",
+        "item_ref": "Operations\/unit_correction.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "0",
+        "seeded_from": "INJ-CHAIN-CLOSE-01"
     },
     {
         "item_id": "2243",
@@ -25764,6 +26196,18 @@
         "seeded_from": "role_permissions:16"
     },
     {
+        "item_id": "3835",
+        "company_id": "0",
+        "profile_id": "115",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_board.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
+    },
+    {
         "item_id": "2652",
         "company_id": "0",
         "profile_id": "115",
@@ -27634,6 +28078,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:27"
+    },
+    {
+        "item_id": "3827",
+        "company_id": "0",
+        "profile_id": "142",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_violations.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
         "item_id": "2813",
@@ -29854,6 +30310,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:6"
+    },
+    {
+        "item_id": "3836",
+        "company_id": "0",
+        "profile_id": "160",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_board.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
         "item_id": "3077",
