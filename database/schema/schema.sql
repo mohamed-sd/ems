@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 10:00:21
+-- المصدر: equipation_manage · التوليد: 2026-08-22 13:56:58
 -- الجداول: 642 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -6540,16 +6540,15 @@ CREATE TABLE `gov_data_classes` (
 
 -- ── Table: gov_dead_letter_rulings ──
 CREATE TABLE `gov_dead_letter_rulings` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `fail_code` varchar(32) NOT NULL,
-  `messages` int(10) unsigned NOT NULL,
-  `ruling` varchar(32) NOT NULL COMMENT 'UNDELIVERABLE_BY_DESIGN | RETRY | INVESTIGATE',
+  `job_id` bigint(20) NOT NULL,
+  `job_type` varchar(64) NOT NULL,
+  `ruling` varchar(32) NOT NULL COMMENT 'TEST_POLLUTION · RETRY · DROP · NEEDS_GOVERNING_SOURCE',
   `owner_role` varchar(64) NOT NULL,
   `reason` varchar(400) NOT NULL,
-  `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_fail` (`fail_code`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GAP-32 — قرارٌ ومالكٌ وسببٌ لكلِّ صنفِ رسالةٍ ميتة';
+  `evidence` varchar(300) NOT NULL,
+  `ruled_at` datetime NOT NULL,
+  PRIMARY KEY (`job_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FR-EVT-007 — لا رسالةَ ميتةً بلا قرارٍ ومالكٍ وسبب';
 
 -- ── Table: gov_delegation_state ──
 CREATE TABLE `gov_delegation_state` (
