@@ -1,7 +1,7 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 17:02:08
+-- المصدر: equipation_manage · التوليد: 2026-08-22 17:08:36
 -- الجداول: 646 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
@@ -5359,6 +5359,7 @@ CREATE TABLE `fin_payments` (
   `created_by` int(11) DEFAULT NULL,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `sod_state` varchar(16) NOT NULL DEFAULT 'ENFORCED' COMMENT 'ENFORCED · PRE_SOD — فصلُ الواجبات (FR-FIN-007)',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_fin_pay_no` (`company_id`,`payment_no`),
   UNIQUE KEY `uq_collection_ref` (`company_id`,`bank_ref`,`amount`,`received_on`),
@@ -5367,7 +5368,8 @@ CREATE TABLE `fin_payments` (
   KEY `ix_fin_pay_deleted` (`is_deleted`),
   CONSTRAINT `ck_pay_fx_pair` CHECK (`fx_rate` is null and `base_amount` is null or `fx_rate` is not null and `base_amount` = round(`amount` * `fx_rate`,2)),
   CONSTRAINT `ck_fp_allocated` CHECK (`allocated_amount` >= 0 and `allocated_amount` <= `amount`),
-  CONSTRAINT `ck_collection_bank_ref` CHECK (`direction` <> 'collection' or `bank_ref` is not null and `bank_ref` <> '')
+  CONSTRAINT `ck_collection_bank_ref` CHECK (`direction` <> 'collection' or `bank_ref` is not null and `bank_ref` <> ''),
+  CONSTRAINT `chk_payment_two_hands` CHECK (`sod_state` = 'PRE_SOD' or `executed_by` is null or `executed_by` = 0 or `created_by` is null or `executed_by` <> `created_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: fin_posting_matrix ──
