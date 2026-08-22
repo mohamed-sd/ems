@@ -137,6 +137,45 @@ if ($seedSet) {
     file_put_contents($seedBasePath, json_encode($seedNow, JSON_PRETTY_PRINT));
 }
 
+/* ═══ NF-30 · حياةُ الأعمدةِ المُعلَنة — لا وجودُ الصفِّ وحدَه ═══════════════
+ * ◆ **الكشفُ الذي أوجبه**: «فحصُ التسليم يمرّر السجلَّ الموحدَ بمئةٍ بالمئة
+ *   بينما **عمودا الاسمِ القانونيِّ والتوليدِ فيه ميتان بالكامل** — الفحصُ
+ *   يغطي وجودَ الصفِّ لا حياةَ أعمدتِه».
+ * ◆ **وحياةُ العمودِ تُقاس بالمعمور لا بالوجود**: عمودٌ موجودٌ وكلُّ قيمِه
+ *   فارغةٌ **عمودٌ ميت** — والصفُّ يمرُّ وهو أجوف. */
+echo "\n═══ NF-30 · حياةُ الأعمدةِ المُعلَنة ═══\n";
+/* ◆ **والعمودُ المُعلَنُ غيرُ الموجودِ رسوبٌ لا انفجار**: أوّلُ كتابةٍ سألت عن
+ *   عمودٍ افترضتُه (`admin_companies.legal_name`) فلم يوجد **فانفجر الفاحصُ
+ *   ولم يحكم** — وفاحصٌ ينفجر لا يقول شيئًا. ⇒ يُتحقَّق من وجودِ العمودِ أوّلًا،
+ *   وغيابُه يُعلَن رسوبًا باسمِه. */
+$colExists = function ($c, $tbl, $col) {
+    $st = $c->prepare("SELECT COUNT(*) FROM information_schema.COLUMNS
+                        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?");
+    if (!$st) { return false; }
+    $st->bind_param('ss', $tbl, $col);
+    $st->execute(); $st->bind_result($n); $st->fetch(); $st->close();
+    return (int) $n === 1;
+};
+foreach (array(
+    'admin_companies' => array('company_name'),
+    'roles'           => array('name'),
+    'modules'         => array('code', 'name'),
+    'nav_items'       => array('label_ar', 'route'),
+) as $tbl => $columns) {
+    foreach ($columns as $col) {
+        if (!$colExists($c, $tbl, $col)) {
+            t(false, "عمودٌ حيٌّ {$tbl}.{$col}", '**عمودٌ مُعلَنٌ لا وجودَ له**');
+            continue;
+        }
+        $tot  = scalarOf($c, "SELECT COUNT(*) FROM `{$tbl}`");
+        $live = scalarOf($c, "SELECT COUNT(*) FROM `{$tbl}`
+                               WHERE `{$col}` IS NOT NULL AND TRIM(`{$col}`) <> ''");
+        t($tot === 0 || $live > 0, "عمودٌ حيٌّ {$tbl}.{$col}",
+          $tot === 0 ? 'الجدولُ فارغٌ — خارجَ الحكم'
+                     : "{$live}/{$tot} معمورًا" . ($live === 0 ? ' — **عمودٌ ميت**' : ''));
+    }
+}
+
 echo "\n═══ ④ ما يجب أن يبقى فارغًا ═══\n";
 // تسرُّبُ بياناتِ المصدر إلى تنصيبٍ جديدٍ عطبٌ صامت — يُقاس صراحةً.
 foreach (array('ems_sequences', 'contracts', 'equipments', 'timesheet',
