@@ -45,6 +45,15 @@ function chk($c, $l, $d = '') {
 }
 function n(mysqli $d, $q) { $r = @$d->query($q); return $r ? (int) $r->fetch_row()[0] : -1; }
 
+/* ◆ **مُنتقي المطلبِ `--req=`** — شاهدٌ واحدٌ يخدم مطلبَين بحالتَين مختلفتَين
+ *   يبقى أحمرَ بسببِ المفتوحِ منهما، **فلا يُتحقَّق المُغلَقُ أبدًا ويُقرأ
+ *   ارتدادًا**. وعلاجُه **حكمٌ لكلِّ مطلبٍ على حدة** لا تخفيفُ الحزام.
+ *   وبلا مُنتقٍ يُقاس الكلُّ كما كان. */
+$__req = '';
+foreach ($argv as $__a) { if (strpos($__a, '--req=') === 0) { $__req = substr($__a, 6); } }
+function req_on($want) { global $__req; return $__req === '' || $__req === $want; }
+
+
 $neg = in_array('--negative', $argv, true);
 echo "══ FR-APP-003 · FR-APP-005 — رمزٌ واحد · ولا نوعَ بلا سلّم ══\n";
 
@@ -102,6 +111,7 @@ chk(empty($noCode),
     empty($noCode) ? 'صفرٌ' : count($noCode) . ': ' . implode(' · ', array_slice($noCode, 0, 4)));
 
 /* ── ④ FR-APP-005 — كلُّ نوعِ كيانٍ حيٍّ له سلّم ─────────────────────────── */
+if (req_on('FR-APP-005')) {
 echo "\n── ④ الأنواعُ الحيّةُ وسلاليمُها ──\n";
 $ladders = array();
 /* ◆ **عمودٌ باسمٍ مُخمَّنٍ يُخرج صفرًا فيُتَّهم البريء**: قرأتُ
@@ -173,6 +183,8 @@ if ($neg) {
     @unlink($belt);
     clearstatcache();
     chk(!is_file($belt), 'وكُنس الحزامُ أثرَه');
+}
+
 }
 
 echo "\n" . str_repeat('─', 66) . "\n";
