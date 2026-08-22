@@ -1,0 +1,15 @@
+{
+    "roles": 35,
+    "modules": 502,
+    "role_permissions": 3102,
+    "link_groups": 1292,
+    "nav_items": 1802,
+    "equipments_types": 30,
+    "failure_codes": 402,
+    "tenant:fin_chart_of_accounts": 298,
+    "tenant:fin_approval_matrix": 20,
+    "tenant:fin_effect_map": 11,
+    "tenant:job_titles": 23,
+    "tenant:employee_roles": 20,
+    "tenant:transfer_types": 20
+}

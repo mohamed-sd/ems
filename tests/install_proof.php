@@ -86,23 +86,55 @@ $role = $c->query('SELECT id, name FROM roles WHERE id = ' . intval($user['role'
 t($role !== null, 'الدورُ معرَّفٌ في roles', $role ? "{$role['id']} — {$role['name']}" : 'مفقود');
 
 echo "\n═══ ② البذرةُ العالمية ═══\n";
-foreach (array(
-    'roles' => 25, 'modules' => 208, 'role_permissions' => 1008, 'link_groups' => 16,
-    'nav_items' => 613, 'equipments_types' => 3, 'failure_codes' => 402,
-) as $tbl => $n) {
+/* ◆ **العددُ المجمَّدُ يتعفَّن، والسقّاطةُ لا**: كانت التوقّعاتُ حروفًا مكتوبةً
+ *   هنا (roles=25 · modules=208 · nav_items=613)، ونمت البذرةُ نموًّا مشروعًا
+ *   فصار الشاهدُ يرسُب على **نجاحِ التثبيتِ نفسِه** — أحدَ عشرَ رسوبًا كلُّها في
+ *   المقياسِ لا في المُثبِّت. ⇒ يُقاس بأساسٍ مُسجَّلٍ يتحرّك **بقرارٍ صريح**
+ *   (`--set`) لا صمتًا، كسقّاطةِ الدَّين: **النقصُ رسوبٌ دائمًا** فبذرةٌ ناقصةٌ
+ *   تُمسَك، والنموُّ يُعلَن ويُعتمَد بيدٍ لا بتعفُّن. */
+$seedBasePath = dirname(__DIR__) . '/docs/install_seed_baseline.json';
+$seedBase = is_file($seedBasePath)
+    ? (array) json_decode((string) file_get_contents($seedBasePath), true) : array();
+$seedSet = in_array('--set', $argv, true);
+$seedNow = array();
+foreach (array('roles', 'modules', 'role_permissions', 'link_groups',
+               'nav_items', 'equipments_types', 'failure_codes') as $tbl) {
     $got = scalarOf($c, "SELECT COUNT(*) FROM `{$tbl}`");
-    t($got === $n, "الجدول {$tbl}", "{$got} / {$n}");
+    $seedNow[$tbl] = $got;
+    if ($seedSet) { echo "  · {$tbl} = {$got}\n"; continue; }
+    if (!array_key_exists($tbl, $seedBase)) {
+        t(false, "الجدول {$tbl}", "{$got} صفًّا · **بلا أساسٍ مسجَّل** — يُسجَّل بـ--set بقرار");
+        continue;
+    }
+    $exp = (int) $seedBase[$tbl];
+    t($got >= $exp, "الجدول {$tbl}", $got === $exp ? "{$got}"
+        : ($got > $exp ? "{$got} · نما عن الأساس {$exp} (+" . ($got - $exp) . ") — يُعتمَد بـ--set"
+                       : "**{$got} < الأساس {$exp}** — بذرةٌ ناقصة"));
+}
+if ($seedSet) {
+    file_put_contents($seedBasePath, json_encode($seedNow, JSON_PRETTY_PRINT));
+    echo "  ✔ سُجِّل أساسُ البذرةِ في docs/install_seed_baseline.json\n";
 }
 
 echo "\n═══ ③ البذرةُ المستأجَرة — company_id مُحقَن ═══\n";
 $cid = intval($user['company_id']);
-foreach (array(
-    'fin_chart_of_accounts' => 16, 'fin_approval_matrix' => 4, 'fin_effect_map' => 11,
-    'job_titles' => 16, 'employee_roles' => 9, 'transfer_types' => 6,
-) as $tbl => $n) {
+/* ◆ **والحكمُ هنا على الإسنادِ لا على العدد**: الخطرُ الذي يقيسه هذا القسمُ
+ *   هو **تسرُّبُ صفٍّ لا يحمل شركةَ التثبيت** — صفرُ صفٍّ يتيمٍ وصفرُ صفٍّ
+ *   لشركةٍ أخرى. أما كم صفًّا بذرَ دليلُ الحساباتِ فينمو مشروعًا، وتجميدُه
+ *   جعل الشاهدَ يرسُب على بذرةٍ أغنى — **والغنى ليس عطبًا**. */
+foreach (array('fin_chart_of_accounts', 'fin_approval_matrix', 'fin_effect_map',
+               'job_titles', 'employee_roles', 'transfer_types') as $tbl) {
     $got  = scalarOf($c, "SELECT COUNT(*) FROM `{$tbl}`");
     $mine = scalarOf($c, "SELECT COUNT(*) FROM `{$tbl}` WHERE company_id = {$cid}");
-    t($got === $n && $mine === $n, "الجدول {$tbl}", "{$got} صفًّا · {$mine} بـcompany_id={$cid}");
+    $seedNow['tenant:' . $tbl] = $got;
+    $exp  = isset($seedBase['tenant:' . $tbl]) ? (int) $seedBase['tenant:' . $tbl] : null;
+    $ok   = ($got > 0 && $mine === $got && ($exp === null || $got >= $exp));
+    t($ok, "الجدول {$tbl}", "{$got} صفًّا · {$mine} بـcompany_id={$cid}"
+        . ($exp !== null && $got < $exp ? " · **دون الأساس {$exp}**" : '')
+        . ($mine !== $got ? ' · **صفوفٌ لا تحمل شركةَ التثبيت: ' . ($got - $mine) . '**' : ''));
+}
+if ($seedSet) {
+    file_put_contents($seedBasePath, json_encode($seedNow, JSON_PRETTY_PRINT));
 }
 
 echo "\n═══ ④ ما يجب أن يبقى فارغًا ═══\n";
