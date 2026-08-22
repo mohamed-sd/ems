@@ -419,7 +419,11 @@ function act_entity_label($type, $map)
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     // ح-09 · نموذج + تصدير + استيراد (الإطار الموحّد)
     foreach (ems_excel_header_actions('activities', 'الأنشطة التجارية', $can_add) as $__xl) { $header_actions[] = $__xl; }
-    include('../includes/page_header.php');
+    
+/* شريطُ تبويباتِ العائلة — قرارُ وثيقةِ المواءمة (مكوّنٌ مركزيّ) */
+$sft_family = 'opportunity'; $sft_active = 'activities';
+include __DIR__ . '/../includes/sales_family_tabs.php';
+include('../includes/page_header.php');
     // UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
     echo ems_states_bundle('لا أنشطةَ تجاريةً مسجَّلةً بعدُ', 'سجّل أولَ نشاطٍ تجاريٍّ بزرِّ «إضافة» في رأسِ الشاشة');
     ?>

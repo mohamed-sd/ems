@@ -235,6 +235,11 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
+
+/* شريطُ تبويباتِ العائلة — قرارُ وثيقةِ المواءمة (مكوّنٌ مركزيّ) */
+$sft_family = 'reference'; $sft_active = 'ratebooks';
+include __DIR__ . '/../includes/sales_family_tabs.php';
+
 ?>
 <style>
 /* UXW-01 ②: أنماطُ الشاشةِ الثابتةُ نُقلت من سماتِ style الموضعيةِ إلى أصنافٍ ببادئةِ rb- */

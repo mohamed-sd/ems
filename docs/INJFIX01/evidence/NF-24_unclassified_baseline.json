@@ -1,7 +1,7 @@
 {
     "gap": "GAP-22 · NF-24",
     "meaning": "مساراتٌ نشطةٌ في التنقّلِ بلا صفٍّ في gov_space_appearances ⇒ مفتوحةٌ افتراضًا",
-    "count": 13,
+    "count": 12,
     "routes": [
         "admin_close.php",
         "asset_hours_link.php",
@@ -14,7 +14,6 @@
         "ticket_sla_config.php",
         "ticket_types_config.php",
         "user_profile.php",
-        "view_timesheet.php",
         "watchtower.php"
     ]
 }

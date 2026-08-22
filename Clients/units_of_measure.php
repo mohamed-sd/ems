@@ -302,7 +302,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     }
     $header_actions[] = array('id' => 'toggleStats', 'class' => 'btn', 'title' => 'إظهار أو إخفاء الإحصائيات', 'icon' => 'fas fa-eye', 'label' => 'إظهار الإحصائيات', 'label_class' => 'uom-toggle-stats-text');
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
-    include('../includes/page_header.php');
+    
+/* شريطُ تبويباتِ العائلة — قرارُ وثيقةِ المواءمة (مكوّنٌ مركزيّ) */
+$sft_family = 'reference'; $sft_active = 'uom';
+include __DIR__ . '/../includes/sales_family_tabs.php';
+include('../includes/page_header.php');
     ?>
 
     <?php if (!empty($_GET['msg'])):

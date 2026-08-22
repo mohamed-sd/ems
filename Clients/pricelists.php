@@ -349,7 +349,11 @@ function pl_revenue_label($model, $map)
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fa-solid fa-share', 'label' => '');
     // ح-09 · نموذج + تصدير + استيراد (الإطار الموحّد)
     foreach (ems_excel_header_actions('pricelists', 'قوائم التسعير', $can_add) as $__xl) { $header_actions[] = $__xl; }
-    include('../includes/page_header.php');
+    
+/* شريطُ تبويباتِ العائلة — قرارُ وثيقةِ المواءمة (مكوّنٌ مركزيّ) */
+$sft_family = 'reference'; $sft_active = 'pricelists';
+include __DIR__ . '/../includes/sales_family_tabs.php';
+include('../includes/page_header.php');
     ?>
 
     <?php if (!empty($_GET['msg'])):

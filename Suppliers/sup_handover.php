@@ -103,7 +103,11 @@ if (isset($conn)) { ems_screen_about_auto($conn); }
   }
   $header_back = array('href' => 'shares_coverage.php', 'class' => '',
                        'icon' => 'fas fa-arrow-right', 'label' => 'حصصُ الموردين والتغطية');
-  include __DIR__ . '/../includes/page_header.php';
+  
+/* شريطُ تبويباتِ العائلة — قرارُ وثيقةِ المواءمة (مكوّنٌ مركزيّ) */
+$sft_family = 'capacity'; $sft_active = 'handover';
+include __DIR__ . '/../includes/sales_family_tabs.php';
+include __DIR__ . '/../includes/page_header.php';
 
   echo ems_next_step('تسجيلُ التسليمِ بمستندِه وتاريخِ سريانِه — والحصةُ تنتقل بين الحاويتين فورَ الحفظ');
   echo ems_states_bundle('لا تسليماتِ حصصٍ مسجَّلةً بعد', 'سجّلِ التسليمَ بمستندِه وتاريخِه فيظهر أثرُه هنا');

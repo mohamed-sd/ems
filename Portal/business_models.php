@@ -119,6 +119,11 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(isset($perms) ? $perms : (isset($permissions) ? $permissions : null));
 include '../inheader.php';
 include '../insidebar.php';
+
+/* شريطُ تبويباتِ العائلة — قرارُ وثيقةِ المواءمة (مكوّنٌ مركزيّ) */
+$sft_family = 'reference'; $sft_active = 'models';
+include __DIR__ . '/../includes/sales_family_tabs.php';
+
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>

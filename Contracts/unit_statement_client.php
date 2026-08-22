@@ -31,6 +31,10 @@ $st->close();
 $page_title = 'إيكوبيشن | كشفُ وحداتِ العميل';
 include __DIR__ . '/../inheader.php';
 include __DIR__ . '/../insidebar.php';
+/* شريطُ تبويباتِ العائلة — قرارُ وثيقةِ المواءمة (مكوّنٌ مركزيّ) */
+$sft_family = 'claim'; $sft_active = 'perf';
+include __DIR__ . '/../includes/sales_family_tabs.php';
+
 require_once __DIR__ . '/../includes/screen_contract.php';
 if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>

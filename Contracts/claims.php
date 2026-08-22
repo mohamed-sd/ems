@@ -315,7 +315,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
         $header_actions[] = array('id' => 'toggleForm', 'class' => 'add-btn', 'icon' => 'fas fa-plus-circle', 'label' => 'توليد مستخلص');
     }
     $header_back = array('href' => '../main/dashboard.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'رجوع');
-    include('../includes/page_header.php');
+    
+/* شريطُ تبويباتِ العائلة — قرارُ وثيقةِ المواءمة (مكوّنٌ مركزيّ) */
+$sft_family = 'claim'; $sft_active = 'claim';
+include __DIR__ . '/../includes/sales_family_tabs.php';
+include('../includes/page_header.php');
     // TKT-15 · زر الإبلاغ السياقي — المستخلص والفاتورة (§2-⑦)
     require_once __DIR__ . '/../includes/report_button.php';
     ems_report_button(array('screen' => 'claims', 'contract_id' => $contract_id ?? null));

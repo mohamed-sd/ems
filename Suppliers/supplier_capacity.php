@@ -121,6 +121,11 @@ require_once __DIR__ . '/../includes/screen_contract.php';
 ems_shell_axes(null);
 include '../inheader.php';
 include '../insidebar.php';
+
+/* شريطُ تبويباتِ العائلة — قرارُ وثيقةِ المواءمة (مكوّنٌ مركزيّ) */
+$sft_family = 'capacity'; $sft_active = 'capacity';
+include __DIR__ . '/../includes/sales_family_tabs.php';
+
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 // NAV-01 §8 (update0006-b): الشاشةُ قسمٌ من ملف المورد الأم
 $sf_supplier_id = intval($_GET['supplier_id'] ?? $_GET['id'] ?? 0); $sf_active = 'capacity';

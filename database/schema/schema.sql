@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 01:53:55
--- الجداول: 631 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-22 03:07:20
+-- الجداول: 635 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6908,6 +6908,18 @@ CREATE TABLE `gov_key_pollution_archive` (
   KEY `ix_kpa_src` (`src_table`,`src_column`,`src_row_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: gov_label_unified_log ──
+CREATE TABLE `gov_label_unified_log` (
+  `nav_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `route` varchar(160) NOT NULL,
+  `label_before` varchar(120) NOT NULL,
+  `label_after` varchar(120) NOT NULL,
+  `basis` varchar(160) NOT NULL,
+  `at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`nav_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='توحيدُ الاسمِ الظاهرِ على الكنسيّ — بالاسمِ السابقِ لكلِّ صفّ';
+
 -- ── Table: gov_ladder_actor_roles ──
 CREATE TABLE `gov_ladder_actor_roles` (
   `actor_code` varchar(40) NOT NULL,
@@ -7014,6 +7026,23 @@ CREATE TABLE `gov_migration_ledger` (
   KEY `ix_sev` (`severity`),
   KEY `ix_state` (`migration_state`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='سجلُّ الترحيلِ — 663 موضعًا بأعمدةِ الدفترِ التسعةَ عشرَ وحالةٍ مقيسة';
+
+-- ── Table: gov_nav_hidden_log ──
+CREATE TABLE `gov_nav_hidden_log` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `role_id` int(11) NOT NULL,
+  `nav_id` int(11) NOT NULL,
+  `route` varchar(160) NOT NULL,
+  `label_ar` varchar(120) NOT NULL,
+  `group_before` int(11) DEFAULT NULL,
+  `sort_before` int(11) DEFAULT NULL,
+  `doc_code` varchar(24) NOT NULL,
+  `reachable` varchar(40) NOT NULL COMMENT 'TAB_IN_PARENT | ACTIVE_FOR_OTHER_ROLE | OWNED_ELSEWHERE',
+  `hidden_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_hidden` (`nav_id`),
+  KEY `ix_hidden_role` (`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='ما أُخفي من التنقّلِ بموضعِه السابق — الرجوعُ يعيده حرفًا';
 
 -- ── Table: gov_nav_reference_standard ──
 CREATE TABLE `gov_nav_reference_standard` (
@@ -7149,6 +7178,16 @@ CREATE TABLE `gov_profile_items` (
   KEY `ix_profile` (`profile_id`),
   CONSTRAINT `fk_pi_profile` FOREIGN KEY (`profile_id`) REFERENCES `gov_role_profiles` (`profile_id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-AUTH-01 §5-1 — بنودُ القالبِ الستة';
+
+-- ── Table: gov_redirect_repoint_log ──
+CREATE TABLE `gov_redirect_repoint_log` (
+  `old_route` varchar(128) NOT NULL,
+  `heir_before` varchar(128) NOT NULL,
+  `heir_after` varchar(128) NOT NULL,
+  `basis` varchar(255) NOT NULL,
+  `at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`old_route`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='تحويلٌ أُعيد توجيهُه لأن وارثَه صار تبويبًا — بالأصلِ للرجوع';
 
 -- ── Table: gov_restricted_views ──
 CREATE TABLE `gov_restricted_views` (
@@ -7323,6 +7362,22 @@ CREATE TABLE `gov_stage_outputs` (
   UNIQUE KEY `uq_stage` (`role_id`,`stage_no`),
   KEY `ix_src` (`output_source`,`next_source`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='⑨ المستندُ الناتجُ والحالةُ التالية — ولكلِّ خانةٍ مصدرُها المعلَن';
+
+-- ── Table: gov_target_nav ──
+CREATE TABLE `gov_target_nav` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `doc_code` varchar(24) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `group_no` tinyint(3) unsigned NOT NULL,
+  `group_ar` varchar(120) NOT NULL,
+  `item_no` tinyint(3) unsigned NOT NULL,
+  `item_ar` varchar(120) NOT NULL,
+  `route` varchar(160) NOT NULL,
+  `note` varchar(300) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_tn` (`doc_code`,`route`),
+  KEY `ix_tn_role` (`role_id`,`group_no`,`item_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='التنقّلُ المستهدَفُ بعدَ الدمج — منقولٌ من وثيقتَي المواءمة';
 
 -- ── Table: gov_test_data_isolation ──
 CREATE TABLE `gov_test_data_isolation` (
