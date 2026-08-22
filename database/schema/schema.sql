@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-23 02:15:37
--- الجداول: 651 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-23 02:27:16
+-- الجداول: 652 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -6824,6 +6824,28 @@ CREATE TABLE `gov_field_inheritance` (
   UNIQUE KEY `uq_inh` (`company_id`,`child_entity`,`child_field`),
   KEY `ix_parent` (`parent_entity`,`parent_field`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FIN-OBL-01 §4-21 — التوريثُ ومنعُ إعادةِ الإدخال';
+
+-- ── Table: gov_field_trace ──
+CREATE TABLE `gov_field_trace` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `book` varchar(60) NOT NULL,
+  `sheet` varchar(120) NOT NULL,
+  `sheet_no` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `header_cell` varchar(12) NOT NULL,
+  `field_no` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `field_name` varchar(255) NOT NULL,
+  `as_is` varchar(120) NOT NULL DEFAULT '',
+  `to_be` varchar(120) NOT NULL DEFAULT '',
+  `visibility_rule` varchar(255) NOT NULL DEFAULT '',
+  `judged_from` varchar(160) NOT NULL DEFAULT '',
+  `surface_state` varchar(120) NOT NULL DEFAULT '',
+  `req_id` varchar(16) NOT NULL DEFAULT '',
+  `reconciliation` text DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `u_field` (`book`,`sheet`,`header_cell`),
+  KEY `k_req` (`req_id`),
+  KEY `k_tobe` (`to_be`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: gov_finance_gate_policy ──
 CREATE TABLE `gov_finance_gate_policy` (
