@@ -46,8 +46,12 @@ $FORBIDDEN = array(
     'Activation Pattern', 'Visibility Guard',
     'نبدأ من هنا', 'نراجع السجلات',
 );
-/* صياغةٌ محادثيةٌ: تبويبٌ يبدأ بفعلِ جماعةٍ («نبدأ» «نراقب» «نستعمل» …) */
-$CONVERSATIONAL = '/^ن[\x{0600}-\x{06FF}]+\s/u';
+/* ── صياغةٌ محادثيةٌ: تبويبٌ يبدأ بفعلِ جماعةٍ ──────────────────────────
+   ◆ التعريفُ في `includes/conv_form_detect.php` **مصدرًا واحدًا** — يقرأه
+     هذا الحارسُ وشاهدُ `tests/injfrd66_xc02_detector_test.php` معًا.
+     ونسختانِ في ملفَّين تتفرَّقان بلا إنذارٍ فيُخضِّر أحدُهما ما يُحمِّره الآخر. */
+require_once $ROOT . '/includes/conv_form_detect.php';
+$CONVERSATIONAL = ems_conv_pattern();
 
 $matrix = uxp_matrix($ROOT);
 $roles = uxp_root_roles();

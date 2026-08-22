@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 18:12:13
--- الجداول: 646 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-23 00:18:34
+-- الجداول: 647 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -7972,6 +7972,18 @@ CREATE TABLE `incentive_rules` (
   CONSTRAINT `fk_ir_contract` FOREIGN KEY (`contract_id`) REFERENCES `employee_contracts` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: injfrd66_xc02_backup ──
+CREATE TABLE `injfrd66_xc02_backup` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `tbl` varchar(64) NOT NULL,
+  `row_key` varchar(255) NOT NULL,
+  `col` varchar(64) NOT NULL,
+  `old_value` text DEFAULT NULL,
+  `swept_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `k_tbl` (`tbl`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- ── Table: intercompany_dues ──
 CREATE TABLE `intercompany_dues` (
   `due_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -13341,6 +13353,7 @@ CREATE TABLE `supplier_contract_lines` (
   KEY `ix_sup_line_co` (`company_id`,`contract_id`),
   KEY `ix_sup_line_obl` (`contract_obligation_ref`),
   CONSTRAINT `fk_sup_line_contract` FOREIGN KEY (`contract_id`) REFERENCES `supplier_contracts` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_sup_line_obligation` FOREIGN KEY (`contract_obligation_ref`) REFERENCES `contract_commitments` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `ck_sup_line_standby` CHECK (`standby_basis` = _utf8mb4'none' and `standby_rate` is null or `standby_basis` <> _utf8mb4'none' and `standby_rate` is not null and `standby_rate` > 0),
   CONSTRAINT `ck_sup_line_price` CHECK (`unit_price` > 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
