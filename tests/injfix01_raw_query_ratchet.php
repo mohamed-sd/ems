@@ -48,38 +48,19 @@ function ok($c, $l, &$p, &$f, $d = '') { if ($c) { $p++; echo "  ✔ {$l}" . ($d
 
 echo "════ سقّاطةُ الاستعلامِ الخامّ — GAP-29 ════\n";
 
-/* ── جداولُ المستأجِرِ تُقرأ من المخطَّطِ لا من قائمةٍ يدوية ──────────────── */
-$tenant = array();
-$q = $conn->query("SELECT TABLE_NAME FROM information_schema.COLUMNS
-                    WHERE TABLE_SCHEMA = DATABASE() AND COLUMN_NAME = 'company_id'");
-while ($q && $x = $q->fetch_row()) { $tenant[strtolower($x[0])] = true; }
-echo "  جداولُ مستأجِرٍ في المخطَّط: " . count($tenant) . "\n";
-ok(count($tenant) > 0, 'قُرئت جداولُ المستأجِرِ من المخطَّط', $okN, $badN);
+/* ── الماسحُ **مشترَكٌ لا منسوخ** ───────────────────────────────────────────
+ * ◆ السقّاطةُ تعدُّ، والسجلُّ يُبنى من المعدود، والبوابةُ تقارن بالسجل. ولو
+ *   نسخ كلٌّ منها منطقَ المسحِ لتفرّقت الأرقامُ بصمتٍ عندَ أوّلِ تعديل —
+ *   وهو ما وقع قبلًا في عدّادٍ وعارضٍ في ملفَّين.
+ *   ⇒ `tools/lib/raw_query_scan.php` **مصدرٌ واحد**. */
+require_once $ROOT . '/tools/lib/raw_query_scan.php';
+$scan    = ems_raw_query_hits($ROOT, $conn);
+$hits    = $scan['hits'];
+$scanned = $scan['scanned'];
+echo "  جداولُ مستأجِرٍ في المخطَّط: " . $scan['tenant_tables'] . "
+";
+ok($scan['tenant_tables'] > 0, 'قُرئت جداولُ المستأجِرِ من المخطَّط', $okN, $badN);
 
-/* ── المسحُ: ملفُّ إنتاجٍ يذكر جدولَ مستأجِرٍ في عبارةِ SQL خام ─────────────
-   ◆ ويُستثنى ما ليس إنتاجًا — والأدواتُ والفاحصاتُ منها: ملفٌّ يقيس ليس
-     ملفًّا يُسرِّب، وعدُّه يُضخِّم المقامَ فيصير التقدُّمُ غيرَ مقروء. */
-$SKIP = array('/storage/', '/vendor/', '/.git/', '/docs/', '/node_modules/',
-              '/examples/', '/tests/', '/tools/', '/database/migrations/', '/database/seeds/');
-$rx = '/\b(?:FROM|JOIN|UPDATE|INSERT\s+INTO|DELETE\s+FROM)\s+`?([a-z_][a-z0-9_]*)`?/i';
-
-$scanned = 0; $hits = array();
-$it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($ROOT, FilesystemIterator::SKIP_DOTS));
-foreach ($it as $f) {
-    if (!$f->isFile() || substr($f->getFilename(), -4) !== '.php') { continue; }
-    $p = str_replace('\\', '/', $f->getPathname());
-    $bad = false;
-    foreach ($SKIP as $s) { if (strpos($p, $s) !== false) { $bad = true; break; } }
-    if ($bad) { continue; }
-    $scanned++;
-    $src = @file_get_contents($p);
-    if ($src === false) { continue; }
-    if (!preg_match_all($rx, $src, $m)) { continue; }
-    foreach ($m[1] as $t) {
-        if (isset($tenant[strtolower($t)])) { $hits[str_replace($ROOT . '/', '', $p)] = true; break; }
-    }
-}
-ksort($hits);
 $now = count($hits);
 
 echo "\n── المقياس ──\n";
@@ -108,6 +89,36 @@ ok($now >= $BASELINE,
    'وخطُّ الأساسِ ما يزال مطابقًا — والانخفاضُ يطلب شدَّ السقّاطة', $okN, $badN,
    $now < $BASELINE ? "انخفض إلى {$now}: **اخفِض \$BASELINE إلى {$now}**" : 'مطابق');
 
+
+/* ── FR-SEC-006 · **البوابةُ تعرف الأسماءَ لا العددَ وحدَه** ────────────────
+ * ◆ **ومقايضةٌ تعبر سقّاطةَ العدد**: ملفٌّ يُحوَّل وملفٌّ جديدٌ يُضاف فيبقى 608
+ *   والعدُّ راضٍ — **والتسريبُ الجديدُ داخل**. فالسجلُّ يعرفهم بأسمائِهم:
+ *   أيُّ اسمٍ خارجَه **يُرسِّب البناءَ** مهما كان العدد.
+ * ◆ وهذا هو «سلوكُ الفشل» بنصِّ الدفتر: «رسوبُ البناءِ عندَ ملفٍّ جديد». */
+$REG = $ROOT . '/docs/raw_query_exceptions.json';
+if (!is_file($REG)) {
+    ok(false, 'FR-SEC-006 · سجلُّ الاستثناءاتِ موجود', $okN, $badN,
+       'مفقود — شغّل tools/injfrd01_sec006_raw_query_register.php --build');
+} else {
+    $reg   = json_decode((string) file_get_contents($REG), true);
+    $known = isset($reg['entries']) && is_array($reg['entries']) ? $reg['entries'] : array();
+    $unreg = array_values(array_diff(array_keys($hits), array_keys($known)));
+    ok(empty($unreg),
+       'FR-SEC-006 · **صفرُ ملفٍّ باستعلامٍ خامٍّ خارجَ السجل**', $okN, $badN,
+       empty($unreg) ? count($known) . ' مدخلًا مسجَّلًا · صفرَ خارجَه'
+                     : count($unreg) . ' خارجَ السجل');
+    foreach (array_slice($unreg, 0, 8) as $u) { echo "       ✘ غيرُ مسجَّل: {$u}\n"; }
+
+    /* ولكلِّ مدخلٍ سببٌ — والمالكُ يُعَدُّ ولا يُدَّعى */
+    $noReason = 0; $namedOwner = 0;
+    foreach ($known as $e) {
+        if (trim((string) (isset($e['reason']) ? $e['reason'] : '')) === '') { $noReason++; }
+        if ((isset($e['owner']) ? $e['owner'] : '') !== 'NEEDS_GOVERNING_SOURCE') { $namedOwner++; }
+    }
+    ok($noReason === 0, 'ولكلِّ مدخلٍ **سببٌ مكتوب**', $okN, $badN, "بلا سبب: {$noReason}");
+    printf("  ◆ مالكٌ مسمّى: %d من %d · والباقي NEEDS_GOVERNING_SOURCE **مُعلَنًا لا فارغًا**\n",
+           $namedOwner, count($known));
+}
 echo "───────────────────────────────────────────────────────────────\n";
 echo ($badN === 0 ? "✔" : "✘") . " النتيجة: نجح {$okN} · رسب {$badN}\n";
 echo "◆ والسقّاطةُ لا تُغلق GAP-29 — تمنع ازديادَه وتقيس تقدُّمَه.\n";
