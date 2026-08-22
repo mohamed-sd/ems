@@ -69,5 +69,19 @@
             "historical/BL-20260821-f0bc3e4e/snapshot_measures.json": "aefe44046d53e30e5cc3e95588293b469f200415b520b02e22b46b49e4032600",
             "snapshot_measures_b.json": "0dfece05d9ee24808db22d653769e556f279a142bab1c15af1f456a6080fd8f1"
         }
+    },
+    "docs/sources/INJ-FRD-REM-01": {
+        "sealed_at": "2026-08-22 16:54:38",
+        "file_count": 2,
+        "tree_hash": "f28395c00eb506721b0d3be2b424a46c7cdcb90817efa5f15433703e94aa2629",
+        "disk_hash": "137441b6e879f8807a91dc0ad5550507de337c62fa9a17aa7cbcefa0396dfc2d",
+        "files": {
+            "document.docx": "d39756f58828bc5b36f8dc9c0ac72d091f808251f9334a53f17580e1dc3a3062",
+            "workbook.xlsx": "3e8984562bfd585c1e1faf6b12896902b1e7c4cf5d756940574254dd0786d97b"
+        },
+        "disk_files": {
+            "document.docx": "c2e97b9e86f7cdfc5e0b224ee940990604f5feed723702157c60162a315727aa",
+            "workbook.xlsx": "fcf31f59fc2fa3b072222a0b75c4743517a48b43fb739d645303173a8100d7ad"
+        }
     }
 }

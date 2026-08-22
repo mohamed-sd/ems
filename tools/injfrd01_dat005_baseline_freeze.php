@@ -68,11 +68,21 @@ if ($freeze !== '') {
     if (!is_dir($dir)) { exit("⛔ مجلدٌ غيرُ موجود: {$freeze}\n"); }
     $files = seal_tree($dir, $ROOT, $freeze);
     if (!$files) { exit("⛔ مجلدٌ فارغ — لا يُختم فراغ\n"); }
+    /* ◆ **بصمتان لكلِّ ملفّ**: مخرَجُ `git show` **لا يطابق بايتاتِ القرصِ
+       للملفاتِ الثنائية** (xlsx · docx) — فمقارنةُ القرصِ ببصمةِ التاريخِ
+       أعطت «مسًّا» في ملفَّين لم يُمَسَّا. ⇒ لكلِّ طرفٍ بصمتُه. */
+    $diskFiles = array();
+    foreach (array_keys($files) as $rf) {
+        $abs = $dir . '/' . $rf;
+        if (is_file($abs)) { $diskFiles[$rf] = hash_file('sha256', $abs); }
+    }
     $seals[$freeze] = array(
         'sealed_at'   => date('Y-m-d H:i:s'),
         'file_count'  => count($files),
         'tree_hash'   => hash('sha256', json_encode($files)),
+        'disk_hash'   => hash('sha256', json_encode($diskFiles)),
         'files'       => $files,
+        'disk_files'  => $diskFiles,
     );
     file_put_contents($SEAL, json_encode($seals, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
     printf("✔ خُتمت «%s» — %d ملفًّا · بصمةُ الشجرة %s\n",
@@ -92,9 +102,38 @@ foreach ($seals as $rel => $seal) {
     $now = seal_tree($dir, $ROOT, $rel);
     $nowHash = hash('sha256', json_encode($now));
     $same = ($nowHash === $seal['tree_hash']);
+    /* ── طرفُ الشجرةِ العاملةِ — والمحاولةُ تسبق الالتزام ──────────────
+       ◆ الختمُ يقرأ `HEAD`، فمسُّ ملفٍّ مختومٍ **قبلَ الالتزامِ لا يُكتشف**.
+         و§خامسًا-10: «**أيُّ محاولةِ تعديلٍ تُكتشف آليًا**» — والمحاولةُ
+         تقع في الشجرةِ العاملةِ لا في التاريخ.
+       ◆ وقِيس: أُلحق سطرٌ بمصنوعةٍ مختومةٍ **فبقي العدُّ كما كان**.
+       ◆ فيُقاس الطرفان: `HEAD` **والقرصُ** — ويُسمّى أيُّهما اختلف. */
+    /* ◆ **مفاتيحُ الختمِ نسبيةٌ للمجلَّدِ المختومِ لا للجذر** — وضمُّها بالجذرِ
+       وحدَه أعطى «مفقودٌ على القرص» لملفَّين قائمَين. ⇒ الجذرُ ثمّ المجلَّد.
+       ◆ **وختمٌ قديمٌ بلا بصمةِ قرصٍ: طرفُه الثاني غيرُ مقيس** — ولا يُدَّعى
+       مسٌّ ولا سلامة. */
+    $wtDiff = array();
+    $wtMeasured = isset($seal['disk_files']) && is_array($seal['disk_files']);
+    if ($wtMeasured) {
+        foreach ($seal['disk_files'] as $wf => $wh) {
+            $abs = $ROOT . '/' . ltrim($rel, '/') . '/' . $wf;
+            if (!is_file($abs)) { $wtDiff[] = $wf . ' (مفقودٌ على القرص)'; continue; }
+            if (hash_file('sha256', $abs) !== $wh) { $wtDiff[] = $wf; }
+        }
+    }
+
     printf("\n── %s (خُتمت %s · %d ملفًّا)\n", $rel, $seal['sealed_at'], (int) $seal['file_count']);
-    if ($same) {
-        printf("  ✔ **بصمةٌ مطابقة** — صفرُ مسٍّ منذ الختم\n");
+    if ($same && empty($wtDiff)) {
+        printf("  ✔ **بصمةٌ مطابقة** — صفرُ مسٍّ في التاريخ%s\n",
+               $wtMeasured ? ' **وعلى القرص**' : ' · **وطرفُ القرصِ غيرُ مقيسٍ** (ختمٌ قديم)');
+        continue;
+    }
+    if ($same && $wtDiff) {
+        $bad++;
+        printf("  ✘ **مسٌّ في الشجرةِ العاملةِ لم يُلتزَم بعد** — %d ملفًّا:\n", count($wtDiff));
+        foreach (array_slice($wtDiff, 0, 6) as $wf) { echo "     ~ {$wf}\n"; }
+        echo "  ◆ والتاريخُ مطابقٌ — **فالمحاولةُ وقعت ولم تُلتزَم**، وهي ما\n";
+        echo "    يشترط §خامسًا-10 اكتشافَها آليًّا.\n";
         continue;
     }
     $bad++;
@@ -109,6 +148,7 @@ foreach ($seals as $rel => $seal) {
     foreach (array_slice($changed, 0, 6) as $f) { echo "     ~ {$f}\n"; }
     if (count($changed) > 6) { echo "     … و" . (count($changed) - 6) . " غيرُها\n"; }
     foreach (array_slice($removed, 0, 4) as $f) { echo "     − {$f}\n"; }
+    if ($wtDiff) { printf("     ◆ وعلى القرصِ أيضًا: %d ملفًّا يخالف الختم\n", count($wtDiff)); }
     echo "  ◆ **ولقطةُ أساسٍ تُعاد كتابتُها في مكانِها تُلغي طرفَ «قبل» في كلِّ مقارنة.**\n";
 }
 echo "\n" . str_repeat('─', 66) . "\n";
