@@ -24,10 +24,34 @@ mb_internal_encoding('UTF-8');
 $ROOT = dirname(__DIR__);
 require_once $ROOT . '/tools/lib/xlsx_io.php';
 $XLSX = $ROOT . '/docs/sources/INJ-FRD-REM-01/workbook.xlsx';
+
+/* ◆ **الحاجزُ الذي يرجع صفرًا يقول للمنادي: نجحتُ**. و`exit("نص")` في PHP
+ *   يطبع ويخرج بـ**صفر** — فكلُّ ⛔ في هذه الأداةِ كان يمرُّ في السكربتات
+ *   بوصفِه نجاحًا. ⇒ الإيقافُ يطبع في القياسيِّ الخطأِ ويخرج بواحد. */
+function ems_halt($msg) { fwrite(STDERR, $msg); exit(1); }
+
 $SHEET = 'سجل المتطلبات';
 
+/* ◆ **مفتاحٌ مجهولٌ يوقف — ولا يُبتلع صامتًا**: مُرِّر `--state=EVIDENCE_CLOSED`
+ *   والمقروءُ `--closure`، فسقط الوسيطُ ولم تُكتب حالةُ الإغلاق **وطُبع
+ *   نجاحٌ بثلاثةِ حقولٍ** — كتابةٌ ناقصةٌ تبدو تامّة. ولولا أن الحصيلةَ لم
+ *   تتحرّك لمرَّت. ⇒ **كلُّ وسيطٍ خارجَ المعروفِ يوقف الأداة.** */
+$KNOWN = array('set','list','tally','cs','status','commit','test',
+                'evidence','blocker','closure');
 $arg = array();
-foreach ($argv as $a) { if (preg_match('~^--([a-z]+)(?:=(.*))?$~s', $a, $m)) { $arg[$m[1]] = isset($m[2]) ? $m[2] : true; } }
+foreach ($argv as $i => $a) {
+    if ($i === 0 || substr($a, 0, 2) !== '--') { continue; }
+    if (!preg_match('~^--([a-z_]+)(?:=(.*))?$~s', $a, $m)) {
+        ems_halt("⛔ وسيطٌ لا يُفهَم: {$a}
+");
+    }
+    if (!in_array($m[1], $KNOWN, true)) {
+        ems_halt("⛔ **مفتاحٌ مجهول**: --{$m[1]}
+   المعروفُ: --" . implode(' · --', $KNOWN) . "
+");
+    }
+    $arg[$m[1]] = isset($m[2]) ? $m[2] : true;
+}
 
 /* الأعمدةُ التنفيذيةُ الخمسة — تُنشأ إن لم تكن */
 $EXEC = array('Commit', 'Test_Result', 'Evidence_Status', 'Blocker', 'Closure_State');
@@ -36,7 +60,7 @@ $CLOSURES = array('EVIDENCE_CLOSED', 'IMPLEMENTED_NOT_CLOSED', 'BLOCKED_GOVERNIN
                   'BLOCKED_OWNER_DECISION', 'OPEN', 'REGRESSION_CONSTRAINT');
 
 $z = new ZipArchive();
-if ($z->open($XLSX) !== true) { exit("⛔ تعذّر فتحُ الدفتر\n"); }
+if ($z->open($XLSX) !== true) { ems_halt("⛔ تعذّر فتحُ الدفتر\n"); }
 $ent = array();
 for ($i = 0; $i < $z->numFiles; $i++) { $ent[$z->getNameIndex($i)] = $z->getFromIndex($i); }
 $z->close();
@@ -50,7 +74,7 @@ if (preg_match('~<row r="4"[^>]*>(.*?)</row>~su', $s1, $hm)) {
         $HEAD[trim(str_replace('◆ ', '', html_entity_decode($c[2], ENT_QUOTES | ENT_XML1, 'UTF-8')))] = $c[1];
     }
 }
-if (count($HEAD) < 30) { exit("⛔ تعذّر قراءةُ الرأس\n"); }
+if (count($HEAD) < 30) { ems_halt("⛔ تعذّر قراءةُ الرأس\n"); }
 
 function next_col($letter) {
     $n = 0;
@@ -67,7 +91,7 @@ foreach ($EXEC as $name) {
     $L = next_col($last);
     $cell = '<c r="' . $L . '4" t="inlineStr"><is><t xml:space="preserve">' . $name . '</t></is></c>';
     $pat = '~(<c r="' . $last . '4"(?:\s[^>]*)?(?:/>|>.*?</c>))~su';
-    if (!preg_match($pat, $s1)) { exit("⛔ تعذّر إيجادُ العمودِ الأخير {$last}\n"); }
+    if (!preg_match($pat, $s1)) { ems_halt("⛔ تعذّر إيجادُ العمودِ الأخير {$last}\n"); }
     $s1 = preg_replace($pat, '$1' . $cell, $s1, 1);
     $HEAD[$name] = $L;
     $made[] = $name . '→' . $L;
@@ -116,21 +140,21 @@ if (isset($arg['list']) || !isset($arg['set'])) {
 
 /* ── الكتابة ───────────────────────────────────────────────────────── */
 $id = (string) $arg['set'];
-if (!isset($rowOf[$id])) { exit("⛔ معرِّفٌ غيرُ موجود: {$id}\n"); }
+if (!isset($rowOf[$id])) { ems_halt("⛔ معرِّفٌ غيرُ موجود: {$id}\n"); }
 $rn = $rowOf[$id];
 
 $closure = isset($arg['closure']) ? (string) $arg['closure'] : '';
 if ($closure !== '' && !in_array($closure, $CLOSURES, true)) {
-    exit("⛔ حالةُ إغلاقٍ غيرُ مشروعة: {$closure}\n   المشروعُ: " . implode(' · ', $CLOSURES) . "\n");
+    ems_halt("⛔ حالةُ إغلاقٍ غيرُ مشروعة: {$closure}\n   المشروعُ: " . implode(' · ', $CLOSURES) . "\n");
 }
 /* ◆ **الشروطُ السبعةُ مجتمعةً أو لا إغلاق** — §الحادي عشر */
 if ($closure === 'EVIDENCE_CLOSED') {
     $need = array('commit' => 'هاشُ الالتزام', 'test' => 'نتيجةُ الاختبار', 'evidence' => 'الدليل');
     foreach ($need as $k => $lbl) {
-        if (empty($arg[$k])) { exit("⛔ لا يُكتب EVIDENCE_CLOSED بلا {$lbl}\n"); }
+        if (empty($arg[$k])) { ems_halt("⛔ لا يُكتب EVIDENCE_CLOSED بلا {$lbl}\n"); }
     }
     if (stripos((string) $arg['test'], 'PASS') === false) {
-        exit("⛔ لا يُكتب EVIDENCE_CLOSED ونتيجةُ الاختبارِ ليست PASS\n");
+        ems_halt("⛔ لا يُكتب EVIDENCE_CLOSED ونتيجةُ الاختبارِ ليست PASS\n");
     }
 }
 
@@ -143,7 +167,7 @@ if (isset($arg['blocker']))  { $set['Blocker'] = (string) $arg['blocker']; }
 if ($closure !== '')         { $set['Closure_State'] = $closure; }
 
 foreach ($set as $name => $val) {
-    if (!isset($HEAD[$name])) { exit("⛔ عمودٌ غيرُ موجود: {$name}\n"); }
+    if (!isset($HEAD[$name])) { ems_halt("⛔ عمودٌ غيرُ موجود: {$name}\n"); }
     $ref = $HEAD[$name] . $rn;
     $rep = '<c r="' . $ref . '" t="inlineStr"><is><t xml:space="preserve">'
          . htmlspecialchars($val, ENT_QUOTES | ENT_XML1, 'UTF-8') . '</t></is></c>';
@@ -161,7 +185,7 @@ $ent['xl/worksheets/sheet1.xml'] = $s1;
 
 $tmp = $XLSX . '.tmp';
 $zz = new ZipArchive();
-if ($zz->open($tmp, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) { exit("⛔ تعذّر الكتابة\n"); }
+if ($zz->open($tmp, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) { ems_halt("⛔ تعذّر الكتابة\n"); }
 foreach ($ent as $n => $d) { $zz->addFromString($n, $d); }
 $zz->close();
 if (!@rename($tmp, $XLSX)) { @copy($tmp, $XLSX); @unlink($tmp); }
@@ -176,7 +200,7 @@ $bad = array();
 foreach ($set as $name => $val) {
     if (!isset($ix2[$name]) || trim((string) ($got[$ix2[$name]] ?? '')) !== $val) { $bad[] = $name; }
 }
-if ($bad) { exit("⛔ كتابةٌ مزعومة — لم تُقرأ: " . implode(' · ', $bad) . "\n"); }
+if ($bad) { ems_halt("⛔ كتابةٌ مزعومة — لم تُقرأ: " . implode(' · ', $bad) . "\n"); }
 
 if ($made) { echo "  ✔ أُنشئت أعمدةٌ: " . implode(' · ', $made) . "\n"; }
 printf("  ✔ %s (صف %d) — %s\n", $id, $rn,
