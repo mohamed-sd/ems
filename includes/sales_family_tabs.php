@@ -44,9 +44,21 @@ $SFT = array(
     )),
     'opportunity' => array('ملف الفرصة البيعية', array(
         'opportunity' => array('بيانات الفرصة',            'Opportunities/opportunities.php'),
+        'need'        => array('احتياج العميل وطلب العرض', 'Opportunities/client_need_rfq.php'),
         'activities'  => array('الأنشطة والمتابعات',       'Clients/activities.php'),
         'tenders'     => array('المناقصات',                'Clients/tenders.php'),
         'readiness'   => array('مراجعة ما قبل التعاقد',    'Clients/readiness_lines.php'),
+    )),
+    'quotation' => array('ملف عرض السعر', array(
+        'quotation' => array('بيانات العرض',              'Clients/quotations.php'),
+        'lines'     => array('بنود العرض',                'Clients/quotation_lines.php'),
+        'nego'      => array('سجل التفاوض ومراجعاته',     'Clients/quotation_negotiation.php'),
+        'readiness' => array('مراجعة ما قبل التعاقد',     'Clients/readiness_lines.php'),
+    )),
+    'settlement' => array('ملف تسوية المورد', array(
+        'settlement' => array('الاستحقاقات وكشف الحساب',  'Suppliers/settlements.php'),
+        'advances'   => array('السلف والنيابية',           'Suppliers/supplier_advances.php'),
+        'violations' => array('المخالفات والجزاءات',       'Suppliers/supplier_violations.php'),
     )),
     'claim' => array('ملف المطالبة التجارية', array(
         'claim'     => array('بيانات المطالبة',            'Contracts/claims.php'),

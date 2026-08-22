@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-22 03:07:20
--- الجداول: 635 · المناظير: 25
+-- المصدر: equipation_manage · التوليد: 2026-08-22 03:47:19
+-- الجداول: 639 · المناظير: 25
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -10899,6 +10899,87 @@ CREATE TABLE `roles` (
   CONSTRAINT `roles_ibfk_1` FOREIGN KEY (`parent_role_id`) REFERENCES `roles` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: sal_client_needs ──
+CREATE TABLE `sal_client_needs` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `need_no` varchar(30) NOT NULL,
+  `opportunity_id` int(10) unsigned NOT NULL COMMENT 'سجلٌّ تابعٌ للفرصة — لا سطحٌ مستقل',
+  `client_id` int(10) unsigned DEFAULT NULL,
+  `project_id` int(10) unsigned DEFAULT NULL,
+  `business_model` varchar(80) DEFAULT NULL COMMENT 'نموذجُ العملِ من السجلِّ المرجعيّ',
+  `service_type` varchar(120) NOT NULL,
+  `qty` decimal(16,4) NOT NULL DEFAULT 0.0000,
+  `unit_type` varchar(16) NOT NULL DEFAULT 'hour',
+  `duration_months` smallint(5) unsigned DEFAULT NULL,
+  `required_from` date DEFAULT NULL,
+  `site_note` varchar(200) DEFAULT NULL,
+  `notes` varchar(400) DEFAULT NULL,
+  `state` enum('draft','submitted','quoted','closed','cancelled') NOT NULL DEFAULT 'draft',
+  `created_by` int(10) unsigned NOT NULL,
+  `submitted_at` datetime DEFAULT NULL,
+  `idem_key` varchar(96) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_scn_idem` (`idem_key`),
+  UNIQUE KEY `uq_scn_no` (`company_id`,`need_no`),
+  KEY `ix_scn_opp` (`opportunity_id`),
+  CONSTRAINT `chk_scn_qty` CHECK (`qty` > 0),
+  CONSTRAINT `chk_scn_submit` CHECK (`state` = 'draft' or `submitted_at` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='الورقة 06 — احتياج العميل وطلب العرض · سجلٌّ تابعٌ للفرصة';
+
+-- ── Table: sal_quotation_lines ──
+CREATE TABLE `sal_quotation_lines` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `quotation_id` int(10) unsigned NOT NULL COMMENT 'بنودُ العرضِ تابعةٌ لرأسِه',
+  `line_no` smallint(5) unsigned NOT NULL,
+  `product_id` int(10) unsigned DEFAULT NULL COMMENT 'من كتالوجِ الخدماتِ — اختيارٌ لا كتابةٌ حرة',
+  `description` varchar(240) NOT NULL,
+  `qty` decimal(16,4) NOT NULL,
+  `unit_type` varchar(16) NOT NULL DEFAULT 'hour',
+  `unit_price` decimal(16,2) NOT NULL,
+  `currency` varchar(8) NOT NULL,
+  `discount_pct` decimal(5,2) NOT NULL DEFAULT 0.00,
+  `line_total` decimal(18,2) NOT NULL COMMENT 'محسوبٌ في طبقةِ الخدمة — يُعرض ولا يُدخَل',
+  `notes` varchar(200) DEFAULT NULL,
+  `created_by` int(10) unsigned NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_sql_line` (`company_id`,`quotation_id`,`line_no`),
+  KEY `ix_sql_q` (`quotation_id`),
+  CONSTRAINT `chk_sql_qty` CHECK (`qty` > 0),
+  CONSTRAINT `chk_sql_price` CHECK (`unit_price` >= 0),
+  CONSTRAINT `chk_sql_disc` CHECK (`discount_pct` >= 0 and `discount_pct` <= 100),
+  CONSTRAINT `chk_sql_cur` CHECK (char_length(`currency`) >= 3)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='الورقة 08 — بنود العروض · تابعةٌ لرأسِ العرض';
+
+-- ── Table: sal_quotation_revisions ──
+CREATE TABLE `sal_quotation_revisions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `quotation_id` int(10) unsigned NOT NULL,
+  `revision_no` smallint(5) unsigned NOT NULL,
+  `event_kind` enum('issued','sent','client_counter','revised','accepted','rejected','expired') NOT NULL COMMENT 'واقعةُ تفاوضٍ محكومةٌ من قائمةٍ مغلقة',
+  `party` enum('us','client') NOT NULL,
+  `note` varchar(400) NOT NULL COMMENT 'لا واقعةَ تفاوضٍ بلا نصٍّ يشرحها',
+  `doc_ref` varchar(120) DEFAULT NULL,
+  `amount_before` decimal(18,2) DEFAULT NULL,
+  `amount_after` decimal(18,2) DEFAULT NULL,
+  `currency` varchar(8) DEFAULT NULL,
+  `valid_until` date DEFAULT NULL,
+  `decided_by` int(10) unsigned NOT NULL,
+  `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `idem_key` varchar(96) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_sqr_idem` (`idem_key`),
+  UNIQUE KEY `uq_sqr_rev` (`company_id`,`quotation_id`,`revision_no`),
+  KEY `ix_sqr_q` (`quotation_id`),
+  CONSTRAINT `chk_sqr_note` CHECK (char_length(`note`) >= 8)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='الورقة 09 — سجل نسخ العرض ووقائع التفاوض';
+
 -- ── Table: schema_migrations ──
 CREATE TABLE `schema_migrations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -12919,6 +13000,39 @@ CREATE TABLE `substitute_coverages` (
   CONSTRAINT `ck_cov_dates` CHECK (`valid_to` >= `valid_from`),
   CONSTRAINT `ck_cov_reason_governed` CHECK (`reason_code` <> _utf8mb4'' and `level` <> _utf8mb4'')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: sup_violations ──
+CREATE TABLE `sup_violations` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `violation_no` varchar(30) NOT NULL,
+  `supplier_id` int(10) unsigned NOT NULL,
+  `contract_id` int(10) unsigned DEFAULT NULL,
+  `settlement_id` int(10) unsigned DEFAULT NULL COMMENT 'سجلٌّ تابعٌ للتسوية — وأثرُه فيها',
+  `rule_ref` varchar(120) DEFAULT NULL COMMENT 'القاعدةُ المخالَفة من `supplier_rules`',
+  `violation_kind` enum('availability','quality','safety','document','delay','other') NOT NULL,
+  `occurred_on` date NOT NULL,
+  `description` varchar(400) NOT NULL,
+  `evidence_ref` varchar(120) DEFAULT NULL,
+  `penalty_amount` decimal(18,2) NOT NULL DEFAULT 0.00,
+  `currency` varchar(8) DEFAULT NULL,
+  `recorded_by` int(10) unsigned NOT NULL,
+  `approved_by` int(10) unsigned DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `state` enum('recorded','reviewed','approved','applied','waived','rejected') NOT NULL DEFAULT 'recorded',
+  `waive_reason` varchar(300) DEFAULT NULL,
+  `idem_key` varchar(96) NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_sv_idem` (`idem_key`),
+  UNIQUE KEY `uq_sv_no` (`company_id`,`violation_no`),
+  KEY `ix_sv_sup` (`supplier_id`,`state`),
+  CONSTRAINT `chk_sv_sod` CHECK (`approved_by` is null or `approved_by` <> `recorded_by`),
+  CONSTRAINT `chk_sv_cur` CHECK (`penalty_amount` = 0 or `currency` is not null and char_length(`currency`) >= 3),
+  CONSTRAINT `chk_sv_waive` CHECK (`state` <> 'waived' or char_length(coalesce(`waive_reason`,'')) >= 8),
+  CONSTRAINT `chk_sv_desc` CHECK (char_length(`description`) >= 8)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='الورقة م19 — المخالفات والجزاءات · سجلٌّ تابعٌ للتسوية';
 
 -- ── Table: super_admin_password_resets ──
 CREATE TABLE `super_admin_password_resets` (

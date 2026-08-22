@@ -356,6 +356,19 @@ class TenantRegistry
         'tre_pay_batches'      => array('type' => self::T_TENANT, 'soft' => false),   // عقدة 25
         'tre_pay_batch_lines'  => array('type' => self::T_CHILD,  'soft' => false,
             'parent' => 'tre_pay_batches', 'fk' => 'batch_id'),
+
+        /* ══ القدراتُ الخمسُ التي ثبت غيابُها — INJ-SAL/SUP-ALIGN-01 ═══════════
+           الثلاثةُ الأولى **أبناءٌ** بنصِّ قرارِ ورقتِها: «سجلٌّ تابعٌ لا سطحٌ
+           مستقل» — فتُقرأ في سياقِ أبيها ولا تُستعرض وحدَها. والمخالفاتُ
+           سجلٌّ تابعٌ للتسويةِ في العرضِ ومستقلٌّ في السجلِّ (لها رقمُها وحالتُها
+           وسلّمُ اعتمادِها) — فهي `T_TENANT` بمفتاحِ المورد. */
+        'sal_client_needs'        => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'opportunities', 'fk' => 'opportunity_id'),
+        'sal_quotation_lines'     => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'quotations', 'fk' => 'quotation_id'),
+        'sal_quotation_revisions' => array('type' => self::T_CHILD, 'soft' => false,
+            'parent' => 'quotations', 'fk' => 'quotation_id'),
+        'sup_violations'          => array('type' => self::T_TENANT, 'soft' => false),
         'fin_request_routing' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_funding_facilities' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_funding_schedules' => array('type' => self::T_TENANT, 'soft' => false),

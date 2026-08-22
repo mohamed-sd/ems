@@ -114,6 +114,10 @@ include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/entity_tabs.php'; echo ems_entity_tabs('supplier', 'التسوياتُ والصرف');
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
+
+/* شريطُ تبويباتِ العائلة — قرارُ وثيقةِ المواءمة (مكوّنٌ مركزيّ) */
+$sft_family = 'settlement'; $sft_active = 'advances';
+include __DIR__ . '/../includes/sales_family_tabs.php';
 ?>
 <?php /* نُقلت أنماطُ هذه الشاشةِ إلى assets/css/ems-screens.css (UXUI-01 البند ٦: صفرُ نمطٍ محليّ) */ ?>
 <div class="main ems-unified-page-shell ems-doc-cycle">
