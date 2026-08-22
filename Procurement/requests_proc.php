@@ -190,7 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'e21_d
     if ($decision === 'approve') {
         $__lg = ems_ladder_guard($conn, 'LD-10', $company_id, 'proc_request', $rid, $current_user_id);
         if (!$__lg['ok']) {
-            ems_gov_flash_redirect('requests_proc.php', $__lg['reason'] . ' ❌', 'GOV-FAIL-422', '');
+            ems_gov_flash_redirect('requests_proc.php', $__lg['reason'] . ' ❌', EMS_LADDER_DENY_CODE, '');
             exit();
         }
     }

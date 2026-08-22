@@ -50,7 +50,11 @@ if ($__pc['replay'])                     { $msg = $__pc['msg']; }
 if ($__pc['run'] && $__pc['ok']) {
     $__lg = ems_ladder_guard($conn, 'LD-11', $company_id, 'rfq_quote',
         (int) $__pc['data']['qid'], $uid);
-    if (!$__lg['ok']) { $msg = $__lg['reason'] . ' ❌'; $__pc['ok'] = false; }
+    /* FR-APP-003 — الرمزُ الموحَّدُ يُذكر في الرسالة: رفضٌ بلا رمزٍ لا يُتتبَّع */
+    if (!$__lg['ok']) {
+        $msg = $__lg['reason'] . ' ❌ (' . EMS_LADDER_DENY_CODE . ')';
+        $__pc['ok'] = false;
+    }
 }
 if ($__pc['run'] && $__pc['ok']) {
     $svc = new \App\Services\Procurement\RfqAwardService($conn);

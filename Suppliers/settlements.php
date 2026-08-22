@@ -109,7 +109,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
              المنعِ تغييرُ وصولٍ حيٍّ يلزمه قياسٌ مستقرٌّ بصفرِ خرق. */
         $__lg = ems_ladder_guard($conn, 'LD-13', $company_id, 'settlement', $sid, $uid);
         if (!$__lg['ok']) {
-            $res = array('ok' => false, 'reason' => $__lg['reason'], 'net_direction' => '');
+            /* FR-APP-003 — الرمزُ الموحَّدُ في الردِّ: رفضٌ بلا رمزٍ لا يُتتبَّع */
+            $res = array('ok' => false, 'code' => EMS_LADDER_DENY_CODE,
+                         'reason' => $__lg['reason'] . ' (' . EMS_LADDER_DENY_CODE . ')',
+                         'net_direction' => '');
         } else {
         $res = SVC::approve($gate, $conn, $sid, $uid);
         if ($res['ok'] && $res['net_direction'] === 'receivable') {

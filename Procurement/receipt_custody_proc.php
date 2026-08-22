@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['expected_destination'
         $__lg = ems_ladder_guard($conn, 'LD-12', $company_id, 'proc_receipt',
             intval($_POST['id'] ?? 0), $current_user_id);
         if (!$__lg['ok']) {
-            ems_gov_flash_redirect('receipt_custody_proc.php', $__lg['reason'] . ' ❌', 'GOV-FAIL-422', '');
+            ems_gov_flash_redirect('receipt_custody_proc.php', $__lg['reason'] . ' ❌', EMS_LADDER_DENY_CODE, '');
             exit();
         }
     }

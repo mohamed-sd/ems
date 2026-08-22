@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['direction'])) {
         $__lg = ems_ladder_guard($conn, 'LD-08', $company_id, 'payment_request',
             intval($_POST['receivable_id'] ?? 0), $current_user_id);
         if (!$__lg['ok']) {
-            ems_gov_flash_redirect('payments_fin.php', $__lg['reason'] . ' ❌', 'GOV-FAIL-422',
+            ems_gov_flash_redirect('payments_fin.php', $__lg['reason'] . ' ❌', EMS_LADDER_DENY_CODE,
                 'الجهةُ تُحَلُّ من محرّكِ السلاليمِ لا من الشاشة');
             exit();
         }
