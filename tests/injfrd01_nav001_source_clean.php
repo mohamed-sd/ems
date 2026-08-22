@@ -86,9 +86,19 @@ if ($neg) {
         (`company_id`,`dept_name`,`layer_name`,`stage_order`,`stage_name`,`group_name`,
          `screen_title`,`screen_file`,`stage_kind`)
         VALUES (4,'{$MARK}','اختبار',999,'مرحلةُ حزام','نحاسبه ونصرف','شاشةُ حزام','belt/{$MARK}.php','عادي')");
+    /* ◆ **وبذرُ تصريفٍ متقاعدٍ لا تمسكه السلسلةُ الحرفية** (البند ٠-٥):
+     *   «وحاوياتها» — الجذرُ فيها `حاوي`، و`LIKE '%الحاويات%'` يعبرها لأن
+     *   «ال» صارت «و…ها». */
+    $db->query("INSERT INTO `gov_screen_cycle`
+        (`company_id`,`dept_name`,`layer_name`,`stage_order`,`stage_name`,`group_name`,
+         `screen_title`,`screen_file`,`stage_kind`)
+        VALUES (4,'{$MARK}','اختبار',998,'مرحلةُ حزامٍ ثانية','حصصٌ وحاوياتها للحزام',
+                'شاشةُ حزامٍ ثانية','belt/{$MARK}2.php','عادي')");
     /* ◆ **والبذرُ في الجدولِ الذي يُرسَم منه أيضًا** (البند ٠-٤): مجموعةٌ نشطةٌ
      *   في `link_groups` **ومعها بندُ تنقّلٍ نشط** — فمجموعةٌ بلا بندٍ لا تُصيَّر
-     *   ولا تُقاس، وبذرٌ لا يُصيَّر لا يُجرّب الحارسَ في موضعِ عملِه. */
+     *   ولا تُقاس، وبذرٌ لا يُصيَّر لا يُجرّب الحارسَ في موضعِ عملِه.
+     *   ◆ و`insert_id` يُلتقط **عقبَ إدراجِه مباشرةً** — فبذرٌ آخرُ بينهما
+     *     يُزيح المعرِّفَ إلى صفٍّ آخرَ فيُربَط البندُ بمجموعةٍ ليست الهدف. */
     $db->query("INSERT INTO `link_groups` (`name`,`group_code`,`icon`,`display_order`,`is_active`)
                 VALUES ('نحاسبه ونصرف','{$MARK}','fa fa-folder',9999,1)");
     $BELT_GID = (int) $db->insert_id;
@@ -99,7 +109,7 @@ if ($neg) {
                      (`role_id`,`door`,`label_ar`,`route`,`group_id`,`sort_order`,`active`)
                      VALUES (12,'{$door}','بندُ حزام','__belt/{$MARK}.php',{$BELT_GID},9999,1)");
     }
-    echo "  ◆ دُسَّت صيغةٌ ممنوعةٌ حيّةٌ للحزامِ السلبيّ\n";
+    echo "  ◆ دُسَّت صيغةٌ ممنوعةٌ في المصدرِ والمُصيَّر، وتصريفٌ متقاعدٌ للحزامِ السلبيّ\n";
 }
 
 /* ① القائمةُ المحظورةُ قُرئت */
@@ -139,11 +149,69 @@ chk(empty($verbRows), 'وصفرُ مجموعةٍ فعليةٍ خارجَ الا�
     empty($verbRows) ? 'صفر · والمُعلَنُ ' . count($NOUN_WHITELIST) . ' اسمًا'
                      : implode(' · ', $verbRows));
 
-/* ④ صفرُ لفظٍ متقاعد */
-$ret = n($db, "SELECT COUNT(*) FROM `gov_screen_cycle`
-                WHERE `group_name` LIKE '%الحاويات%' OR `stage_name` LIKE '%الحاويات%'
-                   OR `group_name` LIKE '%الخانات%'  OR `stage_name` LIKE '%الخانات%'");
-chk($ret === 0, 'وصفرُ لفظٍ متقاعدٍ في المصدر', "المقيس: {$ret}");
+/* ④ صفرُ لفظٍ متقاعد — **مطابقةٌ بالجذرِ لا بالسلسلةِ الحرفية** (البند ٠-٥) ──
+ * ◆ كان الفحصُ `LIKE '%الحاويات%'` — فلا يمسك التصريف: صفّانِ حيّانِ في
+ *   `gov_screen_cycle` (420 · 421) يحملان «حصص الموردين **وحاوياتها**»
+ *   ويعبران، لأن «ال» صارت «و…ها». **والسلسلةُ الحرفيةُ تمسك صيغةً وتترك أسرتَها.**
+ * ◆ ومصدرُ التقاعدِ ليس ذاكرةَ الكاتب: `gov_cycle_name_log` يحمله مكتوبًا —
+ *   «توزيع الحصص والحاويات» ⇐ «توزيع الحصص وإسناد المعدات» ·
+ *   «نوزّع الحاويات»        ⇐ «إسناد المعدات للوحدات».
+ *   ولذلك **يُفحص أن النمطَ ما يزال يمسك ما في السجل** (الفحص ⑧ أدناه) —
+ *   فنمطٌ يتفرّق عن سجلِّ التقاعدِ يتعفّن صامتًا.
+ * ◆ والمقامُ **مصدرانِ لا مصدر**: `gov_screen_cycle` الحاكمُ، و`link_groups`
+ *   الذي يُرسَم منه — ويُفصَل المُصيَّرُ عن الراكدِ فلا يُخفى أحدُهما بالآخر.
+ */
+$RETIRED = array(
+    'حاوي'      => 'حاوية · حاويات · وحاوياتها — متقاعدةٌ بسجلِّ `gov_cycle_name_log`',
+    'خان[ةات]'  => 'خانة · خانات — متقاعدةٌ بالحارسِ السابقِ ولا قيدَ لها في السجل',
+);
+$retHits = array(); $retRend = 0; $retDorm = 0; $retCycle = 0;
+foreach ($RETIRED as $rx => $why) {
+    $e = $db->real_escape_string($rx);
+    /* ① المصدرُ الحاكم */
+    $r = $db->query("SELECT `group_name` AS v, COUNT(*) c FROM `gov_screen_cycle`
+                      WHERE `group_name` REGEXP '{$e}' OR `stage_name` REGEXP '{$e}' GROUP BY 1");
+    while ($r && $x = $r->fetch_assoc()) {
+        $retHits[] = "دورة«{$x['v']}»×{$x['c']}"; $retCycle += (int) $x['c'];
+    }
+    /* ② الجدولُ الذي يُرسَم منه — مُصيَّرًا وراكدًا، كلٌّ بعدَده */
+    $r = $db->query("SELECT g.`name` AS nm, COALESCE(g.`stage_title`,'') AS st,
+                            (SELECT COUNT(*) FROM `nav_items` n
+                              WHERE n.`group_id` = g.`id` AND n.`active` = 1) AS items
+                       FROM `link_groups` g
+                      WHERE g.`is_active` = 1
+                        AND (g.`name` REGEXP '{$e}' OR g.`stage_title` REGEXP '{$e}')");
+    while ($r && $x = $r->fetch_assoc()) {
+        $live = ((int) $x['items'] > 0);
+        if ($live) { $retRend++; } else { $retDorm++; }
+        $lbl = $live ? 'مُصيَّر' : 'راكد';
+        $retHits[] = "{$lbl}«" . ($x['st'] !== '' ? $x['st'] : $x['nm']) . '»';
+    }
+    /* ③ الكنسيّ */
+    $r = $db->query("SELECT `canonical_ar` AS v, COUNT(*) c FROM `nav_canonical`
+                      WHERE `canonical_ar` REGEXP '{$e}' GROUP BY 1");
+    while ($r && $x = $r->fetch_assoc()) { $retHits[] = "كنسيّ«{$x['v']}»×{$x['c']}"; }
+}
+$retTot = $retCycle + $retRend + $retDorm;
+chk($retTot === 0, 'وصفرُ لفظٍ متقاعدٍ **بالجذرِ** في المصادرِ الثلاثة',
+    $retTot === 0 ? 'صفر · والجذورُ المُعلَنةُ ' . count($RETIRED)
+                  : "دورة={$retCycle} · مُصيَّر={$retRend} · راكد={$retDorm} ⇒ **{$retTot}**: "
+                    . implode(' · ', array_slice($retHits, 0, 6)));
+
+/* ⑧ النمطُ ما يزال يمسك سجلَّ التقاعدِ نفسَه — **وإلا تعفّن صامتًا** */
+$logOld = array(); $missPat = array();
+$r = $db->query("SELECT DISTINCT `old_value` FROM `gov_cycle_name_log`
+                  WHERE `old_value` IS NOT NULL AND `old_value` <> ''");
+while ($r && $x = $r->fetch_row()) { $logOld[] = $x[0]; }
+foreach ($logOld as $ov) {
+    $isRetired = false;
+    foreach ($RETIRED as $rx => $why) { if (preg_match('/' . $rx . '/u', $ov)) { $isRetired = true; } }
+    /* قيدٌ يحمل لفظًا متقاعدًا في قيمتِه القديمةِ يجب أن يمسكه نمطٌ — والعكسُ لا يلزم */
+    if (!$isRetired && preg_match('/حاوي|خان[ةات]/u', $ov)) { $missPat[] = $ov; }
+}
+chk(empty($missPat), 'وأنماطُ الجذرِ ما تزال تمسك ما في سجلِّ التقاعد',
+    empty($missPat) ? count($logOld) . ' قيمةً قديمةً فُحصت · صفرُ لفظٍ متقاعدٍ بلا نمطٍ يمسكه'
+                    : implode(' · ', $missPat));
 
 /* ⑤ صفرُ فقد — السجلُّ يحمل ما تغيَّر ويُرجعه */
 $logged = n($db, "SELECT COUNT(*) FROM `gov_cycle_name_log` WHERE `requirement_id` = 'FR-NAV-001'");
@@ -204,6 +272,8 @@ if ($neg) {
      *   يخضرُّ من غيرِ أن يُجرَّب. فيُشترط أن **يُسمّى البذرُ** في مخرَجِ الفحصَين. */
     $caughtSrc = false;
     foreach ($hits as $h)   { if (strpos($h, 'نحاسبه ونصرف') !== false) { $caughtSrc = true; } }
+    $caughtRetired = false;
+    foreach ($retHits as $h) { if (strpos($h, 'وحاوياتها للحزام') !== false) { $caughtRetired = true; } }
     $caughtRend = false;
     foreach ($hitsLG as $h) { if (strpos($h, 'نحاسبه ونصرف') !== false) { $caughtRend = true; } }
     echo "\n── حكمُ الحزامِ السلبيّ ──\n";
@@ -211,6 +281,9 @@ if ($neg) {
         $caughtSrc ? 'نحاسبه ونصرف' : 'مرَّ — والحارسُ لا يراه');
     chk($caughtRend, '**والبذرُ في الجدولِ الذي يُرسَم منه أُمسك باسمِه**',
         $caughtRend ? 'نحاسبه ونصرف' : 'مرَّ — والحارسُ لا يراه');
+    chk($caughtRetired, '**وتصريفُ اللفظِ المتقاعدِ أُمسك بالجذرِ**',
+        $caughtRetired ? 'حصصٌ وحاوياتها للحزام — والسلسلةُ الحرفيةُ كانت تعبره'
+                       : 'مرَّ — والمطابقةُ ما تزال حرفية');
     /* الكنسُ بالعائلةِ — الوسمُ ثابتٌ لا بـ`getmypid` فيُكنس أثرُ جولةٍ انهارت */
     $db->query("DELETE FROM `gov_screen_cycle` WHERE `dept_name` = '{$MARK}'");
     $db->query("DELETE FROM `nav_items` WHERE `route` = '__belt/{$MARK}.php'");
@@ -221,7 +294,7 @@ if ($neg) {
     chk($left === 0, 'وكُنس الحزامُ أثرَه من الجداولِ الثلاثة', "المتبقي: {$left}");
     echo "\n◆ والحزامُ **يُثبت الإمساكَ لا الرسوبَ المجرَّد** — فالشاهدُ يرسُب اليومَ\n";
     echo "  لسببٍ قائم، ورسوبٌ لا يُنسب إلى البذرِ لا يُثبت أن الحارسَ يراه.\n";
-    exit(($caughtSrc && $caughtRend && $left === 0) ? 0 : 1);
+    exit(($caughtSrc && $caughtRend && $caughtRetired && $left === 0) ? 0 : 1);
 }
 
 echo "\n" . str_repeat('─', 66) . "\n";
