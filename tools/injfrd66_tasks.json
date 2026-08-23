@@ -1221,8 +1221,8 @@
         "sheet": "م32 أعمار الأرصدة",
         "fields": 22,
         "gates": {
-            "built": "لا",
-            "linked": "لا",
+            "built": "نعم",
+            "linked": "نعم",
             "data": "لا",
             "tested": "نعم",
             "accepted": "لا"

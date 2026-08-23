@@ -97,9 +97,14 @@ $cap('SUP-16', 'الإقفالُ التعاقديُّ للخانات',
              OR NOT EXISTS (SELECT 1 FROM supplier_contracts s WHERE s.id = c.contract_id))", 0);
 
 /* SUP-22 — «كلُّ رصيدٍ له شريحةُ عمرٍ وإجراءٌ مقترح» */
+/* **منظرٌ لا جدول**: «قدرةٌ مفقودة — منظرٌ في التسويات» بنصِّ المتطلب.
+   فـ«صفرُ إدخال» خاصيةٌ بنيويةٌ لا قاعدةٌ تُراقَب. */
 $cap('SUP-22', 'أعمارُ الأرصدةِ والالتزامات',
-    array('sup_balance_aging'),
-    'sup_balance_aging', 'رصيدٌ بلا شريحةِ عمر', null, 0);
+    array('v_supplier_balance_aging'),
+    'v_supplier_balance_aging', 'رصيدٌ بلا شريحةِ عمرٍ أو إجراءٍ مقترح',
+    "SELECT COUNT(*) FROM v_supplier_balance_aging
+      WHERE age_bucket IS NULL OR age_bucket = ''
+         OR suggested_action IS NULL OR suggested_action = ''", 0);
 
 /* SUP-26 — «صفرُ مستندٍ منتهٍ بلا تنبيه» */
 $cap('SUP-26', 'سجلُّ المستنداتِ والضمانات',

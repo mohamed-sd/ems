@@ -2,13 +2,14 @@
 /**
  * tests/injfrd66_w4_capabilities_test.php — شاهدُ الموجةِ ④: القدراتُ المستجدّة
  * ═══════════════════════════════════════════════════════════════════════════
- * ◆ **الوثيقةُ تعدُّ أربعًا «تُبنى أولَ مرة» — والقياسُ يجد ثلاثًا مبنيّة.**
- *   وهذا الشاهدُ يُثبت البناءَ بجداولِه وصفوفِه، ويُثبت الغيابَ حيث هو غياب.
+ * ◆ **الوثيقةُ تعدُّ أربعًا «تُبنى أولَ مرة» — والقياسُ وجد ثلاثًا مبنيّةً سلفًا**،
+ *   والرابعةُ (`SUP-22`) بُنيت في هذه الجولةِ **منظرًا مشتقًّا لا جدولَ إدخال**
+ *   بنصِّ موضعِها: «قدرةٌ مفقودة — منظرٌ في التسويات».
  *
  * ◆ **إيجابيٌّ ①**: ثلاثُ قدراتٍ لها جداولُها وصفوفُها الحقيقية.
  * ◆ **إيجابيٌّ ②**: معياراهما المرجعيّانِ أخضران (إرساءٌ بعرضٍ · إقفالٌ بعقد).
- * ◆ **سالبٌ ③**: `SUP-22` **غائبةٌ فعلًا** — والبوابةُ تُعلنها «غيرَ مبنيّة»
- *   لا «صفرَ خرق». وجدولٌ مفقودٌ لا يُقاس ولا يُحسب نجاحًا.
+ * ◆ **إيجابيٌّ ③**: `SUP-22` منظرٌ (VIEW) بحقوقِ المستدعي، وكلُّ رصيدٍ فيه له
+ *   شريحةُ عمرٍ وإجراءٌ مقترح — **وترتيبُ أعمدتِه مثبَّتٌ على المخطَّط**.
  * ◆ **سالبٌ ④**: الحالةُ تُقرأ لا تُعمَّم — `called` و`draft` ليستا مستندًا
  *   حيًّا منتهيًا، وتعميمُهما يُضخّم الرقمَ ثمانيةَ أضعافٍ ويُغرق الخرقَ فيه.
  * ◆ **محجوزٌ ⑤**: ضمانٌ حيٌّ مضى تاريخُه — مبلغٌ محتجَزٌ بلا إفراجٍ ولا تمديد.
@@ -62,12 +63,33 @@ $check($num("SELECT COUNT(*) FROM supplier_contract_closures c WHERE c.is_delete
                    OR NOT EXISTS (SELECT 1 FROM supplier_contracts s WHERE s.id=c.contract_id))") === 0,
     'SUP-16 صفرُ إقفالٍ بلا عقدٍ مرجعيّ');
 
-echo "\n③ سالبٌ — الغائبُ يُعلَن غيابًا لا صفرَ خرق:\n";
-$check(!$tbl('sup_balance_aging'), 'SUP-22 أعمارُ الأرصدة — `sup_balance_aging` غيرُ موجودٍ فعلًا');
+echo "
+③ إيجابيٌّ — SUP-22 منظرٌ مشتقٌّ لا جدولُ إدخال:
+";
+$check($tbl('v_supplier_balance_aging'), '`v_supplier_balance_aging` قائم');
+$VW = "WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='v_supplier_balance_aging'";
+$check($num("SELECT COUNT(*) FROM information_schema.VIEWS {$VW}") === 1,
+    'وهو VIEW لا TABLE — فـ«صفرُ إدخال» خاصيةٌ بنيويةٌ لا قاعدةٌ تُراقَب');
+$check($num("SELECT COUNT(*) FROM information_schema.VIEWS {$VW} AND SECURITY_TYPE='INVOKER'") === 1,
+    'وبحقوقِ المستدعي لا المنشئ — فلا يفشل عندَ الاستعادةِ على مضيفٍ آخر');
+$rows = $num("SELECT COUNT(*) FROM v_supplier_balance_aging");
+$check($rows > 0, 'ويحمل ' . $rows . ' رصيدًا حيًّا');
+$check($num("SELECT COUNT(*) FROM v_supplier_balance_aging
+              WHERE age_bucket IS NULL OR CHAR_LENGTH(age_bucket)=0
+                 OR suggested_action IS NULL OR CHAR_LENGTH(suggested_action)=0") === 0,
+    'وكلُّ رصيدٍ له شريحةُ عمرٍ وإجراءٌ مقترح');
+
+/* ◆ **فخُّ الترتيب**: حرفياتُ `CASE` تأخذ ترتيبَ **اتصالِ العميل** لا المخطَّط —
+     فمقارنةُ `= ''` تنجح من سطرِ الأوامرِ وترسُب من PHP بـ«Illegal mix of
+     collations». وعطبٌ يظهر في بيئةٍ ويختفي في أخرى أخطرُ من عطبٍ ثابت. */
+$badColl = $num("SELECT COUNT(*) FROM information_schema.COLUMNS {$VW}
+                  AND COLLATION_NAME IS NOT NULL AND COLLATION_NAME <> 'utf8mb4_unicode_ci'");
+$check($badColl === 0, "وترتيبُ أعمدتِه النصّيةِ موحَّدٌ على المخطَّط (شواذُّ: {$badColl})");
 $out = array(); $rc = 0;
 exec('"' . PHP_BINARY . '" ' . escapeshellarg($ROOT . '/tools/injfrd66_w4_capabilities_gate.php') . ' 2>&1', $out, $rc);
-$txt = implode("\n", $out);
-$check(mb_strpos($txt, 'غيرُ مبنيّة') !== false, 'والبوابةُ تُعلنها «غيرَ مبنيّة» لا خضراء');
+$txt = implode("
+", $out);
+$check(mb_strpos($txt, 'غيرُ مبنيّة') === false, 'ولم تعدِ البوابةُ تُعلن أيَّ قدرةٍ «غيرَ مبنيّة»');
 
 echo "\n④ سالبٌ — الحالةُ تُقرأ لا تُعمَّم:\n";
 $W = "is_deleted=0 AND expiry_date IS NOT NULL AND expiry_date < CURDATE()";
