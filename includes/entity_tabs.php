@@ -25,7 +25,7 @@ if (!function_exists('ems_entity_tabs')) {
                 'label' => 'ملفُّ المورد',
                 'tabs' => array(
                     'البيانات' => 'Suppliers/suppliers.php',
-                    'جهاتُ الاتصالِ والمفوضون' => '',           /* SUP-02 — يُبنى */
+                    'جهاتُ الاتصالِ والمفوضون' => 'Suppliers/supplier_contacts.php',
                     'التأهيلُ والوثائقُ والحساب' => 'Suppliers/supplier_documents.php',
                     'المعداتُ المقدَّمة' => 'Suppliers/equipment_plan.php',
                     'الطاقةُ والجاهزية' => 'Suppliers/supplier_capacity.php',
@@ -74,7 +74,7 @@ if (!function_exists('ems_entity_tabs')) {
                 'label' => 'ملفُّ العميل',
                 'tabs' => array(
                     'البيانات الأساسية' => 'Clients/clients.php',
-                    'جهات الاتصال' => '',                      /* SAL-02 — يُبنى */
+                    'جهات الاتصال' => 'Clients/client_contacts.php',
                     'المشاريع' => 'Projects/projects.php',
                     'العقود' => 'Contracts/contracts.php',
                     'المركز المالي' => 'Contracts/client_statement.php',

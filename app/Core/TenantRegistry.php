@@ -243,6 +243,11 @@ class TenantRegistry
         // بcompany_id مباشرٍ (سابقة claim_lines)، وsoft=true لأن المكوّنَ نصُّ
         // عقدٍ يُستبدل بحالةٍ (replaced/ended) ولا يُمحى من أثر التدقيق.
         'pay_components' => array('type' => self::T_TENANT, 'soft' => true),
+        // INJ-FRD-01 · SAL-02 + SUP-02: جهاتُ الاتصالِ والمفوَّضون — **بيتٌ
+        // واحدٌ لطرفَي التعاقد** (`party_type` + `party_ref`) كما `settlements`.
+        // وجدولانِ منفصلانِ يفترقانِ بأوَّلِ تعديلٍ كما افترقت العملة.
+        // وحذفٌ ناعم: جهةُ اتصالٍ ذُكرت في عقدٍ لا تُمحى من أثرِ التدقيق.
+        'party_contacts' => array('type' => self::T_TENANT, 'soft' => true),
         // H-08-③ (هجرة 2026-08-19 · CON-01 §3.3): قواعدُ الحوافز — نصُّ عقدٍ
         // يُستبدل بحالةٍ لا يُمحى (soft)؛ والتوزيعُ ابنُ قاعدته يُستبدل ذريًّا
         // (replaceChildren يكنسه صلبًا داخل معاملته — فلا soft له).
