@@ -1,0 +1,374 @@
+<title>ما يُغلق INJ-FRD-01</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Noto+Kufi+Arabic:wght@700&display=swap">
+
+<style>
+/* ── نظامُ الرموزِ نفسُه الذي يستعمله دفترُ التاسكات — صفحتانِ شقيقتان ──── */
+:root{
+  --paper:#EBEEF2; --surface:#FFFFFF; --sunk:#F4F6F8;
+  --ink:#131920; --ink-2:#3D4956; --muted:#6B7886;
+  --rule:#D3DAE1; --rule-soft:#E2E7EC;
+  --accent:#A8660A; --accent-soft:#F3E7D2;
+  --act:#0E6E7A;   --act-soft:#DCEEF0;     /* فعلُ مشغّل */
+  --own:#8A3E12;   --own-soft:#F6E3D8;     /* قرارُ مالك */
+  --sys:#2F4C86;   --sys-soft:#E2E8F5;     /* عملُ نظام */
+  --ok:#166B4B;    --ok-soft:#DDEDE5;
+  --shadow:0 1px 2px rgba(19,25,32,.06), 0 8px 24px -16px rgba(19,25,32,.28);
+  --r:4px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D1116; --surface:#161B22; --sunk:#11161C;
+    --ink:#E3E9EF; --ink-2:#B3BECA; --muted:#8592A0;
+    --rule:#28313B; --rule-soft:#1E262E;
+    --accent:#E5A233; --accent-soft:#33291A;
+    --act:#4FB6C2;   --act-soft:#12262A;
+    --own:#D98A5E;   --own-soft:#2C1D15;
+    --sys:#8AA6DF;   --sys-soft:#1A2233;
+    --ok:#48B58C;    --ok-soft:#16281F;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D1116; --surface:#161B22; --sunk:#11161C;
+  --ink:#E3E9EF; --ink-2:#B3BECA; --muted:#8592A0;
+  --rule:#28313B; --rule-soft:#1E262E;
+  --accent:#E5A233; --accent-soft:#33291A;
+  --act:#4FB6C2;   --act-soft:#12262A;
+  --own:#D98A5E;   --own-soft:#2C1D15;
+  --sys:#8AA6DF;   --sys-soft:#1A2233;
+  --ok:#48B58C;    --ok-soft:#16281F;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans Arabic","Segoe UI",system-ui,sans-serif;
+  font-size:15px; line-height:1.7; direction:rtl;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1120px; margin:0 auto; padding:clamp(20px,4vw,52px) clamp(14px,3vw,32px) 80px;
+      display:flex; flex-direction:column; gap:34px}
+h1,h2,h3{font-family:"Noto Kufi Arabic","IBM Plex Sans Arabic",sans-serif; font-weight:700;
+         text-wrap:balance; margin:0; line-height:1.4}
+code,.mono,.num{font-family:"IBM Plex Mono",ui-monospace,monospace;
+                font-variant-numeric:tabular-nums; direction:ltr; unicode-bidi:isolate}
+code{background:var(--sunk); border:1px solid var(--rule-soft); border-radius:3px;
+     padding:1px 5px; font-size:.86em}
+a{color:var(--act)}
+
+/* ── الترويسة ─────────────────────────────────────────────── */
+.mast{border-bottom:2px solid var(--ink); padding-bottom:16px}
+.eyebrow{font-size:11.5px; letter-spacing:.14em; color:var(--muted);
+         text-transform:uppercase; margin:0 0 8px}
+.mast h1{font-size:clamp(24px,3.8vw,36px)}
+.mast .sub{color:var(--ink-2); font-size:15px; margin-top:10px; max-width:64ch}
+
+/* ── شريطُ الحالة ─────────────────────────────────────────── */
+.bar{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r);
+     box-shadow:var(--shadow); padding:clamp(18px,3vw,26px);
+     display:grid; grid-template-columns:minmax(190px,auto) 1fr; gap:clamp(18px,4vw,40px)}
+@media(max-width:760px){.bar{grid-template-columns:1fr}}
+.big{display:flex; flex-direction:column; gap:4px;
+     border-inline-end:1px solid var(--rule-soft); padding-inline-end:clamp(18px,4vw,40px)}
+@media(max-width:760px){.big{border-inline-end:0; padding-inline-end:0;
+     border-bottom:1px solid var(--rule-soft); padding-bottom:16px}}
+.big .label{font-size:11.5px; letter-spacing:.13em; color:var(--muted); text-transform:uppercase}
+.big .val{font-family:"IBM Plex Mono",monospace; font-size:clamp(40px,6.5vw,56px);
+          font-weight:600; line-height:1; letter-spacing:-.02em; color:var(--accent)}
+.big .val small{font-size:.4em; font-weight:400; color:var(--muted); margin-inline-start:2px}
+.big .foot{font-size:13px; color:var(--ink-2); margin-top:4px}
+.gates{display:grid; grid-template-columns:repeat(auto-fit,minmax(128px,1fr)); gap:12px; align-content:start}
+.gate{background:var(--sunk); border:1px solid var(--rule-soft); border-radius:var(--r); padding:10px 12px}
+.gate .g-n{font-size:12px; color:var(--muted); margin-bottom:3px}
+.gate .g-v{font-family:"IBM Plex Mono",monospace; font-size:17px; font-weight:600}
+.gate.is-done .g-v{color:var(--ok)}
+
+/* ── الأقسام ──────────────────────────────────────────────── */
+section{display:flex; flex-direction:column; gap:14px}
+.sec-head{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
+          border-bottom:1px solid var(--rule); padding-bottom:8px}
+.sec-head h2{font-size:19px}
+.sec-head .who{font-size:12px; letter-spacing:.08em; padding:3px 10px; border-radius:100px;
+               border:1px solid transparent}
+.who.w-act{color:var(--act); background:var(--act-soft); border-color:var(--act)}
+.who.w-own{color:var(--own); background:var(--own-soft); border-color:var(--own)}
+.who.w-sys{color:var(--sys); background:var(--sys-soft); border-color:var(--sys)}
+.sec-head .note{font-size:13px; color:var(--muted); margin-inline-start:auto}
+.lede{color:var(--ink-2); font-size:14.5px; margin:0; max-width:70ch}
+
+/* ── الجداول ──────────────────────────────────────────────── */
+.tbl-wrap{overflow-x:auto; background:var(--surface); border:1px solid var(--rule);
+          border-radius:var(--r); box-shadow:var(--shadow)}
+table{width:100%; border-collapse:collapse; font-size:14px}
+th,td{text-align:right; padding:11px 14px; vertical-align:top; border-bottom:1px solid var(--rule-soft)}
+thead th{font-size:12px; letter-spacing:.05em; color:var(--muted); font-weight:600;
+         background:var(--sunk); border-bottom:1px solid var(--rule); white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.req{white-space:nowrap; font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:13px}
+td.n{white-space:nowrap; font-family:"IBM Plex Mono",monospace; font-variant-numeric:tabular-nums;
+     font-size:16px; font-weight:600}
+.n-act{color:var(--act)} .n-own{color:var(--own)} .n-sys{color:var(--sys)}
+td .goal{display:block; font-size:12px; color:var(--muted); font-weight:400;
+         font-family:"IBM Plex Sans Arabic",sans-serif}
+td.do{min-width:230px}
+td.chk{min-width:210px}
+td.chk code{display:block; white-space:pre-wrap; word-break:break-word; font-size:11.5px;
+            line-height:1.6; background:transparent; border:0; padding:0; color:var(--ink-2)}
+
+/* ── ملاحظاتٌ حادّة ───────────────────────────────────────── */
+.sharp{background:var(--surface); border:1px solid var(--rule); border-inline-start:3px solid var(--accent);
+       border-radius:var(--r); padding:14px 18px; font-size:14px; color:var(--ink-2)}
+.sharp strong{color:var(--ink)}
+.traps{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px}
+.trap{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r);
+      padding:14px 16px; display:flex; flex-direction:column; gap:6px}
+.trap h3{font-size:14.5px; font-family:"IBM Plex Sans Arabic",sans-serif; font-weight:600}
+.trap p{margin:0; font-size:13.5px; color:var(--ink-2); line-height:1.65}
+.foot-note{font-size:12.5px; color:var(--muted); border-top:1px solid var(--rule); padding-top:14px}
+</style>
+
+<div class="wrap">
+
+  <header class="mast">
+    <p class="eyebrow">INJ-FRD-01 · إدارتا المبيعات والموردين</p>
+    <h1>ما يُغلق الحزمة</h1>
+    <p class="sub">
+      البناءُ اكتمل: <strong>«مبنيّ» و«موصول» صفرُ «لا»</strong>، و«مُختبَر» ٦٥ من ٦٦.
+      وما بقي <strong>ليس كودًا</strong> — أفعالُ مشغّلٍ وقراراتُ مالكٍ وأثرٌ مؤرَّخ.
+      وكلُّ سطرٍ أدناه يحمل <strong>الرقمَ الذي يجب أن يتحرَّك</strong> والاستعلامَ الذي يقيسه.
+    </p>
+  </header>
+
+  <div class="bar">
+    <div class="big">
+      <span class="label">المنجَز</span>
+      <span class="val">87.84<small>%</small></span>
+      <span class="foot">من خطِّ أساسٍ <b class="mono">35.57%</b> · ٢٤ التزامًا · ٢١ شاهدًا</span>
+    </div>
+    <div class="gates">
+      <div class="gate is-done"><div class="g-n">مبنيّ</div><div class="g-v">64 + 2 جزئي</div></div>
+      <div class="gate is-done"><div class="g-n">موصول</div><div class="g-v">55 + 9 جزئي</div></div>
+      <div class="gate"><div class="g-n">بيانات مُرحَّلة</div><div class="g-v">50 · 11 لا</div></div>
+      <div class="gate is-done"><div class="g-n">مُختبَر</div><div class="g-v">65 / 66</div></div>
+      <div class="gate"><div class="g-n">مقبول</div><div class="g-v">27 · 14 جزئي</div></div>
+    </div>
+  </div>
+
+  <p class="sharp">
+    <strong>وبوابةُ «مقبول» هي المتبقّي كلُّه تقريبًا</strong> — ولا يُغلقها كودٌ جديد.
+    خمسةٌ وعشرون متطلبًا تنتظر أن <strong>يُمارَس ما بُني</strong>: نشاطٌ يُسجَّل، ومراجعةٌ تُكمَل،
+    وتقييمٌ يُكتَب، وقرارٌ يُحسَم. <strong>والرقمُ الذي لا يتحرَّك لأنَّ أحدًا لم يعمل ليس عطبًا في النظام.</strong>
+  </p>
+
+  <!-- ══ أفعالُ مشغّل ══ -->
+  <section>
+    <div class="sec-head">
+      <h2>يُغلق بعملٍ يوميّ</h2>
+      <span class="who w-act">فعلُ مشغّل</span>
+      <span class="note">خمسةُ بنود · تُغلق بلا قرارٍ ولا شفرة</span>
+    </div>
+    <p class="lede">
+      هذه أرقامٌ تنزل إلى صفرٍ حين يؤدّي أصحابُها عملَهم المعتاد — لا يلزمها موافقةٌ ولا تعديل.
+    </p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>المتطلب</th><th>الرقمُ الآن</th><th>مَن يعمل</th><th>ما يُفعَل</th><th>القياس</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td class="req">SAL-04</td>
+            <td class="n n-act">9<span class="goal">← صفر</span></td>
+            <td>مسؤولُ المبيعات</td>
+            <td class="do">يسجّل نشاطَ متابعةٍ لكلِّ فرصةٍ مفتوحة — من تبويبِ الأنشطةِ في ملفِّ العميل.</td>
+            <td class="chk"><code>injfrd66_w7_integrity_gate · SAL-04</code></td>
+          </tr>
+          <tr>
+            <td class="req">SAL-10</td>
+            <td class="n n-act">17<span class="goal">← صفر</span></td>
+            <td>مراجعُ ما قبلَ التعاقد</td>
+            <td class="do">يُكمل بنودَ الجاهزيةِ حتى تصير حالةُ العقدِ «مجتاز» — ١٤ «لم يبدأ» و٣ «جارٍ».</td>
+            <td class="chk"><code>contracts.readiness_state &lt;&gt; 'مجتاز'</code></td>
+          </tr>
+          <tr>
+            <td class="req">SAL-14</td>
+            <td class="n n-act">4<span class="goal">← صفر</span></td>
+            <td>مالكُ العقد</td>
+            <td class="do">يعتمد خطَّ الأساسِ الشهريَّ لأربعةِ عقودٍ نافذةٍ أو قيدَ التنفيذ.</td>
+            <td class="chk"><code>injfrd66_w3_gate · SAL-14</code></td>
+          </tr>
+          <tr>
+            <td class="req">SUP-24</td>
+            <td class="n n-act">17<span class="goal">← صفر</span></td>
+            <td>إدارةُ الموردين</td>
+            <td class="do">تقييمٌ دوريٌّ لكلِّ موردٍ متعاقَدٍ معه — ١٧ من ١٩ بلا تقييمٍ البتّة.</td>
+            <td class="chk"><code>injfrd66_w7_integrity_gate · SUP-24</code></td>
+          </tr>
+          <tr>
+            <td class="req">XC-11</td>
+            <td class="n n-act">2<span class="goal">رحلتان</span></td>
+            <td>موظفٌ حقيقيّ</td>
+            <td class="do">رحلةُ بيعٍ ورحلةُ تعاقدٍ كاملتان <strong>بحسابِ إنسانٍ لا ببذرةِ اختبار</strong> — وهي وحدَها تُحوِّل أربعَ عشرةَ «جزئي» إلى «نعم».</td>
+            <td class="chk"><code>injfrd66_xc09_lifecycle_gate · XC-11</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="sharp">
+      <strong>و<code>XC-11</code> لا تُمرَّر بأداة.</strong> نصُّها «والرحلتان تعبران <strong>ببشر</strong>»،
+      وبوابةُ البيانات تستبعد بذرةَ الاختبار — <strong>فتمريرُها بيدِ الآلةِ يُنتج ما تمنعه الوثيقةُ نفسُها</strong>.
+    </p>
+  </section>
+
+  <!-- ══ قراراتُ مالك ══ -->
+  <section>
+    <div class="sec-head">
+      <h2>يُغلق بحكمٍ مكتوب</h2>
+      <span class="who w-own">قرارُ مالك</span>
+      <span class="note">ثمانيةُ بنود · لكلٍّ سؤالٌ واحدٌ يُجاب</span>
+    </div>
+    <p class="lede">
+      هذه ليست أعطابًا تُصلَح بل <strong>مفترقاتٌ تُحسَم</strong>. وكلُّ واحدٍ منها بقي مفتوحًا
+      لأنَّ إغلاقَه بيدِ المنفِّذِ يكتب في السجلِّ حكمًا لم يقلْه أحد.
+    </p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>المتطلب</th><th>الرقم</th><th>الحال</th><th>السؤالُ الذي يُجاب</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td class="req">SUP-26</td>
+            <td class="n n-own">1</td>
+            <td class="do">ضمانُ احتجازٍ حيٌّ <b class="mono">5,182.50</b> دولارًا مضى تاريخُه منذ <b class="mono">674</b> يومًا.</td>
+            <td class="do"><strong>إفراجٌ أم تمديدٌ أم مصادرة؟</strong> والمبلغُ محتجَزٌ حتى يُقال.</td>
+          </tr>
+          <tr>
+            <td class="req">SUP-03</td>
+            <td class="n n-own">71<span class="goal">و٢٠ عقدًا</span></td>
+            <td class="do">صفرٌ من ٧١ موردًا مكتملُ التأهيل، و<code>bank_verified_at</code> لم يستقبل قيمةً واحدةً قطّ.</td>
+            <td class="do"><strong>متى يُنفَّذ حارسُ «لا تعاقُدَ مع غيرِ مؤهَّل»؟</strong> إنفاذُه اليومَ يُخالف عقودَ الإدارةِ العشرينَ كلَّها — فيلزمه <strong>تاريخُ سريانٍ ومهلةُ تصحيح</strong>.</td>
+          </tr>
+          <tr>
+            <td class="req">SUP-29</td>
+            <td class="n n-own">120</td>
+            <td class="do">المبيعاتُ تكتب «دولار» و«جنيه»، والموردون <code>USD</code> — <strong>صفرُ قيمةٍ مشتركة</strong>.</td>
+            <td class="do"><strong>أيُّ أبجديةٍ تُعتمَد؟</strong> والتحويلُ يمسُّ ١٢٠ عقدًا وكلَّ قارئٍ للعملةِ نصًّا — <strong>موجةٌ مستقلّةٌ بحزامِ لقطات</strong>.</td>
+          </tr>
+          <tr>
+            <td class="req">SUP-20</td>
+            <td class="n n-own">27<span class="goal">من ١١١٣</span></td>
+            <td class="do">١١١٣ صرفًا طالبُه صارفُه — <strong>و٢٧ منها أُنشئت بعدَ بدءِ الإنفاذ</strong> وتحمل وسمَ «ما قبلَ الفصل».</td>
+            <td class="do"><strong>الـ٢٧ ليست دَينًا مؤرَّخًا.</strong> تُراجَع فرادى: أتُصحَّح أم يُعاد وسمُها؟</td>
+          </tr>
+          <tr>
+            <td class="req">SUP-19</td>
+            <td class="n n-own">251</td>
+            <td class="do">تسوياتٌ مُعِدُّها معتمِدُها — كلُّها <strong>تسبق الحارسَ تاريخًا</strong>.</td>
+            <td class="do"><strong>تُقبَل دَينًا مؤرَّخًا أم يُعاد اعتمادُها بيدَين؟</strong></td>
+          </tr>
+          <tr>
+            <td class="req">SUP-11</td>
+            <td class="n n-own">707</td>
+            <td class="do">حاوياتٌ بلا التزامٍ مرجعيّ (<code>obl_id</code> فارغ).</td>
+            <td class="do"><strong>تُوصَل بمصفوفةِ الالتزاماتِ أم يُقبَل الوضعُ أثرًا؟</strong></td>
+          </tr>
+          <tr>
+            <td class="req">SAL-11</td>
+            <td class="n n-own">120</td>
+            <td class="do">عروضٌ برمزِ <code>QT-BF-*</code> أُنشئت <strong>بعدَ</strong> عقودِها لتسدَّ مرجعًا.</td>
+            <td class="do"><strong>تُقبَل أثرًا تاريخيًّا معلَنًا أم يُعاد بناءُ المرجع؟</strong></td>
+          </tr>
+          <tr>
+            <td class="req">SAL-01</td>
+            <td class="n n-own">1</td>
+            <td class="do">كيانٌ واحدٌ بسجلَّين نشطَين (<code>1:C001</code> و<code>1667:C0057</code>) ولكلٍّ تبعيّاتُه.</td>
+            <td class="do"><strong>أيُّهما يبقى؟</strong> والدمجُ يُحرِّك مستنداتٍ مطبوعةً بيدِ الناس.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══ عملُ نظامٍ متبقٍّ ══ -->
+  <section>
+    <div class="sec-head">
+      <h2>يُغلق بإصلاحٍ صغير</h2>
+      <span class="who w-sys">عملُ نظام</span>
+      <span class="note">بندان · لا يحتاجان قرارًا</span>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th>المتطلب</th><th>الرقم</th><th>ما يُفعَل</th><th>لماذا لم يُفعَل بعد</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td class="req">SUP-15</td>
+            <td class="n n-sys">12</td>
+            <td class="do">استحقاقاتٌ <code>unit_record_id</code> لها من <b class="mono">1</b> إلى <b class="mono">20</b>
+                بينما سجلاتُ الوحداتِ من <b class="mono">13</b> إلى <b class="mono">672</b> — <strong>مرجعٌ معدوم</strong>.</td>
+            <td class="do">إصلاحُه <strong>إمّا</strong> إعادةُ ربطٍ بمرجعٍ صحيح <strong>أو</strong> حذفُ صفوفٍ يتيمة — وكلاهما يغيّر دفترَ استحقاقٍ ماليًّا. يُعرَض قبلَ أن يُنفَّذ.</td>
+          </tr>
+          <tr>
+            <td class="req">SUP-06</td>
+            <td class="n n-sys">20</td>
+            <td class="do">عقودُ موردين كلُّها موسومةٌ <code>source_table='supplierscontracts'</code> — <strong>مُرحَّلةٌ من سجلٍّ سابقٍ لقدرةِ الترشيح</strong>.</td>
+            <td class="do">اختراعُ ترشيحٍ لها <strong>يكتب واقعةً لم تحدث</strong>. تُوسَم دَينًا مؤرَّخًا كما وُسمت تسوياتُ <code>SUP-19</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ══ فخاخ ══ -->
+  <section>
+    <div class="sec-head">
+      <h2>فخاخٌ تنتظر الجولةَ التالية</h2>
+      <span class="note">كلُّها كلَّفت رقمًا كاذبًا في هذه الجولة</span>
+    </div>
+    <div class="traps">
+      <div class="trap">
+        <h3>الخاملُ ليس المفقود</h3>
+        <p><b class="mono">228</b> رابطًا بـ<code>active=0</code> — <b class="mono">119</b> منها في هاتين الإدارتَين.
+           <strong>وأُطفئت بقرارٍ لا بإهمال</strong>: البندُ صار تبويبًا. وإعادةُ تشغيلِها تنقض التنقّلَ المستهدَف.</p>
+      </div>
+      <div class="trap">
+        <h3>الوصلةُ التي تُسقِط صفوفًا تُخفيها</h3>
+        <p><code>JOIN</code> داخليٌّ يُبلغ <b class="mono">1</b> و<code>LEFT JOIN</code> يُبلغ <b class="mono">13</b>.
+           <strong>وأجملُ الرقمَين هو الخطأ.</strong></p>
+      </div>
+      <div class="trap">
+        <h3>الوسمُ لا يُبرِّئ وحدَه</h3>
+        <p>«ما قبلَ فصلِ الواجبات» أُلصق بـ<b class="mono">27</b> صفًّا <strong>أُنشئ بعدَ بدءِ الإنفاذ</strong> —
+           الوسمُ باختيارِ الكاتبِ لا بالتاريخ. <strong>فقِسِ الدَّينَ بتاريخِه.</strong></p>
+      </div>
+      <div class="trap">
+        <h3>نصفُ معيارٍ يُطوى</h3>
+        <p><code>SUP-19</code> و<code>SUP-20</code> نصفُهما الأولُ أخضر — ولو اكتُفي به لقُرئا مقبولَين
+           وفيهما <b class="mono">1364</b> خرقًا. <strong>وهو أسوأُ من معيارٍ لم يُقَس: الأولُ يُغلَق.</strong></p>
+      </div>
+      <div class="trap">
+        <h3>جدولٌ فارغٌ ليس نجاحًا</h3>
+        <p>«صفرُ خرق» في جدولٍ بلا صفوفٍ <strong>عدمُ ممارسةٍ لا صحّةُ حارس</strong> —
+           وصفٌّ واحدٌ مزروعٌ يقلبه أحمرَ فورًا.</p>
+      </div>
+      <div class="trap">
+        <h3>عدّادٌ اسمُه <code>$pass</code></h3>
+        <p><code>config.php</code> يُسنِده كلمةَ مرورِ القاعدة — فيطبع الشاهدُ «٩» وهي سبعةَ عشر.
+           <strong>رقمٌ كاذبٌ في تقريرٍ صادقٍ أخطرُ من رسوب.</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <p class="foot-note">
+    الأرقامُ مقيسةٌ على القاعدةِ الحيّةِ يوم <b class="mono">2026-08-23</b> ·
+    الفرع <code>fix/remediation-2026-08</code> ·
+    تُعاد بـ<code>php tools/injfrd66_w7_integrity_gate.php</code> و<code>injfrd66_w3_gate.php</code> ·
+    وحزامُ الأدلّة <code>php tools/injfrd66_evidence_belt.php</code> يرصد أيَّ «مُختبَر: نعم» بلا دليلٍ يسمّيه.
+  </p>
+
+</div>
