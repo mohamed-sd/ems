@@ -1,0 +1,194 @@
+<title>إنجاز INJ-FRD-01</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Noto+Kufi+Arabic:wght@700&display=swap">
+
+<style>
+:root{
+  --paper:#EBEEF2; --surface:#FFFFFF; --sunk:#F4F6F8;
+  --ink:#131920; --ink-2:#3D4956; --muted:#6B7886;
+  --rule:#D3DAE1; --rule-soft:#E2E7EC;
+  --accent:#A8660A; --accent-soft:#F3E7D2;
+  --ok:#166B4B; --ok-soft:#DDEDE5;
+  --part:#9A5F10; --part-soft:#F5E8D6;
+  --open:#7E8B99; --open-soft:#E6EAEE;
+  --r:4px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D1116; --surface:#161B22; --sunk:#11161C;
+    --ink:#E3E9EF; --ink-2:#B3BECA; --muted:#8592A0;
+    --rule:#28313B; --rule-soft:#1E262E;
+    --accent:#E5A233; --accent-soft:#33291A;
+    --ok:#48B58C; --ok-soft:#16281F;
+    --part:#D2953C; --part-soft:#2A2117;
+    --open:#6E7C8A; --open-soft:#1C232B;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D1116; --surface:#161B22; --sunk:#11161C;
+  --ink:#E3E9EF; --ink-2:#B3BECA; --muted:#8592A0;
+  --rule:#28313B; --rule-soft:#1E262E;
+  --accent:#E5A233; --accent-soft:#33291A;
+  --ok:#48B58C; --ok-soft:#16281F;
+  --part:#D2953C; --part-soft:#2A2117;
+  --open:#6E7C8A; --open-soft:#1C232B;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans Arabic","Segoe UI",system-ui,sans-serif; font-size:15px; line-height:1.66;
+  -webkit-font-smoothing:antialiased}
+.sheet{max-width:1020px; margin:0 auto; padding:clamp(20px,4vw,54px) clamp(14px,3vw,34px) 78px;
+  display:flex; flex-direction:column; gap:40px}
+h1,h2,h3{font-family:"Noto Kufi Arabic","IBM Plex Sans Arabic",sans-serif; font-weight:700; margin:0;
+  text-wrap:balance; line-height:1.38}
+.mono,code,td.n,th.n{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums}
+code{background:var(--sunk); border:1px solid var(--rule-soft); padding:1px 5px; border-radius:2px; font-size:12px;
+  direction:ltr; unicode-bidi:isolate; color:var(--ink-2)}
+
+/* ترويسة */
+.mast{border-bottom:2px solid var(--ink); padding-bottom:15px}
+.mast .eb{font-size:11.5px; letter-spacing:.15em; color:var(--muted); text-transform:uppercase; margin:0 0 7px}
+.mast h1{font-size:clamp(24px,3.8vw,34px)}
+.mast .sub{margin:8px 0 0; color:var(--ink-2); font-size:14px; max-width:64ch}
+.mast .st{margin:10px 0 0; font-size:12px; color:var(--muted)}
+
+/* شريطُ المؤشراتِ الكبير */
+.kpi{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1px; background:var(--rule);
+  border:1px solid var(--rule); border-radius:var(--r); overflow:hidden}
+.kpi>div{background:var(--surface); padding:17px 19px; display:flex; flex-direction:column; gap:3px}
+.kpi .lb{font-size:11.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
+.kpi .v{font-family:"IBM Plex Mono",monospace; font-size:clamp(26px,4.4vw,36px); font-weight:600; line-height:1.05;
+  letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:.45em; font-weight:400; color:var(--muted)}
+.kpi .hint{font-size:12px; color:var(--muted)}
+.kpi .done .v{color:var(--ok)} .kpi .left .v{color:var(--accent)} .kpi .delta .v{color:var(--ink)}
+
+/* مسار التقدّم */
+.track{border:1px solid var(--rule); border-radius:var(--r); background:var(--surface); padding:18px 19px;
+  display:flex; flex-direction:column; gap:13px}
+.trow{display:grid; grid-template-columns:88px 1fr 62px; align-items:center; gap:13px}
+.trow .k{font-size:12.5px; color:var(--muted)}
+.trow .p{height:11px; background:var(--open-soft); border-radius:99px; overflow:hidden}
+.trow .p i{display:block; height:100%; border-radius:99px}
+.trow .n{font-family:"IBM Plex Mono",monospace; font-size:13px; font-weight:600; text-align:end;
+  font-variant-numeric:tabular-nums}
+
+section{display:flex; flex-direction:column; gap:15px}
+.sh{border-bottom:1px solid var(--rule); padding-bottom:9px; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap}
+.sh h2{font-size:18.5px}
+.sh p{margin:0; font-size:13.5px; color:var(--muted)}
+
+/* جداول */
+.tw{overflow-x:auto; border:1px solid var(--rule); border-radius:var(--r); background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:13.5px}
+th,td{padding:9px 13px; text-align:start; border-bottom:1px solid var(--rule-soft); white-space:nowrap}
+th{font-family:"Noto Kufi Arabic",sans-serif; font-size:12px; font-weight:700; color:var(--muted);
+  background:var(--sunk); position:sticky; top:0}
+td.n,th.n{text-align:end; font-size:13px}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--sunk)}
+tr.tot td{font-weight:600; background:var(--sunk); border-top:2px solid var(--rule)}
+td.w{white-space:normal; min-width:190px}
+.ok{color:var(--ok); font-weight:600} .part{color:var(--part); font-weight:600} .open{color:var(--open)}
+
+/* شريطٌ صغيرٌ داخل الخلية */
+.mini{display:inline-block; width:56px; height:6px; background:var(--open-soft); border-radius:99px;
+  overflow:hidden; vertical-align:middle; margin-inline-start:8px}
+.mini i{display:block; height:100%; background:var(--accent)}
+
+/* شبكةُ المُغلَق */
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(228px,1fr)); gap:7px}
+.card{background:var(--surface); border:1px solid var(--rule); border-inline-start:3px solid var(--ok);
+  border-radius:0 var(--r) var(--r) 0; padding:9px 13px}
+.card b{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ok); display:block}
+.card span{font-size:13px; color:var(--ink-2)}
+
+/* خلاصة */
+.notes{display:flex; flex-direction:column; gap:9px; margin:0; padding:0; list-style:none}
+.notes li{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r); padding:12px 15px;
+  font-size:13.5px; color:var(--ink-2)}
+.notes li b{color:var(--ink)}
+.verdict{border-inline-start:3px solid var(--accent); background:var(--accent-soft); border-radius:0 var(--r) var(--r) 0;
+  padding:15px 18px; font-size:14px; color:var(--ink-2)}
+.verdict b{color:var(--ink)}
+.foot{border-top:1px solid var(--rule); padding-top:15px; font-size:12.5px; color:var(--muted)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important; animation:none!important}}
+</style>
+
+<div class="sheet" dir="rtl" lang="ar">
+
+  <header class="mast">
+    <p class="eb">INJ-FRD-01 · INJ-FRD-TRACE-01</p>
+    <h1>تقريرُ الإنجاز — إكمالُ المبيعاتِ التعاقديةِ وعقودِ الموردين</h1>
+    <p class="sub">ستةٌ وستون متطلبًا بخمسِ بواباتٍ لكلِّ متطلب. كلُّ رقمٍ هنا محسوبٌ من الحالةِ الحيّةِ لا منقولٌ من وثيقة.</p>
+    <p class="st">لقطةُ <span class="mono">2026-08-23 03:40</span> · المصدر <code>tools/injfrd66_tasks.json</code></p>
+  </header>
+
+  <div class="kpi">
+    <div class="done"><span class="lb">المنجز</span><span class="v">87.84<small>%</small></span><span class="hint">من مئةٍ كاملة</span></div>
+    <div class="left"><span class="lb">المتبقّي</span><span class="v">12.16<small>%</small></span><span class="hint">فجوةُ الإغلاق</span></div>
+    <div class="delta"><span class="lb">الفارقُ المُحقَّق</span><span class="v">+52.27</span><span class="hint">نقطةً عن خطِّ الأساس 35.57%</span></div>
+    <div><span class="lb">مُغلَقٌ كاملًا</span><span class="v">24<small>/66</small></span><span class="hint">خمسُ بواباتٍ خضراء</span></div>
+  </div>
+
+  <div class="track">
+    <div class="trow"><span class="k">خطُّ الأساس</span><span class="p"><i style="width:35.57%;background:var(--open)"></i></span><span class="n">35.57%</span></div>
+    <div class="trow"><span class="k">اليوم</span><span class="p"><i style="width:87.84%;background:var(--ok)"></i></span><span class="n">87.84%</span></div>
+  </div>
+
+  <section>
+    <div class="sh"><h2>① المطلوبُ في المستندَين ومقدارُ ما تحقَّق</h2><p>المقاماتُ الحاكمةُ كما نصَّت عليها الوثيقة</p></div>
+    <div class="tw"><table>
+      <thead><tr><th>المطلوب</th><th class="n">المقام</th><th class="n">المُنجَز</th><th class="n">المتبقّي</th><th class="n">النسبة</th></tr></thead>
+      <tbody><tr><td>متطلباتٌ وظيفية</td><td class="n">66</td><td class="n">24 مُغلَقًا كاملًا</td><td class="n">42</td><td class="n"><span class="open">36.36%</span><span class="mini"><i style="width:36%"></i></span></td></tr><tr><td>حقولُ المبيعاتِ المحكومة</td><td class="n">589</td><td class="n">589</td><td class="n">0</td><td class="n"><span class="ok">100.00%</span><span class="mini"><i style="width:100%"></i></span></td></tr><tr><td>حقولُ الموردين المحكومة</td><td class="n">828</td><td class="n">828</td><td class="n">0</td><td class="n"><span class="ok">100.00%</span><span class="mini"><i style="width:100%"></i></span></td></tr><tr><td>إجمالي الحقولِ المحكومة</td><td class="n">1,417</td><td class="n">1,417</td><td class="n">0</td><td class="n"><span class="ok">100.00%</span><span class="mini"><i style="width:100%"></i></span></td></tr><tr><td>قدراتٌ مستجدّةٌ تُبنى أسطحًا</td><td class="n">4</td><td class="n">4</td><td class="n">0</td><td class="n"><span class="ok">100.00%</span><span class="mini"><i style="width:100%"></i></span></td></tr><tr><td>لوحةُ إدارةِ الموردين</td><td class="n">1</td><td class="n">1</td><td class="n">0</td><td class="n"><span class="ok">100.00%</span><span class="mini"><i style="width:100%"></i></span></td></tr><tr><td>متطلباتٌ لها شاهدٌ إيجابيٌّ وسالب</td><td class="n">66</td><td class="n">65</td><td class="n">1</td><td class="n"><span class="part">98.48%</span><span class="mini"><i style="width:98%"></i></span></td></tr><tr><td>متطلباتٌ عبَرت معيارَ قبولِها</td><td class="n">66</td><td class="n">27 كاملًا · 14 جزئيًّا</td><td class="n">25</td><td class="n"><span class="part">51.52%</span><span class="mini"><i style="width:52%"></i></span></td></tr><tr><td>متطلباتٌ تحمل بياناتٍ حقيقية</td><td class="n">61</td><td class="n">50</td><td class="n">11</td><td class="n"><span class="part">81.97%</span><span class="mini"><i style="width:82%"></i></span></td></tr></tbody>
+    </table></div>
+    <p style="margin:0;font-size:12.5px;color:var(--muted)">خمسةُ متطلباتٍ «لا ينطبق عليها الترحيل» — إسقاطٌ أو مرجعٌ لا يحمل بياناتٍ خاصةً بسببٍ مسجَّل؛ فمقامُ البياناتِ 61 لا 66.</p>
+  </section>
+
+  <section>
+    <div class="sh"><h2>② حصيلةُ كلِّ نطاق</h2></div>
+    <div class="tw"><table>
+      <thead><tr><th>النطاق</th><th class="n">المتطلبات</th><th class="n">سقفُه</th><th class="n">المُنجَزُ منه</th><th class="n">نسبةُ إنجازِه</th><th class="n">مُغلَقٌ كاملًا</th></tr></thead>
+      <tbody><tr><td>المبيعات</td><td class="n">24</td><td class="n">36.36%</td><td class="n">31.59%</td><td class="n"><b>86.88%</b><span class="mini"><i style="width:87%"></i></span></td><td class="n">10 من 24</td></tr><tr><td>الموردون</td><td class="n">30</td><td class="n">45.45%</td><td class="n">40.11%</td><td class="n"><b>88.25%</b><span class="mini"><i style="width:88%"></i></span></td><td class="n">10 من 30</td></tr><tr><td>عابر</td><td class="n">12</td><td class="n">18.18%</td><td class="n">16.14%</td><td class="n"><b>88.75%</b><span class="mini"><i style="width:89%"></i></span></td><td class="n">4 من 12</td></tr><tr class="tot"><td>الإجمالي</td><td class="n">66</td><td class="n">100.00%</td><td class="n">87.84%</td><td class="n">87.84%</td><td class="n">24 من 66</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>③ أين يقع المتبقّي بالضبط</h2><p>الفجوةُ موزَّعةً على البواباتِ الخمس</p></div>
+    <div class="tw"><table>
+      <thead><tr><th>البوابة</th><th class="n">الوزن</th><th class="n">نعم</th><th class="n">جزئي</th><th class="n">لا</th><th class="n">لا ينطبق</th><th class="n">المتبقّي</th><th class="n">حصّتُه من الفجوة</th></tr></thead>
+      <tbody><tr><td>مبنيّ</td><td class="n">25%</td><td class="n ok">64</td><td class="n part">2</td><td class="n open">0</td><td class="n">0</td><td class="n"><b>0.38%</b></td><td class="n">3.12%</td></tr><tr><td>موصول</td><td class="n">25%</td><td class="n ok">55</td><td class="n part">9</td><td class="n open">0</td><td class="n">2</td><td class="n"><b>1.70%</b></td><td class="n">14.02%</td></tr><tr><td>بيانات مُرحَّلة</td><td class="n">15%</td><td class="n ok">50</td><td class="n part">0</td><td class="n open">11</td><td class="n">5</td><td class="n"><b>2.50%</b></td><td class="n">20.56%</td></tr><tr><td>مُختبَر</td><td class="n">20%</td><td class="n ok">65</td><td class="n part">0</td><td class="n open">1</td><td class="n">0</td><td class="n"><b>0.30%</b></td><td class="n">2.49%</td></tr><tr><td>مقبول</td><td class="n">15%</td><td class="n ok">27</td><td class="n part">14</td><td class="n open">25</td><td class="n">0</td><td class="n"><b>7.27%</b></td><td class="n">59.81%</td></tr><tr class="tot"><td>الإجمالي</td><td class="n">100%</td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n"></td><td class="n">12.16%</td><td class="n">100%</td></tr></tbody>
+    </table></div>
+    <div class="verdict"><b>59.81% من الفجوةِ الباقيةِ في بوابةِ «مقبول» وحدَها</b> — والبناءُ والوصلُ لم يبقَ فيهما «لا» واحدة.</div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>④ توزيعُ المتطلباتِ على شرائحِ الإنجاز</h2></div>
+    <div class="tw"><table>
+      <thead><tr><th class="n">الشريحة</th><th class="n">العدد</th><th>المعرّفات</th></tr></thead>
+      <tbody><tr><td class="n ok">100.0%</td><td class="n">24</td><td class="w"><code>SAL-03</code> <code>SAL-05</code> <code>SAL-12</code> <code>SAL-15</code> <code>SAL-17</code> <code>SAL-18</code> <code>SAL-20</code> <code>SAL-22</code> <code>SAL-23</code> <code>SAL-24</code> <code>SUP-04</code> <code>SUP-05</code> <code>SUP-09</code> <code>SUP-10</code> <code>SUP-12</code> <code>SUP-14</code> <code>SUP-18</code> <code>SUP-21</code> <code>SUP-25</code> <code>SUP-30</code> <code>XC-04</code> <code>XC-05</code> <code>XC-06</code> <code>XC-12</code></td></tr><tr><td class="n part">92.5%</td><td class="n">14</td><td class="w"><code>SAL-07</code> <code>SAL-21</code> <code>SUP-07</code> <code>SUP-08</code> <code>SUP-13</code> <code>SUP-16</code> <code>SUP-19</code> <code>SUP-20</code> <code>XC-01</code> <code>XC-02</code> <code>XC-07</code> <code>XC-08</code> <code>XC-09</code> <code>XC-10</code></td></tr><tr><td class="n part">87.5%</td><td class="n">1</td><td class="w"><code>SAL-13</code></td></tr><tr><td class="n part">85.0%</td><td class="n">14</td><td class="w"><code>SAL-01</code> <code>SAL-04</code> <code>SAL-10</code> <code>SAL-11</code> <code>SAL-16</code> <code>SUP-01</code> <code>SUP-02</code> <code>SUP-06</code> <code>SUP-11</code> <code>SUP-15</code> <code>SUP-17</code> <code>SUP-24</code> <code>SUP-26</code> <code>SUP-27</code></td></tr><tr><td class="n part">72.5%</td><td class="n">4</td><td class="w"><code>SAL-14</code> <code>SAL-19</code> <code>SUP-29</code> <code>XC-03</code></td></tr><tr><td class="n part">70.0%</td><td class="n">3</td><td class="w"><code>SAL-02</code> <code>SUP-22</code> <code>SUP-28</code></td></tr><tr><td class="n open">57.5%</td><td class="n">5</td><td class="w"><code>SAL-06</code> <code>SAL-08</code> <code>SAL-09</code> <code>SUP-03</code> <code>SUP-23</code></td></tr><tr><td class="n open">37.5%</td><td class="n">1</td><td class="w"><code>XC-11</code></td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>⑤ المُغلَقُ كاملًا — 24 متطلبًا</h2></div>
+    <div class="grid"><div class="card"><b>SAL-03</b><span>سجل المشاريع</span></div><div class="card"><b>SAL-05</b><span>الأنشطة والمتابعات</span></div><div class="card"><b>SAL-12</b><span>بنود العقد والالتزام التجاري</span></div><div class="card"><b>SAL-15</b><span>التغطية التعاقدية</span></div><div class="card"><b>SAL-17</b><span>المطالبات والتسليم للمالية</span></div><div class="card"><b>SAL-18</b><span>آليات تعديل السعر</span></div><div class="card"><b>SAL-20</b><span>لوحة المبيعات</span></div><div class="card"><b>SAL-22</b><span>الأعمال غير المفوترة</span></div><div class="card"><b>SAL-23</b><span>القاموس وقواعد الاستنتاج</span></div><div class="card"><b>SAL-24</b><span>تقارير المراجعة والاكتمال والتتبّع</span></div><div class="card"><b>SUP-04</b><span>المعدات المقدَّمة تحت العقد</span></div><div class="card"><b>SUP-05</b><span>احتياجات التغطية</span></div><div class="card"><b>SUP-09</b><span>بنود عقود الموردين</span></div><div class="card"><b>SUP-10</b><span>مصفوفة المسؤوليات والتكاليف</span></div><div class="card"><b>SUP-12</b><span>توزيع الوحدات التعاقدية على المعدات</span></div><div class="card"><b>SUP-14</b><span>مستهدفات الموردين</span></div><div class="card"><b>SUP-18</b><span>استحقاقات الموردين</span></div><div class="card"><b>SUP-21</b><span>تخصيص الدفع على الإقفالات</span></div><div class="card"><b>SUP-25</b><span>الملاحق والتصفية والإغلاق</span></div><div class="card"><b>SUP-30</b><span>القاموس وخرائط الترحيل وتقارير القبول</span></div><div class="card"><b>XC-04</b><span>مداخل للأسطح المبنية بلا مدخل</span></div><div class="card"><b>XC-05</b><span>حسابات إدارة الموردين</span></div><div class="card"><b>XC-06</b><span>بوابتا الأعمدة</span></div><div class="card"><b>XC-12</b><span>حدود المالية والخزينة</span></div></div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>⑥ المتبقّي — 42 متطلبًا وما ينقص كلًّا منها</h2><p>مرتَّبًا من الأبعدِ إلى الأقرب</p></div>
+    <div class="tw"><table>
+      <thead><tr><th>المعرّف</th><th>العنوان</th><th class="n">نسبتُه</th><th class="w">البواباتُ الناقصة</th><th class="n">ما يحمله من الفجوة</th></tr></thead>
+      <tbody><tr><td><code>XC-11</code></td><td class="w">الممارسة لا البناء</td><td class="n open">37.5%</td><td class="w">موصول (جزئي) · بيانات مُرحَّلة · مُختبَر · مقبول</td><td class="n">0.95%</td></tr><tr><td><code>SAL-06</code></td><td class="w">احتياج العميل وطلب العرض</td><td class="n open">57.5%</td><td class="w">موصول (جزئي) · بيانات مُرحَّلة · مقبول</td><td class="n">0.64%</td></tr><tr><td><code>SAL-08</code></td><td class="w">بنود العروض</td><td class="n open">57.5%</td><td class="w">موصول (جزئي) · بيانات مُرحَّلة · مقبول</td><td class="n">0.64%</td></tr><tr><td><code>SAL-09</code></td><td class="w">التفاوض ومراجعات العرض</td><td class="n open">57.5%</td><td class="w">موصول (جزئي) · بيانات مُرحَّلة · مقبول</td><td class="n">0.64%</td></tr><tr><td><code>SUP-03</code></td><td class="w">التأهيل القانوني والائتماني</td><td class="n open">57.5%</td><td class="w">مبنيّ (جزئي) · بيانات مُرحَّلة · مقبول</td><td class="n">0.64%</td></tr><tr><td><code>SUP-23</code></td><td class="w">المخالفات والجزاءات</td><td class="n open">57.5%</td><td class="w">موصول (جزئي) · بيانات مُرحَّلة · مقبول</td><td class="n">0.64%</td></tr><tr><td><code>SAL-02</code></td><td class="w">جهات اتصال العملاء</td><td class="n part">70.0%</td><td class="w">بيانات مُرحَّلة · مقبول</td><td class="n">0.45%</td></tr><tr><td><code>SUP-22</code></td><td class="w">أعمار الأرصدة والالتزامات</td><td class="n part">70.0%</td><td class="w">بيانات مُرحَّلة · مقبول</td><td class="n">0.45%</td></tr><tr><td><code>SUP-28</code></td><td class="w">لوحة إدارة الموردين</td><td class="n part">70.0%</td><td class="w">بيانات مُرحَّلة · مقبول</td><td class="n">0.45%</td></tr><tr><td><code>SAL-14</code></td><td class="w">خط الأساس والمستهدفات</td><td class="n part">72.5%</td><td class="w">موصول (جزئي) · مقبول</td><td class="n">0.42%</td></tr><tr><td><code>SAL-19</code></td><td class="w">الملحقات والتجديد والإغلاق</td><td class="n part">72.5%</td><td class="w">موصول (جزئي) · مقبول</td><td class="n">0.42%</td></tr><tr><td><code>SUP-29</code></td><td class="w">القوائم المرجعية</td><td class="n part">72.5%</td><td class="w">مبنيّ (جزئي) · مقبول</td><td class="n">0.42%</td></tr><tr><td><code>XC-03</code></td><td class="w">تفعيل حجب السلّم بتدرّج</td><td class="n part">72.5%</td><td class="w">موصول (جزئي) · مقبول</td><td class="n">0.42%</td></tr><tr><td><code>SAL-01</code></td><td class="w">سجل العملاء</td><td class="n part">85.0%</td><td class="w">مقبول</td><td class="n">0.23%</td></tr><tr><td><code>SAL-04</code></td><td class="w">الفرص البيعية</td><td class="n part">85.0%</td><td class="w">مقبول</td><td class="n">0.23%</td></tr><tr><td><code>SAL-10</code></td><td class="w">مراجعة ما قبل التعاقد</td><td class="n part">85.0%</td><td class="w">مقبول</td><td class="n">0.23%</td></tr><tr><td><code>SAL-11</code></td><td class="w">سجل عقود المشاريع</td><td class="n part">85.0%</td><td class="w">مقبول</td><td class="n">0.23%</td></tr><tr><td><code>SAL-16</code></td><td class="w">الأداء والمبيعات الشهرية</td><td class="n part">85.0%</td><td class="w">مقبول</td><td class="n">0.23%</td></tr><tr><td><code>SUP-01</code></td><td class="w">سجل الموردين</td><td class="n part">85.0%</td><td class="w">مقبول</td><td class="n">0.23%</td></tr><tr><td><code>SUP-02</code></td><td class="w">جهات الاتصال والمفوضون</td><td class="n part">85.0%</td><td class="w">بيانات مُرحَّلة</td><td class="n">0.23%</td></tr><tr><td><code>SUP-06</code></td><td class="w">الترشيح ومراجعة التعاقد</td><td class="n part">85.0%</td><td class="w">مقبول</td><td class="n">0.23%</td></tr><tr><td><code>SUP-11</code></td><td class="w">الحصص والتغطية التعاقدية</td><td class="n part">85.0%</td><td class="w">مقبول</td><td class="n">0.23%</td></tr><tr><td><code>SUP-15</code></td><td class="w">اعتماد الوحدات المنفَّذة</td><td class="n part">85.0%</td><td class="w">مقبول</td><td class="n">0.23%</td></tr><tr><td><code>SUP-17</code></td><td class="w">النيابية والسلف والخصومات</td><td class="n part">85.0%</td><td class="w">مقبول</td><td class="n">0.23%</td></tr><tr><td><code>SUP-24</code></td><td class="w">تقييم المورد والأداء</td><td class="n part">85.0%</td><td class="w">مقبول</td><td class="n">0.23%</td></tr><tr><td><code>SUP-26</code></td><td class="w">سجل المستندات والضمانات</td><td class="n part">85.0%</td><td class="w">مقبول</td><td class="n">0.23%</td></tr><tr><td><code>SUP-27</code></td><td class="w">مصادر القدرة والتكامل</td><td class="n part">85.0%</td><td class="w">بيانات مُرحَّلة</td><td class="n">0.23%</td></tr><tr><td><code>SAL-13</code></td><td class="w">مصفوفة الالتزامات</td><td class="n part">87.5%</td><td class="w">موصول (جزئي)</td><td class="n">0.19%</td></tr><tr><td><code>SAL-07</code></td><td class="w">سجل العروض</td><td class="n ok">92.5%</td><td class="w">مقبول (جزئي)</td><td class="n">0.11%</td></tr><tr><td><code>SAL-21</code></td><td class="w">البيانات المرجعية</td><td class="n ok">92.5%</td><td class="w">مقبول (جزئي)</td><td class="n">0.11%</td></tr><tr><td><code>SUP-07</code></td><td class="w">عروض الموردين والتفاوض</td><td class="n ok">92.5%</td><td class="w">مقبول (جزئي)</td><td class="n">0.11%</td></tr><tr><td><code>SUP-08</code></td><td class="w">سجل عقود الموردين</td><td class="n ok">92.5%</td><td class="w">مقبول (جزئي)</td><td class="n">0.11%</td></tr><tr><td><code>SUP-13</code></td><td class="w">الجاهزية والإحلال والاحتياط</td><td class="n ok">92.5%</td><td class="w">مقبول (جزئي)</td><td class="n">0.11%</td></tr><tr><td><code>SUP-16</code></td><td class="w">الإقفال التعاقدي للخانات</td><td class="n ok">92.5%</td><td class="w">مقبول (جزئي)</td><td class="n">0.11%</td></tr><tr><td><code>SUP-19</code></td><td class="w">التسويات وكشف الحساب</td><td class="n ok">92.5%</td><td class="w">مقبول (جزئي)</td><td class="n">0.11%</td></tr><tr><td><code>SUP-20</code></td><td class="w">طلبات الدفع وحالة الصرف</td><td class="n ok">92.5%</td><td class="w">مقبول (جزئي)</td><td class="n">0.11%</td></tr><tr><td><code>XC-01</code></td><td class="w">اشتقاق التنقّل من الجدول المستهدف</td><td class="n ok">92.5%</td><td class="w">مقبول (جزئي)</td><td class="n">0.11%</td></tr><tr><td><code>XC-02</code></td><td class="w">كنس المصدر قبل الاشتقاق</td><td class="n ok">92.5%</td><td class="w">مقبول (جزئي)</td><td class="n">0.11%</td></tr><tr><td><code>XC-07</code></td><td class="w">أزرار الإنشاء ببواباتها</td><td class="n ok">92.5%</td><td class="w">مقبول (جزئي)</td><td class="n">0.11%</td></tr><tr><td><code>XC-08</code></td><td class="w">مصفوفة فصل الواجبات</td><td class="n ok">92.5%</td><td class="w">مقبول (جزئي)</td><td class="n">0.11%</td></tr><tr><td><code>XC-09</code></td><td class="w">دورة حياة عقد المورد</td><td class="n ok">92.5%</td><td class="w">مقبول (جزئي)</td><td class="n">0.11%</td></tr><tr><td><code>XC-10</code></td><td class="w">قاموس قواعد الاستنتاج</td><td class="n ok">92.5%</td><td class="w">مقبول (جزئي)</td><td class="n">0.11%</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>⑦ خلاصةُ ما بقي</h2></div>
+    <ul class="notes"><li><b>البياناتُ الحقيقية</b> — 11 متطلبًا بلا صفوفٍ حقيقية، وأربعةُ جداولٍ ما زالت صفرَ صفٍّ فعلًا: <code>sal_client_needs</code> <code>sal_quotation_lines</code> <code>sal_quotation_revisions</code> <code>sup_violations</code>. وهي عقدةُ <code>XC-11</code> نفسِها: <b>الممارسةُ لا البناء</b>.</li><li><b>القبول</b> — 25 متطلبًا لم يعبر معيارَ قبولِه و14 عبَره جزئيًّا؛ وهو <b>أكبرُ بندٍ في الفجوة</b>.</li><li><b>الوصل</b> — 9 موصولٌ جزئيًّا، و<b>صفرُ متطلبٍ غيرِ موصولٍ البتّة</b>.</li><li><b>البناء</b> — 2 مبنيٌّ جزئيًّا، و<b>صفرُ متطلبٍ غيرِ مبنيّ</b>.</li><li><b>الاختبار</b> — 65 من 66 لها شاهدٌ إيجابيٌّ وسالب؛ والباقي <code>XC-11</code>.</li></ul>
+    <div class="verdict"><b>ولا يُقال «اكتملت الإدارتان»</b> قبلَ خضرةِ معاييرِ القبولِ كلِّها على النظامِ الحيّ: ١٬٤١٧ حقلًا محكومة ✔ · القائمةُ مشتقّةٌ لا مكتوبة ✔ · صفرُ سطحٍ مبنيٍّ بلا مدخل ✔ · <b>والرحلتان تعبران ببشر — وهذه لم تقع بعد.</b></div>
+  </section>
+
+  <footer class="foot">مولَّدٌ بـ<code>tools/injfrd66_injaz_report.php</code> — يُعاد توليدُه بعد كلِّ بوابةٍ تُغلق.</footer>
+</div>

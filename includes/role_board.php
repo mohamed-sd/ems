@@ -110,6 +110,36 @@ function roleBoardScalar($gate, array $scope, $sql, array $params = array())
 }
 
 /**
+ * تعريفٌ **واحد** لعدّادِ الاعتماداتِ — الدورُ 2.
+ * ═══════════════════════════════════════════════════════════════════════
+ * ◆ **كان مكتوبًا ثلاثَ مراتٍ ونسخةٌ رابعةٌ تخالفه**: البطاقةُ والمهمّةُ
+ *   والتنبيهُ تحمل الجملةَ نفسَها حرفًا، وشارةُ السايدبار تحمل تعدادَ
+ *   حالاتٍ آخر (`finreq_badges.php`). **وأربعُ نسخٍ تتفرّق بأوَّلِ تعديل** —
+ *   فقارئٌ واحدٌ لكلِّ معيار.
+ *
+ * ◆ **الجملةُ هي الأصليةُ حرفًا بقرارِ المالك 2026-08-23**: جُرِّب مصدرانِ
+ *   آخرانِ ثم أُعيد الأوَّل — فيبقى الرقمُ **٥٨** كما كان.
+ *
+ * ◆ **وما قِيس أثناءَ التجربةِ يُقيَّد هنا لئلّا يُعاد اكتشافُه**:
+ *   ① من الثمانيةِ والخمسين **سبعةٌ وخمسون بذرةُ تهيئة** (`legacy-seed-20260812`)
+ *      والصادقُ **واحد** — فالرقمُ يقيس البذرةَ أكثرَ مما يقيس العمل.
+ *   ② ودفترُ الاعتماداتِ `timesheet_approvals` فيه **٨٥** صفًّا،
+ *      **ومستواه الثاني ٢٢ بالضبط** — وهو الرقمُ الذي ذكره المالكُ أوَّلًا.
+ *   ⇐ فإن أُريد يومًا رقمٌ يقيس عملًا حقيقيًّا، فالبابانِ معروفانِ بسطرِهما.
+ */
+function roleBoardSupplierPendingSql()
+{
+    /* ◆ **ولا استعلامَ فرعيٌّ على `unit_approvals` هنا**: البوابةُ ترفض جدولَ
+         مستأجِرٍ غيرَ مُعلَن («جدولٌ مستأجرٌ غير معلَن») **ويبتلع الحارسُ الخطأَ
+         فيعود صفرًا** — عدّادٌ يُظهر صفرًا لأنَّ استعلامَه رُفض لا لأنَّ العملَ
+         انتهى. وهو أسوأُ من رقمٍ كبيرٍ خاطئ.
+       ◆ **والحالةُ تُغني عن الوصل**: `site_approved` تعني أنَّ الموقعَ اعتمد
+         ولم يعتمدْ طرفٌ بعدَه — وقِيس أنَّ **صفرًا** من صفوفِ هذه الحالةِ يحمل
+         اعتمادَ مرحلةِ `supplier`. وشاهدُ `tests/rb2_supplier_pending_test.php`
+         يحرس هذا التكافؤَ: إن حمل صفٌّ منها اعتمادَ موردٍ يومًا **يرسُب**. */
+    return "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND ue.state='site_approved'";
+}
+/**
  * ④ تعريفات التنبيهات لكل دور — منقولةٌ حرفيًّا من UX-01 §8.
  * لكل تنبيه: النص (السبب) · الشرط (دالّة تعيد العدد) · القفزة (الشاشة).
  * يُبنى هنا التعريفُ وحده؛ والتنفيذُ في roleBoardAlerts.
@@ -396,7 +426,7 @@ function roleBoardAlerts($conn, $gate, $roleId)
         2 => array(
             // UI-DEF-03: ما ينتظر أطرافَ الاعتماد (ومنهم المورد) = بعد اعتماد الموقع
             'units_pending_sup' => array(array('t' => 'unit_entries', 'a' => 'ue'),
-                "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND ue.state='site_approved'"),
+                roleBoardSupplierPendingSql()),
             'sup_contract_end' => array(array('t' => 'supplierscontracts', 'a' => 'sc'),
                 "SELECT COUNT(*) FROM supplierscontracts sc WHERE {TENANT_SCOPE} AND sc.status=1
                  AND sc.actual_end IS NOT NULL AND sc.actual_end BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY)"),
@@ -654,10 +684,12 @@ function roleBoardGenericConfig($rid)
                 array('الموردون', 'fa-truck-field', array('t' => 'suppliers', 'a' => 's'), "SELECT COUNT(*) FROM suppliers s WHERE {TENANT_SCOPE}", '../Suppliers/suppliers.php', 'or'),
                 array('عقود نشطة', 'fa-file-contract', array('t' => 'supplierscontracts', 'a' => 'sc'), "SELECT COUNT(*) FROM supplierscontracts sc WHERE {TENANT_SCOPE} AND sc.status=1", '../Suppliers/supplierscontracts.php', 'ok'),
                 array('تنتهي خلال 30 يومًا', 'fa-hourglass-half', array('t' => 'supplierscontracts', 'a' => 'sc'), "SELECT COUNT(*) FROM supplierscontracts sc WHERE {TENANT_SCOPE} AND sc.status=1 AND sc.actual_end BETWEEN CURDATE() AND DATE_ADD(CURDATE(),INTERVAL 30 DAY)", '../Suppliers/supplierscontracts.php', 'err'),
-                array('وحداتٌ تنتظر أطرافَ الاعتماد (بعد الموقع)', 'fa-scale-balanced', array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND ue.state='site_approved'", '../Approvals/hours_approval.php', 'warn'),
+                /* العنوانُ يقول ما يقيسه الاستعلامُ حرفًا — «أطرافُ الاعتماد» كانت
+                   تعني أيَّ طرفٍ بينما الإدارةُ تنتظر طرفَ الموردِ وحدَه. */
+                array('وحداتٌ تنتظر أطرافَ الاعتماد (بعد الموقع)', 'fa-scale-balanced', array('t' => 'unit_entries', 'a' => 'ue'), roleBoardSupplierPendingSql(), '../Approvals/hours_approval.php', 'warn'),
             ),
             'tasks' => array(
-                array('وحداتٌ تنتظر اعتماد جزء المورد (بعد الموقع)', 'fa fa-check-double', array('t' => 'unit_entries', 'a' => 'ue'), "SELECT COUNT(*) FROM unit_entries ue WHERE {TENANT_SCOPE} AND ue.state='site_approved'", '../Approvals/hours_approval.php'),
+                array('وحداتٌ تنتظر اعتماد جزء المورد (بعد الموقع)', 'fa fa-check-double', array('t' => 'unit_entries', 'a' => 'ue'), roleBoardSupplierPendingSql(), '../Approvals/hours_approval.php'),
             ),
             'pulse' => array('نبض الأداء — وحداتُ الدوام المدخلة (7 أيام)', array('أُدخلت', 'اعتُمدت'),
                 array('t' => 'timesheet', 'a' => 'ts'), "SELECT COUNT(*) FROM timesheet ts WHERE {TENANT_SCOPE} AND ts.date=?",
@@ -990,7 +1022,14 @@ function roleBoardBuild($conn, $gate, $roleId, $userId)
     if (!function_exists('ems_finreq_nav_badges')) {
         require_once __DIR__ . '/finreq_badges.php';
     }
-    $badges = function_exists('ems_finreq_nav_badges') ? ems_finreq_nav_badges($conn) : array();
+    /* ◆ **اللوحةُ كانت تستدعي المُحلِّلَ الأفقرَ**: `ems_finreq_nav_badges`
+         لا يُصدر مفتاحَ `Approvals/hours_approval.php` أبدًا، فبقي صفُّ
+         «اعتماد الوحدات التشغيلية» في ③ **غيرَ قابلٍ للوصولِ لكلِّ الأدوار**
+         وتُصيَّر حالةُ الفراغِ دائمًا. والسايدبارُ يستدعي `ems_nav_all_badges`
+         (`insidebar.php:296`) — فيُوحَّد المصدر. */
+    $badges = function_exists('ems_nav_all_badges')
+        ? ems_nav_all_badges($conn, $rid)
+        : (function_exists('ems_finreq_nav_badges') ? ems_finreq_nav_badges($conn) : array());
 
     return array(
         'role_id'      => $rid,

@@ -1,26 +1,13 @@
 {
     "action_dict_total": "490",
     "action_guard_verified": "82",
-    "action_idem_verified": "113",
-    "action_live": "375",
-    "golden_total": "10",
+    "golden_total": 10,
     "golden_pending": "10",
-    "golden_approved": "0",
     "chain_nodes": "29",
-    "ladder_decisions": "0",
-    "sheet_decisions": "57",
+    "ladder_decisions": "2",
+    "ladder_shadow": "0",
     "event_rulings_business": "11",
     "event_rulings_audit": "47",
-    "settlements": "469",
-    "settlements_paid": "0",
-    "payroll_runs": "74",
-    "journal_entries": "6713",
-    "journal_lines": "13426",
-    "journal_balance_diff": "0.00",
-    "fin_requests": "22",
-    "job_queue_done": "8050",
-    "job_queue_total": "8067",
-    "saved_views": "736",
     "ledger_states": {
         "NOT_STARTED": "147",
         "TECHNICALLY_ELIGIBLE": "516"
@@ -30,16 +17,8 @@
         "CONTROL_OVERSIGHT": "78",
         "EXECUTIVE_OVERSIGHT": "23",
         "FORBIDDEN": "265",
-        "OWNED": "247",
+        "OWNED": "250",
         "PERSONAL_SPACE": "286",
         "SHARED_WORK_ITEM": "51"
-    },
-    "ownership": {
-        "OWNER_CONFIRMED": "80",
-        "OWNER_CHANGED": "5",
-        "APPEARANCE_MISSING": "42",
-        "SHARED_PLATFORM": "36",
-        "NOT_APPLICABLE": "87",
-        "OWNER_ESTABLISHED": "9"
     }
 }

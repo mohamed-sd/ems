@@ -8472,6 +8472,18 @@
         "seeded_from": "role_permissions:18"
     },
     {
+        "item_id": "3867",
+        "company_id": "0",
+        "profile_id": "39",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_entitlements.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:sup18_entitlements"
+    },
+    {
         "item_id": "3823",
         "company_id": "0",
         "profile_id": "39",
@@ -10656,6 +10668,18 @@
         "seeded_from": "role_permissions:17"
     },
     {
+        "item_id": "3868",
+        "company_id": "0",
+        "profile_id": "43",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_entitlements.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:sup18_entitlements"
+    },
+    {
         "item_id": "3463",
         "company_id": "0",
         "profile_id": "43",
@@ -11062,6 +11086,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:4"
+    },
+    {
+        "item_id": "3852",
+        "company_id": "0",
+        "profile_id": "52",
+        "item_kind": "screen",
+        "item_ref": "Clients\/client_contacts.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
     },
     {
         "item_id": "1027",
@@ -12036,6 +12072,18 @@
         "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
+        "item_id": "3860",
+        "company_id": "0",
+        "profile_id": "52",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_contacts.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
+    },
+    {
         "item_id": "1042",
         "company_id": "0",
         "profile_id": "52",
@@ -12550,6 +12598,18 @@
         "can_edit": "1",
         "can_delete": "1",
         "seeded_from": "role_permissions:12"
+    },
+    {
+        "item_id": "3853",
+        "company_id": "0",
+        "profile_id": "61",
+        "item_kind": "screen",
+        "item_ref": "Clients\/client_contacts.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "1",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
     },
     {
         "item_id": "1169",
@@ -14028,6 +14088,18 @@
         "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
+        "item_id": "3861",
+        "company_id": "0",
+        "profile_id": "61",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_contacts.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
+    },
+    {
         "item_id": "1184",
         "company_id": "0",
         "profile_id": "61",
@@ -14962,6 +15034,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:8"
+    },
+    {
+        "item_id": "3854",
+        "company_id": "0",
+        "profile_id": "76",
+        "item_kind": "screen",
+        "item_ref": "Clients\/client_contacts.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
     },
     {
         "item_id": "1457",
@@ -16032,6 +16116,30 @@
         "seeded_from": "role_permissions:8"
     },
     {
+        "item_id": "3862",
+        "company_id": "0",
+        "profile_id": "76",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_contacts.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
+    },
+    {
+        "item_id": "3869",
+        "company_id": "0",
+        "profile_id": "76",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_entitlements.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:sup18_entitlements"
+    },
+    {
         "item_id": "1420",
         "company_id": "0",
         "profile_id": "76",
@@ -16318,6 +16426,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:2"
+    },
+    {
+        "item_id": "3855",
+        "company_id": "0",
+        "profile_id": "79",
+        "item_kind": "screen",
+        "item_ref": "Clients\/client_contacts.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
     },
     {
         "item_id": "1591",
@@ -17448,6 +17568,18 @@
         "seeded_from": "role_permissions:2"
     },
     {
+        "item_id": "3863",
+        "company_id": "0",
+        "profile_id": "79",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_contacts.php",
+        "allow": "1",
+        "can_add": "1",
+        "can_edit": "1",
+        "can_delete": "1",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
+    },
+    {
         "item_id": "1545",
         "company_id": "0",
         "profile_id": "79",
@@ -17470,6 +17602,18 @@
         "can_edit": "1",
         "can_delete": "0",
         "seeded_from": "role_permissions:2"
+    },
+    {
+        "item_id": "3870",
+        "company_id": "0",
+        "profile_id": "79",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_entitlements.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:sup18_entitlements"
     },
     {
         "item_id": "1549",
@@ -19740,6 +19884,18 @@
         "seeded_from": "role_permissions:3"
     },
     {
+        "item_id": "3856",
+        "company_id": "0",
+        "profile_id": "88",
+        "item_kind": "screen",
+        "item_ref": "Clients\/client_contacts.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
+    },
+    {
         "item_id": "1966",
         "company_id": "0",
         "profile_id": "88",
@@ -20844,6 +21000,18 @@
         "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
+        "item_id": "3864",
+        "company_id": "0",
+        "profile_id": "88",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_contacts.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
+    },
+    {
         "item_id": "1982",
         "company_id": "0",
         "profile_id": "88",
@@ -21070,6 +21238,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:7"
+    },
+    {
+        "item_id": "3857",
+        "company_id": "0",
+        "profile_id": "94",
+        "item_kind": "screen",
+        "item_ref": "Clients\/client_contacts.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
     },
     {
         "item_id": "2085",
@@ -22294,6 +22474,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:1"
+    },
+    {
+        "item_id": "3858",
+        "company_id": "0",
+        "profile_id": "97",
+        "item_kind": "screen",
+        "item_ref": "Clients\/client_contacts.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
     },
     {
         "item_id": "2255",
@@ -26208,6 +26400,18 @@
         "seeded_from": "INJ-ALIGN-CAP-01"
     },
     {
+        "item_id": "3865",
+        "company_id": "0",
+        "profile_id": "115",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_contacts.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
+    },
+    {
         "item_id": "2652",
         "company_id": "0",
         "profile_id": "115",
@@ -28080,6 +28284,18 @@
         "seeded_from": "role_permissions:27"
     },
     {
+        "item_id": "3871",
+        "company_id": "0",
+        "profile_id": "142",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_entitlements.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:sup18_entitlements"
+    },
+    {
         "item_id": "3827",
         "company_id": "0",
         "profile_id": "142",
@@ -29074,6 +29290,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "role_permissions:6"
+    },
+    {
+        "item_id": "3859",
+        "company_id": "0",
+        "profile_id": "160",
+        "item_kind": "screen",
+        "item_ref": "Clients\/client_contacts.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
     },
     {
         "item_id": "3062",
@@ -30322,6 +30550,18 @@
         "can_edit": "0",
         "can_delete": "0",
         "seeded_from": "INJ-ALIGN-CAP-01"
+    },
+    {
+        "item_id": "3866",
+        "company_id": "0",
+        "profile_id": "160",
+        "item_kind": "screen",
+        "item_ref": "Suppliers\/supplier_contacts.php",
+        "allow": "1",
+        "can_add": "0",
+        "can_edit": "0",
+        "can_delete": "0",
+        "seeded_from": "injfrd66:2026-08-23:party_contacts"
     },
     {
         "item_id": "3077",

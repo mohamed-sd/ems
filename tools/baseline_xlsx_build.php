@@ -20,7 +20,7 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 $D = $ROOT . '/docs/baseline_20260821/extract/';
 function j($f) { global $D; return json_decode((string) file_get_contents($D . $f . '.json'), true) ?: array(); }
 
-$SNAP = 'BL-20260822-f330a975';
+$SNAP = 'BL-20260823-eaf25a2c';
 $reg = j('screen_registry');
 $fields = j('field_registry');
 $cycle = j('gov_screen_cycle');
@@ -69,7 +69,7 @@ function meta_rows($ws, $title)
 {
     global $SNAP;
     $ws->setCellValue('A1', $title);
-    $ws->setCellValue('A2', 'اللقطة: ' . $SNAP . ' · تاريخ القياس: 2026-08-22 05:18→05:55 · المصدر: استخراج حي (كود + قاعدة + Git) — لا صيغ: كل قيمة قياسٌ بلحظته · اللقطة السابقة في historical/');
+    $ws->setCellValue('A2', 'اللقطة: ' . $SNAP . ' · تاريخ القياس: 2026-08-23 06:34→07:10 · المصدر: استخراج حي (كود + قاعدة + Git) — لا صيغ: كل قيمة قياسٌ بلحظته · اللقطة السابقة في historical/');
     $ws->getStyle('A1')->getFont()->setBold(true)->setSize(13)->setName('Arial');
     $ws->getStyle('A2')->getFont()->setSize(9)->setItalic(true)->setName('Arial');
 }
@@ -89,7 +89,7 @@ $sumRows = array(
     array('تعارض ملكية بين المصادر', $stats['owner_conflicts'], 'من ' . $stats['registry_rows'] . ' — القائمة في 07_UNRESOLVED'),
     array('شاشة بمرحلة دورة عمل', $stats['with_stage'], 'من ' . $stats['registry_rows'] . ' (سجل الدورة يغطي 663 ظهورًا إداريًّا)'),
     array('إجمالي الحقول المستخرَجة', $stats['fields_total'], 'استخراج ساكن: أعمدة جداول + حقول نماذج + أعمدة U13 من gov_field_class'),
-    array('حقول حساسة بسياسة', count($sens), 'scr_sensitive_fields — **34/34 بحالة «معتمد» أي داخل الإنفاذ** بعد توحيد القاموس (كانت 15/34)'),
+    array('حقول حساسة بسياسة', count($sens), 'scr_sensitive_fields — 33 «معتمد» داخل الإنفاذ + 1 «ملغاة» بقرار (كانت 15/34 خارج الإنفاذ)'),
     array('حقول مصنَّفة DC', count($fclass), 'gov_field_class على 44 شاشة'),
     array('أدوار', count($roles), 'جدول roles'),
     array('أفعال القاموس', $statusM['action_dict_total'], 'nav09_action_map'),

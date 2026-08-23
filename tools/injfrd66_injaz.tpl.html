@@ -1,0 +1,194 @@
+<title>إنجاز INJ-FRD-01</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Noto+Kufi+Arabic:wght@700&display=swap">
+
+<style>
+:root{
+  --paper:#EBEEF2; --surface:#FFFFFF; --sunk:#F4F6F8;
+  --ink:#131920; --ink-2:#3D4956; --muted:#6B7886;
+  --rule:#D3DAE1; --rule-soft:#E2E7EC;
+  --accent:#A8660A; --accent-soft:#F3E7D2;
+  --ok:#166B4B; --ok-soft:#DDEDE5;
+  --part:#9A5F10; --part-soft:#F5E8D6;
+  --open:#7E8B99; --open-soft:#E6EAEE;
+  --r:4px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#0D1116; --surface:#161B22; --sunk:#11161C;
+    --ink:#E3E9EF; --ink-2:#B3BECA; --muted:#8592A0;
+    --rule:#28313B; --rule-soft:#1E262E;
+    --accent:#E5A233; --accent-soft:#33291A;
+    --ok:#48B58C; --ok-soft:#16281F;
+    --part:#D2953C; --part-soft:#2A2117;
+    --open:#6E7C8A; --open-soft:#1C232B;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0D1116; --surface:#161B22; --sunk:#11161C;
+  --ink:#E3E9EF; --ink-2:#B3BECA; --muted:#8592A0;
+  --rule:#28313B; --rule-soft:#1E262E;
+  --accent:#E5A233; --accent-soft:#33291A;
+  --ok:#48B58C; --ok-soft:#16281F;
+  --part:#D2953C; --part-soft:#2A2117;
+  --open:#6E7C8A; --open-soft:#1C232B;
+}
+*{box-sizing:border-box}
+body{margin:0; background:var(--paper); color:var(--ink);
+  font-family:"IBM Plex Sans Arabic","Segoe UI",system-ui,sans-serif; font-size:15px; line-height:1.66;
+  -webkit-font-smoothing:antialiased}
+.sheet{max-width:1020px; margin:0 auto; padding:clamp(20px,4vw,54px) clamp(14px,3vw,34px) 78px;
+  display:flex; flex-direction:column; gap:40px}
+h1,h2,h3{font-family:"Noto Kufi Arabic","IBM Plex Sans Arabic",sans-serif; font-weight:700; margin:0;
+  text-wrap:balance; line-height:1.38}
+.mono,code,td.n,th.n{font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums}
+code{background:var(--sunk); border:1px solid var(--rule-soft); padding:1px 5px; border-radius:2px; font-size:12px;
+  direction:ltr; unicode-bidi:isolate; color:var(--ink-2)}
+
+/* ترويسة */
+.mast{border-bottom:2px solid var(--ink); padding-bottom:15px}
+.mast .eb{font-size:11.5px; letter-spacing:.15em; color:var(--muted); text-transform:uppercase; margin:0 0 7px}
+.mast h1{font-size:clamp(24px,3.8vw,34px)}
+.mast .sub{margin:8px 0 0; color:var(--ink-2); font-size:14px; max-width:64ch}
+.mast .st{margin:10px 0 0; font-size:12px; color:var(--muted)}
+
+/* شريطُ المؤشراتِ الكبير */
+.kpi{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1px; background:var(--rule);
+  border:1px solid var(--rule); border-radius:var(--r); overflow:hidden}
+.kpi>div{background:var(--surface); padding:17px 19px; display:flex; flex-direction:column; gap:3px}
+.kpi .lb{font-size:11.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted)}
+.kpi .v{font-family:"IBM Plex Mono",monospace; font-size:clamp(26px,4.4vw,36px); font-weight:600; line-height:1.05;
+  letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:.45em; font-weight:400; color:var(--muted)}
+.kpi .hint{font-size:12px; color:var(--muted)}
+.kpi .done .v{color:var(--ok)} .kpi .left .v{color:var(--accent)} .kpi .delta .v{color:var(--ink)}
+
+/* مسار التقدّم */
+.track{border:1px solid var(--rule); border-radius:var(--r); background:var(--surface); padding:18px 19px;
+  display:flex; flex-direction:column; gap:13px}
+.trow{display:grid; grid-template-columns:88px 1fr 62px; align-items:center; gap:13px}
+.trow .k{font-size:12.5px; color:var(--muted)}
+.trow .p{height:11px; background:var(--open-soft); border-radius:99px; overflow:hidden}
+.trow .p i{display:block; height:100%; border-radius:99px}
+.trow .n{font-family:"IBM Plex Mono",monospace; font-size:13px; font-weight:600; text-align:end;
+  font-variant-numeric:tabular-nums}
+
+section{display:flex; flex-direction:column; gap:15px}
+.sh{border-bottom:1px solid var(--rule); padding-bottom:9px; display:flex; align-items:baseline; gap:12px; flex-wrap:wrap}
+.sh h2{font-size:18.5px}
+.sh p{margin:0; font-size:13.5px; color:var(--muted)}
+
+/* جداول */
+.tw{overflow-x:auto; border:1px solid var(--rule); border-radius:var(--r); background:var(--surface)}
+table{border-collapse:collapse; width:100%; font-size:13.5px}
+th,td{padding:9px 13px; text-align:start; border-bottom:1px solid var(--rule-soft); white-space:nowrap}
+th{font-family:"Noto Kufi Arabic",sans-serif; font-size:12px; font-weight:700; color:var(--muted);
+  background:var(--sunk); position:sticky; top:0}
+td.n,th.n{text-align:end; font-size:13px}
+tr:last-child td{border-bottom:0}
+tbody tr:hover{background:var(--sunk)}
+tr.tot td{font-weight:600; background:var(--sunk); border-top:2px solid var(--rule)}
+td.w{white-space:normal; min-width:190px}
+.ok{color:var(--ok); font-weight:600} .part{color:var(--part); font-weight:600} .open{color:var(--open)}
+
+/* شريطٌ صغيرٌ داخل الخلية */
+.mini{display:inline-block; width:56px; height:6px; background:var(--open-soft); border-radius:99px;
+  overflow:hidden; vertical-align:middle; margin-inline-start:8px}
+.mini i{display:block; height:100%; background:var(--accent)}
+
+/* شبكةُ المُغلَق */
+.grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(228px,1fr)); gap:7px}
+.card{background:var(--surface); border:1px solid var(--rule); border-inline-start:3px solid var(--ok);
+  border-radius:0 var(--r) var(--r) 0; padding:9px 13px}
+.card b{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--ok); display:block}
+.card span{font-size:13px; color:var(--ink-2)}
+
+/* خلاصة */
+.notes{display:flex; flex-direction:column; gap:9px; margin:0; padding:0; list-style:none}
+.notes li{background:var(--surface); border:1px solid var(--rule); border-radius:var(--r); padding:12px 15px;
+  font-size:13.5px; color:var(--ink-2)}
+.notes li b{color:var(--ink)}
+.verdict{border-inline-start:3px solid var(--accent); background:var(--accent-soft); border-radius:0 var(--r) var(--r) 0;
+  padding:15px 18px; font-size:14px; color:var(--ink-2)}
+.verdict b{color:var(--ink)}
+.foot{border-top:1px solid var(--rule); padding-top:15px; font-size:12.5px; color:var(--muted)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important; animation:none!important}}
+</style>
+
+<div class="sheet" dir="rtl" lang="ar">
+
+  <header class="mast">
+    <p class="eb">INJ-FRD-01 · INJ-FRD-TRACE-01</p>
+    <h1>تقريرُ الإنجاز — إكمالُ المبيعاتِ التعاقديةِ وعقودِ الموردين</h1>
+    <p class="sub">ستةٌ وستون متطلبًا بخمسِ بواباتٍ لكلِّ متطلب. كلُّ رقمٍ هنا محسوبٌ من الحالةِ الحيّةِ لا منقولٌ من وثيقة.</p>
+    <p class="st">لقطةُ <span class="mono">{{STAMP}}</span> · المصدر <code>tools/injfrd66_tasks.json</code></p>
+  </header>
+
+  <div class="kpi">
+    <div class="done"><span class="lb">المنجز</span><span class="v">{{DONE}}<small>%</small></span><span class="hint">من مئةٍ كاملة</span></div>
+    <div class="left"><span class="lb">المتبقّي</span><span class="v">{{REMAIN}}<small>%</small></span><span class="hint">فجوةُ الإغلاق</span></div>
+    <div class="delta"><span class="lb">الفارقُ المُحقَّق</span><span class="v">+{{DELTA}}</span><span class="hint">نقطةً عن خطِّ الأساس {{BASE}}%</span></div>
+    <div><span class="lb">مُغلَقٌ كاملًا</span><span class="v">{{FULL}}<small>/{{N}}</small></span><span class="hint">خمسُ بواباتٍ خضراء</span></div>
+  </div>
+
+  <div class="track">
+    <div class="trow"><span class="k">خطُّ الأساس</span><span class="p"><i style="width:{{BASE}}%;background:var(--open)"></i></span><span class="n">{{BASE}}%</span></div>
+    <div class="trow"><span class="k">اليوم</span><span class="p"><i style="width:{{DONE}}%;background:var(--ok)"></i></span><span class="n">{{DONE}}%</span></div>
+  </div>
+
+  <section>
+    <div class="sh"><h2>① المطلوبُ في المستندَين ومقدارُ ما تحقَّق</h2><p>المقاماتُ الحاكمةُ كما نصَّت عليها الوثيقة</p></div>
+    <div class="tw"><table>
+      <thead><tr><th>المطلوب</th><th class="n">المقام</th><th class="n">المُنجَز</th><th class="n">المتبقّي</th><th class="n">النسبة</th></tr></thead>
+      <tbody>{{ROWS_REQ}}</tbody>
+    </table></div>
+    <p style="margin:0;font-size:12.5px;color:var(--muted)">خمسةُ متطلباتٍ «لا ينطبق عليها الترحيل» — إسقاطٌ أو مرجعٌ لا يحمل بياناتٍ خاصةً بسببٍ مسجَّل؛ فمقامُ البياناتِ {{DATA_DEN}} لا {{N}}.</p>
+  </section>
+
+  <section>
+    <div class="sh"><h2>② حصيلةُ كلِّ نطاق</h2></div>
+    <div class="tw"><table>
+      <thead><tr><th>النطاق</th><th class="n">المتطلبات</th><th class="n">سقفُه</th><th class="n">المُنجَزُ منه</th><th class="n">نسبةُ إنجازِه</th><th class="n">مُغلَقٌ كاملًا</th></tr></thead>
+      <tbody>{{ROWS_SCOPE}}</tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>③ أين يقع المتبقّي بالضبط</h2><p>الفجوةُ موزَّعةً على البواباتِ الخمس</p></div>
+    <div class="tw"><table>
+      <thead><tr><th>البوابة</th><th class="n">الوزن</th><th class="n">نعم</th><th class="n">جزئي</th><th class="n">لا</th><th class="n">لا ينطبق</th><th class="n">المتبقّي</th><th class="n">حصّتُه من الفجوة</th></tr></thead>
+      <tbody>{{ROWS_GATE}}</tbody>
+    </table></div>
+    <div class="verdict">{{GATE_VERDICT}}</div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>④ توزيعُ المتطلباتِ على شرائحِ الإنجاز</h2></div>
+    <div class="tw"><table>
+      <thead><tr><th class="n">الشريحة</th><th class="n">العدد</th><th>المعرّفات</th></tr></thead>
+      <tbody>{{ROWS_SLICE}}</tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>⑤ المُغلَقُ كاملًا — {{FULL}} متطلبًا</h2></div>
+    <div class="grid">{{CARDS}}</div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>⑥ المتبقّي — {{REST}} متطلبًا وما ينقص كلًّا منها</h2><p>مرتَّبًا من الأبعدِ إلى الأقرب</p></div>
+    <div class="tw"><table>
+      <thead><tr><th>المعرّف</th><th>العنوان</th><th class="n">نسبتُه</th><th class="w">البواباتُ الناقصة</th><th class="n">ما يحمله من الفجوة</th></tr></thead>
+      <tbody>{{ROWS_REST}}</tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <div class="sh"><h2>⑦ خلاصةُ ما بقي</h2></div>
+    <ul class="notes">{{NOTES}}</ul>
+    <div class="verdict"><b>ولا يُقال «اكتملت الإدارتان»</b> قبلَ خضرةِ معاييرِ القبولِ كلِّها على النظامِ الحيّ: ١٬٤١٧ حقلًا محكومة ✔ · القائمةُ مشتقّةٌ لا مكتوبة ✔ · صفرُ سطحٍ مبنيٍّ بلا مدخل ✔ · <b>والرحلتان تعبران ببشر — وهذه لم تقع بعد.</b></div>
+  </section>
+
+  <footer class="foot">مولَّدٌ بـ<code>tools/injfrd66_injaz_report.php</code> — يُعاد توليدُه بعد كلِّ بوابةٍ تُغلق.</footer>
+</div>

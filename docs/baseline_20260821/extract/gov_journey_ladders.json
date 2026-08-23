@@ -74,7 +74,7 @@
         "nav_hits": "3",
         "ladder_wired": "1",
         "gap_note": "موصولٌ فعلًا: سلّمُه يُقرأ من نقطةِ قرارٍ حيّةٍ قبلَ الكتابة — تُفحص أهليةُ الدورِ و«لا يدَ تمشي خطوتَين» من `gov_ladder_decisions`. مقيسٌ من الشجرةِ لا مكتوبٌ يدًا.",
-        "entity_type": null,
+        "entity_type": "claim_invoice · completion_cert",
         "action": null
     },
     {
@@ -87,7 +87,7 @@
         "nav_hits": "24",
         "ladder_wired": "1",
         "gap_note": "موصولٌ فعلًا: سلّمُه يُقرأ من نقطةِ قرارٍ حيّةٍ قبلَ الكتابة — تُفحص أهليةُ الدورِ و«لا يدَ تمشي خطوتَين» من `gov_ladder_decisions`. مقيسٌ من الشجرةِ لا مكتوبٌ يدًا.",
-        "entity_type": null,
+        "entity_type": "unit_final",
         "action": null
     },
     {
@@ -100,7 +100,7 @@
         "nav_hits": "7",
         "ladder_wired": "1",
         "gap_note": "موصولٌ فعلًا: سلّمُه يُقرأ من نقطةِ قرارٍ حيّةٍ قبلَ الكتابة — تُفحص أهليةُ الدورِ و«لا يدَ تمشي خطوتَين» من `gov_ladder_decisions`. مقيسٌ من الشجرةِ لا مكتوبٌ يدًا.",
-        "entity_type": null,
+        "entity_type": "proc_request",
         "action": null
     },
     {
@@ -113,7 +113,7 @@
         "nav_hits": "3",
         "ladder_wired": "1",
         "gap_note": "موصولٌ فعلًا: سلّمُه يُقرأ من نقطةِ قرارٍ حيّةٍ قبلَ الكتابة — تُفحص أهليةُ الدورِ و«لا يدَ تمشي خطوتَين» من `gov_ladder_decisions`. مقيسٌ من الشجرةِ لا مكتوبٌ يدًا.",
-        "entity_type": null,
+        "entity_type": "rfq_quote",
         "action": null
     },
     {
@@ -126,7 +126,7 @@
         "nav_hits": "6",
         "ladder_wired": "1",
         "gap_note": "موصولٌ فعلًا: سلّمُه يُقرأ من نقطةِ قرارٍ حيّةٍ قبلَ الكتابة — تُفحص أهليةُ الدورِ و«لا يدَ تمشي خطوتَين» من `gov_ladder_decisions`. مقيسٌ من الشجرةِ لا مكتوبٌ يدًا.",
-        "entity_type": null,
+        "entity_type": "proc_receipt",
         "action": null
     },
     {
@@ -152,7 +152,7 @@
         "nav_hits": "24",
         "ladder_wired": "1",
         "gap_note": "موصولٌ فعلًا: سلّمُه يُقرأ من نقطةِ قرارٍ حيّةٍ قبلَ الكتابة — تُفحص أهليةُ الدورِ و«لا يدَ تمشي خطوتَين» من `gov_ladder_decisions`. مقيسٌ من الشجرةِ لا مكتوبٌ يدًا.",
-        "entity_type": null,
+        "entity_type": "settlement",
         "action": null
     },
     {
@@ -165,7 +165,7 @@
         "nav_hits": "13",
         "ladder_wired": "1",
         "gap_note": "موصولٌ فعلًا: سلّمُه يُقرأ من نقطةِ قرارٍ حيّةٍ قبلَ الكتابة — تُفحص أهليةُ الدورِ و«لا يدَ تمشي خطوتَين» من `gov_ladder_decisions`. مقيسٌ من الشجرةِ لا مكتوبٌ يدًا.",
-        "entity_type": null,
+        "entity_type": "payment_request",
         "action": null
     },
     {
@@ -178,7 +178,7 @@
         "nav_hits": "13",
         "ladder_wired": "1",
         "gap_note": "موصولٌ فعلًا: سلّمُه يُقرأ من نقطةِ قرارٍ حيّةٍ قبلَ الكتابة — تُفحص أهليةُ الدورِ و«لا يدَ تمشي خطوتَين» من `gov_ladder_decisions`. مقيسٌ من الشجرةِ لا مكتوبٌ يدًا.",
-        "entity_type": null,
+        "entity_type": "pay_batch",
         "action": null
     }
 ]

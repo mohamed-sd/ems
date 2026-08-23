@@ -1426,6 +1426,11 @@
         ]
     },
     {
+        "route": "Clients\/client_contacts.php",
+        "tables": [],
+        "form_fields": []
+    },
+    {
         "route": "Clients\/client_profile.php",
         "tables": [
             {
@@ -33941,6 +33946,36 @@
             {
                 "name": "event_id",
                 "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إنشاء قيد (مدين = دائن)",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "manual_kind",
+                "input_type": "select",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إنشاء قيد (مدين = دائن)",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "source_doc_ref",
+                "input_type": "text",
+                "label_ar": "",
+                "required": 0,
+                "readonly": 0,
+                "section": "إنشاء قيد (مدين = دائن)",
+                "is_system": 0,
+                "dup_count": 1
+            },
+            {
+                "name": "reversal_link",
+                "input_type": "number",
                 "label_ar": "",
                 "required": 0,
                 "readonly": 0,
@@ -79592,6 +79627,11 @@
         ]
     },
     {
+        "route": "Suppliers\/supplier_contacts.php",
+        "tables": [],
+        "form_fields": []
+    },
+    {
         "route": "Suppliers\/supplier_contract_lines.php",
         "tables": [
             {
@@ -79917,7 +79957,7 @@
                 "name": "contract_obligation_ref",
                 "input_type": "select",
                 "label_ar": "",
-                "required": 0,
+                "required": 1,
                 "readonly": 0,
                 "section": "بندٌ جديد \/ تعديل",
                 "is_system": 0,
@@ -80308,6 +80348,94 @@
                 "dup_count": 1
             }
         ]
+    },
+    {
+        "route": "Suppliers\/supplier_entitlements.php",
+        "tables": [
+            {
+                "table_index": 0,
+                "columns": [
+                    {
+                        "label_ar": "الرمز",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "entitle_code"
+                    },
+                    {
+                        "label_ar": "الفترة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "period"
+                    },
+                    {
+                        "label_ar": "سجلُّ الوحدة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "record_no"
+                    },
+                    {
+                        "label_ar": "حكمُ العميل",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "client_ruling"
+                    },
+                    {
+                        "label_ar": "مبلغُ العميل",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "client_amount"
+                    },
+                    {
+                        "label_ar": "حكمُ المورد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "supplier_ruling"
+                    },
+                    {
+                        "label_ar": "مبلغُ المورد",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "supplier_amount"
+                    },
+                    {
+                        "label_ar": "حكمُ المشغّل",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "operator_ruling"
+                    },
+                    {
+                        "label_ar": "مبلغُ المشغّل",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "operator_amount"
+                    },
+                    {
+                        "label_ar": "العملة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "currency"
+                    },
+                    {
+                        "label_ar": "الحالة",
+                        "col_group": "",
+                        "th_class": "",
+                        "hidden_default": 0,
+                        "technical": "state"
+                    }
+                ]
+            }
+        ],
+        "form_fields": []
     },
     {
         "route": "Suppliers\/supplier_evaluation.php",

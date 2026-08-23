@@ -408,6 +408,23 @@
         "mtime": "2026-08-21"
     },
     {
+        "path": "Clients\/client_contacts.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 0,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 88,
+        "mtime": "2026-08-23"
+    },
+    {
         "path": "Clients\/client_profile.php",
         "class": "SCREEN",
         "generator": "",
@@ -422,7 +439,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 1425,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Clients\/clients.php",
@@ -439,7 +456,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 1558,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Clients\/commercial_risks.php",
@@ -507,7 +524,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 795,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Clients\/pricelists.php",
@@ -626,7 +643,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 844,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Clients\/tenders.php",
@@ -728,7 +745,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 200,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Contracts\/collections.php",
@@ -761,8 +778,8 @@
         "thead": 1,
         "form": 0,
         "deprecated_mark": 0,
-        "lines": 215,
-        "mtime": "2026-08-18"
+        "lines": 243,
+        "mtime": "2026-08-23"
     },
     {
         "path": "Contracts\/contract_actions_handler.php",
@@ -2682,8 +2699,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 418,
-        "mtime": "2026-08-19"
+        "lines": 424,
+        "mtime": "2026-08-22"
     },
     {
         "path": "Finance\/entitlement.php",
@@ -2852,8 +2869,8 @@
         "thead": 0,
         "form": 0,
         "deprecated_mark": 0,
-        "lines": 1512,
-        "mtime": "2026-08-21"
+        "lines": 1545,
+        "mtime": "2026-08-22"
     },
     {
         "path": "Finance\/fin_m10_actions.php",
@@ -3056,8 +3073,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 452,
-        "mtime": "2026-08-19"
+        "lines": 512,
+        "mtime": "2026-08-22"
     },
     {
         "path": "Finance\/maintenance_provision_fin.php",
@@ -3260,8 +3277,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 354,
-        "mtime": "2026-08-21"
+        "lines": 357,
+        "mtime": "2026-08-22"
     },
     {
         "path": "Finance\/periodic_events_fin.php",
@@ -6083,7 +6100,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 455,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Procurement\/reordering_proc.php",
@@ -6117,7 +6134,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 683,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Procurement\/rfq_compare_award.php",
@@ -6133,8 +6150,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 249,
-        "mtime": "2026-08-21"
+        "lines": 253,
+        "mtime": "2026-08-22"
     },
     {
         "path": "Procurement\/stock_proc.php",
@@ -7578,7 +7595,7 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 531,
+        "lines": 534,
         "mtime": "2026-08-22"
     },
     {
@@ -7596,7 +7613,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 135,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Suppliers\/showcontractsuppliers.php",
@@ -7630,7 +7647,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 246,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Suppliers\/supplier_advances.php",
@@ -7664,7 +7681,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 354,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Suppliers\/supplier_board.php",
@@ -7698,7 +7715,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 368,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Suppliers\/supplier_closure.php",
@@ -7715,7 +7732,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 312,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-22"
+    },
+    {
+        "path": "Suppliers\/supplier_contacts.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 0,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 90,
+        "mtime": "2026-08-23"
     },
     {
         "path": "Suppliers\/supplier_contract_actions_handler.php",
@@ -7748,8 +7782,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 601,
-        "mtime": "2026-08-18"
+        "lines": 608,
+        "mtime": "2026-08-22"
     },
     {
         "path": "Suppliers\/supplier_documents.php",
@@ -7766,7 +7800,24 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 324,
-        "mtime": "2026-08-18"
+        "mtime": "2026-08-22"
+    },
+    {
+        "path": "Suppliers\/supplier_entitlements.php",
+        "class": "SCREEN",
+        "generator": "",
+        "u13_screen": "",
+        "sidebar": 1,
+        "header": 1,
+        "bootstrap": 1,
+        "action_guard": 0,
+        "reads_post": 0,
+        "json": 0,
+        "thead": 1,
+        "form": 0,
+        "deprecated_mark": 0,
+        "lines": 174,
+        "mtime": "2026-08-23"
     },
     {
         "path": "Suppliers\/supplier_evaluation.php",
@@ -7783,7 +7834,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 345,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Suppliers\/supplier_profile.php",
@@ -7800,7 +7851,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 350,
-        "mtime": "2026-08-21"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Suppliers\/supplier_rules.php",
@@ -7817,7 +7868,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 342,
-        "mtime": "2026-08-19"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Suppliers\/supplier_violations.php",
@@ -7851,7 +7902,7 @@
         "form": 1,
         "deprecated_mark": 0,
         "lines": 843,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Suppliers\/suppliers_details.php",
@@ -7884,8 +7935,8 @@
         "thead": 1,
         "form": 1,
         "deprecated_mark": 0,
-        "lines": 2051,
-        "mtime": "2026-08-17"
+        "lines": 2052,
+        "mtime": "2026-08-22"
     },
     {
         "path": "Suppliers\/supplierscontracts_details.php",
@@ -7919,7 +7970,7 @@
         "form": 0,
         "deprecated_mark": 0,
         "lines": 180,
-        "mtime": "2026-08-17"
+        "mtime": "2026-08-22"
     },
     {
         "path": "Tickets\/admin_close.php",
@@ -10230,8 +10281,8 @@
         "thead": 0,
         "form": 0,
         "deprecated_mark": 0,
-        "lines": 627,
-        "mtime": "2026-08-13"
+        "lines": 638,
+        "mtime": "2026-08-22"
     },
     {
         "path": "cron_events.php",

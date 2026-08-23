@@ -55,6 +55,17 @@
         "last_at": "2026-08-18 07:38:29"
     },
     {
+        "category": "operational",
+        "event_key": "capacity.gap_escalated",
+        "cnt": "311",
+        "delivered_ok_sum": "311",
+        "delivered_failed_sum": "0",
+        "dlq_sum": "0",
+        "training_cnt": "0",
+        "first_at": "2026-08-02 07:43:37",
+        "last_at": "2026-08-22 23:47:39"
+    },
+    {
         "category": "financial",
         "event_key": "finance.recon_adjustment.posted",
         "cnt": "220",
@@ -134,13 +145,13 @@
     {
         "category": "operational",
         "event_key": "capacity.gap_opened",
-        "cnt": "191",
-        "delivered_ok_sum": "191",
+        "cnt": "201",
+        "delivered_ok_sum": "201",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-08-02 07:43:37",
-        "last_at": "2026-08-13 03:21:01"
+        "last_at": "2026-08-22 23:47:35"
     },
     {
         "category": "financial",
@@ -221,36 +232,36 @@
     },
     {
         "category": "operational",
-        "event_key": "capacity.gap_escalated",
+        "event_key": "capacity.gap_closed",
         "cnt": "76",
         "delivered_ok_sum": "76",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
-        "first_at": "2026-08-02 07:43:37",
-        "last_at": "2026-08-13 03:21:03"
-    },
-    {
-        "category": "operational",
-        "event_key": "capacity.gap_closed",
-        "cnt": "75",
-        "delivered_ok_sum": "75",
-        "delivered_failed_sum": "0",
-        "dlq_sum": "0",
-        "training_cnt": "0",
         "first_at": "2026-08-02 07:44:02",
-        "last_at": "2026-08-13 03:21:04"
+        "last_at": "2026-08-22 23:47:42"
     },
     {
         "category": "commercial",
         "event_key": "procurement.supplier_contract.state_changed",
-        "cnt": "54",
-        "delivered_ok_sum": "54",
+        "cnt": "59",
+        "delivered_ok_sum": "59",
         "delivered_failed_sum": "0",
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-08-15 09:45:38",
-        "last_at": "2026-08-18 07:38:42"
+        "last_at": "2026-08-22 20:50:09"
+    },
+    {
+        "category": "commercial",
+        "event_key": "procurement.supplier_contract.termination_revoked",
+        "cnt": "26",
+        "delivered_ok_sum": "26",
+        "delivered_failed_sum": "0",
+        "dlq_sum": "0",
+        "training_cnt": "0",
+        "first_at": "2026-08-15 09:45:38",
+        "last_at": "2026-08-22 20:50:09"
     },
     {
         "category": "operational",
@@ -262,17 +273,6 @@
         "training_cnt": "0",
         "first_at": "2026-08-13 12:34:07",
         "last_at": "2026-08-15 17:43:00"
-    },
-    {
-        "category": "commercial",
-        "event_key": "procurement.supplier_contract.termination_revoked",
-        "cnt": "24",
-        "delivered_ok_sum": "24",
-        "delivered_failed_sum": "0",
-        "dlq_sum": "0",
-        "training_cnt": "0",
-        "first_at": "2026-08-15 09:45:38",
-        "last_at": "2026-08-15 17:39:15"
     },
     {
         "category": "operational",
@@ -536,7 +536,7 @@
         "dlq_sum": "0",
         "training_cnt": "0",
         "first_at": "2026-07-28 09:45:09",
-        "last_at": "2026-08-22 02:03:43"
+        "last_at": "2026-08-22 18:47:06"
     },
     {
         "category": "financial",

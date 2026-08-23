@@ -101,6 +101,28 @@ while ($fq && ($x = mysqli_fetch_assoc($fq))) {
     $forbiddenBySpace[(int) $x['role_id']][$x['rt']] = 1;
 }
 
+/* ══ سجلُّ النقلِ إلى بلاطاتِ «الوصول السريع» ═══════════════════════════════
+   ◆ **عذرٌ ثانٍ للإزالةِ المصرَّحة، أضيقُ من العزل**: بندٌ نُقل من القائمةِ
+     إلى بلاطاتِ لوحةِ التحكمِ **لئلّا يظهر في القائمتَين معًا** لم يُفقَد —
+     تغيَّر موضعُه. وقيدُه في `gov_nav_hidden_log` بعذرِ `QUICK_TILE`.
+   ◆ **ولم يُستعمل `FORBIDDEN` لهذا**: تصنيفُ المساحةِ يعني «ليست لهذه
+     الإدارة»، وهو يُخرج المسارَ من **بحثِ الإدارةِ وتصديرِ إكسل**
+     (`excel.php:102`) ومن حارسِ الروابطِ المباشرة. فوسمُ شاشةٍ يوميةٍ
+     مملوكةٍ بهذا يمنع صاحبَها من تصديرِها — **علاجٌ يُعطِب ما يداوي**.
+   ◆ **والشرطانِ معًا لا أحدُهما**: قيدٌ بعذرِ `QUICK_TILE` **و**صفُّ
+     `modules` حيٌّ (`is_quick=1 AND is_link=1`) لصاحبِ الدور. فقيدٌ بلا
+     بلاطةٍ **فقدٌ يُرسِّب** — وإلا صار السجلُّ غطاءً لكلِّ اختفاء. */
+$quickMoved = array();
+$mq = @mysqli_query($conn, "SELECT h.role_id, LOWER(h.route) rt
+                              FROM gov_nav_hidden_log h
+                              JOIN modules m ON LOWER(m.code) = LOWER(h.route)
+                                            AND m.owner_role_id = h.role_id
+                                            AND m.is_quick = 1 AND m.is_link = 1
+                             WHERE h.reachable = 'QUICK_TILE'");
+while ($mq && ($x = mysqli_fetch_assoc($mq))) {
+    $quickMoved[(int) $x['role_id']][$x['rt']] = 1;
+}
+
 /** هويةُ البند: (الملفُّ الأمُّ صغيرًا) + الاسمُ المعروض */
 function upc_key($href, $label)
 {
@@ -142,11 +164,16 @@ foreach (uxp_root_roles() as $rid) {
     $preF = array(); $nowF = array();
     foreach ($p as $k => $c)   { list($f, $l) = explode('||', $k, 2); $preF[$f]['labels'][$l] = ($preF[$f]['labels'][$l] ?? 0) + $c; $preF[$f]['n'] = ($preF[$f]['n'] ?? 0) + $c; }
     foreach ($now as $k => $c) { list($f, $l) = explode('||', $k, 2); $nowF[$f]['labels'][$l] = ($nowF[$f]['labels'][$l] ?? 0) + $c; $nowF[$f]['n'] = ($nowF[$f]['n'] ?? 0) + $c; }
-    $missing = array(); $renamedHere = 0; $mergedHere = 0; $absorbedHere = 0; $isolatedHere = 0;
+    $missing = array(); $renamedHere = 0; $mergedHere = 0; $absorbedHere = 0; $isolatedHere = 0; $quickHere = 0;
     foreach ($preF as $f => $P) {
         /* ملفٌّ اختفى من الدور = فقدٌ صريح — إلا أن يكون **ذاب في وارثٍ مُعلَنٍ
            حاضرٍ في الدورِ نفسِه**: الإعلانُ من nav_redirects والحضورُ مقيسٌ الآن. */
-        if (!isset($nowF[$f]) && isset($mergeInto[$f]) && isset($nowF[$mergeInto[$f]])) {
+        /* ◆ **ووارثٌ انتقل إلى بلاطةٍ ما يزال وارثًا حاضرًا**: الذوبانُ يُقاس
+             بوجودِ الوارثِ لا بموضعِه. ونقلُ الوارثِ إلى لوحةِ التحكمِ كان
+             **يُيتِّم ورثتَه دفعةً واحدة** فتُقرأ ستةُ ملفاتٍ مفقودةً وهي
+             سليمة — عطبٌ سببُه المقياسُ لا التغيير. */
+        if (!isset($nowF[$f]) && isset($mergeInto[$f])
+            && (isset($nowF[$mergeInto[$f]]) || isset($quickMoved[$rid][mb_strtolower($mergeInto[$f])]))) {
             $absorbedHere += $P['n'];
             continue;
         }
@@ -160,6 +187,11 @@ foreach (uxp_root_roles() as $rid) {
              غطاءً لكلِّ اختفاء. */
         if (!isset($nowF[$f]) && isset($forbiddenBySpace[$rid][mb_strtolower($f)])) {
             $isolatedHere += $P['n'];
+            continue;
+        }
+        if (!isset($nowF[$f]) && isset($quickMoved[$rid][mb_strtolower($f)])) {
+            $isolatedHere += $P['n'];   /* يُحسب في المقامِ نفسِه: إزالةٌ مصرَّحة */
+            $quickHere    += $P['n'];
             continue;
         }
         if (!isset($nowF[$f])) { $missing[] = 'الملفُّ كلُّه: ' . $f; continue; }
@@ -191,6 +223,7 @@ foreach (uxp_root_roles() as $rid) {
     echo ($ok ? '  ✔' : '  ✗') . " دور {$rid}: قبل={$cntPre} · بعد={$cntNow}"
         . ($absorbedHere ? " · ذاب في وارثٍ مُعلَنٍ حاضر={$absorbedHere}" : '')
         . ($isolatedHere ? " · **أُزيل بعزلٍ مصرَّحٍ={$isolatedHere}**" : '')
+        . ($quickHere ? " · **نُقل إلى بلاطةٍ={$quickHere}**" : '')
         . ($renamedHere ? " · أُعيدت تسميتُه بالسجل={$renamedHere}" : '')
         . ($mergedHere ? " · توأمٌ مندمجٌ باسمٍ واحد={$mergedHere}" : '')
         . ($missing ? ' · ناقص: ' . implode(' ، ', array_slice($missing, 0, 6)) : '')

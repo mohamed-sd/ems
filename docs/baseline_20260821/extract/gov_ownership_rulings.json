@@ -440,6 +440,16 @@
         "decided_at": "2026-08-21 15:17:27"
     },
     {
+        "route": "Contracts\/tax_invoices.php?view=v72b04c",
+        "owner_before": "",
+        "owner_after": "المالية والخزينة",
+        "witness": "أساسُه Contracts\/tax_invoices.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
         "route": "Contracts\/tax_invoices.php#2",
         "owner_before": "UNKNOWN",
         "owner_after": "المالية والخزينة",
@@ -640,6 +650,16 @@
         "decided_at": "2026-08-21 15:17:27"
     },
     {
+        "route": "Equipments\/equipments.php#2",
+        "owner_before": "",
+        "owner_after": "إدارة الأسطول",
+        "witness": "أساسُه Equipments\/equipments.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
         "route": "Equipments\/fin_assets.php",
         "owner_before": "إدارة الأسطول",
         "owner_after": "إدارة الأسطول",
@@ -658,6 +678,16 @@
         "ruling": "OWNER_CONFIRMED",
         "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
         "decided_at": "2026-08-21 15:17:27"
+    },
+    {
+        "route": "Equipments\/fleet_models.php#2",
+        "owner_before": "",
+        "owner_after": "إدارة الأسطول",
+        "witness": "أساسُه Equipments\/fleet_models.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
     },
     {
         "route": "Equipments\/get_contract_stats.php",
@@ -780,6 +810,16 @@
         "decided_at": "2026-08-21 15:17:28"
     },
     {
+        "route": "Finance\/approvals_inbox.php#2",
+        "owner_before": "",
+        "owner_after": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "witness": "أساسُه Finance\/approvals_inbox.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
         "route": "Finance\/assets_fin.php",
         "owner_before": "المالية والخزينة",
         "owner_after": "المالية والخزينة",
@@ -798,6 +838,16 @@
         "ruling": "OWNER_CONFIRMED",
         "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
         "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/budget_dept.php#2",
+        "owner_before": "",
+        "owner_after": "التمويل والملكية",
+        "witness": "أساسُه Finance\/budget_dept.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
     },
     {
         "route": "Finance\/budget_master.php",
@@ -928,6 +978,16 @@
         "ruling": "OWNER_CONFIRMED",
         "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
         "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Finance\/currencies_fin.php#2",
+        "owner_before": "",
+        "owner_after": "المالية والخزينة",
+        "witness": "أساسُه Finance\/currencies_fin.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
     },
     {
         "route": "Finance\/dues_fin.php",
@@ -1160,6 +1220,36 @@
         "decided_at": "2026-08-21 15:17:28"
     },
     {
+        "route": "Financing\/deviations.php?view=v08c5c1",
+        "owner_before": "",
+        "owner_after": "التمويل والملكية",
+        "witness": "أساسُه Financing\/deviations.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
+        "route": "Financing\/deviations.php?view=v649001",
+        "owner_before": "",
+        "owner_after": "التمويل والملكية",
+        "witness": "أساسُه Financing\/deviations.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
+        "route": "Financing\/deviations.php?view=vcb3ce4",
+        "owner_before": "",
+        "owner_after": "التمويل والملكية",
+        "witness": "أساسُه Financing\/deviations.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
         "route": "Financing\/deviations.php#2",
         "owner_before": "UNKNOWN",
         "owner_after": "التمويل والملكية",
@@ -1170,6 +1260,26 @@
         "decided_at": "2026-08-21 15:17:28"
     },
     {
+        "route": "Financing\/deviations.php#3",
+        "owner_before": "",
+        "owner_after": "التمويل والملكية",
+        "witness": "أساسُه Financing\/deviations.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
+        "route": "Financing\/deviations.php#4",
+        "owner_before": "",
+        "owner_after": "التمويل والملكية",
+        "witness": "أساسُه Financing\/deviations.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
         "route": "Financing\/owners_registry.php",
         "owner_before": "التمويل والملكية",
         "owner_after": "التمويل والملكية",
@@ -1178,6 +1288,16 @@
         "ruling": "OWNER_CONFIRMED",
         "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
         "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Financing\/owners_registry.php#2",
+        "owner_before": "",
+        "owner_after": "التمويل والملكية",
+        "witness": "أساسُه Financing\/owners_registry.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
     },
     {
         "route": "Financing\/ownership_links.php",
@@ -1228,6 +1348,16 @@
         "ruling": "OWNER_CONFIRMED",
         "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
         "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Fleet\/readiness_board.php#2",
+        "owner_before": "",
+        "owner_after": "إدارة الأسطول",
+        "witness": "أساسُه Fleet\/readiness_board.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
     },
     {
         "route": "Governance\/cron_permissions.php",
@@ -1380,6 +1510,16 @@
         "decided_at": "2026-08-21 15:17:28"
     },
     {
+        "route": "Maintenance\/orders.php#2",
+        "owner_before": "",
+        "owner_after": "إدارة الصيانة",
+        "witness": "أساسُه Maintenance\/orders.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
         "route": "Maintenance\/preventive_plans.php",
         "owner_before": "إدارة الصيانة",
         "owner_after": "إدارة الصيانة",
@@ -1458,6 +1598,26 @@
         "ruling": "OWNER_CONFIRMED",
         "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
         "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/containers.php?view=v5d6808",
+        "owner_before": "",
+        "owner_after": "إدارة التشغيل",
+        "witness": "أساسُه Operations\/containers.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
+        "route": "Operations\/containers.php#2",
+        "owner_before": "",
+        "owner_after": "إدارة التشغيل",
+        "witness": "أساسُه Operations\/containers.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
     },
     {
         "route": "Operations\/cron_asset_reconciliation.php",
@@ -1578,6 +1738,36 @@
         "ruling": "OWNER_CONFIRMED",
         "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
         "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Operations\/distribution_space.php?view=va9e1b1",
+        "owner_before": "",
+        "owner_after": "إدارة التشغيل",
+        "witness": "أساسُه Operations\/distribution_space.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
+        "route": "Operations\/distribution_space.php#2",
+        "owner_before": "",
+        "owner_after": "إدارة التشغيل",
+        "witness": "أساسُه Operations\/distribution_space.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
+        "route": "Operations\/distribution_space.php#3",
+        "owner_before": "",
+        "owner_after": "إدارة التشغيل",
+        "witness": "أساسُه Operations\/distribution_space.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
     },
     {
         "route": "Operations\/equipment_quota.php",
@@ -1858,6 +2048,16 @@
         "ruling": "OWNER_CONFIRMED",
         "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
         "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Procurement\/items_proc.php#2",
+        "owner_before": "",
+        "owner_after": "إدارة المشتريات التشغيلية",
+        "witness": "أساسُه Procurement\/items_proc.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
     },
     {
         "route": "Procurement\/master_data_proc.php",
@@ -2190,6 +2390,16 @@
         "decided_at": "2026-08-21 15:17:28"
     },
     {
+        "route": "Suppliers\/shares_coverage.php#2",
+        "owner_before": "",
+        "owner_after": "إدارة الموردين",
+        "witness": "أساسُه Suppliers\/shares_coverage.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
         "route": "Suppliers\/supplier_capacity.php#2",
         "owner_before": "UNKNOWN",
         "owner_after": "إدارة الموردين",
@@ -2198,6 +2408,16 @@
         "ruling": "OWNER_ESTABLISHED",
         "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة · ولا مالكَ سابقًا فهو إثباتٌ لا نقض",
         "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Suppliers\/supplier_capacity.php#3",
+        "owner_before": "",
+        "owner_after": "إدارة الموردين",
+        "witness": "أساسُه Suppliers\/supplier_capacity.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
     },
     {
         "route": "Suppliers\/supplier_contract_actions_handler.php",
@@ -2228,6 +2448,16 @@
         "ruling": "OWNER_CONFIRMED",
         "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
         "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Suppliers\/suppliers.php#2",
+        "owner_before": "",
+        "owner_after": "إدارة الموردين",
+        "witness": "أساسُه Suppliers\/suppliers.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
     },
     {
         "route": "Suppliers\/unit_statement_supplier.php",
@@ -2290,6 +2520,16 @@
         "decided_at": "2026-08-20 03:20:39"
     },
     {
+        "route": "Tickets\/ticket_dashboard.php#2",
+        "owner_before": "",
+        "owner_after": "مركز البلاغات",
+        "witness": "أساسُه Tickets\/ticket_dashboard.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
         "route": "Tickets\/ticket_form.php",
         "owner_before": "مركز البلاغات",
         "owner_after": "مركز البلاغات",
@@ -2308,6 +2548,26 @@
         "ruling": "APPEARANCE_MISSING",
         "reason": "الشاهدُ يوافق المالكَ المسجَّل · **والعيبُ نقصُ ظهورٍ في مساحةِ المالكِ لا خطأُ نسبة — ولا تُزال، فإزالتُها تحذف آخرَ مدخل**",
         "decided_at": "2026-08-20 03:20:39"
+    },
+    {
+        "route": "Tickets\/ticket_recurrence.php#2",
+        "owner_before": "",
+        "owner_after": "مركز البلاغات",
+        "witness": "أساسُه Tickets\/ticket_recurrence.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
+    },
+    {
+        "route": "Tickets\/ticket_types_config.php#2",
+        "owner_before": "",
+        "owner_after": "مركز البلاغات",
+        "witness": "أساسُه Tickets\/ticket_types_config.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
     },
     {
         "route": "Tickets\/ticket_workstreams_board.php",
@@ -2438,6 +2698,16 @@
         "ruling": "OWNER_CONFIRMED",
         "reason": "INJFIX02-NF14 · المساحةُ تدّعيه أصليًّا لدورتِها — والترجيحُ عدٌّ لا حجة",
         "decided_at": "2026-08-21 15:17:28"
+    },
+    {
+        "route": "Transport\/transfer_requests.php#2",
+        "owner_before": "",
+        "owner_after": "النقل والترحيل",
+        "witness": "أساسُه Transport\/transfer_requests.php — مالكٌ محسومٌ بإجماعٍ في السجلِّ الموحَّد",
+        "witness_kind": "VARIANT_OF_BASE",
+        "ruling": "OWNER_ESTABLISHED",
+        "reason": "متغايرُ عرضٍ لا سطحٌ مستقلّ: المسارُ هو الملفُّ نفسُه بذيلِ منظرٍ (`?view=` أو `#`). فمالكُه مالكُ أساسِه — **اشتقاقٌ من حكمٍ قائمٍ لا اختراعُ ملكية**. وشرطُه الإجماع: أساسٌ بأكثرَ من مالكٍ لا يُورَّث منه.",
+        "decided_at": "2026-08-22 17:18:04"
     },
     {
         "route": "Workforce\/contract_registry.php",

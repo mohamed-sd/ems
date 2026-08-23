@@ -46,7 +46,7 @@
         "created_by": "0",
         "created_by_name": "م-هـ [تجريبي — ق-15]",
         "created_at": "2026-08-06 15:37:51",
-        "updated_at": "2026-08-06 15:37:51",
+        "updated_at": "2026-08-22 16:01:35",
         "approver_user_id": null
     },
     {
@@ -216,12 +216,12 @@
         "approver_name": "قرار شركة منفذة — ق-15",
         "approved_date": null,
         "status_label": "معتمد",
-        "status": "معتمد",
+        "status": "ملغاة",
         "is_seed": "1",
         "created_by": "0",
         "created_by_name": "م-هـ [تجريبي — ق-15]",
         "created_at": "2026-08-06 15:37:51",
-        "updated_at": "2026-08-06 15:37:51",
+        "updated_at": "2026-08-22 15:54:11",
         "approver_user_id": null
     },
     {

@@ -102,9 +102,28 @@ foreach ($target as $roleId => $items) {
     $liveByRoute = array();
     foreach ($live as $p) { $liveByRoute[strtolower(uxp_norm($p['href']))][] = $p; }
 
-    $ok = array(); $bad = array(); $missing = array(); $exempt = array();
+    $ok = array(); $bad = array(); $missing = array(); $exempt = array(); $quick = array();
+
+    /* ══ بنودُ «الوصول السريع» تُقاس في البلاطاتِ لا في السايدبار ══════════
+       ◆ **البندُ مطلوبٌ وموضعُه تغيَّر**: قرارُ المالك 2026-08-23 نقل روابطَ
+         العملِ اليوميِّ لدورِ الموردين من القائمةِ إلى بلاطاتِ لوحةِ التحكم
+         **لئلّا يظهر الرابطُ في القائمتَين معًا**. فالوثيقةُ ما تزال تُعلنه
+         وتحفظ اسمَه، لكنَّ مقامَ القياسِ صار البلاطات.
+       ◆ **ولا يُقاس بالادّعاء**: يُشترَط صفُّ `modules` حيٌّ لهذا الدور
+         (`is_quick=1 AND is_link=1`) — **وإلّا فهو ناقصٌ يُرسِّب**، لأنَّه
+         اختفى من القائمةِ ولم يظهر في البلاطات. */
+    $quickTiles = array();
+    $qq = @mysqli_query($conn, "SELECT LOWER(code) c FROM modules
+                                  WHERE owner_role_id = " . (int) $roleId . "
+                                    AND is_quick = 1 AND is_link = 1");
+    while ($qq && ($qx = mysqli_fetch_row($qq))) { $quickTiles[strtolower(uxp_norm($qx[0]))] = 1; }
 
     foreach ($items as $t) {
+        if ($t['gn'] === 'الوصول السريع') {
+            if (isset($quickTiles[$t['norm']])) { $quick[] = $t; }
+            else { $missing[] = $t; }
+            continue;
+        }
         $hits = $liveByRoute[$t['norm']] ?? array();
         if (!$hits) { $missing[] = $t; continue; }
         $labels = array_unique(array_column($hits, 'label'));
@@ -128,6 +147,13 @@ foreach ($target as $roleId => $items) {
         else { $extraOther[$n] = $p['label']; }
     }
 
+    if ($quick) {
+        echo "
+◆ بلاطاتُ الوصولِ السريع — مقيسةٌ في اللوحةِ لا في القائمة (" . count($quick) . "):
+";
+        foreach ($quick as $t) { printf("   ◆ %s
+", $t['item']); }
+    }
     if ($ok) {
         echo "\n✔ مطابقُ الاسم (" . count($ok) . "):\n";
         foreach ($ok as $t) { printf("   ✔ [%d.%d] %s\n", $t['g'], $t['i'], $t['item']); }

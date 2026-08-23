@@ -6022,5 +6022,41 @@
         "icon": "",
         "display_order": "0",
         "owner_dept_note": null
+    },
+    {
+        "id": "535",
+        "name": "جهات اتصال العميل",
+        "code": "Clients\/client_contacts.php",
+        "owner_role_id": "12",
+        "group_id": "1",
+        "is_link": "0",
+        "is_quick": "0",
+        "icon": "fa fa-address-book",
+        "display_order": "0",
+        "owner_dept_note": null
+    },
+    {
+        "id": "536",
+        "name": "جهات الاتصال والمفوضون",
+        "code": "Suppliers\/supplier_contacts.php",
+        "owner_role_id": "2",
+        "group_id": null,
+        "is_link": "0",
+        "is_quick": "0",
+        "icon": "fa fa-address-book",
+        "display_order": "0",
+        "owner_dept_note": null
+    },
+    {
+        "id": "537",
+        "name": "استحقاقات الموردين",
+        "code": "Suppliers\/supplier_entitlements.php",
+        "owner_role_id": null,
+        "group_id": null,
+        "is_link": "0",
+        "is_quick": "0",
+        "icon": "fa fa-address-book",
+        "display_order": "0",
+        "owner_dept_note": null
     }
 ]

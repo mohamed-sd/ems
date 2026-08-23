@@ -2270,6 +2270,108 @@
     },
     {
         "screen_id": "SCR-0024",
+        "route": "Clients\/client_contacts.php",
+        "file": "Clients\/client_contacts.php",
+        "surface_type": "SCREEN",
+        "on_disk": 1,
+        "sources": [
+            "disk",
+            "apps"
+        ],
+        "name_ar": "جهات اتصال العميل",
+        "names_all": [
+            "جهات اتصال العميل"
+        ],
+        "owner_dept": "ادارة المبيعات",
+        "owner_basis": "CONSENSUS",
+        "workspaces": [
+            {
+                "space": "ادارة المبيعات",
+                "kind": "",
+                "tab": "العملاء والفرص",
+                "cls": "OWNED",
+                "decision": "KEEP",
+                "owner_kind": ""
+            }
+        ],
+        "roles_nav": [],
+        "profiles_count": 8,
+        "profiles": [
+            {
+                "profile": "HRM-G7",
+                "dept": "الموارد البشرية",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "SAL-G7",
+                "dept": "المبيعات والعقود",
+                "allow": 1,
+                "add": 1,
+                "edit": 1,
+                "del": 1
+            },
+            {
+                "profile": "SUP-G4",
+                "dept": "إدارة الموردين",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "SUP-G7",
+                "dept": "إدارة الموردين",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "FLT-G7",
+                "dept": "إدارة الأسطول",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "OPS-G4",
+                "dept": "إدارة التشغيل",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "OPS-G7",
+                "dept": "إدارة التشغيل",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "SIT-G7",
+                "dept": "إدارة الموقع",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            }
+        ],
+        "stage": null,
+        "ledger": null,
+        "nav09": null,
+        "deprecated": 0,
+        "known_issue": [],
+        "table_columns": 0,
+        "form_fields": 0
+    },
+    {
+        "screen_id": "SCR-0025",
         "route": "Clients\/client_profile.php",
         "file": "Clients\/client_profile.php",
         "surface_type": "SCREEN",
@@ -2367,7 +2469,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0025",
+        "screen_id": "SCR-0026",
         "route": "Clients\/clients.php",
         "file": "Clients\/clients.php",
         "surface_type": "SCREEN",
@@ -2540,7 +2642,7 @@
         "form_fields": 10
     },
     {
-        "screen_id": "SCR-0026",
+        "screen_id": "SCR-0027",
         "route": "Clients\/commercial_risks.php",
         "file": "Clients\/commercial_risks.php",
         "surface_type": "SCREEN",
@@ -2651,7 +2753,7 @@
         "form_fields": 12
     },
     {
-        "screen_id": "SCR-0027",
+        "screen_id": "SCR-0028",
         "route": "Clients\/contract_amendments.php",
         "file": "Clients\/contract_amendments.php",
         "surface_type": "SCREEN",
@@ -2695,8 +2797,8 @@
             "stage_order": 7,
             "stage_name": "التجديد والإقفال",
             "layer": "دورة الإدارة",
-            "group": "نجدّد أو نُقفل",
-            "inputs": "contract_amendments · جداولُ نظامِ الحاويات",
+            "group": "التجديد والإقفال",
+            "inputs": "contract_amendments · جداولُ التغطيةِ التعاقدية",
             "output_doc": "عقد نافذ · عقدٌ نافذ",
             "resp_role": "الرئيس التنفيذي",
             "next_state": "نسخةٌ جديدةٌ للكميات والأسعار بسريانها",
@@ -2729,7 +2831,7 @@
         "form_fields": 14
     },
     {
-        "screen_id": "SCR-0028",
+        "screen_id": "SCR-0029",
         "route": "Clients\/contract_commitments.php",
         "file": "Clients\/contract_commitments.php",
         "surface_type": "SCREEN",
@@ -2775,7 +2877,7 @@
         "form_fields": 24
     },
     {
-        "screen_id": "SCR-0029",
+        "screen_id": "SCR-0030",
         "route": "Clients\/contract_events.php",
         "file": "Clients\/contract_events.php",
         "surface_type": "SCREEN",
@@ -2819,7 +2921,7 @@
             "stage_order": 7,
             "stage_name": "التجديد والإقفال",
             "layer": "دورة الإدارة",
-            "group": "نجدّد أو نُقفل",
+            "group": "التجديد والإقفال",
             "inputs": "contract_events",
             "output_doc": "عقد نافذ · عقدٌ نافذ",
             "resp_role": "الرئيس التنفيذي",
@@ -2853,7 +2955,7 @@
         "form_fields": 9
     },
     {
-        "screen_id": "SCR-0030",
+        "screen_id": "SCR-0031",
         "route": "Clients\/pricelists.php",
         "file": "Clients\/pricelists.php",
         "surface_type": "SCREEN",
@@ -2897,7 +2999,7 @@
             "stage_order": 2,
             "stage_name": "العروض والتسعير",
             "layer": "دورة الإدارة",
-            "group": "نتفاوض ونسعّر",
+            "group": "التفاوض والتسعير",
             "inputs": "pricelists",
             "output_doc": "سجل جهة · فرصة مؤهَّلة · عرض سعر مُرسَل · نموذج عملٍ معتمد",
             "resp_role": "مدير المبيعات",
@@ -2931,7 +3033,7 @@
         "form_fields": 12
     },
     {
-        "screen_id": "SCR-0031",
+        "screen_id": "SCR-0032",
         "route": "Clients\/products.php",
         "file": "Clients\/products.php",
         "surface_type": "SCREEN",
@@ -2985,7 +3087,7 @@
             "stage_order": 2,
             "stage_name": "العروض والتسعير",
             "layer": "دورة الإدارة",
-            "group": "نتفاوض ونسعّر",
+            "group": "التفاوض والتسعير",
             "inputs": "products",
             "output_doc": "سجل جهة · فرصة مؤهَّلة · عرض سعر مُرسَل · نموذج عملٍ معتمد",
             "resp_role": "مدير المبيعات",
@@ -3019,7 +3121,7 @@
         "form_fields": 10
     },
     {
-        "screen_id": "SCR-0032",
+        "screen_id": "SCR-0033",
         "route": "Clients\/quotation_lines.php",
         "file": "Clients\/quotation_lines.php",
         "surface_type": "SCREEN",
@@ -3065,7 +3167,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0033",
+        "screen_id": "SCR-0034",
         "route": "Clients\/quotation_negotiation.php",
         "file": "Clients\/quotation_negotiation.php",
         "surface_type": "SCREEN",
@@ -3111,7 +3213,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0034",
+        "screen_id": "SCR-0035",
         "route": "Clients\/quotations.php",
         "file": "Clients\/quotations.php",
         "surface_type": "SCREEN",
@@ -3165,7 +3267,7 @@
             "stage_order": 2,
             "stage_name": "العروض والتسعير",
             "layer": "دورة الإدارة",
-            "group": "نتفاوض ونسعّر",
+            "group": "التفاوض والتسعير",
             "inputs": "quotations · quotations.accepted",
             "output_doc": "سجل جهة · فرصة مؤهَّلة · عرض سعر مُرسَل · نموذج عملٍ معتمد",
             "resp_role": "مدير المبيعات",
@@ -3199,7 +3301,7 @@
         "form_fields": 12
     },
     {
-        "screen_id": "SCR-0035",
+        "screen_id": "SCR-0036",
         "route": "Clients\/rate_books.php",
         "file": "Clients\/rate_books.php",
         "surface_type": "SCREEN",
@@ -3249,7 +3351,7 @@
         "form_fields": 26
     },
     {
-        "screen_id": "SCR-0036",
+        "screen_id": "SCR-0037",
         "route": "Clients\/readiness_lines.php",
         "file": "Clients\/readiness_lines.php",
         "surface_type": "SCREEN",
@@ -3295,7 +3397,7 @@
         "form_fields": 10
     },
     {
-        "screen_id": "SCR-0037",
+        "screen_id": "SCR-0038",
         "route": "Clients\/tenders.php",
         "file": "Clients\/tenders.php",
         "surface_type": "SCREEN",
@@ -3341,7 +3443,7 @@
         "form_fields": 11
     },
     {
-        "screen_id": "SCR-0038",
+        "screen_id": "SCR-0039",
         "route": "Clients\/units_of_measure.php",
         "file": "Clients\/units_of_measure.php",
         "surface_type": "SCREEN",
@@ -3385,7 +3487,7 @@
             "stage_order": 2,
             "stage_name": "العروض والتسعير",
             "layer": "دورة الإدارة",
-            "group": "نتفاوض ونسعّر",
+            "group": "التفاوض والتسعير",
             "inputs": "units_of_measure",
             "output_doc": "سجل جهة · فرصة مؤهَّلة · عرض سعر مُرسَل · نموذج عملٍ معتمد",
             "resp_role": "مدير المبيعات",
@@ -3419,7 +3521,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0039",
+        "screen_id": "SCR-0040",
         "route": "Contracts\/claims.php",
         "file": "Contracts\/claims.php",
         "surface_type": "SCREEN",
@@ -3432,8 +3534,9 @@
             "nav",
             "nav09"
         ],
-        "name_ar": "المستخلصات والمطالبات",
+        "name_ar": "سجل المطالبات والتسليم للمالية",
         "names_all": [
+            "سجل المطالبات والتسليم للمالية",
             "المستخلصات والمطالبات"
         ],
         "owner_dept": "المبيعات والعقود",
@@ -3603,7 +3706,7 @@
         "form_fields": 22
     },
     {
-        "screen_id": "SCR-0040",
+        "screen_id": "SCR-0041",
         "route": "Contracts\/client_statement.php",
         "file": "Contracts\/client_statement.php",
         "surface_type": "SCREEN",
@@ -3730,7 +3833,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0041",
+        "screen_id": "SCR-0042",
         "route": "Contracts\/collections.php",
         "file": "Contracts\/collections.php",
         "surface_type": "SCREEN",
@@ -3884,7 +3987,7 @@
         "form_fields": 10
     },
     {
-        "screen_id": "SCR-0042",
+        "screen_id": "SCR-0043",
         "route": "Contracts\/commercial_board.php",
         "file": "Contracts\/commercial_board.php",
         "surface_type": "SCREEN",
@@ -3984,7 +4087,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0043",
+        "screen_id": "SCR-0044",
         "route": "Contracts\/contract_actions_handler.php",
         "file": "Contracts\/contract_actions_handler.php",
         "surface_type": "HANDLER",
@@ -4009,7 +4112,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0044",
+        "screen_id": "SCR-0045",
         "route": "Contracts\/contract_baseline.php",
         "file": "Contracts\/contract_baseline.php",
         "surface_type": "SCREEN",
@@ -4094,7 +4197,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0045",
+        "screen_id": "SCR-0046",
         "route": "Contracts\/contract_card.php",
         "file": "Contracts\/contract_card.php",
         "surface_type": "SCREEN",
@@ -4258,7 +4361,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0046",
+        "screen_id": "SCR-0047",
         "route": "Contracts\/contract_coverage.php",
         "file": "Contracts\/contract_coverage.php",
         "surface_type": "SCREEN",
@@ -4273,7 +4376,8 @@
         ],
         "name_ar": "التزام العقد بنوع المعدة",
         "names_all": [
-            "التزام العقد بنوع المعدة"
+            "التزام العقد بنوع المعدة",
+            "احتياجات التغطية"
         ],
         "owner_dept": "المبيعات والعقود",
         "owner_basis": "RULING",
@@ -4406,7 +4510,7 @@
             "stage_name": "التعاقد والتغطية والحصص",
             "layer": "دورة الإدارة",
             "group": "العقود والتغطية",
-            "inputs": "contract_coverage · جداولُ نظامِ الحاويات",
+            "inputs": "contract_coverage · جداولُ التغطيةِ التعاقدية",
             "output_doc": "◆ انتقالُ حالةٍ بلا مستندٍ رسمي",
             "resp_role": "مدير التشغيل",
             "next_state": "الحاويةُ الرئيسية تُولَّد",
@@ -4441,7 +4545,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0047",
+        "screen_id": "SCR-0048",
         "route": "Contracts\/contract_guarantees.php",
         "file": "Contracts\/contract_guarantees.php",
         "surface_type": "SCREEN",
@@ -4526,7 +4630,7 @@
         "form_fields": 17
     },
     {
-        "screen_id": "SCR-0048",
+        "screen_id": "SCR-0049",
         "route": "Contracts\/contract_lifecycle.php",
         "file": "Contracts\/contract_lifecycle.php",
         "surface_type": "SCREEN",
@@ -4611,7 +4715,7 @@
         "form_fields": 11
     },
     {
-        "screen_id": "SCR-0049",
+        "screen_id": "SCR-0050",
         "route": "Contracts\/contract_lines.php",
         "file": "Contracts\/contract_lines.php",
         "surface_type": "SCREEN",
@@ -4689,7 +4793,7 @@
         "form_fields": 18
     },
     {
-        "screen_id": "SCR-0050",
+        "screen_id": "SCR-0051",
         "route": "Contracts\/contract_monthly_plan.php",
         "file": "Contracts\/contract_monthly_plan.php",
         "surface_type": "SCREEN",
@@ -4775,7 +4879,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0051",
+        "screen_id": "SCR-0052",
         "route": "Contracts\/contract_obligations.php",
         "file": "Contracts\/contract_obligations.php",
         "surface_type": "SCREEN",
@@ -4891,7 +4995,7 @@
         "form_fields": 10
     },
     {
-        "screen_id": "SCR-0052",
+        "screen_id": "SCR-0053",
         "route": "Contracts\/contract_payment_schedule.php",
         "file": "Contracts\/contract_payment_schedule.php",
         "surface_type": "SCREEN",
@@ -4976,7 +5080,7 @@
         "form_fields": 22
     },
     {
-        "screen_id": "SCR-0053",
+        "screen_id": "SCR-0054",
         "route": "Contracts\/contract_resource_plan.php",
         "file": "Contracts\/contract_resource_plan.php",
         "surface_type": "SCREEN",
@@ -5070,7 +5174,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0054",
+        "screen_id": "SCR-0055",
         "route": "Contracts\/contract_sites.php",
         "file": "Contracts\/contract_sites.php",
         "surface_type": "SCREEN",
@@ -5156,7 +5260,7 @@
         "form_fields": 11
     },
     {
-        "screen_id": "SCR-0055",
+        "screen_id": "SCR-0056",
         "route": "Contracts\/contractequipments_handler.php",
         "file": "Contracts\/contractequipments_handler.php",
         "surface_type": "HANDLER",
@@ -5181,7 +5285,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0056",
+        "screen_id": "SCR-0057",
         "route": "Contracts\/contracts.php",
         "file": "Contracts\/contracts.php",
         "surface_type": "SCREEN",
@@ -5194,8 +5298,9 @@
             "nav",
             "nav09"
         ],
-        "name_ar": "عقود العملاء",
+        "name_ar": "سجل عقود المشاريع",
         "names_all": [
+            "سجل عقود المشاريع",
             "عقود العملاء",
             "حصص الموردين والتغطية"
         ],
@@ -5460,7 +5565,7 @@
         "form_fields": 71
     },
     {
-        "screen_id": "SCR-0057",
+        "screen_id": "SCR-0058",
         "route": "Contracts\/contracts_details.php",
         "file": "Contracts\/contracts_details.php",
         "surface_type": "SCREEN",
@@ -5558,7 +5663,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0058",
+        "screen_id": "SCR-0059",
         "route": "Contracts\/cron_price_adjustment.php",
         "file": "Contracts\/cron_price_adjustment.php",
         "surface_type": "CRON",
@@ -5583,7 +5688,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0059",
+        "screen_id": "SCR-0060",
         "route": "Contracts\/get_contract_equipments.php",
         "file": "Contracts\/get_contract_equipments.php",
         "surface_type": "HANDLER",
@@ -5608,7 +5713,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0060",
+        "screen_id": "SCR-0061",
         "route": "Contracts\/get_equipments.php",
         "file": "Contracts\/get_equipments.php",
         "surface_type": "HANDLER",
@@ -5633,7 +5738,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0061",
+        "screen_id": "SCR-0062",
         "route": "Contracts\/penalties.php",
         "file": "Contracts\/penalties.php",
         "surface_type": "SCREEN",
@@ -5786,7 +5891,7 @@
             "stage_order": 3,
             "stage_name": "العقود",
             "layer": "دورة الإدارة",
-            "group": "نوقّع العقد",
+            "group": "توقيع العقد",
             "inputs": "penalties",
             "output_doc": "تغطية · وحدات · أحكام · مستخلص · مطالبة · — سجلات",
             "resp_role": "المالية",
@@ -5820,7 +5925,7 @@
         "form_fields": 9
     },
     {
-        "screen_id": "SCR-0062",
+        "screen_id": "SCR-0063",
         "route": "Contracts\/plan_actual_link.php",
         "file": "Contracts\/plan_actual_link.php",
         "surface_type": "SCREEN",
@@ -5898,7 +6003,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0063",
+        "screen_id": "SCR-0064",
         "route": "Contracts\/price_terms.php",
         "file": "Contracts\/price_terms.php",
         "surface_type": "SCREEN",
@@ -5974,7 +6079,7 @@
         "form_fields": 22
     },
     {
-        "screen_id": "SCR-0064",
+        "screen_id": "SCR-0065",
         "route": "Contracts\/tax_invoices.php",
         "file": "Contracts\/tax_invoices.php",
         "surface_type": "SCREEN",
@@ -6129,7 +6234,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0065",
+        "screen_id": "SCR-0066",
         "route": "Contracts\/tax_invoices.php#2",
         "file": "Contracts\/tax_invoices.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -6199,7 +6304,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0066",
+        "screen_id": "SCR-0067",
         "route": "Contracts\/tax_invoices.php?view=v72b04c",
         "file": "Contracts\/tax_invoices.php",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -6211,8 +6316,8 @@
         "names_all": [
             "الفاتورة الضريبية والإقرارات"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "المالية والخزينة",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة المالية": [
@@ -6241,7 +6346,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0067",
+        "screen_id": "SCR-0068",
         "route": "Contracts\/unit_client_match.php",
         "file": "Contracts\/unit_client_match.php",
         "surface_type": "SCREEN",
@@ -6325,7 +6430,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0068",
+        "screen_id": "SCR-0069",
         "route": "Contracts\/unit_statement_client.php",
         "file": "Contracts\/unit_statement_client.php",
         "surface_type": "SCREEN",
@@ -6417,7 +6522,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0069",
+        "screen_id": "SCR-0070",
         "route": "Contracts\/update_contract_details.php",
         "file": "Contracts\/update_contract_details.php",
         "surface_type": "HANDLER",
@@ -6442,7 +6547,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0070",
+        "screen_id": "SCR-0071",
         "route": "Employees\/employee_card.php",
         "file": "Employees\/employee_card.php",
         "surface_type": "SCREEN",
@@ -6492,7 +6597,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0071",
+        "screen_id": "SCR-0072",
         "route": "Employees\/employee_contract_actions_handler.php",
         "file": "Employees\/employee_contract_actions_handler.php",
         "surface_type": "HANDLER",
@@ -6517,7 +6622,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0072",
+        "screen_id": "SCR-0073",
         "route": "Employees\/employee_contracts.php",
         "file": "Employees\/employee_contracts.php",
         "surface_type": "SCREEN",
@@ -6662,7 +6767,7 @@
         "form_fields": 73
     },
     {
-        "screen_id": "SCR-0073",
+        "screen_id": "SCR-0074",
         "route": "Employees\/employee_contracts_details.php",
         "file": "Employees\/employee_contracts_details.php",
         "surface_type": "SCREEN",
@@ -6752,7 +6857,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0074",
+        "screen_id": "SCR-0075",
         "route": "Employees\/employee_equipment_history.php",
         "file": "Employees\/employee_equipment_history.php",
         "surface_type": "SCREEN",
@@ -6842,7 +6947,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0075",
+        "screen_id": "SCR-0076",
         "route": "Employees\/employee_profile.php",
         "file": "Employees\/employee_profile.php",
         "surface_type": "SCREEN",
@@ -6932,7 +7037,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0076",
+        "screen_id": "SCR-0077",
         "route": "Employees\/employee_roles.php",
         "file": "Employees\/employee_roles.php",
         "surface_type": "SCREEN",
@@ -6987,7 +7092,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0077",
+        "screen_id": "SCR-0078",
         "route": "Employees\/employees.php",
         "file": "Employees\/employees.php",
         "surface_type": "SCREEN",
@@ -7145,7 +7250,7 @@
         "form_fields": 47
     },
     {
-        "screen_id": "SCR-0078",
+        "screen_id": "SCR-0079",
         "route": "Employees\/equipment_operators.php",
         "file": "Employees\/equipment_operators.php",
         "surface_type": "SCREEN",
@@ -7347,7 +7452,7 @@
         "form_fields": 12
     },
     {
-        "screen_id": "SCR-0079",
+        "screen_id": "SCR-0080",
         "route": "Employees\/get_employee_contract_equipments.php",
         "file": "Employees\/get_employee_contract_equipments.php",
         "surface_type": "HANDLER",
@@ -7372,7 +7477,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0080",
+        "screen_id": "SCR-0081",
         "route": "Employees\/get_employee_data.php",
         "file": "Employees\/get_employee_data.php",
         "surface_type": "HANDLER",
@@ -7397,7 +7502,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0081",
+        "screen_id": "SCR-0082",
         "route": "Employees\/get_mine_contracts.php",
         "file": "Employees\/get_mine_contracts.php",
         "surface_type": "HANDLER",
@@ -7422,7 +7527,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0082",
+        "screen_id": "SCR-0083",
         "route": "Employees\/get_project_hours.php",
         "file": "Employees\/get_project_hours.php",
         "surface_type": "HANDLER",
@@ -7447,7 +7552,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0083",
+        "screen_id": "SCR-0084",
         "route": "Employees\/job_titles.php",
         "file": "Employees\/job_titles.php",
         "surface_type": "SCREEN",
@@ -7502,7 +7607,7 @@
         "form_fields": 6
     },
     {
-        "screen_id": "SCR-0084",
+        "screen_id": "SCR-0085",
         "route": "Employees\/showcontractemployee.php",
         "file": "Employees\/showcontractemployee.php",
         "surface_type": "SCREEN",
@@ -7592,7 +7697,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0085",
+        "screen_id": "SCR-0086",
         "route": "Equipments\/approve_card.php",
         "file": "Equipments\/approve_card.php",
         "surface_type": "HANDLER",
@@ -7617,7 +7722,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0086",
+        "screen_id": "SCR-0087",
         "route": "Equipments\/asset_recon.php",
         "file": "Equipments\/asset_recon.php",
         "surface_type": "SCREEN",
@@ -7734,7 +7839,7 @@
         "form_fields": 16
     },
     {
-        "screen_id": "SCR-0087",
+        "screen_id": "SCR-0088",
         "route": "Equipments\/code_bridge.php",
         "file": "Equipments\/code_bridge.php",
         "surface_type": "SCREEN",
@@ -7819,7 +7924,7 @@
             "layer": "دورة الإدارة",
             "group": "جسر ترقيم المعدات",
             "inputs": "code_bridge",
-            "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · حاويةُ كلِّ معدة",
+            "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · التغطيةُ التعاقديةُ لكلِّ معدة",
             "resp_role": "مسجّل الأصل",
             "next_state": "كلُّ ترميزٍ للمعدة يشير إلى كودٍ واحد",
             "consumers": "التشغيل · الصيانة · الموردون · المالية",
@@ -7851,7 +7956,7 @@
         "form_fields": 18
     },
     {
-        "screen_id": "SCR-0088",
+        "screen_id": "SCR-0089",
         "route": "Equipments\/equipment_card_fields.php",
         "file": "Equipments\/equipment_card_fields.php",
         "surface_type": "HANDLER",
@@ -7876,7 +7981,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0089",
+        "screen_id": "SCR-0090",
         "route": "Equipments\/equipment_child_save.php",
         "file": "Equipments\/equipment_child_save.php",
         "surface_type": "HANDLER",
@@ -7901,7 +8006,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0090",
+        "screen_id": "SCR-0091",
         "route": "Equipments\/equipment_documents.php",
         "file": "Equipments\/equipment_documents.php",
         "surface_type": "SCREEN",
@@ -8158,7 +8263,7 @@
         "form_fields": 12
     },
     {
-        "screen_id": "SCR-0091",
+        "screen_id": "SCR-0092",
         "route": "Equipments\/equipment_profile.php",
         "file": "Equipments\/equipment_profile.php",
         "surface_type": "SCREEN",
@@ -8304,7 +8409,7 @@
         "form_fields": 29
     },
     {
-        "screen_id": "SCR-0092",
+        "screen_id": "SCR-0093",
         "route": "Equipments\/equipment_sourcing.php",
         "file": "Equipments\/equipment_sourcing.php",
         "surface_type": "SCREEN",
@@ -8389,7 +8494,7 @@
             "layer": "دورة الإدارة",
             "group": "مصدر المعدة ونمط تملّكها",
             "inputs": "equipment_sourcing",
-            "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · حاويةُ كلِّ معدة",
+            "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · التغطيةُ التعاقديةُ لكلِّ معدة",
             "resp_role": "مسجّل الأصل",
             "next_state": "المصدرُ يحدد: من يملك",
             "consumers": "المالية · التمويل · الموردون · التشغيل",
@@ -8423,7 +8528,7 @@
         "form_fields": 22
     },
     {
-        "screen_id": "SCR-0093",
+        "screen_id": "SCR-0094",
         "route": "Equipments\/equipment_sourcing.php#2",
         "file": "Equipments\/equipment_sourcing.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -8465,7 +8570,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0094",
+        "screen_id": "SCR-0095",
         "route": "Equipments\/equipments.php",
         "file": "Equipments\/equipments.php",
         "surface_type": "SCREEN",
@@ -8757,7 +8862,7 @@
             "layer": "دورة الإدارة",
             "group": "سجل المعدات",
             "inputs": "asset_register · equipments",
-            "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · حاويةُ كلِّ معدة",
+            "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · التغطيةُ التعاقديةُ لكلِّ معدة",
             "resp_role": "مدير الموقع",
             "next_state": "كرتٌ بكودٍ دائم",
             "consumers": "الصيانة · التشغيل · المالية · التمويل",
@@ -8789,7 +8894,7 @@
         "form_fields": 30
     },
     {
-        "screen_id": "SCR-0095",
+        "screen_id": "SCR-0096",
         "route": "Equipments\/equipments.php#2",
         "file": "Equipments\/equipments.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -8801,8 +8906,8 @@
         "names_all": [
             "سجل المعدات"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة الأسطول",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة الاسطول": [
@@ -8831,7 +8936,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0096",
+        "screen_id": "SCR-0097",
         "route": "Equipments\/equipments_drivers.php",
         "file": "Equipments\/equipments_drivers.php",
         "surface_type": "SCREEN",
@@ -8873,7 +8978,7 @@
         "form_fields": 29
     },
     {
-        "screen_id": "SCR-0097",
+        "screen_id": "SCR-0098",
         "route": "Equipments\/equipments_fleet.php",
         "file": "Equipments\/equipments_fleet.php",
         "surface_type": "SCREEN",
@@ -9021,7 +9126,7 @@
         "form_fields": 35
     },
     {
-        "screen_id": "SCR-0098",
+        "screen_id": "SCR-0099",
         "route": "Equipments\/equipments_types.php",
         "file": "Equipments\/equipments_types.php",
         "surface_type": "SCREEN",
@@ -9192,7 +9297,7 @@
             "layer": "دورة الإدارة",
             "group": "الأنواع والموديلات",
             "inputs": "equipment_types",
-            "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · حاويةُ كلِّ معدة",
+            "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · التغطيةُ التعاقديةُ لكلِّ معدة",
             "resp_role": "مسجّل الأصل",
             "next_state": "النوعُ يصير متاحًا في بنود العقد وخطط الوقائية",
             "consumers": "المبيعات · الصيانة · التشغيل",
@@ -9224,7 +9329,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0099",
+        "screen_id": "SCR-0100",
         "route": "Equipments\/fin_assets.php",
         "file": "Equipments\/fin_assets.php",
         "surface_type": "SCREEN",
@@ -9332,7 +9437,7 @@
             "layer": "دورة الإدارة",
             "group": "الأعيان المموَّلة",
             "inputs": "financed_assets",
-            "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · حاويةُ كلِّ معدة",
+            "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · التغطيةُ التعاقديةُ لكلِّ معدة",
             "resp_role": "التمويل",
             "next_state": "الأصلُ يحمل مصدرَ تمويله",
             "consumers": "المالية · الأسطول",
@@ -9364,7 +9469,7 @@
         "form_fields": 22
     },
     {
-        "screen_id": "SCR-0100",
+        "screen_id": "SCR-0101",
         "route": "Equipments\/fleet_depreciation_profiles.php",
         "file": "Equipments\/fleet_depreciation_profiles.php",
         "surface_type": "SCREEN",
@@ -9545,7 +9650,7 @@
         "form_fields": 10
     },
     {
-        "screen_id": "SCR-0101",
+        "screen_id": "SCR-0102",
         "route": "Equipments\/fleet_failures.php",
         "file": "Equipments\/fleet_failures.php",
         "surface_type": "SCREEN",
@@ -9595,7 +9700,7 @@
         "form_fields": 6
     },
     {
-        "screen_id": "SCR-0102",
+        "screen_id": "SCR-0103",
         "route": "Equipments\/fleet_models.php",
         "file": "Equipments\/fleet_models.php",
         "surface_type": "SCREEN",
@@ -9789,7 +9894,7 @@
             "layer": "دورة الإدارة",
             "group": "الأنواع والموديلات",
             "inputs": "equipment_models",
-            "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · حاويةُ كلِّ معدة",
+            "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · التغطيةُ التعاقديةُ لكلِّ معدة",
             "resp_role": "مدير الصيانة",
             "next_state": "كلُّ معدةٍ من الموديل ترث مواصفاتِه ودورياتِ غياره وقطعَه القياسية",
             "consumers": "الصيانة · المشتريات",
@@ -9821,7 +9926,7 @@
         "form_fields": 22
     },
     {
-        "screen_id": "SCR-0103",
+        "screen_id": "SCR-0104",
         "route": "Equipments\/fleet_models.php#2",
         "file": "Equipments\/fleet_models.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -9833,8 +9938,8 @@
         "names_all": [
             "موديلات المعدات ومواصفاتها"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة الأسطول",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة الصيانة": [
@@ -9863,7 +9968,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0104",
+        "screen_id": "SCR-0105",
         "route": "Equipments\/get_contract_stats.php",
         "file": "Equipments\/get_contract_stats.php",
         "surface_type": "HANDLER",
@@ -9888,7 +9993,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0105",
+        "screen_id": "SCR-0106",
         "route": "Equipments\/get_equipment_details.php",
         "file": "Equipments\/get_equipment_details.php",
         "surface_type": "HANDLER",
@@ -9913,7 +10018,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0106",
+        "screen_id": "SCR-0107",
         "route": "Equipments\/get_mine_contracts.php",
         "file": "Equipments\/get_mine_contracts.php",
         "surface_type": "HANDLER",
@@ -9938,7 +10043,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0107",
+        "screen_id": "SCR-0108",
         "route": "Equipments\/get_model_data.php",
         "file": "Equipments\/get_model_data.php",
         "surface_type": "HANDLER",
@@ -9963,7 +10068,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0108",
+        "screen_id": "SCR-0109",
         "route": "Equipments\/gov_dept_flt.php",
         "file": "Equipments\/gov_dept_flt.php",
         "surface_type": "SCREEN",
@@ -10063,7 +10168,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0109",
+        "screen_id": "SCR-0110",
         "route": "Equipments\/manage_failure_codes.php",
         "file": "Equipments\/manage_failure_codes.php",
         "surface_type": "SCREEN",
@@ -10241,7 +10346,7 @@
         "form_fields": 17
     },
     {
-        "screen_id": "SCR-0110",
+        "screen_id": "SCR-0111",
         "route": "Equipments\/meter_readings.php",
         "file": "Equipments\/meter_readings.php",
         "surface_type": "SCREEN",
@@ -10411,7 +10516,7 @@
         "form_fields": 11
     },
     {
-        "screen_id": "SCR-0111",
+        "screen_id": "SCR-0112",
         "route": "Equipments\/select_project.php",
         "file": "Equipments\/select_project.php",
         "surface_type": "SCREEN",
@@ -10557,7 +10662,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0112",
+        "screen_id": "SCR-0113",
         "route": "FinRequests\/accountant_desk.php",
         "file": "FinRequests\/accountant_desk.php",
         "surface_type": "SCREEN",
@@ -10695,7 +10800,7 @@
         "form_fields": 10
     },
     {
-        "screen_id": "SCR-0113",
+        "screen_id": "SCR-0114",
         "route": "FinRequests\/cycle_time_board.php",
         "file": "FinRequests\/cycle_time_board.php",
         "surface_type": "SCREEN",
@@ -10833,7 +10938,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0114",
+        "screen_id": "SCR-0115",
         "route": "FinRequests\/dept_inbox.php",
         "file": "FinRequests\/dept_inbox.php",
         "surface_type": "SCREEN",
@@ -11196,7 +11301,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0115",
+        "screen_id": "SCR-0116",
         "route": "FinRequests\/effect_map.php",
         "file": "FinRequests\/effect_map.php",
         "surface_type": "SCREEN",
@@ -11334,7 +11439,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0116",
+        "screen_id": "SCR-0117",
         "route": "FinRequests\/finance_gateway.php",
         "file": "FinRequests\/finance_gateway.php",
         "surface_type": "SCREEN",
@@ -11440,7 +11545,7 @@
         "form_fields": 6
     },
     {
-        "screen_id": "SCR-0117",
+        "screen_id": "SCR-0118",
         "route": "FinRequests\/my_requests.php",
         "file": "FinRequests\/my_requests.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -11637,7 +11742,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0118",
+        "screen_id": "SCR-0119",
         "route": "FinRequests\/request_actions.php",
         "file": "FinRequests\/request_actions.php",
         "surface_type": "HANDLER",
@@ -11662,7 +11767,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0119",
+        "screen_id": "SCR-0120",
         "route": "FinRequests\/request_form.php",
         "file": "FinRequests\/request_form.php",
         "surface_type": "SCREEN",
@@ -12143,7 +12248,7 @@
         "form_fields": 40
     },
     {
-        "screen_id": "SCR-0120",
+        "screen_id": "SCR-0121",
         "route": "FinRequests\/requests_reports.php",
         "file": "FinRequests\/requests_reports.php",
         "surface_type": "SCREEN",
@@ -12249,7 +12354,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0121",
+        "screen_id": "SCR-0122",
         "route": "FinRequests\/routing_admin.php",
         "file": "FinRequests\/routing_admin.php",
         "surface_type": "SCREEN",
@@ -12387,7 +12492,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0122",
+        "screen_id": "SCR-0123",
         "route": "Finance\/acc_approval_chain.php",
         "file": "Finance\/acc_approval_chain.php",
         "surface_type": "SCREEN",
@@ -12480,7 +12585,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0123",
+        "screen_id": "SCR-0124",
         "route": "Finance\/acc_backflow.php",
         "file": "Finance\/acc_backflow.php",
         "surface_type": "SCREEN",
@@ -12573,7 +12678,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0124",
+        "screen_id": "SCR-0125",
         "route": "Finance\/acc_my_day.php",
         "file": "Finance\/acc_my_day.php",
         "surface_type": "SCREEN",
@@ -12666,7 +12771,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0125",
+        "screen_id": "SCR-0126",
         "route": "Finance\/acc_routing_matrix.php",
         "file": "Finance\/acc_routing_matrix.php",
         "surface_type": "SCREEN",
@@ -12744,7 +12849,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0126",
+        "screen_id": "SCR-0127",
         "route": "Finance\/acc_specializations.php",
         "file": "Finance\/acc_specializations.php",
         "surface_type": "SCREEN",
@@ -12822,7 +12927,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0127",
+        "screen_id": "SCR-0128",
         "route": "Finance\/accountants_fin.php",
         "file": "Finance\/accountants_fin.php",
         "surface_type": "SCREEN",
@@ -12928,7 +13033,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0128",
+        "screen_id": "SCR-0129",
         "route": "Finance\/accounts_fin.php",
         "file": "Finance\/accounts_fin.php",
         "surface_type": "SCREEN",
@@ -13066,7 +13171,7 @@
         "form_fields": 6
     },
     {
-        "screen_id": "SCR-0129",
+        "screen_id": "SCR-0130",
         "route": "Finance\/approvals_inbox.php",
         "file": "Finance\/approvals_inbox.php",
         "surface_type": "SCREEN",
@@ -13571,7 +13676,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0130",
+        "screen_id": "SCR-0131",
         "route": "Finance\/approvals_inbox.php#2",
         "file": "Finance\/approvals_inbox.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -13583,8 +13688,8 @@
         "names_all": [
             "صندوق ما ينتظر اعتمادي"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "مشتركةٌ معلَنة — منصةٌ بلا مساحةٍ أصلية",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة الصلاحيات": [
@@ -13648,7 +13753,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0131",
+        "screen_id": "SCR-0132",
         "route": "Finance\/ar_accrual_gen.php",
         "file": "Finance\/ar_accrual_gen.php",
         "surface_type": "SCREEN",
@@ -13769,7 +13874,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0132",
+        "screen_id": "SCR-0133",
         "route": "Finance\/ar_claim_invoice.php",
         "file": "Finance\/ar_claim_invoice.php",
         "surface_type": "SCREEN",
@@ -13890,7 +13995,7 @@
         "form_fields": 9
     },
     {
-        "screen_id": "SCR-0133",
+        "screen_id": "SCR-0134",
         "route": "Finance\/ar_completion_cert.php",
         "file": "Finance\/ar_completion_cert.php",
         "surface_type": "SCREEN",
@@ -14011,7 +14116,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0134",
+        "screen_id": "SCR-0135",
         "route": "Finance\/asset_hours_link.php",
         "file": "Finance\/asset_hours_link.php",
         "surface_type": "HANDLER",
@@ -14103,7 +14208,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0135",
+        "screen_id": "SCR-0136",
         "route": "Finance\/assets_fin.php",
         "file": "Finance\/assets_fin.php",
         "surface_type": "SCREEN",
@@ -14317,7 +14422,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0136",
+        "screen_id": "SCR-0137",
         "route": "Finance\/bank_reconciliation_fin.php",
         "file": "Finance\/bank_reconciliation_fin.php",
         "surface_type": "SCREEN",
@@ -14455,7 +14560,7 @@
         "form_fields": 22
     },
     {
-        "screen_id": "SCR-0137",
+        "screen_id": "SCR-0138",
         "route": "Finance\/budget_dept.php",
         "file": "Finance\/budget_dept.php",
         "surface_type": "SCREEN",
@@ -14987,7 +15092,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0138",
+        "screen_id": "SCR-0139",
         "route": "Finance\/budget_dept.php#2",
         "file": "Finance\/budget_dept.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -14999,8 +15104,8 @@
         "names_all": [
             "ميزانية إدارتي"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "التمويل والملكية",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة المالية": [
@@ -15057,7 +15162,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0139",
+        "screen_id": "SCR-0140",
         "route": "Finance\/budget_form_fin.php",
         "file": "Finance\/budget_form_fin.php",
         "surface_type": "SCREEN",
@@ -15425,7 +15530,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0140",
+        "screen_id": "SCR-0141",
         "route": "Finance\/budget_master.php",
         "file": "Finance\/budget_master.php",
         "surface_type": "SCREEN",
@@ -15586,7 +15691,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0141",
+        "screen_id": "SCR-0142",
         "route": "Finance\/cash_forecast_fin.php",
         "file": "Finance\/cash_forecast_fin.php",
         "surface_type": "SCREEN",
@@ -15724,7 +15829,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0142",
+        "screen_id": "SCR-0143",
         "route": "Finance\/cfo_daily_board_fin.php",
         "file": "Finance\/cfo_daily_board_fin.php",
         "surface_type": "SCREEN",
@@ -15835,7 +15940,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0143",
+        "screen_id": "SCR-0144",
         "route": "Finance\/cost_report_fin.php",
         "file": "Finance\/cost_report_fin.php",
         "surface_type": "SCREEN",
@@ -16148,7 +16253,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0144",
+        "screen_id": "SCR-0145",
         "route": "Finance\/cron_depreciation_fin.php",
         "file": "Finance\/cron_depreciation_fin.php",
         "surface_type": "CRON",
@@ -16173,7 +16278,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0145",
+        "screen_id": "SCR-0146",
         "route": "Finance\/cron_finance_fin.php",
         "file": "Finance\/cron_finance_fin.php",
         "surface_type": "CRON",
@@ -16198,7 +16303,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0146",
+        "screen_id": "SCR-0147",
         "route": "Finance\/cron_obligation_alerts.php",
         "file": "Finance\/cron_obligation_alerts.php",
         "surface_type": "CRON",
@@ -16223,7 +16328,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0147",
+        "screen_id": "SCR-0148",
         "route": "Finance\/cron_periodic_fin.php",
         "file": "Finance\/cron_periodic_fin.php",
         "surface_type": "CRON",
@@ -16248,7 +16353,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0148",
+        "screen_id": "SCR-0149",
         "route": "Finance\/ctrl_authority_limits.php",
         "file": "Finance\/ctrl_authority_limits.php",
         "surface_type": "SCREEN",
@@ -16326,7 +16431,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0149",
+        "screen_id": "SCR-0150",
         "route": "Finance\/ctrl_dept_propagation.php",
         "file": "Finance\/ctrl_dept_propagation.php",
         "surface_type": "SCREEN",
@@ -16404,7 +16509,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0150",
+        "screen_id": "SCR-0151",
         "route": "Finance\/ctrl_doc_registry.php",
         "file": "Finance\/ctrl_doc_registry.php",
         "surface_type": "SCREEN",
@@ -16482,7 +16587,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0151",
+        "screen_id": "SCR-0152",
         "route": "Finance\/ctrl_doc_variance.php",
         "file": "Finance\/ctrl_doc_variance.php",
         "surface_type": "SCREEN",
@@ -16560,7 +16665,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0152",
+        "screen_id": "SCR-0153",
         "route": "Finance\/ctrl_quality_kpis.php",
         "file": "Finance\/ctrl_quality_kpis.php",
         "surface_type": "SCREEN",
@@ -16638,7 +16743,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0153",
+        "screen_id": "SCR-0154",
         "route": "Finance\/ctrl_role_migration.php",
         "file": "Finance\/ctrl_role_migration.php",
         "surface_type": "SCREEN",
@@ -16716,7 +16821,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0154",
+        "screen_id": "SCR-0155",
         "route": "Finance\/ctrl_supervision.php",
         "file": "Finance\/ctrl_supervision.php",
         "surface_type": "SCREEN",
@@ -16794,7 +16899,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0155",
+        "screen_id": "SCR-0156",
         "route": "Finance\/currencies_fin.php",
         "file": "Finance\/currencies_fin.php",
         "surface_type": "SCREEN",
@@ -16955,7 +17060,7 @@
         "form_fields": 10
     },
     {
-        "screen_id": "SCR-0156",
+        "screen_id": "SCR-0157",
         "route": "Finance\/currencies_fin.php#2",
         "file": "Finance\/currencies_fin.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -16967,8 +17072,8 @@
         "names_all": [
             "أسعار الصرف"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "المالية والخزينة",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة المالية": [
@@ -17025,7 +17130,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0157",
+        "screen_id": "SCR-0158",
         "route": "Finance\/daily_pricing_fin.php",
         "file": "Finance\/daily_pricing_fin.php",
         "surface_type": "SCREEN",
@@ -17078,7 +17183,7 @@
         "form_fields": 11
     },
     {
-        "screen_id": "SCR-0158",
+        "screen_id": "SCR-0159",
         "route": "Finance\/depr_run.php",
         "file": "Finance\/depr_run.php",
         "surface_type": "HANDLER",
@@ -17170,7 +17275,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0159",
+        "screen_id": "SCR-0160",
         "route": "Finance\/dues_fin.php",
         "file": "Finance\/dues_fin.php",
         "surface_type": "SCREEN",
@@ -17387,7 +17492,7 @@
         "form_fields": 14
     },
     {
-        "screen_id": "SCR-0160",
+        "screen_id": "SCR-0161",
         "route": "Finance\/entitlement.php",
         "file": "Finance\/entitlement.php",
         "surface_type": "SCREEN",
@@ -17548,7 +17653,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0161",
+        "screen_id": "SCR-0162",
         "route": "Finance\/entitlement_gate.php",
         "file": "Finance\/entitlement_gate.php",
         "surface_type": "SCREEN",
@@ -17709,7 +17814,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0162",
+        "screen_id": "SCR-0163",
         "route": "Finance\/events_list_fin.php",
         "file": "Finance\/events_list_fin.php",
         "surface_type": "SCREEN",
@@ -17976,7 +18081,7 @@
         "form_fields": 11
     },
     {
-        "screen_id": "SCR-0163",
+        "screen_id": "SCR-0164",
         "route": "Finance\/executive_dashboard_fin.php",
         "file": "Finance\/executive_dashboard_fin.php",
         "surface_type": "SCREEN",
@@ -18082,7 +18187,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0164",
+        "screen_id": "SCR-0165",
         "route": "Finance\/fin_analysis_actions.php",
         "file": "Finance\/fin_analysis_actions.php",
         "surface_type": "HANDLER",
@@ -18107,7 +18212,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0165",
+        "screen_id": "SCR-0166",
         "route": "Finance\/fin_cashflow_stmt.php",
         "file": "Finance\/fin_cashflow_stmt.php",
         "surface_type": "SCREEN",
@@ -18236,7 +18341,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0166",
+        "screen_id": "SCR-0167",
         "route": "Finance\/fin_contract_margin.php",
         "file": "Finance\/fin_contract_margin.php",
         "surface_type": "SCREEN",
@@ -18381,7 +18486,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0167",
+        "screen_id": "SCR-0168",
         "route": "Finance\/fin_early_warning.php",
         "file": "Finance\/fin_early_warning.php",
         "surface_type": "SCREEN",
@@ -18510,7 +18615,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0168",
+        "screen_id": "SCR-0169",
         "route": "Finance\/fin_equity_stmt.php",
         "file": "Finance\/fin_equity_stmt.php",
         "surface_type": "SCREEN",
@@ -18639,7 +18744,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0169",
+        "screen_id": "SCR-0170",
         "route": "Finance\/fin_helpers.php",
         "file": "Finance\/fin_helpers.php",
         "surface_type": "HANDLER",
@@ -18664,7 +18769,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0170",
+        "screen_id": "SCR-0171",
         "route": "Finance\/fin_m10_actions.php",
         "file": "Finance\/fin_m10_actions.php",
         "surface_type": "HANDLER",
@@ -18689,7 +18794,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0171",
+        "screen_id": "SCR-0172",
         "route": "Finance\/fin_posting_matrix.php",
         "file": "Finance\/fin_posting_matrix.php",
         "surface_type": "SCREEN",
@@ -18816,7 +18921,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0172",
+        "screen_id": "SCR-0173",
         "route": "Finance\/fin_project_pl.php",
         "file": "Finance\/fin_project_pl.php",
         "surface_type": "SCREEN",
@@ -18945,7 +19050,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0173",
+        "screen_id": "SCR-0174",
         "route": "Finance\/fin_ratio_detail.php",
         "file": "Finance\/fin_ratio_detail.php",
         "surface_type": "SCREEN",
@@ -19074,7 +19179,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0174",
+        "screen_id": "SCR-0175",
         "route": "Finance\/fin_ratio_targets.php",
         "file": "Finance\/fin_ratio_targets.php",
         "surface_type": "SCREEN",
@@ -19203,7 +19308,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0175",
+        "screen_id": "SCR-0176",
         "route": "Finance\/fin_ratios.php",
         "file": "Finance\/fin_ratios.php",
         "surface_type": "SCREEN",
@@ -19332,7 +19437,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0176",
+        "screen_id": "SCR-0177",
         "route": "Finance\/fin_unit_economics.php",
         "file": "Finance\/fin_unit_economics.php",
         "surface_type": "SCREEN",
@@ -19477,7 +19582,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0177",
+        "screen_id": "SCR-0178",
         "route": "Finance\/financial_statements_fin.php",
         "file": "Finance\/financial_statements_fin.php",
         "surface_type": "SCREEN",
@@ -19640,7 +19745,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0178",
+        "screen_id": "SCR-0179",
         "route": "Finance\/funding_fin.php",
         "file": "Finance\/funding_fin.php",
         "surface_type": "SCREEN",
@@ -19746,7 +19851,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0179",
+        "screen_id": "SCR-0180",
         "route": "Finance\/gov_dept_fin.php",
         "file": "Finance\/gov_dept_fin.php",
         "surface_type": "SCREEN",
@@ -19830,7 +19935,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0180",
+        "screen_id": "SCR-0181",
         "route": "Finance\/import_events_fin.php",
         "file": "Finance\/import_events_fin.php",
         "surface_type": "SCREEN",
@@ -19936,7 +20041,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0181",
+        "screen_id": "SCR-0182",
         "route": "Finance\/journal_form_fin.php",
         "file": "Finance\/journal_form_fin.php",
         "surface_type": "SCREEN",
@@ -20071,10 +20176,10 @@
         "deprecated": 0,
         "known_issue": [],
         "table_columns": 46,
-        "form_fields": 10
+        "form_fields": 13
     },
     {
-        "screen_id": "SCR-0182",
+        "screen_id": "SCR-0183",
         "route": "Finance\/maintenance_provision_fin.php",
         "file": "Finance\/maintenance_provision_fin.php",
         "surface_type": "SCREEN",
@@ -20212,7 +20317,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0183",
+        "screen_id": "SCR-0184",
         "route": "Finance\/management_accounting_fin.php",
         "file": "Finance\/management_accounting_fin.php",
         "surface_type": "SCREEN",
@@ -20350,7 +20455,7 @@
         "form_fields": 10
     },
     {
-        "screen_id": "SCR-0184",
+        "screen_id": "SCR-0185",
         "route": "Finance\/ob_commitments.php",
         "file": "Finance\/ob_commitments.php",
         "surface_type": "SCREEN",
@@ -20481,7 +20586,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0185",
+        "screen_id": "SCR-0186",
         "route": "Finance\/ob_contingent.php",
         "file": "Finance\/ob_contingent.php",
         "surface_type": "SCREEN",
@@ -20612,7 +20717,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0186",
+        "screen_id": "SCR-0187",
         "route": "Finance\/ob_due_soon.php",
         "file": "Finance\/ob_due_soon.php",
         "surface_type": "SCREEN",
@@ -20743,7 +20848,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0187",
+        "screen_id": "SCR-0188",
         "route": "Finance\/ob_horizon.php",
         "file": "Finance\/ob_horizon.php",
         "surface_type": "SCREEN",
@@ -20874,7 +20979,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0188",
+        "screen_id": "SCR-0189",
         "route": "Finance\/ob_overdue.php",
         "file": "Finance\/ob_overdue.php",
         "surface_type": "SCREEN",
@@ -21005,7 +21110,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0189",
+        "screen_id": "SCR-0190",
         "route": "Finance\/ob_register.php",
         "file": "Finance\/ob_register.php",
         "surface_type": "SCREEN",
@@ -21136,7 +21241,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0190",
+        "screen_id": "SCR-0191",
         "route": "Finance\/ob_schedule.php",
         "file": "Finance\/ob_schedule.php",
         "surface_type": "SCREEN",
@@ -21265,7 +21370,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0191",
+        "screen_id": "SCR-0192",
         "route": "Finance\/operator_pay_fin.php",
         "file": "Finance\/operator_pay_fin.php",
         "surface_type": "SCREEN",
@@ -21315,7 +21420,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0192",
+        "screen_id": "SCR-0193",
         "route": "Finance\/operator_pay_policies_fin.php",
         "file": "Finance\/operator_pay_policies_fin.php",
         "surface_type": "SCREEN",
@@ -21421,7 +21526,7 @@
         "form_fields": 16
     },
     {
-        "screen_id": "SCR-0193",
+        "screen_id": "SCR-0194",
         "route": "Finance\/payments_fin.php",
         "file": "Finance\/payments_fin.php",
         "surface_type": "SCREEN",
@@ -21705,7 +21810,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0194",
+        "screen_id": "SCR-0195",
         "route": "Finance\/periodic_events_fin.php",
         "file": "Finance\/periodic_events_fin.php",
         "surface_type": "SCREEN",
@@ -21782,7 +21887,7 @@
         "form_fields": 10
     },
     {
-        "screen_id": "SCR-0195",
+        "screen_id": "SCR-0196",
         "route": "Finance\/periods_fin.php",
         "file": "Finance\/periods_fin.php",
         "surface_type": "SCREEN",
@@ -21920,7 +22025,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0196",
+        "screen_id": "SCR-0197",
         "route": "Finance\/supplier_statement_fin.php",
         "file": "Finance\/supplier_statement_fin.php",
         "surface_type": "SCREEN",
@@ -22055,7 +22160,7 @@
             "stage_order": 6,
             "stage_name": "التسويات والصرف",
             "layer": "دورة الإدارة",
-            "group": "نحاسبه ونصرف",
+            "group": "المحاسبة والصرف",
             "inputs": "supplier_statements",
             "output_doc": "تسوية · كشف شهري · أمر دفع",
             "resp_role": "المالية",
@@ -22091,7 +22196,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0197",
+        "screen_id": "SCR-0198",
         "route": "Finance\/tax_fin.php",
         "file": "Finance\/tax_fin.php",
         "surface_type": "SCREEN",
@@ -22197,7 +22302,7 @@
         "form_fields": 11
     },
     {
-        "screen_id": "SCR-0198",
+        "screen_id": "SCR-0199",
         "route": "Finance\/tre_authority_caps.php",
         "file": "Finance\/tre_authority_caps.php",
         "surface_type": "SCREEN",
@@ -22298,7 +22403,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0199",
+        "screen_id": "SCR-0200",
         "route": "Finance\/tre_beneficiary.php",
         "file": "Finance\/tre_beneficiary.php",
         "surface_type": "SCREEN",
@@ -22494,7 +22599,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0200",
+        "screen_id": "SCR-0201",
         "route": "Finance\/tre_cycle_stages.php",
         "file": "Finance\/tre_cycle_stages.php",
         "surface_type": "SCREEN",
@@ -22587,7 +22692,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0201",
+        "screen_id": "SCR-0202",
         "route": "Finance\/tre_pay_batch.php",
         "file": "Finance\/tre_pay_batch.php",
         "surface_type": "SCREEN",
@@ -22783,7 +22888,7 @@
         "form_fields": 6
     },
     {
-        "screen_id": "SCR-0202",
+        "screen_id": "SCR-0203",
         "route": "Finance\/tre_sod_matrix.php",
         "file": "Finance\/tre_sod_matrix.php",
         "surface_type": "SCREEN",
@@ -22861,7 +22966,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0203",
+        "screen_id": "SCR-0204",
         "route": "Finance\/tre_unit_roles.php",
         "file": "Finance\/tre_unit_roles.php",
         "surface_type": "SCREEN",
@@ -22954,7 +23059,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0204",
+        "screen_id": "SCR-0205",
         "route": "Finance\/unit_fin_final.php",
         "file": "Finance\/unit_fin_final.php",
         "surface_type": "SCREEN",
@@ -23075,7 +23180,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0205",
+        "screen_id": "SCR-0206",
         "route": "Finance\/unit_records_fin.php",
         "file": "Finance\/unit_records_fin.php",
         "surface_type": "SCREEN",
@@ -23295,7 +23400,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0206",
+        "screen_id": "SCR-0207",
         "route": "Finance\/variance_monitor_fin.php",
         "file": "Finance\/variance_monitor_fin.php",
         "surface_type": "SCREEN",
@@ -23472,7 +23577,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0207",
+        "screen_id": "SCR-0208",
         "route": "Financing\/asset_disposal.php",
         "file": "Financing\/asset_disposal.php",
         "surface_type": "SCREEN",
@@ -23538,7 +23643,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0208",
+        "screen_id": "SCR-0209",
         "route": "Financing\/cost_allocation.php",
         "file": "Financing\/cost_allocation.php",
         "surface_type": "SCREEN",
@@ -23701,7 +23806,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0209",
+        "screen_id": "SCR-0210",
         "route": "Financing\/deviations.php",
         "file": "Financing\/deviations.php",
         "surface_type": "SCREEN",
@@ -23817,7 +23922,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0210",
+        "screen_id": "SCR-0211",
         "route": "Financing\/deviations.php#2",
         "file": "Financing\/deviations.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -23852,7 +23957,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0211",
+        "screen_id": "SCR-0212",
         "route": "Financing\/deviations.php#3",
         "file": "Financing\/deviations.php#3",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -23864,8 +23969,8 @@
         "names_all": [
             "الخروج غير المسجَّل من الملكية"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "التمويل والملكية",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة التمويل": [
@@ -23887,7 +23992,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0212",
+        "screen_id": "SCR-0213",
         "route": "Financing\/deviations.php#4",
         "file": "Financing\/deviations.php#4",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -23899,8 +24004,8 @@
         "names_all": [
             "عقود تمويل بلا حركة"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "التمويل والملكية",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة التمويل": [
@@ -23922,7 +24027,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0213",
+        "screen_id": "SCR-0214",
         "route": "Financing\/deviations.php?view=v08c5c1",
         "file": "Financing\/deviations.php",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -23934,43 +24039,8 @@
         "names_all": [
             "فروق السداد والاستحقاق"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
-        "workspaces": [],
-        "roles_nav": {
-            "إدارة التمويل": [
-                {
-                    "group": "إضافاتُ المالك",
-                    "order": 1,
-                    "perm": "Financing\/deviations.php"
-                }
-            ]
-        },
-        "profiles_count": 0,
-        "profiles": [],
-        "stage": null,
-        "ledger": null,
-        "nav09": null,
-        "deprecated": 0,
-        "known_issue": [],
-        "table_columns": 0,
-        "form_fields": 0
-    },
-    {
-        "screen_id": "SCR-0214",
-        "route": "Financing\/deviations.php?view=v649001",
-        "file": "Financing\/deviations.php",
-        "surface_type": "SCREEN_SUBSYSTEM",
-        "on_disk": 1,
-        "sources": [
-            "nav"
-        ],
-        "name_ar": "عقود تمويل بلا حركة",
-        "names_all": [
-            "عقود تمويل بلا حركة"
-        ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "التمويل والملكية",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة التمويل": [
@@ -23993,19 +24063,19 @@
     },
     {
         "screen_id": "SCR-0215",
-        "route": "Financing\/deviations.php?view=vcb3ce4",
+        "route": "Financing\/deviations.php?view=v649001",
         "file": "Financing\/deviations.php",
         "surface_type": "SCREEN_SUBSYSTEM",
         "on_disk": 1,
         "sources": [
             "nav"
         ],
-        "name_ar": "الخروج غير المسجَّل من الملكية",
+        "name_ar": "عقود تمويل بلا حركة",
         "names_all": [
-            "الخروج غير المسجَّل من الملكية"
+            "عقود تمويل بلا حركة"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "التمويل والملكية",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة التمويل": [
@@ -24028,6 +24098,41 @@
     },
     {
         "screen_id": "SCR-0216",
+        "route": "Financing\/deviations.php?view=vcb3ce4",
+        "file": "Financing\/deviations.php",
+        "surface_type": "SCREEN_SUBSYSTEM",
+        "on_disk": 1,
+        "sources": [
+            "nav"
+        ],
+        "name_ar": "الخروج غير المسجَّل من الملكية",
+        "names_all": [
+            "الخروج غير المسجَّل من الملكية"
+        ],
+        "owner_dept": "التمويل والملكية",
+        "owner_basis": "RULING",
+        "workspaces": [],
+        "roles_nav": {
+            "إدارة التمويل": [
+                {
+                    "group": "إضافاتُ المالك",
+                    "order": 1,
+                    "perm": "Financing\/deviations.php"
+                }
+            ]
+        },
+        "profiles_count": 0,
+        "profiles": [],
+        "stage": null,
+        "ledger": null,
+        "nav09": null,
+        "deprecated": 0,
+        "known_issue": [],
+        "table_columns": 0,
+        "form_fields": 0
+    },
+    {
+        "screen_id": "SCR-0217",
         "route": "Financing\/fin_changes.php",
         "file": "Financing\/fin_changes.php",
         "surface_type": "SCREEN",
@@ -24116,7 +24221,7 @@
         "form_fields": 23
     },
     {
-        "screen_id": "SCR-0217",
+        "screen_id": "SCR-0218",
         "route": "Financing\/fin_models.php",
         "file": "Financing\/fin_models.php",
         "surface_type": "SCREEN",
@@ -24205,7 +24310,7 @@
         "form_fields": 9
     },
     {
-        "screen_id": "SCR-0218",
+        "screen_id": "SCR-0219",
         "route": "Financing\/financiers_registry.php",
         "file": "Financing\/financiers_registry.php",
         "surface_type": "SCREEN",
@@ -24330,7 +24435,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0219",
+        "screen_id": "SCR-0220",
         "route": "Financing\/financing_board.php",
         "file": "Financing\/financing_board.php",
         "surface_type": "SCREEN",
@@ -24419,7 +24524,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0220",
+        "screen_id": "SCR-0221",
         "route": "Financing\/financing_operation_new.php",
         "file": "Financing\/financing_operation_new.php",
         "surface_type": "SCREEN",
@@ -24512,7 +24617,7 @@
         "form_fields": 15
     },
     {
-        "screen_id": "SCR-0221",
+        "screen_id": "SCR-0222",
         "route": "Financing\/gov_dept_cap.php",
         "file": "Financing\/gov_dept_cap.php",
         "surface_type": "SCREEN",
@@ -24596,7 +24701,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0222",
+        "screen_id": "SCR-0223",
         "route": "Financing\/installments.php",
         "file": "Financing\/installments.php",
         "surface_type": "SCREEN",
@@ -24683,7 +24788,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0223",
+        "screen_id": "SCR-0224",
         "route": "Financing\/operation_profile.php",
         "file": "Financing\/operation_profile.php",
         "surface_type": "SCREEN",
@@ -24717,7 +24822,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0224",
+        "screen_id": "SCR-0225",
         "route": "Financing\/owners_registry.php",
         "file": "Financing\/owners_registry.php",
         "surface_type": "SCREEN",
@@ -24857,7 +24962,7 @@
             "layer": "دورة الإدارة",
             "group": "الأعيان المموَّلة",
             "inputs": "ownership_shares",
-            "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · حاويةُ كلِّ معدة",
+            "output_doc": "أمر عمل معتمد · استمارة إدخال · كرت معدة · تخصيصٌ ميداني · التغطيةُ التعاقديةُ لكلِّ معدة",
             "resp_role": "التمويل",
             "next_state": "الحارسُ يفحص Σ الحصص = 100٪ بالضبط",
             "consumers": "المالية · الأسطول",
@@ -24889,7 +24994,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0225",
+        "screen_id": "SCR-0226",
         "route": "Financing\/owners_registry.php#2",
         "file": "Financing\/owners_registry.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -24901,8 +25006,8 @@
         "names_all": [
             "حصص الملكية في الأصول"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "التمويل والملكية",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة الاسطول": [
@@ -24931,7 +25036,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0226",
+        "screen_id": "SCR-0227",
         "route": "Financing\/ownership_links.php",
         "file": "Financing\/ownership_links.php",
         "surface_type": "SCREEN",
@@ -25041,7 +25146,7 @@
         "form_fields": 24
     },
     {
-        "screen_id": "SCR-0227",
+        "screen_id": "SCR-0228",
         "route": "Fleet\/cron_doc_expiry_escalation.php",
         "file": "Fleet\/cron_doc_expiry_escalation.php",
         "surface_type": "CRON",
@@ -25066,7 +25171,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0228",
+        "screen_id": "SCR-0229",
         "route": "Fleet\/readiness_board.php",
         "file": "Fleet\/readiness_board.php",
         "surface_type": "SCREEN",
@@ -25313,7 +25418,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0229",
+        "screen_id": "SCR-0230",
         "route": "Fleet\/readiness_board.php#2",
         "file": "Fleet\/readiness_board.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -25325,8 +25430,8 @@
         "names_all": [
             "جاهزية المعدات للتشغيل"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة الأسطول",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة الاسطول": [
@@ -25369,7 +25474,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0230",
+        "screen_id": "SCR-0231",
         "route": "Fleet\/readiness_cert.php",
         "file": "Fleet\/readiness_cert.php",
         "surface_type": "SCREEN",
@@ -25435,7 +25540,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0231",
+        "screen_id": "SCR-0232",
         "route": "Governance\/access_review.php",
         "file": "Governance\/access_review.php",
         "surface_type": "SCREEN",
@@ -25522,7 +25627,7 @@
         "form_fields": 18
     },
     {
-        "screen_id": "SCR-0232",
+        "screen_id": "SCR-0233",
         "route": "Governance\/activation_patterns.php",
         "file": "Governance\/activation_patterns.php",
         "surface_type": "SCREEN",
@@ -25647,7 +25752,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0233",
+        "screen_id": "SCR-0234",
         "route": "Governance\/auth_grants.php",
         "file": "Governance\/auth_grants.php",
         "surface_type": "SCREEN",
@@ -25718,7 +25823,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0234",
+        "screen_id": "SCR-0235",
         "route": "Governance\/auth_profiles.php",
         "file": "Governance\/auth_profiles.php",
         "surface_type": "SCREEN",
@@ -25789,7 +25894,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0235",
+        "screen_id": "SCR-0236",
         "route": "Governance\/authority_caps.php",
         "file": "Governance\/authority_caps.php",
         "surface_type": "SCREEN",
@@ -25867,7 +25972,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0236",
+        "screen_id": "SCR-0237",
         "route": "Governance\/break_glass.php",
         "file": "Governance\/break_glass.php",
         "surface_type": "SCREEN",
@@ -25954,7 +26059,7 @@
         "form_fields": 18
     },
     {
-        "screen_id": "SCR-0237",
+        "screen_id": "SCR-0238",
         "route": "Governance\/bus_board.php",
         "file": "Governance\/bus_board.php",
         "surface_type": "HANDLER",
@@ -26053,7 +26158,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0238",
+        "screen_id": "SCR-0239",
         "route": "Governance\/bus_deliveries.php",
         "file": "Governance\/bus_deliveries.php",
         "surface_type": "HANDLER",
@@ -26152,7 +26257,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0239",
+        "screen_id": "SCR-0240",
         "route": "Governance\/bus_outbox.php",
         "file": "Governance\/bus_outbox.php",
         "surface_type": "HANDLER",
@@ -26251,7 +26356,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0240",
+        "screen_id": "SCR-0241",
         "route": "Governance\/canonical_names.php",
         "file": "Governance\/canonical_names.php",
         "surface_type": "SCREEN",
@@ -26338,7 +26443,7 @@
         "form_fields": 18
     },
     {
-        "screen_id": "SCR-0241",
+        "screen_id": "SCR-0242",
         "route": "Governance\/cron_permissions.php",
         "file": "Governance\/cron_permissions.php",
         "surface_type": "CRON",
@@ -26363,7 +26468,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0242",
+        "screen_id": "SCR-0243",
         "route": "Governance\/design_system.php",
         "file": "Governance\/design_system.php",
         "surface_type": "SCREEN",
@@ -26434,7 +26539,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0243",
+        "screen_id": "SCR-0244",
         "route": "Governance\/doc_types.php",
         "file": "Governance\/doc_types.php",
         "surface_type": "SCREEN",
@@ -26521,7 +26626,7 @@
         "form_fields": 17
     },
     {
-        "screen_id": "SCR-0244",
+        "screen_id": "SCR-0245",
         "route": "Governance\/dr_restore.php",
         "file": "Governance\/dr_restore.php",
         "surface_type": "HANDLER",
@@ -26622,7 +26727,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0245",
+        "screen_id": "SCR-0246",
         "route": "Governance\/entities_registry.php",
         "file": "Governance\/entities_registry.php",
         "surface_type": "SCREEN",
@@ -26771,7 +26876,7 @@
         "form_fields": 9
     },
     {
-        "screen_id": "SCR-0246",
+        "screen_id": "SCR-0247",
         "route": "Governance\/exceptions.php",
         "file": "Governance\/exceptions.php",
         "surface_type": "SCREEN",
@@ -26858,7 +26963,7 @@
         "form_fields": 22
     },
     {
-        "screen_id": "SCR-0247",
+        "screen_id": "SCR-0248",
         "route": "Governance\/gov_dept.php",
         "file": "Governance\/gov_dept.php",
         "surface_type": "SCREEN",
@@ -26913,7 +27018,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0248",
+        "screen_id": "SCR-0249",
         "route": "Governance\/gov_dept_gov.php",
         "file": "Governance\/gov_dept_gov.php",
         "surface_type": "SCREEN",
@@ -26989,7 +27094,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0249",
+        "screen_id": "SCR-0250",
         "route": "Governance\/gov_dept_sal.php",
         "file": "Governance\/gov_dept_sal.php",
         "surface_type": "SCREEN",
@@ -27080,7 +27185,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0250",
+        "screen_id": "SCR-0251",
         "route": "Governance\/gov_dept_sup.php",
         "file": "Governance\/gov_dept_sup.php",
         "surface_type": "SCREEN",
@@ -27179,7 +27284,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0251",
+        "screen_id": "SCR-0252",
         "route": "Governance\/gov_m14_actions.php",
         "file": "Governance\/gov_m14_actions.php",
         "surface_type": "HANDLER",
@@ -27204,7 +27309,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0252",
+        "screen_id": "SCR-0253",
         "route": "Governance\/gov_reports.php",
         "file": "Governance\/gov_reports.php",
         "surface_type": "SCREEN",
@@ -27283,7 +27388,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0253",
+        "screen_id": "SCR-0254",
         "route": "Governance\/guard_denials.php",
         "file": "Governance\/guard_denials.php",
         "surface_type": "SCREEN",
@@ -27378,7 +27483,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0254",
+        "screen_id": "SCR-0255",
         "route": "Governance\/guards.php",
         "file": "Governance\/guards.php",
         "surface_type": "SCREEN",
@@ -27466,7 +27571,7 @@
         "form_fields": 19
     },
     {
-        "screen_id": "SCR-0255",
+        "screen_id": "SCR-0256",
         "route": "Governance\/impersonations.php",
         "file": "Governance\/impersonations.php",
         "surface_type": "SCREEN",
@@ -27537,7 +27642,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0256",
+        "screen_id": "SCR-0257",
         "route": "Governance\/job_queue.php",
         "file": "Governance\/job_queue.php",
         "surface_type": "HANDLER",
@@ -27636,7 +27741,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0257",
+        "screen_id": "SCR-0258",
         "route": "Governance\/job_schedule.php",
         "file": "Governance\/job_schedule.php",
         "surface_type": "HANDLER",
@@ -27737,7 +27842,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0258",
+        "screen_id": "SCR-0259",
         "route": "Governance\/licenses_guarantees.php",
         "file": "Governance\/licenses_guarantees.php",
         "surface_type": "SCREEN",
@@ -27932,7 +28037,7 @@
         "form_fields": 16
     },
     {
-        "screen_id": "SCR-0259",
+        "screen_id": "SCR-0260",
         "route": "Governance\/ownership_grants.php",
         "file": "Governance\/ownership_grants.php",
         "surface_type": "SCREEN",
@@ -28002,7 +28107,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0260",
+        "screen_id": "SCR-0261",
         "route": "Governance\/perm_explain.php",
         "file": "Governance\/perm_explain.php",
         "surface_type": "SCREEN",
@@ -28091,7 +28196,7 @@
         "form_fields": 18
     },
     {
-        "screen_id": "SCR-0261",
+        "screen_id": "SCR-0262",
         "route": "Governance\/portal_users.php",
         "file": "Governance\/portal_users.php",
         "surface_type": "SCREEN",
@@ -28178,7 +28283,7 @@
         "form_fields": 18
     },
     {
-        "screen_id": "SCR-0262",
+        "screen_id": "SCR-0263",
         "route": "Governance\/read_log.php",
         "file": "Governance\/read_log.php",
         "surface_type": "SCREEN",
@@ -28228,7 +28333,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0263",
+        "screen_id": "SCR-0264",
         "route": "Governance\/security_log.php",
         "file": "Governance\/security_log.php",
         "surface_type": "SCREEN",
@@ -28283,7 +28388,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0264",
+        "screen_id": "SCR-0265",
         "route": "Governance\/sensitive_fields.php",
         "file": "Governance\/sensitive_fields.php",
         "surface_type": "SCREEN",
@@ -28370,7 +28475,7 @@
         "form_fields": 15
     },
     {
-        "screen_id": "SCR-0265",
+        "screen_id": "SCR-0266",
         "route": "Governance\/signing_authority.php",
         "file": "Governance\/signing_authority.php",
         "surface_type": "SCREEN",
@@ -28541,7 +28646,7 @@
         "form_fields": 11
     },
     {
-        "screen_id": "SCR-0266",
+        "screen_id": "SCR-0267",
         "route": "Governance\/state_machines.php",
         "file": "Governance\/state_machines.php",
         "surface_type": "SCREEN",
@@ -28628,7 +28733,7 @@
         "form_fields": 17
     },
     {
-        "screen_id": "SCR-0267",
+        "screen_id": "SCR-0268",
         "route": "Governance\/tech_gov_center.php",
         "file": "Governance\/tech_gov_center.php",
         "surface_type": "SCREEN",
@@ -28699,7 +28804,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0268",
+        "screen_id": "SCR-0269",
         "route": "Maintenance\/dashboard_mnt.php",
         "file": "Maintenance\/dashboard_mnt.php",
         "surface_type": "SCREEN",
@@ -28769,7 +28874,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0269",
+        "screen_id": "SCR-0270",
         "route": "Maintenance\/equipment_hours_preventive.php",
         "file": "Maintenance\/equipment_hours_preventive.php",
         "surface_type": "SCREEN",
@@ -28803,7 +28908,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0270",
+        "screen_id": "SCR-0271",
         "route": "Maintenance\/failure_report.php",
         "file": "Maintenance\/failure_report.php",
         "surface_type": "SCREEN",
@@ -28861,7 +28966,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0271",
+        "screen_id": "SCR-0272",
         "route": "Maintenance\/get_breakdown_count.php",
         "file": "Maintenance\/get_breakdown_count.php",
         "surface_type": "HANDLER",
@@ -28886,7 +28991,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0272",
+        "screen_id": "SCR-0273",
         "route": "Maintenance\/get_open_orders_count.php",
         "file": "Maintenance\/get_open_orders_count.php",
         "surface_type": "HANDLER",
@@ -28911,7 +29016,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0273",
+        "screen_id": "SCR-0274",
         "route": "Maintenance\/get_project_equipment.php",
         "file": "Maintenance\/get_project_equipment.php",
         "surface_type": "HANDLER",
@@ -28936,7 +29041,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0274",
+        "screen_id": "SCR-0275",
         "route": "Maintenance\/gov_dept_mnt.php",
         "file": "Maintenance\/gov_dept_mnt.php",
         "surface_type": "SCREEN",
@@ -29028,7 +29133,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0275",
+        "screen_id": "SCR-0276",
         "route": "Maintenance\/inspections.php",
         "file": "Maintenance\/inspections.php",
         "surface_type": "SCREEN",
@@ -29221,7 +29326,7 @@
         "form_fields": 18
     },
     {
-        "screen_id": "SCR-0276",
+        "screen_id": "SCR-0277",
         "route": "Maintenance\/master_data.php",
         "file": "Maintenance\/master_data.php",
         "surface_type": "SCREEN",
@@ -29291,7 +29396,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0277",
+        "screen_id": "SCR-0278",
         "route": "Maintenance\/orders.php",
         "file": "Maintenance\/orders.php",
         "surface_type": "SCREEN",
@@ -29620,7 +29725,7 @@
         "form_fields": 32
     },
     {
-        "screen_id": "SCR-0278",
+        "screen_id": "SCR-0279",
         "route": "Maintenance\/orders.php#2",
         "file": "Maintenance\/orders.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -29632,8 +29737,8 @@
         "names_all": [
             "أوامر الصيانة"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة الصيانة",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة الصيانة": [
@@ -29662,7 +29767,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0279",
+        "screen_id": "SCR-0280",
         "route": "Maintenance\/preventive_plans.php",
         "file": "Maintenance\/preventive_plans.php",
         "surface_type": "SCREEN",
@@ -29817,7 +29922,7 @@
         "form_fields": 21
     },
     {
-        "screen_id": "SCR-0280",
+        "screen_id": "SCR-0281",
         "route": "Maintenance\/return_to_service.php",
         "file": "Maintenance\/return_to_service.php",
         "surface_type": "SCREEN",
@@ -29851,7 +29956,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0281",
+        "screen_id": "SCR-0282",
         "route": "Maintenance\/workshop.php",
         "file": "Maintenance\/workshop.php",
         "surface_type": "SCREEN",
@@ -29953,7 +30058,7 @@
         "form_fields": 22
     },
     {
-        "screen_id": "SCR-0282",
+        "screen_id": "SCR-0283",
         "route": "Operations\/attendance.php",
         "file": "Operations\/attendance.php",
         "surface_type": "SCREEN",
@@ -30101,7 +30206,7 @@
         "form_fields": 24
     },
     {
-        "screen_id": "SCR-0283",
+        "screen_id": "SCR-0284",
         "route": "Operations\/containers.php",
         "file": "Operations\/containers.php",
         "surface_type": "SCREEN",
@@ -30297,7 +30402,7 @@
         "form_fields": 21
     },
     {
-        "screen_id": "SCR-0284",
+        "screen_id": "SCR-0285",
         "route": "Operations\/containers.php#2",
         "file": "Operations\/containers.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -30309,8 +30414,8 @@
         "names_all": [
             "إسناد المعدات للوحدات"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة التشغيل",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة التشغيل": [
@@ -30339,7 +30444,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0285",
+        "screen_id": "SCR-0286",
         "route": "Operations\/containers.php?view=v5d6808",
         "file": "Operations\/containers.php",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -30351,8 +30456,8 @@
         "names_all": [
             "إسناد المعدات للوحدات"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة التشغيل",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة التشغيل": [
@@ -30374,7 +30479,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0286",
+        "screen_id": "SCR-0287",
         "route": "Operations\/cron_asset_reconciliation.php",
         "file": "Operations\/cron_asset_reconciliation.php",
         "surface_type": "CRON",
@@ -30399,7 +30504,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0287",
+        "screen_id": "SCR-0288",
         "route": "Operations\/cron_capacity_rollup.php",
         "file": "Operations\/cron_capacity_rollup.php",
         "surface_type": "CRON",
@@ -30424,7 +30529,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0288",
+        "screen_id": "SCR-0289",
         "route": "Operations\/cron_container_gate_report.php",
         "file": "Operations\/cron_container_gate_report.php",
         "surface_type": "CRON",
@@ -30449,7 +30554,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0289",
+        "screen_id": "SCR-0290",
         "route": "Operations\/cron_fin_posting.php",
         "file": "Operations\/cron_fin_posting.php",
         "surface_type": "CRON",
@@ -30474,7 +30579,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0290",
+        "screen_id": "SCR-0291",
         "route": "Operations\/cron_job_worker.php",
         "file": "Operations\/cron_job_worker.php",
         "surface_type": "CRON",
@@ -30499,7 +30604,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0291",
+        "screen_id": "SCR-0292",
         "route": "Operations\/cron_org_assignments.php",
         "file": "Operations\/cron_org_assignments.php",
         "surface_type": "CRON",
@@ -30524,7 +30629,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0292",
+        "screen_id": "SCR-0293",
         "route": "Operations\/cron_rotation_transfer.php",
         "file": "Operations\/cron_rotation_transfer.php",
         "surface_type": "CRON",
@@ -30549,7 +30654,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0293",
+        "screen_id": "SCR-0294",
         "route": "Operations\/cron_unit_chain_sla.php",
         "file": "Operations\/cron_unit_chain_sla.php",
         "surface_type": "CRON",
@@ -30574,7 +30679,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0294",
+        "screen_id": "SCR-0295",
         "route": "Operations\/cron_unit_chain_weekly.php",
         "file": "Operations\/cron_unit_chain_weekly.php",
         "surface_type": "CRON",
@@ -30599,7 +30704,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0295",
+        "screen_id": "SCR-0296",
         "route": "Operations\/cron_wfm_engine.php",
         "file": "Operations\/cron_wfm_engine.php",
         "surface_type": "CRON",
@@ -30624,7 +30729,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0296",
+        "screen_id": "SCR-0297",
         "route": "Operations\/daily_plan.php",
         "file": "Operations\/daily_plan.php",
         "surface_type": "SCREEN",
@@ -30795,7 +30900,7 @@
         "form_fields": 9
     },
     {
-        "screen_id": "SCR-0297",
+        "screen_id": "SCR-0298",
         "route": "Operations\/distribution_space.php",
         "file": "Operations\/distribution_space.php",
         "surface_type": "SCREEN",
@@ -31022,7 +31127,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0298",
+        "screen_id": "SCR-0299",
         "route": "Operations\/distribution_space.php#2",
         "file": "Operations\/distribution_space.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -31034,8 +31139,8 @@
         "names_all": [
             "توزيع المعدات والمشغّلين"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة التشغيل",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة التشغيل": [
@@ -31064,7 +31169,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0299",
+        "screen_id": "SCR-0300",
         "route": "Operations\/distribution_space.php#3",
         "file": "Operations\/distribution_space.php#3",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -31076,8 +31181,8 @@
         "names_all": [
             "تكليف المشغّل على المعدة"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة التشغيل",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة التشغيل": [
@@ -31099,7 +31204,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0300",
+        "screen_id": "SCR-0301",
         "route": "Operations\/distribution_space.php?view=va9e1b1",
         "file": "Operations\/distribution_space.php",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -31111,8 +31216,8 @@
         "names_all": [
             "تكليف المشغّل على المعدة"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة التشغيل",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة التشغيل": [
@@ -31134,7 +31239,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0301",
+        "screen_id": "SCR-0302",
         "route": "Operations\/equipment_quota.php",
         "file": "Operations\/equipment_quota.php",
         "surface_type": "SCREEN",
@@ -31226,7 +31331,7 @@
             "stage_order": 3,
             "stage_name": "التعاقد والتغطية والحصص",
             "layer": "دورة الإدارة",
-            "group": "حصص الموردين وحاوياتها",
+            "group": "حصص الموردين والتغطية التعاقدية",
             "inputs": "equipment_quota",
             "output_doc": "◆ انتقالُ حالةٍ بلا مستندٍ رسمي",
             "resp_role": "مدير التشغيل",
@@ -31262,7 +31367,7 @@
         "form_fields": 25
     },
     {
-        "screen_id": "SCR-0302",
+        "screen_id": "SCR-0303",
         "route": "Operations\/fleet_calendar.php",
         "file": "Operations\/fleet_calendar.php",
         "surface_type": "SCREEN",
@@ -31322,7 +31427,7 @@
         "form_fields": 16
     },
     {
-        "screen_id": "SCR-0303",
+        "screen_id": "SCR-0304",
         "route": "Operations\/fleet_utilization.php",
         "file": "Operations\/fleet_utilization.php",
         "surface_type": "SCREEN",
@@ -31382,7 +31487,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0304",
+        "screen_id": "SCR-0305",
         "route": "Operations\/gov_dept_ops.php",
         "file": "Operations\/gov_dept_ops.php",
         "surface_type": "SCREEN",
@@ -31474,7 +31579,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0305",
+        "screen_id": "SCR-0306",
         "route": "Operations\/gov_dept_sit.php",
         "file": "Operations\/gov_dept_sit.php",
         "surface_type": "SCREEN",
@@ -31558,7 +31663,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0306",
+        "screen_id": "SCR-0307",
         "route": "Operations\/monthly_close.php",
         "file": "Operations\/monthly_close.php",
         "surface_type": "SCREEN",
@@ -31757,7 +31862,7 @@
         "form_fields": 27
     },
     {
-        "screen_id": "SCR-0307",
+        "screen_id": "SCR-0308",
         "route": "Operations\/monthly_plan.php",
         "file": "Operations\/monthly_plan.php",
         "surface_type": "SCREEN",
@@ -31823,7 +31928,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0308",
+        "screen_id": "SCR-0309",
         "route": "Operations\/operations_room.php",
         "file": "Operations\/operations_room.php",
         "surface_type": "SCREEN",
@@ -31948,7 +32053,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0309",
+        "screen_id": "SCR-0310",
         "route": "Operations\/production.php",
         "file": "Operations\/production.php",
         "surface_type": "SCREEN",
@@ -32097,7 +32202,7 @@
         "form_fields": 24
     },
     {
-        "screen_id": "SCR-0310",
+        "screen_id": "SCR-0311",
         "route": "Operations\/shift_entry.php",
         "file": "Operations\/shift_entry.php",
         "surface_type": "SCREEN",
@@ -32166,7 +32271,7 @@
             "stage_order": 2,
             "stage_name": "التنفيذ اليومي",
             "layer": "دورة الإدارة",
-            "group": "نسجّل ما حدث اليوم",
+            "group": "تسجيل اليومية",
             "inputs": "جداولُ نظامِ الموردينَ والورديات",
             "output_doc": "◆ انتقالُ حالةٍ بلا مستندٍ رسمي",
             "resp_role": "إدارة الموقع",
@@ -32197,7 +32302,7 @@
         "form_fields": 18
     },
     {
-        "screen_id": "SCR-0311",
+        "screen_id": "SCR-0312",
         "route": "Operations\/shift_log.php",
         "file": "Operations\/shift_log.php",
         "surface_type": "SCREEN",
@@ -32322,7 +32427,7 @@
         "form_fields": 21
     },
     {
-        "screen_id": "SCR-0312",
+        "screen_id": "SCR-0313",
         "route": "Operations\/site_gate_equip.php",
         "file": "Operations\/site_gate_equip.php",
         "surface_type": "SCREEN",
@@ -32424,7 +32529,7 @@
         "form_fields": 21
     },
     {
-        "screen_id": "SCR-0313",
+        "screen_id": "SCR-0314",
         "route": "Operations\/site_gate_person.php",
         "file": "Operations\/site_gate_person.php",
         "surface_type": "SCREEN",
@@ -32528,7 +32633,7 @@
         "form_fields": 21
     },
     {
-        "screen_id": "SCR-0314",
+        "screen_id": "SCR-0315",
         "route": "Operations\/site_shift_plan.php",
         "file": "Operations\/site_shift_plan.php",
         "surface_type": "SCREEN",
@@ -32630,7 +32735,7 @@
         "form_fields": 21
     },
     {
-        "screen_id": "SCR-0315",
+        "screen_id": "SCR-0316",
         "route": "Operations\/site_work_calendar.php",
         "file": "Operations\/site_work_calendar.php",
         "surface_type": "SCREEN",
@@ -32732,7 +32837,7 @@
         "form_fields": 21
     },
     {
-        "screen_id": "SCR-0316",
+        "screen_id": "SCR-0317",
         "route": "Operations\/sites_board.php",
         "file": "Operations\/sites_board.php",
         "surface_type": "SCREEN",
@@ -32766,7 +32871,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0317",
+        "screen_id": "SCR-0318",
         "route": "Operations\/stops_unattributed.php",
         "file": "Operations\/stops_unattributed.php",
         "surface_type": "SCREEN",
@@ -32891,7 +32996,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0318",
+        "screen_id": "SCR-0319",
         "route": "Operations\/swap_request.php",
         "file": "Operations\/swap_request.php",
         "surface_type": "SCREEN",
@@ -32925,7 +33030,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0319",
+        "screen_id": "SCR-0320",
         "route": "Operations\/unbilled.php",
         "file": "Operations\/unbilled.php",
         "surface_type": "SCREEN",
@@ -33028,7 +33133,7 @@
         "form_fields": 24
     },
     {
-        "screen_id": "SCR-0320",
+        "screen_id": "SCR-0321",
         "route": "Operations\/unit_correction.php",
         "file": "Operations\/unit_correction.php",
         "surface_type": "SCREEN",
@@ -33146,7 +33251,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0321",
+        "screen_id": "SCR-0322",
         "route": "Operations\/unit_perf.php",
         "file": "Operations\/unit_perf.php",
         "surface_type": "SCREEN",
@@ -33296,7 +33401,7 @@
         "form_fields": 28
     },
     {
-        "screen_id": "SCR-0322",
+        "screen_id": "SCR-0323",
         "route": "Opportunities\/client_need_rfq.php",
         "file": "Opportunities\/client_need_rfq.php",
         "surface_type": "SCREEN",
@@ -33342,7 +33447,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0323",
+        "screen_id": "SCR-0324",
         "route": "Opportunities\/opportunities.php",
         "file": "Opportunities\/opportunities.php",
         "surface_type": "SCREEN",
@@ -33396,7 +33501,7 @@
             "stage_order": 2,
             "stage_name": "العروض والتسعير",
             "layer": "دورة الإدارة",
-            "group": "نتفاوض ونسعّر",
+            "group": "التفاوض والتسعير",
             "inputs": "opportunities.stage",
             "output_doc": "سجل جهة · فرصة مؤهَّلة · عرض سعر مُرسَل · نموذج عملٍ معتمد",
             "resp_role": "المبيعات",
@@ -33430,7 +33535,7 @@
         "form_fields": 26
     },
     {
-        "screen_id": "SCR-0324",
+        "screen_id": "SCR-0325",
         "route": "Oprators\/get_contract_stats.php",
         "file": "Oprators\/get_contract_stats.php",
         "surface_type": "HANDLER",
@@ -33455,7 +33560,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0325",
+        "screen_id": "SCR-0326",
         "route": "Oprators\/get_contract_suppliers.php",
         "file": "Oprators\/get_contract_suppliers.php",
         "surface_type": "HANDLER",
@@ -33480,7 +33585,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0326",
+        "screen_id": "SCR-0327",
         "route": "Oprators\/get_mine_contracts.php",
         "file": "Oprators\/get_mine_contracts.php",
         "surface_type": "HANDLER",
@@ -33505,7 +33610,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0327",
+        "screen_id": "SCR-0328",
         "route": "Oprators\/oprators.php",
         "file": "Oprators\/oprators.php",
         "surface_type": "SCREEN",
@@ -33595,7 +33700,7 @@
         "form_fields": 18
     },
     {
-        "screen_id": "SCR-0328",
+        "screen_id": "SCR-0329",
         "route": "Oprators\/select_project.php",
         "file": "Oprators\/select_project.php",
         "surface_type": "SCREEN",
@@ -33689,7 +33794,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0329",
+        "screen_id": "SCR-0330",
         "route": "Portal\/approvals_inbox.php",
         "file": "Portal\/approvals_inbox.php",
         "surface_type": "SCREEN",
@@ -33899,7 +34004,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0330",
+        "screen_id": "SCR-0331",
         "route": "Portal\/business_models.php",
         "file": "Portal\/business_models.php",
         "surface_type": "SCREEN",
@@ -34007,7 +34112,7 @@
             "stage_order": 2,
             "stage_name": "العروض والتسعير",
             "layer": "دورة الإدارة",
-            "group": "نتفاوض ونسعّر",
+            "group": "التفاوض والتسعير",
             "inputs": "business_models",
             "output_doc": "سجل جهة · فرصة مؤهَّلة · عرض سعر مُرسَل · نموذج عملٍ معتمد",
             "resp_role": "الرئيس التنفيذي",
@@ -34041,7 +34146,7 @@
         "form_fields": 18
     },
     {
-        "screen_id": "SCR-0331",
+        "screen_id": "SCR-0332",
         "route": "Portal\/ceo_approvals.php",
         "file": "Portal\/ceo_approvals.php",
         "surface_type": "SCREEN",
@@ -34129,7 +34234,7 @@
         "form_fields": 23
     },
     {
-        "screen_id": "SCR-0332",
+        "screen_id": "SCR-0333",
         "route": "Portal\/ceo_assignments.php",
         "file": "Portal\/ceo_assignments.php",
         "surface_type": "SCREEN",
@@ -34215,7 +34320,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0333",
+        "screen_id": "SCR-0334",
         "route": "Portal\/ceo_audit_reports.php",
         "file": "Portal\/ceo_audit_reports.php",
         "surface_type": "SCREEN",
@@ -34301,7 +34406,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0334",
+        "screen_id": "SCR-0335",
         "route": "Portal\/ceo_board.php",
         "file": "Portal\/ceo_board.php",
         "surface_type": "SCREEN",
@@ -34389,7 +34494,7 @@
         "form_fields": 14
     },
     {
-        "screen_id": "SCR-0335",
+        "screen_id": "SCR-0336",
         "route": "Portal\/ceo_contracts.php",
         "file": "Portal\/ceo_contracts.php",
         "surface_type": "SCREEN",
@@ -34477,7 +34582,7 @@
         "form_fields": 27
     },
     {
-        "screen_id": "SCR-0336",
+        "screen_id": "SCR-0337",
         "route": "Portal\/ceo_reports.php",
         "file": "Portal\/ceo_reports.php",
         "surface_type": "SCREEN",
@@ -34540,7 +34645,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0337",
+        "screen_id": "SCR-0338",
         "route": "Portal\/ceo_risk.php",
         "file": "Portal\/ceo_risk.php",
         "surface_type": "SCREEN",
@@ -34627,7 +34732,7 @@
         "form_fields": 17
     },
     {
-        "screen_id": "SCR-0338",
+        "screen_id": "SCR-0339",
         "route": "Portal\/contract_review.php",
         "file": "Portal\/contract_review.php",
         "surface_type": "SCREEN",
@@ -34704,7 +34809,7 @@
             "stage_order": 7,
             "stage_name": "التجديد والإقفال",
             "layer": "دورة الإدارة",
-            "group": "نجدّد أو نُقفل",
+            "group": "التجديد والإقفال",
             "inputs": "contract_review",
             "output_doc": "عقد نافذ · عقدٌ نافذ",
             "resp_role": "الرئيس التنفيذي",
@@ -34738,7 +34843,7 @@
         "form_fields": 21
     },
     {
-        "screen_id": "SCR-0339",
+        "screen_id": "SCR-0340",
         "route": "Portal\/dept_achievement.php",
         "file": "Portal\/dept_achievement.php",
         "surface_type": "SCREEN",
@@ -35290,7 +35395,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0340",
+        "screen_id": "SCR-0341",
         "route": "Portal\/dept_board.php",
         "file": "Portal\/dept_board.php",
         "surface_type": "SCREEN",
@@ -35500,7 +35605,7 @@
         "form_fields": 6
     },
     {
-        "screen_id": "SCR-0341",
+        "screen_id": "SCR-0342",
         "route": "Portal\/founding_mode.php",
         "file": "Portal\/founding_mode.php",
         "surface_type": "SCREEN",
@@ -35610,7 +35715,7 @@
         "form_fields": 16
     },
     {
-        "screen_id": "SCR-0342",
+        "screen_id": "SCR-0343",
         "route": "Portal\/gov_dept_ceo.php",
         "file": "Portal\/gov_dept_ceo.php",
         "surface_type": "SCREEN",
@@ -35686,7 +35791,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0343",
+        "screen_id": "SCR-0344",
         "route": "Portal\/journey_action.php",
         "file": "Portal\/journey_action.php",
         "surface_type": "HANDLER",
@@ -35711,7 +35816,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0344",
+        "screen_id": "SCR-0345",
         "route": "Portal\/my_achievement.php",
         "file": "Portal\/my_achievement.php",
         "surface_type": "SCREEN",
@@ -36292,7 +36397,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0345",
+        "screen_id": "SCR-0346",
         "route": "Portal\/my_certificate.php",
         "file": "Portal\/my_certificate.php",
         "surface_type": "SCREEN",
@@ -36504,7 +36609,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0346",
+        "screen_id": "SCR-0347",
         "route": "Portal\/my_evaluation.php",
         "file": "Portal\/my_evaluation.php",
         "surface_type": "SCREEN",
@@ -36716,7 +36821,7 @@
         "form_fields": 12
     },
     {
-        "screen_id": "SCR-0347",
+        "screen_id": "SCR-0348",
         "route": "Portal\/my_kpi.php",
         "file": "Portal\/my_kpi.php",
         "surface_type": "SCREEN",
@@ -36926,7 +37031,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0348",
+        "screen_id": "SCR-0349",
         "route": "Portal\/my_portal.php",
         "file": "Portal\/my_portal.php",
         "surface_type": "SCREEN",
@@ -37536,7 +37641,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0349",
+        "screen_id": "SCR-0350",
         "route": "Portal\/my_requests.php",
         "file": "Portal\/my_requests.php",
         "surface_type": "SCREEN",
@@ -37746,7 +37851,7 @@
         "form_fields": 15
     },
     {
-        "screen_id": "SCR-0350",
+        "screen_id": "SCR-0351",
         "route": "Portal\/my_tasks.php",
         "file": "Portal\/my_tasks.php",
         "surface_type": "SCREEN",
@@ -38347,7 +38452,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0351",
+        "screen_id": "SCR-0352",
         "route": "Portal\/notifications.php",
         "file": "Portal\/notifications.php",
         "surface_type": "SCREEN",
@@ -38557,7 +38662,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0352",
+        "screen_id": "SCR-0353",
         "route": "Portal\/portal_elements.php",
         "file": "Portal\/portal_elements.php",
         "surface_type": "SCREEN",
@@ -38599,7 +38704,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0353",
+        "screen_id": "SCR-0354",
         "route": "Portal\/project_charter.php",
         "file": "Portal\/project_charter.php",
         "surface_type": "SCREEN",
@@ -38686,7 +38791,7 @@
         "form_fields": 28
     },
     {
-        "screen_id": "SCR-0354",
+        "screen_id": "SCR-0355",
         "route": "Portal\/release_stamp.php",
         "file": "Portal\/release_stamp.php",
         "surface_type": "SCREEN",
@@ -38796,7 +38901,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0355",
+        "screen_id": "SCR-0356",
         "route": "Portal\/visibility_audit.php",
         "file": "Portal\/visibility_audit.php",
         "surface_type": "SCREEN",
@@ -38838,7 +38943,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0356",
+        "screen_id": "SCR-0357",
         "route": "Portal\/visibility_keys.php",
         "file": "Portal\/visibility_keys.php",
         "surface_type": "SCREEN",
@@ -38971,7 +39076,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0357",
+        "screen_id": "SCR-0358",
         "route": "Portal\/visibility_simulator.php",
         "file": "Portal\/visibility_simulator.php",
         "surface_type": "SCREEN",
@@ -39013,7 +39118,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0358",
+        "screen_id": "SCR-0359",
         "route": "Portal\/workspace.php",
         "file": "Portal\/workspace.php",
         "surface_type": "SCREEN",
@@ -39191,7 +39296,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0359",
+        "screen_id": "SCR-0360",
         "route": "Procurement\/consumption_rate.php",
         "file": "Procurement\/consumption_rate.php",
         "surface_type": "SCREEN",
@@ -39280,7 +39385,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0360",
+        "screen_id": "SCR-0361",
         "route": "Procurement\/dashboard_proc.php",
         "file": "Procurement\/dashboard_proc.php",
         "surface_type": "SCREEN",
@@ -39335,7 +39440,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0361",
+        "screen_id": "SCR-0362",
         "route": "Procurement\/gov_dept_inv.php",
         "file": "Procurement\/gov_dept_inv.php",
         "surface_type": "SCREEN",
@@ -39419,7 +39524,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0362",
+        "screen_id": "SCR-0363",
         "route": "Procurement\/gov_dept_prc.php",
         "file": "Procurement\/gov_dept_prc.php",
         "surface_type": "SCREEN",
@@ -39503,7 +39608,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0363",
+        "screen_id": "SCR-0364",
         "route": "Procurement\/issue_proc.php",
         "file": "Procurement\/issue_proc.php",
         "surface_type": "SCREEN",
@@ -39763,7 +39868,7 @@
         "form_fields": 16
     },
     {
-        "screen_id": "SCR-0364",
+        "screen_id": "SCR-0365",
         "route": "Procurement\/items_proc.php",
         "file": "Procurement\/items_proc.php",
         "surface_type": "SCREEN",
@@ -39911,7 +40016,7 @@
         "form_fields": 13
     },
     {
-        "screen_id": "SCR-0365",
+        "screen_id": "SCR-0366",
         "route": "Procurement\/items_proc.php#2",
         "file": "Procurement\/items_proc.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -39923,8 +40028,8 @@
         "names_all": [
             "كتالوج الأصناف والقطع الحرجة"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة المشتريات التشغيلية",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة الصيانة": [
@@ -39960,7 +40065,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0366",
+        "screen_id": "SCR-0367",
         "route": "Procurement\/master_data_proc.php",
         "file": "Procurement\/master_data_proc.php",
         "surface_type": "SCREEN",
@@ -40043,7 +40148,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0367",
+        "screen_id": "SCR-0368",
         "route": "Procurement\/orders_proc.php",
         "file": "Procurement\/orders_proc.php",
         "surface_type": "SCREEN",
@@ -40153,7 +40258,7 @@
         "form_fields": 27
     },
     {
-        "screen_id": "SCR-0368",
+        "screen_id": "SCR-0369",
         "route": "Procurement\/po_match.php",
         "file": "Procurement\/po_match.php",
         "surface_type": "SCREEN",
@@ -40240,7 +40345,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0369",
+        "screen_id": "SCR-0370",
         "route": "Procurement\/receipt_custody_proc.php",
         "file": "Procurement\/receipt_custody_proc.php",
         "surface_type": "SCREEN",
@@ -40399,7 +40504,7 @@
         "form_fields": 13
     },
     {
-        "screen_id": "SCR-0370",
+        "screen_id": "SCR-0371",
         "route": "Procurement\/reordering_proc.php",
         "file": "Procurement\/reordering_proc.php",
         "surface_type": "SCREEN",
@@ -40477,7 +40582,7 @@
         "form_fields": 9
     },
     {
-        "screen_id": "SCR-0371",
+        "screen_id": "SCR-0372",
         "route": "Procurement\/requests_proc.php",
         "file": "Procurement\/requests_proc.php",
         "surface_type": "SCREEN",
@@ -40686,7 +40791,7 @@
         "form_fields": 20
     },
     {
-        "screen_id": "SCR-0372",
+        "screen_id": "SCR-0373",
         "route": "Procurement\/rfq_compare_award.php",
         "file": "Procurement\/rfq_compare_award.php",
         "surface_type": "SCREEN",
@@ -40812,7 +40917,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0373",
+        "screen_id": "SCR-0374",
         "route": "Procurement\/stock_proc.php",
         "file": "Procurement\/stock_proc.php",
         "surface_type": "SCREEN",
@@ -41095,7 +41200,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0374",
+        "screen_id": "SCR-0375",
         "route": "Procurement\/supplier_card_proc.php",
         "file": "Procurement\/supplier_card_proc.php",
         "surface_type": "SCREEN",
@@ -41137,7 +41242,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0375",
+        "screen_id": "SCR-0376",
         "route": "Procurement\/suppliers_proc.php",
         "file": "Procurement\/suppliers_proc.php",
         "surface_type": "SCREEN",
@@ -41192,7 +41297,7 @@
         "form_fields": 9
     },
     {
-        "screen_id": "SCR-0376",
+        "screen_id": "SCR-0377",
         "route": "Procurement\/warehouse_board.php",
         "file": "Procurement\/warehouse_board.php",
         "surface_type": "SCREEN",
@@ -41255,7 +41360,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0377",
+        "screen_id": "SCR-0378",
         "route": "Procurement\/warehouses.php",
         "file": "Procurement\/warehouses.php",
         "surface_type": "SCREEN",
@@ -41343,7 +41448,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0378",
+        "screen_id": "SCR-0379",
         "route": "Procurement\/wh_count.php",
         "file": "Procurement\/wh_count.php",
         "surface_type": "SCREEN",
@@ -41430,7 +41535,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0379",
+        "screen_id": "SCR-0380",
         "route": "Procurement\/wh_receipt.php",
         "file": "Procurement\/wh_receipt.php",
         "surface_type": "SCREEN",
@@ -41540,7 +41645,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0380",
+        "screen_id": "SCR-0381",
         "route": "Procurement\/wh_returns.php",
         "file": "Procurement\/wh_returns.php",
         "surface_type": "SCREEN",
@@ -41574,7 +41679,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0381",
+        "screen_id": "SCR-0382",
         "route": "Procurement\/wh_transfer.php",
         "file": "Procurement\/wh_transfer.php",
         "surface_type": "SCREEN",
@@ -41661,7 +41766,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0382",
+        "screen_id": "SCR-0383",
         "route": "Projects\/project_profile.php",
         "file": "Projects\/project_profile.php",
         "surface_type": "SCREEN",
@@ -41759,7 +41864,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0383",
+        "screen_id": "SCR-0384",
         "route": "Projects\/projects.php",
         "file": "Projects\/projects.php",
         "surface_type": "SCREEN",
@@ -41774,7 +41879,8 @@
         ],
         "name_ar": "المشاريع والمواقع",
         "names_all": [
-            "المشاريع والمواقع"
+            "المشاريع والمواقع",
+            "سجل المشاريع"
         ],
         "owner_dept": "المبيعات والعقود",
         "owner_basis": "RULING",
@@ -41947,7 +42053,7 @@
         "form_fields": 16
     },
     {
-        "screen_id": "SCR-0384",
+        "screen_id": "SCR-0385",
         "route": "Projects\/sites.php",
         "file": "Projects\/sites.php",
         "surface_type": "SCREEN",
@@ -42025,7 +42131,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0385",
+        "screen_id": "SCR-0386",
         "route": "Reports\/approval_lag_report.php",
         "file": "Reports\/approval_lag_report.php",
         "surface_type": "SCREEN",
@@ -42118,7 +42224,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0386",
+        "screen_id": "SCR-0387",
         "route": "Reports\/contract_report.php",
         "file": "Reports\/contract_report.php",
         "surface_type": "SCREEN",
@@ -42216,7 +42322,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0387",
+        "screen_id": "SCR-0388",
         "route": "Reports\/contractall.php",
         "file": "Reports\/contractall.php",
         "surface_type": "SCREEN",
@@ -42314,7 +42420,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0388",
+        "screen_id": "SCR-0389",
         "route": "Reports\/daily_units_report.php",
         "file": "Reports\/daily_units_report.php",
         "surface_type": "SCREEN",
@@ -42392,7 +42498,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0389",
+        "screen_id": "SCR-0390",
         "route": "Reports\/deliy.php",
         "file": "Reports\/deliy.php",
         "surface_type": "SCREEN",
@@ -42490,7 +42596,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0390",
+        "screen_id": "SCR-0391",
         "route": "Reports\/deriver.php",
         "file": "Reports\/deriver.php",
         "surface_type": "SCREEN",
@@ -42588,7 +42694,7 @@
         "form_fields": 6
     },
     {
-        "screen_id": "SCR-0391",
+        "screen_id": "SCR-0392",
         "route": "Reports\/driverAndsupplerscontract.php",
         "file": "Reports\/driverAndsupplerscontract.php",
         "surface_type": "SCREEN",
@@ -42686,7 +42792,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0392",
+        "screen_id": "SCR-0393",
         "route": "Reports\/equipments_reports.php",
         "file": "Reports\/equipments_reports.php",
         "surface_type": "SCREEN",
@@ -42784,7 +42890,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0393",
+        "screen_id": "SCR-0394",
         "route": "Reports\/exceptions_report.php",
         "file": "Reports\/exceptions_report.php",
         "surface_type": "SCREEN",
@@ -42826,7 +42932,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0394",
+        "screen_id": "SCR-0395",
         "route": "Reports\/get_mine_contracts.php",
         "file": "Reports\/get_mine_contracts.php",
         "surface_type": "HANDLER",
@@ -42851,7 +42957,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0395",
+        "screen_id": "SCR-0396",
         "route": "Reports\/guard_denials_report.php",
         "file": "Reports\/guard_denials_report.php",
         "surface_type": "SCREEN",
@@ -42893,7 +42999,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0396",
+        "screen_id": "SCR-0397",
         "route": "Reports\/margin_report.php",
         "file": "Reports\/margin_report.php",
         "surface_type": "SCREEN",
@@ -43093,7 +43199,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0397",
+        "screen_id": "SCR-0398",
         "route": "Reports\/new_reports.php",
         "file": "Reports\/new_reports.php",
         "surface_type": "SCREEN",
@@ -43191,7 +43297,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0398",
+        "screen_id": "SCR-0399",
         "route": "Reports\/projects_reports.php",
         "file": "Reports\/projects_reports.php",
         "surface_type": "SCREEN",
@@ -43289,7 +43395,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0399",
+        "screen_id": "SCR-0400",
         "route": "Reports\/reports.php",
         "file": "Reports\/reports.php",
         "surface_type": "SCREEN",
@@ -43543,7 +43649,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0400",
+        "screen_id": "SCR-0401",
         "route": "Reports\/timesheet_reports.php",
         "file": "Reports\/timesheet_reports.php",
         "surface_type": "SCREEN",
@@ -43641,7 +43747,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0401",
+        "screen_id": "SCR-0402",
         "route": "Reports\/timesheetdeliy.php",
         "file": "Reports\/timesheetdeliy.php",
         "surface_type": "SCREEN",
@@ -43739,7 +43845,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0402",
+        "screen_id": "SCR-0403",
         "route": "Risk\/dept_risk_space.php",
         "file": "Risk\/dept_risk_space.php",
         "surface_type": "SCREEN",
@@ -44149,7 +44255,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0403",
+        "screen_id": "SCR-0404",
         "route": "Risk\/gov_dept_rsk.php",
         "file": "Risk\/gov_dept_rsk.php",
         "surface_type": "SCREEN",
@@ -44271,7 +44377,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0404",
+        "screen_id": "SCR-0405",
         "route": "Risk\/risk_acceptance.php",
         "file": "Risk\/risk_acceptance.php",
         "surface_type": "SCREEN",
@@ -44398,7 +44504,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0405",
+        "screen_id": "SCR-0406",
         "route": "Risk\/risk_actions.php",
         "file": "Risk\/risk_actions.php",
         "surface_type": "HANDLER",
@@ -44423,7 +44529,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0406",
+        "screen_id": "SCR-0407",
         "route": "Risk\/risk_appetite.php",
         "file": "Risk\/risk_appetite.php",
         "surface_type": "SCREEN",
@@ -44545,7 +44651,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0407",
+        "screen_id": "SCR-0408",
         "route": "Risk\/risk_assessment.php",
         "file": "Risk\/risk_assessment.php",
         "surface_type": "SCREEN",
@@ -44673,7 +44779,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0408",
+        "screen_id": "SCR-0409",
         "route": "Risk\/risk_board.php",
         "file": "Risk\/risk_board.php",
         "surface_type": "SCREEN",
@@ -44771,7 +44877,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0409",
+        "screen_id": "SCR-0410",
         "route": "Risk\/risk_card.php",
         "file": "Risk\/risk_card.php",
         "surface_type": "SCREEN",
@@ -44898,7 +45004,7 @@
         "form_fields": 10
     },
     {
-        "screen_id": "SCR-0410",
+        "screen_id": "SCR-0411",
         "route": "Risk\/risk_committee.php",
         "file": "Risk\/risk_committee.php",
         "surface_type": "SCREEN",
@@ -45025,7 +45131,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0411",
+        "screen_id": "SCR-0412",
         "route": "Risk\/risk_control_verify.php",
         "file": "Risk\/risk_control_verify.php",
         "surface_type": "SCREEN",
@@ -45144,7 +45250,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0412",
+        "screen_id": "SCR-0413",
         "route": "Risk\/risk_controls.php",
         "file": "Risk\/risk_controls.php",
         "surface_type": "SCREEN",
@@ -45263,7 +45369,7 @@
         "form_fields": 12
     },
     {
-        "screen_id": "SCR-0413",
+        "screen_id": "SCR-0414",
         "route": "Risk\/risk_dept_cap.php",
         "file": "Risk\/risk_dept_cap.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -45362,7 +45468,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0414",
+        "screen_id": "SCR-0415",
         "route": "Risk\/risk_dept_ceo.php",
         "file": "Risk\/risk_dept_ceo.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -45461,7 +45567,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0415",
+        "screen_id": "SCR-0416",
         "route": "Risk\/risk_dept_crp.php",
         "file": "Risk\/risk_dept_crp.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -45560,7 +45666,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0416",
+        "screen_id": "SCR-0417",
         "route": "Risk\/risk_dept_fin.php",
         "file": "Risk\/risk_dept_fin.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -45675,7 +45781,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0417",
+        "screen_id": "SCR-0418",
         "route": "Risk\/risk_dept_flt.php",
         "file": "Risk\/risk_dept_flt.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -45790,7 +45896,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0418",
+        "screen_id": "SCR-0419",
         "route": "Risk\/risk_dept_gov.php",
         "file": "Risk\/risk_dept_gov.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -45889,7 +45995,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0419",
+        "screen_id": "SCR-0420",
         "route": "Risk\/risk_dept_hrm.php",
         "file": "Risk\/risk_dept_hrm.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -45988,7 +46094,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0420",
+        "screen_id": "SCR-0421",
         "route": "Risk\/risk_dept_inv.php",
         "file": "Risk\/risk_dept_inv.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -46087,7 +46193,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0421",
+        "screen_id": "SCR-0422",
         "route": "Risk\/risk_dept_mnt.php",
         "file": "Risk\/risk_dept_mnt.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -46194,7 +46300,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0422",
+        "screen_id": "SCR-0423",
         "route": "Risk\/risk_dept_ops.php",
         "file": "Risk\/risk_dept_ops.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -46301,7 +46407,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0423",
+        "screen_id": "SCR-0424",
         "route": "Risk\/risk_dept_prc.php",
         "file": "Risk\/risk_dept_prc.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -46400,7 +46506,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0424",
+        "screen_id": "SCR-0425",
         "route": "Risk\/risk_dept_sal.php",
         "file": "Risk\/risk_dept_sal.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -46490,7 +46596,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0425",
+        "screen_id": "SCR-0426",
         "route": "Risk\/risk_dept_sit.php",
         "file": "Risk\/risk_dept_sit.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -46589,7 +46695,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0426",
+        "screen_id": "SCR-0427",
         "route": "Risk\/risk_dept_sup.php",
         "file": "Risk\/risk_dept_sup.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -46687,7 +46793,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0427",
+        "screen_id": "SCR-0428",
         "route": "Risk\/risk_dept_trp.php",
         "file": "Risk\/risk_dept_trp.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -46786,7 +46892,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0428",
+        "screen_id": "SCR-0429",
         "route": "Risk\/risk_dept_wrk.php",
         "file": "Risk\/risk_dept_wrk.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -46885,7 +46991,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0429",
+        "screen_id": "SCR-0430",
         "route": "Risk\/risk_field.php",
         "file": "Risk\/risk_field.php",
         "surface_type": "SCREEN",
@@ -47060,7 +47166,7 @@
         "form_fields": 11
     },
     {
-        "screen_id": "SCR-0430",
+        "screen_id": "SCR-0431",
         "route": "Risk\/risk_incidents.php",
         "file": "Risk\/risk_incidents.php",
         "surface_type": "SCREEN",
@@ -47209,7 +47315,7 @@
         "form_fields": 12
     },
     {
-        "screen_id": "SCR-0431",
+        "screen_id": "SCR-0432",
         "route": "Risk\/risk_kris.php",
         "file": "Risk\/risk_kris.php",
         "surface_type": "SCREEN",
@@ -47299,7 +47405,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0432",
+        "screen_id": "SCR-0433",
         "route": "Risk\/risk_register.php",
         "file": "Risk\/risk_register.php",
         "surface_type": "SCREEN",
@@ -47425,7 +47531,7 @@
         "form_fields": 10
     },
     {
-        "screen_id": "SCR-0433",
+        "screen_id": "SCR-0434",
         "route": "Risk\/risk_reports.php",
         "file": "Risk\/risk_reports.php",
         "surface_type": "SCREEN",
@@ -47569,7 +47675,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0434",
+        "screen_id": "SCR-0435",
         "route": "Risk\/risk_reviews.php",
         "file": "Risk\/risk_reviews.php",
         "surface_type": "SCREEN",
@@ -47697,7 +47803,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0435",
+        "screen_id": "SCR-0436",
         "route": "Risk\/risk_settings.php",
         "file": "Risk\/risk_settings.php",
         "surface_type": "SCREEN",
@@ -47810,7 +47916,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0436",
+        "screen_id": "SCR-0437",
         "route": "Risk\/risk_signals.php",
         "file": "Risk\/risk_signals.php",
         "surface_type": "SCREEN",
@@ -47928,7 +48034,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0437",
+        "screen_id": "SCR-0438",
         "route": "Risk\/risk_treatments.php",
         "file": "Risk\/risk_treatments.php",
         "surface_type": "SCREEN",
@@ -48018,7 +48124,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0438",
+        "screen_id": "SCR-0439",
         "route": "Risk\/risk_units.php",
         "file": "Risk\/risk_units.php",
         "surface_type": "SCREEN",
@@ -48135,7 +48241,7 @@
         "form_fields": 6
     },
     {
-        "screen_id": "SCR-0439",
+        "screen_id": "SCR-0440",
         "route": "Settings\/change_password.php",
         "file": "Settings\/change_password.php",
         "surface_type": "SCREEN",
@@ -48379,7 +48485,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0440",
+        "screen_id": "SCR-0441",
         "route": "Settings\/guard_classification.php",
         "file": "Settings\/guard_classification.php",
         "surface_type": "SCREEN",
@@ -48450,7 +48556,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0441",
+        "screen_id": "SCR-0442",
         "route": "Settings\/modules.php",
         "file": "Settings\/modules.php",
         "surface_type": "SCREEN",
@@ -48545,7 +48651,7 @@
         "form_fields": 6
     },
     {
-        "screen_id": "SCR-0442",
+        "screen_id": "SCR-0443",
         "route": "Settings\/role_permissions.php",
         "file": "Settings\/role_permissions.php",
         "surface_type": "SCREEN",
@@ -48587,7 +48693,7 @@
         "form_fields": 9
     },
     {
-        "screen_id": "SCR-0443",
+        "screen_id": "SCR-0444",
         "route": "Settings\/roles.php",
         "file": "Settings\/roles.php",
         "surface_type": "SCREEN",
@@ -48682,7 +48788,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0444",
+        "screen_id": "SCR-0445",
         "route": "Settings\/settings.php",
         "file": "Settings\/settings.php",
         "surface_type": "SCREEN",
@@ -48883,7 +48989,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0445",
+        "screen_id": "SCR-0446",
         "route": "Suppliers\/equipment_plan.php",
         "file": "Suppliers\/equipment_plan.php",
         "surface_type": "SCREEN",
@@ -48945,9 +49051,9 @@
             "stage_order": 2,
             "stage_name": "التأهيل والقدرة",
             "layer": "دورة الإدارة",
-            "group": "نتحقق من قدرته",
+            "group": "التحقق من القدرة",
             "inputs": "supplier_equipment_plan",
-            "output_doc": "حاويةُ كلِّ معدة · عقد مورد · حصة مخصَّصة",
+            "output_doc": "التغطيةُ التعاقديةُ لكلِّ معدة · عقد مورد · حصة مخصَّصة",
             "resp_role": "مدير الموردين",
             "next_state": "الخطةُ تصير التزامًا",
             "consumers": "التشغيل · الأسطول",
@@ -48981,7 +49087,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0446",
+        "screen_id": "SCR-0447",
         "route": "Suppliers\/equipment_plan.php#2",
         "file": "Suppliers\/equipment_plan.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -49016,7 +49122,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0447",
+        "screen_id": "SCR-0448",
         "route": "Suppliers\/get_mine_contracts.php",
         "file": "Suppliers\/get_mine_contracts.php",
         "surface_type": "HANDLER",
@@ -49041,7 +49147,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0448",
+        "screen_id": "SCR-0449",
         "route": "Suppliers\/get_project_hours.php",
         "file": "Suppliers\/get_project_hours.php",
         "surface_type": "HANDLER",
@@ -49066,7 +49172,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0449",
+        "screen_id": "SCR-0450",
         "route": "Suppliers\/get_supplier_contract_equipments.php",
         "file": "Suppliers\/get_supplier_contract_equipments.php",
         "surface_type": "HANDLER",
@@ -49091,7 +49197,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0450",
+        "screen_id": "SCR-0451",
         "route": "Suppliers\/quota_approval_minutes.php",
         "file": "Suppliers\/quota_approval_minutes.php",
         "surface_type": "SCREEN",
@@ -49157,7 +49263,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0451",
+        "screen_id": "SCR-0452",
         "route": "Suppliers\/rfq_requests.php",
         "file": "Suppliers\/rfq_requests.php",
         "surface_type": "SCREEN",
@@ -49169,7 +49275,8 @@
         ],
         "name_ar": "طلبات عروض الموردين",
         "names_all": [
-            "طلبات عروض الموردين"
+            "طلبات عروض الموردين",
+            "الترشيح ومراجعة التعاقد"
         ],
         "owner_dept": "إدارة الموردين",
         "owner_basis": "CONSENSUS",
@@ -49258,7 +49365,7 @@
         "form_fields": 13
     },
     {
-        "screen_id": "SCR-0452",
+        "screen_id": "SCR-0453",
         "route": "Suppliers\/settlements.php",
         "file": "Suppliers\/settlements.php",
         "surface_type": "SCREEN",
@@ -49271,8 +49378,9 @@
             "nav",
             "nav09"
         ],
-        "name_ar": "تسويات ومستحقات الموردين",
+        "name_ar": "التسويات وكشف الحساب",
         "names_all": [
+            "التسويات وكشف الحساب",
             "تسويات ومستحقات الموردين"
         ],
         "owner_dept": "إدارة الموردين",
@@ -49423,7 +49531,7 @@
             "stage_order": 6,
             "stage_name": "التسويات والصرف",
             "layer": "دورة الإدارة",
-            "group": "نحاسبه ونصرف",
+            "group": "المحاسبة والصرف",
             "inputs": "settlements · جداولُ نظامِ الموردينَ والورديات",
             "output_doc": "تسوية · كشف شهري · أمر دفع",
             "resp_role": "المالية",
@@ -49460,7 +49568,7 @@
         "form_fields": 14
     },
     {
-        "screen_id": "SCR-0453",
+        "screen_id": "SCR-0454",
         "route": "Suppliers\/shares_coverage.php",
         "file": "Suppliers\/shares_coverage.php",
         "surface_type": "SCREEN",
@@ -49476,6 +49584,7 @@
         "name_ar": "حصص الموردين من العقود",
         "names_all": [
             "حصص الموردين من العقود",
+            "سجل الحصص والتغطية التعاقدية",
             "دفتر استهلاك حصص الموردين"
         ],
         "owner_dept": "إدارة الموردين",
@@ -49552,7 +49661,7 @@
             "stage_order": 3,
             "stage_name": "التعاقد والتغطية والحصص",
             "layer": "دورة الإدارة",
-            "group": "حصص الموردين وحاوياتها",
+            "group": "حصص الموردين والتغطية التعاقدية",
             "inputs": "container_shares · quota_ledger",
             "output_doc": "◆ انتقالُ حالةٍ بلا مستندٍ رسمي",
             "resp_role": "مدير التشغيل",
@@ -49589,7 +49698,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0454",
+        "screen_id": "SCR-0455",
         "route": "Suppliers\/shares_coverage.php#2",
         "file": "Suppliers\/shares_coverage.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -49601,8 +49710,8 @@
         "names_all": [
             "دفتر استهلاك حصص الموردين"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة الموردين",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "مشرف موردين": [
@@ -49624,7 +49733,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0455",
+        "screen_id": "SCR-0456",
         "route": "Suppliers\/showcontractsuppliers.php",
         "file": "Suppliers\/showcontractsuppliers.php",
         "surface_type": "SCREEN",
@@ -49690,7 +49799,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0456",
+        "screen_id": "SCR-0457",
         "route": "Suppliers\/sup_handover.php",
         "file": "Suppliers\/sup_handover.php",
         "surface_type": "SCREEN",
@@ -49747,9 +49856,9 @@
         ],
         "stage": {
             "stage_order": 4,
-            "stage_name": "توزيع الحصص والحاويات",
+            "stage_name": "توزيع الحصص وإسناد المعدات",
             "layer": "دورة الإدارة",
-            "group": "نعطيه حصتَه",
+            "group": "إسناد الحصة",
             "inputs": "جداولُ نظامِ الموردينَ والورديات",
             "output_doc": "خطة شهرية معتمدة",
             "resp_role": "إدارة الموردين",
@@ -49782,7 +49891,7 @@
         "form_fields": 6
     },
     {
-        "screen_id": "SCR-0457",
+        "screen_id": "SCR-0458",
         "route": "Suppliers\/supplier_advances.php",
         "file": "Suppliers\/supplier_advances.php",
         "surface_type": "SCREEN",
@@ -49866,7 +49975,7 @@
             "stage_order": 6,
             "stage_name": "التسويات والصرف",
             "layer": "دورة الإدارة",
-            "group": "نحاسبه ونصرف",
+            "group": "المحاسبة والصرف",
             "inputs": "supplier_advances",
             "output_doc": "تسوية · كشف شهري · أمر دفع",
             "resp_role": "المالية",
@@ -49902,7 +50011,7 @@
         "form_fields": 12
     },
     {
-        "screen_id": "SCR-0458",
+        "screen_id": "SCR-0459",
         "route": "Suppliers\/supplier_bank.php",
         "file": "Suppliers\/supplier_bank.php",
         "surface_type": "SCREEN",
@@ -49963,7 +50072,7 @@
             "stage_order": 1,
             "stage_name": "تسجيل الموردين",
             "layer": "دورة الإدارة",
-            "group": "نبدأ من المورد",
+            "group": "تسجيل المورد",
             "inputs": "supplier_banks",
             "output_doc": "محضر مقارنة · قرار ترسية · ملف مورد مكتمل",
             "resp_role": "مدير الموردين",
@@ -49999,7 +50108,7 @@
         "form_fields": 22
     },
     {
-        "screen_id": "SCR-0459",
+        "screen_id": "SCR-0460",
         "route": "Suppliers\/supplier_board.php",
         "file": "Suppliers\/supplier_board.php",
         "surface_type": "SCREEN",
@@ -50109,7 +50218,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0460",
+        "screen_id": "SCR-0461",
         "route": "Suppliers\/supplier_capacity.php",
         "file": "Suppliers\/supplier_capacity.php",
         "surface_type": "SCREEN",
@@ -50125,6 +50234,7 @@
         "name_ar": "طاقة المورد وجاهزيته ومهلة الإحلال",
         "names_all": [
             "طاقة المورد وجاهزيته ومهلة الإحلال",
+            "البيانات المرجعية ومصادر القدرة",
             "أداء الموردين وجاهزيتهم"
         ],
         "owner_dept": "إدارة الموردين",
@@ -50209,9 +50319,9 @@
             "stage_order": 2,
             "stage_name": "التأهيل والقدرة",
             "layer": "دورة الإدارة",
-            "group": "نتحقق من قدرته",
+            "group": "التحقق من القدرة",
             "inputs": "supplier_capacity",
-            "output_doc": "حاويةُ كلِّ معدة · عقد مورد · حصة مخصَّصة",
+            "output_doc": "التغطيةُ التعاقديةُ لكلِّ معدة · عقد مورد · حصة مخصَّصة",
             "resp_role": "الرئيس التنفيذي",
             "next_state": "الجاهزيةُ الفعليةُ تُقاس مقابل الدنيا",
             "consumers": "التشغيل · المالية",
@@ -50245,7 +50355,7 @@
         "form_fields": 13
     },
     {
-        "screen_id": "SCR-0461",
+        "screen_id": "SCR-0462",
         "route": "Suppliers\/supplier_capacity.php#2",
         "file": "Suppliers\/supplier_capacity.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -50280,7 +50390,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0462",
+        "screen_id": "SCR-0463",
         "route": "Suppliers\/supplier_capacity.php#3",
         "file": "Suppliers\/supplier_capacity.php#3",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -50292,8 +50402,8 @@
         "names_all": [
             "أداء الموردين وجاهزيتهم"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة الموردين",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "مشرف موردين": [
@@ -50315,7 +50425,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0463",
+        "screen_id": "SCR-0464",
         "route": "Suppliers\/supplier_closure.php",
         "file": "Suppliers\/supplier_closure.php",
         "surface_type": "SCREEN",
@@ -50399,7 +50509,7 @@
             "stage_order": 7,
             "stage_name": "تقييم الأداء والإنهاء",
             "layer": "دورة الإدارة",
-            "group": "نقيّمه أو نُنهي عقدَه",
+            "group": "التقييم وإنهاء العقد",
             "inputs": "supplier_closure",
             "output_doc": "تقييم دوري · محضر تصفية",
             "resp_role": "مدير الموردين",
@@ -50433,7 +50543,101 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0464",
+        "screen_id": "SCR-0465",
+        "route": "Suppliers\/supplier_contacts.php",
+        "file": "Suppliers\/supplier_contacts.php",
+        "surface_type": "SCREEN",
+        "on_disk": 1,
+        "sources": [
+            "disk",
+            "apps"
+        ],
+        "name_ar": "جهات الاتصال والمفوضون",
+        "names_all": [
+            "جهات الاتصال والمفوضون"
+        ],
+        "owner_dept": "ادارة الموردين",
+        "owner_basis": "CONSENSUS",
+        "workspaces": [
+            {
+                "space": "ادارة الموردين",
+                "kind": "",
+                "tab": "الموردون والتعاقد",
+                "cls": "OWNED",
+                "decision": "KEEP",
+                "owner_kind": ""
+            }
+        ],
+        "roles_nav": [],
+        "profiles_count": 7,
+        "profiles": [
+            {
+                "profile": "HRM-G7",
+                "dept": "الموارد البشرية",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "SAL-G7",
+                "dept": "المبيعات والعقود",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "SUP-G4",
+                "dept": "إدارة الموردين",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "SUP-G7",
+                "dept": "إدارة الموردين",
+                "allow": 1,
+                "add": 1,
+                "edit": 1,
+                "del": 1
+            },
+            {
+                "profile": "FLT-G7",
+                "dept": "إدارة الأسطول",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "PRC-G7",
+                "dept": "إدارة المشتريات التشغيلية",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "SIT-G7",
+                "dept": "إدارة الموقع",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            }
+        ],
+        "stage": null,
+        "ledger": null,
+        "nav09": null,
+        "deprecated": 0,
+        "known_issue": [],
+        "table_columns": 0,
+        "form_fields": 0
+    },
+    {
+        "screen_id": "SCR-0466",
         "route": "Suppliers\/supplier_contract_actions_handler.php",
         "file": "Suppliers\/supplier_contract_actions_handler.php",
         "surface_type": "HANDLER",
@@ -50458,7 +50662,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0465",
+        "screen_id": "SCR-0467",
         "route": "Suppliers\/supplier_contract_lines.php",
         "file": "Suppliers\/supplier_contract_lines.php",
         "surface_type": "SCREEN",
@@ -50529,7 +50733,7 @@
         "form_fields": 28
     },
     {
-        "screen_id": "SCR-0466",
+        "screen_id": "SCR-0468",
         "route": "Suppliers\/supplier_documents.php",
         "file": "Suppliers\/supplier_documents.php",
         "surface_type": "SCREEN",
@@ -50600,7 +50804,85 @@
         "form_fields": 15
     },
     {
-        "screen_id": "SCR-0467",
+        "screen_id": "SCR-0469",
+        "route": "Suppliers\/supplier_entitlements.php",
+        "file": "Suppliers\/supplier_entitlements.php",
+        "surface_type": "SCREEN",
+        "on_disk": 1,
+        "sources": [
+            "disk",
+            "apps"
+        ],
+        "name_ar": "استحقاقات الموردين",
+        "names_all": [
+            "استحقاقات الموردين"
+        ],
+        "owner_dept": "ادارة الموردين",
+        "owner_basis": "CONSENSUS",
+        "workspaces": [
+            {
+                "space": "ادارة الموردين",
+                "kind": "",
+                "tab": "التسويات والاستحقاقات",
+                "cls": "OWNED",
+                "decision": "KEEP",
+                "owner_kind": ""
+            }
+        ],
+        "roles_nav": [],
+        "profiles_count": 5,
+        "profiles": [
+            {
+                "profile": "FIN-G3",
+                "dept": "المالية والخزينة",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "FIN-G7",
+                "dept": "المالية والخزينة",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "SUP-G4",
+                "dept": "إدارة الموردين",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "SUP-G7",
+                "dept": "إدارة الموردين",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            },
+            {
+                "profile": "WRK-G7",
+                "dept": "القوى التشغيلية",
+                "allow": 1,
+                "add": 0,
+                "edit": 0,
+                "del": 0
+            }
+        ],
+        "stage": null,
+        "ledger": null,
+        "nav09": null,
+        "deprecated": 0,
+        "known_issue": [],
+        "table_columns": 11,
+        "form_fields": 0
+    },
+    {
+        "screen_id": "SCR-0470",
         "route": "Suppliers\/supplier_evaluation.php",
         "file": "Suppliers\/supplier_evaluation.php",
         "surface_type": "SCREEN",
@@ -50684,7 +50966,7 @@
             "stage_order": 7,
             "stage_name": "تقييم الأداء والإنهاء",
             "layer": "دورة الإدارة",
-            "group": "نقيّمه أو نُنهي عقدَه",
+            "group": "التقييم وإنهاء العقد",
             "inputs": "supplier_ratings",
             "output_doc": "تقييم دوري · محضر تصفية",
             "resp_role": "مدير الموردين",
@@ -50720,7 +51002,7 @@
         "form_fields": 14
     },
     {
-        "screen_id": "SCR-0468",
+        "screen_id": "SCR-0471",
         "route": "Suppliers\/supplier_profile.php",
         "file": "Suppliers\/supplier_profile.php",
         "surface_type": "SCREEN",
@@ -50810,7 +51092,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0469",
+        "screen_id": "SCR-0472",
         "route": "Suppliers\/supplier_rules.php",
         "file": "Suppliers\/supplier_rules.php",
         "surface_type": "SCREEN",
@@ -50894,7 +51176,7 @@
             "stage_order": 3,
             "stage_name": "العقود والحصص",
             "layer": "دورة الإدارة",
-            "group": "نوقّع عقدَه",
+            "group": "توقيع عقد المورد",
             "inputs": "supplier_rules",
             "output_doc": "عقد مورد · حصة مخصَّصة",
             "resp_role": "الرئيس التنفيذي",
@@ -50930,7 +51212,7 @@
         "form_fields": 21
     },
     {
-        "screen_id": "SCR-0470",
+        "screen_id": "SCR-0473",
         "route": "Suppliers\/supplier_violations.php",
         "file": "Suppliers\/supplier_violations.php",
         "surface_type": "SCREEN",
@@ -51032,7 +51314,7 @@
         "form_fields": 11
     },
     {
-        "screen_id": "SCR-0471",
+        "screen_id": "SCR-0474",
         "route": "Suppliers\/suppliers.php",
         "file": "Suppliers\/suppliers.php",
         "surface_type": "SCREEN",
@@ -51204,7 +51486,7 @@
         "form_fields": 18
     },
     {
-        "screen_id": "SCR-0472",
+        "screen_id": "SCR-0475",
         "route": "Suppliers\/suppliers.php#2",
         "file": "Suppliers\/suppliers.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -51216,8 +51498,8 @@
         "names_all": [
             "سجل الموردين"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "إدارة الموردين",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة المشتريات": [
@@ -51239,7 +51521,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0473",
+        "screen_id": "SCR-0476",
         "route": "Suppliers\/suppliers_details.php",
         "file": "Suppliers\/suppliers_details.php",
         "surface_type": "SCREEN",
@@ -51321,7 +51603,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0474",
+        "screen_id": "SCR-0477",
         "route": "Suppliers\/supplierscontracts.php",
         "file": "Suppliers\/supplierscontracts.php",
         "surface_type": "SCREEN",
@@ -51336,7 +51618,8 @@
         ],
         "name_ar": "عقود الموردين",
         "names_all": [
-            "عقود الموردين"
+            "عقود الموردين",
+            "سجل عقود الموردين"
         ],
         "owner_dept": "إدارة الموردين",
         "owner_basis": "CONSENSUS",
@@ -51413,7 +51696,7 @@
             "stage_order": 3,
             "stage_name": "العقود والحصص",
             "layer": "دورة الإدارة",
-            "group": "نوقّع عقدَه",
+            "group": "توقيع عقد المورد",
             "inputs": "supplier_contracts",
             "output_doc": "عقد مورد · حصة مخصَّصة",
             "resp_role": "الرئيس التنفيذي",
@@ -51449,7 +51732,7 @@
         "form_fields": 74
     },
     {
-        "screen_id": "SCR-0475",
+        "screen_id": "SCR-0478",
         "route": "Suppliers\/supplierscontracts_details.php",
         "file": "Suppliers\/supplierscontracts_details.php",
         "surface_type": "SCREEN",
@@ -51515,7 +51798,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0476",
+        "screen_id": "SCR-0479",
         "route": "Suppliers\/unit_statement_supplier.php",
         "file": "Suppliers\/unit_statement_supplier.php",
         "surface_type": "SCREEN",
@@ -51617,7 +51900,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0477",
+        "screen_id": "SCR-0480",
         "route": "Tickets\/admin_close.php",
         "file": "Tickets\/admin_close.php",
         "surface_type": "SCREEN",
@@ -51666,7 +51949,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0478",
+        "screen_id": "SCR-0481",
         "route": "Tickets\/cron_tickets.php",
         "file": "Tickets\/cron_tickets.php",
         "surface_type": "CRON",
@@ -51691,7 +51974,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0479",
+        "screen_id": "SCR-0482",
         "route": "Tickets\/dept_inbox.php",
         "file": "Tickets\/dept_inbox.php",
         "surface_type": "SCREEN_VIA_KIT",
@@ -51946,7 +52229,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0480",
+        "screen_id": "SCR-0483",
         "route": "Tickets\/get_tickets_count.php",
         "file": "Tickets\/get_tickets_count.php",
         "surface_type": "HANDLER",
@@ -51971,7 +52254,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0481",
+        "screen_id": "SCR-0484",
         "route": "Tickets\/gov_dept_crp.php",
         "file": "Tickets\/gov_dept_crp.php",
         "surface_type": "SCREEN",
@@ -52055,7 +52338,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0482",
+        "screen_id": "SCR-0485",
         "route": "Tickets\/inquiry.php",
         "file": "Tickets\/inquiry.php",
         "surface_type": "SCREEN",
@@ -52089,7 +52372,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0483",
+        "screen_id": "SCR-0486",
         "route": "Tickets\/intake_classify.php",
         "file": "Tickets\/intake_classify.php",
         "surface_type": "SCREEN",
@@ -52134,7 +52417,7 @@
         "form_fields": 3
     },
     {
-        "screen_id": "SCR-0484",
+        "screen_id": "SCR-0487",
         "route": "Tickets\/my_tickets.php",
         "file": "Tickets\/my_tickets.php",
         "surface_type": "SCREEN",
@@ -52427,7 +52710,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0485",
+        "screen_id": "SCR-0488",
         "route": "Tickets\/ticket_categories_config.php",
         "file": "Tickets\/ticket_categories_config.php",
         "surface_type": "SCREEN",
@@ -52472,7 +52755,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0486",
+        "screen_id": "SCR-0489",
         "route": "Tickets\/ticket_close.php",
         "file": "Tickets\/ticket_close.php",
         "surface_type": "SCREEN",
@@ -52546,7 +52829,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0487",
+        "screen_id": "SCR-0490",
         "route": "Tickets\/ticket_contextual_open.php",
         "file": "Tickets\/ticket_contextual_open.php",
         "surface_type": "SCREEN",
@@ -53089,7 +53372,7 @@
         "form_fields": 11
     },
     {
-        "screen_id": "SCR-0488",
+        "screen_id": "SCR-0491",
         "route": "Tickets\/ticket_dashboard.php",
         "file": "Tickets\/ticket_dashboard.php",
         "surface_type": "SCREEN",
@@ -53163,7 +53446,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0489",
+        "screen_id": "SCR-0492",
         "route": "Tickets\/ticket_dashboard.php#2",
         "file": "Tickets\/ticket_dashboard.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -53175,8 +53458,8 @@
         "names_all": [
             "مؤشرات البلاغات"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "مركز البلاغات",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة البلاغات": [
@@ -53198,7 +53481,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0490",
+        "screen_id": "SCR-0493",
         "route": "Tickets\/ticket_escalation_config.php",
         "file": "Tickets\/ticket_escalation_config.php",
         "surface_type": "SCREEN",
@@ -53277,7 +53560,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0491",
+        "screen_id": "SCR-0494",
         "route": "Tickets\/ticket_form.php",
         "file": "Tickets\/ticket_form.php",
         "surface_type": "SCREEN",
@@ -53570,7 +53853,7 @@
         "form_fields": 24
     },
     {
-        "screen_id": "SCR-0492",
+        "screen_id": "SCR-0495",
         "route": "Tickets\/ticket_kpi.php",
         "file": "Tickets\/ticket_kpi.php",
         "surface_type": "SCREEN",
@@ -53652,7 +53935,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0493",
+        "screen_id": "SCR-0496",
         "route": "Tickets\/ticket_recurrence.php",
         "file": "Tickets\/ticket_recurrence.php",
         "surface_type": "SCREEN",
@@ -53772,7 +54055,7 @@
         "form_fields": 10
     },
     {
-        "screen_id": "SCR-0494",
+        "screen_id": "SCR-0497",
         "route": "Tickets\/ticket_recurrence.php#2",
         "file": "Tickets\/ticket_recurrence.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -53784,8 +54067,8 @@
         "names_all": [
             "البلاغات الدورية المولَّدة"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "مركز البلاغات",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة البلاغات": [
@@ -53807,7 +54090,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0495",
+        "screen_id": "SCR-0498",
         "route": "Tickets\/ticket_sla_config.php",
         "file": "Tickets\/ticket_sla_config.php",
         "surface_type": "SCREEN",
@@ -53852,7 +54135,7 @@
         "form_fields": 9
     },
     {
-        "screen_id": "SCR-0496",
+        "screen_id": "SCR-0499",
         "route": "Tickets\/ticket_types_config.php",
         "file": "Tickets\/ticket_types_config.php",
         "surface_type": "SCREEN",
@@ -53932,7 +54215,7 @@
         "form_fields": 6
     },
     {
-        "screen_id": "SCR-0497",
+        "screen_id": "SCR-0500",
         "route": "Tickets\/ticket_types_config.php#2",
         "file": "Tickets\/ticket_types_config.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -53944,8 +54227,8 @@
         "names_all": [
             "إعدادات البلاغات — الأنواع والمهل والتصعيد"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "مركز البلاغات",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "إدارة البلاغات": [
@@ -53967,7 +54250,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0498",
+        "screen_id": "SCR-0501",
         "route": "Tickets\/ticket_workstreams_board.php",
         "file": "Tickets\/ticket_workstreams_board.php",
         "surface_type": "SCREEN",
@@ -54086,7 +54369,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0499",
+        "screen_id": "SCR-0502",
         "route": "Tickets\/tickets_list.php",
         "file": "Tickets\/tickets_list.php",
         "surface_type": "SCREEN",
@@ -54520,7 +54803,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0500",
+        "screen_id": "SCR-0503",
         "route": "Tickets\/tickets_list.php?tab=dept",
         "file": "Tickets\/tickets_list.php",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -54779,7 +55062,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0501",
+        "screen_id": "SCR-0504",
         "route": "Tickets\/watchtower.php",
         "file": "Tickets\/watchtower.php",
         "surface_type": "SCREEN",
@@ -54824,7 +55107,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0502",
+        "screen_id": "SCR-0505",
         "route": "Timesheet\/aprovment.php",
         "file": "Timesheet\/aprovment.php",
         "surface_type": "SCREEN",
@@ -54970,7 +55253,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0503",
+        "screen_id": "SCR-0506",
         "route": "Timesheet\/get_contract_hours.php",
         "file": "Timesheet\/get_contract_hours.php",
         "surface_type": "HANDLER",
@@ -54995,7 +55278,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0504",
+        "screen_id": "SCR-0507",
         "route": "Timesheet\/get_failure_codes.php",
         "file": "Timesheet\/get_failure_codes.php",
         "surface_type": "HANDLER",
@@ -55020,7 +55303,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0505",
+        "screen_id": "SCR-0508",
         "route": "Timesheet\/get_timesheet.php",
         "file": "Timesheet\/get_timesheet.php",
         "surface_type": "HANDLER",
@@ -55045,7 +55328,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0506",
+        "screen_id": "SCR-0509",
         "route": "Timesheet\/get_timesheet_data.php",
         "file": "Timesheet\/get_timesheet_data.php",
         "surface_type": "HANDLER",
@@ -55070,7 +55353,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0507",
+        "screen_id": "SCR-0510",
         "route": "Timesheet\/get_timesheet_failures.php",
         "file": "Timesheet\/get_timesheet_failures.php",
         "surface_type": "HANDLER",
@@ -55095,7 +55378,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0508",
+        "screen_id": "SCR-0511",
         "route": "Timesheet\/timesheet.php",
         "file": "Timesheet\/timesheet.php",
         "surface_type": "SCREEN",
@@ -55489,7 +55772,7 @@
         "form_fields": 64
     },
     {
-        "screen_id": "SCR-0509",
+        "screen_id": "SCR-0512",
         "route": "Timesheet\/timesheet_details.php",
         "file": "Timesheet\/timesheet_details.php",
         "surface_type": "SCREEN",
@@ -55635,7 +55918,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0510",
+        "screen_id": "SCR-0513",
         "route": "Timesheet\/timesheet_type.php",
         "file": "Timesheet\/timesheet_type.php",
         "surface_type": "SCREEN",
@@ -55770,7 +56053,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0511",
+        "screen_id": "SCR-0514",
         "route": "Timesheet\/view_timesheet.php",
         "file": "Timesheet\/view_timesheet.php",
         "surface_type": "SCREEN",
@@ -55937,7 +56220,7 @@
         "form_fields": 9
     },
     {
-        "screen_id": "SCR-0512",
+        "screen_id": "SCR-0515",
         "route": "Transport\/cron_transfer.php",
         "file": "Transport\/cron_transfer.php",
         "surface_type": "CRON",
@@ -55962,7 +56245,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0513",
+        "screen_id": "SCR-0516",
         "route": "Transport\/gov_dept_trp.php",
         "file": "Transport\/gov_dept_trp.php",
         "surface_type": "SCREEN",
@@ -56046,7 +56329,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0514",
+        "screen_id": "SCR-0517",
         "route": "Transport\/transfer_arrival.php",
         "file": "Transport\/transfer_arrival.php",
         "surface_type": "SCREEN",
@@ -56101,7 +56384,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0515",
+        "screen_id": "SCR-0518",
         "route": "Transport\/transfer_close_cost.php",
         "file": "Transport\/transfer_close_cost.php",
         "surface_type": "SCREEN",
@@ -56262,7 +56545,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0516",
+        "screen_id": "SCR-0519",
         "route": "Transport\/transfer_cost_rules_config.php",
         "file": "Transport\/transfer_cost_rules_config.php",
         "surface_type": "SCREEN",
@@ -56317,7 +56600,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0517",
+        "screen_id": "SCR-0520",
         "route": "Transport\/transfer_dashboard.php",
         "file": "Transport\/transfer_dashboard.php",
         "surface_type": "SCREEN",
@@ -56373,7 +56656,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0518",
+        "screen_id": "SCR-0521",
         "route": "Transport\/transfer_fleet.php",
         "file": "Transport\/transfer_fleet.php",
         "surface_type": "SCREEN",
@@ -56460,7 +56743,7 @@
         "form_fields": 21
     },
     {
-        "screen_id": "SCR-0519",
+        "screen_id": "SCR-0522",
         "route": "Transport\/transfer_in_transit.php",
         "file": "Transport\/transfer_in_transit.php",
         "surface_type": "SCREEN",
@@ -56547,7 +56830,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0520",
+        "screen_id": "SCR-0523",
         "route": "Transport\/transfer_in_transit.php#2",
         "file": "Transport\/transfer_in_transit.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -56582,7 +56865,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0521",
+        "screen_id": "SCR-0524",
         "route": "Transport\/transfer_order_form.php",
         "file": "Transport\/transfer_order_form.php",
         "surface_type": "SCREEN",
@@ -56616,7 +56899,7 @@
         "form_fields": 42
     },
     {
-        "screen_id": "SCR-0522",
+        "screen_id": "SCR-0525",
         "route": "Transport\/transfer_orders_list.php",
         "file": "Transport\/transfer_orders_list.php",
         "surface_type": "SCREEN",
@@ -56817,7 +57100,7 @@
         "form_fields": 2
     },
     {
-        "screen_id": "SCR-0523",
+        "screen_id": "SCR-0526",
         "route": "Transport\/transfer_permits.php",
         "file": "Transport\/transfer_permits.php",
         "surface_type": "SCREEN",
@@ -56904,7 +57187,7 @@
         "form_fields": 20
     },
     {
-        "screen_id": "SCR-0524",
+        "screen_id": "SCR-0527",
         "route": "Transport\/transfer_requests.php",
         "file": "Transport\/transfer_requests.php",
         "surface_type": "SCREEN",
@@ -57136,7 +57419,7 @@
         "form_fields": 11
     },
     {
-        "screen_id": "SCR-0525",
+        "screen_id": "SCR-0528",
         "route": "Transport\/transfer_requests.php#2",
         "file": "Transport\/transfer_requests.php#2",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -57148,8 +57431,8 @@
         "names_all": [
             "طلبات الترحيل"
         ],
-        "owner_dept": "UNKNOWN",
-        "owner_basis": "NONE",
+        "owner_dept": "النقل والترحيل",
+        "owner_basis": "RULING",
         "workspaces": [],
         "roles_nav": {
             "ادارة التشغيل": [
@@ -57171,7 +57454,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0526",
+        "screen_id": "SCR-0529",
         "route": "Transport\/transfer_tariffs.php",
         "file": "Transport\/transfer_tariffs.php",
         "surface_type": "SCREEN",
@@ -57270,7 +57553,7 @@
         "form_fields": 17
     },
     {
-        "screen_id": "SCR-0527",
+        "screen_id": "SCR-0530",
         "route": "Transport\/transfer_types_config.php",
         "file": "Transport\/transfer_types_config.php",
         "surface_type": "SCREEN",
@@ -57325,7 +57608,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0528",
+        "screen_id": "SCR-0531",
         "route": "Transport\/trs_locations_config.php",
         "file": "Transport\/trs_locations_config.php",
         "surface_type": "SCREEN",
@@ -57380,7 +57663,7 @@
         "form_fields": 5
     },
     {
-        "screen_id": "SCR-0529",
+        "screen_id": "SCR-0532",
         "route": "Workforce\/contract_registry.php",
         "file": "Workforce\/contract_registry.php",
         "surface_type": "SCREEN",
@@ -57530,7 +57813,7 @@
         "form_fields": 50
     },
     {
-        "screen_id": "SCR-0530",
+        "screen_id": "SCR-0533",
         "route": "Workforce\/deductions.php",
         "file": "Workforce\/deductions.php",
         "surface_type": "SCREEN",
@@ -57640,7 +57923,7 @@
         "form_fields": 30
     },
     {
-        "screen_id": "SCR-0531",
+        "screen_id": "SCR-0534",
         "route": "Workforce\/employee_advances.php",
         "file": "Workforce\/employee_advances.php",
         "surface_type": "SCREEN",
@@ -57751,7 +58034,7 @@
         "form_fields": 13
     },
     {
-        "screen_id": "SCR-0532",
+        "screen_id": "SCR-0535",
         "route": "Workforce\/employee_settlements.php",
         "file": "Workforce\/employee_settlements.php",
         "surface_type": "SCREEN",
@@ -57859,7 +58142,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0533",
+        "screen_id": "SCR-0536",
         "route": "Workforce\/final_settlement.php",
         "file": "Workforce\/final_settlement.php",
         "surface_type": "SCREEN",
@@ -57969,7 +58252,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0534",
+        "screen_id": "SCR-0537",
         "route": "Workforce\/gov_dept_hrm.php",
         "file": "Workforce\/gov_dept_hrm.php",
         "surface_type": "SCREEN",
@@ -58053,7 +58336,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0535",
+        "screen_id": "SCR-0538",
         "route": "Workforce\/gov_dept_wrk.php",
         "file": "Workforce\/gov_dept_wrk.php",
         "surface_type": "SCREEN",
@@ -58137,7 +58420,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0536",
+        "screen_id": "SCR-0539",
         "route": "Workforce\/housing_units.php",
         "file": "Workforce\/housing_units.php",
         "surface_type": "SCREEN",
@@ -58247,7 +58530,7 @@
         "form_fields": 7
     },
     {
-        "screen_id": "SCR-0537",
+        "screen_id": "SCR-0540",
         "route": "Workforce\/op_codes.php",
         "file": "Workforce\/op_codes.php",
         "surface_type": "SCREEN",
@@ -58336,7 +58619,7 @@
         "form_fields": 17
     },
     {
-        "screen_id": "SCR-0538",
+        "screen_id": "SCR-0541",
         "route": "Workforce\/op_monthly.php",
         "file": "Workforce\/op_monthly.php",
         "surface_type": "SCREEN",
@@ -58446,7 +58729,7 @@
         "form_fields": 22
     },
     {
-        "screen_id": "SCR-0539",
+        "screen_id": "SCR-0542",
         "route": "Workforce\/op_qual.php",
         "file": "Workforce\/op_qual.php",
         "surface_type": "SCREEN",
@@ -58558,7 +58841,7 @@
         "form_fields": 19
     },
     {
-        "screen_id": "SCR-0540",
+        "screen_id": "SCR-0543",
         "route": "Workforce\/payroll_runs.php",
         "file": "Workforce\/payroll_runs.php",
         "surface_type": "SCREEN",
@@ -58719,7 +59002,7 @@
         "form_fields": 13
     },
     {
-        "screen_id": "SCR-0541",
+        "screen_id": "SCR-0544",
         "route": "Workforce\/project_contracts.php",
         "file": "Workforce\/project_contracts.php",
         "surface_type": "SCREEN",
@@ -58829,7 +59112,7 @@
         "form_fields": 27
     },
     {
-        "screen_id": "SCR-0542",
+        "screen_id": "SCR-0545",
         "route": "Workforce\/proposed_deductions.php",
         "file": "Workforce\/proposed_deductions.php",
         "surface_type": "SCREEN",
@@ -58941,7 +59224,7 @@
         "form_fields": 6
     },
     {
-        "screen_id": "SCR-0543",
+        "screen_id": "SCR-0546",
         "route": "Workforce\/recruitment_pipeline.php",
         "file": "Workforce\/recruitment_pipeline.php",
         "surface_type": "SCREEN",
@@ -59051,7 +59334,7 @@
         "form_fields": 14
     },
     {
-        "screen_id": "SCR-0544",
+        "screen_id": "SCR-0547",
         "route": "Workforce\/rotation.php",
         "file": "Workforce\/rotation.php",
         "surface_type": "SCREEN",
@@ -59138,7 +59421,7 @@
         "form_fields": 28
     },
     {
-        "screen_id": "SCR-0545",
+        "screen_id": "SCR-0548",
         "route": "Workforce\/worker_contract.php",
         "file": "Workforce\/worker_contract.php",
         "surface_type": "SCREEN",
@@ -59193,7 +59476,7 @@
         "form_fields": 24
     },
     {
-        "screen_id": "SCR-0546",
+        "screen_id": "SCR-0549",
         "route": "Workforce\/worker_evaluation.php",
         "file": "Workforce\/worker_evaluation.php",
         "surface_type": "SCREEN",
@@ -59280,7 +59563,7 @@
         "form_fields": 22
     },
     {
-        "screen_id": "SCR-0547",
+        "screen_id": "SCR-0550",
         "route": "Workforce\/worker_leave_absence.php",
         "file": "Workforce\/worker_leave_absence.php",
         "surface_type": "SCREEN",
@@ -59428,7 +59711,7 @@
         "form_fields": 14
     },
     {
-        "screen_id": "SCR-0548",
+        "screen_id": "SCR-0551",
         "route": "Workforce\/worker_movement.php",
         "file": "Workforce\/worker_movement.php",
         "surface_type": "SCREEN",
@@ -59538,7 +59821,7 @@
         "form_fields": 22
     },
     {
-        "screen_id": "SCR-0549",
+        "screen_id": "SCR-0552",
         "route": "Workforce\/worker_register.php",
         "file": "Workforce\/worker_register.php",
         "surface_type": "SCREEN",
@@ -59593,7 +59876,7 @@
         "form_fields": 28
     },
     {
-        "screen_id": "SCR-0550",
+        "screen_id": "SCR-0553",
         "route": "Workforce\/worker_settlement.php",
         "file": "Workforce\/worker_settlement.php",
         "surface_type": "SCREEN",
@@ -59648,7 +59931,7 @@
         "form_fields": 15
     },
     {
-        "screen_id": "SCR-0551",
+        "screen_id": "SCR-0554",
         "route": "Workforce\/worker_worklog.php",
         "file": "Workforce\/worker_worklog.php",
         "surface_type": "SCREEN",
@@ -59703,7 +59986,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0552",
+        "screen_id": "SCR-0555",
         "route": "Workforce\/workforce_requirement.php",
         "file": "Workforce\/workforce_requirement.php",
         "surface_type": "SCREEN",
@@ -59758,7 +60041,7 @@
         "form_fields": 13
     },
     {
-        "screen_id": "SCR-0553",
+        "screen_id": "SCR-0556",
         "route": "admin\/companies\/action.php",
         "file": "admin\/companies\/action.php",
         "surface_type": "HANDLER",
@@ -59783,7 +60066,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0554",
+        "screen_id": "SCR-0557",
         "route": "admin\/cron_backup.php",
         "file": "admin\/cron_backup.php",
         "surface_type": "CRON",
@@ -59808,7 +60091,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0555",
+        "screen_id": "SCR-0558",
         "route": "admin\/dashboard.php",
         "file": "admin\/dashboard.php",
         "surface_type": "ENTRY",
@@ -59833,7 +60116,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0556",
+        "screen_id": "SCR-0559",
         "route": "admin\/forgot_password.php",
         "file": "admin\/forgot_password.php",
         "surface_type": "HANDLER",
@@ -59858,7 +60141,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0557",
+        "screen_id": "SCR-0560",
         "route": "admin\/includes\/auth.php",
         "file": "admin\/includes\/auth.php",
         "surface_type": "HANDLER",
@@ -59883,7 +60166,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0558",
+        "screen_id": "SCR-0561",
         "route": "admin\/index.php",
         "file": "admin\/index.php",
         "surface_type": "ENTRY",
@@ -59908,7 +60191,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0559",
+        "screen_id": "SCR-0562",
         "route": "admin\/login.php",
         "file": "admin\/login.php",
         "surface_type": "HANDLER",
@@ -59933,7 +60216,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0560",
+        "screen_id": "SCR-0563",
         "route": "admin\/logout.php",
         "file": "admin\/logout.php",
         "surface_type": "ENTRY",
@@ -59958,7 +60241,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0561",
+        "screen_id": "SCR-0564",
         "route": "admin\/managers.php",
         "file": "admin\/managers.php",
         "surface_type": "HANDLER",
@@ -59983,7 +60266,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0562",
+        "screen_id": "SCR-0565",
         "route": "admin\/ops_manager_board.php",
         "file": "admin\/ops_manager_board.php",
         "surface_type": "SCREEN",
@@ -60038,7 +60321,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0563",
+        "screen_id": "SCR-0566",
         "route": "admin\/org_assignments.php",
         "file": "admin\/org_assignments.php",
         "surface_type": "SCREEN",
@@ -60217,7 +60500,7 @@
         "form_fields": 14
     },
     {
-        "screen_id": "SCR-0564",
+        "screen_id": "SCR-0567",
         "route": "admin\/org_permits.php",
         "file": "admin\/org_permits.php",
         "surface_type": "SCREEN",
@@ -60342,7 +60625,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0565",
+        "screen_id": "SCR-0568",
         "route": "admin\/org_structure.php",
         "file": "admin\/org_structure.php",
         "surface_type": "SCREEN",
@@ -60506,7 +60789,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0566",
+        "screen_id": "SCR-0569",
         "route": "admin\/permissions\/index.php",
         "file": "admin\/permissions\/index.php",
         "surface_type": "ENTRY",
@@ -60531,7 +60814,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0567",
+        "screen_id": "SCR-0570",
         "route": "admin\/permissions\/link_groups.php",
         "file": "admin\/permissions\/link_groups.php",
         "surface_type": "HANDLER",
@@ -60556,7 +60839,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0568",
+        "screen_id": "SCR-0571",
         "route": "admin\/permissions\/modules.php",
         "file": "admin\/permissions\/modules.php",
         "surface_type": "HANDLER",
@@ -60581,7 +60864,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0569",
+        "screen_id": "SCR-0572",
         "route": "admin\/permissions\/nav_items.php",
         "file": "admin\/permissions\/nav_items.php",
         "surface_type": "HANDLER",
@@ -60606,7 +60889,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0570",
+        "screen_id": "SCR-0573",
         "route": "admin\/permissions\/role_permissions.php",
         "file": "admin\/permissions\/role_permissions.php",
         "surface_type": "HANDLER",
@@ -60631,7 +60914,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0571",
+        "screen_id": "SCR-0574",
         "route": "admin\/permissions\/roles.php",
         "file": "admin\/permissions\/roles.php",
         "surface_type": "HANDLER",
@@ -60656,7 +60939,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0572",
+        "screen_id": "SCR-0575",
         "route": "admin\/permissions\/screen_guide.php",
         "file": "admin\/permissions\/screen_guide.php",
         "surface_type": "HANDLER",
@@ -60681,7 +60964,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0573",
+        "screen_id": "SCR-0576",
         "route": "admin\/plans.php",
         "file": "admin\/plans.php",
         "surface_type": "HANDLER",
@@ -60706,7 +60989,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0574",
+        "screen_id": "SCR-0577",
         "route": "admin\/reset_password.php",
         "file": "admin\/reset_password.php",
         "surface_type": "HANDLER",
@@ -60731,7 +61014,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0575",
+        "screen_id": "SCR-0578",
         "route": "admin\/sec_employee_wizard.php",
         "file": "admin\/sec_employee_wizard.php",
         "surface_type": "SCREEN",
@@ -60786,7 +61069,7 @@
         "form_fields": 14
     },
     {
-        "screen_id": "SCR-0576",
+        "screen_id": "SCR-0579",
         "route": "admin\/sec_governance.php",
         "file": "admin\/sec_governance.php",
         "surface_type": "SCREEN",
@@ -60873,7 +61156,7 @@
         "form_fields": 9
     },
     {
-        "screen_id": "SCR-0577",
+        "screen_id": "SCR-0580",
         "route": "admin\/sec_governance.php?view=v001c44",
         "file": "admin\/sec_governance.php",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -60908,7 +61191,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0578",
+        "screen_id": "SCR-0581",
         "route": "admin\/settings.php",
         "file": "admin\/settings.php",
         "surface_type": "HANDLER",
@@ -60933,7 +61216,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0579",
+        "screen_id": "SCR-0582",
         "route": "admin\/subscriptions\/requests.php",
         "file": "admin\/subscriptions\/requests.php",
         "surface_type": "HANDLER",
@@ -60958,7 +61241,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0580",
+        "screen_id": "SCR-0583",
         "route": "admin\/support\/view.php",
         "file": "admin\/support\/view.php",
         "surface_type": "HANDLER",
@@ -60983,7 +61266,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0581",
+        "screen_id": "SCR-0584",
         "route": "admin\/update_permission_quick.php",
         "file": "admin\/update_permission_quick.php",
         "surface_type": "HANDLER",
@@ -61008,7 +61291,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0582",
+        "screen_id": "SCR-0585",
         "route": "api\/bootstrap.php",
         "file": "api\/bootstrap.php",
         "surface_type": "HANDLER",
@@ -61033,7 +61316,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0583",
+        "screen_id": "SCR-0586",
         "route": "api\/index.php",
         "file": "api\/index.php",
         "surface_type": "ENTRY",
@@ -61058,7 +61341,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0584",
+        "screen_id": "SCR-0587",
         "route": "chats\/index.php",
         "file": "chats\/index.php",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -61631,7 +61914,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0585",
+        "screen_id": "SCR-0588",
         "route": "company\/forgot_password.php",
         "file": "company\/forgot_password.php",
         "surface_type": "HANDLER",
@@ -61656,7 +61939,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0586",
+        "screen_id": "SCR-0589",
         "route": "company\/login.php",
         "file": "company\/login.php",
         "surface_type": "HANDLER",
@@ -61681,7 +61964,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0587",
+        "screen_id": "SCR-0590",
         "route": "company\/logout.php",
         "file": "company\/logout.php",
         "surface_type": "ENTRY",
@@ -61706,7 +61989,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0588",
+        "screen_id": "SCR-0591",
         "route": "company\/register.php",
         "file": "company\/register.php",
         "surface_type": "HANDLER",
@@ -61731,7 +62014,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0589",
+        "screen_id": "SCR-0592",
         "route": "company\/request_subscription.php",
         "file": "company\/request_subscription.php",
         "surface_type": "HANDLER",
@@ -61756,7 +62039,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0590",
+        "screen_id": "SCR-0593",
         "route": "company\/team.php",
         "file": "company\/team.php",
         "surface_type": "HANDLER",
@@ -61781,7 +62064,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0591",
+        "screen_id": "SCR-0594",
         "route": "config.php",
         "file": "config.php",
         "surface_type": "HANDLER",
@@ -61806,7 +62089,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0592",
+        "screen_id": "SCR-0595",
         "route": "cron_events.php",
         "file": "cron_events.php",
         "surface_type": "CRON",
@@ -61831,7 +62114,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0593",
+        "screen_id": "SCR-0596",
         "route": "cron_jobs.php",
         "file": "cron_jobs.php",
         "surface_type": "CRON",
@@ -61856,7 +62139,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0594",
+        "screen_id": "SCR-0597",
         "route": "cron_proc_replenish.php",
         "file": "cron_proc_replenish.php",
         "surface_type": "CRON",
@@ -61881,7 +62164,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0595",
+        "screen_id": "SCR-0598",
         "route": "cron_requests.php",
         "file": "cron_requests.php",
         "surface_type": "CRON",
@@ -61906,7 +62189,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0596",
+        "screen_id": "SCR-0599",
         "route": "emsreports\/index.php",
         "file": "emsreports\/index.php",
         "surface_type": "SCREEN_SUBSYSTEM",
@@ -62407,7 +62690,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0597",
+        "screen_id": "SCR-0600",
         "route": "excel.php",
         "file": "excel.php",
         "surface_type": "HANDLER",
@@ -62432,7 +62715,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0598",
+        "screen_id": "SCR-0601",
         "route": "index.php",
         "file": "index.php",
         "surface_type": "ENTRY",
@@ -62457,7 +62740,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0599",
+        "screen_id": "SCR-0602",
         "route": "inheader.php",
         "file": "inheader.php",
         "surface_type": "SCREEN",
@@ -62482,7 +62765,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0600",
+        "screen_id": "SCR-0603",
         "route": "login.php",
         "file": "login.php",
         "surface_type": "HANDLER",
@@ -62507,7 +62790,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0601",
+        "screen_id": "SCR-0604",
         "route": "logout.php",
         "file": "logout.php",
         "surface_type": "ENTRY",
@@ -62532,7 +62815,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0602",
+        "screen_id": "SCR-0605",
         "route": "main\/all_assistants.php",
         "file": "main\/all_assistants.php",
         "surface_type": "SCREEN",
@@ -62619,7 +62902,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0603",
+        "screen_id": "SCR-0606",
         "route": "main\/check_username_availability.php",
         "file": "main\/check_username_availability.php",
         "surface_type": "HANDLER",
@@ -62644,7 +62927,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0604",
+        "screen_id": "SCR-0607",
         "route": "main\/dashboard.php",
         "file": "main\/dashboard.php",
         "surface_type": "SCREEN",
@@ -62930,7 +63213,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0605",
+        "screen_id": "SCR-0608",
         "route": "main\/global_search.php",
         "file": "main\/global_search.php",
         "surface_type": "SCREEN",
@@ -63361,7 +63644,7 @@
         "form_fields": 1
     },
     {
-        "screen_id": "SCR-0606",
+        "screen_id": "SCR-0609",
         "route": "main\/glossary.php",
         "file": "main\/glossary.php",
         "surface_type": "SCREEN",
@@ -63457,7 +63740,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0607",
+        "screen_id": "SCR-0610",
         "route": "main\/my_workspace.php",
         "file": "main\/my_workspace.php",
         "surface_type": "SCREEN",
@@ -64059,7 +64342,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0608",
+        "screen_id": "SCR-0611",
         "route": "main\/profile.php",
         "file": "main\/profile.php",
         "surface_type": "SCREEN",
@@ -64449,7 +64732,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0609",
+        "screen_id": "SCR-0612",
         "route": "main\/project_users.php",
         "file": "main\/project_users.php",
         "surface_type": "SCREEN",
@@ -64930,7 +65213,7 @@
         "form_fields": 8
     },
     {
-        "screen_id": "SCR-0610",
+        "screen_id": "SCR-0613",
         "route": "main\/role_board.php",
         "file": "main\/role_board.php",
         "surface_type": "SCREEN",
@@ -65283,7 +65566,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0611",
+        "screen_id": "SCR-0614",
         "route": "main\/soon.php",
         "file": "main\/soon.php",
         "surface_type": "SCREEN",
@@ -65559,7 +65842,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0612",
+        "screen_id": "SCR-0615",
         "route": "main\/user_profile.php",
         "file": "main\/user_profile.php",
         "surface_type": "SCREEN",
@@ -65835,7 +66118,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0613",
+        "screen_id": "SCR-0616",
         "route": "main\/users.php",
         "file": "main\/users.php",
         "surface_type": "SCREEN",
@@ -65952,7 +66235,7 @@
         "form_fields": 11
     },
     {
-        "screen_id": "SCR-0614",
+        "screen_id": "SCR-0617",
         "route": "movement\/add_drivers.php",
         "file": "movement\/add_drivers.php",
         "surface_type": "SCREEN",
@@ -66074,7 +66357,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0615",
+        "screen_id": "SCR-0618",
         "route": "movement\/client_tree.php",
         "file": "movement\/client_tree.php",
         "surface_type": "SCREEN",
@@ -66172,7 +66455,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0616",
+        "screen_id": "SCR-0619",
         "route": "movement\/map_page.php",
         "file": "movement\/map_page.php",
         "surface_type": "SCREEN",
@@ -66235,7 +66518,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0617",
+        "screen_id": "SCR-0620",
         "route": "movement\/move_oprators.php",
         "file": "movement\/move_oprators.php",
         "surface_type": "SCREEN",
@@ -66285,7 +66568,7 @@
         "form_fields": 19
     },
     {
-        "screen_id": "SCR-0618",
+        "screen_id": "SCR-0621",
         "route": "movement\/movement_operations.php",
         "file": "movement\/movement_operations.php",
         "surface_type": "SCREEN",
@@ -66348,7 +66631,7 @@
         "form_fields": 4
     },
     {
-        "screen_id": "SCR-0619",
+        "screen_id": "SCR-0622",
         "route": "movement\/project_drivers.php",
         "file": "movement\/project_drivers.php",
         "surface_type": "SCREEN",
@@ -66390,7 +66673,7 @@
         "form_fields": 16
     },
     {
-        "screen_id": "SCR-0620",
+        "screen_id": "SCR-0623",
         "route": "movement\/save_equipment_drivers.php",
         "file": "movement\/save_equipment_drivers.php",
         "surface_type": "HANDLER",
@@ -66415,7 +66698,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0621",
+        "screen_id": "SCR-0624",
         "route": "movement\/update_operation_shift_type.php",
         "file": "movement\/update_operation_shift_type.php",
         "surface_type": "HANDLER",
@@ -66440,7 +66723,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0622",
+        "screen_id": "SCR-0625",
         "route": "movement\/update_shift_type.php",
         "file": "movement\/update_shift_type.php",
         "surface_type": "HANDLER",
@@ -66465,7 +66748,7 @@
         "form_fields": 0
     },
     {
-        "screen_id": "SCR-0623",
+        "screen_id": "SCR-0626",
         "route": "user_capacities.php",
         "file": "user_capacities.php",
         "surface_type": "SCREEN",
