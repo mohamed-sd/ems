@@ -62,7 +62,7 @@ if (!function_exists('ems_entity_tabs')) {
                 'label' => 'ملفُّ التسوية',
                 'tabs' => array(
                     'التسوياتُ وكشفُ الحساب' => 'Suppliers/settlements.php',
-                    'الاستحقاقات' => '',                        /* SUP-18 — يُبنى */
+                    'الاستحقاقات' => 'Suppliers/supplier_entitlements.php',
                     'السلفُ والنيابية' => 'Suppliers/supplier_advances.php',
                     'المخالفاتُ والجزاءات' => 'Suppliers/supplier_violations.php',
                     'طلباتُ الدفعِ وحالةُ الصرف' => 'Finance/payments_fin.php',

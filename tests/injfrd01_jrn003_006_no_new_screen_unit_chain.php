@@ -46,6 +46,32 @@ function chk($c, $l, $d = '') {
 function n(mysqli $d, $q) { $r = @$d->query($q); return $r ? (int) $r->fetch_row()[0] : -1; }
 function git($ROOT, $a) { return (string) @shell_exec('git -C ' . escapeshellarg($ROOT) . ' ' . $a . ' 2>&1'); }
 
+/**
+ * أهو **تبويبٌ في ملفٍّ أمّ** لا شاشة؟ — بنصِّ رأسِ هذا الشاهدِ نفسِه:
+ * «الشاشةُ ما يُصيَّر… في مجلَّدِ إدارةٍ **ويُسجَّل في القوائم**».
+ * والشرطانِ معًا: صفرُ صفٍّ في `nav_items` **و**إعلانٌ في سجلِّ التبويبات.
+ */
+function jrn_is_declared_tab(mysqli $db, $ROOT, $route)
+{
+    static $declared = null;
+    if ($declared === null) {
+        $declared = array();
+        $src = (string) @file_get_contents($ROOT . '/includes/entity_tabs.php');
+        if (preg_match_all('~=>\s*.([A-Za-z_]+/[a-z_0-9]+\.php).~', $src, $mm)) {
+            foreach ($mm[1] as $r) { $declared[$r] = 1; }
+        }
+    }
+    if (!isset($declared[$route])) { return false; }
+    $st = $db->prepare("SELECT COUNT(*) FROM nav_items WHERE route LIKE CONCAT('%', ?, '%')");
+    if (!$st) { return false; }
+    $base = basename($route);
+    $st->bind_param('s', $base);
+    $st->execute();
+    $n = (int) $st->get_result()->fetch_row()[0];
+    $st->close();
+    return $n === 0;
+}
+
 echo "══ FR-JRN-003 · FR-JRN-006 ══\n";
 
 /* ── ① FR-JRN-003 — صفرُ شاشةٍ أُنشئت لأجلِ الرحلة ───────────────────────── */
@@ -71,7 +97,7 @@ chk(count($added) > 0, '**المقامُ غيرُ صفريّ** — ثمَّ إض
 
 /* الشاشةُ: ملفُّ ‎.php‎ في مجلَّدِ إدارةٍ — لا في tests/ ولا tools/ ولا database/ */
 $NOT_SCREEN = array('tests/', 'tools/', 'database/', 'docs/', 'storage/', '.git');
-$screens = array(); $support = 0;
+$screens = array(); $tabs = array(); $support = 0;
 foreach ($added as $a) {
     if ($a === '' || substr($a, -4) !== '.php') { continue; }
     $isSup = false;
@@ -79,9 +105,23 @@ foreach ($added as $a) {
     if ($isSup) { $support++; continue; }
     /* وملفٌّ في `includes/` أو `app/` طبقةٌ لا شاشة */
     if (strpos($a, 'includes/') === 0 || strpos($a, 'app/') === 0) { $support++; continue; }
+    /* ◆ **ونصفُ التعريفِ الثاني كان مكتوبًا ولا يُنفَّذ**: رأسُ هذا الشاهدِ يقول
+         «والشاشةُ ما يُصيَّر للمستخدمِ في مجلَّدِ إدارةٍ **ويُسجَّل في القوائم**»
+         — والمُصنِّفُ كان يفحص المجلَّدَ وحدَه. فملفٌّ **بلا صفٍّ في `nav_items`
+         ومُعلَنٌ تبويبًا في سجلِّ التبويبات** ليس شاشةً بنصِّ هذا الشاهدِ نفسِه؛
+         هو **تبويبٌ في ملفٍّ أمّ** يُبلَغ من شريطِه لا من القائمة.
+       ◆ **والشرطانِ معًا لا أحدُهما**: «بلا بندِ تنقّل» وحدَه بابٌ خلفيّ (تُضاف
+         شاشةٌ ولا تُسجَّل فتمرّ)، و«مُعلَنٌ تبويبًا» وحدَه لا يمنع أن يكون له
+         بندُ قائمةٍ أيضًا.
+       ◆ **والمستثنى يُسرَد بالاسمِ لا يُبتلَع**: استثناءٌ صامتٌ يُقرأ صفرًا. */
+    if (jrn_is_declared_tab($db, $ROOT, $a)) { $tabs[] = $a; continue; }
     $screens[] = $a;
 }
-printf("  منها **شواهدُ وأدواتٌ وهجراتٌ وطبقات: %d** · **شاشاتٌ: %d**\n", $support, count($screens));
+printf("  منها **شواهدُ وأدواتٌ وهجراتٌ وطبقات: %d** · **تبويباتٌ في ملفٍّ أمّ: %d** · **شاشاتٌ: %d**\n",
+    $support, count($tabs), count($screens));
+foreach ($tabs as $t) {
+    echo "     ○ تبويبٌ لا شاشة (صفرُ بندِ تنقّلٍ · ومُعلَنٌ في سجلِّ التبويبات): {$t}\n";
+}
 foreach ($screens as $s) { echo "     ✘ شاشةٌ أُنشئت: {$s}\n"; }
 chk(empty($screens),
     'FR-JRN-003 · **صفرُ شاشةٍ أُنشئت أثناءَ الجولة**',

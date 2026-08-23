@@ -437,6 +437,10 @@ class TenantRegistry
         // M-41 (SPEC-01 #22): الإقرارُ الضريبيُّ الدوريُّ بمفتاح الفترة.
         'fin_tax_returns' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_tax_transactions' => array('type' => self::T_TENANT, 'soft' => true),
+        // INJ-FRD-01 · SUP-18: دفترُ الاستحقاقاتِ — يحمل `company_id` ولا
+        // `is_deleted` (الاستحقاقُ يُعكَس بحالةٍ `reversed` لا يُمحى)، فـsoft=false.
+        // وكان **غائبًا عن السجلِّ كلِّه** فردَّت البوابةُ 500 لأوَّلِ قارئٍ له.
+        'fin_entitlements' => array('type' => self::T_TENANT, 'soft' => false),
         'fin_unit_records' => array('type' => self::T_TENANT, 'soft' => true),
         'fin_units' => array('type' => self::T_TENANT, 'soft' => true),
         'fleet_depreciation_profile' => array('type' => self::T_TENANT, 'soft' => true),
