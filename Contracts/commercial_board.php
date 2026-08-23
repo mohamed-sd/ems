@@ -42,7 +42,20 @@ $gate = $is_super_admin ? ems_tenant_db()->forAllTenants('board super') : ems_te
 $ALL  = isset($_GET['all']) && $_GET['all'] === '1';
 
 $rows = CBD::board($gate, !$ALL, 100);
+/* ◆ **INJ-FRD-01 · SAL-20 — «كلُّ مؤشرٍ له مصدرٌ قابلٌ للنقر»**: رقمٌ لا يُفضي
+     إلى مصدرِه **يُصدَّق ولا يُراجَع** — ولوحةٌ بلا نفاذٍ لوحةُ إعلانٍ لا إدارة.
+   ◆ **والمجاميعُ تُحسَب قبلَ التصفية**: لو حُسبت بعدَها لاختفت بطاقاتُ العملاتِ
+     الأخرى بأوَّلِ نقرة — **فيصير مصدرُ المؤشرِ يمحو المؤشراتِ المجاورة**، ولا
+     يبقى للزائرِ بابٌ يعود منه. */
 $tot  = CBD::totals($rows);
+$CUR  = isset($_GET['cur']) ? trim((string) $_GET['cur']) : '';
+if ($CUR !== '' && isset($tot[$CUR])) {
+    $rows = array_values(array_filter($rows, static function ($r) use ($CUR) {
+        return (string) $r['currency'] === $CUR;
+    }));
+} else {
+    $CUR = '';   /* عملةٌ غيرُ موجودةٍ لا تُصفّي شيئًا ولا تبقى في الرابط */
+}
 $cl   = CBD::closureCheck($gate);
 $GAPS = CBD::GAP_OWNERS;
 $STATE_AR = CBS::STATE_AR;
@@ -76,6 +89,11 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     .cb-totals{display:flex;gap:12px;flex-wrap:wrap}
     .cb-total-card{border:1px solid var(--c-d1d5db, #d1d5db);border-radius:8px;padding:12px 18px;min-width:280px}
     .cb-total-cur{font-weight:700;margin-bottom:6px}
+    /* SAL-20: المؤشرُ بابٌ لا لافتة — ويُرى أنَّه باب */
+    .cb-total-link{color:inherit;text-decoration:none;border-bottom:1px dashed currentColor}
+    .cb-total-link:hover,.cb-total-link:focus{text-decoration:none;opacity:.75}
+    .cb-total-on{border-color:var(--c-2563eb, #2563eb);box-shadow:0 0 0 1px var(--c-2563eb, #2563eb) inset}
+    .cb-drill{text-decoration:none;border-bottom:1px dashed currentColor}
     .cb-table{width:100%}
     .cb-row-review{background:var(--c-fff7ed, #fff7ed)}
     .cb-wrap{white-space:normal}
@@ -107,10 +125,17 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
     <div class="card"><div class="card-header"><h5><i class="fa fa-calculator"></i>
         المجاميع — <strong>بعملةٍ عملة، ولا تُجمع عملتان</strong></h5></div>
     <div class="card-body"><div class="cb-totals">
-        <?php foreach ($tot as $cur => $t): ?>
-            <div class="cb-total-card">
-                <div class="cb-total-cur"><?php echo htmlspecialchars((string)$cur); ?>
-                    — <?php echo intval($t['contracts']); ?> عقدًا</div>
+        <?php foreach ($tot as $cur => $t):
+            $curOn   = ((string)$cur === $CUR);
+            $curHref = '?all=' . ($ALL ? '1' : '0') . ($curOn ? '' : '&cur=' . rawurlencode((string)$cur));
+        ?>
+            <div class="cb-total-card<?php echo $curOn ? ' cb-total-on' : ''; ?>">
+                <div class="cb-total-cur">
+                    <a class="cb-total-link" href="<?php echo htmlspecialchars($curHref); ?>"
+                       title="<?php echo $curOn ? 'ارفع التصفية' : 'اعرض عقودَ هذه العملةِ وحدَها'; ?>"
+                    ><?php echo htmlspecialchars((string)$cur); ?>
+                        — <?php echo intval($t['contracts']); ?> عقدًا<?php
+                        echo $curOn ? ' ✕' : ' ↩'; ?></a></div>
                 <div>مخطَّط: <strong><?php echo $t['planned']; ?></strong></div>
                 <div>منفَّذ: <strong><?php echo $t['executed']; ?></strong></div>
                 <div>مفوتَر: <strong><?php echo $t['billed']; ?></strong></div>
@@ -144,7 +169,10 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             <tbody>
             <?php foreach ($rows as $r): ?>
                 <tr<?php echo $r['credible'] ? '' : " class='cb-row-review'"; ?>>
-                    <td>#<?php echo intval($r['contract_id']); ?></td>
+                    <td><a class="cb-drill"
+                           href="contracts_details.php?id=<?php echo intval($r['contract_id']); ?>"
+                           title="افتح ملفَّ العقدِ — مصدرُ أرقامِ هذا السطر"
+                        >#<?php echo intval($r['contract_id']); ?></a></td>
                     <td class="cb-wrap"><?php
                         echo htmlspecialchars((string)($r['second_party'] ?? '')); ?></td>
                     <td><?php echo htmlspecialchars((string)($r['contract_status'] ?? '')); ?></td>

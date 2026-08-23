@@ -19,11 +19,11 @@ $ROOT = dirname(__DIR__);
 require_once $ROOT . '/includes/conv_form_detect.php';
 $CONVERSATIONAL = ems_conv_pattern();
 
-$pass = 0; $fail = 0;
-$check = static function (string $label, string $s, bool $want) use ($CONVERSATIONAL, &$pass, &$fail): void {
+$nOk = 0; $nBad = 0;
+$check = static function (string $label, string $s, bool $want) use ($CONVERSATIONAL, &$nOk, &$nBad): void {
     $got = (bool) preg_match($CONVERSATIONAL, $s);
-    if ($got === $want) { $pass++; printf("   ✔ %-8s «%s»\n", $label, $s); }
-    else { $fail++; printf("   ✘ %-8s «%s» — توقّعتُ %s فجاء %s\n", $label, $s,
+    if ($got === $want) { $nOk++; printf("   ✔ %-8s «%s»\n", $label, $s); }
+    else { $nBad++; printf("   ✘ %-8s «%s» — توقّعتُ %s فجاء %s\n", $label, $s,
         $want ? 'رصدًا' : 'صمتًا', $got ? 'رصدًا' : 'صمتًا'); }
 };
 
@@ -51,8 +51,8 @@ while ($res && ($x = mysqli_fetch_assoc($res))) {
         if (preg_match($CONVERSATIONAL, (string) $x[$c])) { $hits[] = "#{$x['id']} {$c}=«{$x[$c]}»"; }
     }
 }
-if ($hits) { $fail++; printf("   ✘ %d إصابةً في الدفتر:\n", count($hits)); foreach ($hits as $h) { echo "      {$h}\n"; } }
-else { $pass++; echo "   ✔ صفرُ صيغةٍ محادثيةٍ في دفتر الدورة الحي\n"; }
+if ($hits) { $nBad++; printf("   ✘ %d إصابةً في الدفتر:\n", count($hits)); foreach ($hits as $h) { echo "      {$h}\n"; } }
+else { $nOk++; echo "   ✔ صفرُ صيغةٍ محادثيةٍ في دفتر الدورة الحي\n"; }
 
-printf("\n%s  ناجح %d · راسب %d\n", $fail === 0 ? '✔ XC-02①' : '✘ XC-02①', $pass, $fail);
-exit($fail === 0 ? 0 : 1);
+printf("\n%s  ناجح %d · راسب %d\n", $nBad === 0 ? '✔ XC-02①' : '✘ XC-02①', $nOk, $nBad);
+exit($nBad === 0 ? 0 : 1);

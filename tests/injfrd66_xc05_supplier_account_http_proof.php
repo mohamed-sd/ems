@@ -27,9 +27,9 @@ $ROOT = dirname(__DIR__);
 $BASE = 'http://localhost/ems';
 $PW   = '12345678';
 
-$pass = 0; $fail = 0;
-$check = static function (bool $ok, string $msg) use (&$pass, &$fail): void {
-    if ($ok) { $pass++; echo "   ✔ {$msg}\n"; } else { $fail++; echo "   ✘ {$msg}\n"; }
+$nOk = 0; $nBad = 0;
+$check = static function (bool $ok, string $msg) use (&$nOk, &$nBad): void {
+    if ($ok) { $nOk++; echo "   ✔ {$msg}\n"; } else { $nBad++; echo "   ✘ {$msg}\n"; }
 };
 
 /** طلبٌ بلا اتّباعِ تحويل — فتُقرأ ترويسةُ `Location` كما هي */
@@ -61,12 +61,12 @@ $acct = $res ? mysqli_fetch_assoc($res) : null;
 
 echo "① الحسابُ المقيسُ لدورِ إدارةِ الموردين:\n";
 if (!$acct) {
-    $fail++;
+    $nBad++;
     echo "   ✘ صفرُ حسابٍ نشطٍ للدورِ 2 — المعيارُ غيرُ مستوفٍ من أصلِه\n";
-    printf("\n✘ XC-05  ناجح %d · راسب %d\n", $pass, $fail);
+    printf("\n✘ XC-05  ناجح %d · راسب %d\n", $nOk, $nBad);
     exit(1);
 }
-$pass++;
+$nOk++;
 printf("   ✔ «%s» (%s · #%d · %s)\n", $acct['name'], $acct['username'], $acct['id'], $acct['status']);
 
 /* ── ② سالبٌ: كلمةُ مرورٍ خاطئةٍ تُمنع ───────────────────────────────── */
@@ -115,5 +115,5 @@ $check(($c3 >= 300 && $c3 < 400 && mb_strpos($loc3, 'login') !== false) || $c3 =
 @unlink($jarNone);
 @unlink($jar);
 
-printf("\n%s  ناجح %d · راسب %d\n", $fail === 0 ? '✔ XC-05' : '✘ XC-05', $pass, $fail);
-exit($fail === 0 ? 0 : 1);
+printf("\n%s  ناجح %d · راسب %d\n", $nBad === 0 ? '✔ XC-05' : '✘ XC-05', $nOk, $nBad);
+exit($nBad === 0 ? 0 : 1);
