@@ -74,6 +74,31 @@ foreach ($argv as $a) {
     echo "حُدِّث {$id}: {$pairs}\n";
 }
 
+/* ── ‎--measured: تحديثُ نصِّ القياسِ من سطر الأوامر ────────────────────
+   ◆ **ولماذا من الأداةِ لا باليد**: `measured` هو ما يشرح **لماذا** استقرَّت
+     البوابةُ على قيمتِها. وحكمٌ يتغيّر ونصُّه القديمُ باقٍ **يكذب بصمت** —
+     يقرؤه القادمُ فيظنُّ أنَّ القياسَ لم يُعَد. والملفُّ مولَّدٌ لا يُحرَّر يدًا.
+   الصيغة: --measured=SUP-14:النصُّ الجديد                                  */
+foreach ($argv as $a) {
+    if (!preg_match('/^--measured=([A-Z]{2,3}-\d{2}):(.+)$/us', $a, $m)) {
+        continue;
+    }
+    [$id, $txt] = [$m[1], $m[2]];
+    $hit = false;
+    foreach ($tasks as &$t) {
+        if ($t['id'] !== $id) { continue; }
+        $hit = true;
+        $t['measured'] = $txt;
+    }
+    unset($t);
+    if (!$hit) {
+        fwrite(STDERR, "متطلبٌ مجهول: {$id}\n");
+        exit(1);
+    }
+    file_put_contents($STATE, json_encode($tasks, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    echo "حُدِّث قياسُ {$id}\n";
+}
+
 /* ── الحساب ────────────────────────────────────────────────────────── */
 $n         = count($tasks);
 $sum       = 0.0;
