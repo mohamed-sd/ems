@@ -125,9 +125,14 @@ $measure('SAL-13', 'التزامٌ خارجَ مصفوفةِ عقدِه', array(
        WHERE o.is_deleted=0 AND NOT EXISTS (SELECT 1 FROM contracts c
               WHERE c.id=o.client_contract_id AND c.is_deleted=0)", 0);
 
-$measure('SAL-14', 'عقدٌ نافذٌ بلا خطِّ أساس', array('contracts', 'contract_baseline'),
+/* ◆ **و«نافذ» حالتان لا حالة**: التعدادُ يحمل «نافذ» **و«قيد التنفيذ»**، وعقدٌ
+     قيدَ التنفيذِ بلا خطِّ أساسٍ خرقٌ **أشدُّ** لا أخفّ — يُنفَّذ بلا مرجعٍ يُقاس
+     عليه. وقصرُ القياسِ على «نافذ» وحدَها كان يُبلغ **واحدًا وهي أربعة**.
+   ◆ ولا يُقاس هذا في بوابتَين: **قارئٌ واحدٌ لكلِّ معيار** — وعدّادانِ في
+     ملفَّين يتفرّقان بأوَّلِ تعديل. */
+$measure('SAL-14', 'عقدٌ نافذٌ أو قيدَ التنفيذِ بلا خطِّ أساس', array('contracts', 'contract_baseline'),
     "SELECT COUNT(*) FROM contracts c
-      WHERE c.is_deleted=0 AND c.contract_status IN ('active','نافذ','running')
+      WHERE c.is_deleted=0 AND c.contract_status IN ('active','running','نافذ','قيد التنفيذ')
         AND NOT EXISTS (SELECT 1 FROM contract_baseline b WHERE b.contract_id=c.id AND b.is_deleted=0)", 0);
 
 $measure('SAL-19', 'ملحقٌ بلا تاريخِ سريان', array('contract_amendments'),
