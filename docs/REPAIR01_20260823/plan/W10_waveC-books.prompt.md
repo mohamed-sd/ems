@@ -30,7 +30,27 @@ php tools/repair01_w9_gate.php
 **موضعُها من الترتيب:** قرارُ المالك DEC-OPEN-03 (معتمد): الحبّةُ `Legal Entity × Accounting Period` لا `System × Month`. و§23 يرتّب: Accounting Setup ← Subledgers ← Adjustments ← Reconciliations ← Trial Balance ← Closing Checklist ← Period Close ← Statements.
 
 ## ٣ · النطاقُ المقيسُ الآن
-لا مقامَ عدديًّا — مرحلةُ تجميعٍ وإصدار.
+**متطلَّباتُ هذه المرحلة: 43 · حقولُها: 636** — هذه قائمتُك الكاملة، لا تشتقَّ غيرَها.
+
+| الوحدة | المجموعة | # | المعرّفات |
+|---|---|---:|---|
+| 05 الإدارة المالية | الإقفال | 5 | `ACC-21 · ACC-22 · ACC-23 · ACC-24 · ACC-25` |
+| 05 الإدارة المالية | التأسيس المرجعي | 5 | `ACC-02 · ACC-03 · ACC-04 · ACC-05 · ACC-06` |
+| 05 الإدارة المالية | التسويات والمحاسبة العامة | 4 | `ACC-17 · ACC-18 · ACC-19 · ACC-20` |
+| 05 الإدارة المالية | الذمم الدائنة | 3 | `ACC-09 · ACC-10 · ACC-16` |
+| 05 الإدارة المالية | الذمم المدينة | 4 | `ACC-07 · ACC-08 · ACC-14 · ACC-15` |
+| 05 الإدارة المالية | القيد والدفتر | 3 | `ACC-11 · ACC-12 · ACC-13` |
+| 05 الإدارة المالية | اللوحة — خارج الدورة (Overview) | 1 | `ACC-01` |
+| 06 إدارة الخزينة | التأسيس | 2 | `TRS-02 · TRS-03` |
+| 06 إدارة الخزينة | التخطيط | 1 | `TRS-04` |
+| 06 إدارة الخزينة | الرقابة والإقفال | 6 | `TRS-13 · TRS-14 · TRS-15 · TRS-16 · TRS-17 · TRS-18` |
+| 06 إدارة الخزينة | اللوحة — خارج الدورة (Overview) | 1 | `TRS-01` |
+| 06 إدارة الخزينة | دورة الصرف | 5 | `TRS-08 · TRS-09 · TRS-10 · TRS-11 · TRS-12` |
+| 06 إدارة الخزينة | دورة القبض | 3 | `TRS-05 · TRS-06 · TRS-07` |
+
+```bash
+php tools/_uxw_probe.php "SELECT requirement_id,unit,surface,grain,source_of_truth FROM repair01_requirements WHERE stage_no=10 ORDER BY unit,seq"
+```
 
 > الأرقامُ مقيسةٌ لحظةَ التوليد. أعِدْ `php tools/repair01_plan_gen.php` إن مرّ وقتٌ طويل.
 

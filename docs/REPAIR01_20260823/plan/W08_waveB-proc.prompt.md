@@ -28,7 +28,24 @@ php tools/repair01_w7_gate.php
 **موضعُها من الترتيب:** §20: Header + Lines · PR · Package · RFQ · Invitations · Offer Lines · Evaluation · PO · Delivery · GRN · Store Receipt/Issue · Custody · Reorder.
 
 ## ٣ · النطاقُ المقيسُ الآن
-لا مقامَ عدديًّا — مرحلةُ تجميعٍ وإصدار.
+**متطلَّباتُ هذه المرحلة: 34 · حقولُها: 500** — هذه قائمتُك الكاملة، لا تشتقَّ غيرَها.
+
+| الوحدة | المجموعة | # | المعرّفات |
+|---|---|---:|---|
+| 16 إدارة المشتريات | الأمر والتوريد | 4 | `PRC-11 · PRC-12 · PRC-13 · PRC-14` |
+| 16 إدارة المشتريات | الطلب والتجميع | 4 | `PRC-02 · PRC-03 · PRC-04 · PRC-05` |
+| 16 إدارة المشتريات | العروض والترسية | 5 | `PRC-06 · PRC-07 · PRC-08 · PRC-09 · PRC-10` |
+| 16 إدارة المشتريات | اللوحة — خارج الدورة (Overview) | 1 | `PRC-01` |
+| 16 إدارة المشتريات | المطابقة والإقفال | 2 | `PRC-15 · PRC-16` |
+| 17 إدارة المخازن | التأسيس المرجعي | 2 | `WH-02 · WH-03` |
+| 17 إدارة المخازن | الرقابة والإقفال | 4 | `WH-15 · WH-16 · WH-17 · WH-18` |
+| 17 إدارة المخازن | اللوحة — خارج الدورة (Overview) | 1 | `WH-01` |
+| 17 إدارة المخازن | دورة الاستلام | 4 | `WH-04 · WH-05 · WH-06 · WH-07` |
+| 17 إدارة المخازن | دورة الصرف | 7 | `WH-08 · WH-09 · WH-10 · WH-11 · WH-12 · WH-13 · WH-14` |
+
+```bash
+php tools/_uxw_probe.php "SELECT requirement_id,unit,surface,grain,source_of_truth FROM repair01_requirements WHERE stage_no=8 ORDER BY unit,seq"
+```
 
 > الأرقامُ مقيسةٌ لحظةَ التوليد. أعِدْ `php tools/repair01_plan_gen.php` إن مرّ وقتٌ طويل.
 

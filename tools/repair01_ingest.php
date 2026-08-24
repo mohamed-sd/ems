@@ -284,7 +284,14 @@ foreach ($w10['04_مستهدف_غير_مبني'] as $ri => $r) {
 }
 $report['⑥ فجواتٌ مستهدفة'] = "$nG سطحًا";
 
-/* ═══ ⑦ المتطلَّبات ═══ */
+/* ═══ ⑦ المتطلَّبات ═══
+   ⚠ `stage_no` إسنادٌ **يعيش خارجَ الإكسل** — يضعه `repair01_stage_assign.php`.
+   والمسحُ وإعادةُ الإدراجِ يمحوه صامتًا، فتفقد ملفّاتُ المراحلِ نطاقَها وتُولَّد
+   «بلا مقامٍ عدديّ» وهي أخطرُ من الخطأِ الصريح. لذلك يُلتقَط قبل المسحِ ويُعاد
+   بعد الإدراج، والمتطلَّبُ الجديدُ يبقى NULL فتلتقطه البوّابةُ G0-12. */
+$keepStage = array();
+$rk = $conn->query("SELECT requirement_id, stage_no FROM repair01_requirements WHERE stage_no IS NOT NULL");
+if ($rk) { while ($x = $rk->fetch_assoc()) { $keepStage[$x['requirement_id']] = (int) $x['stage_no']; } }
 r01_q($conn, "DELETE FROM repair01_requirements");
 $nR = 0; $dupR = 0;
 foreach ($wb09['01_سجل_المتطلبات'] as $ri => $r) {
@@ -297,7 +304,15 @@ foreach ($wb09['01_سجل_المتطلبات'] as $ri => $r) {
         . r01_e($conn, r01_cell($r, 8)) . "','09 › 01_سجل_المتطلبات › ص" . ($ri + 1) . "')");
     if ($ok) { $nR++; } else { $dupR++; }
 }
-$report['⑦ المتطلَّبات'] = "$nR" . ($dupR ? " · مكرَّرٌ مرفوض $dupR" : '');
+/* إرجاعُ الإسنادِ الملتقَط */
+$restored = 0;
+foreach ($keepStage as $rid => $st) {
+    if (r01_q($conn, "UPDATE repair01_requirements SET stage_no=" . (int) $st
+        . " WHERE requirement_id='" . r01_e($conn, $rid) . "'")) { $restored += $conn->affected_rows; }
+}
+$stillNull = (int) $conn->query("SELECT COUNT(*) FROM repair01_requirements WHERE stage_no IS NULL")->fetch_row()[0];
+$report['⑦ المتطلَّبات'] = "$nR" . ($dupR ? " · مكرَّرٌ مرفوض $dupR" : '')
+    . " · إسنادٌ مُرجَع $restored" . ($stillNull ? " · ⚠ بلا مرحلة $stillNull — شغّلْ repair01_stage_assign.php" : " · بلا مرحلة 0");
 
 /* ═══ ⑧ الحقول ═══ */
 r01_q($conn, "DELETE FROM repair01_fields");

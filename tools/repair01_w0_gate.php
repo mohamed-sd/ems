@@ -149,6 +149,16 @@ gate($pass, $fail, $lines, 'G0-11', 'محورُ الحجبِ مصنَّفٌ وم
     "DEC-OPEN $openTot مصنَّفٌ $openTyped · STRUCTURAL $struct · THRESHOLD $thresh · عتبةٌ موسومةٌ بنيويّةً $badThresh",
     '18 · 18 · مجموعُهما 18 · 0');
 
+/* ── G0-12 إسنادُ المراحل: لا متطلَّبَ بلا مرحلة ──
+     الإسنادُ يعيش خارجَ الإكسل، فإعادةُ الاستيعابِ قد تمحوه صامتًا وتُولَّد
+     ملفّاتُ المراحلِ «بلا مقامٍ عدديّ» — وهو خطأٌ لا يصرخ. هذا الحاجبُ يصرخ. */
+$reqTot   = (int) one($conn, "SELECT COUNT(*) FROM repair01_requirements");
+$reqNull  = (int) one($conn, "SELECT COUNT(*) FROM repair01_requirements WHERE stage_no IS NULL");
+$reqStages = (int) one($conn, "SELECT COUNT(DISTINCT stage_no) FROM repair01_requirements WHERE stage_no IS NOT NULL");
+gate($pass, $fail, $lines, 'G0-12', 'كلُّ متطلَّبٍ مُسنَدٌ إلى مرحلة',
+    ($reqTot > 0 && $reqNull === 0 && $reqStages >= 10),
+    "متطلَّبات $reqTot · بلا مرحلة $reqNull · مراحلُ مأهولة $reqStages", "$reqTot · 0 · ≥10");
+
 /* ── الطباعة ── */
 echo "\n═══════════ بوّابةُ المرحلةِ صفر — REPAIR01 ═══════════\n";
 foreach ($lines as $l) { echo $l . "\n"; }
