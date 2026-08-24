@@ -1,0 +1,962 @@
+طلب تثبيت سجل القرارات المؤسسي وبناء خطة التنفيذ المرحلية لإصلاح نظام إنجاز
+بعد المراجعة الجديدة للحزمة المصححة، أريد الانتقال من مرحلة تصميم المستهدف إلى مرحلة تهيئة التنفيذ المنضبط.
+لكن لا أريد البدء الآن بتعديل الشاشات أو السايدبار أو قاعدة البيانات مباشرة.
+لدينا الآن طبقات مختلفة يجب تثبيتها ومصالحتها أولًا:
+1. القيادة التنفيذية العليا — Target القيادة.
+2. الدستور المؤسسي — القواعد والهيكل الحاكم.
+3. ملفات الموجات A–E — المتطلبات التفصيلية لكل نطاق.
+4. السجلات المؤسسية والقرارات — مصدر القرارات والمتطلبات والحقول والأحداث.
+5. المصالحة مع النظام الحالي — AS-IS.
+6. المراجعة الثانية — Independent Challenge.
+7. مراجعة القيادة — مصالحة القيادة المستهدفة مع المبني.
+المطلوب الآن هو تحويل هذه الحزمة إلى:
+«Enterprise Target Baseline واحد لا يتناقض مع نفسه»
+ثم استخدامه لإصلاح النظام بصورة تدريجية.
+أولًا — المصدر الحاكم الأول قبل أي ملف آخر
+ابدأ من:
+"09 · السجلات المؤسسية والقرارات.xlsx"
+وبالتحديد:
+"OWNER_DECISIONS_MASTER"
+هذا هو Source of Truth للقرارات.
+لا تعتبر القرارات الموجودة داخل ملفات الموجات مصادر مستقلة.
+ولا تعتبر القرارات الموجودة في ملفات المراجعة مصادر مستقلة.
+أي Decision يظهر في:
+- 4.
+- 5.
+- 6.
+- 7.
+- 8.
+- 10.
+- 11.
+- 12.
+يجب أن يكون:
+«Projection / Filter من OWNER_DECISIONS_MASTER»
+وليس نسخة يدوية يمكن أن تختلف عنه.
+ثانيًا — أصلح مشكلة Drift القرارات فورًا
+يوجد حاليًا تناقض واضح.
+"OWNER_DECISIONS_MASTER" يقول:
+«108 قرارًا
+90 APPROVED
+18 تنتظر قيمًا أو عتبات.»
+لكن بعض ملفات الموجات ما زالت تقول:
+««19 قرارًا معلقًا»»
+أو:
+««15 قرارًا معلقًا»»
+رغم أن معظم هذه القرارات ظاهرة داخل نفس الشيت كـ:
+«"APPROVED — قرار المالك".»
+وكذلك مراجعة القيادة ما زالت تعرض:
+"DEC-CEO-03"
+"DEC-CEO-04"
+"DEC-CEO-05"
+كقرارات معلقة، بينما سجل القرارات الحاكم يصنفها:
+«"APPROVED".»
+هذا ممنوع.
+من الآن:
+«Decision Status لا يُكتب يدويًا في أي مصنف تابع.»
+بل يُقرأ من "OWNER_DECISIONS_MASTER".
+ثالثًا — أضف مستوى تأثير القرار
+ليست كل القرارات المعلقة متساوية.
+أضف إلى "OWNER_DECISIONS_MASTER":
+"Blocking_Level"
+والقيم:
+"STRUCTURAL_TARGET_BLOCKER"
+يمنع تثبيت Target Architecture.
+"READY_TO_BUILD_BLOCKER"
+المستهدف معروف، لكن لا يجوز بناء الوظيفة قبل القرار.
+"UAT_BLOCKER"
+يمكن البناء، لكن لا يمكن اختبار السيناريو النهائي قبل القيمة.
+"GO_LIVE_BLOCKER"
+يمكن البناء والاختبار، لكن لا يمكن الإطلاق.
+"CONFIG_PENDING"
+قيمة تشغيلية يمكن إدخالها لاحقًا في Policy Registry ولا تمنع بناء المحرك.
+رابعًا — لا تجعل العتبات الرقمية تمنع بناء المحركات تلقائيًا
+أمثلة:
+- حد الشراء المباشر.
+- حد Petty Cash.
+- عدد الساعات قبل التصعيد.
+- قيمة مستوى اعتماد مالي.
+- عتبة الخطر.
+- عتبة Critical Downtime.
+إذا كانت القاعدة نفسها معروفة:
+«Threshold يقرأ من Registry / Policy.»
+فعدم تحديد الرقم الآن غالبًا:
+«"CONFIG_PENDING"»
+وليس:
+«"READY_TO_BUILD_BLOCKER".»
+المبرمج يبني:
+«Configurable Engine»
+ولا يكتب:
+"if amount > 100000"
+Hardcoded.
+خامسًا — أعد حساب G0 من القرارات الحقيقية
+حاليًا بعض شيتات G0 تحجب الإدارة بعدد جميع قراراتها، حتى الموافق عليها.
+هذا خطأ.
+"G0-10 Decisions"
+يصبح PASS إذا:
+«لا يوجد Decision من نوع "STRUCTURAL_TARGET_BLOCKER" أو "READY_TO_BUILD_BLOCKER" مفتوح لهذه الإدارة.»
+ولا يتأثر بقرار:
+«"CONFIG_PENDING"»
+إلا إذا كانت قيمة القرار مطلوبة فعلًا لبناء السيناريو.
+السادسًا — بعد تثبيت القرارات، أعد توليد "03 · الدستور"
+هذه هي أول وثيقة يعاد بناؤها بعد 09.
+لا تبدأ من نسخة الدستور القديمة.
+أنشئ:
+"03 · الدستور — OWNER APPROVED"
+من القرارات الحاكمة.
+السابعًا — الهيكل المؤسسي المثبت في الدستور
+اعتمد 17 نطاقًا وظيفيًا رئيسيًا.
+الإدارات المؤسسية والتجارية والرقابية
+1. إدارة المبيعات التعاقدية والعقود.
+2. إدارة الموردين.
+3. إدارة التمويل والممولين.
+4. إدارة الأسطول والأصول.
+5. الإدارة المالية.
+6. إدارة الخزينة.
+7. إدارة الموارد البشرية.
+8. إدارة الحوكمة والالتزام.
+9. إدارة المخاطر.
+10. إدارة البلاغات.
+القطاع التشغيلي
+11. إدارة التشغيل — رأس القطاع التشغيلي.
+ويتبع مدير التشغيل:
+12. إدارة الموقع.
+13. إدارة القوى التشغيلية.
+14. إدارة الصيانة.
+15. إدارة النقل والترحيل.
+16. إدارة المشتريات.
+17. إدارة المخازن.
+ثامنًا — إدارة الموقع وفريق المنجم
+ثبت صراحة:
+«إدارة الموقع هي أدنى طبقة إدارية تشغيلية.»
+وتحتها:
+«فريق المنجم / الفريق الميداني»
+كـ:
+"Operational Team"
+وليس Department.
+ولا يظهر كإدارة رقم 18.
+تاسعًا — إدارة البلاغات
+ثبت:
+«إدارة البلاغات Department.»
+ولا تسمها في Target:
+«Control Center.»
+لكن يمكن أن تحمل خاصية:
+"Enterprise_Orchestration_Function = Yes".
+تملك:
+«Ticket Lifecycle.»
+ولا تملك:
+«Resolution Execution الخاص بالإدارات المختصة.»
+عاشرًا — ما يخرج من تعداد الإدارات
+القيادة التنفيذية
+Executive Workspace.
+مساحة عملي
+Personal Workspace.
+المراجع الداخلي
+Independent Assurance Function.
+ولا تدخل هذه الثلاثة في الـ17.
+الحادي عشر — الوحدات الملغاة نهائيًا
+لا تنشئ:
+HSE Department
+عناصر السلامة توزع على ملاكها الفعليين.
+Central Procurement Department
+الوظائف الاستراتيجية تكون Group داخل المشتريات.
+Project Personnel Department
+الوظائف موزعة على HR والقوى والموقع.
+ولا تبق هذه الأسماء في:
+- Screen Registry.
+- Domain Registry.
+- Sidebar Target.
+- Event Owners.
+- SoD Owners.
+الثاني عشر — المراجعة الداخلية
+صحح أي موضع ما زال يقول:
+««إضافة وحدة أو ربطها بالحوكمة».»
+الحكم مثبت:
+"Independent Assurance Function"
+خارج الإدارات الـ17.
+ترفع وظيفيًا حاليًا للمالك.
+وترسل نتائجها:
+- للخاضع للمراجعة من أجل Management Response.
+- للرئيس للمتابعة التنفيذية.
+- للمالك للتأكيد المستقل.
+ولا تملك الحوكمة تعديل نتيجة المراجعة.
+الثالث عشر — إعادة توليد ملف القيادة
+بعد الدستور:
+راجع:
+"02 · القيادة.xlsx"
+مقابل "OWNER_DECISIONS_MASTER".
+ولا تعيد تصميم Core Architecture إذا لم توجد فجوة.
+ثبت:
+- CEO Enterprise Visibility.
+- Deputy_Role / Scope.
+- AAM.
+- Executive Reports.
+- Requests.
+- Red Lines.
+- Reserved Authority.
+- Independent Assurance Inbox.
+ثم صحح أية معرفات Screen_ID أو Ownership.
+الرابع عشر — بعد القيادة، أعد توليد الموجات وليس تعديلها يدويًا
+الملفات:
+- 04 Wave A.
+- 05 Wave B.
+- 06 Wave C.
+- 07 Wave D.
+- 08 Wave E.
+تقرأ قراراتها من:
+"OWNER_DECISIONS_MASTER".
+ولا تحتفظ Decision Status داخلي مستقل.
+الخامس عشر — الموجة A
+التشغيل والأصول
+تشمل:
+- التشغيل.
+- الموقع.
+- الأسطول.
+- الصيانة.
+- القوى التشغيلية.
+- النقل.
+وتحليل هذه الإدارات يتم بالتوازي بعد تثبيت Shared Keys.
+السادس عشر — Shared Keys للموجة A
+قبل فصل Domain FRDs:
+ثبت على الأقل:
+- "Company_ID"
+- "Project_ID"
+- "Site_ID"
+- "Unit_ID"
+- "Asset_ID"
+- "Person_ID"
+- "Workforce_Assignment_ID"
+- "Shift_ID"
+- "Timesheet_ID"
+- "Maintenance_Order_ID"
+- "Transport_Request_ID"
+- "Transport_Order_ID"
+- "Ticket_ID"
+لا ينشئ Domain معرفًا بديلًا لنفس الحقيقة.
+السابع عشر — أولويات التنفيذ داخل الموجة A
+A0 — تثبيت Masters والعلاقات
+أولًا:
+- Project/Site references.
+- Asset Master.
+- Person/Workforce reference.
+- Operational Unit.
+A1 — الحقيقة الميدانية
+ثم:
+- Site Day.
+- Shift.
+- Actual Presence.
+- Timesheet.
+- Unit Execution.
+- Downtime/Event.
+A2 — أثر الأصل والقوى
+ثم:
+- Asset availability.
+- Assignment.
+- Workforce assignment.
+- Substitution.
+- Rotation.
+A3 — الصيانة والنقل
+ثم:
+- Maintenance Event.
+- Work Order.
+- Return to Service.
+- Transport Request.
+- Transport Order.
+- Trip Legs.
+- Delivery.
+الثامن عشر — أول Proof للموجة A
+لا تقبل الموجة قبل عبور سيناريو:
+«معدة في موقع
+→ تعمل
+→ تتوقف
+→ يسجل التوقف مرة واحدة
+→ يتأثر التشغيل
+→ تتأثر الجاهزية
+→ يتحدد المشغل الموجود
+→ الصيانة تستلم
+→ المخاطر تقرأ Trigger
+→ الحوكمة تقرأ Control Breach إن وجد
+→ البلاغات تتابع إذا كان هناك Ticket
+→ القيادة ترى Critical Alert
+→ الإصلاح
+→ شهادة العودة
+→ الأسطول يعيد الحالة
+→ التشغيل يعيد الجاهزية.»
+التاسع عشر — الموجة B
+بعد استقرار الحقيقة التشغيلية:
+- المبيعات.
+- الموردون.
+- المشتريات.
+- المخازن.
+المبيعات والموردون:
+«Reference Implementations.»
+لا تعيد بناءهما.
+شغل Regression أولًا.
+ثم أصلح فقط:
+«ما يكشفه Target الجديد أو Integration الجديد.»
+العشرون — المشتريات والمخازن
+ركز على:
+- Header + Lines.
+- PR.
+- Package.
+- RFQ.
+- Invitations.
+- Offer Lines.
+- Evaluation.
+- PO.
+- Delivery.
+- GRN.
+- Store Receipt.
+- Store Issue.
+- Custody.
+- Reorder.
+ولا تضع Items متعددة داخل Field تجميعي إذا كانت تحتاج Lifecycle مستقلًا.
+الحادي والعشرون — الموجة C
+بعد تثبيت التعاقد والتنفيذ:
+- التمويل.
+- المالية.
+- الخزينة.
+الثاني والعشرون — التمويل
+ثبت:
+«Contractual Close
+≠ Monthly Close
+≠ Final Close.»
+وافصل:
+«Legacy Historical Aggregate»
+عن:
+«Future Payment Order Model.»
+ولا تجعل تصميم المستقبل تابعًا لمحدودية البيانات التاريخية.
+الثالث والعشرون — المالية
+رتب الدورة:
+«Accounting Setup
+→ Subledgers
+→ Adjustments
+→ Reconciliations
+→ Trial Balance
+→ Closing Checklist
+→ Period Close
+→ Statements.»
+ولا تضع:
+- Accruals.
+- Prepayments.
+- Provisions.
+- Fixed Assets.
+- Reconciliations.
+تحت AP فقط.
+الرابع والعشرون — الخزينة
+الخزينة:
+«تنفذ.»
+المالية:
+«تعترف وتقيد.»
+الإدارة المصدرية:
+«تطلب.»
+ويجب دعم:
+«Receipt → Allocation»
+و:
+«Bank Reconciliation → Difference Lines.»
+الخامس والعشرون — الموجة D
+بعد ثبات العمليات والمال:
+- الموارد البشرية.
+- إدارة البلاغات.
+- إدارة المخاطر.
+- الحوكمة والالتزام.
+ثم:
+«Internal Audit Assurance Integration.»
+ولا HSE Domain ولا Project Personnel Unit.
+السادس والعشرون — إدارة المخاطر
+تطبق العائلات الأربع:
+1. Operational.
+2. Capital — Financing/Suppliers.
+3. Customer Contractual.
+4. Procurement/Supply Chain.
+وتقرأ Source Events ولا تنسخها.
+السابع والعشرون — الحوكمة
+تفرق بوضوح:
+«Operational Deviation
+≠ Risk Exposure
+≠ Governance/Compliance Breach.»
+ولا تفتح Governance Case لكل انحراف تشغيلي.
+الثامن والعشرون — إدارة البلاغات
+تثبت:
+"Reporter"
+≠
+"Subject"
+≠
+"Ticket Owner"
+≠
+"Resolution Owner".
+وتدعم:
+- Routing History.
+- Assignment History.
+- Actions.
+- Communications.
+- Escalation.
+- Verification.
+- Reopening.
+- Closure.
+التاسع والعشرون — الموجة E
+آخر موجة:
+- مساحة عملي.
+- القيادة.
+- Enterprise Reports.
+- Cross-domain views.
+لأنها تستهلك حقائق الإدارات ولا ينبغي بناؤها قبل استقرار المصادر.
+الثلاثون — مساحة عملي
+"طلباتي"
+لا تصبح Source of Truth.
+هي:
+Unified Request Launcher + Projection.
+اختيار:
+«Leave Request»
+ينشئ في HR.
+اختيار:
+«Maintenance Request»
+ينشئ في مالكه.
+اختيار:
+«Ticket»
+ينشئ في إدارة البلاغات.
+الحادي والثلاثون — لا تبدأ المصالحة من جديد قبل تثبيت Target
+بعد:
+09 → 03 → 02 → 04–08
+أعد توليد:
+"09 · السجلات المؤسسية"
+ثم فقط انتقل إلى:
+"10 · المصالحة مع النظام".
+الثاني والثلاثون — المصالحة الجديدة يجب أن تكون من Snapshot حي
+الـ10 الحالي مفيد جدًا لكنه يجب إعادة تشغيله بعد تثبيت Target.
+حاليًا كشف حجمًا مهمًا من العمل، منها:
+- 174 سطحًا Target غير مبني.
+- 104 شاشات تظهر في أكثر من إدارة.
+- 265 ظهورًا FORBIDDEN.
+- 83 سطحًا مجهول المالك.
+- 13 تعارض ملكية.
+- 62 شاشة على القرص خارج السجلات.
+- 34 سطحًا مرشحًا للدمج في Parent Files.
+- 24 سطح اعتماد بلا مستند رسمي مسمى.
+هذه لا تُصلح يدويًا من التقرير القديم.
+أعد استخراجها بعد Target Freeze.
+الثالث والثلاثون — أعد تعريف أحكام المصالحة
+لكل سطح:
+- "KEEP"
+- "PATCH"
+- "RENAME"
+- "MOVE"
+- "MERGE"
+- "SPLIT"
+- "BUILD"
+- "RETIRE"
+- "PROJECTION"
+- "PLATFORM_SHARED"
+- "BLOCKED"
+ولا تستخدم اسم الشاشة فقط للمطابقة.
+استخدم:
+- Grain.
+- Owner.
+- Route.
+- Fields.
+- Lifecycle.
+- Source of Truth.
+الرابع والثلاثون — صحح الملكية قبل السايدبار
+قبل تغيير ترتيب Sidebar:
+أغلق:
+- Unknown Owners.
+- Ownership Conflicts.
+- Duplicate Ownership.
+- FORBIDDEN Appearances.
+القاعدة:
+«Screen Registry وOwnership Registry أولًا. Sidebar ثانيًا.»
+الخامس والثلاثون — ترتيب تنفيذ السايدبار
+بعد الملكية:
+1.
+ثبت Canonical Screen_ID.
+2.
+ثبت Canonical Route.
+3.
+ثبت Department Owner.
+4.
+ثبت Lifecycle Position.
+5.
+ثبت Parent/Tab.
+6.
+ثبت Visibility Class.
+7.
+ولّد Sidebar من Target Registry.
+ولا تعدل القائمة يدويًا شاشة شاشة.
+السادس والثلاثون — Sidebar ليس Security
+ظهور الرابط لا يعطي الصلاحية.
+وإخفاء الرابط لا يمنع Direct URL.
+كل شاشة:
+«Server-Side View Gate.»
+وكل Action:
+«Server-Side Action Gate.»
+السابع والثلاثون — بعد السايدبار تبدأ الشاشات
+داخل كل Domain:
+طبق الشاشات وفق ترتيب دورة العمل.
+لا تبدأ من أجمل شاشة أو أسهل شاشة.
+ابدأ من أول كيان ينتج الحقيقة التي يحتاجها التالي.
+الثامن والثلاثون — ترتيب إصلاح الشاشة
+لكل شاشة:
+Grain
+PK/FK
+Parent/Child
+Source of Truth
+Field Order
+Required/Optional
+Controlled Lists
+Derived Rules
+Documents
+Status Machine
+Review
+Approval
+Execution
+Closure
+Audit
+ولا تبدأ بالتنسيق البصري قبل صحة هذا النموذج.
+التاسع والثلاثون — صحح الحقول بحسب الدورة المستندية
+الترتيب الإرشادي:
+«ID
+→ Source/Parent
+→ Origin
+→ Parties
+→ Classification
+→ Details
+→ Dates
+→ Responsibility
+→ Review
+→ Approval
+→ Execution
+→ Evidence
+→ Operational/Financial Effect
+→ Exception
+→ Status
+→ Closure
+→ Audit.»
+الأربعون — بعد الشاشة يأتي المحرك
+لا Status Text حر.
+لكل كيان:
+«State Machine.»
+ويحتوي:
+- Allowed transitions.
+- Forbidden transitions.
+- Preconditions.
+- Approval.
+- Required documents.
+- Reopen.
+- Cancellation.
+- Correction.
+- Closure.
+الحادي والأربعون — بعد State Machine تأتي الصلاحيات والاعتمادات
+لا Hardcode أسماء الأشخاص.
+استخدم:
+- "Role_Key"
+- "Authority_Rule_ID"
+- "Deputy_Role"
+- "Scope"
+- "Delegation"
+- "Effective_Date"
+الثاني والأربعون — لا تشغل Enforce قبل Shadow
+محرك الاعتماد الحالي يبقى:
+«"monitor"»
+حتى تمر نافذة القياس المطلوبة.
+لا تستخدم إصلاح الإدارات ذريعة لتشغيل Enforce قبل:
+- Shadow volume.
+- Shadow duration.
+- Diff review.
+- False-denial resolution.
+ثم قرار تفعيل موثق.
+الثالث والأربعون — ضع Ratchet فورًا على المسارات القديمة
+حتى أثناء الترميم:
+«لا تسمح بزيادة Legacy Debt.»
+خصوصًا:
+- Direct authority readers.
+- Raw SQL.
+- Local approval engines.
+- Direct event inserts.
+- Screens outside registry.
+- Manual navigation items.
+الموجود يُرحل تدريجيًا.
+الجديد ممنوع.
+الرابع والأربعون — بعد الصلاحيات تأتي الأحداث
+لكل Transition حاكم:
+اسأل:
+«هل ينتج Business Event؟»
+إذا نعم:
+سجله في Enterprise Event Catalog.
+الخامس والأربعون — ثم عقود الأثر
+لكل Event:
+حدد كل Consumer الفعلي.
+ليس:
+««كل المستهلكين»»
+بل:
+- Target Department.
+- Target Screen/Service.
+- Source Key.
+- Target Key.
+- Effect.
+- Preconditions.
+- Retry.
+- Idempotency.
+- Failure.
+- Compensation.
+السادس والأربعون — لا تعتبر Event Bus مكتملًا لأن البنية موجودة
+الوضع الحالي أثبت سابقًا أن:
+«البنية يمكن أن تعمل بينما Business Consumers لا تعمل.»
+لذلك Acceptance يقيس:
+«Business Effect»
+وليس:
+«Event row created.»
+السابع والأربعون — إصلاح المراقبة والتكامل P0
+قبل نشر التكاملات الجديدة:
+ثبت:
+- Consumer health.
+- Stalled consumer alerts.
+- Retry.
+- DLQ.
+- Dead-letter ownership.
+- Replay.
+- Idempotency.
+- Compensation.
+ولا فشل صامت.
+الثامن والأربعون — المالية تأتي عبر Events/Requests لا الكتابة المباشرة
+لا يسمح لأي Domain أن يكتب:
+«Journal Entry.»
+Domain يصدر:
+«Financial Effect / Recognition Request.»
+والمالية تقرر وتثبت القيد.
+التاسع والأربعون — بعد التكامل تأتي Projections
+ابنِ:
+- Dashboards.
+- Monthly Reports.
+- Personal Workspace.
+- Executive Views.
+بعد استقرار الحقائق والآثار.
+لا قبلها.
+الخمسون — ثم مراجعة 11
+بعد كل موجة، شغّل:
+"11 · المراجعة الثانية"
+كـIndependent Challenge.
+ولا تجعله يعيد استخدام نفس Rule Engine الذي بنى Target.
+يجب أن يستطيع إصدار:
+«"REDESIGN"»
+حتى إذا الاختبارات البنيوية خضراء.
+الحادي والخمسون — أصلح نقاط المراجعة الثانية الحالية
+المراجعة الحالية تكشف مثلًا:
+«71 خرق ملكية حقيقيًا في السايدبار الحالي.»
+وتكشف أن:
+«20.6% من البنود لا تملك Responsible Role معلنًا.»
+هذه تدخل كمتطلبات إصلاح، لا مجرد ملاحظات.
+الثاني والخمسون — ثم مراجعة القيادة 12
+بعد كل موجة تحقق:
+«ماذا وصل للقيادة؟»
+لكن قبل ذلك صحح Drift الحالي.
+"DEC-CEO-03/04/05"
+لم تعد Pending.
+اقرأ حالتها من:
+"OWNER_DECISIONS_MASTER".
+الثالث والخمسون — القيادة لا تملك معاملات الإدارات
+مراجعة القيادة كشفت أن النظام الحالي وضع شاشات مثل:
+- الموازنة.
+- القوائم المالية.
+- بعض العقود.
+- بعض المخاطر.
+داخل مكتب الرئيس.
+المطلوب:
+«Move ownership back to Domain.»
+ثم:
+«Executive Projection.»
+الرابع والخمسون — مساحة النواب
+المصالحة الحالية تكشف أن:
+«12 سطحًا للنواب Target وليس لها مقابل مبني.»
+لا تنشئ ثلاثة أنظمة.
+ابن:
+«"Deputy_Role / Scope Engine"»
+ثم Views.
+الخامس والخمسون — الأسطح القيادية بلا Screen_ID
+الخمسة الحالية يجب أن تسجل في:
+«Screen Registry»
+إذا كانت أسطحًا فعلية.
+ولا يوجد Sidebar Item رسمي بلا Canonical Screen_ID إلا إذا كان:
+«External/Utility Action»
+وموسومًا بذلك.
+السادس والخمسون — بعد اكتمال كل ما سبق أصدر Baseline
+لا يصدر:
+«Enterprise Target Baseline»
+إلا بعد أن تنجح:
+1. Owner Decisions reconciliation.
+2. Constitution.
+3. Leadership.
+4. Waves.
+5. Enterprise Registries.
+6. System Reconciliation.
+7. Independent Review.
+8. Leadership Review.
+ثم:
+"ENTERPRISE-TARGET-BASELINE-v1.0 — OWNER APPROVED"
+السابع والخمسون — بعدها فقط تبدأ Domain FRDs التنفيذية
+لكل إدارة:
+"INJ-FRD-<DOMAIN>-01"
+ويحتوي:
+- Atomic Requirements.
+- AS-IS.
+- TO-BE.
+- Fields.
+- State Machines.
+- SoD.
+- Events.
+- Effects.
+- Documents.
+- Scenarios.
+- G0.
+الثامن والخمسون — G0 المصحح
+لا تعط "READY_TO_BUILD" إلا إذا:
+G0-01
+Source Mining = PASS.
+G0-02
+AS-IS Inventory = PASS.
+G0-03
+TO-BE Mapping = PASS.
+G0-04
+Screen Map = PASS.
+G0-05
+Field Trace = PASS.
+G0-06
+State Machines = PASS.
+G0-07
+Domain SoD = PASS.
+G0-08
+Event Catalog = PASS.
+G0-09
+Integration Contracts = PASS.
+G0-10
+No "READY_TO_BUILD_BLOCKER".
+مع السماح بـ:
+«"CONFIG_PENDING"»
+إذا لم يمنع بناء المحرك.
+التاسع والخمسون — ترتيب البرمجة بعد G0
+لا تبدأ بكل الموجة دفعة واحدة.
+داخل كل Domain:
+Patch 1
+Registry + Ownership + Route.
+Patch 2
+Sidebar + Entry Points.
+Patch 3
+Core Masters.
+Patch 4
+Transactions + Children.
+Patch 5
+State Machines.
+Patch 6
+Documents + Gates.
+Patch 7
+Approval + SoD.
+Patch 8
+Events + Effects.
+Patch 9
+Projections + Reports.
+Patch 10
+Migration/Reconciliation.
+Patch 11
+Tests.
+Patch 12
+Human UAT.
+ولا تخلط كل ذلك في Commit واحد ضخم.
+الستون — بوابات كل Patch
+قبل الانتقال للـPatch التالي:
+- Migration recorded.
+- Referential integrity.
+- Negative test.
+- No regression.
+- Evidence saved.
+- Revert/rollback strategy.
+- No new legacy debt.
+الحادي والستون — اختبارات الشاشة
+ليست Happy Path فقط.
+اختبر:
+- Success.
+- Missing parent.
+- Missing document.
+- Wrong state.
+- Wrong role.
+- Wrong department.
+- SoD conflict.
+- Duplicate.
+- Direct URL.
+- Direct service call.
+- Reopen.
+- Correction.
+- Concurrent edit.
+- Expired delegation.
+الثاني والستون — اختبارات التكامل
+اختبر:
+- Event success.
+- Consumer failure.
+- Retry.
+- Duplicate event.
+- Duplicate delivery.
+- DLQ.
+- Replay.
+- Compensation.
+- Consumer unavailable.
+- Target already changed.
+الثالث والستون — اختبارات الرحلات البشرية
+قبل قبول أي Domain:
+«موظف فعلي أو UAT User يمثل دوره الحقيقي.»
+يمر الرحلة من بدايتها لنهايتها.
+ولا Seed Data فقط.
+الرابع والستون — لا تقبل نسبة واحدة
+أريد لكل Domain:
+Structural
+%
+Navigation
+%
+Field
+%
+Workflow
+%
+Integration
+%
+Data
+%
+Test
+%
+Human UAT
+%
+Acceptance
+%
+ولا تكتب:
+««95% مكتمل»»
+دون هذه المقامات.
+الخامس والستون — معنى DONE
+لا تعني:
+«الشاشة موجودة.»
+ولا:
+«الكود مكتوب.»
+ولا:
+«Event سجل.»
+تعني:
+«Requirement Accepted with Evidence.»
+السادس والستون — خطة البداية الفعلية للمبرمج
+إذا أردت معرفة أول ملف يفتحه المبرمج فالجواب:
+"09 · السجلات المؤسسية والقرارات"
+ليثبت القرارات الحاكمة ويزيل Drift.
+ثم:
+"03 · الدستور — OWNER APPROVED"
+يعاد توليده.
+ثم:
+"02 · القيادة"
+للمصالحة فقط، لا للبدء بالواجهات.
+ثم:
+"04 · الموجة أ"
+لإغلاق G0 والتخطيط لأول Domain Implementation.
+ثم بالتوازي:
+"05 · الموجة ب"
+للـRegression والتحضير.
+ثم:
+"06 · الموجة ج"
+ثم:
+"07 · الموجة د"
+ثم:
+"08 · الموجة هـ"
+بعدها:
+إعادة توليد "09"
+ثم:
+"10 · المصالحة مع النظام"
+وهنا يبدأ جرد الكود الحقيقي.
+ثم:
+"11 · المراجعة الثانية"
+ثم:
+"12 · مراجعة القيادة"
+ثم:
+إصدار Enterprise Target Baseline.
+ثم فقط:
+Domain FRD + G0.
+ثم فقط:
+Code.
+السابع والستون — لا تبدأ بالموجة A قبل المصالحة
+وجود Wave A لا يعني:
+«ابدأ تعديل "operations.php".»
+بل يعني:
+«هذه أول موجة Domain تُعطى الأولوية بعد تثبيت Target وإغلاق G0.»
+الثامن والستون — لا تبدأ بالسايدبار قبل Screen Registry
+وهذه نقطة مهمة في ترتيب التنفيذ.
+المسار الصحيح:
+«Owner Decisions
+→ Constitution
+→ Screen Registry
+→ Ownership
+→ Routes
+→ Target Navigation
+→ Sidebar Renderer
+→ Screens.»
+وليس:
+«غيّر القائمة ثم حاول جعل الشاشات تلحق بها.»
+التاسع والستون — لا تبدأ بالشاشات قبل الدورة
+المسار داخل الإدارة:
+«Lifecycle
+→ State Machine
+→ Screen/Document
+→ Fields.»
+وليس:
+«Screen موجودة → ابحث ماذا تضع فيها.»
+السبعون — لا تبدأ بالتكامل قبل معرفة الأثر
+المسار:
+«Source Event
+→ Business Meaning
+→ Consumer
+→ Effect Contract
+→ Implementation.»
+وليس:
+«أنشئ Listener ثم قرر ماذا يفعل.»
+الحادي والسبعون — Freeze على الدين القديم
+من أول يوم تنفيذ:
+ضع Ratchets تمنع:
+- شاشة جديدة بلا Registry.
+- Route جديد بلا Owner.
+- Permission Reader محلي جديد.
+- Raw SQL جديد في Domain Paths.
+- Local Approval Logic جديد.
+- Event مباشر خارج Publisher.
+- Lookup جديد خارج Canonical Registry.
+- Derived Field بلا Derivation Rule.
+حتى لا نصلح 10 ونخلق 20.
+الثاني والسبعون — النتيجة المطلوبة
+إذا نُفذت الخطة بهذا الترتيب، فالنتيجة لا تكون:
+«Sidebar أجمل.»
+بل:
+«نظام إنجاز يعمل كمنظومة تشغيل واحدة.»
+المستخدم يدخل الإدارة فيرى دورة العمل الصحيحة.
+يفتح الشاشة فيرى الدورة المستندية الصحيحة.
+يبدأ المعاملة من مصدرها الصحيح.
+تمر بالمراجعة والاعتماد الصحيح.
+تولد أحداثها مرة واحدة.
+تصل آثارها للإدارات المعنية.
+تصل المالية فقط للآثار المالية.
+تصل المخاطر للتعرض.
+تصل الحوكمة لكسر الضابط.
+تصل البلاغات للمتابعة.
+وتصل القيادة للمعلومة والقرار دون امتلاك نسخة من المعاملة.
+القاعدة النهائية للمبرمج
+لا تسأل:
+««أي شاشة أصلح أولًا؟»»
+اسأل بالترتيب:
+«ما القرار الحاكم؟
+ما دورة العمل؟
+ما مصدر الحقيقة؟
+ما المستند؟
+ما Grain؟
+ما السابق؟
+ما التالي؟
+ما Gate؟
+من ينشئ؟
+من يراجع؟
+من يعتمد؟
+ما Event؟
+من يتأثر؟
+ماذا يحدث عند الفشل؟
+وما Evidence الذي يثبت أن الرحلة تعمل؟»
+إذا لم توجد إجابة محسومة عن هذه الأسئلة:
+«لا تكتب الكود بعد.»
+وإذا وجدت الإجابة وأغلقت G0:
+«ابدأ التنفيذ على دفعات صغيرة قابلة للقياس والانحدار والرجوع.»
+بهذه الطريقة نصلح إنجاز من الدستور إلى القرار، ومن القرار إلى دورة العمل، ومن دورة العمل إلى السايدبار، ومن السايدبار إلى الشاشة، ومن الشاشة إلى المستند، ومن المستند إلى الحدث، ومن الحدث إلى أثره في بقية الشركة — بدل إصلاح واجهات منفصلة لا تعمل كنظام واحد.
+
+[[ فقرات: 960 · جداول: 0 ]]
