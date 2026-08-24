@@ -65,10 +65,11 @@ if ($contracts_has_is_deleted) {
   $contract_not_deleted_plain_sql = 'deleted_at IS NULL';
 }
 
-if (empty($_SESSION['contracts_csrf_token'])) {
-  $_SESSION['contracts_csrf_token'] = bin2hex(openssl_random_pseudo_bytes(32));
-}
-$contracts_csrf_token = $_SESSION['contracts_csrf_token'];
+// [ع-0أ] اعتماد الرمز المركزي بدل رمزٍ محلّيٍّ منفصل: الحاقنُ المركزي يضع حقل
+// csrf_token برمز الجلسة، وهذا كان يطبع حقلًا ثانيًا بالاسم نفسه وقيمةٍ أخرى —
+// وPHP يأخذ الأخير فيفشل الحارس المركزي (403). توحيدُ القيمة يُبقي الفحص المحلّي
+// أدناه فعّالًا ويُمرّر الحارس المركزي أيًّا كان الفائز.
+$contracts_csrf_token = generate_csrf_token();
 
 $project_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $filter_project_id = isset($_GET['filter_project_id']) ? intval($_GET['filter_project_id']) : 0;

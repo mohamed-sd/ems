@@ -60,10 +60,11 @@ if ($company_id <= 0) {
 $amd_gate = ems_tenant_db();
 
 // رمز CSRF
-if (empty($_SESSION['amd_csrf_token'])) {
-    $_SESSION['amd_csrf_token'] = bin2hex(openssl_random_pseudo_bytes(32));
-}
-$amd_csrf_token = $_SESSION['amd_csrf_token'];
+// [ع-0أ] اعتماد الرمز المركزي بدل رمزٍ محلّيٍّ منفصل: الحاقنُ المركزي يضع حقل
+// csrf_token برمز الجلسة، وهذا كان يطبع حقلًا ثانيًا بالاسم نفسه وقيمةٍ أخرى —
+// وPHP يأخذ الأخير فيفشل الحارس المركزي (403). توحيدُ القيمة يُبقي الفحص المحلّي
+// أدناه فعّالًا ويُمرّر الحارس المركزي أيًّا كان الفائز.
+$amd_csrf_token = generate_csrf_token();
 
 // القوائم الثابتة (ENUM)
 $AMD_TYPES = array('تجديد', 'تمديد', 'زيادة نطاق', 'تخفيض نطاق', 'تغيير أسعار', 'إضافة معدات', 'إضافة خدمات');
