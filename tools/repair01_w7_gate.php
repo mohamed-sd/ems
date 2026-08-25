@@ -202,11 +202,25 @@ $closedNoCert = (int) $one("SELECT COUNT(*) FROM mnt_order o
 $certDuty = repair01_w7_cert_duty($conn);
 $dutyOpen = 0;
 foreach ($certDuty as $o) { if ($o['state'] === 'closed' && $o['approved'] === 0) { $dutyOpen++; } }
-gate('W7-10', 'لا عودةَ للخدمةِ بلا شهادةٍ معتمَدة',
-     $retNoCert === 0 && $retNoRule === 0 && $closedNoCert === 0 && $dutyOpen === 0,
+/* ══ حارسُ الخلاء (RPR-W07 · تكملة) ═══════════════════════════════════════
+   ◆ خمسةُ حواجبَ في هذه المرحلةِ تقيس **دورةَ شهادةِ العودة**، والمقامُ صفرٌ:
+     `mnt_return_cert` خاوٍ — فالمحرّكُ **مبنيٌّ ولم يُمارَس**. و«صفرُ مخالفةٍ
+     من صفرِ صفوف» ليس نجاحًا بل تطابقُ لا شيء.
+   ◆ **والحكمُ خبرٌ لا خلل** — بشرطِ أن يُعلَن. فالخلاءُ يمرُّ **مُعلَنًا وحدَه**
+     في `W7-D-08`، ويسقط صامتًا لو حُذف الإعلان. وهو النمطُ نفسُه الذي
+     أعلنته W04 (‏`objection_state` ٦٥٨ صفًّا كلُّها `none`) وW05
+     (‏`unit_approvals` ٩٧٦ قرارًا بصفرِ رفض) ورُفع إلى القبولِ البشريِّ في W16. */
+$emptyDeclared = (int) $one("SELECT COUNT(*) FROM repair01_w7_decisions
+                              WHERE decision_id = 'W7-D-08' AND COALESCE(rationale, '') <> ''");
+$vac = function ($n) use ($emptyDeclared) { return ((int) $n === 0 && $emptyDeclared === 0); };
+
+gate('W7-10', 'لا عودةَ للخدمةِ بلا شهادةٍ معتمَدة — ولا خلاءَ صامت',
+     $retNoCert === 0 && $retNoRule === 0 && $closedNoCert === 0 && $dutyOpen === 0
+     && !$vac(count($certDuty)),
      "أصلٌ عائدٌ بشهادةٍ غيرِ معتمدة $retNoCert · حالةٌ بلا قاعدةٍ $retNoRule"
      . " · أمرٌ مقفلٌ بشهادةٍ غيرِ معتمدة $closedNoCert · أمرٌ مقفلٌ بلا شهادةٍ يوجبها تصنيفُه $dutyOpen"
-     . ' · أوامرُ تُوجب الشهادةَ ' . count($certDuty));
+     . ' · أوامرُ تُوجب الشهادةَ ' . count($certDuty)
+     . (count($certDuty) === 0 ? ($emptyDeclared ? ' · الخلاءُ مُعلَنٌ في W7-D-08 ✔' : ' · **خلاءٌ غيرُ مُعلَن**') : ''));
 
 /* ══ W7-11 · صلاحيةُ الشهادةِ مُعادةُ الحسابِ من العتبةِ لا مقروءةٌ من العمود ═ */
 $val = repair01_w7_cert_validity($conn);
@@ -217,9 +231,10 @@ foreach ($val as $id => $v) {
         $valStale[] = '#' . $id . ' (المخزَّن ' . $v['stored'] . ' · المقيس ' . $v['measured'] . ')';
     }
 }
-gate('W7-11', 'صلاحيةُ الشهادةِ تطابق حسابَها',
-     count($valStale) === 0 && $valNoTh === 0,
-     'شهاداتٌ معتمَدةٌ مقيسة ' . count($val) . ' · بلا عتبةٍ في السجلِّ ' . $valNoTh
+gate('W7-11', 'صلاحيةُ الشهادةِ تطابق حسابَها — ولا خلاءَ صامت',
+     count($valStale) === 0 && $valNoTh === 0 && !$vac(count($val)),
+     (count($val) === 0 ? ($emptyDeclared ? 'خلاءٌ مُعلَنٌ في W7-D-08 ✔ · ' : '**خلاءٌ غيرُ مُعلَن** · ') : '')
+     . 'شهاداتٌ معتمَدةٌ مقيسة ' . count($val) . ' · بلا عتبةٍ في السجلِّ ' . $valNoTh
      . ' · تخالف حسابَها ' . count($valStale)
      . (count($valStale) ? ' ⇐ ' . implode('، ', array_slice($valStale, 0, 2)) : ''));
 
@@ -232,9 +247,10 @@ foreach ($cost as $id => $c) {
     }
 }
 $costNoRule = (int) $one("SELECT COUNT(*) FROM mnt_return_cert WHERE cost_rule = ''");
-gate('W7-12', 'تكلفةُ الشهادةِ مشتقّةٌ ومطابقةٌ لحسابِها',
-     count($costStale) === 0 && $costNoRule === 0,
-     'شهاداتٌ مقيسة ' . count($cost) . " · بلا قاعدةِ تكلفةٍ $costNoRule · تخالف حسابَها " . count($costStale)
+gate('W7-12', 'تكلفةُ الشهادةِ مشتقّةٌ ومطابقةٌ لحسابِها — ولا خلاءَ صامت',
+     count($costStale) === 0 && $costNoRule === 0 && !$vac(count($cost)),
+     (count($cost) === 0 ? ($emptyDeclared ? 'خلاءٌ مُعلَنٌ في W7-D-08 ✔ · ' : '**خلاءٌ غيرُ مُعلَن** · ') : '')
+     . 'شهاداتٌ مقيسة ' . count($cost) . " · بلا قاعدةِ تكلفةٍ $costNoRule · تخالف حسابَها " . count($costStale)
      . (count($costStale) ? ' ⇐ ' . implode('، ', array_slice($costStale, 0, 2)) : ''));
 
 /* ══ W7-13 · «ضمنَ الصلاحية» مُعادُ الاشتقاقِ من الشهادةِ لا مقروءٌ من العمود ═ */
@@ -247,9 +263,10 @@ foreach ($rep as $id => $v) {
     }
 }
 $repNoRule = (int) $one("SELECT COUNT(*) FROM mnt_repeat_repair WHERE derivation_rule = ''");
-gate('W7-13', 'تكرارُ الإصلاحِ يطابق صلاحيةَ شهادتِه',
-     count($repStale) === 0 && $repNoRule === 0,
-     'وقائعُ تكرارٍ مقيسة ' . count($rep) . " · بلا قاعدةٍ $repNoRule · تخالف حسابَها " . count($repStale)
+gate('W7-13', 'تكرارُ الإصلاحِ يطابق صلاحيةَ شهادتِه — ولا خلاءَ صامت',
+     count($repStale) === 0 && $repNoRule === 0 && !$vac(count($rep)),
+     (count($rep) === 0 ? ($emptyDeclared ? 'خلاءٌ مُعلَنٌ في W7-D-08 ✔ · ' : '**خلاءٌ غيرُ مُعلَن** · ') : '')
+     . 'وقائعُ تكرارٍ مقيسة ' . count($rep) . " · بلا قاعدةٍ $repNoRule · تخالف حسابَها " . count($repStale)
      . (count($repStale) ? ' ⇐ ' . implode('، ', array_slice($repStale, 0, 2)) : ''));
 
 /* ══ W7-14 · تكلفةُ الإقفالِ مشتقّةٌ من البنودِ — والحبّةُ مفصولة ═══════ */
@@ -263,9 +280,10 @@ foreach ($clo as $id => $c) {
 $cloNoRule = (int) $one("SELECT COUNT(*) FROM trp_closure WHERE derivation_rule = ''");
 $cloNoDoc  = (int) $one("SELECT COUNT(*) FROM trp_closure
                           WHERE state IN ('submitted','approved') AND delivery_doc_id IS NULL");
-gate('W7-14', 'إقفالُ الترحيلِ مشتقٌّ ومسنَدٌ بمحضرِه',
-     count($cloStale) === 0 && $cloNoRule === 0 && $cloNoDoc === 0,
-     'إقفالاتٌ مقيسة ' . count($clo) . " · بلا قاعدةٍ $cloNoRule · بلا محضرٍ $cloNoDoc"
+gate('W7-14', 'إقفالُ الترحيلِ مشتقٌّ ومسنَدٌ بمحضرِه — ولا خلاءَ صامت',
+     count($cloStale) === 0 && $cloNoRule === 0 && $cloNoDoc === 0 && !$vac(count($clo)),
+     (count($clo) === 0 ? ($emptyDeclared ? 'خلاءٌ مُعلَنٌ في W7-D-08 ✔ · ' : '**خلاءٌ غيرُ مُعلَن** · ') : '')
+     . 'إقفالاتٌ مقيسة ' . count($clo) . " · بلا قاعدةٍ $cloNoRule · بلا محضرٍ $cloNoDoc"
      . ' · تخالف حسابَها ' . count($cloStale)
      . (count($cloStale) ? ' ⇐ ' . implode('، ', array_slice($cloStale, 0, 2)) : ''));
 

@@ -87,6 +87,8 @@ $srId     = (int) $one("SELECT id FROM mnt_safety_rule ORDER BY id LIMIT 1");
 $srRule   = (string) $one("SELECT rule_ref FROM mnt_safety_rule WHERE id = $srId");
 $moImpRule = (string) $one("SELECT ops_impact_rule FROM mnt_order WHERE id = $ordId");
 $eqCert   = $one("SELECT w7_cert_id FROM equipments WHERE id = $eqId");
+/* نصُّ إعلانِ الخلاءِ — يُلتقط ليُرجَع بعد كسرِه (حارسُ W7-D-08) */
+$d08Why  = (string) $one("SELECT rationale FROM repair01_w7_decisions WHERE decision_id = 'W7-D-08'");
 $thWhy    = (string) $one("SELECT why FROM repair01_w7_thresholds WHERE threshold_key = 'W7_REPEAT_WINDOW_DAYS'");
 $thSafety = (string) $one("SELECT value_num FROM repair01_w7_thresholds WHERE threshold_key = 'W7_CERT_VALID_DAYS_SAFETY'");
 $stKey    = $conn->query("SELECT entity, from_state, to_state, forbid_reason FROM repair01_w7_states
@@ -143,6 +145,13 @@ $cases = array(
     array('W7-10', 'إعادةُ أصلٍ بشهادةٍ لا وجودَ لها',
         "UPDATE equipments SET w7_cert_id=999999 WHERE id=$eqId",
         "UPDATE equipments SET w7_cert_id=" . ($eqCert === null ? 'NULL' : (int) $eqCert) . " WHERE id=$eqId"),
+    /* ◆ **حارسُ الخلاء**: خمسةُ حواجبَ تقيس دورةَ شهادةِ العودةِ ومقامُها صفر.
+         نزعُ إعلانِ `W7-D-08` يجب أن يُسقطها كلَّها — وإلّا مرَّ «صفرُ مخالفةٍ
+         من صفرِ صفوف» نجاحًا، وهو تطابقُ لا شيء. */
+    array('W7-10', 'نزعُ إعلانِ الخلاءِ عن دورةِ الشهادة',
+        "UPDATE repair01_w7_decisions SET rationale='' WHERE decision_id='W7-D-08'",
+        "UPDATE repair01_w7_decisions SET rationale='" . $esc($d08Why) . "' WHERE decision_id='W7-D-08'"),
+
     /* و`chk_w7th_why` يمنع إفراغَ العذرِ في الصفّ — فالكسرُ **نزعُ الصفِّ كلِّه** */
     array('W7-15', 'نزعُ عتبةٍ من سجلِّ العتبات',
         "DELETE FROM repair01_w7_thresholds WHERE threshold_key='W7_PM_TOLERANCE_HOURS'", null),
