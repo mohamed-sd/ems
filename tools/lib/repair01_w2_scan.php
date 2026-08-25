@@ -317,22 +317,49 @@ function repair01_w2_manual_nav_items($ROOT)
  * ولا موجةَ تُخترع هنا: الوحدةُ ⇐ المرحلةُ كما في W00، والرمزُ جسرُها.
  * @return string 'W03'..'W14' أو '' لما لا قاعدةَ له
  */
-function repair01_w2_wave_for_code($code)
+/**
+ * موجةُ الرمزِ — **من السجلِّ لا من خريطةٍ صلبة** (‏RPR-W08 · `W8-FIX-02`).
+ * ═══════════════════════════════════════════════════════════════════════════
+ * ⛔ **ولماذا سقطت الخريطةُ الصلبة**: كُتبت قبلَ إقحامِ `W06` (‏نقاءُ لغةِ
+ *   الواجهة) مرحلةً سادسةً بـ`RPR-PATCH-09`، فصارت **مزاحةً بواحدةٍ** من
+ *   `DEP-14` فصاعدًا: فجواتُ الصيانةِ والنقلِ وُسمت `W06` ومرحلتُها ٧، وفجواتُ
+ *   المبيعاتِ والموردين وُسمت `W07` ومرحلتُها ٨، وفجواتُ المشترياتِ وُسمت `W08`
+ *   ومرحلتُها ٩. فمرحلةٌ تقرأ فجواتِها بوسمِها تبني أسطحَ إدارةٍ أخرى **وتترك
+ *   أسطحَها**، وهو خطأٌ صامتٌ لأنَّ الوسمَ موجودٌ وغيرُ فارغ.
+ *
+ * ◆ **والمصدرُ الآن `repair01_requirements.stage_no`** — وهو ما يكتبه
+ *   `tools/repair01_stage_assign.php`، مصدرُ الحقيقةِ في إسنادِ المراحل.
+ *   والرموزُ خارجَ تعدادِ الإداراتِ (`EX-CEO` · `IAF` · `WS-MY`) لا وحدةَ
+ *   متطلَّباتٍ لها بالبادئةِ الرقميّة، فتُقرأ من جسرٍ **مُعلَنٍ** أدناه —
+ *   وإعلانُ ثلاثةٍ بأسمائها أصدقُ من خريطةٍ لعشرين تتقادم كلُّها معًا.
+ *
+ * @param string       $code رمزُ الإدارةِ المعياريّ
+ * @param mysqli|null  $c    اتّصالٌ اختياريّ — و`$GLOBALS['conn']` احتياطُه
+ */
+function repair01_w2_wave_for_code($code, $c = null)
 {
-    static $map = array(
-        'DEP-11' => 'W04', 'DEP-12' => 'W04',
-        'DEP-04' => 'W05', 'DEP-13' => 'W05',
-        'DEP-14' => 'W06', 'DEP-15' => 'W06',
-        'DEP-01' => 'W07', 'DEP-02' => 'W07',
-        'DEP-16' => 'W08', 'DEP-17' => 'W08',
-        'DEP-05' => 'W10', 'DEP-06' => 'W10',
-        'DEP-03' => 'W11',
-        'DEP-07' => 'W12', 'DEP-10' => 'W12',
-        'DEP-08' => 'W13', 'DEP-09' => 'W13', 'IAF' => 'W13',
-        'EX-CEO' => 'W14', 'EX-DVP' => 'W14', 'WS-MY' => 'W14',
-    );
+    static $cache = array();
     $code = trim((string) $code);
-    return isset($map[$code]) ? $map[$code] : '';
+    if ($code === '') { return ''; }
+    if (isset($cache[$code])) { return $cache[$code]; }
+
+    if (!($c instanceof mysqli)) {
+        $c = isset($GLOBALS['conn']) && $GLOBALS['conn'] instanceof mysqli ? $GLOBALS['conn'] : null;
+    }
+    $wave = '';
+    if ($c instanceof mysqli && preg_match('/^DEP-(\d{2})$/', $code, $m)) {
+        $like = $c->real_escape_string($m[1] . ' %');
+        $r = $c->query("SELECT MAX(stage_no) FROM repair01_requirements WHERE unit LIKE '$like'");
+        $row = $r ? $r->fetch_row() : null;
+        if ($row && $row[0] !== null) { $wave = 'W' . str_pad((string) (int) $row[0], 2, '0', STR_PAD_LEFT); }
+    }
+    if ($wave === '') {
+        /* الرموزُ خارجَ تعدادِ الـ١٧ — مُعلَنةٌ بأسمائها لا مخمَّنة (‏DEC-OPEN-18) */
+        static $outside = array('EX-CEO' => 'W15', 'EX-DVP' => 'W15', 'WS-MY' => 'W15', 'IAF' => 'W14');
+        $wave = isset($outside[$code]) ? $outside[$code] : '';
+    }
+    $cache[$code] = $wave;
+    return $wave;
 }
 
 /** المسارُ المعياريُّ: شرطاتٌ أماميةٌ · بلا استعلامٍ ولا مِرساة. */

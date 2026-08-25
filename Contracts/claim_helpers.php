@@ -1012,11 +1012,25 @@ if (!function_exists('claim_approve')) {
            كان الختمُ يُكتب (`approved_by`) بلا مقارنةِ المُعِدِّ بالمعتمِد —
            والمستخلصُ هو ما يُفوتَر عليه العميل. **العطالةُ قبلَ الحارس**: المعتمَدُ
            سلفًا يُرجَع كما هو ولا يُقرأ «اعتمادَ ذاتٍ» جديدًا. */
+        /* ⛔ **والرفضُ يُصنَّف `blocked` لا `failed`** (‏RPR-W08 · `W8-FIX-04`):
+           كان هذا الفرعُ وحدَه يكتب السببَ ويترك `status` على `failed` — بينما
+           كلُّ رفضٍ آخرَ في الدالّةِ يكتب `blocked`. و`failed` عند المُنادي
+           **عطبُ نظامٍ** و`blocked` **قرارُ سياسة**؛ فخلطُهما يجعل حارسَ فصلِ
+           اليدَين يظهر للمستخدمِ خطأً تقنيًّا لا منعًا مفهومًا، ويجعل أيَّ
+           قياسٍ يعدُّ `blocked` **أعمى عن أكثرِ الحالاتِ وقوعًا**: المُنشئُ هو
+           الرافعُ في ٢٩٧ من ٢٩٨ مستخلصًا حيًّا، فالفرعُ الأوّلُ هو الذي يقع
+           عمليًّا والثاني (`submitted_by`) هو المُختبَرُ وحدَه. ورمزُ الحارسِ
+           (`403`) كان يُهمَل فيضيع تمييزُ المنعِ عن الخطأ. */
         if ((string) $c['state'] === 'review' || (string) $c['state'] === 'submitted') {
             require_once __DIR__ . '/../includes/self_approval_guard.php';
             $__sa = ems_no_self_approval($conn, intval($c['created_by'] ?? 0), intval($uid),
                 'مستخلص #' . $claim_id, intval($c['company_id'] ?? 0));
-            if ($__sa !== null) { $out['reason'] = $__sa['reason']; return $out; }
+            if ($__sa !== null) {
+                $out['status'] = 'blocked';
+                $out['code']   = isset($__sa['code']) ? (int) $__sa['code'] : 403;
+                $out['reason'] = $__sa['reason'];
+                return $out;
+            }
         }
 
         if (in_array((string) $c['state'], array('approved', 'invoiced', 'collected'), true)) {
