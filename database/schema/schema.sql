@@ -1,8 +1,8 @@
 -- ═══════════════════════════════════════════════════════════════════════════
 -- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-23 03:26:58
--- الجداول: 654 · المناظير: 26
+-- المصدر: equipation_manage · التوليد: 2026-08-25 04:14:15
+-- الجداول: 668 · المناظير: 28
 -- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
 -- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
 -- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
@@ -8663,8 +8663,10 @@ CREATE TABLE `nav_canonical` (
   `placement_kind` enum('SINGLE','CROSS_ROLE_ENTRY','UNJUSTIFIED_SPLIT') NOT NULL DEFAULT 'SINGLE' COMMENT 'مدخلٌ عابرٌ للأدوارِ مشروعٌ · أو اختلافٌ يُوحَّد بقرارِ المالك',
   `placement_basis` varchar(190) DEFAULT NULL COMMENT 'مصدرُ التصنيفِ — مقيسٌ أو مسمًّى بنصِّ المالك، لا اجتهادٌ صامت',
   `space_class` varchar(32) NOT NULL DEFAULT '' COMMENT 'صنفُ الظهورِ الغالبُ بعدَ شجرةِ القرار — ليقرأ قارئُ المصفوفةِ حكمَ الحارس',
+  `anchor_key` varchar(24) DEFAULT NULL COMMENT 'مفتاحُ مِرساةِ القشرة — الغلافُ ينادي المفتاحَ والسجلُّ يعطي المسارَ والاسم',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_route` (`route`),
+  UNIQUE KEY `uq_anchor` (`anchor_key`),
   KEY `ix_status_level` (`status`,`level_no`,`sort_no`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01: سجلُّ التنقلِ المعياريُّ — صورةُ مصفوفةِ الـ359 المعتمَدة';
 
@@ -9234,6 +9236,40 @@ CREATE TABLE `ownership_access_grants` (
   PRIMARY KEY (`grant_id`),
   KEY `ix_oag_person` (`company_id`,`person_id`,`permission_code`,`state`),
   CONSTRAINT `ck_oag_value_strict` CHECK (`permission_code` <> _utf8mb4'ownership.purchase_value' or `reason` is not null and `valid_from` is not null and `valid_to` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: party_contacts ──
+CREATE TABLE `party_contacts` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(10) unsigned NOT NULL,
+  `party_type` enum('client','supplier') NOT NULL,
+  `party_ref` int(10) unsigned NOT NULL,
+  `contact_name` varchar(190) NOT NULL,
+  `job_title` varchar(120) DEFAULT NULL,
+  `phone` varchar(40) DEFAULT NULL,
+  `phone_alt` varchar(40) DEFAULT NULL,
+  `email` varchar(190) DEFAULT NULL,
+  `is_primary` tinyint(1) NOT NULL DEFAULT 0,
+  `is_signatory` tinyint(1) NOT NULL DEFAULT 0,
+  `authority_kind` enum('تفويضٌ عام','تفويضٌ خاص','سلطةٌ أصلية','—') NOT NULL DEFAULT '—',
+  `authority_scope` varchar(300) DEFAULT NULL,
+  `authority_doc_ref` varchar(120) DEFAULT NULL,
+  `authority_from` date DEFAULT NULL,
+  `authority_to` date DEFAULT NULL,
+  `state` enum('نشط','منتهٍ','ملغى') NOT NULL DEFAULT 'نشط',
+  `note` varchar(300) DEFAULT NULL,
+  `created_by` int(10) unsigned DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `deleted_at` datetime DEFAULT NULL,
+  `deleted_by` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_pc_party_name` (`company_id`,`party_type`,`party_ref`,`contact_name`),
+  KEY `ix_pc_party` (`company_id`,`party_type`,`party_ref`,`is_deleted`),
+  KEY `ix_pc_signatory` (`company_id`,`is_signatory`,`state`),
+  CONSTRAINT `chk_pc_authority` CHECK (`is_signatory` = 0 or `authority_kind` <> '—' and `authority_scope` is not null and char_length(`authority_scope`) >= 3 and `authority_doc_ref` is not null and char_length(`authority_doc_ref`) >= 2),
+  CONSTRAINT `chk_pc_window` CHECK (`authority_from` is null or `authority_to` is null or `authority_to` >= `authority_from`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: pay_components ──
@@ -10494,6 +10530,262 @@ CREATE TABLE `recurring_tasks` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`),
   KEY `ix_rt_next` (`active`,`next_run_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: repair01_decisions ──
+CREATE TABLE `repair01_decisions` (
+  `decision_id` varchar(32) NOT NULL,
+  `domain` varchar(120) NOT NULL DEFAULT '',
+  `question` text DEFAULT NULL,
+  `current_state` text DEFAULT NULL,
+  `options` text DEFAULT NULL,
+  `recommended` text DEFAULT NULL,
+  `owner_decision` text DEFAULT NULL,
+  `status` enum('APPROVED','NEEDS_OWNER_DECISION') NOT NULL DEFAULT 'NEEDS_OWNER_DECISION',
+  `blocking_level` enum('STRUCTURAL_TARGET_BLOCKER','READY_TO_BUILD_BLOCKER','UAT_BLOCKER','GO_LIVE_BLOCKER','CONFIG_PENDING','NONE') NOT NULL DEFAULT 'NONE',
+  `blocker_type` enum('STRUCTURAL','THRESHOLD') DEFAULT NULL,
+  `blocking_reason` varchar(255) NOT NULL DEFAULT '',
+  `affected_documents` text DEFAULT NULL,
+  `affected_screens` text DEFAULT NULL,
+  `affected_rules` text DEFAULT NULL,
+  `migration_impact` text DEFAULT NULL,
+  `code_impact` text DEFAULT NULL,
+  `evidence` text DEFAULT NULL,
+  `approved_by` varchar(120) NOT NULL DEFAULT '',
+  `approved_at` varchar(40) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`decision_id`),
+  KEY `k_status` (`status`),
+  KEY `k_block` (`blocking_level`),
+  KEY `k_btype` (`blocker_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: repair01_departments ──
+CREATE TABLE `repair01_departments` (
+  `canonical_code` varchar(12) NOT NULL,
+  `display_order` smallint(5) unsigned DEFAULT NULL,
+  `name_ar` varchar(160) NOT NULL,
+  `sector` enum('CORPORATE','OPERATIONAL','OUTSIDE') NOT NULL,
+  `parent_code` varchar(12) DEFAULT NULL,
+  `note` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`canonical_code`),
+  KEY `k_order` (`display_order`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: repair01_dept_crosswalk ──
+CREATE TABLE `repair01_dept_crosswalk` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `legacy_name` varchar(160) NOT NULL,
+  `canonical_code` varchar(12) NOT NULL,
+  `verdict` enum('MAP','SPLIT','RECLASSIFY','NEW') NOT NULL,
+  `split_rule` varchar(255) NOT NULL DEFAULT '',
+  `note` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `k_legacy` (`legacy_name`),
+  KEY `k_canon` (`canonical_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: repair01_events ──
+CREATE TABLE `repair01_events` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `event_code` varchar(80) NOT NULL,
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `wave` varchar(8) NOT NULL DEFAULT '',
+  `source_unit` varchar(160) NOT NULL DEFAULT '',
+  `source_screen` varchar(255) NOT NULL DEFAULT '',
+  `idempotency_key` varchar(255) NOT NULL DEFAULT '',
+  `consumers` text DEFAULT NULL,
+  `effect_type` varchar(160) NOT NULL DEFAULT '',
+  `retry_policy` varchar(80) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `k_code` (`event_code`),
+  KEY `k_wave` (`wave`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: repair01_fields ──
+CREATE TABLE `repair01_fields` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `requirement_id` varchar(48) NOT NULL DEFAULT '',
+  `wave` varchar(8) NOT NULL DEFAULT '',
+  `unit` varchar(160) NOT NULL DEFAULT '',
+  `surface` varchar(255) NOT NULL DEFAULT '',
+  `seq` varchar(12) NOT NULL DEFAULT '',
+  `field_name` varchar(255) NOT NULL DEFAULT '',
+  `field_type` varchar(80) NOT NULL DEFAULT '',
+  `visibility_rule` varchar(255) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `k_req` (`requirement_id`),
+  KEY `k_wave` (`wave`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: repair01_ownership ──
+CREATE TABLE `repair01_ownership` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `space_role` varchar(160) NOT NULL DEFAULT '',
+  `screen` varchar(255) NOT NULL DEFAULT '',
+  `route` varchar(255) NOT NULL DEFAULT '',
+  `owner_dept` varchar(160) NOT NULL DEFAULT '',
+  `classification` varchar(60) NOT NULL DEFAULT '',
+  `ownership_kind` varchar(80) NOT NULL DEFAULT '',
+  `space_count` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `gov_meaning` varchar(255) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `w1_verdict` enum('REVOKED_TO_OWNER','CONTEXTUAL_READ_ONLY','RECLASSIFY_OWNED','RECLASSIFY_PERSONAL','ESCALATED_DECISION') DEFAULT NULL,
+  `w1_rule` varchar(48) NOT NULL DEFAULT '',
+  `w1_reason` varchar(400) NOT NULL DEFAULT '',
+  `w1_evidence` varchar(255) NOT NULL DEFAULT '',
+  `w1_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `k_cls` (`classification`),
+  KEY `k_screen` (`screen`),
+  KEY `k_w1` (`w1_verdict`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: repair01_requirements ──
+CREATE TABLE `repair01_requirements` (
+  `requirement_id` varchar(48) NOT NULL,
+  `wave` varchar(8) NOT NULL DEFAULT '',
+  `stage_no` tinyint(3) unsigned DEFAULT NULL,
+  `unit` varchar(160) NOT NULL DEFAULT '',
+  `dependency` varchar(160) NOT NULL DEFAULT '',
+  `seq` varchar(12) NOT NULL DEFAULT '',
+  `group_name` varchar(160) NOT NULL DEFAULT '',
+  `surface` varchar(255) NOT NULL DEFAULT '',
+  `grain` varchar(255) NOT NULL DEFAULT '',
+  `source_of_truth` varchar(255) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`requirement_id`),
+  KEY `k_wave` (`wave`),
+  KEY `k_unit` (`unit`),
+  KEY `k_stage` (`stage_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: repair01_screen_registry ──
+CREATE TABLE `repair01_screen_registry` (
+  `screen_id` varchar(12) NOT NULL COMMENT 'المعرف المعياري SCR-nnnn — ثابت لا يعاد ترقيمه',
+  `screen_file` varchar(160) NOT NULL DEFAULT '' COMMENT 'اسم الملف — مفتاح سجل الدورة الحي',
+  `route` varchar(200) DEFAULT NULL COMMENT 'المسار المعياري Dir/file.php — NULL لما لم يُبنَ (والفراغ لا يصلح: uq_route يمنع تكراره)',
+  `route_rule` varchar(48) NOT NULL DEFAULT '',
+  `owner_code` varchar(12) NOT NULL DEFAULT '' COMMENT 'الرمز المعياري للادارة المالكة',
+  `owner_role` varchar(160) NOT NULL DEFAULT '' COMMENT 'الدور المسؤول عن الشاشة',
+  `owner_rule` varchar(48) NOT NULL DEFAULT '',
+  `lifecycle` enum('LIVE_REGISTERED','LIVE_UNREGISTERED','GHOST_TARGET','GHOST_RETIRED') NOT NULL DEFAULT 'LIVE_UNREGISTERED',
+  `lifecycle_rule` varchar(48) NOT NULL DEFAULT '',
+  `parent_screen_id` varchar(12) NOT NULL DEFAULT '' COMMENT 'الاب حين تكون تبويبا فيه',
+  `parent_rule` varchar(48) NOT NULL DEFAULT '',
+  `visibility_class` enum('MENU_ITEM','TAB_CHILD','DIRECT_ONLY','ANCHOR','NOT_BUILT') NOT NULL DEFAULT 'DIRECT_ONLY',
+  `visibility_rule` varchar(48) NOT NULL DEFAULT '',
+  `on_disk` tinyint(1) NOT NULL DEFAULT 0,
+  `origin` varchar(24) NOT NULL DEFAULT '' COMMENT 'SURFACES / DISK / NAV',
+  `ghost_verdict` varchar(32) NOT NULL DEFAULT '',
+  `ghost_why` varchar(400) NOT NULL DEFAULT '',
+  `guard_kind` varchar(32) NOT NULL DEFAULT '' COMMENT 'SELF_EARLY / SHARED_SHELL / SHELL / NONE',
+  `guard_evidence` varchar(255) NOT NULL DEFAULT '',
+  `w2_why` varchar(400) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`screen_id`),
+  UNIQUE KEY `uq_route` (`route`),
+  KEY `k_file` (`screen_file`),
+  KEY `k_life` (`lifecycle`),
+  KEY `k_vis` (`visibility_class`),
+  KEY `k_guard` (`guard_kind`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W02 — canonical screen registry: one screen per row';
+
+-- ── Table: repair01_source_files ──
+CREATE TABLE `repair01_source_files` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `file_no` varchar(8) NOT NULL,
+  `file_name` varchar(255) NOT NULL,
+  `sha256` char(64) NOT NULL,
+  `bytes` int(10) unsigned NOT NULL,
+  `sheet_count` smallint(5) unsigned NOT NULL,
+  `data_rows` int(10) unsigned NOT NULL,
+  `frozen_at` datetime NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_file` (`file_name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: repair01_surfaces ──
+CREATE TABLE `repair01_surfaces` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `screen_file` varchar(160) NOT NULL,
+  `dept_legacy` varchar(160) NOT NULL DEFAULT '',
+  `canonical_code` varchar(12) DEFAULT NULL,
+  `screen_title` varchar(255) NOT NULL DEFAULT '',
+  `layer_name` varchar(60) NOT NULL DEFAULT '',
+  `stage_order` varchar(10) NOT NULL DEFAULT '',
+  `stage_name` varchar(160) NOT NULL DEFAULT '',
+  `group_name` varchar(160) NOT NULL DEFAULT '',
+  `output_doc` varchar(255) NOT NULL DEFAULT '',
+  `resp_role` varchar(160) NOT NULL DEFAULT '',
+  `next_state` varchar(255) NOT NULL DEFAULT '',
+  `stage_kind` varchar(20) NOT NULL DEFAULT '',
+  `on_disk` tinyint(1) NOT NULL DEFAULT 0,
+  `disk_path` varchar(255) NOT NULL DEFAULT '',
+  `recon_verdict` varchar(60) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `canon_rule` varchar(48) NOT NULL DEFAULT '',
+  `canon_why` varchar(400) NOT NULL DEFAULT '',
+  `role_source` varchar(64) NOT NULL DEFAULT '',
+  `role_why` varchar(400) NOT NULL DEFAULT '',
+  `screen_id` varchar(12) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `k_file` (`screen_file`),
+  KEY `k_disk` (`on_disk`),
+  KEY `k_dept` (`dept_legacy`),
+  KEY `k_scr` (`screen_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: repair01_target_gaps ──
+CREATE TABLE `repair01_target_gaps` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `unit` varchar(160) NOT NULL DEFAULT '',
+  `surface_name` varchar(255) NOT NULL,
+  `built_counterpart` varchar(255) NOT NULL DEFAULT '',
+  `verdict` varchar(120) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `origin_stage` varchar(8) NOT NULL DEFAULT '',
+  `origin_note` varchar(255) NOT NULL DEFAULT '',
+  `wave_stage` varchar(8) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `k_unit` (`unit`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: repair01_w1_decisions ──
+CREATE TABLE `repair01_w1_decisions` (
+  `decision_id` varchar(32) NOT NULL,
+  `stage` varchar(8) NOT NULL DEFAULT 'W01',
+  `topic` varchar(160) NOT NULL DEFAULT '',
+  `question` varchar(400) NOT NULL DEFAULT '',
+  `ruling` varchar(400) NOT NULL DEFAULT '',
+  `rationale` text DEFAULT NULL,
+  `evidence` varchar(400) NOT NULL DEFAULT '',
+  `scope_rows` int(10) unsigned NOT NULL DEFAULT 0,
+  `status` enum('RECORDED_PENDING_OWNER','OWNER_APPROVED') NOT NULL DEFAULT 'RECORDED_PENDING_OWNER',
+  `decided_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`decision_id`),
+  KEY `k_stage` (`stage`),
+  KEY `k_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: repair01_w2_decisions ──
+CREATE TABLE `repair01_w2_decisions` (
+  `decision_id` varchar(32) NOT NULL,
+  `stage` varchar(8) NOT NULL DEFAULT 'W02',
+  `topic` varchar(160) NOT NULL DEFAULT '',
+  `question` varchar(400) NOT NULL DEFAULT '',
+  `ruling` varchar(400) NOT NULL DEFAULT '',
+  `rationale` text DEFAULT NULL,
+  `evidence` varchar(400) NOT NULL DEFAULT '',
+  `scope_rows` int(10) unsigned NOT NULL DEFAULT 0,
+  `status` enum('RECORDED_PENDING_OWNER','OWNER_APPROVED') NOT NULL DEFAULT 'RECORDED_PENDING_OWNER',
+  `decided_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`decision_id`),
+  KEY `k_stage` (`stage`),
+  KEY `k_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: report_role_permissions ──
@@ -15971,9 +16263,17 @@ CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_slot_total_margin` AS se
 SET collation_connection = 'utf8mb4_unicode_ci';
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_supplier_balance_aging` AS select `s`.`company_id` AS `company_id`,`s`.`party_ref` AS `supplier_id`,max(`su`.`name`) AS `supplier_name`,max(`su`.`supplier_code`) AS `supplier_code`,`s`.`currency` AS `currency`,count(0) AS `open_settlements`,sum(`s`.`net_amount`) AS `outstanding_amount`,min(`s`.`period_to`) AS `oldest_period_to`,max(`s`.`period_to`) AS `newest_period_to`,max(to_days(curdate()) - to_days(`s`.`period_to`)) AS `oldest_age_days`,sum(case when to_days(curdate()) - to_days(`s`.`period_to`) <= 30 then `s`.`net_amount` else 0 end) AS `bucket_0_30`,sum(case when to_days(curdate()) - to_days(`s`.`period_to`) between 31 and 60 then `s`.`net_amount` else 0 end) AS `bucket_31_60`,sum(case when to_days(curdate()) - to_days(`s`.`period_to`) between 61 and 90 then `s`.`net_amount` else 0 end) AS `bucket_61_90`,sum(case when to_days(curdate()) - to_days(`s`.`period_to`) between 91 and 180 then `s`.`net_amount` else 0 end) AS `bucket_91_180`,sum(case when to_days(curdate()) - to_days(`s`.`period_to`) > 180 then `s`.`net_amount` else 0 end) AS `bucket_over_180`,sum(case when `s`.`state` = 'payment_requested' then `s`.`net_amount` else 0 end) AS `requested_amount`,sum(case when `s`.`state` = 'approved' then `s`.`net_amount` else 0 end) AS `approved_amount`,sum(case when `s`.`open_objections` > 0 then 1 else 0 end) AS `with_objections`,case when max(to_days(curdate()) - to_days(`s`.`period_to`)) > 180 then 'أكثر من ١٨٠ يومًا' when max(to_days(curdate()) - to_days(`s`.`period_to`)) > 90 then '٩١–١٨٠ يومًا' when max(to_days(curdate()) - to_days(`s`.`period_to`)) > 60 then '٦١–٩٠ يومًا' when max(to_days(curdate()) - to_days(`s`.`period_to`)) > 30 then '٣١–٦٠ يومًا' else 'حتى ٣٠ يومًا' end collate utf8mb4_unicode_ci AS `age_bucket`,case when sum(case when `s`.`open_objections` > 0 then 1 else 0 end) > 0 then 'حسمُ الاعتراضاتِ المفتوحةِ قبلَ الصرف' when sum(case when `s`.`state` = 'payment_requested' then 1 else 0 end) > 0 then 'متابعةُ طلبِ الدفعِ لدى المالية' when max(to_days(curdate()) - to_days(`s`.`period_to`)) > 180 then 'تصعيدٌ — رصيدٌ تجاوز ١٨٠ يومًا' when max(to_days(curdate()) - to_days(`s`.`period_to`)) > 90 then 'إصدارُ طلبِ دفعٍ عاجل' else 'ضمنَ المهلةِ — لا إجراءَ عاجل' end collate utf8mb4_unicode_ci AS `suggested_action`,min(`s`.`prepared_at`) AS `first_prepared_at`,max(`s`.`approved_at`) AS `last_approved_at` from (`settlements` `s` left join `suppliers` `su` on(`su`.`id` = `s`.`party_ref` and `su`.`is_deleted` = 0)) where `s`.`is_deleted` = 0 and `s`.`party_type` = 'supplier' and `s`.`state` in ('approved','payment_requested') and `s`.`paid_at` is null group by `s`.`company_id`,`s`.`party_ref`,`s`.`currency`;
 
+-- ── View: v_supplier_qualification ──
+SET collation_connection = 'utf8mb4_unicode_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_supplier_qualification` AS select `s`.`company_id` AS `company_id`,`s`.`id` AS `supplier_id`,`s`.`name` AS `supplier_name`,`s`.`supplier_code` AS `supplier_code`,`s`.`commercial_registration` is not null and `s`.`commercial_registration` <> '' AS `has_cr`,`s`.`tax_number` is not null and `s`.`tax_number` <> '' AS `has_tax`,`s`.`identity_number` is not null and `s`.`identity_number` <> '' AS `has_identity`,`s`.`identity_expiry_date` AS `identity_expiry_date`,`s`.`identity_expiry_date` is not null and `s`.`identity_expiry_date` < curdate() AS `identity_expired`,`s`.`bank_account_no` is not null and `s`.`bank_account_no` <> '' AS `has_bank_account`,`s`.`bank_iban` is not null and `s`.`bank_iban` <> '' AS `has_iban`,`s`.`bank_verified_at` is not null AS `bank_verified`,(`s`.`commercial_registration` is null or `s`.`commercial_registration` = '') + (`s`.`tax_number` is null or `s`.`tax_number` = '') + (`s`.`identity_number` is null or `s`.`identity_number` = '') + (`s`.`bank_account_no` is null or `s`.`bank_account_no` = '') + (`s`.`bank_verified_at` is null) AS `missing_count`,concat_ws('، ',case when `s`.`commercial_registration` is null or `s`.`commercial_registration` = '' then cast('سجلٌّ تجاريّ' as char charset utf8mb4) collate utf8mb4_unicode_ci end,case when `s`.`tax_number` is null or `s`.`tax_number` = '' then cast('رقمٌ ضريبيّ' as char charset utf8mb4) collate utf8mb4_unicode_ci end,case when `s`.`identity_number` is null or `s`.`identity_number` = '' then cast('هويّة' as char charset utf8mb4) collate utf8mb4_unicode_ci end,case when `s`.`bank_account_no` is null or `s`.`bank_account_no` = '' then cast('حسابٌ بنكيّ' as char charset utf8mb4) collate utf8mb4_unicode_ci end,case when `s`.`bank_verified_at` is null then cast('توثيقُ الحساب' as char charset utf8mb4) collate utf8mb4_unicode_ci end) AS `missing_list`,case when `s`.`commercial_registration` is null or `s`.`commercial_registration` = '' or `s`.`tax_number` is null or `s`.`tax_number` = '' or `s`.`identity_number` is null or `s`.`identity_number` = '' or `s`.`bank_account_no` is null or `s`.`bank_account_no` = '' or `s`.`bank_verified_at` is null then cast('ناقصُ التأهيل' as char charset utf8mb4) collate utf8mb4_unicode_ci when `s`.`identity_expiry_date` is not null and `s`.`identity_expiry_date` < curdate() then cast('هويّةٌ منتهية' as char charset utf8mb4) collate utf8mb4_unicode_ci else cast('مؤهَّل' as char charset utf8mb4) collate utf8mb4_unicode_ci end AS `qualification_state`,coalesce(`k`.`live_contracts`,0) AS `live_contracts` from (`suppliers` `s` left join (select `supplier_contracts`.`supplier_id` AS `supplier_id`,count(0) AS `live_contracts` from `supplier_contracts` where `supplier_contracts`.`is_deleted` = 0 group by `supplier_contracts`.`supplier_id`) `k` on(`k`.`supplier_id` = `s`.`id`)) where `s`.`is_deleted` = 0;
+
 -- ── View: v_supplier_share_units ──
 SET collation_connection = 'utf8mb4_unicode_ci';
 CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_supplier_share_units` AS select `s`.`company_id` AS `company_id`,`s`.`id` AS `supplier_container_id`,`s`.`container_no` AS `container_no`,`s`.`supplier_id` AS `supplier_id`,round(coalesce(sum(`seat`.`monthly_basis`),0) * ((to_days(coalesce(`s`.`valid_to`,`p`.`valid_to`)) - to_days(coalesce(`s`.`valid_from`,`p`.`valid_from`))) / 30.0),2) AS `share_units`,coalesce(`s`.`valid_from`,`p`.`valid_from`) AS `effective_from`,coalesce(`s`.`valid_to`,`p`.`valid_to`) AS `effective_to` from ((`op_containers` `s` left join `op_containers` `p` on(`p`.`id` = `s`.`parent_id`)) left join `op_containers` `seat` on(`seat`.`parent_id` = `s`.`id` and `seat`.`is_deleted` = 0 and `seat`.`level` = 'معدة')) where `s`.`level` = 'مورد' and `s`.`is_deleted` = 0 group by `s`.`company_id`,`s`.`id`,`s`.`container_no`,`s`.`supplier_id`,coalesce(`s`.`valid_from`,`p`.`valid_from`),coalesce(`s`.`valid_to`,`p`.`valid_to`);
+
+-- ── View: v_supplier_targets_monthly ──
+SET collation_connection = 'utf8mb4_unicode_ci';
+CREATE ALGORITHM=UNDEFINED SQL SECURITY INVOKER VIEW `v_supplier_targets_monthly` AS with recursive span as (select `v_supplier_share_units`.`company_id` AS `company_id`,`v_supplier_share_units`.`supplier_id` AS `supplier_id`,date_format(min(`v_supplier_share_units`.`effective_from`),'%Y-%m-01') AS `m_first`,date_format(max(`v_supplier_share_units`.`effective_to`),'%Y-%m-01') AS `m_last` from `v_supplier_share_units` where `v_supplier_share_units`.`supplier_id` is not null and `v_supplier_share_units`.`effective_from` is not null and `v_supplier_share_units`.`effective_to` is not null group by `v_supplier_share_units`.`company_id`,`v_supplier_share_units`.`supplier_id`), months as (select `span`.`company_id` AS `company_id`,`span`.`supplier_id` AS `supplier_id`,cast(`span`.`m_first` as date) AS `mon`,cast(`span`.`m_last` as date) AS `m_last` from `span` union all select `months`.`company_id` AS `company_id`,`months`.`supplier_id` AS `supplier_id`,`months`.`mon` + interval 1 month AS `DATE_ADD(mon, INTERVAL 1 MONTH)`,`months`.`m_last` AS `m_last` from `months` where `months`.`mon` < `months`.`m_last`)select `m`.`company_id` AS `company_id`,`m`.`supplier_id` AS `supplier_id`,`s`.`name` AS `supplier_name`,cast(date_format(`m`.`mon`,'%Y-%m') as char charset utf8mb4) collate utf8mb4_unicode_ci AS `target_month`,`m`.`mon` AS `month_start`,count(`u`.`supplier_container_id`) AS `shares_active`,round(coalesce(sum(`u`.`share_units` * 30.0 / nullif(to_days(`u`.`effective_to`) - to_days(`u`.`effective_from`),0)),0),2) AS `monthly_target`,case when count(`u`.`supplier_container_id`) = 0 then cast('شهرُ صفرٍ — لا حصةَ سارية' as char charset utf8mb4) collate utf8mb4_unicode_ci else cast('مستهدَفٌ من حصصٍ سارية' as char charset utf8mb4) collate utf8mb4_unicode_ci end AS `basis` from ((`months` `m` left join `suppliers` `s` on(`s`.`id` = `m`.`supplier_id`)) left join `v_supplier_share_units` `u` on(`u`.`supplier_id` = `m`.`supplier_id` and `u`.`company_id` = `m`.`company_id` and `u`.`effective_from` is not null and `u`.`effective_to` is not null and `u`.`effective_from` <= last_day(`m`.`mon`) and `u`.`effective_to` >= `m`.`mon`)) group by `m`.`company_id`,`m`.`supplier_id`,`s`.`name`,`m`.`mon`;
 
 -- ── View: v_worker_billable_hours ──
 CREATE ALGORITHM=UNDEFINED SQL SECURITY DEFINER VIEW `v_worker_billable_hours` AS select `wp`.`id` AS `employee_id`,`t`.`date` AS `work_date`,cast(`t`.`operator` as unsigned) AS `operation_id`,coalesce(sum(`t`.`executed_hours`),0) AS `productive_hours`,coalesce(sum(`t`.`standby_hours`),0) AS `standby_hours`,coalesce(sum(`t`.`hr_fault`),0) AS `worker_downtime`,coalesce(sum(`t`.`maintenance_fault`),0) AS `maintenance_downtime`,greatest(coalesce(sum(`t`.`executed_hours`),0) + coalesce(sum(`t`.`standby_hours`),0) - coalesce(sum(`t`.`hr_fault`),0),0) AS `billable_baseline` from (`employees` `wp` join `timesheet` `t` on(cast(`t`.`employee_id` as unsigned) = `wp`.`id`)) group by `wp`.`id`,`t`.`date`,cast(`t`.`operator` as unsigned);

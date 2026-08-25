@@ -21,6 +21,17 @@ require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الج�
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
+
+/* ── RPR-W02 §٤-٤ · CS-01 · RF-02 — الحارسُ فوقَ المعالجِ لا تحتَه ──────────
+   كان حارسُ العرضِ الوحيدُ هو الذي ينفِّذه `insidebar.php` (السطر 233)، وفي
+   السطرِ 124 قبله `INSERT INTO exec_approvals` — أي أنَّ الأثرَ يُرحَّل ثمَّ
+   يُقال «لا صلاحية». و«إخفاءُ الرابطِ لا يُغلق المسارَ المباشر»: المسارُ
+   يُفتح مباشرةً فيكتب قبل أن يُسأل. الدالةُ نفسُها ولا تغييرَ في مَن يُمنع —
+   التغييرُ في **متى**. (النمطُ حرفًا من `Procurement/rfq_compare_award.php`.) */
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 require_once __DIR__ . '/../app/Services/Contract/PenaltyService.php';
 require_once __DIR__ . '/claim_helpers.php';
 

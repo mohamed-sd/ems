@@ -13,6 +13,15 @@ if (!isset($_SESSION['user'])) {
 include '../config.php';
 require_once __DIR__ . '/../includes/ladder_gate.php';
 include '../includes/permissions_helper.php';
+
+/* ── RPR-W02 §٤-٤ · CS-01 · RF-02 — الحارسُ فوقَ المعالجِ لا تحتَه ──────────
+   كان `INSERT INTO exec_approvals` في السطرِ 239 و`insidebar` (منفِّذُ حارسِ
+   العرض) في السطرِ 302 — فالأثرُ يُرحَّل ثمَّ يُقال «لا صلاحية». و`proc_page_perms`
+   أدناه تقرأ الصلاحيةَ ولا تُنفِّذها فوقَ المعالج. الدالةُ نفسُها والتغييرُ في **متى**. */
+if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
+    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+}
+
 require_once __DIR__ . '/proc_helpers.php';
 
 $ctx             = proc_ctx();

@@ -398,17 +398,27 @@ function printStageNav($roleId, array $items, $basePrefix = '../', $badges = arr
                 $cur = uxuiCurrentMap($GLOBALS['conn'], $GLOBALS['__uxui_cur_role']);
                 return isset($cur[$route]);
             };
-            if (!$navFromRegistry('main/role_board.php')) {
-                ems_nav_mark_printed('main/role_board.php||الرئيسية');
-                echo '<li><a href="' . $basePrefix . 'main/role_board.php">'
-                   . '<i class="fa fa-house"></i> <span>الرئيسية</span></a></li>' . "\n";
+            /* RPR-W02 §٤-٣: المرساتان **من السجلِّ المعياريِّ** لا من هذين السطرين.
+               كان المسارُ والاسمُ مكتوبَين حرفًا هنا وفي `insidebar.php` وفي
+               `printEmsTenGroupNav` — **ثلاثةُ مواضعَ لبندٍ واحد**، ويكفي أن
+               يتغيَّر أحدُها ليتفرَّق ما يراه دورٌ عمّا يراه غيرُه. */
+            /* ⚠ `printStageNav` لا تأخذ `$conn` وسيطًا — والاتصالُ يُقرأ من
+               `$GLOBALS` كما يفعل `$navFromRegistry` أعلاه بسطرَين. و`$conn`
+               المحليُّ هنا **غيرُ مُعرَّف**: تمريرُه يعطي `null` فتصمت المرساتان
+               صمتًا تامًّا ولا يظهر خطأ. */
+            require_once __DIR__ . '/nav_icon_map.php';
+            require_once __DIR__ . '/nav_anchors.php';
+            $__navConn = isset($GLOBALS['conn']) ? $GLOBALS['conn'] : null;
+            $__aHome = ems_nav_anchor($__navConn, 'HOME');
+            if ($__aHome !== null && !$navFromRegistry($__aHome['route'])) {
+                ems_nav_mark_printed($__aHome['route'] . '||' . $__aHome['label']);
+                echo ems_nav_anchor_li($__navConn, 'HOME', $basePrefix);
             }
-            if (!$navFromRegistry('chats/index.php')) {
-                ems_nav_mark_printed('chats/index.php||المراسلات');
-                echo '<li><a href="' . $basePrefix . 'chats/index.php" id="sidebarChatLink">'
-                   . '<i class="fa fa-comments"></i> <span>المراسلات</span>'
-                   . '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>'
-                   . '</a></li>' . "\n";
+            $__aChat = ems_nav_anchor($__navConn, 'CHATS');
+            if ($__aChat !== null && !$navFromRegistry($__aChat['route'])) {
+                ems_nav_mark_printed($__aChat['route'] . '||' . $__aChat['label']);
+                echo ems_nav_anchor_li($__navConn, 'CHATS', $basePrefix, 'id="sidebarChatLink"',
+                    '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>');
             }
         }
 
@@ -960,23 +970,27 @@ function printEmsTenGroupNav($conn, $items, $uxMap, $uxCurMap, $basePrefix, $bad
           (الأدوارُ الفرعيةُ ومن خارجِ قياسِ current). ومسارُ العشرةِ لا يمرُّ
           بتلك الدالةِ — فلولا حقنُهما هنا لسقطتا عن أحدَ عشرَ دورًا صامتةً.
           **وهما مُثبَّتتان في «مساحتي»**: مكانٌ واحدٌ في كلِّ إدارةٍ لا يتغير. */
+    /* RPR-W02 §٤-٣: المرساتان من `nav_canonical.anchor_key` — لا مسارَ حرفيًّا هنا. */
+    require_once __DIR__ . '/nav_icon_map.php';
+    require_once __DIR__ . '/nav_anchors.php';
     $anchors = '';
-    if (!isset($covered['main/role_board.php'])) {
+    $__aHome = ems_nav_anchor($conn, 'HOME');
+    if ($__aHome !== null && !isset($covered[$__aHome['route']])) {
         ob_start();
-        printNavLinkItem(array('code' => 'main/role_board.php', 'name' => 'الرئيسية', 'icon' => 'fa fa-house'), $basePrefix, $badges);
+        printNavLinkItem(array('code' => $__aHome['route'], 'name' => $__aHome['label'], 'icon' => $__aHome['icon']),
+                         $basePrefix, $badges);
         $one = ob_get_clean();
-        if (ems_nav_group_has_link($one)) { $anchors .= $one; $covered['main/role_board.php'] = true; }
+        if (ems_nav_group_has_link($one)) { $anchors .= $one; $covered[$__aHome['route']] = true; }
     }
-    if (!isset($covered['chats/index.php'])) {
+    $__aChat = ems_nav_anchor($conn, 'CHATS');
+    if ($__aChat !== null && !isset($covered[$__aChat['route']])) {
         /* المراسلاتُ لها وسمُها الخاصُّ (مُعرِّفُ الرابطِ وشارةُ غيرِ المقروء) —
-           فتُؤخذ حقنةُ `insidebar` إن جاءت، وإلا فالوسمُ المكافئُ حرفًا. */
-        ems_nav_mark_printed('chats/index.php||المراسلات');
+           فتُؤخذ حقنةُ `insidebar` إن جاءت، وإلا فالوسمُ المكافئُ من السجلِّ نفسِه. */
+        ems_nav_mark_printed($__aChat['route'] . '||' . $__aChat['label']);
         $anchors .= ($afterHome !== '') ? $afterHome
-            : '<li><a href="' . $basePrefix . 'chats/index.php" id="sidebarChatLink">'
-              . '<i class="fa fa-comments"></i> <span>المراسلات</span>'
-              . '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>'
-              . '</a></li>' . "\n";
-        $covered['chats/index.php'] = true;
+            : ems_nav_anchor_li($conn, 'CHATS', $basePrefix, 'id="sidebarChatLink"',
+                  '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>');
+        $covered[$__aChat['route']] = true;
     }
     /* حقنةُ المراسلاتِ الصلبةُ تُسقَط متى ولَّدها السجلُّ — منعًا للازدواج */
     $afterHome = '';

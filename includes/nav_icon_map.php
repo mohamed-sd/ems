@@ -177,6 +177,11 @@ function ems_nav_route_icons() {
         'Reports/exceptions_report.php?focus=unattributed_stops' => 'fa fa-circle-pause',
         'emsreports/index.php'        => 'fa fa-chart-column',
         'chats/index.php'             => 'fa fa-comments',
+        /* RPR-W02 §٤-٣: مِرساةُ «الرئيسية» صارت تقرأ أيقونتَها من هذا المصدرِ
+           بعدَ أن كانت `fa fa-house` مكتوبةً حرفًا في ثلاثةِ مواضعَ من القشرة.
+           وبلا صفٍّ هنا تنزل إلى قاعدةِ اللفظِ فتُعطي `fa fa-circle-dot` —
+           فتتبدَّل أيقونةُ أوّلِ رابطٍ في كلِّ قائمةٍ بلا قرار. */
+        'main/role_board.php'         => 'fa fa-house',
         // ── شاشات «قريبًا» (تُفهرس باسم الشاشة) ──
         'my_tasks.php'          => 'fa fa-list-check',
         'shift_log.php'         => 'fa fa-clipboard',

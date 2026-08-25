@@ -1,30 +1,31 @@
 {
-    "generated_at": "2026-08-23 03:26:58",
+    "generated_at": "2026-08-25 04:14:15",
     "source_db": "equipation_manage",
     "server_version": "11.4.9-MariaDB-log",
     "files": {
         "schema.sql": {
-            "sha1": "972899faa7bde218ed8b327a151c43ed7f55e261",
-            "bytes": 1125798
+            "sha1": "f28e75678ca330e238ce36e7fad33b4e6cef4243",
+            "bytes": 1145160
         },
         "seed_reference.sql": {
-            "sha1": "68366095855ea210450df043904201e917d86a2b",
-            "bytes": 919427
+            "sha1": "a0132f630cdd8c62058789bcbe7eb68be3ca402f",
+            "bytes": 1200802
         }
     },
     "schema": {
-        "tables": 654,
-        "views": 26,
+        "tables": 668,
+        "views": 28,
         "triggers": 34
     },
     "seed": {
-        "rows": 8187,
+        "rows": 8606,
         "tables": {
             "roles": 35,
-            "modules": 502,
-            "role_permissions": 3102,
+            "modules": 505,
+            "role_permissions": 3130,
             "link_groups": 1292,
             "nav_items": 1802,
+            "nav_canonical": 388,
             "equipments_types": 30,
             "failure_codes": 402,
             "fin_chart_of_accounts": 298,

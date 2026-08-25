@@ -277,13 +277,18 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
          §6 «مصدرٌ واحدٌ محكوم»، ولتفتح لوحةَ الدور مباشرةً بلا تحويلٍ وسيط
          فيتلوّن رابطُها النشط. والمراسلاتُ تبقى ثابتةً بقرار المالك حتى جولةِ
          تصفية السايدبار — وتُحقن بعد باب HOME لا قبله، فتبقى «الرئيسية» أولَ
-         ما يُرى (§6) ولا تهبط المراسلاتُ إلى ذيل القائمة. */
-      $__sb_chats_li = '<li>'
-        . '<a href="../chats/index.php" id="sidebarChatLink">'
-        . '<i class="fa fa-comments"></i>'
-        . '<span class="sidebar-link-text">المراسلات</span>'
-        . '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>'
-        . '</a></li>' . "\n";
+         ما يُرى (§6) ولا تهبط المراسلاتُ إلى ذيل القائمة.
+
+         RPR-W02 §٤-٣: المسارُ والاسمُ **من السجلِّ المعياريِّ** لا من هذا السطر —
+         كان `../chats/index.php` و«المراسلات» مكتوبَين هنا حرفًا، فتغييرُ أيٍّ
+         منهما تحريرُ ملفِّ قشرة. والمرساةُ الآن مفتاحٌ (`CHATS`) يعطيه
+         `nav_canonical.anchor_key` وجهتَه واسمَه، و`nav_icon_map` أيقونتَه. */
+      require_once dirname(__FILE__) . '/includes/nav_icon_map.php';
+      require_once dirname(__FILE__) . '/includes/nav_anchors.php';
+      $__sb_chats_li = isset($conn)
+        ? ems_nav_anchor_li($conn, 'CHATS', '../', 'id="sidebarChatLink"',
+              '<span id="nav-unread-badge" class="nav-count-badge" style="display:none;"></span>')
+        : '';
       ?>
       <?php
       // عرض الروابط الديناميكية من جدول modules بناءً على دور المستخدم
@@ -346,111 +351,24 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
       }
       ?>
 
-      <?php // صلاحيات الادارة العليا == -1
-      if ($_SESSION['user']['role'] == "-1") {
-        ?>
-        <!-- <li><a href="../Projects/add_project.php"><i class="fa fa-plus-circle"></i> <span>إضافة مشروع</span></a></li>
-        <li><a href="../Projects/view_projects.php"><i class="fa fa-list-alt"></i> <span>قائمة المشاريع</span></a></li>
-        <li><a href="../Projects/add_client.php"><i class="fa fa-user-plus"></i> <span>إضافة عميل</span></a></li>
-        <li><a href="../Clients/clients.php"><i class="fa fa-users"></i> <span>قائمة العملاء</span></a></li>
-        <li><a href="../Projects/projects.php"><i class="fa fa-folder-open"></i> <span>المشاريع</span></a></li>
-        <li><a href="../Suppliers/suppliers.php"><i class="fa fa-truck-loading"></i> <span>الموردين</span></a></li>
-        <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
-        <li><a href="../Employees/employees.php"><i class="fa fa-id-card"></i> <span>المشغلين</span></a></li>
-        <li><a href="../Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>
-        <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a>
-        </li>
-        <li><a href="../Timesheet/view_timesheet.php"><i class="fa fa-calendar-days"></i> <span>ساعات اليوم</span></a>
-        </li>
-        <li><a href="../main/users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
-        <li><a href="../Reports/new_reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
-        <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>تقارير العقود</span></a></li>
-        <?php
-      }
+      <?php
+      /* ═══ RPR-W02 §٤-٣ — قُصَّت كتلتا البنودِ اليدويّةِ الميتة ══════════════
+         ◆ **ما كان هنا**: أربعٌ وستّون سطرًا من `<li><a href="…">` مكتوبةٍ بيدٍ
+           لأحدَ عشرَ دورًا، كلُّها داخلَ تعليقاتِ HTML — يطبعها PHP ولا يعرضها
+           المتصفح. وهي **مسارُ التحريرِ اليدويِّ للبند** بعينِه: تغييرُ رابطٍ
+           كان يعني تحريرَ هذا الملفّ، والمصدرُ الواحدُ (`nav_items`) يُتخطَّى.
+         ◆ **وعطبٌ مقيسٌ لا زخرفة**: التعليقُ الذي كان يبدأ عند «صلاحيات الادارة
+           العليا == -1» **لا يُغلق إلّا داخلَ كتلةِ الدور 1**. فلغيرِ الدور 1 —
+           والسوبر أدمن منهم — يبتلع `<!--` ما بعده: رابطَي التقاريرِ والإعدادات
+           **و`</ul></div>` نفسَيهما**. أي أنَّ ذيلَ السايدبارِ ووسومَ إغلاقِه
+           كانت تُصيَّر داخلَ تعليق.
+         ◆ **وبندُ «اعتماد الوحدات التشغيلية»** (`Approvals/hours_approval.php`)
+           كان في جوفِ ذلك التعليقِ أيضًا — **ميتًا منذ فتحِه**. وله صفُّه في
+           `nav_items` (٧ أدوارٍ · ٣ نشطة)، فالمصدرُ الواحدُ يحمله ولا يُعاد
+           كتابتُه هنا. والقصُّ لا يُخفي رابطًا كان يُرى.
+         ◆ **ولا يُحذف قرار**: العائدُ إليها يجدها في `git show` — والقرارُ
+           مكتوبٌ في `docs/REPAIR01_20260823/plan/W02_CLOSURE.md §٤`. */
       ?>
-
-      <?php if (!$__nav_unified && in_array($_SESSION['user']['role'], ["-1", "1", "2", "3", "4", "5"])) { ?>
-      <li><a href="../Approvals/hours_approval.php"><i class="fa fa-check-double"></i> <span>اعتماد الوحدات التشغيلية
-        </span>
-        <?php if ($hoursApprovalPendingCount > 0): ?>
-        <span class="nav-count-badge"><?php echo ($hoursApprovalPendingCount > 99 ? '99+' : $hoursApprovalPendingCount); ?></span>
-        <?php endif; ?>
-      </a></li>
-      <?php } ?>
-
-      <?php // صلاحيات مدير المشاريع === 1
-      if ($_SESSION['user']['role'] == "1") { ?>
-        <!-- <li><a href="../Clients/clients.php"><i class="fa fa-users"></i> <span>قائمة العملاء</span></a></li> -->
-        <!-- <li><a href="../Projects/project_mines.php"><i class="fa fa-list-alt"></i> <span> المشاريع </span></a></li> -->
-        <!-- <li><a href="../Projects/projects.php"><i class="fa fa-folder-open"></i> <span></span></a></li> -->
-        <!-- <li><a href="../main/users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li> -->
-        <!-- <li><a href="../Reports/new_reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
-        <!-- <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>تقارير العقد</span></a></li>
-        <li><a href="../Equipments/equipments_types.php"><i class="fa-solid fa-screwdriver-wrench"></i> <span> انواع
-              المعدات</span></a></li> -->
-      <?php } ?>
-
-      <?php // صلاحيات مدير الموردين === 2
-      if ($_SESSION['user']['role'] == "2") { ?>
-        <!-- <li><a href="../Suppliers/suppliers.php"><i class="fa fa-truck-loading"></i> <span>الموردين</span></a></li> -->
-        <!-- <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li> -->
-        <!-- <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
-
-      <?php } ?>
-
-      <?php // صلاحيات إدارة الأسطول === 3 (Fleet)
-      if ($_SESSION['user']['role'] == "3") { ?>
-        <!-- <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li> -->
-        <!-- <li><a href="../Employees/employees.php"><i class="fa fa-id-card"></i> <span>المشغلين</span></a></li>
-        <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
-        <li><a href="../Approvals/requests.php"><i class="fa fa-check-double"></i> <span>طلبات الموافقات</span></a></li> -->
-
-      <?php } ?>
-
-      <?php // صلاحيات إدارة الموارد البشرية === 4 (HR)
-      // شاشات طبقة القوى التشغيلية (Workforce/) تظهر ديناميكياً من جدول modules عبر
-      // renderDynamicNavigation أعلاه — لا تُضاف يدوياً هنا (السلوك يقوده جدول الشاشات).
-      if ($_SESSION['user']['role'] == "4") { ?>
-        <!-- <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li> -->
-        <!-- <li><a href="../Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>
-        <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
-        <li><a href="../Approvals/requests.php"><i class="fa fa-check-double"></i> <span>طلبات الموافقات</span></a></li> -->
-      <?php } ?>
-
-      <?php // صلاحيات مدير الحركة والتشغيل === 10
-      if ($_SESSION['user']['role'] == "10") { ?>
-        <!-- <li><a href="../Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>
-        <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li> -->
-      <?php } ?>
-
-      <?php // صلاحيات مدير الموقع === 5
-      if ($_SESSION['user']['role'] == "5") { ?>
-        <!-- <li><a href="../main/project_users.php"><i class="fa fa-users-cog"></i> <span> المشرفين </span></a></li>
-        <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a>
-        </li>
-        <li><a href="../Timesheet/view_timesheet.php"><i class="fa fa-calendar-days"></i> <span>ساعات اليوم</span></a>
-        </li>
-        <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
-      <?php } ?>
-
-      <?php // صلاحيات  مدخل الساعات === 6
-      if ($_SESSION['user']['role'] == "6") { ?>
-        <!-- <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a>
-        </li>
-        <li><a href="../Timesheet/view_timesheet.php"><i class="fa fa-calendar-days"></i> <span>ساعات اليوم</span></a>
-        </li> -->
-      <?php } ?>
-
-      <?php // صلاحيات مراجع ساعات المورد والمشغل === 7 8
-      if ($_SESSION['user']['role'] == "7" || $_SESSION['user']['role'] == "8") { ?>
-        <!-- <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li> -->
-        <!-- <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a> -->
-        <?php } ?>
-
-        <?php // صلاحيات مراجع الاعطال === 9
-        if ($_SESSION['user']['role'] == "9") { ?>
-        <!-- <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a> -->
-        <?php } ?>
 
       <?php
       // رابط «التقارير» الذكي: يحترم الصلاحيات القائمة فلا يقود لصفحة مرفوضة.
@@ -468,48 +386,22 @@ $__sb_ver = function ($f) use ($__sb_css_dir) {
         $__sb_rr = @mysqli_query($conn, "SELECT 1 FROM report_role_permissions WHERE role_id = " . $__sb_role_id . " LIMIT 1");
         $__sb_has_emsreports = ($__sb_rr && mysqli_num_rows($__sb_rr) > 0);
       }
+      /* RPR-W02 §٤-٣: المسارُ والاسمُ من السجلِّ — والقرارُ (أيُّ مركزِ تقارير؟)
+         يبقى هنا لأنَّه **صلاحيةٌ لا ظهور**؛ والظهورُ ليس صلاحيةً (§٣٦)، فما
+         يُقرأ من السجلِّ هو الوجهةُ والاسمُ، وما يُحسم بالصلاحيةِ هو أيُّهما. */
       if ($__sb_has_emsreports) {
-        echo '<li><a href="../emsreports/index.php"><i class="fas fa-chart-pie"></i> <span>التقارير</span></a></li>';
+        echo ems_nav_anchor_li($conn, 'REPORTS_GOV', '../');
       } else {
         $__sb_old = function_exists('check_page_permissions') ? check_page_permissions($conn, 'Reports/reports.php') : array('can_view' => false);
         if ($__sb_is_super || !empty($__sb_old['can_view'])) {
-          echo '<li><a href="../Reports/reports.php"><i class="fas fa-chart-pie"></i> <span>مركز التقارير</span></a></li>';
+          echo ems_nav_anchor_li($conn, 'REPORTS_EXEC', '../');
         }
       }
-      echo '<li><a href="../Settings/settings.php"><i class="fa fa-cog"></i> <span>الإعدادات</span></a></li>';
+      echo ems_nav_anchor_li($conn, 'SETTINGS', '../');
       }
       ?>
 
 
-      <!--
-      <?php if ($_SESSION['user']['role'] == "1") {
-        // المدير
-        ?>
-      <li><a href="../Projects/projects.php"><i class="fa fa-folder-open"></i> <span>المشاريع</span></a></li>
-      <li><a href="../Oprators/oprators.php"><i class="fa fa-cogs"></i> <span>التشغيل</span></a></li>
-      <li><a href="../users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
-      <?php } else
-        if ($_SESSION['user']['role'] == "2") { ?>
-      <li><a href="../Suppliers/suppliers.php"><i class="fa fa-truck-loading"></i> <span>الموردين</span></a></li>
-      <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
-      <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a></li>
-      <li><a href="../Employees/employees.php"><i class="fa fa-id-card"></i> <span>المشغلين</span></a></li>
-      <li><a href="../users.php"><i class="fa fa-users-cog"></i> <span>المستخدمين</span></a></li>
-      <li><a href="../Reports/reports.php"><i class="fa fa-chart-pie"></i> <span>التقارير</span></a></li>
-      <li><a href="../settings.php"><i class="fa fa-cog"></i> <span>الإعدادات</span></a></li>
-      <?php } ?>
-      <?php if ($_SESSION['user']['role'] == "3") { ?>
-      <li><a href="../Suppliers/suppliers.php"><i class="fa fa-truck-loading"></i> <span>الموردين</span></a></li>
-      <li><a href="../Equipments/equipments.php"><i class="fa fa-tractor"></i> <span>الآليات</span></a></li>
-      <?php } ?>
-      <?php if ($_SESSION['user']['role'] == "4") { ?>
-      <li><a href="../Timesheet/timesheet_type.php"><i class="fa fa-business-time"></i> <span>ساعات العمل</span></a></li>
-      <?php } ?>
-
-      <?php if ($_SESSION['user']['role'] == "5") { ?>
-      <li><a href="../Employees/employees.php"><i class="fa fa-id-card"></i> <span>المشغلين</span></a></li>
-      <li><a href="project_users.php"><i class="fa fa-users-cog"></i> <span> مستخدمين المدير </span></a></li>
-       <?php } ?> -->
     </ul>
   </div>
 
