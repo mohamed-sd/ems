@@ -283,10 +283,17 @@ $s0 = (int) $one("SELECT COUNT(*) FROM repair01_source_files");
 $u0 = (int) $one("SELECT COUNT(*) FROM repair01_surfaces");
 $g0 = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry");
 $t0 = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE origin_stage = ''");
-$e0 = (int) $one("SELECT COUNT(*) FROM repair01_events WHERE contract_stage <> 'W03'");
+/* ⚠ **إصلاحُ مقامٍ لا تخفيفُ حاجب** (RPR-W04): كان الشرطُ `contract_stage <> 'W03'`
+   — وهو يعدُّ **عقودَ المراحلِ التالية** أحداثًا للدراسةِ فيسقط الحاجبُ لمجرَّدِ
+   أنَّ W04 كتبت عقودَها. والمقصودُ «أحداثُ الدراسةِ الـ٦٣٢ لم تُمَسّ»، ومَن لم
+   تُمَسَّ يحمل `contract_stage = ''`. فالمقامُ يُقاس بما يعنيه لا بنفيِ مرحلةٍ
+   واحدة — وأُضيف معه أنَّ عقودَ W03 الثلاثةَ عشرَ باقيةٌ، فالحاجبُ **أشدُّ**
+   لا أخفّ: يسقط الآن على الحذفِ كما يسقط على التلويث. */
+$e0 = (int) $one("SELECT COUNT(*) FROM repair01_events WHERE contract_stage = ''");
+$e3 = (int) $one("SELECT COUNT(*) FROM repair01_events WHERE contract_stage = 'W03'");
 gate('W3-14', 'مخزنُ المراحلِ السابقةِ لم يُمَسّ',
-     $d0 === 108 && $s0 === 13 && $u0 === 664 && $g0 === 651 && $t0 === 174 && $e0 === 632,
-     "قرارات $d0 · مصادر $s0 · أسطح $u0 · سجلُّ الشاشات $g0 · فجواتٌ أصليّة $t0 · أحداثُ الدراسة $e0");
+     $d0 === 108 && $s0 === 13 && $u0 === 664 && $g0 === 651 && $t0 === 174 && $e0 === 632 && $e3 === 13,
+     "قرارات $d0 · مصادر $s0 · أسطح $u0 · سجلُّ الشاشات $g0 · فجواتٌ أصليّة $t0 · أحداثُ الدراسة $e0 · عقودُ W03 $e3");
 
 /* ══ W3-15 · رحلةُ الإثبات — تُشغَّل هنا ويُشترط عبورُها كاملةً ═══════════ */
 $jOut = array(); $jCode = 1;

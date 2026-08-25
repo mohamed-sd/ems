@@ -349,6 +349,19 @@ class TenantRegistry
         // D02 §3.10: أعلام تجاوز الطاقة وتخليصها — علمٌ يُرفع ويُخلَّص ولا يُمحى
         'unit_capacity_flags' => array('type' => self::T_TENANT, 'soft' => false),
 
+        /* ══ الحقيقةُ الميدانية — RPR-W04 ═══════════════════════════════════
+           `soft=false` في الخمسةِ بالتصميم: اليومُ الميدانيُّ يُقفَل ولا يُحذف،
+           والمحاولةُ المرفوضةُ دليلٌ يُراجَع، وواقعةُ التوقّفِ تُحسَم ولا تُمحى.
+           و`ops_stop_source` يحمل `company_id` هو الآخر لا `T_CHILD`: عزلُ
+           `T_CHILD` يقرأ الأبَ بـ`id` بينما مفتاحُ هذا الابنِ `occurrence_key`
+           — فالعزلُ بالأبِ كان سيقرأ صفرًا صامتًا. والكيانُ في الصفِّ نفسِه
+           أصدقُ (`DEC-OPEN-03`) وأقصرُ طريقًا. */
+        'site_day'          => array('type' => self::T_TENANT, 'soft' => false),
+        'site_day_shift'    => array('type' => self::T_TENANT, 'soft' => false),
+        'site_day_attempt'  => array('type' => self::T_TENANT, 'soft' => false),
+        'ops_stop_register' => array('type' => self::T_TENANT, 'soft' => false),
+        'ops_stop_source'   => array('type' => self::T_TENANT, 'soft' => false),
+
         /* ══ عقدُ سلسلةِ الأثرِ المبنيةُ في INJ-CHAIN-CLOSE-01 ═════════════════
            كلُّها إلحاقيةٌ بلا حذفٍ ناعم: «المرفوضُ لا يُحذف — حالةٌ بسببِها في
            السجل». والسطورُ أبناءٌ بمفتاحِ أبيها فلا تُقرأ خارجَ سياقِه. */
