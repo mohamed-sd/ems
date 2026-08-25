@@ -1,129 +1,191 @@
 <?php
 /**
- * Maintenance/return_to_service.php — العودةُ للخدمة (★ الصيانة · update0007 S-11)
+ * Maintenance/return_to_service.php — الإقفالُ وشهادةُ إعادةِ الخدمة (RPR-W07 · MNT-14)
  * ───────────────────────────────────────────────────────────────────────────
- * خاتمةُ دورة الصيانة: أوامرُ العمل المنجَزةُ تُعيد معدتَها للخدمة بشهادةِ
- * جاهزيةٍ موثَّقة — فلا معدةَ تعود بصمتٍ ولا أمرَ يبقى مفتوحًا بعد عودتها.
+ * **«الشهادةُ وحدَها تعيد المعدّةَ للخدمةِ وتحدّث حالتَها الفنيّةَ عند الأسطول
+ *   — لا إعادةَ بغيرها»** (`MNT-14` نصًّا).
+ *
+ * ◆ **وما كان هنا قبلَ W07 لم يكن شهادةً — ولم يكن يعمل.** المقيسُ في الشجرةِ
+ *   الحيّة: الاستعلامُ كان `SELECT mo.order_no … WHERE state IN ('Done','Executed','QA')`
+ *   و**`mnt_order` لا يملك عمودًا اسمُه `order_no`**، وحالاتُه الاثنتا عشرةَ
+ *   الحيّةُ عربيّةٌ حرّةٌ ليس فيها واحدةٌ من الثلاث. فـ`mysqli_query` تعيد
+ *   `false`، و`if ($r) while` تُبقي القائمةَ فارغةً، والشاشةُ تعرض «لا أوامر
+ *   منجزة» **دائمًا ومهما كان في القاعدة**. سطحٌ حيٌّ يُصيَّر ولا يعرض شيئًا.
+ *   و«شهادةُ الجاهزية» كانت **نصًّا حرًّا في عمودٍ واحد** بلا رقمٍ ولا صلاحيةٍ
+ *   ولا مُعتمِدٍ ولا اختبارٍ موثَّق — فـ`MNT-15` الذي يقيس «التكرارَ خلالَ
+ *   صلاحيةِ الشهادة» كان **بلا صلاحيةٍ يقيسها**.
+ *
+ * ◆ **و`DEC-OPEN-12` يحكم مَن تلزمه الشهادةُ ومَن يعتمدها**: البسيطُ لا شهادةَ
+ *   له (`CERT_NOT_REQUIRED_FOR_MINOR`)، والحرِجُ للسلامةِ لا يعتمده إلّا مخوَّلٌ
+ *   فنّيٌّ لا المشغّلُ (`SAFETY_CRITICAL_NEEDS_TECHNICAL_AUTHORITY`)، **ومَن
+ *   أنشأ الشهادةَ لا يعتمدها** (`SOD_SELF_APPROVAL`).
+ *
+ * ◆ **وصلاحيةُ الشهادةِ من `repair01_w7_thresholds`** لا من رقمٍ في الشيفرة.
  */
-require_once __DIR__ . '/../includes/session_bootstrap.php';
+require_once __DIR__ . '/../includes/session_bootstrap.php'; // مخزن الجلسات المشترك — يسبق session_start()
 session_start();
 if (!isset($_SESSION['user'])) { header('Location: ../login.php'); exit(); }
 include '../config.php';
 include '../includes/permissions_helper.php';
+require_once __DIR__ . '/../includes/w7_codes.php';
+require_once __DIR__ . '/../app/Services/Maintenance/MaintenanceCycleService.php';
 
-// ── RF-02 · CS-01 — حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب ────────────────────
-// كان هذا السطحُ يعتمد على insidebar.php وحدَه في الحجب، وinsidebar يقع
-// **بعدَ** معالجِ الكتابة — فيُرحَّل الأثرُ ثم يُعاد التوجيهُ برسالةِ «لا صلاحية».
-// الدالةُ نفسُها ولا تغييرَ في مَن يُمنع — التغييرُ في **متى**: قبلَ الكتابة.
-if (function_exists('enforce_current_page_view_permission') && isset($conn)) {
-    enforce_current_page_view_permission($conn, '../main/dashboard.php');
+use App\Services\Maintenance\MaintenanceCycleService as MCS;
+
+$is_super_admin = ((isset($_SESSION['user']['role']) ? strval($_SESSION['user']['role']) : '') === '-1');
+$company_id = isset($_SESSION['user']['company_id']) ? intval($_SESSION['user']['company_id']) : 0;
+$uid = isset($_SESSION['user']['id']) ? intval($_SESSION['user']['id']) : 0;
+if (!$is_super_admin && $company_id <= 0) { ems_gov_flash_redirect('../main/dashboard.php', 'بيئة شركة غير صالحة', 'GOV-SCOPE-403', ''); exit(); }
+
+/* حارسُ الشاشةِ فوقَ أيِّ معالجٍ يكتب (RF-02 · CS-01) — قبلَ الكتابةِ لا بعدها */
+$pp = check_page_permissions($conn, 'Maintenance/return_to_service.php');
+if (!$pp['can_view']) { ems_gov_flash_redirect('../main/dashboard.php', 'لا توجد صلاحية', 'GOV-PERM-403', ''); exit(); }
+
+$gate = $is_super_admin ? ems_tenant_db()->forAllTenants('mnt return cert super') : ems_tenant_db();
+MCS::setEventConnection($conn);
+MCS::setThresholdConnection($conn);
+
+$msg = ''; $msgKind = 'info';
+
+/* ── إصدارُ شهادةٍ لأمرٍ منجَزٍ فنّيًّا ─────────────────────────────────── */
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['issue_order'])) {
+    $r = MCS::issueCert($gate, (int) $_POST['issue_order'], array(
+        'cert_no'             => trim((string) ($_POST['cert_no'] ?? '')),
+        'test_performed'      => trim((string) ($_POST['test_performed'] ?? '')),
+        'test_result'         => (string) ($_POST['test_result'] ?? 'pass'),
+        'meter_at_close'      => (string) ($_POST['meter_at_close'] ?? ''),
+        'new_readiness_state' => (string) ($_POST['new_readiness_state'] ?? 'operational'),
+        'operating_limits'    => trim((string) ($_POST['operating_limits'] ?? '')),
+        'created_by'          => $uid,
+        'src_ref'             => 'Maintenance/return_to_service.php',
+    ));
+    $msg = $r['ok'] ? ('صدرت الشهادة بانتظار الاعتماد. رقم ' . (int) $r['cert_id']) : ('تعذر الإصدار: ' . $r['reason']);
+    $msgKind = $r['ok'] ? 'success' : 'danger';
 }
 
-$company_id = intval($_SESSION['user']['company_id'] ?? 0);
-$uid = intval($_SESSION['user']['id'] ?? 0);
-$msg = '';
+/* ── اعتمادُ الشهادة — وهنا وحدَها تعود المعدّة ────────────────────────── */
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['approve_cert'])) {
+    $r = MCS::approveCert($gate, (int) $_POST['approve_cert'], $uid, (string) ($_POST['signer_kind'] ?? ''));
+    $msg = $r['ok']
+         ? ('اعتمدت الشهادة وعادت المعدة. الصلاحية حتى ' . $r['valid_until'] . '. الجاهزية ' . ems_w7_ar($r['readiness'], $conn))
+         : ('تعذر الاعتماد: ' . $r['reason']);
+    $msgKind = $r['ok'] ? 'success' : 'danger';
+}
 
-if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['rts_order'])) {
-    $oid  = intval($_POST['rts_order']);
-    $cert = trim($_POST['readiness_note'] ?? '');
-    if ($cert === '') { $msg = 'شهادة الجاهزية إلزامية (422)'; }
-    else {
-        $r = mysqli_query($conn, "SELECT equipment_id FROM mnt_order WHERE id=$oid AND company_id=$company_id AND state IN ('Done','Executed','QA')");
-        if ($r && ($o = mysqli_fetch_assoc($r))) {
-            mysqli_begin_transaction($conn);
-            /* ⇐ INJ-0074 · «كلُّ معدةٍ في لوحة الجاهزية تعرض **مرجعَ آخر شهادةِ
-                 جاهزيةٍ وتاريخَها ومُصدرَها**». وكانت الشهادةُ تُشترط (422 بدونها)
-                 ثم **تُكتب في سجلِّ التدقيقِ وحدَه** فلا سبيلَ إلى عرضِها:
-                 **شرطٌ يُستوفى ثم يضيع**. فصارت تُخزَّن مع الأمرِ الذي أصدرها،
-                 وتاريخُها ومُصدرُها في `closed_at`/`closed_by` القائمَين. */
-            $__certStmt = mysqli_prepare($conn,
-                "UPDATE mnt_order
-                    SET state='Closed', readiness_cert_ref=?, closed_at=NOW(), closed_by=?, updated_at=NOW()
-                  WHERE id=? AND company_id=?");
-            $ok1 = false;
-            if ($__certStmt) {
-                mysqli_stmt_bind_param($__certStmt, 'siii', $cert, $uid, $oid, $company_id);
-                $ok1 = mysqli_stmt_execute($__certStmt);
-                mysqli_stmt_close($__certStmt);
-            }
-            $ok2 = mysqli_query($conn, "UPDATE equipments SET status=1 WHERE id=" . intval($o['equipment_id']));
-            if ($ok1 && $ok2) {
-                mysqli_commit($conn);
-                /* ── INJ-0075 · عودةُ المعدةِ للخدمةِ فعلٌ يُراجَع ─────────────────────
-                     الإقفالُ يُعيد المعدةَ إلى الأسطولِ ويفتح بابَ تشغيلِها — فلا
-                     يقع بلا أثرٍ يحمل مَن أقفل ومتى وبأيِّ شهادةِ جاهزية.
-                     والكتابةُ هنا مباشرةٌ لا عبر بوابةِ المستأجرِ المُدقِّقة، فيُنادى
-                     الموصِّلُ صراحةً **بعد نجاحِ المعاملةِ** لا قبلَها، والمصدرُ
-                     مُضمَّنٌ عند موضعِ الاستعمال. */
-                require_once __DIR__ . '/../includes/audit_trail.php';
-                ems_audit_change($conn, 'maintenance', 'mnt_order', 'return_to_service', (int) $oid,
-                    array('state' => 'Done', 'equipment_status' => 0),
-                    array('state' => 'Closed', 'equipment_status' => 1,
-                          'readiness_note' => mb_substr($cert, 0, 200),
-                          'equipment_id' => (int) $o['equipment_id']),
-                    array('company_id' => (int) $company_id, 'user_id' => (int) $uid));
-                $msg = "عادت المعدة للخدمة وأقفل الأمر #$oid — الشهادة: $cert";
-            }
-            else { mysqli_rollback($conn); $msg = 'فشلت المعاملة: ' . mysqli_error($conn); }
-        } else { $msg = 'الأمر ليس منجزا بانتظار العودة (409)'; }
+/* ── الأوامرُ المنجَزةُ فنّيًّا التي يوجب تصنيفُها شهادةً ولم تصدر بعد ── */
+$pending = array(); $certs = array(); $equip = array(); $orders = array();
+try { foreach ($gate->select('equipments', array('columns' => array('id', 'code', 'name'), 'orderBy' => 'id ASC', 'limit' => 500)) as $e) { $equip[(int) $e['id']] = trim(($e['code'] ?? '') . ' ' . ($e['name'] ?? '')); } }
+catch (\Throwable $t) { error_log('return_to_service equip: ' . $t->getMessage()); }
+try {
+    foreach ($gate->select('mnt_order', array('orderBy' => 'id DESC', 'limit' => 400)) as $o) {
+        $orders[(int) $o['id']] = (string) $o['code'];
+        if ((int) $o['is_deleted'] === 1) { continue; }
+        if (!in_array((string) $o['safety_severity'], array('major', 'safety_critical'), true)) { continue; }
+        if ((string) $o['work_end'] === '' || $o['work_end'] === null) { continue; }
+        if ((int) $o['w7_cert_id'] > 0) { continue; }
+        $pending[] = $o;
     }
+} catch (\Throwable $t) { error_log('return_to_service orders: ' . $t->getMessage()); }
+try { $certs = $gate->select('mnt_return_cert', array('orderBy' => 'id DESC', 'limit' => 200)); }
+catch (\Throwable $t) { error_log('return_to_service certs: ' . $t->getMessage()); }
+
+$approved = 0; $waiting = 0;
+foreach ($certs as $c) {
+    if ((string) $c['state'] === 'approved') { $approved++; }
+    elseif ((string) $c['state'] === 'submitted') { $waiting++; }
 }
 
-$rows = array();
-$r = mysqli_query($conn, "SELECT mo.id, mo.order_no, mo.state, e.id eq_id, e.name eq_name, e.status
-                          FROM mnt_order mo JOIN equipments e ON e.id = mo.equipment_id
-                          WHERE mo.company_id=$company_id AND mo.state IN ('Done','Executed','QA')
-                          ORDER BY mo.updated_at DESC");
-if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
-
-$page_title = 'العودة للخدمة';
-// UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
+$page_title = 'إيكوبيشن | الإقفال وشهادة إعادة الخدمة';
 require_once __DIR__ . '/../includes/screen_contract.php';
-ems_shell_axes(null);
+ems_shell_axes(isset($pp) ? $pp : null);
 include '../inheader.php';
 include '../insidebar.php';
 require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { ems_screen_about_auto($conn); }
 ?>
-<div class="main" dir="rtl">
-  <?php
-/* AS-04/AS-05 (UXR-01): رأسُ الصفحةِ الموحَّدُ بدلَ الرأسِ اليدويّ —
-   شريطُ أفعالٍ واحدٌ وسطرُ سياقٍ ومنفذُ بلاغٍ من مصدرٍ واحد. */
-$header_icon = 'fa fa-check-circle';
-$header_title_html = htmlspecialchars('العودة للخدمة', ENT_QUOTES, 'UTF-8');
-$header_actions = array();
-$header_back = false;
-include __DIR__ . '/../includes/page_header.php';
-// UXW-01 ⑨: حالاتُ الشاشةِ الدنيا (تحميل · فراغ · خطأ) — مخفيةٌ افتراضًا
-echo ems_states_bundle('لا أوامر صيانة منجزة بانتظار العودة للخدمة', 'أنجز أمر الصيانة من شاشة أوامر الصيانة ليظهر هنا لإصدار شهادة الجاهزية');
-?>
-  <?php if ($msg): ?><div class="alert alert-info"><?= htmlspecialchars($msg, ENT_QUOTES, 'UTF-8') ?></div><?php endif; ?>
-  <table class="table table-striped" data-no-dt>
-    <thead><tr><th>الأمر</th><th>المعدة</th><th>حالتها</th><th>شهادة الجاهزية</th><th>إجراء</th>
-              <!-- E-03 موجة ٤: النواة الحاكمة (gov_columns) — الخلايا يحشوها ui-unification.js -->
-              <th class="ems-gov-th" data-gov="entity" data-slice="1" title="عزل الشركات — لا صف بلا كيان مالك">الكيان</th>
-              <th class="ems-gov-th" data-gov="creator" data-slice="1" title="من أنشأ المستند وبأي صفة — لا اسم مجرد">المنشئ — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="approver" data-slice="1" title="من اعتمده وبأي صفة">المعتمد — الاسم والصفة</th>
-              <th class="ems-gov-th" data-gov="authority_ref" data-slice="1" title="سند صلاحية المعتمد — تفويض أو سلطة أصلية">مرجع التفويض</th>
-              <th class="ems-gov-th" data-gov="parent_ref" data-slice="1" title="المستند الذي تولد عنه — خيط التتبع">المرجع الأب</th>
-              <th class="ems-gov-th" data-gov="created_at" data-slice="1" title="لحظة الإنشاء بالتاريخ والوقت">تاريخ الإنشاء</th>
-              <th class="ems-gov-th" data-gov="approved_at" data-slice="1" title="لحظة الاعتماد — وبها يقاس زمن الدورة">تاريخ الاعتماد</th>
-              <th class="ems-gov-th" data-gov="status" data-slice="1" title="حالة المستند في دورته">الحالة</th>
-              </tr></thead>
-    <tbody>
-    <?php if (empty($rows)): ?><tr><td colspan="5" class="text-center text-muted">لا أوامر منجزة بانتظار العودة</td></tr><?php endif; ?>
-    <?php foreach ($rows as $o): ?>
-      <tr>
-        <td><?= htmlspecialchars($o['order_no'] ?: '#' . $o['id'], ENT_QUOTES, 'UTF-8') ?></td>
-        <td><?= htmlspecialchars($o['eq_name'], ENT_QUOTES, 'UTF-8') ?></td>
-        <td><?= intval($o['status']) === 1 ? 'عاملة' : 'متوقفة' ?></td>
-        <form method="post">
-        <?= csrf_field() ?>
-          <input type="hidden" name="rts_order" value="<?= intval($o['id']) ?>">
-          <td><input type="text" name="readiness_note" class="form-control form-control-sm" placeholder="فحصت وجاهزة — التوقيع الفني" required aria-label="فحصت وجاهزة — التوقيع الفني"></td>
-          <td><button class="action-btn" type="submit"><i class="fa fa-undo"></i> أعد للخدمة وأقفل</button></td>
-        </form>
-      </tr>
-    <?php endforeach; ?>
-    </tbody>
-  </table>
+<div class="main ems-unified-page-shell">
+    <?php $header_title = 'الإقفال وشهادة إعادة الخدمة'; $header_icon = 'fa fa-check-circle'; $header_actions = array();
+    $header_back = array('href' => 'orders.php', 'class' => '', 'icon' => 'fas fa-arrow-right', 'label' => 'أوامر العمل');
+    include('../includes/page_header.php'); ?>
+    <div class="ems-stat-cards">
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= count($pending) ?></div><div class="ems-stat-label">أوامر تنتظر الشهادة</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $waiting ?></div><div class="ems-stat-label">شهادات تنتظر الاعتماد</div></div>
+        <div class="ems-stat-card"><div class="ems-stat-value"><?= $approved ?></div><div class="ems-stat-label">شهادات معتمدة</div></div>
+    </div>
+    <?php if ($msg !== ''): ?><div class="alert alert-<?= htmlspecialchars($msgKind) ?>"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
+    <?php require_once __DIR__ . '/../includes/ux_components.php';
+    echo ems_states_bundle('لا أوامر تنتظر شهادة إعادة خدمة', 'الشهادة تصدر لأمر أنجز فنيا وتصنيفه فوق البسيط. والبسيط لا شهادة له'); ?>
+
+    <h3 class="ems-section-title">أوامر أنجزت فنيا وتنتظر الشهادة</h3>
+    <div class="table-wrap"><table class="data-table" data-no-dt>
+        <thead><tr><th>الأمر</th><th>المعدة</th><th>خطورة السلامة</th><th>الأثر التشغيلي</th><th>حالة المنع</th>
+            <th>رقم الشهادة</th><th>الاختبار المنفذ</th><th>النتيجة</th><th>قراءة العداد</th>
+            <th>الحالة الفنية الجديدة</th><th>قيود التشغيل</th><th>إجراء</th></tr></thead>
+        <tbody>
+        <?php if ($pending): foreach ($pending as $o): ?>
+            <tr>
+                <form method="post" action="">
+                <?= csrf_field() ?>
+                <input type="hidden" name="issue_order" value="<?= (int) $o['id'] ?>">
+                <td><?= htmlspecialchars((string) $o['code']) ?></td>
+                <td><?= htmlspecialchars(isset($equip[(int) $o['equipment_id']]) ? $equip[(int) $o['equipment_id']] : ('#' . (int) $o['equipment_id'])) ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $o['safety_severity'], $conn)) ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $o['ops_impact'], $conn)) ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $o['lockout_state'], $conn)) ?></td>
+                <td><input type="text" name="cert_no" class="form-control form-control-sm" required aria-label="رقم الشهادة"></td>
+                <td><input type="text" name="test_performed" class="form-control form-control-sm" required aria-label="الاختبار المنفذ"></td>
+                <td><select name="test_result" aria-label="نتيجة الاختبار">
+                    <option value="pass">ناجح</option><option value="conditional">ناجح بشرط</option><option value="fail">مخفق</option>
+                </select></td>
+                <td><input type="number" step="0.01" name="meter_at_close" class="form-control form-control-sm" aria-label="قراءة العداد"></td>
+                <td><select name="new_readiness_state" aria-label="الحالة الفنية الجديدة">
+                    <option value="operational">تعمل</option>
+                    <option value="operational_restricted">تعمل بقيد</option>
+                    <option value="ready_after_approval">جاهزة بعد الاعتماد</option>
+                </select></td>
+                <td><input type="text" name="operating_limits" class="form-control form-control-sm" aria-label="قيود التشغيل"></td>
+                <td><button class="action-btn" type="submit"><i class="fa fa-file-signature"></i> أصدر الشهادة</button></td>
+                </form>
+            </tr>
+        <?php endforeach; else: ?>
+            <tr><td colspan="12">لا أوامر تنتظر شهادة إعادة خدمة.</td></tr>
+        <?php endif; ?>
+        </tbody></table></div>
+
+    <h3 class="ems-section-title">شهادات إعادة الخدمة</h3>
+    <div class="table-wrap"><table class="data-table">
+        <thead><tr><th>#</th><th>رقم الشهادة</th><th>الأمر</th><th>المعدة</th><th>خطورة السلامة</th>
+            <th>تاريخ الإنجاز الفني</th><th>الاختبار المنفذ</th><th>النتيجة</th><th>ساعات التوقف</th>
+            <th>التكلفة الفعلية</th><th>الصلاحية</th><th>الحالة الفنية</th><th>قيود التشغيل</th>
+            <th>حالة الشهادة</th><th>قاعدة الحالة</th><th>إجراء</th></tr></thead>
+        <tbody>
+        <?php if ($certs): $i = 0; foreach ($certs as $c): $i++; ?>
+            <tr><td><?= $i ?></td>
+                <td><?= htmlspecialchars((string) $c['cert_no']) ?></td>
+                <td><?= htmlspecialchars(isset($orders[(int) $c['order_id']]) ? $orders[(int) $c['order_id']] : ('#' . (int) $c['order_id'])) ?></td>
+                <td><?= htmlspecialchars(isset($equip[(int) $c['equipment_id']]) ? $equip[(int) $c['equipment_id']] : ('#' . (int) $c['equipment_id'])) ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $c['safety_severity'], $conn)) ?></td>
+                <td><?= htmlspecialchars((string) $c['tech_complete_date']) ?></td>
+                <td><small><?= htmlspecialchars(mb_substr((string) $c['test_performed'], 0, 100)) ?></small></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $c['test_result'], $conn)) ?></td>
+                <td><?= htmlspecialchars((string) $c['downtime_hours']) ?></td>
+                <td><?= htmlspecialchars((string) $c['actual_cost']) ?></td>
+                <td><?= htmlspecialchars((string) $c['valid_until']) ?></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $c['new_readiness_state'], $conn)) ?></td>
+                <td><small><?= htmlspecialchars(mb_substr((string) $c['operating_limits'], 0, 80)) ?></small></td>
+                <td><?= htmlspecialchars(ems_w7_ar((string) $c['state'], $conn)) ?></td>
+                <td><small><?= htmlspecialchars((string) $c['state_rule']) ?></small></td>
+                <td><?php if ((string) $c['state'] === 'submitted'): ?>
+                    <form method="post" action="">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="approve_cert" value="<?= (int) $c['id'] ?>">
+                    <input type="hidden" name="signer_kind" value="<?= htmlspecialchars((string) $c['signer_kind']) ?>">
+                    <button class="action-btn" type="submit"><i class="fa fa-stamp"></i> اعتمد وأعد للخدمة</button>
+                    </form>
+                <?php else: ?>—<?php endif; ?></td>
+            </tr>
+        <?php endforeach; else: ?>
+            <tr><td colspan="16">لا شهادات إعادة خدمة بعد.</td></tr>
+        <?php endif; ?>
+        </tbody></table></div>
 </div>
+</body></html>

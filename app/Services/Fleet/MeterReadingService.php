@@ -26,8 +26,14 @@ class MeterReadingService
     /** UX-10 §8 نصًّا — لا ثالثَ لهما. */
     const METER_TYPES = array('hour', 'km');
 
-    /** مصادرُ §8 الثلاثة + `reset` (وهو قرارٌ لا قراءةُ ميدان). */
-    const SOURCES = array('manual', 'inspection', 'timesheet', 'reset');
+    /**
+     * مصادرُ §8 الثلاثة + `reset` (وهو قرارٌ لا قراءةُ ميدان)
+     * + `transfer` (‏RPR-W07 · `TRP-09`): «قراءةُ العدّادِ عند الاستلامِ إلزاميّةٌ
+     * وتُسجَّل في كرتِ المعدّةِ **بمصدرِ الاستلام**» — ولولا مفردتُها لاختلطت
+     * قراءةُ محضرِ الترحيلِ بما أدخله موظّفٌ بيدِه تحت `manual`.
+     * ومسمّاها العربيُّ مسجَّلٌ في `repair01_w6_code_dict` قبل أن تُصيَّر.
+     */
+    const SOURCES = array('manual', 'inspection', 'timesheet', 'reset', 'transfer');
 
     /** ترجمةُ الوحدة الموروثة على `equipments.meter_uom` إلى نوعِ العدّاد. */
     const UOM_MAP = array('ساعات' => 'hour', 'ساعة' => 'hour', 'كم' => 'km', 'كيلومتر' => 'km');

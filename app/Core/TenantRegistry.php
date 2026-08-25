@@ -380,6 +380,29 @@ class TenantRegistry
         'asset_readiness'        => array('type' => self::T_TENANT, 'soft' => false),
         'wf_coverage'            => array('type' => self::T_TENANT, 'soft' => false),
 
+        /* ══ الصيانةُ والنقلُ والترحيل — RPR-W07 ═══════════════════════════════
+           `soft=false` في كلِّها بالتصميم: الشهادةُ **تُرفَض أو تُستبدَل بخلفٍ
+           ولا تُحذف** (‏`MNT-14` — الشهادةُ مستندٌ رسميٌّ صادر)، وواقعةُ إعادةِ
+           الإصلاحِ دليلٌ يُراجَع، ومطالبةُ التلفِ تُغلَق بسببِها، وإقفالُ الأمرِ
+           يُعاد فتحُه بسببٍ مكتوبٍ ولا يُمحى.
+           و`mnt_safety_rule` `T_TENANT` لا `T_CATALOG`: `DEC-OPEN-12` يقول
+           «التصنيفُ قابلٌ للتهيئةِ بحسبِ نوعِ المعدّة» — والتهيئةُ قرارُ كيانٍ
+           قانونيٍّ بعينِه لا كتالوجٌ مشترَكٌ بين الكيانات (‏DEC-OPEN-03).
+           و`mnt_kpi_period` و`trp_kpi_period` **مشتقّانِ يُعادُ بناؤهما في كلِّ
+           تشغيل** — فلا حقيقةَ أصليّةً فيهما تُفقد بالتفريغ. */
+        'mnt_safety_rule'     => array('type' => self::T_TENANT, 'soft' => false),
+        'mnt_return_cert'     => array('type' => self::T_TENANT, 'soft' => false),
+        'mnt_repeat_repair'   => array('type' => self::T_TENANT, 'soft' => false),
+        'mnt_part_request'    => array('type' => self::T_TENANT, 'soft' => false),
+        'mnt_external_repair' => array('type' => self::T_TENANT, 'soft' => false),
+        'mnt_daily_care'      => array('type' => self::T_TENANT, 'soft' => false),
+        'mnt_kpi_period'      => array('type' => self::T_TENANT, 'soft' => false),
+        'trp_origin_handover' => array('type' => self::T_TENANT, 'soft' => false),
+        'trp_trip_leg'        => array('type' => self::T_TENANT, 'soft' => false),
+        'trp_damage_claim'    => array('type' => self::T_TENANT, 'soft' => false),
+        'trp_closure'         => array('type' => self::T_TENANT, 'soft' => false),
+        'trp_kpi_period'      => array('type' => self::T_TENANT, 'soft' => false),
+
         /* ══ عقدُ سلسلةِ الأثرِ المبنيةُ في INJ-CHAIN-CLOSE-01 ═════════════════
            كلُّها إلحاقيةٌ بلا حذفٍ ناعم: «المرفوضُ لا يُحذف — حالةٌ بسببِها في
            السجل». والسطورُ أبناءٌ بمفتاحِ أبيها فلا تُقرأ خارجَ سياقِه. */

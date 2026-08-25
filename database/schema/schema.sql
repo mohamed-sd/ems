@@ -1,11 +1,11 @@
 -- ═══════════════════════════════════════════════════════════════════════════
--- EMS — مخطّط التثبيت الكامل (بنية فقط، بلا بيانات)
+-- EMS — مخطط التثبيت الكامل (بنية فقط، بلا بيانات)
 -- ─────────────────────────────────────────────────────────────────────────
--- المصدر: equipation_manage · التوليد: 2026-08-25 04:14:15
--- الجداول: 668 · المناظير: 28
--- يُستورد على قاعدةٍ فارغة عبر المُثبِّت. FOREIGN_KEY_CHECKS مُطفأٌ داخل
--- الملف لأن الجداول مرتّبةٌ أبجديًّا لا حسب تبعية المفاتيح الأجنبية.
--- مولَّدٌ آليًّا بـ `php database/migrate.php dump-schema` — لا يُحرَّر بيد.
+-- المصدر: equipation_manage · التوليد: 2026-08-25 22:44:30
+-- الجداول: 727 · المناظير: 28
+-- يستورد على قاعدة فارغة عبر المثبت. FOREIGN_KEY_CHECKS مطفأ داخل
+-- الملف لأن الجداول مرتبة أبجديا لا حسب تبعية المفاتيح الأجنبية.
+-- مولد آليا ب `php database/migrate.php dump-schema` — لا يحرر بيد.
 -- ═══════════════════════════════════════════════════════════════════════════
 SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
 SET FOREIGN_KEY_CHECKS = 0;
@@ -604,6 +604,58 @@ CREATE TABLE `ar_completion_certs` (
   CONSTRAINT `chk_acc_sod` CHECK (`approved_by` is null or `approved_by` <> `prepared_by`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='عقدة 17 — شهادة الإنجاز الشهرية · LD-06';
 
+-- ── Table: asset_assignment ──
+CREATE TABLE `asset_assignment` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `equipment_id` int(11) NOT NULL,
+  `assign_kind` enum('project','site','unit') NOT NULL DEFAULT 'site',
+  `project_id` int(11) DEFAULT NULL,
+  `site_id` int(11) DEFAULT NULL,
+  `unit_ref` varchar(60) NOT NULL DEFAULT '',
+  `valid_from` date NOT NULL,
+  `valid_to` date DEFAULT NULL,
+  `state` enum('active','ended') NOT NULL DEFAULT 'active',
+  `assigned_by` int(11) DEFAULT NULL,
+  `assigned_at` datetime DEFAULT NULL,
+  `decision_ref` varchar(120) NOT NULL DEFAULT '',
+  `end_reason` varchar(255) NOT NULL DEFAULT '',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_asset_assign` (`company_id`,`equipment_id`,`valid_from`),
+  KEY `ix_aas_equip` (`equipment_id`,`state`),
+  CONSTRAINT `chk_aas_target` CHECK (`project_id` is not null or `site_id` is not null),
+  CONSTRAINT `chk_aas_end` CHECK (`state` <> 'ended' or `valid_to` is not null and `end_reason` <> ''),
+  CONSTRAINT `chk_aas_period` CHECK (`valid_to` is null or `valid_to` >= `valid_from`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FLEET-12 و FLEET-13 اسناد الاصل لموقع او مشروع - لا ينشا اصل جديد عند الانتقال';
+
+-- ── Table: asset_exit ──
+CREATE TABLE `asset_exit` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `equipment_id` int(11) NOT NULL,
+  `exit_kind` enum('temporary','permanent') NOT NULL,
+  `reason_code` varchar(60) NOT NULL DEFAULT '',
+  `exit_date` date NOT NULL,
+  `expected_return` date DEFAULT NULL,
+  `actual_return` date DEFAULT NULL,
+  `disposal_kind` varchar(60) NOT NULL DEFAULT '',
+  `finance_ref` varchar(120) NOT NULL DEFAULT '' COMMENT 'الاثر المالي مرجع من المالية - الاسطول يوثق الواقعة',
+  `state` enum('open','returned','closed') NOT NULL DEFAULT 'open',
+  `decided_by` int(11) DEFAULT NULL,
+  `decided_at` datetime DEFAULT NULL,
+  `doc_ref` varchar(120) NOT NULL DEFAULT '',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_asset_exit` (`company_id`,`equipment_id`,`exit_kind`,`exit_date`),
+  KEY `ix_aex_equip` (`equipment_id`,`state`),
+  CONSTRAINT `chk_aex_reason` CHECK (`reason_code` <> ''),
+  CONSTRAINT `chk_aex_temp` CHECK (`exit_kind` <> 'temporary' or `expected_return` is not null),
+  CONSTRAINT `chk_aex_perm` CHECK (`exit_kind` <> 'permanent' or `finance_ref` <> '' and `expected_return` is null),
+  CONSTRAINT `chk_aex_ret` CHECK (`state` <> 'returned' or `exit_kind` = 'temporary' and `actual_return` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FLEET-21 و FLEET-22 الخروج المؤقت والدائم - والعودة تسجل هنا لا في كرت جديد';
+
 -- ── Table: asset_hour_reconciliations ──
 CREATE TABLE `asset_hour_reconciliations` (
   `rec_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -643,6 +695,63 @@ CREATE TABLE `asset_hour_reconciliations` (
   CONSTRAINT `chk_owner` CHECK (`owner_type` <> 'supplier' or `depreciation_amount` is null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: asset_inspection_order ──
+CREATE TABLE `asset_inspection_order` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `order_no` varchar(40) NOT NULL,
+  `intake_id` int(10) unsigned DEFAULT NULL,
+  `equipment_id` int(11) DEFAULT NULL,
+  `reason` enum('intake','periodic','post_repair','pre_exit','incident') NOT NULL,
+  `reason_rule` varchar(48) NOT NULL DEFAULT '',
+  `ordered_by` int(11) DEFAULT NULL,
+  `ordered_at` datetime DEFAULT NULL,
+  `due_date` date DEFAULT NULL,
+  `state` enum('issued','executed','cancelled') NOT NULL DEFAULT 'issued',
+  `inspection_id` int(11) DEFAULT NULL COMMENT 'بطاقة التفتيش في mnt_inspection',
+  `result` varchar(60) NOT NULL DEFAULT '',
+  `cancel_reason` varchar(255) NOT NULL DEFAULT '',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_insp_order` (`company_id`,`order_no`),
+  KEY `ix_aio_equip` (`equipment_id`),
+  KEY `ix_aio_intake` (`intake_id`),
+  CONSTRAINT `chk_aio_target` CHECK (`intake_id` is not null or `equipment_id` is not null),
+  CONSTRAINT `chk_aio_exec` CHECK (`state` <> 'executed' or `inspection_id` is not null),
+  CONSTRAINT `chk_aio_cancel` CHECK (`state` <> 'cancelled' or `cancel_reason` <> ''),
+  CONSTRAINT `chk_aio_rule` CHECK (`reason_rule` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FLEET-05 امر التفتيش - التفتيش يبدا بامر لا بزيارة وله خمسة اسباب في دورة الاصل';
+
+-- ── Table: asset_intake ──
+CREATE TABLE `asset_intake` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `intake_no` varchar(40) NOT NULL,
+  `requested_dept` varchar(12) NOT NULL DEFAULT '' COMMENT 'الادارة الطالبة برمزها المعياري DEP-nn',
+  `asset_kind` varchar(80) NOT NULL DEFAULT '',
+  `source_type` enum('owned','financed','supplier_external','rented') NOT NULL DEFAULT 'owned',
+  `supplier_id` int(11) DEFAULT NULL,
+  `equipment_id` int(11) DEFAULT NULL COMMENT 'يملا عند اصدار كرت الاصل لا قبله',
+  `state` enum('draft','submitted','source_verified','inspection_ordered','inspected','card_issued','activated','rejected') NOT NULL DEFAULT 'draft',
+  `state_rule` varchar(48) NOT NULL DEFAULT '',
+  `requested_by` int(11) DEFAULT NULL,
+  `requested_at` datetime DEFAULT NULL,
+  `decided_by` int(11) DEFAULT NULL,
+  `decided_at` datetime DEFAULT NULL,
+  `reject_reason` varchar(255) NOT NULL DEFAULT '',
+  `source_ref` varchar(120) NOT NULL DEFAULT '',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_asset_intake` (`company_id`,`intake_no`),
+  KEY `ix_ai_state` (`state`),
+  KEY `ix_ai_equip` (`equipment_id`),
+  CONSTRAINT `chk_ai_reject` CHECK (`state` <> 'rejected' or `reject_reason` <> ''),
+  CONSTRAINT `chk_ai_card` CHECK (`state` not in ('card_issued','activated') or `equipment_id` is not null),
+  CONSTRAINT `chk_ai_rule` CHECK (`state` = 'draft' or `state_rule` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FLEET-03 طلب ادخال الاصل - هنا تبدا دورة الاصل قبل الكرت لا بعده';
+
 -- ── Table: asset_ownership_shares ──
 CREATE TABLE `asset_ownership_shares` (
   `share_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -671,6 +780,83 @@ CREATE TABLE `asset_ownership_shares` (
   CONSTRAINT `fk_aos_financier` FOREIGN KEY (`financier_entity_id`) REFERENCES `legal_entities` (`entity_id`),
   CONSTRAINT `ck_aos_pct` CHECK (`percent` > 0 and `percent` <= 100)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: asset_readiness ──
+CREATE TABLE `asset_readiness` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `equipment_id` int(11) NOT NULL,
+  `period` char(7) NOT NULL COMMENT 'YYYY-MM',
+  `shift_hours` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `executed_hours` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `standby_hours` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `fault_hours` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `stop_hours` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `readiness_pct` decimal(6,2) NOT NULL DEFAULT 0.00,
+  `utilization_pct` decimal(6,2) NOT NULL DEFAULT 0.00,
+  `lifecycle_state` varchar(24) NOT NULL DEFAULT '' COMMENT 'حالة الاصل المشتقة في اخر يوم من الفترة',
+  `derivation_rule` varchar(48) NOT NULL DEFAULT '',
+  `derived_from` varchar(255) NOT NULL DEFAULT '' COMMENT 'السجلات المصدر بالاسم',
+  `derived_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_asset_readiness` (`company_id`,`equipment_id`,`period`),
+  KEY `ix_ard_period` (`period`),
+  CONSTRAINT `chk_ard_rule` CHECK (`derivation_rule` <> ''),
+  CONSTRAINT `chk_ard_pct` CHECK (`readiness_pct` >= 0 and `readiness_pct` <= 100)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FLEET-20 الجاهزية الشهرية - مشتقة بالكامل لا ادخال';
+
+-- ── Table: asset_source_check ──
+CREATE TABLE `asset_source_check` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `intake_id` int(10) unsigned NOT NULL,
+  `check_seq` tinyint(3) unsigned NOT NULL DEFAULT 1,
+  `doc_type` varchar(80) NOT NULL DEFAULT '',
+  `doc_ref` varchar(120) NOT NULL DEFAULT '',
+  `owner_declared` varchar(200) NOT NULL DEFAULT '',
+  `owner_legal` varchar(200) NOT NULL DEFAULT '',
+  `verify_result` enum('passed','failed') NOT NULL,
+  `verify_rule` varchar(48) NOT NULL DEFAULT '',
+  `fail_reason` varchar(255) NOT NULL DEFAULT '',
+  `verified_by` int(11) DEFAULT NULL,
+  `verified_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_source_check` (`intake_id`,`check_seq`),
+  CONSTRAINT `fk_asc_intake` FOREIGN KEY (`intake_id`) REFERENCES `asset_intake` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `chk_asc_evid` CHECK (`verify_result` <> 'passed' or `doc_ref` <> ''),
+  CONSTRAINT `chk_asc_fail` CHECK (`verify_result` <> 'failed' or `fail_reason` <> ''),
+  CONSTRAINT `chk_asc_rule` CHECK (`verify_rule` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FLEET-04 التحقق من المصدر - لا ينشا كرت اصل قبل اجتياز هذا التحقق';
+
+-- ── Table: asset_use_right ──
+CREATE TABLE `asset_use_right` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `equipment_id` int(11) NOT NULL,
+  `holder_kind` enum('company','financier','supplier','client') NOT NULL DEFAULT 'company',
+  `holder_key` varchar(80) NOT NULL DEFAULT '' COMMENT 'مفتاح الحائز - نوعه ومرجعه معا',
+  `holder_ref_id` int(11) DEFAULT NULL,
+  `holder_name` varchar(200) NOT NULL DEFAULT '',
+  `percent` decimal(5,2) NOT NULL DEFAULT 100.00,
+  `valid_from` date NOT NULL,
+  `valid_to` date DEFAULT NULL,
+  `doc_ref` varchar(120) NOT NULL DEFAULT '',
+  `source_register` varchar(48) NOT NULL DEFAULT '' COMMENT 'السجل الحي الذي قيس منه',
+  `source_row_ref` varchar(60) NOT NULL DEFAULT '',
+  `concurrency_rule` varchar(48) NOT NULL DEFAULT '',
+  `concurrency_pct` decimal(7,2) NOT NULL DEFAULT 0.00 COMMENT 'مجموع الحصص المتزامنة في نافذة البداية',
+  `concurrency_note` varchar(255) NOT NULL DEFAULT '',
+  `granted_by` int(11) DEFAULT NULL,
+  `granted_at` datetime DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_use_right` (`company_id`,`equipment_id`,`holder_key`,`valid_from`),
+  KEY `ix_aur_equip` (`equipment_id`,`valid_from`),
+  CONSTRAINT `chk_aur_pct` CHECK (`percent` > 0 and `percent` <= 100),
+  CONSTRAINT `chk_aur_period` CHECK (`valid_to` is null or `valid_to` >= `valid_from`),
+  CONSTRAINT `chk_aur_rule` CHECK (`concurrency_rule` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='FLEET-09 حق الاستخدام التشغيلي - الملكية متعاقبة لا متزامنة';
 
 -- ── Table: assignment_audit ──
 CREATE TABLE `assignment_audit` (
@@ -3203,6 +3389,13 @@ CREATE TABLE `equipments` (
   `card_state` varchar(20) NOT NULL DEFAULT 'active',
   `card_approved_by` int(11) DEFAULT NULL,
   `card_approved_at` datetime DEFAULT NULL,
+  `lifecycle_state` varchar(24) NOT NULL DEFAULT '' COMMENT 'حالة الاصل في دورته - مشتقة لا مدخلة',
+  `lifecycle_rule` varchar(48) NOT NULL DEFAULT '' COMMENT 'قاعدة اشتقاق الحالة - لا قيمة بلا قاعدة',
+  `intake_id` int(10) unsigned DEFAULT NULL COMMENT 'طلب الادخال الذي انشا هذا الكرت',
+  `w7_readiness_state` enum('operational','operational_restricted','stopped','prohibited','ready_after_approval') DEFAULT NULL COMMENT 'المحور ٤ - DEC-OPEN-12',
+  `w7_readiness_rule` varchar(60) NOT NULL DEFAULT '',
+  `w7_operating_limits` varchar(400) NOT NULL DEFAULT '' COMMENT 'قيود التشغيل من شهادة العودة',
+  `w7_cert_id` int(10) unsigned DEFAULT NULL COMMENT 'شهادة العودة السارية - لا اعادة خدمة بلا شهادة',
   PRIMARY KEY (`id`),
   KEY `idx_serial_number` (`serial_number`),
   KEY `idx_chassis_number` (`chassis_number`),
@@ -3211,7 +3404,8 @@ CREATE TABLE `equipments` (
   KEY `idx_equipments_model_id` (`model_id`),
   KEY `idx_equipments_card_state` (`card_state`),
   KEY `idx_equipments_supplier_status_type` (`suppliers`,`status`,`type`),
-  KEY `idx_equipments_company_id` (`company_id`)
+  KEY `idx_equipments_company_id` (`company_id`),
+  CONSTRAINT `chk_eq_w7_limits` CHECK (`w7_readiness_state` is null or `w7_readiness_state` <> 'operational_restricted' or `w7_operating_limits` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: equipments_types ──
@@ -8214,7 +8408,7 @@ CREATE TABLE `meter_readings` (
   `reading_date` date NOT NULL,
   `value` decimal(18,2) NOT NULL,
   `delta` decimal(18,2) DEFAULT NULL COMMENT 'الفارقُ عن سابقتها في السلسلة — NULL لأولها',
-  `source` enum('manual','inspection','timesheet','reset') NOT NULL DEFAULT 'manual',
+  `source` enum('manual','inspection','timesheet','reset','transfer') NOT NULL DEFAULT 'manual',
   `source_ref` varchar(80) DEFAULT NULL COMMENT 'مرجعُ الواقعة: TS-‹id› · INS-‹id›',
   `is_reset` tinyint(4) NOT NULL DEFAULT 0,
   `reset_reason` varchar(255) DEFAULT NULL,
@@ -8261,6 +8455,56 @@ CREATE TABLE `mnt_breakdown` (
   KEY `idx_breakdown_order` (`order_id`),
   KEY `idx_breakdown_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: mnt_daily_care ──
+CREATE TABLE `mnt_daily_care` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `care_date` date NOT NULL,
+  `equipment_id` int(11) NOT NULL,
+  `checklist_ref` varchar(120) NOT NULL DEFAULT '' COMMENT 'قائمة العناية للنوع',
+  `task_key` varchar(60) NOT NULL,
+  `task_ar` varchar(190) NOT NULL DEFAULT '',
+  `performed_by` int(11) DEFAULT NULL,
+  `result` enum('ok','abnormal','not_done') NOT NULL DEFAULT 'ok',
+  `abnormal_note` varchar(400) NOT NULL DEFAULT '',
+  `breakdown_id` int(11) DEFAULT NULL COMMENT 'بلاغ متفرع - مشتق لا يدخل',
+  `state` enum('open','closed') NOT NULL DEFAULT 'open',
+  `state_rule` varchar(60) NOT NULL DEFAULT '',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `src_ref` varchar(190) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_mdc` (`company_id`,`equipment_id`,`care_date`,`task_key`),
+  KEY `ix_mdc_eq` (`equipment_id`,`care_date`),
+  CONSTRAINT `chk_mdc_rule` CHECK (`state_rule` <> ''),
+  CONSTRAINT `chk_mdc_abn` CHECK (`result` <> 'abnormal' or `abnormal_note` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 MNT-13 - العناية اليومية والتشحيم';
+
+-- ── Table: mnt_external_repair ──
+CREATE TABLE `mnt_external_repair` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `line_kind` enum('external_referral','warranty_claim') NOT NULL,
+  `vendor_id` int(11) DEFAULT NULL COMMENT 'الجهة الخارجية او مورد المعدة',
+  `contract_ref` varchar(120) NOT NULL DEFAULT '' COMMENT 'مرجع العقد او الضمان',
+  `scope_ar` varchar(400) NOT NULL DEFAULT '',
+  `estimated_cost` decimal(14,2) NOT NULL DEFAULT 0.00,
+  `actual_cost` decimal(14,2) NOT NULL DEFAULT 0.00,
+  `claim_result` enum('pending','accepted','partial','rejected') NOT NULL DEFAULT 'pending',
+  `receipt_ref` varchar(120) NOT NULL DEFAULT '' COMMENT 'محضر الاستلام',
+  `state` enum('draft','sent','in_progress','received','closed','cancelled') NOT NULL DEFAULT 'draft',
+  `state_rule` varchar(60) NOT NULL DEFAULT '',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `src_ref` varchar(190) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  KEY `ix_mer_order` (`order_id`),
+  CONSTRAINT `chk_mer_rule` CHECK (`state_rule` <> ''),
+  CONSTRAINT `chk_mer_ref` CHECK (`line_kind` <> 'warranty_claim' or `contract_ref` <> ''),
+  CONSTRAINT `chk_mer_recv` CHECK (`state` not in ('received','closed') or `receipt_ref` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 MNT-11 - الاصلاح الخارجي ومطالبات الضمان';
 
 -- ── Table: mnt_inspection ──
 CREATE TABLE `mnt_inspection` (
@@ -8350,6 +8594,29 @@ CREATE TABLE `mnt_inspection_template_line` (
   CONSTRAINT `fk_tplline_template` FOREIGN KEY (`template_id`) REFERENCES `mnt_inspection_template` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: mnt_kpi_period ──
+CREATE TABLE `mnt_kpi_period` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `period` char(7) NOT NULL COMMENT 'YYYY-MM',
+  `scope_kind` enum('equipment','category') NOT NULL DEFAULT 'equipment',
+  `scope_ref` int(11) NOT NULL DEFAULT 0,
+  `breakdowns` int(11) NOT NULL DEFAULT 0,
+  `mtbf_hours` decimal(14,2) NOT NULL DEFAULT 0.00,
+  `mttr_hours` decimal(14,2) NOT NULL DEFAULT 0.00,
+  `readiness_pct` decimal(6,2) NOT NULL DEFAULT 0.00 COMMENT 'مستورد من asset_readiness لا يحسب هنا',
+  `pm_done` int(11) NOT NULL DEFAULT 0,
+  `pm_due` int(11) NOT NULL DEFAULT 0,
+  `pm_compliance_pct` decimal(6,2) NOT NULL DEFAULT 0.00,
+  `cost_per_hour` decimal(14,4) NOT NULL DEFAULT 0.0000,
+  `derivation_rule` varchar(60) NOT NULL DEFAULT '',
+  `derived_from` varchar(300) NOT NULL DEFAULT '',
+  `derived_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_mkp` (`company_id`,`period`,`scope_kind`,`scope_ref`),
+  CONSTRAINT `chk_mkp_rule` CHECK (`derivation_rule` <> '' and `derived_from` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 MNT-16 - مؤشرات الصيانة الدورية مشتقة بلا ادخال';
+
 -- ── Table: mnt_lookup ──
 CREATE TABLE `mnt_lookup` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -8413,6 +8680,19 @@ CREATE TABLE `mnt_order` (
   `waiting_part_since` date DEFAULT NULL COMMENT 'M-32: تاريخُ دخول WaitingPart — العدّادُ يُحسب منه',
   `pm_cycle_key` varchar(80) DEFAULT NULL COMMENT 'M-36: plan:{id}:eq:{id}:due:{date} — يمنع توليدَ الدورة مرتين',
   `readiness_cert_ref` varchar(190) DEFAULT NULL COMMENT 'INJ-0074: مرجعُ شهادةِ الجاهزيةِ الفنية — وتاريخُها ومُصدرُها في closed_at/closed_by',
+  `failure_kind` varchar(40) NOT NULL DEFAULT '' COMMENT 'المحور ١ نوع العطل - كهربائي ميكانيكي هيدروليكي اطارات',
+  `safety_severity` enum('minor','major','safety_critical') DEFAULT NULL COMMENT 'المحور ٢ خطورة السلامة - DEC-OPEN-12',
+  `safety_rule_ref` varchar(60) NOT NULL DEFAULT '' COMMENT 'قاعدة التصنيف من mnt_safety_rule - لا حكم بلا قاعدة',
+  `safety_system_key` varchar(60) NOT NULL DEFAULT '' COMMENT 'النظام المصاب الذي رفع التصنيف',
+  `severity_override_by` int(11) DEFAULT NULL COMMENT 'DEC-OPEN-12 تصعيد الفني او مهندس الصيانة او مسؤول السلامة',
+  `severity_override_reason` varchar(400) NOT NULL DEFAULT '',
+  `ops_impact` enum('low','medium','high','critical') DEFAULT NULL COMMENT 'المحور ٣ الاثر التشغيلي - محور ثان مستقل لا يغير السلامة',
+  `ops_impact_rule` varchar(60) NOT NULL DEFAULT '',
+  `lockout_state` enum('none','locked_out','released') NOT NULL DEFAULT 'none' COMMENT 'ايقاف ومنع تشغيل - شرط الحرج للسلامة',
+  `lockout_at` datetime DEFAULT NULL,
+  `lockout_by` int(11) DEFAULT NULL,
+  `w7_state_rule` varchar(60) NOT NULL DEFAULT '' COMMENT 'قاعدة الانتقال الاخير - لا حالة بلا قاعدة',
+  `w7_cert_id` int(10) unsigned DEFAULT NULL COMMENT 'شهادة اعادة الخدمة التي اقفلت الامر',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_mnt_pm_cycle` (`pm_cycle_key`),
   KEY `idx_order_eq_company_state` (`equipment_id`,`company_id`,`state`),
@@ -8421,7 +8701,9 @@ CREATE TABLE `mnt_order` (
   KEY `idx_order_plan` (`plan_id`),
   KEY `idx_order_inspection` (`inspection_id`),
   KEY `idx_order_deleted` (`is_deleted`),
-  KEY `idx_mnt_order_auto_open` (`company_id`,`equipment_id`,`project_id`,`is_auto`,`state`)
+  KEY `idx_mnt_order_auto_open` (`company_id`,`equipment_id`,`project_id`,`is_auto`,`state`),
+  CONSTRAINT `chk_mo_override` CHECK (`severity_override_by` is null or `severity_override_reason` <> ''),
+  CONSTRAINT `chk_mo_lockout` CHECK (`lockout_state` = 'none' or `lockout_at` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: mnt_order_labor ──
@@ -8456,6 +8738,33 @@ CREATE TABLE `mnt_order_part` (
   KEY `idx_part_order` (`order_id`),
   CONSTRAINT `fk_part_order` FOREIGN KEY (`order_id`) REFERENCES `mnt_order` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: mnt_part_request ──
+CREATE TABLE `mnt_part_request` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `req_no` varchar(40) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `request_date` date DEFAULT NULL,
+  `warehouse_ref` varchar(120) NOT NULL DEFAULT '' COMMENT 'مستورد للقراءة من المخازن',
+  `lines_count` int(11) NOT NULL DEFAULT 0 COMMENT 'مشتق من mnt_order_part',
+  `priority` enum('normal','urgent') NOT NULL DEFAULT 'normal',
+  `custodian_id` int(11) DEFAULT NULL COMMENT 'مستلم العهدة',
+  `issue_doc_ref` varchar(120) NOT NULL DEFAULT '' COMMENT 'رقم سند الصرف من المخازن',
+  `receipt_match` enum('pending','matched','variance') NOT NULL DEFAULT 'pending',
+  `state` enum('draft','submitted','approved','issued','partially_issued','rejected','cancelled') NOT NULL DEFAULT 'draft',
+  `state_rule` varchar(60) NOT NULL DEFAULT '',
+  `reject_reason` varchar(400) NOT NULL DEFAULT '',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `src_ref` varchar(190) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_mpr` (`company_id`,`req_no`),
+  KEY `ix_mpr_order` (`order_id`),
+  CONSTRAINT `chk_mpr_rule` CHECK (`state_rule` <> ''),
+  CONSTRAINT `chk_mpr_issue` CHECK (`state` not in ('issued','partially_issued') or `issue_doc_ref` <> ''),
+  CONSTRAINT `chk_mpr_rej` CHECK (`state` <> 'rejected' or `reject_reason` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 MNT-10 - طلب صرف القطع لامر العمل - لا صرف لامر مقفل';
 
 -- ── Table: mnt_plan ──
 CREATE TABLE `mnt_plan` (
@@ -8500,6 +8809,104 @@ CREATE TABLE `mnt_plan_task` (
   KEY `idx_plantask_plan` (`plan_id`),
   CONSTRAINT `fk_plantask_plan` FOREIGN KEY (`plan_id`) REFERENCES `mnt_plan` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: mnt_repeat_repair ──
+CREATE TABLE `mnt_repeat_repair` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `equipment_id` int(11) NOT NULL,
+  `origin_order_id` int(11) NOT NULL COMMENT 'رقم الامر الاصلي',
+  `origin_cert_id` int(10) unsigned DEFAULT NULL,
+  `new_order_id` int(11) DEFAULT NULL COMMENT 'رقم الامر الجديد - مشتق',
+  `tree_node` varchar(80) NOT NULL DEFAULT '' COMMENT 'عقدة شجرة الاسباب',
+  `repeat_date` date NOT NULL,
+  `days_since_cert` int(11) DEFAULT NULL COMMENT 'مشتق - لا يدخل',
+  `within_validity` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'مشتق من valid_until',
+  `rca_trigger` enum('repeat_within_validity','safety_critical','high_cost','manual') NOT NULL,
+  `rca_state` enum('open','in_analysis','root_found','closed') NOT NULL DEFAULT 'open',
+  `rca_ref` varchar(190) NOT NULL DEFAULT '',
+  `root_cause` varchar(400) NOT NULL DEFAULT '',
+  `decision_ar` varchar(400) NOT NULL DEFAULT '',
+  `derivation_rule` varchar(60) NOT NULL DEFAULT '',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `src_ref` varchar(190) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_mrr` (`company_id`,`origin_order_id`,`repeat_date`),
+  KEY `ix_mrr_eq` (`equipment_id`),
+  CONSTRAINT `chk_mrr_rule` CHECK (`derivation_rule` <> ''),
+  CONSTRAINT `chk_mrr_close` CHECK (`rca_state` <> 'closed' or `root_cause` <> '' and `decision_ar` <> ''),
+  CONSTRAINT `chk_mrr_win` CHECK (`within_validity` = 0 or `days_since_cert` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 MNT-15 - سجل اعادة الاصلاح وتحليل السبب الجذري';
+
+-- ── Table: mnt_return_cert ──
+CREATE TABLE `mnt_return_cert` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `cert_no` varchar(40) NOT NULL,
+  `order_id` int(11) NOT NULL,
+  `equipment_id` int(11) NOT NULL,
+  `safety_severity` enum('minor','major','safety_critical') NOT NULL DEFAULT 'major' COMMENT 'منقول من الامر لحظة الاصدار - هو الذي اوجب الشهادة',
+  `cert_required` tinyint(1) NOT NULL DEFAULT 1,
+  `cert_rule` varchar(60) NOT NULL DEFAULT '',
+  `tech_complete_date` date DEFAULT NULL COMMENT 'تاريخ الانجاز الفني',
+  `test_performed` varchar(300) NOT NULL DEFAULT '' COMMENT 'الاختبار المنفذ موثقا',
+  `test_result` enum('pass','conditional','fail') DEFAULT NULL,
+  `meter_at_close` decimal(14,2) DEFAULT NULL COMMENT 'قراءة العداد عند الاقفال',
+  `downtime_hours` decimal(12,2) NOT NULL DEFAULT 0.00 COMMENT 'مستورد للقراءة من امر العمل',
+  `actual_cost` decimal(14,2) NOT NULL DEFAULT 0.00 COMMENT 'مشتق من العمالة والقطع والخارجي',
+  `cost_rule` varchar(60) NOT NULL DEFAULT '',
+  `new_readiness_state` enum('operational','operational_restricted','stopped','prohibited','ready_after_approval') DEFAULT NULL,
+  `operating_limits` varchar(400) NOT NULL DEFAULT '',
+  `valid_days` int(11) NOT NULL DEFAULT 0 COMMENT 'من repair01_w7_thresholds لا من الشيفرة',
+  `valid_until` date DEFAULT NULL,
+  `signed_by` int(11) DEFAULT NULL COMMENT 'توقيع مدير الصيانة او المخول الفني',
+  `signer_kind` varchar(40) NOT NULL DEFAULT '',
+  `state` enum('draft','submitted','approved','rejected','expired','superseded') NOT NULL DEFAULT 'draft',
+  `state_rule` varchar(60) NOT NULL DEFAULT '',
+  `reject_reason` varchar(400) NOT NULL DEFAULT '',
+  `reviewed_by` int(11) DEFAULT NULL,
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `superseded_by` int(10) unsigned DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `src_ref` varchar(190) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_mrc_no` (`company_id`,`cert_no`),
+  KEY `ix_mrc_order` (`order_id`),
+  KEY `ix_mrc_eq` (`equipment_id`,`valid_until`),
+  CONSTRAINT `chk_mrc_rule` CHECK (`state_rule` <> '' and `cert_rule` <> ''),
+  CONSTRAINT `chk_mrc_appr` CHECK (`state` <> 'approved' or `approved_by` is not null and `approved_at` is not null and `test_result` is not null and `test_result` <> 'fail'),
+  CONSTRAINT `chk_mrc_evid` CHECK (`state` not in ('submitted','approved') or `test_performed` <> '' and `tech_complete_date` is not null),
+  CONSTRAINT `chk_mrc_rej` CHECK (`state` <> 'rejected' or `reject_reason` <> ''),
+  CONSTRAINT `chk_mrc_limits` CHECK (`new_readiness_state` is null or `new_readiness_state` <> 'operational_restricted' or `operating_limits` <> ''),
+  CONSTRAINT `chk_mrc_valid` CHECK (`state` <> 'approved' or `valid_until` is not null),
+  CONSTRAINT `chk_mrc_signer` CHECK (`safety_severity` <> 'safety_critical' or `state` <> 'approved' or `signer_kind` = 'technical_authority')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 MNT-14 - شهادة اعادة الخدمة: الشهادة وحدها تعيد المعدة';
+
+-- ── Table: mnt_safety_rule ──
+CREATE TABLE `mnt_safety_rule` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `equipment_type` varchar(80) NOT NULL DEFAULT '' COMMENT 'فارغ يعني كل الانواع - DEC-OPEN-12 لا قائمة صلبة واحدة',
+  `system_key` varchar(60) NOT NULL COMMENT 'brakes steering control lifting estop fire structural',
+  `system_ar` varchar(160) NOT NULL DEFAULT '',
+  `default_severity` enum('minor','major','safety_critical') NOT NULL DEFAULT 'major',
+  `requires_cert` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'شهادة عودة مستقلة - البسيط لا يحتاجها',
+  `requires_lockout` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'ايقاف ومنع تشغيل قبل الاصلاح',
+  `approver_kind` varchar(40) NOT NULL DEFAULT '' COMMENT 'technician او technical_authority - لا المشغل وحده',
+  `rule_ref` varchar(60) NOT NULL DEFAULT '',
+  `active` tinyint(1) NOT NULL DEFAULT 1,
+  `src_ref` varchar(190) NOT NULL DEFAULT '',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_msr` (`company_id`,`equipment_type`,`system_key`),
+  KEY `ix_msr_sev` (`default_severity`),
+  CONSTRAINT `chk_msr_rule` CHECK (`rule_ref` <> ''),
+  CONSTRAINT `chk_msr_cert` CHECK (`default_severity` <> 'safety_critical' or `requires_cert` = 1 and `requires_lockout` = 1 and `approver_kind` = 'technical_authority')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 - تصنيف السلامة بحسب نوع المعدة والنظام - DEC-OPEN-12';
 
 -- ── Table: modules ──
 CREATE TABLE `modules` (
@@ -8664,10 +9071,12 @@ CREATE TABLE `nav_canonical` (
   `placement_basis` varchar(190) DEFAULT NULL COMMENT 'مصدرُ التصنيفِ — مقيسٌ أو مسمًّى بنصِّ المالك، لا اجتهادٌ صامت',
   `space_class` varchar(32) NOT NULL DEFAULT '' COMMENT 'صنفُ الظهورِ الغالبُ بعدَ شجرةِ القرار — ليقرأ قارئُ المصفوفةِ حكمَ الحارس',
   `anchor_key` varchar(24) DEFAULT NULL COMMENT 'مفتاحُ مِرساةِ القشرة — الغلافُ ينادي المفتاحَ والسجلُّ يعطي المسارَ والاسم',
+  `screen_id` varchar(12) NOT NULL DEFAULT '' COMMENT 'REPAIR01 - المعرف المعياري للشاشة SCR-nnnn',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_route` (`route`),
   UNIQUE KEY `uq_anchor` (`anchor_key`),
-  KEY `ix_status_level` (`status`,`level_no`,`sort_no`)
+  KEY `ix_status_level` (`status`,`level_no`,`sort_no`),
+  KEY `ix_screen_id` (`screen_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='UXUI-01: سجلُّ التنقلِ المعياريُّ — صورةُ مصفوفةِ الـ359 المعتمَدة';
 
 -- ── Table: nav_canonical_current ──
@@ -9133,6 +9542,56 @@ CREATE TABLE `opportunities` (
   KEY `idx_opp_stage` (`stage`),
   KEY `idx_opp_deleted` (`is_deleted`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- ── Table: ops_stop_register ──
+CREATE TABLE `ops_stop_register` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `occurrence_key` char(40) NOT NULL COMMENT 'sha1 لحبة الواقعة - مفتاح العطالة',
+  `stop_date` date NOT NULL,
+  `shift` enum('day','night') NOT NULL,
+  `equipment_id` int(11) DEFAULT NULL,
+  `site_id` int(11) DEFAULT NULL,
+  `project_id` int(11) DEFAULT NULL,
+  `ops_state` varchar(32) NOT NULL DEFAULT '' COMMENT 'من مفردات unit_time_log.ops_state',
+  `hours` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `resp_party` varchar(24) NOT NULL DEFAULT '',
+  `obligation_type` varchar(32) NOT NULL DEFAULT '',
+  `billable` tinyint(1) NOT NULL DEFAULT 0,
+  `authority` enum('unit_time_log','timesheet','manual') NOT NULL DEFAULT 'unit_time_log' COMMENT 'السجل الحاكم للواقعة - والباقي مرآة',
+  `authority_rule` varchar(48) NOT NULL DEFAULT '',
+  `authority_ref` varchar(64) NOT NULL DEFAULT '',
+  `decision` enum('pending','classified','attributed','disputed','closed') NOT NULL DEFAULT 'pending',
+  `decided_by` int(11) DEFAULT NULL,
+  `decided_at` datetime DEFAULT NULL,
+  `sla_due_at` datetime DEFAULT NULL COMMENT 'المهلة - كيان مستقل بمهلة',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_occurrence` (`occurrence_key`),
+  KEY `ix_day` (`company_id`,`stop_date`,`shift`),
+  KEY `ix_decision` (`decision`),
+  CONSTRAINT `chk_stop_decided` CHECK (`decision` = 'pending' or `decided_by` is not null and `decided_at` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W04 - السجل الواحد لواقعة التوقف بمفتاح عطالة فريد';
+
+-- ── Table: ops_stop_source ──
+CREATE TABLE `ops_stop_source` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL COMMENT 'DEC-OPEN-03 - لا قراءة سجل بلا كيان قانوني',
+  `occurrence_key` char(40) NOT NULL,
+  `register_name` enum('unit_time_log','timesheet') NOT NULL,
+  `source_ref` varchar(64) NOT NULL DEFAULT '' COMMENT 'مفتاح الصف في سجله',
+  `role` enum('AUTHORITY','MIRROR') NOT NULL DEFAULT 'MIRROR',
+  `hours_read` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `variance_hours` decimal(8,2) NOT NULL DEFAULT 0.00,
+  `variance_rule` varchar(48) NOT NULL DEFAULT '',
+  `variance_note` varchar(255) NOT NULL DEFAULT '',
+  `measured_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_occ_register` (`occurrence_key`,`register_name`),
+  KEY `ix_role` (`role`),
+  KEY `ix_company` (`company_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W04 - قراءة كل سجل مصدر للواقعة نفسها بفارقها المسجل';
 
 -- ── Table: org_assignment_types ──
 CREATE TABLE `org_assignment_types` (
@@ -9782,6 +10241,9 @@ CREATE TABLE `personal_notifications` (
 -- ── Table: persons ──
 CREATE TABLE `persons` (
   `person_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) DEFAULT NULL COMMENT 'DEC-OPEN-03 - لا صف في كيان أم بلا كيان قانوني',
+  `employee_id` int(11) DEFAULT NULL COMMENT 'REPAIR01 W03 - Person_ID المالك employees.id',
+  `person_class` enum('WORKFORCE','IDENTITY_ONLY','UNRESOLVED') NOT NULL DEFAULT 'UNRESOLVED' COMMENT 'WORKFORCE يلزمه employee_id - IDENTITY_ONLY صف هوية معلن',
   `full_name` varchar(190) NOT NULL,
   `national_ref` varchar(60) DEFAULT NULL COMMENT 'مرجع هوية — معرّف دائم لا يُعاد استعماله',
   `contact_json` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`contact_json`)),
@@ -9789,8 +10251,14 @@ CREATE TABLE `persons` (
   `active` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `w3_link_rule` varchar(48) NOT NULL DEFAULT '' COMMENT 'قاعدة الوصل - لا قيمة بلا قاعدة',
   PRIMARY KEY (`person_id`),
-  UNIQUE KEY `uq_persons_national` (`national_ref`)
+  UNIQUE KEY `uq_persons_national` (`national_ref`),
+  UNIQUE KEY `uq_employee` (`employee_id`),
+  KEY `ix_company` (`company_id`),
+  KEY `ix_class` (`person_class`),
+  CONSTRAINT `chk_persons_w3_company` CHECK (`active` <> 1 or `company_id` is not null and `company_id` <> 0),
+  CONSTRAINT `chk_persons_w3_master_key` CHECK (`active` <> 1 or `person_class` <> 'WORKFORCE' or `employee_id` is not null and `employee_id` <> 0)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SEC-01 §14: سجل الإنسان — حساب واحد عبر المنصة والصفات متعددة';
 
 -- ── Table: policy_rules ──
@@ -10598,6 +11066,16 @@ CREATE TABLE `repair01_events` (
   `effect_type` varchar(160) NOT NULL DEFAULT '',
   `retry_policy` varchar(80) NOT NULL DEFAULT '',
   `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `trigger_rule` varchar(400) NOT NULL DEFAULT '' COMMENT 'المحفز - ما الذي يطلقه',
+  `min_payload` varchar(600) NOT NULL DEFAULT '' COMMENT 'الحمولة الدنيا',
+  `consumer_list` text DEFAULT NULL COMMENT 'كل مستهلك فعلي بالاسم',
+  `consumer_effect` text DEFAULT NULL COMMENT 'أثر كل مستهلك على حدة',
+  `preconditions` varchar(600) NOT NULL DEFAULT '' COMMENT 'الشروط المسبقة',
+  `failure_policy` varchar(400) NOT NULL DEFAULT '' COMMENT 'سلوك الفشل',
+  `compensation` varchar(400) NOT NULL DEFAULT '' COMMENT 'التعويض',
+  `contract_status` enum('NONE','RECORDED') NOT NULL DEFAULT 'NONE' COMMENT 'حدث بلا عقد أثر مسجل لا ينفذ',
+  `contract_rule` varchar(48) NOT NULL DEFAULT '',
+  `contract_stage` varchar(8) NOT NULL DEFAULT '' COMMENT 'المرحلة التي كتبت العقد',
   PRIMARY KEY (`id`),
   KEY `k_code` (`event_code`),
   KEY `k_wave` (`wave`)
@@ -10619,6 +11097,73 @@ CREATE TABLE `repair01_fields` (
   KEY `k_req` (`requirement_id`),
   KEY `k_wave` (`wave`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: repair01_key_alias ──
+CREATE TABLE `repair01_key_alias` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `key_code` varchar(40) NOT NULL,
+  `alias_table` varchar(64) NOT NULL,
+  `alias_column` varchar(64) NOT NULL DEFAULT '',
+  `alias_kind` enum('PARALLEL_REGISTER','LABEL_ONLY','DENORM_LABEL') NOT NULL,
+  `verdict` enum('LINKED','ALTERNATE_ID','SEED_NO_REFERENT','DIFFERENT_GRAIN','DENORM_LABEL') NOT NULL,
+  `verdict_rule` varchar(48) NOT NULL DEFAULT '',
+  `verdict_why` varchar(400) NOT NULL DEFAULT '',
+  `rows_total` int(11) NOT NULL DEFAULT 0,
+  `rows_seed` int(11) NOT NULL DEFAULT 0,
+  `rows_resolvable` int(11) NOT NULL DEFAULT 0,
+  `link_column` varchar(64) NOT NULL DEFAULT '' COMMENT 'العمود الحامل للمفتاح بعد الوصل',
+  `rows_linked` int(11) NOT NULL DEFAULT 0,
+  `resolved_at` datetime DEFAULT NULL,
+  `wave_stage` varchar(8) NOT NULL DEFAULT '' COMMENT 'الموجة التي تحسمه إن لم يحسم هنا',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_alias` (`key_code`,`alias_table`,`alias_column`),
+  KEY `ix_verdict` (`verdict`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W03 - المعرفات البديلة للحقيقة نفسها بحكم مقيس';
+
+-- ── Table: repair01_key_registry ──
+CREATE TABLE `repair01_key_registry` (
+  `key_code` varchar(40) NOT NULL COMMENT 'المفتاح المشترك — Company_ID …',
+  `key_ar` varchar(120) NOT NULL DEFAULT '',
+  `seq_no` tinyint(3) unsigned NOT NULL DEFAULT 0 COMMENT 'ترتيب المفتاح في الوثيقة — لا ترتيب أبجدي',
+  `owner_table` varchar(64) NOT NULL DEFAULT '' COMMENT 'الجدول المالك — واحد لا أكثر',
+  `owner_column` varchar(64) NOT NULL DEFAULT '' COMMENT 'العمود الحامل للمفتاح',
+  `owner_dept` varchar(12) NOT NULL DEFAULT '' COMMENT 'الرمز المعياري للادارة المالكة',
+  `owner_screen_id` varchar(12) NOT NULL DEFAULT '' COMMENT 'SCR-nnnn الشاشة التي تنشئ المفتاح',
+  `owner_rule` varchar(48) NOT NULL DEFAULT '',
+  `create_rule` varchar(400) NOT NULL DEFAULT '' COMMENT 'قاعدة الإنشاء',
+  `create_rule_src` varchar(255) NOT NULL DEFAULT '',
+  `read_rule` varchar(400) NOT NULL DEFAULT '' COMMENT 'قاعدة القراءة',
+  `read_rule_src` varchar(255) NOT NULL DEFAULT '',
+  `company_scope` enum('SCOPED','ROOT') NOT NULL DEFAULT 'SCOPED',
+  `company_column` varchar(64) NOT NULL DEFAULT '',
+  `is_master` tinyint(1) NOT NULL DEFAULT 1,
+  `measured_rows` int(11) NOT NULL DEFAULT 0,
+  `measured_at` datetime DEFAULT NULL,
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`key_code`),
+  UNIQUE KEY `uq_owner` (`owner_table`,`owner_column`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W03 - سجل المفاتيح الثلاثة عشر بمالك واحد';
+
+-- ── Table: repair01_master_entities ──
+CREATE TABLE `repair01_master_entities` (
+  `entity_code` varchar(40) NOT NULL,
+  `entity_ar` varchar(160) NOT NULL DEFAULT '',
+  `key_code` varchar(40) NOT NULL DEFAULT '',
+  `table_name` varchar(64) NOT NULL DEFAULT '',
+  `company_column` varchar(64) NOT NULL DEFAULT '',
+  `rows_total` int(11) NOT NULL DEFAULT 0,
+  `rows_in_use` int(11) NOT NULL DEFAULT 0 COMMENT 'المقام الحاكم لـDEC-OPEN-03',
+  `rows_no_company` int(11) NOT NULL DEFAULT 0,
+  `rows_quarantined` int(11) NOT NULL DEFAULT 0,
+  `quarantine_rule` varchar(48) NOT NULL DEFAULT '',
+  `guard_kind` enum('TRIGGER','NOT_NULL','APP_ONLY','NONE') NOT NULL DEFAULT 'NONE',
+  `guard_evidence` varchar(255) NOT NULL DEFAULT '',
+  `verdict` varchar(48) NOT NULL DEFAULT '',
+  `measured_at` datetime DEFAULT NULL,
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`entity_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W03 - الكيانات الأم وحكم DEC-OPEN-03';
 
 -- ── Table: repair01_ownership ──
 CREATE TABLE `repair01_ownership` (
@@ -10754,6 +11299,34 @@ CREATE TABLE `repair01_target_gaps` (
   KEY `k_unit` (`unit`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ── Table: repair01_ui_labels ──
+CREATE TABLE `repair01_ui_labels` (
+  `technical_key` varchar(160) NOT NULL COMMENT 'المفتاح التقني - screen او group او action او code او state',
+  `arabic_ui_label` varchar(190) NOT NULL DEFAULT '' COMMENT 'المسمى العربي المعتمد - منقى',
+  `short_label` varchar(60) NOT NULL DEFAULT '' COMMENT 'الصيغة القصيرة للزر والتبويب',
+  `allowed_context` varchar(120) NOT NULL DEFAULT '' COMMENT 'SIDEBAR TAB BUTTON COLUMN STATE WORK_ITEM CYCLE',
+  `sensitive` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'مسمى حساس لا يظهر لكل دور',
+  `deprecated_label` varchar(190) NOT NULL DEFAULT '' COMMENT 'الصيغة المتقاعدة - لا تحذف فهي دليل',
+  `replacement_label` varchar(190) NOT NULL DEFAULT '' COMMENT 'ما حل محل المتقاعد',
+  `visibility_class` varchar(20) NOT NULL DEFAULT '' COMMENT 'USER_VISIBLE AUDITOR_VISIBLE ADMIN_VISIBLE DEVELOPER_ONLY',
+  `label_state` varchar(16) NOT NULL DEFAULT 'ACTIVE' COMMENT 'DRAFT ACTIVE DEPRECATED REPLACED',
+  `source_table` varchar(64) NOT NULL DEFAULT '',
+  `source_column` varchar(64) NOT NULL DEFAULT '',
+  `source_key` varchar(200) NOT NULL DEFAULT '' COMMENT 'مفتاح الصف في مصدره - لا اسم بلا صف يعود اليه',
+  `owner_code` varchar(12) NOT NULL DEFAULT '' COMMENT 'الادارة المالكة بالرمز المعياري',
+  `rule_id` varchar(48) NOT NULL DEFAULT '' COMMENT 'قاعدة الاشتقاق - لا قيمة بلا قاعدة',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `origin` varchar(8) NOT NULL DEFAULT 'W06' COMMENT 'ختم الموجة التي سجلت الصف',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`technical_key`),
+  KEY `ix_label` (`arabic_ui_label`),
+  KEY `ix_dep` (`deprecated_label`),
+  KEY `ix_state` (`label_state`),
+  KEY `ix_vis` (`visibility_class`),
+  KEY `ix_source` (`source_table`,`source_column`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W06 - سجل المسميات المركزي: مفتاح تقني واحد لكل مسمى';
+
 -- ── Table: repair01_w1_decisions ──
 CREATE TABLE `repair01_w1_decisions` (
   `decision_id` varchar(32) NOT NULL,
@@ -10787,6 +11360,578 @@ CREATE TABLE `repair01_w2_decisions` (
   KEY `k_stage` (`stage`),
   KEY `k_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ── Table: repair01_w3_decisions ──
+CREATE TABLE `repair01_w3_decisions` (
+  `decision_id` varchar(24) NOT NULL,
+  `question` varchar(400) NOT NULL DEFAULT '',
+  `ruling` varchar(600) NOT NULL DEFAULT '',
+  `rationale` varchar(900) DEFAULT NULL,
+  `scope_rows` int(11) NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`decision_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W03 - قرارات المرحلة';
+
+-- ── Table: repair01_w3_journey ──
+CREATE TABLE `repair01_w3_journey` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `run_id` varchar(40) NOT NULL DEFAULT '',
+  `station_no` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `station` varchar(160) NOT NULL DEFAULT '',
+  `key_code` varchar(40) NOT NULL DEFAULT '',
+  `consumer` varchar(120) NOT NULL DEFAULT '' COMMENT 'المستهلك بالاسم لا كل المستهلكين',
+  `expected` varchar(400) NOT NULL DEFAULT '',
+  `measured` varchar(400) NOT NULL DEFAULT '',
+  `business_effect` varchar(400) NOT NULL DEFAULT '' COMMENT 'الأثر التجاري المقيس لا صف الحدث',
+  `passed` tinyint(1) NOT NULL DEFAULT 0,
+  `run_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_run` (`run_id`,`station_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W03 - رحلة المفتاح: محطاتها وأثر كل مستهلك';
+
+-- ── Table: repair01_w3_scope ──
+CREATE TABLE `repair01_w3_scope` (
+  `requirement_id` varchar(48) NOT NULL,
+  `unit` varchar(160) NOT NULL DEFAULT '',
+  `group_name` varchar(160) NOT NULL DEFAULT '',
+  `surface` varchar(255) NOT NULL DEFAULT '',
+  `anchor_screen_id` varchar(12) NOT NULL DEFAULT '' COMMENT 'Canonical Screen_ID أو فراغ لما لم يبن',
+  `map_rule` varchar(48) NOT NULL DEFAULT '',
+  `map_why` varchar(400) NOT NULL DEFAULT '',
+  `wave_stage` varchar(8) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`requirement_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W03 - ربط متطلبات المرحلة بالسجل المعياري للشاشات';
+
+-- ── Table: repair01_w3_sidebar ──
+CREATE TABLE `repair01_w3_sidebar` (
+  `screen_id` varchar(12) NOT NULL,
+  `route` varchar(200) NOT NULL DEFAULT '',
+  `owner_code` varchar(12) NOT NULL DEFAULT '',
+  `s1_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s1_rule` varchar(48) NOT NULL DEFAULT '',
+  `s2_label_live` varchar(190) NOT NULL DEFAULT '',
+  `s2_label_canon` varchar(190) NOT NULL DEFAULT '',
+  `s2_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s2_rule` varchar(48) NOT NULL DEFAULT '',
+  `s3_group_live` varchar(190) NOT NULL DEFAULT '',
+  `s3_group_canon` varchar(190) NOT NULL DEFAULT '',
+  `s3_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s3_rule` varchar(48) NOT NULL DEFAULT '',
+  `s4_order_src` varchar(48) NOT NULL DEFAULT '',
+  `s4_order_no` int(11) NOT NULL DEFAULT 0,
+  `s4_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s4_rule` varchar(48) NOT NULL DEFAULT '',
+  `s5_parent` varchar(12) NOT NULL DEFAULT '',
+  `s5_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s5_rule` varchar(48) NOT NULL DEFAULT '',
+  `s5_why` varchar(400) NOT NULL DEFAULT '',
+  `s6_visibility` varchar(24) NOT NULL DEFAULT '',
+  `s6_perm_rows` int(11) NOT NULL DEFAULT 0,
+  `s6_perm_coded` int(11) NOT NULL DEFAULT 0,
+  `s6_guard_kind` varchar(24) NOT NULL DEFAULT '',
+  `s6_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s6_rule` varchar(48) NOT NULL DEFAULT '',
+  `s7_linked` tinyint(1) NOT NULL DEFAULT 0,
+  `s7_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s7_rule` varchar(48) NOT NULL DEFAULT '',
+  `measured_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`screen_id`),
+  KEY `ix_owner` (`owner_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W03 - الخطوات السبع للسايدبار داخل نطاق المرحلة';
+
+-- ── Table: repair01_w4_decisions ──
+CREATE TABLE `repair01_w4_decisions` (
+  `decision_id` varchar(24) NOT NULL,
+  `question` varchar(400) NOT NULL DEFAULT '',
+  `ruling` varchar(700) NOT NULL DEFAULT '',
+  `rationale` varchar(900) DEFAULT NULL,
+  `scope_rows` int(11) NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`decision_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W04 - قرارات المرحلة';
+
+-- ── Table: repair01_w4_journey ──
+CREATE TABLE `repair01_w4_journey` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `run_id` varchar(40) NOT NULL DEFAULT '',
+  `station_no` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `station` varchar(160) NOT NULL DEFAULT '',
+  `entity` varchar(40) NOT NULL DEFAULT '',
+  `consumer` varchar(120) NOT NULL DEFAULT '' COMMENT 'المستهلك بالاسم لا كل المستهلكين',
+  `expected` varchar(400) NOT NULL DEFAULT '',
+  `measured` varchar(400) NOT NULL DEFAULT '',
+  `business_effect` varchar(400) NOT NULL DEFAULT '' COMMENT 'الأثر التجاري المقيس لا صف الحدث',
+  `passed` tinyint(1) NOT NULL DEFAULT 0,
+  `run_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_run` (`run_id`,`station_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W04 - رحلة اليوم: محطاتها وأثر كل مستهلك';
+
+-- ── Table: repair01_w4_scope ──
+CREATE TABLE `repair01_w4_scope` (
+  `requirement_id` varchar(48) NOT NULL,
+  `unit` varchar(160) NOT NULL DEFAULT '',
+  `group_name` varchar(160) NOT NULL DEFAULT '',
+  `surface` varchar(255) NOT NULL DEFAULT '',
+  `anchor_screen_id` varchar(12) NOT NULL DEFAULT '' COMMENT 'Canonical Screen_ID أو فراغ لما لم يبن',
+  `anchor_route` varchar(200) NOT NULL DEFAULT '',
+  `anchor_probe` varchar(80) NOT NULL DEFAULT '' COMMENT 'الجدول أو الصنف الذي يثبت المرساة قياسا',
+  `owner_measured` varchar(12) NOT NULL DEFAULT '' COMMENT 'مالك الشاشة كما يقيسه السجل',
+  `owner_expected` varchar(12) NOT NULL DEFAULT '' COMMENT 'الادارة المالكة للمتطلب',
+  `owner_verdict` varchar(32) NOT NULL DEFAULT '' COMMENT 'MATCH او MISMATCH — لا يدهس',
+  `map_rule` varchar(48) NOT NULL DEFAULT '',
+  `map_why` varchar(400) NOT NULL DEFAULT '',
+  `wave_stage` varchar(8) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`requirement_id`),
+  KEY `ix_screen` (`anchor_screen_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W04 - ربط متطلبات المرحلة بالسجل المعياري للشاشات';
+
+-- ── Table: repair01_w4_sidebar ──
+CREATE TABLE `repair01_w4_sidebar` (
+  `screen_id` varchar(12) NOT NULL,
+  `route` varchar(200) NOT NULL DEFAULT '',
+  `owner_code` varchar(12) NOT NULL DEFAULT '',
+  `s1_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s1_rule` varchar(48) NOT NULL DEFAULT '',
+  `s2_label_live` varchar(190) NOT NULL DEFAULT '',
+  `s2_label_canon` varchar(190) NOT NULL DEFAULT '',
+  `s2_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s2_rule` varchar(48) NOT NULL DEFAULT '',
+  `s3_group_live` varchar(190) NOT NULL DEFAULT '',
+  `s3_group_canon` varchar(190) NOT NULL DEFAULT '',
+  `s3_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s3_rule` varchar(48) NOT NULL DEFAULT '',
+  `s4_order_src` varchar(48) NOT NULL DEFAULT '',
+  `s4_order_no` int(11) NOT NULL DEFAULT 0,
+  `s4_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s4_rule` varchar(48) NOT NULL DEFAULT '',
+  `s5_parent` varchar(12) NOT NULL DEFAULT '',
+  `s5_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s5_rule` varchar(48) NOT NULL DEFAULT '',
+  `s5_why` varchar(400) NOT NULL DEFAULT '',
+  `s6_visibility` varchar(24) NOT NULL DEFAULT '',
+  `s6_perm_rows` int(11) NOT NULL DEFAULT 0,
+  `s6_perm_coded` int(11) NOT NULL DEFAULT 0,
+  `s6_guard_kind` varchar(24) NOT NULL DEFAULT '',
+  `s6_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s6_rule` varchar(48) NOT NULL DEFAULT '',
+  `s7_linked` tinyint(1) NOT NULL DEFAULT 0,
+  `s7_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s7_rule` varchar(48) NOT NULL DEFAULT '',
+  `measured_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`screen_id`),
+  KEY `ix_owner` (`owner_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W04 - الخطوات السبع للسايدبار داخل نطاق المرحلة';
+
+-- ── Table: repair01_w5_decisions ──
+CREATE TABLE `repair01_w5_decisions` (
+  `decision_id` varchar(24) NOT NULL,
+  `question` varchar(400) NOT NULL DEFAULT '',
+  `ruling` varchar(900) NOT NULL DEFAULT '',
+  `rationale` varchar(900) DEFAULT NULL,
+  `scope_rows` int(11) NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`decision_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W05 - قرارات المرحلة';
+
+-- ── Table: repair01_w5_journey ──
+CREATE TABLE `repair01_w5_journey` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `run_id` varchar(40) NOT NULL DEFAULT '',
+  `station_no` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `station` varchar(160) NOT NULL DEFAULT '',
+  `entity` varchar(40) NOT NULL DEFAULT '',
+  `consumer` varchar(120) NOT NULL DEFAULT '' COMMENT 'المستهلك بالاسم لا كل المستهلكين',
+  `expected` varchar(400) NOT NULL DEFAULT '',
+  `measured` varchar(400) NOT NULL DEFAULT '',
+  `business_effect` varchar(400) NOT NULL DEFAULT '' COMMENT 'الاثر التجاري المقيس لا صف الحدث',
+  `readiness_after` varchar(80) NOT NULL DEFAULT '' COMMENT 'الجاهزية المشتقة بعد المحطة',
+  `passed` tinyint(1) NOT NULL DEFAULT 0,
+  `run_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_run` (`run_id`,`station_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W05 - رحلة الاصل: محطاتها واثر كل مستهلك';
+
+-- ── Table: repair01_w5_scope ──
+CREATE TABLE `repair01_w5_scope` (
+  `requirement_id` varchar(48) NOT NULL,
+  `unit` varchar(160) NOT NULL DEFAULT '',
+  `group_name` varchar(160) NOT NULL DEFAULT '',
+  `surface` varchar(255) NOT NULL DEFAULT '',
+  `anchor_screen_id` varchar(12) NOT NULL DEFAULT '' COMMENT 'Canonical Screen_ID او فراغ لما لم يبن',
+  `anchor_route` varchar(200) NOT NULL DEFAULT '',
+  `anchor_probe` varchar(80) NOT NULL DEFAULT '' COMMENT 'الجدول او الصنف الذي يثبت المرساة قياسا',
+  `owner_measured` varchar(12) NOT NULL DEFAULT '',
+  `owner_expected` varchar(12) NOT NULL DEFAULT '',
+  `owner_verdict` varchar(32) NOT NULL DEFAULT '' COMMENT 'MATCH او MISMATCH - لا يدهس',
+  `map_rule` varchar(48) NOT NULL DEFAULT '',
+  `map_why` varchar(400) NOT NULL DEFAULT '',
+  `wave_stage` varchar(8) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`requirement_id`),
+  KEY `ix_screen` (`anchor_screen_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W05 - ربط متطلبات المرحلة بالسجل المعياري للشاشات';
+
+-- ── Table: repair01_w5_sidebar ──
+CREATE TABLE `repair01_w5_sidebar` (
+  `screen_id` varchar(12) NOT NULL,
+  `route` varchar(200) NOT NULL DEFAULT '',
+  `owner_code` varchar(12) NOT NULL DEFAULT '',
+  `s1_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s1_rule` varchar(48) NOT NULL DEFAULT '',
+  `s2_label_live` varchar(190) NOT NULL DEFAULT '',
+  `s2_label_canon` varchar(190) NOT NULL DEFAULT '',
+  `s2_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s2_rule` varchar(48) NOT NULL DEFAULT '',
+  `s3_group_live` varchar(190) NOT NULL DEFAULT '',
+  `s3_group_canon` varchar(190) NOT NULL DEFAULT '',
+  `s3_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s3_rule` varchar(48) NOT NULL DEFAULT '',
+  `s4_order_src` varchar(48) NOT NULL DEFAULT '',
+  `s4_order_no` int(11) NOT NULL DEFAULT 0,
+  `s4_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s4_rule` varchar(48) NOT NULL DEFAULT '',
+  `s5_parent` varchar(12) NOT NULL DEFAULT '',
+  `s5_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s5_rule` varchar(48) NOT NULL DEFAULT '',
+  `s5_why` varchar(400) NOT NULL DEFAULT '',
+  `s6_visibility` varchar(24) NOT NULL DEFAULT '',
+  `s6_perm_rows` int(11) NOT NULL DEFAULT 0,
+  `s6_perm_coded` int(11) NOT NULL DEFAULT 0,
+  `s6_guard_kind` varchar(24) NOT NULL DEFAULT '',
+  `s6_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s6_rule` varchar(48) NOT NULL DEFAULT '',
+  `s7_linked` tinyint(1) NOT NULL DEFAULT 0,
+  `s7_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s7_rule` varchar(48) NOT NULL DEFAULT '',
+  `measured_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`screen_id`),
+  KEY `ix_owner` (`owner_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W05 - الخطوات السبع للسايدبار داخل نطاق المرحلة';
+
+-- ── Table: repair01_w6_code_dict ──
+CREATE TABLE `repair01_w6_code_dict` (
+  `raw_code` varchar(120) NOT NULL COMMENT 'الرمز الداخلي كما يكتب في القاعدة او الشيفرة',
+  `display_ar` varchar(190) NOT NULL DEFAULT '' COMMENT 'ما يراه المستخدم',
+  `display_short` varchar(60) NOT NULL DEFAULT '',
+  `code_family` varchar(48) NOT NULL DEFAULT '' COMMENT 'STATE WORKSTREAM EVENT DENY_REASON READINESS',
+  `allowed_context` varchar(120) NOT NULL DEFAULT '',
+  `why` varchar(400) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`raw_code`),
+  KEY `ix_family` (`code_family`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W06 - قاموس عرض الرموز الداخلية للمستخدم';
+
+-- ── Table: repair01_w6_coupled ──
+CREATE TABLE `repair01_w6_coupled` (
+  `term` varchar(190) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'النص المشكول الذي يقارن به - مقارنة ثنائية فالتشكيل هو الفرق',
+  `couple_kind` varchar(24) NOT NULL DEFAULT '' COMMENT 'COMPARE CASE INDEX SQL JS_COMPARE JS_INDEX ENUM',
+  `first_seen` varchar(255) NOT NULL DEFAULT '' COMMENT 'اول موضع اقتران بالاسم',
+  `marks` int(11) NOT NULL DEFAULT 0 COMMENT 'علامات التشكيل المعفاة بسببه',
+  `why` varchar(400) NOT NULL DEFAULT '',
+  `owner_wave` varchar(8) NOT NULL DEFAULT '' COMMENT 'الموجة التي تملك بيانات هذا المصطلح',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `measured_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`term`),
+  KEY `ix_kind` (`couple_kind`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W06 - معجم الاقتران المعلن بعدده لا المدعى صفرا';
+
+-- ── Table: repair01_w6_decisions ──
+CREATE TABLE `repair01_w6_decisions` (
+  `decision_id` varchar(24) NOT NULL,
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `rationale` text DEFAULT NULL,
+  `scope_rows` int(11) NOT NULL DEFAULT 0,
+  `decided_by` varchar(80) NOT NULL DEFAULT '',
+  `decided_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`decision_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W06 - قرارات المرحلة';
+
+-- ── Table: repair01_w6_file_log ──
+CREATE TABLE `repair01_w6_file_log` (
+  `rel_path` varchar(255) NOT NULL COMMENT 'مسار الملف من جذر المستودع',
+  `ui_before` int(11) NOT NULL DEFAULT 0 COMMENT 'علامات تشكيل في نص واجهة قبل التنقية',
+  `ui_after` int(11) NOT NULL DEFAULT 0,
+  `coupled_marks` int(11) NOT NULL DEFAULT 0 COMMENT 'في موضع مقارنة او مفتاح او استعلام - تعذر',
+  `excused_marks` int(11) NOT NULL DEFAULT 0 COMMENT 'نص واجهة يساوي مفردة مقترنة - تعذر',
+  `comment_marks` int(11) NOT NULL DEFAULT 0 COMMENT 'تعليق شيفرة باي لغة - خارج المقام',
+  `spans_changed` int(11) NOT NULL DEFAULT 0,
+  `sha_before` char(40) NOT NULL DEFAULT '',
+  `sha_after` char(40) NOT NULL DEFAULT '',
+  `lint_ok` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'php -l بعد الكتابة',
+  `run_id` varchar(48) NOT NULL DEFAULT '',
+  `applied_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`rel_path`),
+  KEY `ix_run` (`run_id`),
+  KEY `ix_dirty` (`ui_after`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W06 - قياس كل ملف شاشة قبل التنقية وبعدها';
+
+-- ── Table: repair01_w6_journey ──
+CREATE TABLE `repair01_w6_journey` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `run_id` varchar(48) NOT NULL DEFAULT '',
+  `station_no` int(11) NOT NULL DEFAULT 0,
+  `station` varchar(190) NOT NULL DEFAULT '',
+  `consumer` varchar(190) NOT NULL DEFAULT '' COMMENT 'المستهلك بالاسم',
+  `rendered_text` varchar(600) NOT NULL DEFAULT '' COMMENT 'النص المصير نفسه لا صف الجدول',
+  `business_effect` varchar(600) NOT NULL DEFAULT '',
+  `passed` tinyint(1) NOT NULL DEFAULT 0,
+  `detail` varchar(600) NOT NULL DEFAULT '',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_run` (`run_id`,`station_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W06 - رحلة النص بمحطاتها واثر كل مستهلك';
+
+-- ── Table: repair01_w6_reject_log ──
+CREATE TABLE `repair01_w6_reject_log` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `technical_key` varchar(160) NOT NULL DEFAULT '',
+  `attempted` varchar(600) NOT NULL DEFAULT '',
+  `reject_code` varchar(40) NOT NULL DEFAULT '' COMMENT 'DIACRITICS TECH_TERM EQUATION RAW_CODE TOO_LONG NOT_REGISTERED',
+  `reject_detail` varchar(400) NOT NULL DEFAULT '',
+  `caller` varchar(190) NOT NULL DEFAULT '',
+  `actor_id` int(10) unsigned NOT NULL DEFAULT 0,
+  `run_id` varchar(48) NOT NULL DEFAULT '',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_code` (`reject_code`),
+  KEY `ix_run` (`run_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W06 - كل محاولة تسجيل مسمى مرفوضة تقيد بسببها';
+
+-- ── Table: repair01_w6_rewrite ──
+CREATE TABLE `repair01_w6_rewrite` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `source_table` varchar(64) NOT NULL DEFAULT '',
+  `source_column` varchar(64) NOT NULL DEFAULT '',
+  `source_key` varchar(200) NOT NULL DEFAULT '',
+  `old_text` varchar(600) NOT NULL DEFAULT '',
+  `new_text` varchar(600) NOT NULL DEFAULT '',
+  `defect_kind` varchar(32) NOT NULL DEFAULT '' COMMENT 'EQUATION TECH_TERM RAW_CODE DECOR LENGTH',
+  `rule_id` varchar(48) NOT NULL DEFAULT '',
+  `why` varchar(400) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `applied_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_src` (`source_table`,`source_column`),
+  KEY `ix_kind` (`defect_kind`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W06 - كل اعادة كتابة غير الية بقاعدتها ومرجعها';
+
+-- ── Table: repair01_w6_scope ──
+CREATE TABLE `repair01_w6_scope` (
+  `source_key` varchar(80) NOT NULL COMMENT 'الجدول.العمود',
+  `source_table` varchar(64) NOT NULL DEFAULT '',
+  `source_column` varchar(64) NOT NULL DEFAULT '',
+  `row_filter` varchar(190) NOT NULL DEFAULT '' COMMENT 'شرط المقام - المقام كامل لا مختار',
+  `is_rendered` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'يصير للمستخدم ام سجل حوكمة',
+  `renderer` varchar(190) NOT NULL DEFAULT '' COMMENT 'المستهلك بالاسم لا كل المستهلكين',
+  `visibility_class` varchar(20) NOT NULL DEFAULT '',
+  `rows_total` int(11) NOT NULL DEFAULT 0,
+  `dia_before` int(11) NOT NULL DEFAULT 0,
+  `dia_after` int(11) NOT NULL DEFAULT 0,
+  `decor_before` int(11) NOT NULL DEFAULT 0,
+  `decor_after` int(11) NOT NULL DEFAULT 0,
+  `tech_before` int(11) NOT NULL DEFAULT 0,
+  `tech_after` int(11) NOT NULL DEFAULT 0,
+  `eq_before` int(11) NOT NULL DEFAULT 0,
+  `eq_after` int(11) NOT NULL DEFAULT 0,
+  `purify_order` int(11) NOT NULL DEFAULT 0 COMMENT 'ترتيب التنقية - المولد قبل المولد',
+  `map_rule` varchar(48) NOT NULL DEFAULT '',
+  `map_why` varchar(400) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  `measured_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`source_key`),
+  KEY `ix_order` (`purify_order`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W06 - مصادر النص المصير وقياسها قبل التنقية وبعدها';
+
+-- ── Table: repair01_w6_sod ──
+CREATE TABLE `repair01_w6_sod` (
+  `process_key` varchar(60) NOT NULL,
+  `process_name` varchar(190) NOT NULL DEFAULT '',
+  `initiator_role` varchar(48) NOT NULL DEFAULT '',
+  `reviewer_role` varchar(48) NOT NULL DEFAULT '',
+  `approver_role` varchar(48) NOT NULL DEFAULT '',
+  `executor_role` varchar(48) NOT NULL DEFAULT '',
+  `closer_role` varchar(48) NOT NULL DEFAULT '',
+  `forbidden_combo` varchar(400) NOT NULL DEFAULT '' COMMENT 'التركيبة الممنوعة صراحة',
+  `authority_rule_id` varchar(48) NOT NULL DEFAULT '',
+  `deputy_role` varchar(48) NOT NULL DEFAULT '',
+  `scope_rule` varchar(190) NOT NULL DEFAULT '',
+  `delegation` varchar(190) NOT NULL DEFAULT '',
+  `effective_date` date DEFAULT NULL,
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`process_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W06 - فصل الواجبات بادوار ستة وتركيبة ممنوعة';
+
+-- ── Table: repair01_w6_states ──
+CREATE TABLE `repair01_w6_states` (
+  `entity` varchar(40) NOT NULL COMMENT 'ui_label او ui_text_source',
+  `from_state` varchar(24) NOT NULL,
+  `to_state` varchar(24) NOT NULL,
+  `allowed` tinyint(1) NOT NULL DEFAULT 1 COMMENT '0 = ممنوع صراحة لا مسكوت عنه',
+  `owner_role` varchar(48) NOT NULL DEFAULT '',
+  `precondition` varchar(400) NOT NULL DEFAULT '',
+  `official_doc` varchar(190) NOT NULL DEFAULT '',
+  `approval_gate` varchar(120) NOT NULL DEFAULT '',
+  `reopen_rule` varchar(300) NOT NULL DEFAULT '',
+  `correct_rule` varchar(300) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`entity`,`from_state`,`to_state`),
+  KEY `ix_allowed` (`entity`,`allowed`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W06 - انتقالات مسموحة وممنوعة صراحة لكيانات المرحلة';
+
+-- ── Table: repair01_w6_thresholds ──
+CREATE TABLE `repair01_w6_thresholds` (
+  `threshold_key` varchar(48) NOT NULL COMMENT 'MAX_LEN_BUTTON MAX_LEN_FIELD MAX_LEN_TAB MAX_LEN_MENU',
+  `value_no` int(11) NOT NULL DEFAULT 0,
+  `unit` varchar(24) NOT NULL DEFAULT 'حرف',
+  `applies_to` varchar(120) NOT NULL DEFAULT '',
+  `why` varchar(400) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`threshold_key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W06 - حدود الطول تقرا من هنا ولا تكتب في اداة';
+
+-- ── Table: repair01_w7_decisions ──
+CREATE TABLE `repair01_w7_decisions` (
+  `decision_id` varchar(24) NOT NULL,
+  `question` varchar(400) NOT NULL DEFAULT '',
+  `ruling` varchar(900) NOT NULL DEFAULT '',
+  `rationale` varchar(900) DEFAULT NULL,
+  `scope_rows` int(11) NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`decision_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W07 - قرارات المرحلة';
+
+-- ── Table: repair01_w7_journey ──
+CREATE TABLE `repair01_w7_journey` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `run_id` varchar(40) NOT NULL DEFAULT '',
+  `station_no` tinyint(3) unsigned NOT NULL DEFAULT 0,
+  `station` varchar(160) NOT NULL DEFAULT '',
+  `entity` varchar(40) NOT NULL DEFAULT '',
+  `consumer` varchar(190) NOT NULL DEFAULT '' COMMENT 'المستهلك بالاسم لا كل المستهلكين',
+  `expected` varchar(400) NOT NULL DEFAULT '',
+  `measured` varchar(400) NOT NULL DEFAULT '',
+  `business_effect` varchar(400) NOT NULL DEFAULT '' COMMENT 'الاثر التجاري المقيس لا صف الحدث',
+  `readiness_after` varchar(120) NOT NULL DEFAULT '' COMMENT 'حالة الجاهزية المشتقة بعد المحطة',
+  `passed` tinyint(1) NOT NULL DEFAULT 0,
+  `run_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_run` (`run_id`,`station_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W07 - رحلة التوقف: محطاتها واثر كل مستهلك';
+
+-- ── Table: repair01_w7_scope ──
+CREATE TABLE `repair01_w7_scope` (
+  `requirement_id` varchar(48) NOT NULL,
+  `unit` varchar(160) NOT NULL DEFAULT '',
+  `group_name` varchar(160) NOT NULL DEFAULT '',
+  `surface` varchar(255) NOT NULL DEFAULT '',
+  `anchor_screen_id` varchar(12) NOT NULL DEFAULT '' COMMENT 'Canonical Screen_ID او فراغ لما لم يبن',
+  `anchor_route` varchar(200) NOT NULL DEFAULT '',
+  `anchor_probe` varchar(80) NOT NULL DEFAULT '' COMMENT 'الجدول او الصنف الذي يثبت المرساة قياسا',
+  `owner_measured` varchar(12) NOT NULL DEFAULT '',
+  `owner_expected` varchar(12) NOT NULL DEFAULT '',
+  `owner_verdict` varchar(32) NOT NULL DEFAULT '' COMMENT 'MATCH او MISMATCH - لا يدهس',
+  `map_rule` varchar(48) NOT NULL DEFAULT '',
+  `map_why` varchar(400) NOT NULL DEFAULT '',
+  `wave_stage` varchar(8) NOT NULL DEFAULT '',
+  `src_ref` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`requirement_id`),
+  KEY `ix_screen` (`anchor_screen_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W07 - ربط متطلبات المرحلة بالسجل المعياري للشاشات';
+
+-- ── Table: repair01_w7_sidebar ──
+CREATE TABLE `repair01_w7_sidebar` (
+  `screen_id` varchar(12) NOT NULL,
+  `route` varchar(200) NOT NULL DEFAULT '',
+  `owner_code` varchar(12) NOT NULL DEFAULT '',
+  `s1_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s1_rule` varchar(48) NOT NULL DEFAULT '',
+  `s2_label_live` varchar(190) NOT NULL DEFAULT '',
+  `s2_label_canon` varchar(190) NOT NULL DEFAULT '',
+  `s2_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s2_rule` varchar(48) NOT NULL DEFAULT '',
+  `s3_group_live` varchar(190) NOT NULL DEFAULT '',
+  `s3_group_canon` varchar(190) NOT NULL DEFAULT '',
+  `s3_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s3_rule` varchar(48) NOT NULL DEFAULT '',
+  `s4_order_src` varchar(48) NOT NULL DEFAULT '',
+  `s4_order_no` int(11) NOT NULL DEFAULT 0,
+  `s4_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s4_rule` varchar(48) NOT NULL DEFAULT '',
+  `s5_parent` varchar(12) NOT NULL DEFAULT '',
+  `s5_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s5_rule` varchar(48) NOT NULL DEFAULT '',
+  `s5_why` varchar(400) NOT NULL DEFAULT '',
+  `s6_visibility` varchar(24) NOT NULL DEFAULT '',
+  `s6_perm_rows` int(11) NOT NULL DEFAULT 0,
+  `s6_perm_coded` int(11) NOT NULL DEFAULT 0,
+  `s6_guard_kind` varchar(24) NOT NULL DEFAULT '',
+  `s6_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s6_rule` varchar(48) NOT NULL DEFAULT '',
+  `s7_linked` tinyint(1) NOT NULL DEFAULT 0,
+  `s7_verdict` varchar(40) NOT NULL DEFAULT '',
+  `s7_rule` varchar(48) NOT NULL DEFAULT '',
+  `measured_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`screen_id`),
+  KEY `ix_owner` (`owner_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W07 - الخطوات السبع للسايدبار داخل نطاق المرحلة';
+
+-- ── Table: repair01_w7_sod ──
+CREATE TABLE `repair01_w7_sod` (
+  `process_key` varchar(60) NOT NULL,
+  `process_name` varchar(190) NOT NULL DEFAULT '',
+  `initiator_role` varchar(120) NOT NULL DEFAULT '',
+  `reviewer_role` varchar(120) NOT NULL DEFAULT '',
+  `approver_role` varchar(120) NOT NULL DEFAULT '',
+  `executor_role` varchar(120) NOT NULL DEFAULT '',
+  `closer_role` varchar(120) NOT NULL DEFAULT '',
+  `forbidden_combo` varchar(500) NOT NULL DEFAULT '' COMMENT 'التركيبة الممنوعة صراحة',
+  `enforced_by` varchar(190) NOT NULL DEFAULT '' COMMENT 'رمز الرد الذي ينفذها - لا اعلان بلا تنفيذ',
+  `authority_rule_id` varchar(60) NOT NULL DEFAULT '',
+  `deputy_role` varchar(120) NOT NULL DEFAULT '',
+  `scope_rule` varchar(300) NOT NULL DEFAULT '',
+  `delegation` varchar(300) NOT NULL DEFAULT '',
+  `effective_date` date DEFAULT NULL,
+  `src_ref` varchar(190) NOT NULL DEFAULT '',
+  PRIMARY KEY (`process_key`),
+  CONSTRAINT `chk_w7sod_full` CHECK (`initiator_role` <> '' and `approver_role` <> '' and `executor_role` <> '' and `closer_role` <> '' and `forbidden_combo` <> '' and `authority_rule_id` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W07 - فصل الواجبات بستة ادوار وتركيبة ممنوعة';
+
+-- ── Table: repair01_w7_states ──
+CREATE TABLE `repair01_w7_states` (
+  `entity` varchar(48) NOT NULL,
+  `from_state` varchar(48) NOT NULL,
+  `to_state` varchar(48) NOT NULL,
+  `allowed` tinyint(1) NOT NULL DEFAULT 1 COMMENT 'الممنوع صراحة يكتب ولا يسكت عنه',
+  `owner_role` varchar(120) NOT NULL DEFAULT '',
+  `precondition` varchar(500) NOT NULL DEFAULT '',
+  `official_doc` varchar(190) NOT NULL DEFAULT '',
+  `approval_gate` varchar(190) NOT NULL DEFAULT '',
+  `reopen_rule` varchar(300) NOT NULL DEFAULT '',
+  `correct_rule` varchar(300) NOT NULL DEFAULT '',
+  `forbid_reason` varchar(400) NOT NULL DEFAULT '' COMMENT 'الممنوع بلا سبب مكتوب ليس ممنوعا',
+  `src_ref` varchar(190) NOT NULL DEFAULT '',
+  PRIMARY KEY (`entity`,`from_state`,`to_state`),
+  CONSTRAINT `chk_w7st_forbid` CHECK (`allowed` = 1 or `forbid_reason` <> ''),
+  CONSTRAINT `chk_w7st_allow` CHECK (`allowed` = 0 or `owner_role` <> '' and `precondition` <> '' and `official_doc` <> '' and `approval_gate` <> '' and `reopen_rule` <> '' and `correct_rule` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W07 - آلة حالة لكل كيان رئيسي في النطاق';
+
+-- ── Table: repair01_w7_thresholds ──
+CREATE TABLE `repair01_w7_thresholds` (
+  `threshold_key` varchar(48) NOT NULL,
+  `value_num` decimal(14,4) NOT NULL DEFAULT 0.0000,
+  `unit_ar` varchar(40) NOT NULL DEFAULT '',
+  `title_ar` varchar(190) NOT NULL DEFAULT '',
+  `why` varchar(600) NOT NULL DEFAULT '',
+  `decision_ref` varchar(48) NOT NULL DEFAULT '',
+  `src_ref` varchar(190) NOT NULL DEFAULT '',
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`threshold_key`),
+  CONSTRAINT `chk_w7th_why` CHECK (`why` <> '' and `decision_ref` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W07 - عتبات المرحلة: من السجل لا من الشيفرة';
 
 -- ── Table: report_role_permissions ──
 CREATE TABLE `report_role_permissions` (
@@ -12456,9 +13601,11 @@ CREATE TABLE `scr_production` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
+  `site_id` int(11) DEFAULT NULL COMMENT 'REPAIR01 W03 - Site_ID بدل التعريف بالاسم',
   PRIMARY KEY (`id`),
   KEY `ix_production_live` (`company_id`,`status`),
   KEY `fk_scr_production_approver` (`approver_user_id`),
+  KEY `ix_w3_site_id` (`site_id`),
   CONSTRAINT `fk_scr_production_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `chk_scr_production_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة production.php';
@@ -12772,9 +13919,11 @@ CREATE TABLE `scr_site_shift_plan` (
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `approver_user_id` int(11) DEFAULT NULL COMMENT 'هويةُ المعتمِدِ من سلسلةِ الاعتماد — والاسمُ يُقرأ منها لا يُكتب',
+  `operator_employee_id` int(11) DEFAULT NULL COMMENT 'REPAIR01 W03 - Person_ID بدل التعريف بالاسم',
   PRIMARY KEY (`id`),
   KEY `ix_site_shift_plan_live` (`company_id`,`status`),
   KEY `fk_scr_site_shift_plan_approver` (`approver_user_id`),
+  KEY `ix_w3_operator_employee_id` (`operator_employee_id`),
   CONSTRAINT `fk_scr_site_shift_plan_approver` FOREIGN KEY (`approver_user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `chk_scr_site_shift_plan_approver_identity` CHECK (`created_at` < '2026-08-19 00:00:00' or `approver_name` is null or trim(`approver_name`) = '' or `approver_user_id` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة site_shift_plan.php';
@@ -12997,8 +14146,10 @@ CREATE TABLE `scr_unit_perf` (
   `created_by_name` varchar(120) DEFAULT NULL COMMENT 'المُنشئ — الاسم والصفة',
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `equipment_id` int(11) DEFAULT NULL COMMENT 'REPAIR01 W03 - Asset_ID بدل التعريف بالكود النصي',
   PRIMARY KEY (`id`),
-  KEY `ix_unit_perf_live` (`company_id`,`status`)
+  KEY `ix_unit_perf_live` (`company_id`,`status`),
+  KEY `ix_w3_equipment_id` (`equipment_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='CMP-03 موجة ٢: الجدول الأصلي لشاشة unit_perf.php';
 
 -- ── Table: scr_workshop ──
@@ -13410,6 +14561,74 @@ CREATE TABLE `signing_authorities` (
   KEY `ix_sa_delegated` (`delegated_from_auth_id`),
   CONSTRAINT `fk_sa_entity` FOREIGN KEY (`entity_id`) REFERENCES `legal_entities` (`entity_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='LEG-01 §4: التفويض بالتوقيع — لا اعتماد بلا تفويض نافذ ساري';
+
+-- ── Table: site_day ──
+CREATE TABLE `site_day` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL COMMENT 'DEC-OPEN-03 - لا يوم بلا كيان قانوني',
+  `site_id` int(11) NOT NULL,
+  `project_id` int(11) DEFAULT NULL,
+  `day_date` date NOT NULL,
+  `state` enum('open','closed','reopened') NOT NULL DEFAULT 'open',
+  `opened_by` int(11) NOT NULL,
+  `opened_at` datetime NOT NULL,
+  `closed_by` int(11) DEFAULT NULL,
+  `closed_at` datetime DEFAULT NULL,
+  `close_note` varchar(255) NOT NULL DEFAULT '',
+  `reopened_by` int(11) DEFAULT NULL,
+  `reopened_at` datetime DEFAULT NULL,
+  `reopen_reason` varchar(255) NOT NULL DEFAULT '',
+  `source_ref` varchar(120) NOT NULL DEFAULT '',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_site_day` (`company_id`,`site_id`,`day_date`),
+  KEY `ix_state` (`state`),
+  CONSTRAINT `chk_site_day_closed` CHECK (`state` <> 'closed' or `closed_by` is not null and `closed_at` is not null),
+  CONSTRAINT `chk_site_day_reopen` CHECK (`state` <> 'reopened' or `reopened_by` is not null and `reopen_reason` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W04 - اليوم الميداني: موقع × يوم - فتح واحد وإقفال واحد';
+
+-- ── Table: site_day_attempt ──
+CREATE TABLE `site_day_attempt` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `day_id` int(10) unsigned DEFAULT NULL,
+  `site_id` int(11) NOT NULL,
+  `day_date` date NOT NULL,
+  `shift` varchar(16) NOT NULL DEFAULT '',
+  `attempt_kind` enum('unit_entry','stop_register','shift_open','day_close') NOT NULL DEFAULT 'unit_entry',
+  `actor_id` int(11) DEFAULT NULL,
+  `outcome` enum('rejected','allowed') NOT NULL DEFAULT 'rejected',
+  `reason_code` varchar(48) NOT NULL DEFAULT '' COMMENT 'DAY_CLOSED - SHIFT_CLOSED - NO_DAY …',
+  `reason_note` varchar(255) NOT NULL DEFAULT '',
+  `payload_ref` varchar(120) NOT NULL DEFAULT '',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `ix_day` (`day_id`),
+  KEY `ix_reason` (`reason_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W04 - سجل محاولات القيد بعد الإقفال: ترفض وتقيد';
+
+-- ── Table: site_day_shift ──
+CREATE TABLE `site_day_shift` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `day_id` int(10) unsigned NOT NULL,
+  `shift` enum('day','night') NOT NULL,
+  `state` enum('open','handed_over','closed') NOT NULL DEFAULT 'open',
+  `supervisor_id` int(11) DEFAULT NULL,
+  `opened_at` datetime NOT NULL,
+  `handover_to` int(11) DEFAULT NULL COMMENT 'مشرف الوردية التالية - محضر التسليم',
+  `handover_at` datetime DEFAULT NULL,
+  `handover_note` varchar(255) NOT NULL DEFAULT '',
+  `closed_at` datetime DEFAULT NULL,
+  `hse_state` enum('clear','observation','incident') NOT NULL DEFAULT 'clear',
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_day_shift` (`day_id`,`shift`),
+  KEY `ix_company` (`company_id`),
+  CONSTRAINT `fk_sds_day` FOREIGN KEY (`day_id`) REFERENCES `site_day` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `chk_sds_handover` CHECK (`state` <> 'handed_over' or `handover_to` is not null and `handover_at` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='REPAIR01 W04 - ورديات اليوم الميداني ومحضر التسليم بينها';
 
 -- ── Table: sites ──
 CREATE TABLE `sites` (
@@ -14679,12 +15898,15 @@ CREATE TABLE `timesheet` (
   `status` tinyint(1) DEFAULT 1,
   `client_uuid` varchar(64) DEFAULT NULL,
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `stop_register_role` enum('NONE','AUTHORITY','MIRROR') NOT NULL DEFAULT 'NONE' COMMENT 'REPAIR01 W04 - دور هذا الصف في واقعة التوقف: حاكم أم مرآة',
+  `stop_occurrence_key` char(40) NOT NULL DEFAULT '' COMMENT 'REPAIR01 W04 - مفتاح الواقعة التي يرآها هذا الصف',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_timesheet_client_uuid` (`client_uuid`),
   KEY `idx_timesheet_updated_at` (`updated_at`),
   KEY `idx_timesheet_date` (`date`),
   KEY `idx_timesheet_operator` (`operator`),
-  KEY `idx_timesheet_date_id` (`date`,`id`)
+  KEY `idx_timesheet_date_id` (`date`,`id`),
+  KEY `ix_stop_role` (`stop_register_role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ── Table: timesheet_approval_notes ──
@@ -15130,6 +16352,149 @@ CREATE TABLE `tre_pay_batches` (
   CONSTRAINT `chk_tpb_ref` CHECK (`executed_at` is null or `bank_ref` is not null and `bank_ref` <> '')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='عقدة 25 — دفعات الدفع والتنفيذ · تنفيذ نقدي ولا قيد';
 
+-- ── Table: trp_closure ──
+CREATE TABLE `trp_closure` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `order_id` int(10) unsigned NOT NULL,
+  `delivery_doc_id` bigint(20) unsigned DEFAULT NULL COMMENT 'محضر الاستلام - لا اقفال قبله',
+  `cost_lines_count` int(11) NOT NULL DEFAULT 0 COMMENT 'مشتق من transfer_cost_lines',
+  `total_cost` decimal(16,2) NOT NULL DEFAULT 0.00 COMMENT 'مشتق لا يدخل',
+  `bearer_split` varchar(400) NOT NULL DEFAULT '' COMMENT 'التوزيع بالمتحمل - مشتق',
+  `meter_posted` tinyint(1) NOT NULL DEFAULT 0 COMMENT 'ترحيل قراءة العداد الى كرت المعدة',
+  `meter_ref` varchar(120) NOT NULL DEFAULT '',
+  `finance_ref` varchar(120) NOT NULL DEFAULT '' COMMENT 'الاحالة للمالية',
+  `note_ar` varchar(400) NOT NULL DEFAULT '',
+  `state` enum('draft','submitted','approved','rejected','reopened') NOT NULL DEFAULT 'draft',
+  `state_rule` varchar(60) NOT NULL DEFAULT '',
+  `reject_reason` varchar(400) NOT NULL DEFAULT '',
+  `reopen_reason` varchar(400) NOT NULL DEFAULT '',
+  `derivation_rule` varchar(60) NOT NULL DEFAULT '',
+  `reviewed_by` int(11) DEFAULT NULL,
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_at` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `src_ref` varchar(190) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_tcl` (`company_id`,`order_id`),
+  CONSTRAINT `chk_tcl_rule` CHECK (`state_rule` <> '' and `derivation_rule` <> ''),
+  CONSTRAINT `chk_tcl_doc` CHECK (`state` not in ('submitted','approved') or `delivery_doc_id` is not null),
+  CONSTRAINT `chk_tcl_appr` CHECK (`state` <> 'approved' or `approved_by` is not null and `approved_at` is not null and `meter_posted` = 1),
+  CONSTRAINT `chk_tcl_rej` CHECK (`state` <> 'rejected' or `reject_reason` <> ''),
+  CONSTRAINT `chk_tcl_reop` CHECK (`state` <> 'reopened' or `reopen_reason` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 TRP-12 - اقفال امر الترحيل - حبة مفصولة عن بنود التكلفة';
+
+-- ── Table: trp_damage_claim ──
+CREATE TABLE `trp_damage_claim` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `claim_no` varchar(40) NOT NULL,
+  `order_id` int(10) unsigned NOT NULL,
+  `incident_ref` varchar(120) NOT NULL DEFAULT '' COMMENT 'مرجع الواقعة في المحضر او حدث الرحلة',
+  `damage_desc` varchar(400) NOT NULL DEFAULT '',
+  `liable_party` enum('carrier','driver','client','company','third_party','undetermined') NOT NULL DEFAULT 'undetermined',
+  `liable_rule` varchar(60) NOT NULL DEFAULT '' COMMENT 'قاعدة المتحمل من العقد',
+  `claim_amount` decimal(16,2) NOT NULL DEFAULT 0.00,
+  `evidence_ref` varchar(190) NOT NULL DEFAULT '',
+  `claim_route` enum('insurance','carrier','client','internal') NOT NULL DEFAULT 'internal',
+  `settlement_ar` varchar(400) NOT NULL DEFAULT '',
+  `settlement_amount` decimal(16,2) NOT NULL DEFAULT 0.00,
+  `state` enum('draft','submitted','under_review','settled','rejected','closed') NOT NULL DEFAULT 'draft',
+  `state_rule` varchar(60) NOT NULL DEFAULT '',
+  `reject_reason` varchar(400) NOT NULL DEFAULT '',
+  `reviewed_by` int(11) DEFAULT NULL,
+  `approved_by` int(11) DEFAULT NULL,
+  `approved_at` datetime DEFAULT NULL,
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `src_ref` varchar(190) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_tdc` (`company_id`,`claim_no`),
+  KEY `ix_tdc_order` (`order_id`),
+  CONSTRAINT `chk_tdc_rule` CHECK (`state_rule` <> ''),
+  CONSTRAINT `chk_tdc_evid` CHECK (`state` = 'draft' or `incident_ref` <> '' and `damage_desc` <> ''),
+  CONSTRAINT `chk_tdc_set` CHECK (`state` <> 'settled' or `settlement_ar` <> '' and `approved_by` is not null),
+  CONSTRAINT `chk_tdc_rej` CHECK (`state` <> 'rejected' or `reject_reason` <> ''),
+  CONSTRAINT `chk_tdc_liab` CHECK (`liable_party` = 'undetermined' or `liable_rule` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 TRP-10 - مطالبات التلف والحوادث';
+
+-- ── Table: trp_kpi_period ──
+CREATE TABLE `trp_kpi_period` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `period` char(7) NOT NULL,
+  `orders_total` int(11) NOT NULL DEFAULT 0,
+  `orders_closed` int(11) NOT NULL DEFAULT 0,
+  `avg_trip_hours` decimal(14,2) NOT NULL DEFAULT 0.00,
+  `on_time_pct` decimal(6,2) NOT NULL DEFAULT 0.00,
+  `incidents` int(11) NOT NULL DEFAULT 0,
+  `total_cost` decimal(16,2) NOT NULL DEFAULT 0.00,
+  `cost_per_km` decimal(14,4) NOT NULL DEFAULT 0.0000,
+  `by_carrier` varchar(400) NOT NULL DEFAULT '',
+  `derivation_rule` varchar(60) NOT NULL DEFAULT '',
+  `derived_from` varchar(300) NOT NULL DEFAULT '',
+  `derived_at` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_tkp` (`company_id`,`period`),
+  CONSTRAINT `chk_tkp_rule` CHECK (`derivation_rule` <> '' and `derived_from` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 TRP-13 - تقرير اوامر الترحيل مشتق بلا ادخال';
+
+-- ── Table: trp_origin_handover ──
+CREATE TABLE `trp_origin_handover` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `order_id` int(10) unsigned NOT NULL,
+  `item_key` varchar(60) NOT NULL COMMENT 'بند التجهيز',
+  `item_ar` varchar(190) NOT NULL DEFAULT '',
+  `performed_by` int(11) DEFAULT NULL,
+  `result` enum('pending','ok','failed','na') NOT NULL DEFAULT 'pending',
+  `handover_ref` varchar(120) NOT NULL DEFAULT '' COMMENT 'محضر التسليم الاصلي',
+  `photo_ref` varchar(190) NOT NULL DEFAULT '' COMMENT 'صور حالة ما قبل النقل',
+  `route_risk` enum('low','medium','high') DEFAULT NULL COMMENT 'تقييم مخاطر المسار',
+  `done_at` datetime DEFAULT NULL,
+  `state` enum('open','completed','blocked') NOT NULL DEFAULT 'open',
+  `state_rule` varchar(60) NOT NULL DEFAULT '',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `src_ref` varchar(190) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_toh` (`company_id`,`order_id`,`item_key`),
+  KEY `ix_toh_order` (`order_id`),
+  CONSTRAINT `chk_toh_rule` CHECK (`state_rule` <> ''),
+  CONSTRAINT `chk_toh_done` CHECK (`result` not in ('ok','failed') or `done_at` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 TRP-06 - تجهيز المغادرة والتسليم الاصلي';
+
+-- ── Table: trp_trip_leg ──
+CREATE TABLE `trp_trip_leg` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `order_id` int(10) unsigned NOT NULL,
+  `leg_seq` int(11) NOT NULL,
+  `from_point` varchar(190) NOT NULL DEFAULT '',
+  `to_point` varchar(190) NOT NULL DEFAULT '',
+  `vehicle_id` int(11) DEFAULT NULL,
+  `driver_id` int(11) DEFAULT NULL,
+  `distance_km` decimal(12,2) NOT NULL DEFAULT 0.00,
+  `started_at` datetime DEFAULT NULL,
+  `ended_at` datetime DEFAULT NULL,
+  `handover_to_next` tinyint(1) NOT NULL DEFAULT 0,
+  `events_count` int(11) NOT NULL DEFAULT 0 COMMENT 'مشتق من transfer_events',
+  `state` enum('planned','in_transit','arrived','handed_over','cancelled') NOT NULL DEFAULT 'planned',
+  `state_rule` varchar(60) NOT NULL DEFAULT '',
+  `created_by` int(11) DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp(),
+  `src_ref` varchar(190) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_ttl` (`company_id`,`order_id`,`leg_seq`),
+  KEY `ix_ttl_order` (`order_id`),
+  CONSTRAINT `chk_ttl_rule` CHECK (`state_rule` <> ''),
+  CONSTRAINT `chk_ttl_seq` CHECK (`leg_seq` > 0),
+  CONSTRAINT `chk_ttl_span` CHECK (`ended_at` is null or `started_at` is null or `ended_at` >= `started_at`),
+  CONSTRAINT `chk_ttl_start` CHECK (`state` not in ('in_transit','arrived','handed_over') or `started_at` is not null)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='RPR-W07 TRP-07 - مراحل الرحلة Trip Legs';
+
 -- ── Table: trs_locations ──
 CREATE TABLE `trs_locations` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -15405,6 +16770,9 @@ CREATE TABLE `unit_entries` (
   `created_by_role` smallint(5) unsigned DEFAULT NULL COMMENT 'TS-04: الدورُ يُخزَّن مع المعرِّف لأن دورَ الشخصِ يتغير والسجلُّ لا',
   `seed_tag` varchar(32) DEFAULT NULL COMMENT 'TS-05: وسمُ البيانِ المبذور — ''test-seed''',
   `shift_slot_key` varchar(96) GENERATED ALWAYS AS (case when `seed_tag` is null and `state` not in ('rejected','cancelled','superseded','reversed') then concat_ws('|',`company_id`,`entry_date`,`shift`,`equipment_id`) else NULL end) STORED COMMENT 'مفتاحُ القفل — يوائم ق-18: NULL للمبذورِ وللحالاتِ المنتهيةِ فلا تشغل الخانة',
+  `field_kind` enum('FIELD_DAILY','CONTRACT_PROJECTION') NOT NULL DEFAULT 'FIELD_DAILY' COMMENT 'REPAIR01 W04 - قيد ميداني أم إسقاط التزام تعاقدي',
+  `field_kind_rule` varchar(48) NOT NULL DEFAULT '' COMMENT 'REPAIR01 W04 - قاعدة التصنيف: لا قيمة بلا قاعدة',
+  `site_day_id` int(10) unsigned DEFAULT NULL COMMENT 'REPAIR01 W04 - اليوم الميداني الذي يحمل القيد',
   PRIMARY KEY (`id`),
   UNIQUE KEY `uq_entry_no` (`company_id`,`entry_no`),
   UNIQUE KEY `uq_sync` (`company_id`,`sync_uuid`),
@@ -15421,9 +16789,12 @@ CREATE TABLE `unit_entries` (
   KEY `ix_container_ue` (`container_key`),
   KEY `ix_machine_ue` (`equipment_id`,`entry_date`),
   KEY `ix_supplier_ue` (`supplier_entity_id`,`entry_date`),
+  KEY `ix_field_kind` (`field_kind`),
+  KEY `ix_site_day` (`site_day_id`),
   CONSTRAINT `chk_ue_match_evidence` CHECK (`client_match_state` = 'pending' or `client_match_at` is not null and `client_match_by` is not null),
   CONSTRAINT `chk_ue_dispute_ref` CHECK (`client_decision` <> 'disputed' or `dispute_ref` is not null),
-  CONSTRAINT `chk_ue_meter` CHECK (`meter_after` is null or `meter_before` is null or `meter_after` >= `meter_before`)
+  CONSTRAINT `chk_ue_meter` CHECK (`meter_after` is null or `meter_before` is null or `meter_after` >= `meter_before`),
+  CONSTRAINT `chk_ue_w4_shift` CHECK (`field_kind` <> 'FIELD_DAILY' or `shift` is not null)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='D02 §3.1 — سجلّ الواقعة: مصدر الحقيقة الوحيد للوحدة التشغيلية';
 
 -- ── Table: unit_final_approvals ──
@@ -15721,6 +17092,31 @@ CREATE TABLE `waivers_reversals` (
   PRIMARY KEY (`ovr_id`),
   KEY `ix_wr_source` (`source_type`,`source_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='GOV-01 §8: الإعفاء والعكس والتعليق والتخفيض — Insert-only ولا حذف للأصل أبدًا';
+
+-- ── Table: wf_coverage ──
+CREATE TABLE `wf_coverage` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` int(11) NOT NULL,
+  `requirement_id` int(11) NOT NULL COMMENT 'صف workforce_requirement المشتق منه',
+  `project_id` int(11) DEFAULT NULL,
+  `worker_category` varchar(120) NOT NULL DEFAULT '',
+  `required_qty` int(11) NOT NULL DEFAULT 0,
+  `available_qty` int(11) NOT NULL DEFAULT 0,
+  `gap_qty` int(11) NOT NULL DEFAULT 0,
+  `surplus_qty` int(11) NOT NULL DEFAULT 0,
+  `coverage_state` varchar(24) NOT NULL DEFAULT '' COMMENT 'SHORTAGE او BALANCED او SURPLUS - مشتق',
+  `derivation_rule` varchar(48) NOT NULL DEFAULT '',
+  `declared_state` varchar(24) NOT NULL DEFAULT '' COMMENT 'المدخل حيا - مراة لا تدهس',
+  `declared_gap` int(11) NOT NULL DEFAULT 0,
+  `variance_rule` varchar(48) NOT NULL DEFAULT '',
+  `variance_note` varchar(255) NOT NULL DEFAULT '',
+  `derived_at` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_wf_coverage` (`company_id`,`requirement_id`),
+  KEY `ix_wfc_state` (`coverage_state`),
+  CONSTRAINT `chk_wfc_rule` CHECK (`derivation_rule` <> ''),
+  CONSTRAINT `chk_wfc_var` CHECK (`variance_rule` <> '')
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='WRK-03 المطلوب مقابل المتوفر - سطر فجوة مشتق والمدخل مراة بفارقها';
 
 -- ── Table: work_delegations ──
 CREATE TABLE `work_delegations` (

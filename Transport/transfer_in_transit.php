@@ -45,6 +45,24 @@ $r = mysqli_query($conn,
      ORDER BY o.departure_datetime");
 if ($r) while ($x = mysqli_fetch_assoc($r)) $rows[] = $x;
 
+/* ── TRP-08 · «حالةُ الأمرِ تتقدَّم بالأحداثِ لا بالتعديلِ اليدويّ» ─────────
+     وكانت شاشةُ التتبُّعِ **لا تقرأ `transfer_events` أصلًا**: تعرض المرحلةَ
+     ولا تعرض الواقعةَ التي نقلتها — فحالةٌ بلا سببِها. والأحداثُ هنا مُصيَّرةٌ
+     بمرجعِها، ومراحلُ الرحلةِ (`trp_trip_leg`) معها لأنَّ الحدثَ يقع على مرحلة. */
+$events = array(); $legs = array();
+$re = mysqli_query($conn,
+    "SELECT ev.order_id, ev.event_type, ev.body, ev.old_value, ev.new_value, ev.created_at,
+            o2.order_no
+       FROM transfer_events ev
+       JOIN transfer_orders o2 ON o2.id = ev.order_id
+      WHERE ev.company_id = $company_id AND ev.is_deleted = 0 AND o2.stage = 'in_transit'
+      ORDER BY ev.created_at DESC LIMIT 100");
+if ($re) while ($x = mysqli_fetch_assoc($re)) { $events[] = $x; }
+$rl = mysqli_query($conn,
+    "SELECT order_id, COUNT(*) n, SUM(state = 'in_transit') moving
+       FROM trp_trip_leg WHERE company_id = $company_id GROUP BY order_id");
+if ($rl) while ($x = mysqli_fetch_assoc($rl)) { $legs[(int) $x['order_id']] = $x; }
+
 $page_title = 'الحركة في الطريق';
 // UXR P4: بذرُ محاورِ الغلافِ الحاكمِ CM-00 من الخادمِ قبل التصيير
 require_once __DIR__ . '/../includes/screen_contract.php';
@@ -116,3 +134,23 @@ echo ems_states_bundle('لا حركة في الطريق الآن', 'أكد ال�
     </tbody>
   </table>
 </div>
+
+  <h3 class="ems-section-title">أحداث الرحلات الجارية</h3>
+  <div class="table-wrap"><table class="data-table">
+    <thead><tr><th>#</th><th>أمر الترحيل</th><th>نوع الحدث</th><th>من مرحلة</th><th>إلى مرحلة</th>
+        <th>مراحل الرحلة</th><th>البيان</th><th>وقت الحدث</th></tr></thead>
+    <tbody>
+    <?php if ($events): $i = 0; foreach ($events as $ev): $i++; $lg = isset($legs[(int) $ev['order_id']]) ? $legs[(int) $ev['order_id']] : null; ?>
+      <tr><td><?= $i ?></td>
+        <td><?= htmlspecialchars((string) $ev['order_no'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $ev['event_type'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $ev['old_value'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= htmlspecialchars((string) $ev['new_value'], ENT_QUOTES, 'UTF-8') ?></td>
+        <td><?= $lg ? ((int) $lg['moving'] . ' من ' . (int) $lg['n']) : '—' ?></td>
+        <td><small><?= htmlspecialchars(mb_substr((string) $ev['body'], 0, 120), ENT_QUOTES, 'UTF-8') ?></small></td>
+        <td><?= htmlspecialchars((string) $ev['created_at'], ENT_QUOTES, 'UTF-8') ?></td>
+      </tr>
+    <?php endforeach; else: ?>
+      <tr><td colspan="8">لا أحداث مسجلة على الرحلات الجارية.</td></tr>
+    <?php endif; ?>
+    </tbody></table></div>

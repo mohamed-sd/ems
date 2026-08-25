@@ -28,51 +28,45 @@ if (!$is_super_admin && $company_id <= 0) {
 require_once __DIR__ . '/../includes/cmp03_local_store.php'; // الموجة ٢ — الجدول الأصلي
 
 $CANONICAL = 'transfer_permits.php';
-$COLS   = array (
-  0 => 'رقم التصريح',
-  1 => 'أمر الترحيل',
-  2 => 'الجهة المصدرة',
-  3 => 'نوع التصريح',
-  4 => 'المسار المصرح',
-  5 => 'الحمولة المصرحة',
-  6 => 'الوزن الإجمالي',
-  7 => 'تاريخ الإصدار',
-  8 => 'تاريخ الانتهاء',
-  9 => 'الرسوم',
-  10 => 'المرفق',
-  11 => 'استخرجه',
-  12 => 'الحالة',
-  13 => 'الكيان',
-  14 => 'المنشئ — الاسم والصفة',
-  15 => 'تاريخ الإنشاء',
-  16 => 'المعتمد — الاسم والصفة',
-  17 => 'تاريخ الاعتماد',
-  18 => 'مرجع التفويض',
-  19 => 'المرجع الأب',
-  20 => 'مركز التكلفة',
-  21 => 'سعر الصرف ومصدره',
-);
-$FIELDS = array (
-  0 => 'رقم التصريح',
-  1 => 'أمر الترحيل',
-  2 => 'الجهة المصدرة',
-  3 => 'نوع التصريح',
-  4 => 'المسار المصرح',
-  5 => 'الحمولة المصرحة',
-  6 => 'الوزن الإجمالي',
-  7 => 'تاريخ الإصدار',
-  8 => 'تاريخ الانتهاء',
-  9 => 'الرسوم',
-  10 => 'المرفق',
-  11 => 'استخرجه',
-  12 => 'الحالة',
-  13 => 'المعتمد — الاسم والصفة',
-  14 => 'تاريخ الاعتماد',
-  15 => 'مرجع التفويض',
-  16 => 'المرجع الأب',
-  17 => 'مركز التكلفة',
-  18 => 'سعر الصرف ومصدره',
-);
+
+/* ── TRP-05 · «لا مغادرةَ لحمولةٍ استثنائيّةٍ بتصريحٍ منتهٍ — Fail-Closed» ──
+     وبوّابةُ المغادرة (`TransferCycleService::authorizeDeparture`) تقرأ
+     **`transfer_permits` الحيَّ** لا مخزنَ `cmp03_screen_rows`. وكان هذا السطحُ
+     يعرض المخزنَ البينيَّ وحدَه — فالمصدرُ الذي يمنع المغادرةَ **لا يُرى في
+     شاشتِه**، ومَن يقرأ الشاشةَ يظنُّ التصريحَ ساريًا وهو منتهٍ في الحيّ.
+     والسماحُ من `repair01_w7_thresholds` لا من رقمٍ في الشيفرة (§٥). */
+$w7_permits = array(); $w7_grace = null; $w7_expired = 0; $w7_limit = '';
+$gr = @$conn->query("SELECT value_num FROM repair01_w7_thresholds
+                      WHERE threshold_key = 'W7_PERMIT_EXPIRY_GRACE_DAYS'");
+if ($gr && $g = $gr->fetch_row()) { $w7_grace = (int) $g[0]; }
+/* حدُّ الانتهاءِ يُحسب **بساعةِ القاعدةِ** لا بساعةِ الويب: بوّابةُ المغادرةِ
+   تقارن بالحدِّ نفسِه، وساعتانِ مختلفتانِ تعطيان حكمَين على تصريحٍ واحد. */
+if ($w7_grace !== null) {
+    $lr = @$conn->query("SELECT DATE_SUB(CURDATE(), INTERVAL " . (int) $w7_grace . " DAY)");
+    if ($lr && $lx = $lr->fetch_row()) { $w7_limit = (string) $lx[0]; }
+}
+/* ⛔ **والقراءةُ عبرَ بوابةِ المستأجِرِ لا باستعلامٍ خام** (FR-SEC-006 · GAP-29):
+     `transfer_permits` و`transfer_orders` جدولا مستأجِرٍ، والعزلُ يُحقن بنيةً
+     ولا يُترك لشرطِ `company_id` يكتبه المطوِّرُ بيدِه في كلِّ استعلام. */
+$w7_gate = ems_tenant_db();
+$w7_ordNo = array();
+try {
+    foreach ($w7_gate->select('transfer_orders', array(
+        'columns' => array('id', 'order_no', 'stage'), 'orderBy' => 'id DESC', 'limit' => 800)) as $o) {
+        $w7_ordNo[(int) $o['id']] = array('no' => (string) $o['order_no'], 'stage' => (string) $o['stage']);
+    }
+} catch (\Throwable $t) { error_log('transfer_permits w7 orders: ' . $t->getMessage()); }
+try {
+    foreach ($w7_gate->select('transfer_permits', array('orderBy' => 'expiry_date ASC', 'limit' => 200)) as $x) {
+        $oid = (int) $x['order_id'];
+        $x['order_no'] = isset($w7_ordNo[$oid]) ? $w7_ordNo[$oid]['no'] : ('#' . $oid);
+        $x['stage']    = isset($w7_ordNo[$oid]) ? $w7_ordNo[$oid]['stage'] : '';
+        $x['w7_expired'] = ($w7_limit !== '' && (string) $x['expiry_date'] !== ''
+            && (string) $x['expiry_date'] < $w7_limit) ? 1 : 0;
+        if ($x['w7_expired']) { $w7_expired++; }
+        $w7_permits[] = $x;
+    }
+} catch (\Throwable $t) { error_log('transfer_permits w7 live: ' . $t->getMessage()); }
 
 /* ── الحفظ: فورم الإضافة الموحد → المخزن البيني ─────────────────────────── */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['cmp03_action'] ?? '') === 'add') {
@@ -239,6 +233,28 @@ require_once __DIR__ . '/../includes/screen_contract.php'; if (isset($conn)) { e
             </tbody>
         </table>
         </div>
+
+    <h3 class="ems-section-title">السجل الحي للتصاريح ومصدر بوابة المغادرة</h3>
+    <div class="table-wrap"><table class="data-table">
+      <thead><tr><th>#</th><th>أمر الترحيل</th><th>مرحلة الأمر</th><th>نوع التصريح</th>
+          <th>الجهة المصدرة</th><th>تاريخ الإصدار</th><th>تاريخ الانتهاء</th>
+          <th>الحالة</th><th>يحجب المغادرة</th></tr></thead>
+      <tbody>
+      <?php if ($w7_permits): $wi = 0; foreach ($w7_permits as $wp): $wi++; ?>
+        <tr><td><?php echo $wi; ?></td>
+          <td><?php echo htmlspecialchars((string) $wp['order_no'], ENT_QUOTES, 'UTF-8'); ?></td>
+          <td><?php echo htmlspecialchars((string) $wp['stage'], ENT_QUOTES, 'UTF-8'); ?></td>
+          <td><?php echo htmlspecialchars((string) $wp['permit_type'], ENT_QUOTES, 'UTF-8'); ?></td>
+          <td><?php echo htmlspecialchars((string) $wp['authority'], ENT_QUOTES, 'UTF-8'); ?></td>
+          <td><?php echo htmlspecialchars((string) $wp['issue_date'], ENT_QUOTES, 'UTF-8'); ?></td>
+          <td><?php echo htmlspecialchars((string) $wp['expiry_date'], ENT_QUOTES, 'UTF-8'); ?></td>
+          <td><?php echo htmlspecialchars((string) $wp['state'], ENT_QUOTES, 'UTF-8'); ?></td>
+          <td><?php echo ((int) $wp['w7_expired'] === 1 ? 'نعم' : 'لا'); ?></td>
+        </tr>
+      <?php endforeach; else: ?>
+        <tr><td colspan="9">لا تصاريح في السجل الحي. وبوابة المغادرة تقرأ منه لا من المخزن البيني.</td></tr>
+      <?php endif; ?>
+      </tbody></table></div>
     </div></div>
 </div>
 
