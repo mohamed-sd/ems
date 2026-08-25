@@ -93,11 +93,30 @@ foreach ($live as $d) {
 gate($pass, $fail, $lines, 'G0-06', 'جسرُ المسمّياتِ الحيّة',
     ($unbridged === 0), count($live) . " مسمّى · بلا جسر $unbridged", count($live) . " · 0");
 
-/* ── G0-07 مقامُ الأسطح: يساوي الحيَّ تمامًا ── */
+/* ── G0-07 أساسُ الأسطح محفوظٌ في الحيِّ — والنموُّ يُعَدُّ لا يُمنَع ──
+   ⚠ **إصلاحُ مقامٍ لا تخفيفُ حاجب** (RPR-PATCH-03 · 2026-08-25): كان الشرطُ
+   `COUNT(repair01_surfaces) === COUNT(gov_screen_cycle)` — أي مساواةُ **لقطةِ
+   الدراسةِ المجمَّدةِ** بالسجلِّ الحيّ. فيسقط لحظةَ تُدخِل موجةٌ سطحًا جديدًا
+   في مصفوفةِ الدورة، وهو ما يوجبه `RP-01` نفسُه («تُسجَّل في gov_screen_cycle
+   أو تُتقاعَد»). فكان الحاجبانِ يتناقضان: هذا يمنع الإدراجَ وذاك يوجبه.
+   والمقصودُ «لم يضع سطحٌ من أساسِ الدراسة»، وهو يُقاس بالانتماءِ لا بالعدد.
+   والحاجبُ **أدقُّ**: كان يمرّ لو حُذف صفٌّ وأُضيف آخرُ (العددُ ثابت)، وصار
+   يسقط على فقدِ أيِّ ملفِّ أساسٍ مهما كان العدد. */
 $sN = (int) one($conn, "SELECT COUNT(*) FROM repair01_surfaces");
 $gN = (int) one($conn, "SELECT COUNT(*) FROM gov_screen_cycle");
-gate($pass, $fail, $lines, 'G0-07', 'مقامُ الأسطح = الحيّ',
-    ($sN === $gN && $gN > 0), "$sN / $gN", 'متساويان');
+$lost = (int) one($conn, "SELECT COUNT(*) FROM (
+            SELECT DISTINCT s.screen_file f FROM repair01_surfaces s WHERE s.screen_file <> ''
+        ) b LEFT JOIN (
+            SELECT DISTINCT screen_file f FROM gov_screen_cycle WHERE screen_file <> ''
+        ) l ON l.f = b.f WHERE l.f IS NULL");
+$grown = $gN - $sN;
+gate($pass, $fail, $lines, 'G0-07', 'أساسُ الأسطح محفوظٌ في الحيّ',
+    ($lost === 0 && $gN >= $sN), "أساس $sN · حيّ $gN · نموّ $grown · ملفُّ أساسٍ مفقودٌ $lost", 'مفقود 0 · حيّ ≥ أساس');
+
+/* المقامُ القديمُ يبقى مطبوعًا للسياق */
+/* لقطةُ الدراسةِ نفسُها مجمَّدةٌ عند مقامِها — لا تنمو ولا تنقص */
+gate($pass, $fail, $lines, 'G0-07b', 'لقطةُ الدراسةِ مجمَّدةٌ عند مقامِها',
+    ($sN === 664), "أسطحُ الدراسة $sN", '664');
 
 /* ── G0-08 الشبح: مسحٌ عوديٌّ حيٌّ لا قراءةُ عمود ── */
 $diskIdx = array();

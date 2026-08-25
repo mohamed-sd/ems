@@ -362,6 +362,24 @@ class TenantRegistry
         'ops_stop_register' => array('type' => self::T_TENANT, 'soft' => false),
         'ops_stop_source'   => array('type' => self::T_TENANT, 'soft' => false),
 
+        /* ══ أثرُ الأصلِ والقوى — RPR-W05 ═══════════════════════════════════
+           `soft=false` في الثمانيةِ بالتصميم: طلبُ الإدخالِ يُرفَض بسببِه ولا
+           يُحذف، وواقعةُ التحقُّقِ من المصدرِ دليلٌ يُراجَع، وأمرُ التفتيشِ يُلغى
+           بسببِه، والخروجُ يُقفَل ولا يُمحى.
+           و`asset_source_check` يحمل `company_id` هو الآخر لا `T_CHILD` — بالسببِ
+           نفسِه الذي جعل `ops_stop_source` كذلك (‏W04): الكيانُ في الصفِّ أصدقُ
+           (`DEC-OPEN-03`) وأقصرُ طريقًا من قراءةِ الأبِ في كلِّ استعلام.
+           و`asset_readiness` و`wf_coverage` **مشتقّانِ يُعادُ بناؤهما من الحيِّ في
+           كلِّ تشغيل** — فلا حقيقةَ أصليّةً فيهما تُفقد بالتفريغ. */
+        'asset_intake'           => array('type' => self::T_TENANT, 'soft' => false),
+        'asset_source_check'     => array('type' => self::T_TENANT, 'soft' => false),
+        'asset_inspection_order' => array('type' => self::T_TENANT, 'soft' => false),
+        'asset_use_right'        => array('type' => self::T_TENANT, 'soft' => false),
+        'asset_assignment'       => array('type' => self::T_TENANT, 'soft' => false),
+        'asset_exit'             => array('type' => self::T_TENANT, 'soft' => false),
+        'asset_readiness'        => array('type' => self::T_TENANT, 'soft' => false),
+        'wf_coverage'            => array('type' => self::T_TENANT, 'soft' => false),
+
         /* ══ عقدُ سلسلةِ الأثرِ المبنيةُ في INJ-CHAIN-CLOSE-01 ═════════════════
            كلُّها إلحاقيةٌ بلا حذفٍ ناعم: «المرفوضُ لا يُحذف — حالةٌ بسببِها في
            السجل». والسطورُ أبناءٌ بمفتاحِ أبيها فلا تُقرأ خارجَ سياقِه. */
