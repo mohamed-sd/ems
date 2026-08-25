@@ -89,7 +89,19 @@ $firstSha = $__log ? end($__log) : '';
 if ($firstSha === '' || strpos($firstSha, 'fatal') !== false) {
     $firstSha = trim(git($ROOT, "log --format=%h -1 --skip=40"));
 }
-$range = $firstSha . '..HEAD';
+/* ◆ **والمدى ينتهي بنهايةِ الجولةِ لا عند الرأس** (RPR-PATCH-08 · 2026-08-25):
+     كان `firstSha..HEAD` — مربوطًا بأوّلِ التزامِ هذه الحزمةِ وممتدًّا إلى
+     الرأسِ **أبدًا**. فكلُّ حملةٍ تأتي بعدَها تدخل مداها وتُحاسَب بمعيارِها:
+     حملةُ REPAIR01 غايتُها بناءُ الأسطحِ المستهدَفة، فبنت ستًّا في W05
+     فانقلب هذا الشاهدُ أحمرَ — **لا لعيبٍ فيها بل لأنّ المدى بلا نهاية**.
+     والمعيارُ نفسُه يقول «أُنشئت **أثناءَ تنفيذِ الرحلة**» — والرحلةُ انتهت
+     بآخرِ التزامٍ يحمل وسمَ الحزمة. فيُغلَق المدى عنده.
+     وهذا **تصحيحُ مدًى لا تخفيفُ شاهد**: ما وقع داخلَ الجولةِ يبقى محاسَبًا
+     كما كان، وما بعدَها يُحاسَب بشاهدِ حملتِه هو. */
+$lastSha = $__log ? $__log[0] : '';
+$range = ($lastSha !== '' && $lastSha !== $firstSha)
+    ? $firstSha . '..' . $lastSha
+    : $firstSha . '..HEAD';
 $added = array_values(array_filter(array_map('trim',
     explode("\n", git($ROOT, "diff --name-only --diff-filter=A " . escapeshellarg($range))))));
 printf("  المدى: %s · ملفاتٌ أُضيفت: **%d**\n", $range, count($added));

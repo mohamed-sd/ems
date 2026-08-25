@@ -71,7 +71,21 @@ $oSurf = one($conn, "SELECT id, resp_role, canonical_code FROM repair01_surfaces
 $oFin  = one($conn, "SELECT id, canonical_code FROM repair01_surfaces
                       WHERE dept_legacy='المالية والخزينة' ORDER BY id LIMIT 1");
 $oCeo  = one($conn, "SELECT id FROM repair01_surfaces WHERE canonical_code='EX-CEO' ORDER BY id LIMIT 1");
-$oDec  = one($conn, "SELECT decision_id, rationale FROM repair01_w1_decisions ORDER BY decision_id LIMIT 1");
+/* ⚠ **الكسرُ يستهدف ما يفحصه الحاجبُ لا أوّلَ صفٍّ أبجديًّا** (RPR-PATCH-07):
+   كان يأخذ `ORDER BY decision_id LIMIT 1` — وW1-08 لا يفحص كلَّ القرارات، بل
+   **المُشارَ إليه من `role_source`** ومعه قرارُ إعلانِ الخلاء. فحين خلا
+   `role_source` صار الكسرُ يقع على قرارٍ لا يراه الحاجبُ فلا يسقط —
+   **وهو فحصٌ سلبيٌّ أعمى**، أخطرُ من غيابِه لأنّه يمنح ثقةً كاذبة.
+   فيُلتقط المُشارُ إليه أوّلًا، وإن خلا فقرارُ إعلانِ الخلاء `W1-D-03`. */
+$oDec = one($conn, "SELECT decision_id, rationale FROM repair01_w1_decisions
+                     WHERE decision_id IN (
+                       SELECT DISTINCT SUBSTRING(role_source, 13) FROM repair01_surfaces
+                        WHERE role_source LIKE 'W1\\_DECISION:%')
+                     LIMIT 1");
+if (!$oDec) {
+    $oDec = one($conn, "SELECT decision_id, rationale FROM repair01_w1_decisions
+                         WHERE decision_id = 'W1-D-03' LIMIT 1");
+}
 $baseTxt = (string) file_get_contents($BASE);
 $hookTxt = (string) file_get_contents($HOOK);
 

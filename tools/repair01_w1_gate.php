@@ -119,8 +119,22 @@ while ($x = $r->fetch_row()) {
                               AND rationale IS NOT NULL AND rationale<>''");
     if ($ok === 0) { $dang++; }
 }
-gate('W1-08', 'مصدرُ الدورِ مُعلَنٌ وقرارُه قائم',
-     $noSrc === 0 && $dang === 0, "بلا مبرَّرٍ {$noSrc} · قراراتٌ مُشارٌ إليها {$decN} · معلَّقةٌ في الهواء {$dang}");
+/* ⚠ **حارسُ الخلاء** (RPR-PATCH-06 · 2026-08-25): كان الحاجبُ يخضرُّ على
+   مجموعةٍ خاوية — فلو فرغ `role_source` من كلِّ صفٍّ مرَّ بصفرٍ وصفر، وهو
+   **أخضرُ كاذب**. وقع فعلًا: إعادةُ استيعابٍ خاطئةٌ محت أثرَ الإسنادِ فصار
+   `role_why` فارغًا في الـ٦٦٤ كلِّها والحاجبُ أخضر.
+   فصار يشترط **تغطيةً مُعلَنةً**: إمّا أنّ لكلِّ سطحٍ أثرَ إسنادٍ مكتوبًا،
+   وإمّا أنّ الخلاءَ **مُعلَنٌ بقرارٍ مسجَّلٍ بمقامِه** — ولا يمرّ صامتًا. */
+$whyN   = (int) q1($conn, "SELECT COUNT(*) FROM repair01_surfaces WHERE COALESCE(role_why,'')<>''");
+$allN   = (int) q1($conn, "SELECT COUNT(*) FROM repair01_surfaces");
+$gapDec = (int) q1($conn, "SELECT COUNT(*) FROM repair01_w1_decisions
+                            WHERE decision_id='W1-D-03' AND COALESCE(rationale,'')<>'' AND scope_rows=" . ($allN - $whyN));
+$vacuum = ($whyN < $allN && $gapDec === 0);
+gate('W1-08', 'مصدرُ الدورِ مُعلَنٌ وقرارُه قائم — ولا خلاءَ صامت',
+     $noSrc === 0 && $dang === 0 && !$vacuum,
+     "بلا مبرَّرٍ {$noSrc} · قراراتٌ مُشارٌ إليها {$decN} · معلَّقةٌ في الهواء {$dang}"
+     . " · أثرُ إسنادٍ مكتوبٌ {$whyN}/{$allN}"
+     . ($whyN < $allN ? ($gapDec ? ' · الفجوةُ مُعلَنةٌ في W1-D-03 ✔' : ' · **خلاءٌ غيرُ مُعلَن**') : ''));
 
 /* ── W1-09 · الشقُّ الماليُّ يحترم قاعدتَه ولا يبتلع المقام ───────────────── */
 $fin5 = (int) q1($conn, "SELECT COUNT(*) FROM repair01_surfaces WHERE dept_legacy='المالية والخزينة' AND canonical_code='DEP-05'");

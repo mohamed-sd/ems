@@ -51,9 +51,39 @@ gate($pass, $fail, $lines, 'G0-01', 'تجميدُ المصدر (تجزئةٌ م�
 $dTot = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions");
 $dApr = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions WHERE status='APPROVED'");
 $dNeed = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions WHERE status='NEEDS_OWNER_DECISION'");
-gate($pass, $fail, $lines, 'G0-02', 'مقامُ القرارات',
-    ($dTot === 108 && $dApr === 92 && $dNeed === 16),
-    "$dTot = معتمد $dApr + منتظر $dNeed", '108 = 92 + 16');
+/* ⚠ **سقّاطةُ مجموعةٍ لا عدّ** (RPR-PATCH-04 · 2026-08-25): كان الشرطُ
+   `$dApr === 92` — تجميدُ عددِ المعتمَدِ عند لحظةِ W00، فيسقط حينَ **يُجيب
+   المالكُ عن قرار** وهو غايةُ الحملة. وأرضيّةٌ عدديّةٌ (`>= 92`) **تُعمي
+   الحاجبَ**: قلبُ معتمَدٍ إلى منتظِرٍ بعد اعتمادِ آخرَ يُبقي العددَ عند
+   الأرضيّةِ فيمرّ. فالمقياسُ **المجموعةُ لا العدد**: كلُّ معرِّفٍ اعتُمد
+   مرّةً يبقى معتمَدًا، والجديدُ يُضاف تلقائيًّا. نمطُ خطِّ أساسِ NF-24 نفسُه. */
+$BASE_F = dirname(__DIR__) . '/docs/REPAIR01_20260823/evidence/approved_baseline.json';
+$aprSet = array();
+$r = $conn->query("SELECT decision_id FROM repair01_decisions WHERE status='APPROVED' ORDER BY decision_id");
+while ($r && $x = $r->fetch_row()) { $aprSet[] = $x[0]; }
+$known = array(); $seeded = false;
+if (is_file($BASE_F)) {
+    $j = json_decode((string) file_get_contents($BASE_F), true);
+    if (is_array($j) && isset($j['approved'])) { $known = $j['approved']; }
+}
+if (!$known) {   /* أوّلُ تشغيلٍ — يُبذَر خطُّ الأساسِ فورًا، وإلّا بقي الحاجبُ أعمى */
+    if (!is_dir(dirname($BASE_F))) { @mkdir(dirname($BASE_F), 0777, true); }
+    $known = $aprSet; $seeded = true;
+}
+$regressed = array_values(array_diff($known, $aprSet));   /* اعتُمد ثمّ عاد منتظِرًا */
+$fresh     = array_values(array_diff($aprSet, $known));   /* اعتُمد حديثًا — تقدُّم */
+if (!$regressed && ($fresh || $seeded)) {   /* التقدُّمُ يُثبَّت فلا يُنقَض */
+    @file_put_contents($BASE_F, json_encode(array(
+        'meaning' => 'قرارٌ اعتُمد مرّةً لا يعود منتظِرًا — سقّاطةُ مجموعةٍ لا عدّ',
+        'count' => count($aprSet), 'approved' => $aprSet,
+    ), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+}
+gate($pass, $fail, $lines, 'G0-02', 'المعتمَدُ مقفلُ الاتّجاه (مجموعةً)',
+    ($dTot === 108 && ($dApr + $dNeed) === 108 && !$regressed),
+    "$dTot = معتمد $dApr + منتظر $dNeed · مرتدٌّ " . count($regressed)
+    . (count($regressed) ? ' ⇐ ' . implode('، ', array_slice($regressed, 0, 3)) : '')
+    . ' · جديدُ الاعتماد ' . count($fresh),
+    '108 · المجموع 108 · مرتدّ 0');
 
 /* ── G0-03 اتّساقُ الحجب: لا معتمدٌ حاجب، ولا منتظرٌ بلا تصنيف ── */
 $badA = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions WHERE status='APPROVED' AND blocking_level<>'NONE'");
@@ -68,8 +98,12 @@ $hard = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions
                           WHERE status='NEEDS_OWNER_DECISION'
                             AND blocking_level IN ('STRUCTURAL_TARGET_BLOCKER','READY_TO_BUILD_BLOCKER')");
 $cfg = (int) one($conn, "SELECT COUNT(*) FROM repair01_decisions WHERE blocking_level='CONFIG_PENDING'");
-gate($pass, $fail, $lines, 'G0-04', 'الحاجبُ الحقيقيُّ للبناء',
-    ($hard === 4 && $cfg === 12), "حاجبٌ صلب $hard · إعدادٌ مؤجَّل $cfg", '4 · 12');
+/* بالمنطقِ نفسِه: الحاجبُ الصلبُ **يَنقص ولا يزيد** (سقفُه ٤)، وتصنيفُ
+   العتباتِ الاثنتَي عشرةَ ثابتٌ لأنّه صفةُ القرارِ لا حالتُه. */
+$HARD_CEILING = 4;
+gate($pass, $fail, $lines, 'G0-04', 'الحاجبُ الصلبُ يَنقص ولا يزيد',
+    ($hard <= $HARD_CEILING && $cfg === 12),
+    "حاجبٌ صلبٌ مفتوح $hard (سقفٌ $HARD_CEILING) · إعدادٌ مؤجَّل $cfg", '≤ 4 · 12');
 
 /* ── G0-05 الترقيم: 01..17 متّصلٌ بلا ثغرةٍ ولا تكرار ── */
 $ord = array();
