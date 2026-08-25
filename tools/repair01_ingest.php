@@ -363,3 +363,12 @@ $report['⑩ الملكيّة'] = "$nO";
 echo "\n════════ استيعابُ REPAIR01 ════════\n";
 foreach ($report as $k => $v) { printf("%-22s %s\n", $k, $v); }
 echo "═══════════════════════════════════\n";
+
+/* ⚠ **الاستيعابُ يمسح ويعيد الإدخال** — فأحكامُ W01 المكتوبةُ في `canonical_code`
+ * و`resp_role` و`w1_*` تُمحى بهذه الجولةِ ولا تُستعاد من المصنَّف. والصمتُ هنا
+ * هو ما يجعل تراجعًا صامتًا يعبر إلى المرحلةِ التالية. */
+$w1 = $conn->query("SHOW COLUMNS FROM repair01_surfaces LIKE 'canon_rule'");
+if ($w1 && $w1->num_rows > 0) {
+    echo "\n⚠ أحكامُ W01 مُحيت مع إعادةِ الإدخال. أعِدْ:\n";
+    echo "   php tools/repair01_w1_apply.php   ثمّ   php tools/repair01_w1_gate.php\n";
+}

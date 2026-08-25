@@ -16,8 +16,21 @@
  * السجلاتُ الستة: أنماطٌ موضعية · ألوانٌ صلبة · خارجَ السلّم · بطاقةٌ خام ·
  * تواريخُ متفرقة · رسالةٌ في نافذةِ المتصفح.
  *
+ * ── توسعةُ REPAIR01 · W01 §٤-٤ (خطّةُ الحملةِ §٧١) ─────────────────────────
+ * ◆ ثمانيةُ أصنافِ دَينٍ حَوكميّةٍ أُضيفت إلى الستّةِ البصريّة: شاشةٌ بلا سجلّ ·
+ *   مسارٌ بلا مالك · قارئُ صلاحيةٍ محليّ · SQL خامٌّ في مسارِ إدارة · منطقُ
+ *   اعتمادٍ محليّ · حدثٌ خارجَ Publisher · بحثٌ خارجَ السجلِّ المعياريّ ·
+ *   حقلٌ مشتقٌّ بلا قاعدة. **أربعةَ عشرَ سجلًّا لا ستّة.**
+ * ◆ **السقّاطةُ من أوّلِ يومٍ وإلّا أصلحنا عشرةً وخلقنا عشرين** (§٧١): الموجودُ
+ *   يُرحَّل بخطِّ أساسٍ موثَّق، والجديدُ ممنوعٌ عند خطّافِ ما قبل الالتزام.
+ * ◆ **والماسحُ مشترَكٌ لا منسوخ**: `tools/lib/repair01_debt_scan.php` مصدرٌ
+ *   واحدٌ تقرؤه السقّاطةُ والبوّابةُ معًا — فلا يتفرّق رقمانِ في ملفَّين.
+ * ◆ **وصنفٌ لا يُقاس يُعلَن `—` ولا يُعَدُّ صفرًا**: صفرٌ كاذبٌ أسوأُ من غيابٍ
+ *   مُعلَن، والبوّابةُ تسقط إن نقص المقيسُ عن أربعةَ عشر.
+ *
  * التشغيل: php tools/u12_debt_ratchet.php [--set] [--md=مسار]
  *   --set يكتب خطَّ الأساسِ من القياسِ الحاليِّ (يُستعمل مرةً عند التأسيس).
+ *         والخطُّ السابقُ يُحفَظ في `history` — الترحيلُ لا يمحو الدليل.
  */
 if (php_sapi_name() !== 'cli') { exit("CLI فقط\n"); }
 error_reporting(E_ALL);
@@ -101,6 +114,24 @@ $OWNER = array(
     'UI-13' => 'فريقُ الواجهة — تُنقل إلى ems_gov_flash_redirect أو EmsUI.toast',
 );
 
+/* ── توسعةُ REPAIR01: ثمانيةُ أصنافِ دَينٍ حَوكميّةٍ من الماسحِ المشترَك ────── */
+require_once $ROOT . '/tools/lib/repair01_debt_scan.php';
+$rpConn = null;
+if (is_file($ROOT . '/includes/env.php')) {
+    require_once $ROOT . '/includes/env.php';
+    $rpHost = ems_env('DB_HOST'); $rpPort = 3306;
+    if (strpos($rpHost, ':') !== false) { list($rpHost, $rpPort) = explode(':', $rpHost); $rpPort = (int) $rpPort; }
+    mysqli_report(MYSQLI_REPORT_OFF);
+    $try = @new mysqli($rpHost, ems_env('DB_USER'), ems_env('DB_PASS'), ems_env('DB_NAME'), $rpPort);
+    if (!$try->connect_errno) { $try->set_charset('utf8mb4'); $rpConn = $try; }
+}
+$rp = repair01_debt_measure($ROOT, $rpConn);
+foreach (repair01_debt_classes() as $k => $meta) {
+    $m[$k]     = $rp['counts'][$k];      /* قد يكون null — يُعلَن ولا يُعَدُّ صفرًا */
+    $LABEL[$k] = $meta['label'];
+    $OWNER[$k] = $meta['owner'];
+}
+
 /* ── خطُّ الأساسِ والحكم ────────────────────────────────────────────────── */
 $base = array();
 if (is_file($BASE)) {
@@ -108,43 +139,63 @@ if (is_file($BASE)) {
     if (is_array($j) && isset($j['debts'])) { $base = $j['debts']; }
 }
 
-$fail = 0; $improved = 0; $rows = array();
+$fail = 0; $improved = 0; $unmeasured = 0; $rows = array();
+$prev = $base;
 foreach ($m as $k => $now) {
     $was = isset($base[$k]) ? (int) $base[$k] : null;
-    if ($set || $was === null) { $verdict = 'أُسِّس'; $mark = '◆'; $base[$k] = $now; }
+    if ($now === null) {
+        /* صنفٌ لم يُقَس — يُعلَن ولا يُعَدُّ صفرًا. صفرٌ كاذبٌ أسوأُ من غيابٍ مُعلَن. */
+        $verdict = 'لم يُقَس — تعذّرت القاعدة'; $mark = '⚠'; $unmeasured++;
+    } elseif ($set || $was === null) { $verdict = 'أُسِّس'; $mark = '◆'; $base[$k] = $now; }
     elseif ($now > $was)       { $verdict = 'زادَ ' . ($now - $was) . ' — العيبُ عاد'; $mark = '✘'; $fail++; }
     elseif ($now < $was)       { $verdict = 'نقصَ ' . ($was - $now) . ' — يُثبَّت الخطُّ الجديد'; $mark = '✔'; $improved++; $base[$k] = $now; }
     else                       { $verdict = 'ثابتٌ عند خطِّه'; $mark = '✔'; }
     $rows[] = array($k, $LABEL[$k], $was, $now, $verdict, $mark);
 }
 
-if ($fail === 0) {
+/* ◆ **لا تُكتب إلّا عند تغيُّرٍ فعليّ**: السقّاطةُ تعمل في كلِّ التزامٍ الآن،
+ *   وكتابةُ `measured_at` في كلِّ جولةٍ تترك الشجرةَ مُتَّسِخةً بعد كلِّ التزام
+ *   بفرقٍ لا يحمل معلومة — وهو ضجيجٌ يُخفي التغيُّرَ الحقيقيَّ حين يقع. */
+if ($fail === 0 && $unmeasured === 0 && ($set || $base !== $prev)) {
+    $hist = array();
+    if (is_file($BASE)) {
+        $old = json_decode((string) file_get_contents($BASE), true);
+        if (is_array($old) && isset($old['history']) && is_array($old['history'])) { $hist = $old['history']; }
+        /* الترحيلُ لا يمحو الدليل: خطٌّ رُفع بـ--set يُقيَّد قبل استبدالِه. */
+        if ($set && $prev) { $hist[] = array('until' => date('Y-m-d H:i:s'), 'debts' => $prev); }
+    }
     @mkdir(dirname($BASE), 0777, true);
     file_put_contents($BASE, json_encode(array(
         'measured_at' => date('Y-m-d H:i:s'),
         'screens' => count($files),
         'debts' => $base,
-        'note' => 'سقّاطةٌ مُقفَلةُ الاتجاه: الرقمُ يهبط ولا يصعد. الزيادةُ رسوبٌ يوقف البناء.',
+        'history' => $hist,
+        'note' => 'سقّاطةٌ مُقفَلةُ الاتجاه: الرقمُ يهبط ولا يصعد. الزيادةُ رسوبٌ يوقف البناء.'
+                . ' وأصنافُ RP-* من REPAIR01 §٧١ — الموجودُ مُرحَّلٌ والجديدُ ممنوع.',
     ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 }
 
-echo "سجلاتُ الدَّينِ الستةُ وسقّاطتُها المانعةُ للعودة\n";
+echo "سجلاتُ الدَّينِ الأربعةَ عشرَ وسقّاطتُها المانعةُ للعودة\n";
 echo str_repeat('═', 76), "\n";
-echo 'الشاشاتُ الحيةُ المقيسة: ' . count($files) . '  ·  تاريخُ القياس: ' . date('Y-m-d H:i') . "\n\n";
+echo 'الشاشاتُ الحيةُ المقيسة: ' . count($files) . '  ·  نطاقُ RP: ' . $rp['files']
+   . '  ·  تاريخُ القياس: ' . date('Y-m-d H:i') . "\n\n";
 printf("%-8s %-42s %8s %8s  %s\n", 'السجل', 'الدَّين', 'الأساس', 'اليوم', 'الحكم');
 echo str_repeat('─', 76), "\n";
 foreach ($rows as $r) {
-    printf("%s %-7s %-40s %8s %8d  %s\n", $r[5], $r[0], $r[1],
-        $r[2] === null ? '—' : $r[2], $r[3], $r[4]);
+    printf("%s %-7s %-40s %8s %8s  %s\n", $r[5], $r[0], $r[1],
+        $r[2] === null ? '—' : $r[2], $r[3] === null ? '—' : $r[3], $r[4]);
 }
 echo str_repeat('─', 76), "\n";
-echo 'مُحسَّنٌ هذه الجولة: ' . $improved . '  ·  عائدٌ (رسوب): ' . $fail . "\n";
-echo $fail === 0
+echo 'مُحسَّنٌ هذه الجولة: ' . $improved . '  ·  عائدٌ (رسوب): ' . $fail
+   . '  ·  لم يُقَس: ' . $unmeasured . '  ·  السجلات: ' . count($rows) . "\n";
+echo ($fail === 0 && $unmeasured === 0)
     ? "🟢 السقّاطةُ سليمة — لا دَينَ زاد. وهذا هو إنفاذُ L4 لـUI-DEF-11 وUI-DEF-12.\n"
-    : "🔴 دَينٌ زاد — العيبُ عاد والبناءُ يتوقف.\n";
+    : ($unmeasured > 0
+        ? "🔴 صنفٌ لم يُقَس — القياسُ الناقصُ ليس أخضرَ (fail-closed).\n"
+        : "🔴 دَينٌ زاد — العيبُ عاد والبناءُ يتوقف.\n");
 
 if ($mdOut !== null) {
-    $md = "# سجلاتُ الدَّينِ الستةُ — أرقامُ الجولةِ وسقّاطتُها\n\n";
+    $md = "# سجلاتُ الدَّينِ الأربعةَ عشرَ — أرقامُ الجولةِ وسقّاطتُها\n\n";
     $md .= "> قيست على **" . count($files) . " شاشةً حيةً** · " . date('Y-m-d H:i') . "\n>\n";
     $md .= "> **السقّاطة**: خطُّ أساسٍ مسجَّلٌ لكلِّ دَين. نقصَ ⇒ يُثبَّت الخطُّ الجديد. "
         . "زادَ ⇒ رسوبٌ يوقف البناء. فالدَّينُ مُقفَلُ الاتجاه: يهبط ولا يصعد.\n\n";
@@ -164,4 +215,4 @@ if ($mdOut !== null) {
     file_put_contents($mdOut, $md);
     echo "\nالمخرَجُ: " . $mdOut . "\n";
 }
-exit($fail === 0 ? 0 : 1);
+exit(($fail === 0 && $unmeasured === 0) ? 0 : 1);

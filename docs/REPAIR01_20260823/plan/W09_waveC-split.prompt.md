@@ -33,7 +33,7 @@ php tools/repair01_w8_gate.php
 | البند | العدد | المصدر |
 |---|---:|---|
 | سطحٌ في الوحدةِ المشقوقة | **123** | `repair01_surfaces · dept_legacy=المالية والخزينة` |
-| سطحٌ بلا رمزٍ معياريّ (كلُّ المشقوق) | **153** | `repair01_surfaces · canonical_code IS NULL` |
+| سطحٌ بلا رمزٍ معياريّ (كلُّ المشقوق) | **0** | `repair01_surfaces · canonical_code IS NULL` |
 
 > الأرقامُ مقيسةٌ لحظةَ التوليد. أعِدْ `php tools/repair01_plan_gen.php` إن مرّ وقتٌ طويل.
 

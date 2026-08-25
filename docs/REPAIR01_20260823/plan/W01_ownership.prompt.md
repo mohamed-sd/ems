@@ -25,8 +25,8 @@ php tools/repair01_w0_gate.php
 | البند | العدد | المصدر |
 |---|---:|---|
 | ظهورٌ محظور | **265** | `repair01_ownership · classification=FORBIDDEN` |
-| سطحٌ بلا دورٍ مسؤول | **130** | `repair01_surfaces · resp_role فارغ` |
-| سطحٌ بلا رمزٍ معياريّ | **153** | `repair01_surfaces · canonical_code IS NULL` |
+| سطحٌ بلا دورٍ مسؤول | **0** | `repair01_surfaces · resp_role فارغ` |
+| سطحٌ بلا رمزٍ معياريّ | **0** | `repair01_surfaces · canonical_code IS NULL` |
 
 > الأرقامُ مقيسةٌ لحظةَ التوليد. أعِدْ `php tools/repair01_plan_gen.php` إن مرّ وقتٌ طويل.
 
