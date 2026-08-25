@@ -90,7 +90,7 @@ foreach ($files as $f) {
     }
 
     /* ④ في مرحلةِ الأساسِ وحدَها */
-    if (strpos($bn, 'W15_') === 0) {
+    if (strpos($bn, 'W16_') === 0) {
         $ok = true;
         foreach ($T4 as $nd) { if (mb_strpos($txt, $nd) === false) { $ok = false; $r['miss'][] = "④←«" . mb_substr($nd, 0, 28) . "»"; } }
         $r['res']['④بشري'] = $ok;

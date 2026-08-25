@@ -1,12 +1,12 @@
-# RPR-W15 — الأساسُ المؤسسيُّ v1.0  ·  المرحلة 15 من 16
+# RPR-W16 — الأساسُ المؤسسيُّ v1.0  ·  المرحلة 16 من 17
 > ملفُّ تنفيذٍ مستقلّ. الصقْه في جلسةِ Claude Code نظيفةٍ داخل `C:\wamp64\www\ems`.
 > ⛔ مولَّدٌ من المخزن — **لا تحرّره يدويًّا**: `php tools/repair01_plan_gen.php` يعيد كتابتَه ويمحو تحريرَك.
 
 ## ٠ · اقرأْ قبل أيِّ فعل
 1. `docs/REPAIR01_20260823/plan/_CONTEXT.md` — الأعرافُ والمحظورات
 2. جداولُ `repair01_*` — الدفترُ ومصدرُ الحقيقة
-3. `docs/REPAIR01_20260823/plan/W14_CLOSURE.md` — ماذا أُغلق فعلًا قبلك
-4. `docs/REPAIR01_20260823/plan/W15_FEEDBACK.md` — ملاحظاتُ التشغيلِ في الأيّامِ التسعة
+3. `docs/REPAIR01_20260823/plan/W15_CLOSURE.md` — ماذا أُغلق فعلًا قبلك
+4. `docs/REPAIR01_20260823/plan/W16_FEEDBACK.md` — ملاحظاتُ التشغيلِ في الأيّامِ التسعة
 
 ## ١ · إعادةُ الأساس (إلزاميّة — لا تتخطَّها)
 ```bash
@@ -24,7 +24,8 @@ php tools/repair01_w10_gate.php && \
 php tools/repair01_w11_gate.php && \
 php tools/repair01_w12_gate.php && \
 php tools/repair01_w13_gate.php && \
-php tools/repair01_w14_gate.php
+php tools/repair01_w14_gate.php && \
+php tools/repair01_w15_gate.php
 ```
 - خضراءُ كلُّها ← تابعْ إلى §٢.  ·  سقطت واحدة ← **قفْ** وأبلغْ بالرقمِ الساقط.
 - وشغّلْ `git status` — الشجرةُ المُفسَدةُ تُشخَّص قبل الشيفرةِ لا بعدها.
@@ -60,7 +61,7 @@ php tools/repair01_w14_gate.php
 
 ## ٦ · البوّابةُ والفحصُ السلبيّ
 ```bash
-php tools/repair01_w15_gate.php
+php tools/repair01_w16_gate.php
 ```
 المتوقَّع: `الثمانيةُ خضراء · مقاماتٌ 9/9 لكلِّ نطاق · نسبةٌ مجمَّعةٌ منشورة 0 · القبولُ البشريُّ برحلةِ موظّفٍ حقيقيٍّ لا بسكربت`
 
@@ -68,12 +69,12 @@ php tools/repair01_w15_gate.php
 اكسرْ بندًا عمدًا ← أعِدْ تشغيلَ البوّابة ← يجب أن تسقط ← أرجِعْه.
 لم تسقط؟ البوّابةُ عمياءُ والمرحلةُ **غيرُ مُغلقة** مهما كان الرقمُ أخضر.
 ارسُ على أسماءِ الأصنافِ والمقاماتِ لا على العبارات — نصُّ حالةِ الخطأِ يطابق العبارةَ فيُخضِرُّ كذبًا.
-اكتبْ `tools/repair01_w15_negative.php` على نمطِ `tools/repair01_w0_negative.php`.
+اكتبْ `tools/repair01_w16_negative.php` على نمطِ `tools/repair01_w0_negative.php`.
 
 ## ٧ · المخرَجات (اكتبها قبل أن تُنهي)
 - [ ] جداولُ `repair01_*` محدَّثةٌ لكلِّ بندٍ لُمس
-- [ ] `tools/repair01_w15_gate.php` + `tools/repair01_w15_negative.php`
-- [ ] `docs/REPAIR01_20260823/plan/W15_CLOSURE.md` — المُنجَز · المؤجَّل وسببُه · الاستثناءات
+- [ ] `tools/repair01_w16_gate.php` + `tools/repair01_w16_negative.php`
+- [ ] `docs/REPAIR01_20260823/plan/W16_CLOSURE.md` — المُنجَز · المؤجَّل وسببُه · الاستثناءات
 - [ ] `php tools/repair01_plan_gen.php` — لتحملَ المراحلُ التاليةُ الأرقامَ الجديدة
 - [ ] التزامٌ واحدٌ للمرحلةِ كلِّها
 
