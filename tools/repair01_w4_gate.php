@@ -254,14 +254,24 @@ gate('W4-14', 'التركيبةُ الممنوعةُ مقفلةُ الاتّجا
 $d0 = (int) $one("SELECT COUNT(*) FROM repair01_decisions");
 $s0 = (int) $one("SELECT COUNT(*) FROM repair01_source_files");
 $u0 = (int) $one("SELECT COUNT(*) FROM repair01_surfaces");
-$g0 = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry");
+/* ⚠ **إصلاحُ مقامٍ لا تخفيفُ حاجب** (RPR-PATCH-02 · 2026-08-25) — النمطُ نفسُه
+   المطبَّقُ في `W3-14`، وهو النمطُ الذي طبّقته هذه المرحلةُ نفسُها على
+   `repair01_events.contract_stage`: يُجمَّد **أساسُ** السجلِّ لا عددُه الخام،
+   فيسمح بنموِّ الأسطحِ الـ٣٣٤ ويسقط على حذفِ الأساسِ أو نموٍّ بلا ختمِ موجة. */
+$BASE_ORIGINS = "'SURFACES','DISK','NAV'";
+$g0    = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin IN ($BASE_ORIGINS)");
+$gNew  = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin NOT IN ($BASE_ORIGINS)");
+$gWild = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
+                      WHERE origin NOT IN ($BASE_ORIGINS) AND origin NOT REGEXP '^W[0-9]{2}$'");
 $t0 = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE origin_stage = ''");
 $e0 = (int) $one("SELECT COUNT(*) FROM repair01_events WHERE contract_stage = ''");
 $e3 = (int) $one("SELECT COUNT(*) FROM repair01_events WHERE contract_stage = 'W03'");
 $k0 = (int) $one("SELECT COUNT(*) FROM repair01_key_registry");
-gate('W4-15', 'مخزنُ المراحلِ السابقةِ لم يُمَسّ',
-     $d0 === 108 && $s0 === 13 && $u0 === 664 && $g0 === 651 && $t0 === 174 && $e0 === 632 && $e3 === 13 && $k0 === 13,
-     "قرارات $d0 · مصادر $s0 · أسطح $u0 · سجلُّ الشاشات $g0 · فجواتٌ أصليّة $t0 · أحداثُ الدراسة $e0 · عقودُ W03 $e3 · مفاتيح $k0");
+gate('W4-15', 'أساسُ المراحلِ السابقةِ لم يُمَسّ',
+     $d0 === 108 && $s0 === 13 && $u0 === 664 && $g0 === 651 && $gWild === 0
+     && $t0 === 174 && $e0 === 632 && $e3 === 13 && $k0 === 13,
+     "قرارات $d0 · مصادر $s0 · أسطح $u0 · أساسُ السجلّ $g0 · نموٌّ مختومٌ $gNew · نموٌّ بلا ختمٍ $gWild"
+     . " · فجواتٌ أصليّة $t0 · أحداثُ الدراسة $e0 · عقودُ W03 $e3 · مفاتيح $k0");
 
 /* ══ W4-16 · رحلةُ اليوم — تُشغَّل هنا ويُشترط عبورُها كاملةً ════════════ */
 $jOut = array(); $jCode = 1;

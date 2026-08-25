@@ -281,7 +281,20 @@ gate('W3-13', 'حدثٌ حيٌّ بلا عقدِ أثرٍ صفر', count($noCont
 $d0 = (int) $one("SELECT COUNT(*) FROM repair01_decisions");
 $s0 = (int) $one("SELECT COUNT(*) FROM repair01_source_files");
 $u0 = (int) $one("SELECT COUNT(*) FROM repair01_surfaces");
-$g0 = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry");
+/* ⚠ **إصلاحُ مقامٍ لا تخفيفُ حاجب** (RPR-PATCH-02 · 2026-08-25): كان الشرطُ
+   `COUNT(*) = 651` على السجلِّ كلِّه — فيسقط الحاجبُ لمجرَّدِ **تسجيلِ شاشةٍ
+   جديدة**، وهو غايةُ الحملةِ لا انتهاكُها. و٣٣٤ سطحًا تنتظر البناءَ في
+   W05…W14، فكلُّ واحدٍ منها كان يكسر هذا الحاجبَ وحاجبَ W4-15 معه.
+   والمقصودُ «أساسُ W00/W02 لم يُمَسّ»، وأساسُه يُعرَف بـ`origin` الثلاثة.
+   فالحاجبُ الآن **أشدُّ في ثلاثةِ وجوه**: يسقط على حذفِ صفِّ أساسٍ (العددُ
+   ينقص)، وعلى تحويلِ صفِّ أساسٍ إلى نموٍّ (العددُ ينقص)، وعلى **نموٍّ بلا
+   ختمِ موجة** — وهو ما لم يكن يفحصه أصلًا. والنمطُ نفسُه الذي طبّقته W04
+   على `repair01_events.contract_stage`. */
+$BASE_ORIGINS = "'SURFACES','DISK','NAV'";
+$g0    = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin IN ($BASE_ORIGINS)");
+$gNew  = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry WHERE origin NOT IN ($BASE_ORIGINS)");
+$gWild = (int) $one("SELECT COUNT(*) FROM repair01_screen_registry
+                      WHERE origin NOT IN ($BASE_ORIGINS) AND origin NOT REGEXP '^W[0-9]{2}$'");
 $t0 = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE origin_stage = ''");
 /* ⚠ **إصلاحُ مقامٍ لا تخفيفُ حاجب** (RPR-W04): كان الشرطُ `contract_stage <> 'W03'`
    — وهو يعدُّ **عقودَ المراحلِ التالية** أحداثًا للدراسةِ فيسقط الحاجبُ لمجرَّدِ
@@ -291,9 +304,11 @@ $t0 = (int) $one("SELECT COUNT(*) FROM repair01_target_gaps WHERE origin_stage =
    لا أخفّ: يسقط الآن على الحذفِ كما يسقط على التلويث. */
 $e0 = (int) $one("SELECT COUNT(*) FROM repair01_events WHERE contract_stage = ''");
 $e3 = (int) $one("SELECT COUNT(*) FROM repair01_events WHERE contract_stage = 'W03'");
-gate('W3-14', 'مخزنُ المراحلِ السابقةِ لم يُمَسّ',
-     $d0 === 108 && $s0 === 13 && $u0 === 664 && $g0 === 651 && $t0 === 174 && $e0 === 632 && $e3 === 13,
-     "قرارات $d0 · مصادر $s0 · أسطح $u0 · سجلُّ الشاشات $g0 · فجواتٌ أصليّة $t0 · أحداثُ الدراسة $e0 · عقودُ W03 $e3");
+gate('W3-14', 'أساسُ المراحلِ السابقةِ لم يُمَسّ',
+     $d0 === 108 && $s0 === 13 && $u0 === 664 && $g0 === 651 && $gWild === 0
+     && $t0 === 174 && $e0 === 632 && $e3 === 13,
+     "قرارات $d0 · مصادر $s0 · أسطح $u0 · أساسُ السجلّ $g0 · نموٌّ مختومٌ $gNew · نموٌّ بلا ختمٍ $gWild"
+     . " · فجواتٌ أصليّة $t0 · أحداثُ الدراسة $e0 · عقودُ W03 $e3");
 
 /* ══ W3-15 · رحلةُ الإثبات — تُشغَّل هنا ويُشترط عبورُها كاملةً ═══════════ */
 $jOut = array(); $jCode = 1;
